@@ -1,4 +1,0 @@
-INDEX VERSION 1.134+C:\GitHub\EclipseWorkSpaces\S-Port-Simula\.metadata\.plugins\org.eclipse.jdt.core
-524495999.index
-1865797976.index
-2975505858.index
