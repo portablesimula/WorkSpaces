@@ -22,7 +22,7 @@ import simula.compiler.utilities.Util;
 ///         | protected hidden identifier-list
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/HiddenSpecification.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/HiddenSpecification.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class HiddenSpecification extends SyntaxClass {

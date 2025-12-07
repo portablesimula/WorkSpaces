@@ -29,8 +29,8 @@ import simula.editor.RTOption;
  *
  */
 public final class RunSingleTest {
-	private static final File simulaDir=new File("C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/Simula");
-	private static final File userDir=new File("C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/SimulaTestBatch");
+	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/Simula");
+	private static final File userDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch");
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 
 	public static void main(String[] args) {
@@ -84,7 +84,7 @@ public final class RunSingleTest {
 		Global.packetName="simulaTestBatch";
 		Option.internal.keepJava=userDir; // Generated .java Source is then found in Eclipse Package simulaTestBatch
 		Global.simulaRtsLib=new File(simulaDir,"bin"); // To use Eclipse Project's simula.runtime
-//		Global.extLib="C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/Simula/src/simulaTestBatch/sim/bin";
+//		Global.extLib="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/Simula/src/simulaTestBatch/sim/bin";
 		
 		// Set RunTime Options and tracing.
 //		RTOption.VERBOSE = true;

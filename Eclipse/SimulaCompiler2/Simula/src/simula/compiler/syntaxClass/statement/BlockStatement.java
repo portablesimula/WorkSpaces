@@ -43,7 +43,7 @@ import simula.compiler.utilities.Util;
 ///               | BEGIN statement { ; statement } END
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/BlockStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/BlockStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group

@@ -33,7 +33,7 @@ import simula.compiler.utilities.Util;
 /// Utility class: For-list While element.
 ///
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ForWhileElement.java">
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ForWhileElement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen

@@ -24,7 +24,7 @@ import simula.compiler.SimulaCompiler;
 
 /// A set of all static Utility Methods
 /// 
-/// Link to GitHub: <a href="https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/utilities/Util.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/utilities/Util.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class Util { 

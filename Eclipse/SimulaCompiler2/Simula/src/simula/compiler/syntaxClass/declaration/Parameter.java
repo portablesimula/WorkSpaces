@@ -33,7 +33,7 @@ import simula.compiler.utilities.Util;
 /// A parameter models class and procedure parameters.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/Parameter.java">
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/Parameter.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen

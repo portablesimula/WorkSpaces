@@ -64,7 +64,7 @@ import java.util.StringTokenizer;
 /// may be retrieved by means of procedure "page".
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_Printfile.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_Printfile.java"><b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen

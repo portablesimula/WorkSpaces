@@ -82,7 +82,7 @@ import simula.compiler.utilities.Util;
 /// This class is prefix to StandardProcedure and SwitchDeclaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/ProcedureDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/ProcedureDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group

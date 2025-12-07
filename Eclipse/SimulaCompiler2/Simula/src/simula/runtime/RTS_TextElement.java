@@ -42,7 +42,7 @@ import java.awt.Stroke;
 /// 
 /// end;
 /// </pre>
-/// Link to GitHub: <a href="https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_TextElement.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_TextElement.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public class RTS_TextElement extends RTS_Link implements RTS_Drawing.Animable {

@@ -81,7 +81,7 @@ package simula.runtime;
 /// implicit use of the sequencing procedures (detach, call and resume) explicit
 /// sequencing by these procedures should be done with care.
 /// 
-/// Link to GitHub: <a href="https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_Simulation.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_Simulation.java"><b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen

@@ -10,7 +10,7 @@ import java.util.Iterator;
 /// Abstract class representing a for-statement element, all of which are Iterator's.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/runtime/FOR_Element.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/runtime/FOR_Element.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public abstract class FOR_Element implements Iterator<Boolean> {

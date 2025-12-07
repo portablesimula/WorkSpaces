@@ -46,7 +46,7 @@ import simula.compiler.utilities.Util;
 /// containing its declaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/LocalObject.java">
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/LocalObject.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Simula Standard

@@ -10,7 +10,7 @@ package simula.runtime;
 // ************************************************************
 /// This class represent a Simula real array. 
 /// 
-/// Link to GitHub: <a href="https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_REAL_ARRAY.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_REAL_ARRAY.java"><b>Source File</b></a>.
 /// @author Øystein Myhre Andersen
 public final class RTS_REAL_ARRAY extends RTS_REALTYPE_ARRAY {
 	/// The elements in this RTS_REAL_ARRAY

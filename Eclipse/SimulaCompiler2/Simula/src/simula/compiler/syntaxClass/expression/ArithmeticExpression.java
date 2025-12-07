@@ -88,7 +88,7 @@ import simula.compiler.utilities.Util;
 ///   It is always evaluated in long real and the result is converted to the appropriate type. 
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/ArithmeticExpression.java">
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/ArithmeticExpression.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Simula Standard

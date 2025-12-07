@@ -7,7 +7,7 @@ package simula.runtime;
 
 /// System class EVENT_NOTICE.
 /// 
-/// Link to GitHub: <a href="https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_EVENT_NOTICE.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_EVENT_NOTICE.java"><b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen

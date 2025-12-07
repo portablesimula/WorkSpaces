@@ -48,7 +48,7 @@ import simula.editor.RTOption;
 /// 			- Run the loaded program
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/SimulaCompiler.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/SimulaCompiler.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class SimulaCompiler {

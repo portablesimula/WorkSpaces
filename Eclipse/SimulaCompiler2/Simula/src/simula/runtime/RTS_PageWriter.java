@@ -24,7 +24,7 @@ import javax.swing.JOptionPane;
 /// Utility class PageWriter, used by [RTS_Printfile].
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_PageWriter.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_PageWriter.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public class RTS_PageWriter extends Writer {

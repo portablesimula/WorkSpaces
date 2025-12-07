@@ -76,7 +76,7 @@ package simula.runtime;
 /// assign a new value to this name parameter will result in an error message.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_NAME.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_NAME.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 ///

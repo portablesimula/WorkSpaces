@@ -28,8 +28,8 @@ import simula.editor.RTOption;
  *
  */
 public final class RunFullClassTestBatch {
-	private static final File simulaDir=new File("C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/Simula");
-	private static final File userDir=new File("C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/SimulaTestBatch");
+	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/Simula");
+	private static final File userDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch");
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 	private static final String testBatchJarDir = userDir+"/src/simulaTestBatch/bin/";
 	private static long startTimeMs = System.currentTimeMillis( );

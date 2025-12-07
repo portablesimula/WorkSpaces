@@ -64,16 +64,16 @@ public final class RunSimulaSample {
 //		Option.internal.TRACE_ATTRIBUTE_OUTPUT=true;
 //		Option.internal.TRACE_ATTRIBUTE_INPUT=true;
 
-//		File simulaHome=new File("C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/TestBatch");
-		File simulaDir=new File("C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/Simula");
-		File userDir=new File("C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/SimulaTestBatch");
+//		File simulaHome=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/TestBatch");
+		File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/Simula");
+		File userDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch");
 				
 		Global.packetName="simulaSamples";
 //		Option.internal.keepJava=userDir; // Generated .java Source is then found in Eclipse Package simulaTestPrograms
 		Global.simulaRtsLib=new File(simulaDir,"bin"); // To use Eclipse Project's simula.runtime
-//		Option.outputDir=new File("C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/Simula/src/simulaTestPrograms/samples/simula/bin");
-//		Global.outputDir=new File("C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/TestBatch/src/simulaTestPrograms/samples/simula/bin");
-		Global.outputDir=new File("C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/CompilerTests/bin/simulaTestPrograms");
+//		Option.outputDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/Simula/src/simulaTestPrograms/samples/simula/bin");
+//		Global.outputDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/TestBatch/src/simulaTestPrograms/samples/simula/bin");
+		Global.outputDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/CompilerTests/bin/simulaTestPrograms");
 			
 			
 		// Set RunTime Options and tracing.

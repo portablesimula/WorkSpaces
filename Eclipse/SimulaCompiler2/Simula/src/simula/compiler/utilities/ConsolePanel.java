@@ -34,7 +34,7 @@ import java.io.Writer;
 /// A Console panel.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/utilities/ConsolePanel.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/utilities/ConsolePanel.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 @SuppressWarnings("serial")

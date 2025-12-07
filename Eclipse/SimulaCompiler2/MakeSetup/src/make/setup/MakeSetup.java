@@ -46,9 +46,9 @@ public final class MakeSetup {
 	private final static String RELEASE_HOME=SETUP_TEMPS+"\\"+RELEASE_ID;
 	private final static String RELEASE_SAMPLES=RELEASE_HOME+"\\samples";
 	private final static String GITHUB_ROOT="C:\\GitHub";
-	private final static String SETUP_ROOT="C:\\GitHub\\EclipseWorkSpaces/SimulaCompiler2\\MakeSetup";
-	private final static String SIMULA_ROOT="C:\\GitHub\\EclipseWorkSpaces/SimulaCompiler2\\Simula";
-	private final static String TESTBATCH_ROOT="C:\\GitHub\\EclipseWorkSpaces/SimulaCompiler2\\SimulaTestBatch";
+	private final static String SETUP_ROOT="C:\\GitHub\\WorkSpaces/Eclipse/SimulaCompiler2\\MakeSetup";
+	private final static String SIMULA_ROOT="C:\\GitHub\\WorkSpaces/Eclipse/SimulaCompiler2\\Simula";
+	private final static String TESTBATCH_ROOT="C:\\GitHub\\WorkSpaces/Eclipse/SimulaCompiler2\\SimulaTestBatch";
 	private final static String COMPILER_BIN=SIMULA_ROOT+"\\bin";
 	private final static String INSTALLER_BIN=SETUP_ROOT+"\\bin";
 
@@ -240,7 +240,7 @@ public final class MakeSetup {
 //	// *** DUMMY EXECUTE SIMULA COMPILER JAR
 //	// ***************************************************************
 //	private static void dummyExecuteEclipseWorkSpaces/SimulaCompiler2() throws IOException	{
-//		printHeading("Dummy Execute EclipseWorkSpaces/SimulaCompiler2: "+RELEASE_HOME+"\\simula.jar");
+//		printHeading("Dummy Execute WorkSpaces/Eclipse/SimulaCompiler2: "+RELEASE_HOME+"\\simula.jar");
 //		execute("java -jar "+RELEASE_HOME+"\\simula.jar");
 //	}
 	
@@ -248,7 +248,7 @@ public final class MakeSetup {
 //	// *** EXECUTE SIMULA COMPILER EDITOR
 //	// ***************************************************************
 //	private static void executeEclipseWorkSpaces/SimulaCompiler2Editor() throws IOException	{
-//		printHeading("Execute EclipseWorkSpaces/SimulaCompiler2Editor: "+RELEASE_HOME+"\\simula.jar");
+//		printHeading("Execute WorkSpaces/Eclipse/SimulaCompiler2Editor: "+RELEASE_HOME+"\\simula.jar");
 //		execute("java -jar "+RELEASE_HOME+"\\simula.jar");
 //	}
 	

@@ -26,7 +26,7 @@ import simula.compiler.utilities.Util;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/InnerStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/InnerStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen

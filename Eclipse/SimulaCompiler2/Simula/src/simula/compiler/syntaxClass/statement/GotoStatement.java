@@ -40,7 +40,7 @@ import simula.compiler.utilities.Util;
 /// Sect. 6.1 Goto Statement
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/GotoStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/GotoStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group

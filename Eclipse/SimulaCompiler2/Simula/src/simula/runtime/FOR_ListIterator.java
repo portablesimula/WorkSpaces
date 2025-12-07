@@ -30,7 +30,7 @@ import java.util.Iterator;
 /// 
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/runtime/FOR_ListIterator.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/runtime/FOR_ListIterator.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class FOR_ListIterator implements Iterator<Boolean> {

@@ -25,7 +25,7 @@ import simula.compiler.utilities.Util;
  *
  */
 public final class RunSingleClassTest {
-	private static final File userDir=new File("C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/SimulaTestBatch");
+	private static final File userDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch");
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 	private static final String testBatchJarDir = userDir+"/src/simulaTestBatch/bin/";
 	private static final String simulaJar = "C:\\Users\\omyhr\\Simula\\Simula-2.0\\simula.jar";

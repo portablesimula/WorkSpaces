@@ -42,7 +42,7 @@ import simula.compiler.utilities.Util;
 ///    	identifier-list  =  identifier  { , identifier }
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/VirtualSpecification.java">
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/VirtualSpecification.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group

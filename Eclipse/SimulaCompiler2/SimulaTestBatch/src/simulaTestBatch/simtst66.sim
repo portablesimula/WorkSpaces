@@ -10,7 +10,7 @@ external class SimulaTest;
 
 SimulaTest(66,"--- Test corutines and two infiles which read from the same file.") begin
    
-   text fileName="C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/any66";
+   text fileName="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/any66";
 
    class InputFile(neste, navn, a);
       value navn;

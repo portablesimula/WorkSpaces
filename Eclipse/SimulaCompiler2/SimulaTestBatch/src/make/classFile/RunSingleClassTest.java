@@ -28,8 +28,8 @@ import simula.editor.RTOption;
  *
  */
 public final class RunSingleClassTest {
-	private static final File simulaDir=new File("C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/Simula");
-	private static final File userDir=new File("C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/SimulaTestBatch");
+	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/Simula");
+	private static final File userDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch");
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 
 	public static void main(String[] args) {
@@ -75,7 +75,7 @@ public final class RunSingleClassTest {
 
 		Option.internal.keepJava=userDir; // Generated .java Source is then found in Eclipse Package simulaTestBatch
 		Global.simulaRtsLib=new File(simulaDir,"bin"); // To use Eclipse Project's simula.runtime
-//		Global.extLib="C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/Simula/src/simulaTestBatch/sim/bin";
+//		Global.extLib="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/Simula/src/simulaTestBatch/sim/bin";
 		
 		// Set RunTime Options and tracing.
 		RTOption.VERBOSE = false;
@@ -86,7 +86,7 @@ public final class RunSingleClassTest {
 //		RTOption.QPS_TRACING = true;
 		RTOption.SML_TRACING = true;
 		
-//		Option.internal.RUNTIME_USER_DIR = "C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/TestBatch/";
+//		Option.internal.RUNTIME_USER_DIR = "C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/TestBatch/";
     	//System.setProperty("file.encoding","UTF-8");
 		Vector<String> names=new Vector<String>();
 //		names.add("AdHoc_SimulaTest.sim"); // Simula TestBatch Framework

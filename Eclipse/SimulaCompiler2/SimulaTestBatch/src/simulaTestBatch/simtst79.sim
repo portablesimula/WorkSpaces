@@ -26,15 +26,15 @@ external class SimulaTest;
 
 SimulaTest(79,"--- Test the attribute 'isopen' of class File.") begin
 
-   text anyExistingdirectfile="C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyExistingDirectfile79";
-   text anyImagefile="C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyImageFile79";
+   text anyExistingdirectfile="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyExistingDirectfile79";
+   text anyImagefile="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyImageFile79";
 
-   text anyExistingImagefile="C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyExistingImageFile79";
-   text anyExitingbytefile="C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyExistingByteFile79";
-   text anyoutfile="C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyOutFile79";
-   text anyoutbytefile="C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyOutByteFile79";
-   text anyprintfile="C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyPrintFile79";
-   text anydirectbytefile="C:/GitHub/EclipseWorkSpaces/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyDirectByteFile79";
+   text anyExistingImagefile="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyExistingImageFile79";
+   text anyExitingbytefile="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyExistingByteFile79";
+   text anyoutfile="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyOutFile79";
+   text anyoutbytefile="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyOutByteFile79";
+   text anyprintfile="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyPrintFile79";
+   text anydirectbytefile="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch/src/simulaTestBatch/files/anyDirectByteFile79";
 
    ref(File) xf;
    integer i;

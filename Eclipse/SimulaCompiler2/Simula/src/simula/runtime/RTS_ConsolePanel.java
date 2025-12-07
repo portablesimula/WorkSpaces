@@ -33,7 +33,7 @@ import java.io.Writer;
 
 /// This is an implementation of a Console Panel.
 /// 
-/// Link to GitHub: <a href="https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_ConsolePanel.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_ConsolePanel.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 @SuppressWarnings("serial")

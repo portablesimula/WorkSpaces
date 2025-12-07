@@ -31,7 +31,7 @@ import simula.compiler.utilities.Util;
 ///   Constant = unsigned-number | string | character-constant | NONE | NOTEXT
 ///   
 /// </pre>
-/// Link to GitHub: <a href="https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/Constant.java">
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/Constant.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen

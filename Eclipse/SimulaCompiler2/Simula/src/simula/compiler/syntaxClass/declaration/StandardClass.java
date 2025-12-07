@@ -22,7 +22,7 @@ import simula.compiler.syntaxClass.statement.Statement;
 /// Standard Class.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/StandardClass.java">
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/StandardClass.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen

@@ -77,7 +77,7 @@ import simula.compiler.utilities.Util;
 /// "T1 & (T2.sub(1,2)) & (T3.main)" are equivalent.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/TextExpression.java">
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/TextExpression.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Simula Standard
