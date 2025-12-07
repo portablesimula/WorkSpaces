@@ -1,1 +1,0 @@
-package com.simula.extensions.SyntaxHighlighterExtension.lexer;
