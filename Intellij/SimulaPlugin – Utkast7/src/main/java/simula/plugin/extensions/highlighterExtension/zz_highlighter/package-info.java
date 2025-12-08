@@ -1,1 +1,0 @@
-package simula.plugin.extensions.highlighterExtension.zz_highlighter;

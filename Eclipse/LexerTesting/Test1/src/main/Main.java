@@ -1,5 +1,8 @@
 package main;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import lang.IElementType;
 import lang.lexer.Lexer;
 import lang.scanner.SimpleManualLexer;
@@ -14,7 +17,13 @@ public class Main {
 
 	public static void main(String[] argv) {
 //		tester1();
-		tester2();
+//		tester2();
+		try {
+			tester3();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	static void tester1() {
@@ -47,6 +56,19 @@ public class Main {
 //				+ "end; ";
 		
 		buffer = "begin\r\n   outtext(\"Hello World!\");\r\n--   outimage;\r\nend; ";
+		tester.doSetText(buffer);
+	}
+
+	
+	static void tester3() throws IOException {
+		Lexer lexer = new SimulaLexer();
+		Tester tester = new Tester(lexer);
+		String fileName = "C:/Users/omyhr/Simula/Simula-2.0/samples/HexDump.sim";
+		FileInputStream file = new FileInputStream(fileName);
+		byte[] bytes = file.readAllBytes();
+		
+//		 char data[] = {'a', 'b', 'c'};
+	    buffer = new String(bytes);
 		tester.doSetText(buffer);
 	}
 
