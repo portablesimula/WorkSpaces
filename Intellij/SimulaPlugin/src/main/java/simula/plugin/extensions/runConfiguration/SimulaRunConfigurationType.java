@@ -4,7 +4,9 @@ import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.execution.configurations.ConfigurationTypeBase;
 import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.NotNullLazyValue;
 import simula.plugin.util.Util;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,6 +14,13 @@ public class SimulaRunConfigurationType extends ConfigurationTypeBase {
     private static MyConfigurationFactory myConfigurationFactory;
     private static SimulaRunConfigurationType INSTANCE;
 
+//    static final String ID = "DemoRunConfiguration";
+//
+//    DemoRunConfigurationType() {
+//        super(ID, "Demo", "Demo run configuration type",
+//                NotNullLazyValue.createValue(() -> AllIcons.Nodes.Console));
+//        addFactory(new DemoConfigurationFactory(this));
+//    }
 
     public SimulaRunConfigurationType() {
         // ID, Name, Description, Icon

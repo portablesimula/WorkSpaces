@@ -10,6 +10,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
+import simula.plugin.extensions.runConfiguration.DemoRunConfigurationOptions;
 import simula.plugin.extensions.runConfiguration.SimOption;
 import simula.plugin.util.Global;
 import simula.plugin.util.Util;
@@ -23,7 +24,7 @@ import java.util.Properties;
 
 public class SimulaCompiler {
     private static Project project;
-    private static SimOption ctOption;
+//    private static SimOption ctOption;
     private static String sourceFile;
 
     private static String userHomeDir;
@@ -34,7 +35,40 @@ public class SimulaCompiler {
 
     public static int call(Project prj, SimOption optn) {
         project = prj;
-        ctOption = optn;
+//       ctOption = optn;
+        System.out.println("SimulaCompiler.call: Project=" + project);
+        Util.printProject("SimulaCompiler.call: ", project);
+
+        userHomeDir = System.getProperty("user.home");
+
+        loadSimulaProperties();
+        simulaHomeDir = simulaProperties.getProperty("simula.home");
+//        Util.TRACE("simulaHomeDir: "+simulaHomeDir);
+        workDirectory =  project.getBasePath();
+        simulaOutDir = workDirectory + "/bin";
+//        Util.TRACE("simulaOutDir: "+simulaOutDir);
+
+        sourceFile = getCurrentFilePath(project);
+        Global.currentSourceFile = sourceFile;
+        if(sourceFile == null) {
+            Util.TRACE("SimulaCompiler.call: ERROR: No Source file available");
+            return -1;
+        } else {
+            Util.TRACE("SimulaCompiler.call: sourceFile=" + sourceFile);
+            askRunSimula();
+//
+//            RunManager runManager = RunManager.getInstance(project);
+//            List<RunnerAndConfigurationSettings> allConfigurations = runManager.getAllSettings();
+//            // Alternatively, you can use getConfigurationsList()
+//            // List<RunConfiguration> configurationsList = runManager.getConfigurationsList();
+        }
+        return 0;
+    }
+
+
+    public static int call(Project prj, DemoRunConfigurationOptions optn) {
+        project = prj;
+//        ctOption = optn;
         System.out.println("SimulaCompiler.call: Project=" + project);
         Util.printProject("SimulaCompiler.call: ", project);
 

@@ -1,17 +1,14 @@
 package simula.plugin.extensions.runConfiguration;
 
-import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
-import com.intellij.execution.process.OSProcessHandler;
-import com.intellij.execution.process.ProcessHandler;
-import com.intellij.execution.process.ProcessHandlerFactory;
-import com.intellij.execution.process.ProcessTerminatedListener;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import simula.plugin.extensions.runConfiguration.run.SimulaCommandLineState;
+import simula.plugin.extensions.runConfiguration.run.simulaCompiler.SimulaCompiler;
 
 import java.util.Map;
 
@@ -30,12 +27,12 @@ public class DemoRunConfiguration extends RunConfigurationBase<DemoRunConfigurat
         return (DemoRunConfigurationOptions) super.getOptions();
     }
 
-    public String getScriptName() {
-        return getOptions().getScriptName();
+    public String getJarFileDirName() {
+        return getOptions().getJarFileDirName();
     }
 
-    public void setScriptName(String scriptName) {
-        getOptions().setScriptName(scriptName);
+    public void setJarFileDirName(String dirName) {
+        getOptions().setJarFileDirName(dirName);
     }
 
     public Map<String, String> getOptionsMap() {
@@ -55,20 +52,32 @@ public class DemoRunConfiguration extends RunConfigurationBase<DemoRunConfigurat
 
     @Nullable
     @Override
-    public RunProfileState getState(@NotNull Executor executor,
-                                    @NotNull ExecutionEnvironment environment) {
-        return new CommandLineState(environment) {
-            @NotNull
-            @Override
-            protected ProcessHandler startProcess() throws ExecutionException {
-                GeneralCommandLine commandLine =
-                        new GeneralCommandLine(getOptions().getScriptName());
-                OSProcessHandler processHandler = ProcessHandlerFactory.getInstance()
-                        .createColoredProcessHandler(commandLine);
-                ProcessTerminatedListener.attach(processHandler);
-                return processHandler;
-            }
-        };
+//    public RunProfileState getState(@NotNull Executor executor,
+//                                    @NotNull ExecutionEnvironment environment) {
+//        return new CommandLineState(environment) {
+//            @NotNull
+//            @Override
+//            protected ProcessHandler startProcess() throws ExecutionException {
+//                GeneralCommandLine commandLine =
+//                        new GeneralCommandLine(getOptions().getScriptName());
+//                OSProcessHandler processHandler = ProcessHandlerFactory.getInstance()
+//                        .createColoredProcessHandler(commandLine);
+//                ProcessTerminatedListener.attach(processHandler);
+//                return processHandler;
+//            }
+//        };
+//    }
+    public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment environment) {
+        // Call the Simula Compiler to produce the .jar file
+        int exitCode = SimulaCompiler.call(environment.getProject(), demoRunConfigurationOptions);
+
+        if(exitCode == 0) {
+            System.out.println("SimulaRunConfiguration.getState: Execute resulting .jar");
+
+            // Return the execution logic to Intellij which will execute it
+            return new SimulaCommandLineState(environment);
+        }
+        return null;
     }
 
 }

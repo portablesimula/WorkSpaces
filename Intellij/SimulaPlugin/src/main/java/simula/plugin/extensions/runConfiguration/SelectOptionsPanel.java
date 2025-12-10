@@ -1,6 +1,5 @@
 package simula.plugin.extensions.runConfiguration;
 
-import com.intellij.openapi.components.StoredProperty;
 import simula.plugin.util.Util;
 
 import javax.swing.*;
@@ -13,50 +12,64 @@ import java.util.Map;
 import java.util.Set;
 
 public class SelectOptionsPanel extends JPanel {
-    Map<String, String> options;
+    DemoSettingsEditor settingsEditor;
+    Map<String, String> getOptions() {
+        return settingsEditor.optionsMap;
+    }
 
-    public SelectOptionsPanel(Map<String, String> options) {
-        this.options = options;
-
+    public SelectOptionsPanel(DemoSettingsEditor settingsEditor) {
+        this.settingsEditor = settingsEditor;
         JButton modeButton = new JButton("Set Compiler Mode");
         modeButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                selectModeOption();
-            }
+            public void actionPerformed(ActionEvent e) { selectModeOption(); }
         });
         this.add(modeButton);
 
         JButton ctButton = new JButton("Set Compiler Options");
         ctButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                Util.TRACE("BUTTON PRESSED: CT-OPTION");
-                selectCTOptions();
-            }
+            public void actionPerformed(ActionEvent e) { selectCTOptions(); }
         });
         this.add(ctButton);
 
         JButton rtButton = new JButton("Set Runtime Options");
         rtButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                selectRTOptions();
-            }
+            public void actionPerformed(ActionEvent e) { selectRTOptions(); }
         });
         this.add(rtButton);
     }
 
+    private void setDefaults() {
+        setDefaultOption("simula.compiler.compilerMode", "directClassFiles");
+        setDefaultOption("simula.compiler.caseSensitive", "false");
+        setDefaultOption("simula.compiler.verbose", "true");
+        setDefaultOption("simula.compiler.noExecution", "false");
+        setDefaultOption("simula.compiler.warnings", "false");
+        setDefaultOption("simula.compiler.extensions", "true");
+        setDefaultOption("simula.runtime.verbose", "true");
+        setDefaultOption("simula.runtime.blockTracing", "false");
+        setDefaultOption("simula.runtime.gotoTracing", "false");
+        setDefaultOption("simula.runtime.qpsTracing", "false");
+        setDefaultOption("simula.runtime.smlTracing", "false");
+    }
+
+    private void setDefaultOption(String id, String val){
+        String prev = getOptions().get(id);
+        if(prev == null) getOptions().put(id, val);
+    }
 
     /// Editor Utility: Set Compiler Mode.
     public JPanel selectModeOption() {
+        setDefaults();
         JPanel panel=new JPanel();
         panel.setBackground(Color.white);
         JCheckBox but1 = checkBox("viaJavaSource");
         JCheckBox but2 = checkBox("directClassFiles");
         JCheckBox but3 = checkBox("simulaClassLoader");
 
-        String compilerMode = options.get("simula.compiler.compilerMode");
+        String compilerMode = getOptions().get("simula.compiler.compilerMode");
 
         if(compilerMode.equals("viaJavaSource")) but1.setSelected(true);
         else if(compilerMode.equals("directClassFiles")) but2.setSelected(true);
@@ -84,45 +97,34 @@ public class SelectOptionsPanel extends JPanel {
         panel.add(new JLabel(" "));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         Util.optionDialog(panel,"Select Compiler Mode",JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,"Ok");
-//        Global.storeWorkspaceProperties();
         return panel;
     }
 
     public JPanel selectCTOptions() {
+        setDefaults();
         JPanel panel=new JPanel();
 //        panel.setBackground(Color.white);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(new JLabel("Compiler Options:"));
-//        Util.TRACE("SimOption.selectCTOptions: "+properties);
-
-//        Set<String> names = getProperties().stringPropertyNames();
-//        Map<String, String> options = getOptionsMap();
-        Set<String> names = options.keySet();
+        Set<String> names = getOptions().keySet();
         for(String name:names) {
-//            Util.TRACE("SimOption.selectCTOptions: name="+name);
-            if(! name.equals("simula.compiler.compilerMode"))
+           if(! name.equals("simula.compiler.compilerMode"))
                 if(name.startsWith("simula.compiler.")) panel.add(checkBox(name));
         }
         Util.optionDialog(panel,"Select Compiler Options",JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,"Ok");
-        printOptions("SimOption.selectCTOptions: DONE");
-//    	Global.storeWorkspaceProperties();
         return panel;
     }
 
     public JPanel selectRTOptions() {
+        setDefaults();
         JPanel panel=new JPanel();
 //        panel.setBackground(Color.white);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(new JLabel("Runtime Options:"));
-
-//        Set<String> names = getProperties().stringPropertyNames();
-//        Map<String, String> options = getOptionsMap();
-        Set<String> names = options.keySet();
+        Set<String> names = getOptions().keySet();
         for(String name:names)
             if(name.startsWith("simula.runtime.")) panel.add(checkBox(name));
         Util.optionDialog(panel,"Select Runtime Options",JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,"Ok");
-        printOptions("SimOption.selectRTOptions: DONE");
-//    	Global.storeWorkspaceProperties();
         return panel;
     }
 
@@ -130,19 +132,18 @@ public class SelectOptionsPanel extends JPanel {
     /// @param id option id
     /// @return the resulting check box
     private JCheckBox checkBox(String id) {
-        String val = options.get(id);
+        String val = getOptions().get(id);
         int p = id.lastIndexOf('.');
-        boolean selected = val.equals("true");
+        boolean selected = "true".equals(val);
         JCheckBox item = new JCheckBox(id.substring(p+1));
         item.setBackground(Color.white);
         item.setSelected(selected);
         item.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if(id.equals("viaJavaSource") || id.equals("directClassFiles") || id.equals("simulaClassLoader")) {
-//                    if(Option.verbose) Util.println("Compiler Mode: "+id);
                     setCompilerMode(id);
                 } else {
-                    setCTOption(id,item.isSelected());
+                    setOption(id,item.isSelected());
                 }
             }});
         item.addMouseListener(new MouseAdapter() {
@@ -160,47 +161,20 @@ public class SelectOptionsPanel extends JPanel {
         return(item);
     }
 
-    public void printOptions(String title) {
-        System.out.println("============= " + title + "=================");
-//        getProperties().list(System.out);
-//        Map<String, String> options = getOptionsMap();
-    }
-
-    /// Returns the Compiler option name 'id'
-    /// @param id option id
-    /// @return the option name 'id'
-    public boolean getCTOption(String id) {
-        String val = options.get("simula.compiler." + id);
-        return val.equals("true");
-    }
-
     /// Set the Compiler option named 'id' to the given value
     /// @param id option id
     /// @param val new option value
-    public void setCTOption(String id, boolean val) {
-        options.put(id, ""+val);
-    }
-
-    /// Set the Runtime option named 'id' to the given value
-    /// @param id option id
-    /// @param val new option value
-    public void setRTOption(String id, boolean val) {
-        options.put(id, ""+val);
+    public void setOption(String id, boolean val) {
+        Util.TRACE("SelectOptionsPanel.setOption: "+id+" := "+val);
+        getOptions().put(id, ""+val);
+//        settingsEditor.???
     }
 
     /// Editor Utility: Set Compiler Mode.
     /// @param id the mode String.
     public void setCompilerMode(String id) {
         Util.TRACE("SimOption.setCompilerMode: "+id);
-        options.put("simula.compiler.compilerMode", id);
-    }
-
-    /// Returns the Runtime option name 'id'
-    /// @param id option id
-    /// @return the option name 'id'
-    public boolean getROption(String id) {
-        String val = options.get("simula.runtime." + id);
-        return val.equals("true");
+        getOptions().put("simula.compiler.compilerMode", id);
     }
 
 }

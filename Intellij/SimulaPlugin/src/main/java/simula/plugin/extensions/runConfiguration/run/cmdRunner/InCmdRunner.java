@@ -62,14 +62,14 @@ public class InCmdRunner extends GenericProgramRunner<RunnerSettings> {
     @NotNull
     @Override
     public String getRunnerId() {
-        System.out.println("InCmdRunner.getRunnerId: ");
+//       System.out.println("InCmdRunner.getRunnerId: ");
 //        if(true) throw new RuntimeException("InCmdRunner.getRunnerId: ");
         return "InCmdRunner";
     }
 
     @Override
     public boolean canRun(@NotNull String executorId, @NotNull RunProfile profile) {
-        System.out.println("InCmdRunner.canRun: ");
+//        System.out.println("InCmdRunner.canRun: ");
 //       if(true) throw new RuntimeException("InCmdRunner.canRun: ");
 
 //        return executorId.equals(InCmdExecutor.executorId) &&
@@ -77,7 +77,7 @@ public class InCmdRunner extends GenericProgramRunner<RunnerSettings> {
 
         // 1. Check if the executor is the one we support (e.g., the default "Run" executor)
         if (!DefaultRunExecutor.EXECUTOR_ID.equals(executorId)) {
-           System.out.println("InCmdRunner.canRun: Check1: executorId="+executorId);
+//           System.out.println("InCmdRunner.canRun: Check1: executorId="+executorId);
 //           if(true) throw new RuntimeException("InCmdRunner.canRun: Check1: executorId="+executorId);
            return false;
         }
