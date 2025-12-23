@@ -371,9 +371,9 @@ public final class SimulaCompiler {
 		if (Option.internal.RUNTIME_USER_DIR.length() > 0) {
 			cmds.add("-userDir");
 			cmds.add(Option.internal.RUNTIME_USER_DIR);
-		} else {
-			cmds.add("-userDir");
-			cmds.add(Global.outputDir.getParentFile().getAbsolutePath());
+//		} else {
+//			cmds.add("-userDir");
+//			cmds.add(Global.outputDir.getParentFile().getAbsolutePath());
 		}
 		RTOption.addRTArguments(cmds);
 		if(Option.noPopup) {

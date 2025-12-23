@@ -1,9 +1,7 @@
 package simula.plugin.extensions.runConfiguration.run;
 
 import com.intellij.execution.ExecutionException;
-import com.intellij.execution.configurations.CommandLineState;
-import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.configurations.RunProfile;
+import com.intellij.execution.configurations.*;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
@@ -16,12 +14,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.ReadonlyStatusHandler;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.NotNull;
 import simula.plugin.extensions.runConfiguration.DemoRunConfiguration;
 import simula.plugin.extensions.runConfiguration.DemoRunConfigurationOptions;
 import simula.plugin.util.Dialogs;
 import simula.plugin.util.Global;
 import simula.plugin.util.Util;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.io.File;
@@ -32,20 +30,20 @@ import java.util.Map;
 import java.util.Properties;
 
 // Called from: DemoRunConfiguration
-public class SimulaExecCommandLineState extends CommandLineState {
+public class SimulaCompilerCommandLineState extends CommandLineState {
     Map<String, String> optionMap;
 
-    public SimulaExecCommandLineState(@NotNull ExecutionEnvironment environment, Map<String, String> optionMap) {
+    public SimulaCompilerCommandLineState(@NotNull ExecutionEnvironment environment, Map<String, String> optionMap) {
         super(environment);
         this.optionMap = optionMap;
     }
 
     @Override
     protected @NotNull ProcessHandler startProcess() throws ExecutionException {
-        Util.TRACE("+++++++++++++++++++++++++++++++++++++++++++++++++++");
-        Util.TRACE("+++   SimulaExecCommandLineState.startProcess   +++");
-        Util.TRACE("+++           Execute Users Program             +++");
-        Util.TRACE("+++++++++++++++++++++++++++++++++++++++++++++++++++");
+        Util.TRACE("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        Util.TRACE("+++   SimulaCompilerCommandLineState.startProcess   +++");
+        Util.TRACE("+++               Call Simula Compiler              +++");
+        Util.TRACE("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         // 1. Create a GeneralCommandLine object
         Util.TRACE("SimulaCommandLineState.startProcess: 1. Create a GeneralCommandLine object");
         GeneralCommandLine commandLine = getCommandLine();
@@ -73,26 +71,16 @@ public class SimulaExecCommandLineState extends CommandLineState {
         String workDirectory =  project.getBasePath();
         String simulaOutDir = workDirectory + "/bin";
         String sourceFile = getCurrentFilePath(project);
-        Util.TRACE("SimulaExecCommandLineState.getCommandLine: sourceFile=" + sourceFile);
         Global.currentSourceFile = sourceFile;
         if(sourceFile == null) {
-            Util.IERR("SimulaExecCommandLineState.getCommandLine: No Source file available");
+            Util.IERR("SimulaCompiler.call: No Source file available");
             return null;
         }
-//       File src = new File(sourceFile).getParentFile().getPath();
-//        src.getPath();
-//        src.getParentFile()
-//        Util.TRACE("SimulaExecCommandLineState.getCommandLine: src.getPath=" + src.getParentFile().getPath());
-//        String userDir = workDirectory + "/ssf";
-        String userDir = new File(sourceFile).getParentFile().getPath();
-        Util.TRACE("SimulaExecCommandLineState.getCommandLine: userDir=" + userDir);
-
 
         // TODO: DETTE MÅ RETTES FØR ENDELIG VERSJON
 //        String javaExePath = "java";
         String javaExePath = "C:\\Program Files\\Java\\jdk-25\\bin\\java.exe";
 
-        // Set up for Simula Compiler
         GeneralCommandLine commandLine = new GeneralCommandLine()
                 .withExePath(javaExePath)
                 .withParameters("-jar"
@@ -101,23 +89,19 @@ public class SimulaExecCommandLineState extends CommandLineState {
 //                        , "-noexec"
 //                       , "-verbose"
                 )
-//                .withWorkDirectory(workDirectory) // Set working directory
-                .withWorkDirectory(userDir) // Set working directory
+                .withWorkDirectory(workDirectory) // Set working directory
                 .withCharset(Charset.forName("UTF-8"));
 
-//        String userDir = workDirectory + "/ssf";
-//       commandLine.addParameters("-userDir", userDir);
-
-        Map<String, String> optionMap = getOptionsMap(getEnvironment());
+//        Map<String, String> optionMap = getOptionsMap(getEnvironment());
         if(optionMap != null) {
             DemoRunConfigurationOptions.setDefaults(optionMap);
-            Util.TRACE("SimulaExecCommandLineState.getCommandLine: optionMap=" + optionMap);
+            Util.TRACE("SimulaCompilerCommandLineState.getCommandLine: optionMap=" + optionMap);
 
-//            if(optionMap.get("simula.compiler.verbose").equals("true")) commandLine.addParameters("-verbose");
-//            if(optionMap.get("simula.compiler.caseSensitive").equals("true")) commandLine.addParameters("-caseSensitive");
-//            if(optionMap.get("simula.compiler.noExecution").equals("true")) commandLine.addParameters("-noExecution");
-//            if(optionMap.get("simula.compiler.warnings").equals("true")) commandLine.addParameters("-warnings");
-//            if(optionMap.get("simula.compiler.noextension").equals("true")) commandLine.addParameters("-noextension");
+            if(optionMap.get("simula.compiler.verbose").equals("true")) commandLine.addParameters("-verbose");
+            if(optionMap.get("simula.compiler.caseSensitive").equals("true")) commandLine.addParameters("-caseSensitive");
+            if(optionMap.get("simula.compiler.noExecution").equals("true")) commandLine.addParameters("-noExecution");
+            if(optionMap.get("simula.compiler.warnings").equals("true")) commandLine.addParameters("-warnings");
+            if(optionMap.get("simula.compiler.noextension").equals("true")) commandLine.addParameters("-noextension");
 
             if (optionMap.get("simula.runtime.verbose").equals("true")) commandLine.addParameters("-verbose");
             if (optionMap.get("simula.runtime.noPopup").equals("true")) commandLine.addParameters("-noPopup");
@@ -127,21 +111,21 @@ public class SimulaExecCommandLineState extends CommandLineState {
         }
 
         commandLine.addParameters(sourceFile);
-        Util.TRACE("SimulaExecCommandLineState.getCommandLine: commandLine="+commandLine);
+        Util.TRACE("SimulaCompilerCommandLineState.getCommandLine: commandLine="+commandLine);
         return commandLine;
     }
 
-    private Map<String, String> getOptionsMap(ExecutionEnvironment environment) {
-        RunProfile runProfile = getEnvironment().getRunProfile();
-        if(runProfile instanceof DemoRunConfiguration myRunConfiguration) {
-            DemoRunConfigurationOptions options = myRunConfiguration.getState();
-            Map<String, String> optionMap = options.getOptionsMap();
-            DemoRunConfigurationOptions.setDefaults(optionMap);
-            Util.TRACE("SimulaCompiler.runCommandFromPlugin: optionMap=" + optionMap);
-            return optionMap;
-        }
-        return null;
-    }
+//    private Map<String, String> getOptionsMap(ExecutionEnvironment environment) {
+//        RunProfile runProfile = getEnvironment().getRunProfile();
+//        if(runProfile instanceof DemoRunConfiguration myRunConfiguration) {
+//            DemoRunConfigurationOptions options = myRunConfiguration.getState();
+//            Map<String, String> optionMap = options.getOptionsMap();
+//            DemoRunConfigurationOptions.setDefaults(optionMap);
+//            Util.TRACE("SimulaCompiler.runCommandFromPlugin: optionMap=" + optionMap);
+//            return optionMap;
+//        }
+//        return null;
+//    }
 
     private static Properties simulaProperties;
     public static void loadSimulaProperties() {
