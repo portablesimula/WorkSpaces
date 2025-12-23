@@ -90,8 +90,6 @@ public class DemoRunConfiguration extends RunConfigurationBase<DemoRunConfigurat
 
             if(exitCode == 0) {
                 System.out.println("SimulaRunConfiguration.getState: Execute resulting .jar");
-
-                // Return the execution logic to Intellij which will execute it
                 return new SimulaExecCommandLineState(environment, optionMap);
             }
             return null;

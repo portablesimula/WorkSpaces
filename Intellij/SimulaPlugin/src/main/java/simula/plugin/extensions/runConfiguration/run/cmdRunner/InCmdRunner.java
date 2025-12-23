@@ -145,59 +145,6 @@ public class InCmdRunner extends GenericProgramRunner<RunnerSettings> {
 
         return descriptor;
 
-        // TIDLIGERE KODE FORSLAG
-//        JavaCommandLineState state = (JavaCommandLineState) runProfileState;
-//        JavaParameters javaParameters = state.getJavaParameters();
-//        javaParameters.setUseDynamicClasspath(false);
-//        LOG.info("Old command line. JDK path: " + javaParameters.getJdkPath() +
-//                " VM options: " + javaParameters.getVMParametersList() +
-//                " Parameters: " + javaParameters.getProgramParametersList()
-//        );
-//
-//        OptionsPatchConfiguration options = ServiceManager.getService(environment.getProject(), OptionsPatchConfiguration.class);
-//        patchParameterList(javaParameters.getVMParametersList(), options.toAddVmOptions, options.toRemoveVmOptions, options.startPort);
-//        patchParameterList(javaParameters.getProgramParametersList(), options.toAddProgramOptions, options.toRemoveProgramOptions, options.startPort);
-//
-//        String workingDirectory = state.getJavaParameters().getWorkingDirectory();
-//
-//        PathsList classPath = javaParameters.getClassPath();
-//        String classPathPathsString = classPath.getPathsString();
-//        clear(classPath);
-//
-//        GeneralCommandLine generalCommandLine = javaParameters.toCommandLine();
-//        String original = generalCommandLine.getCommandLineString();
-//        String newCommandLine;
-//        if (SystemInfo.isWindows) {
-//            newCommandLine = original
-//                    .replace("^", "^^") //replace ^ first
-//                    .replace("&", "^&")
-//                    .replace("<", "^<")
-//                    .replace(">", "^>")
-//                    .replace("(", "^(")
-//                    .replace(")", "^)")
-//                    .replace("@", "^@")
-//                    .replace("|", "^|");
-//        } else {
-//            newCommandLine = original;
-//        }
-//
-//        boolean passParentEnvs = javaParameters.isPassParentEnvs();
-//        Map<String, String> env = javaParameters.getEnv();
-//
-//        if (options.isRunInsideTerminal && isTerminalPluginEnabled()) {
-//            try {
-//                String[] command = createCommand(false, newCommandLine, null, null);
-//                TerminalRunner.runInIdeaTerminal(environment.getProject(), command, classPathPathsString, workingDirectory, passParentEnvs, env);
-//            } catch (Throwable e) {
-//                showWarning("Unable to run in internal IDEA Terminal due to '" + e.getMessage() + "'<br>Run in external cmd instead", environment);
-//                runInExternalCmd(classPathPathsString, generalCommandLine, workingDirectory, newCommandLine, passParentEnvs, env);
-//            }
-//        } else {
-//            if (!isTerminalPluginEnabled()) {
-//                showWarning("Terminal plugin disabled<br>Run in external cmd instead", environment);
-//            }
-//            runInExternalCmd(classPathPathsString, generalCommandLine, workingDirectory, newCommandLine, passParentEnvs, env);
-//        }
     }
 
     private static void runInExternalCmd(@NotNull String classPathPathsString,

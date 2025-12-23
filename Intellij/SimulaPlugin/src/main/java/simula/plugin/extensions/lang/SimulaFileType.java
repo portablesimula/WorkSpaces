@@ -1,7 +1,7 @@
 package simula.plugin.extensions.lang;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
-import simula.plugin.extensions.highlighterExtension.lexer.SimulaIcons;
+import simula.plugin.extensions.lexer.SimulaIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;

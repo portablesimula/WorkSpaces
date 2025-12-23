@@ -11,6 +11,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import simula.plugin.extensions.runConfiguration.DemoRunConfigurationOptions;
+import simula.plugin.util.Dialogs;
 import simula.plugin.util.Global;
 import simula.plugin.util.Util;
 
@@ -95,7 +96,7 @@ public class SimulaCompiler {
         msg +="\nUser dir: " + userHomeDir;
         msg +="\nWorkDirectory: " + workDirectory;
         msg +="\n\nDo you want to start Simula Compiling now ?\n\n";
-        int answer = Util.optionDialog(msg,title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, "Start Simula", "Cancel");
+        int answer = Dialogs.optionDialog(msg,title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, "Start Simula", "Cancel");
         if(answer == JOptionPane.OK_OPTION) {
             System.out.println("SimulaCompiler.askRunSimula: DO RUN SIMULA");
             runCommandFromPlugin(project);

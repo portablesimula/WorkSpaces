@@ -16,6 +16,7 @@ import com.intellij.openapi.vfs.ReadonlyStatusHandler;
 import com.intellij.openapi.vfs.VirtualFile;
 import simula.plugin.extensions.runConfiguration.DemoRunConfiguration;
 import simula.plugin.extensions.runConfiguration.DemoRunConfigurationOptions;
+import simula.plugin.util.Dialogs;
 import simula.plugin.util.Global;
 import simula.plugin.util.Util;
 import org.jetbrains.annotations.NotNull;
@@ -90,10 +91,11 @@ public class SimulaCompilerCommandLineState extends CommandLineState {
                 )
                 .withWorkDirectory(workDirectory) // Set working directory
                 .withCharset(Charset.forName("UTF-8"));
+
 //        Map<String, String> optionMap = getOptionsMap(getEnvironment());
         if(optionMap != null) {
             DemoRunConfigurationOptions.setDefaults(optionMap);
-            Util.TRACE("SimulaCompiler.runCommandFromPlugin: optionMap=" + optionMap);
+            Util.TRACE("SimulaCompilerCommandLineState.getCommandLine: optionMap=" + optionMap);
 
             if(optionMap.get("simula.compiler.verbose").equals("true")) commandLine.addParameters("-verbose");
             if(optionMap.get("simula.compiler.caseSensitive").equals("true")) commandLine.addParameters("-caseSensitive");
@@ -109,7 +111,7 @@ public class SimulaCompilerCommandLineState extends CommandLineState {
         }
 
         commandLine.addParameters(sourceFile);
-        Util.TRACE("SimulaCompiler.runCommandFromPlugin: commandLine="+commandLine);
+        Util.TRACE("SimulaCompilerCommandLineState.getCommandLine: commandLine="+commandLine);
         return commandLine;
     }
 
@@ -148,7 +150,7 @@ public class SimulaCompilerCommandLineState extends CommandLineState {
             if (currentFile != null) {
                 if(hasUnsavedChanges(currentFile)) {
                     String msg = "The file: \n"+currentFile+"\nHas unsaved changes - do you want to save it ?";
-                    int res = Util.optionDialog(msg,"Question", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,"Yes","No");
+                    int res = Dialogs.optionDialog(msg,"Question", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,"Yes","No");
                     Util.TRACE("SimulaCompiler.getCurrentFilePath: res="+res);
                     if(res == JOptionPane.YES_OPTION) updateVirtualFileContent(project, currentFile, editor.getDocument().getText());
                 }

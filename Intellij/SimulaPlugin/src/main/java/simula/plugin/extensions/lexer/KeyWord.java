@@ -3,7 +3,7 @@
 /// 
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
-package simula.plugin.extensions.highlighterExtension.lexer;
+package simula.plugin.extensions.lexer;
 
 /// The Simula Keywords and some additional symbols.
 /// 

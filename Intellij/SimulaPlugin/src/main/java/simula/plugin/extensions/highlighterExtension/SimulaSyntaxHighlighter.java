@@ -1,4 +1,4 @@
-package simula.plugin.extensions.highlighterExtension.highlighter;
+package simula.plugin.extensions.highlighterExtension;
 
 // Copyright 2000-2022 JetBrains s.r.o. and other contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
 
@@ -9,8 +9,8 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import simula.plugin.extensions.highlighterExtension.lexer.SimulaElementTypes;
-import simula.plugin.extensions.highlighterExtension.lexer.SimulaLexer;
+import simula.plugin.extensions.lexer.SimulaElementTypes;
+import simula.plugin.extensions.lexer.SimulaLexer;
 import simula.plugin.extensions.lang.psi.SimulaTypes;
 import org.jetbrains.annotations.NotNull;
 

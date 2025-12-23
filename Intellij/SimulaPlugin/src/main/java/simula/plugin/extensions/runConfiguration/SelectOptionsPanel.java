@@ -1,6 +1,7 @@
 package simula.plugin.extensions.runConfiguration;
 
 import simula.plugin.util.Util;
+import simula.plugin.util.Dialogs;
 
 import javax.swing.*;
 import java.awt.*;
@@ -77,7 +78,7 @@ public class SelectOptionsPanel extends JPanel {
         panel.add(new JLabel("                  program execution"));
         panel.add(new JLabel(" "));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        Util.optionDialog(panel,"Select Compiler Mode",JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,"Ok");
+        Dialogs.optionDialog(panel,"Select Compiler Mode",JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,"Ok");
         return panel;
     }
 
@@ -92,7 +93,7 @@ public class SelectOptionsPanel extends JPanel {
            if(! name.equals("simula.compiler.compilerMode"))
                 if(name.startsWith("simula.compiler.")) panel.add(checkBox(name));
         }
-        Util.optionDialog(panel,"Select Compiler Options",JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,"Ok");
+        Dialogs.optionDialog(panel,"Select Compiler Options",JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,"Ok");
         return panel;
     }
 
@@ -105,7 +106,7 @@ public class SelectOptionsPanel extends JPanel {
         Set<String> names = getOptions().keySet();
         for(String name:names)
             if(name.startsWith("simula.runtime.")) panel.add(checkBox(name));
-        Util.optionDialog(panel,"Select Runtime Options",JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,"Ok");
+        Dialogs.optionDialog(panel,"Select Runtime Options",JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,"Ok");
         return panel;
     }
 

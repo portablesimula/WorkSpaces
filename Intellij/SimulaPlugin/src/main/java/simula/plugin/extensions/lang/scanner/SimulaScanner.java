@@ -5,9 +5,8 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.plugin.extensions.lang.scanner;
 
-import simula.plugin.extensions.highlighterExtension.lexer.DefaultScanner;
-import simula.plugin.extensions.highlighterExtension.lexer.KeyWord;
-import simula.plugin.extensions.runConfiguration.DemoRunConfigurationOptions;
+import simula.plugin.extensions.lexer.DefaultScanner;
+import simula.plugin.extensions.lexer.KeyWord;
 import simula.plugin.util.Global;
 import simula.plugin.util.Util;
 

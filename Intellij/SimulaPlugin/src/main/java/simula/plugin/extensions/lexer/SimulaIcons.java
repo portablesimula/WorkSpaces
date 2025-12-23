@@ -1,4 +1,4 @@
-package simula.plugin.extensions.highlighterExtension.lexer;
+package simula.plugin.extensions.lexer;
 
 import com.intellij.openapi.util.IconLoader;
 

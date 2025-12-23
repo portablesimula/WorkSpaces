@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 public class MyFileDropHandler implements FileDropHandler {
@@ -31,11 +32,14 @@ public class MyFileDropHandler implements FileDropHandler {
         Project project = fileDropEvent.getProject();
         try {
 //        VirtualFile sourceDir = VFS.getSourceDir(project);
-            VirtualFile sourceDir = VfsUtil.createDirectoryIfMissing(Util.getBaseDir(project), "src");
-            if (sourceDir == null) {
-                Util.ALERT("Can't find source directory");
-                return false;
-            }
+//            VirtualFile sourceDir = VfsUtil.createDirectoryIfMissing(Util.getBaseDir(project), "src");
+//            if (sourceDir == null) {
+//                Util.ALERT("Can't find source directory");
+//                return false;
+//            }
+
+            VirtualFile sourceDir = VFS.getFolder(project, "src");
+
             LOOP: for (File file : files) {
                 System.out.println("MyCustomFileDropHandler.handleDrop: File=" + file);
                 VirtualFile vFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file);
@@ -44,7 +48,7 @@ public class MyFileDropHandler implements FileDropHandler {
                     VirtualFile oldFile = sourceDir.findChild(vFile.getName());
                     if (oldFile != null) {
                         String msg = "File already exists: " + oldFile.getName() + "\n\nDo you want to overwrite it ?\n\n";
-                        int answer = Util.optionDialog(msg,"", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, "Yes", "No");
+                        int answer = Dialogs.optionDialog(msg,"", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, "Yes", "No");
                         if(answer != JOptionPane.OK_OPTION) continue LOOP;
                     }
                     copyFile(project, vFile, sourceDir);

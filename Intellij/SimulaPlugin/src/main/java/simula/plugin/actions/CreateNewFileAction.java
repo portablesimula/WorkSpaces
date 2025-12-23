@@ -7,10 +7,13 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import simula.plugin.util.Dialogs;
 import simula.plugin.util.Util;
+import simula.plugin.util.VFS;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -25,27 +28,32 @@ public class CreateNewFileAction extends AnAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         Util.TRACE("CreateNewFileAction.actionPerformed: anActionEvent: " + anActionEvent.getClass().getSimpleName());
-        VirtualFile directory = null;
-        VirtualFile file = anActionEvent.getData(CommonDataKeys.VIRTUAL_FILE);
-
-        if (file != null) {
-            // If the selection is already a directory, use it directly
-            // Otherwise, get the parent directory of the selected file
-            directory = file.isDirectory() ? file : file.getParent();
-            Util.TRACE("CreateNewFileAction.actionPerformed: directory: " + directory);
-
-            if (directory != null) {
-                String path = directory.getPath();
-                // Perform action with the directory path
-                Util.TRACE("CreateNewFileAction.actionPerformed: 2'directory: " + directory);
-           }
-        }
-        if(directory == null) return;
+//        VirtualFile directory = null;
+//        VirtualFile file = anActionEvent.getData(CommonDataKeys.VIRTUAL_FILE);
+//
+//        if (file != null) {
+//            // If the selection is already a directory, use it directly
+//            // Otherwise, get the parent directory of the selected file
+//            directory = file.isDirectory() ? file : file.getParent();
+//            Util.TRACE("CreateNewFileAction.actionPerformed: directory: " + directory);
+//
+//            if (directory != null) {
+//                String path = directory.getPath();
+//                // Perform action with the directory path
+//                Util.TRACE("CreateNewFileAction.actionPerformed: 2'directory: " + directory);
+//           }
+//        }
+//        if(directory == null) return;
 
         Project project = anActionEvent.getProject();
+        VirtualFile directory = VFS.getFolder(project, "src");
+
         Object answ = JOptionPane.showInputDialog(null,"Enter filename:","New Simula File",
                 JOptionPane.QUESTION_MESSAGE, Util.getSimulaIcon("sim.png"),null, "Unnamed.sim");
         String newFileName = (answ == null)? null : answ.toString();
+
+//        String answ = Messages.showInputDialog(project, "Enter filename:","New Simula File", Util.getSimulaIcon());
+//        String newFileName = (answ == null)? null : answ.toString();
 
         Util.TRACE("CreateNewFileAction.actionPerformed: " + newFileName);
         if(newFileName == null) return;
@@ -54,7 +62,7 @@ public class CreateNewFileAction extends AnAction {
         boolean didWrite =  tryWrite(project, directory, newFileName, content, false);
         if (! didWrite) {
             String msg = "File already exists: " + newFileName + "\n\nDo you want to overwrite it ?\n\n";
-            int answer = Util.optionDialog(msg, "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, "Yes", "No");
+            int answer = Dialogs.optionDialog(msg, "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, "Yes", "No");
             if (answer == JOptionPane.OK_OPTION) tryWrite(project, directory, newFileName, content, true);
         }
     }

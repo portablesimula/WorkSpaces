@@ -5,7 +5,7 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.plugin.extensions.lang.scanner;
 
-import simula.plugin.extensions.highlighterExtension.lexer.KeyWord;
+import simula.plugin.extensions.lexer.KeyWord;
 
 /// Utility class Token.
 /// 

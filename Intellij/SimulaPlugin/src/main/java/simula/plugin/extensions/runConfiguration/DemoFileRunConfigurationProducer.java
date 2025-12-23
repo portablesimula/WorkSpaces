@@ -71,7 +71,7 @@ public class DemoFileRunConfigurationProducer extends LazyRunConfigurationProduc
 
     private String getName(PsiElement element) {
         PsiFile psiFile = element.getContainingFile();
-        return psiFile.getName();
+        return (psiFile == null)? "Simula" : psiFile.getName();
     }
 
 

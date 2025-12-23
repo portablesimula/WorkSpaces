@@ -1,4 +1,4 @@
-package simula.plugin.extensions.highlighterExtension.lexer;
+package simula.plugin.extensions.lexer;
 
 import java.util.LinkedList;
 
@@ -7,7 +7,6 @@ import com.intellij.lexer.LexerBase;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
 import simula.plugin.extensions.lang.SimulaLanguage;
-import simula.plugin.extensions.runConfiguration.DemoRunConfigurationOptions;
 import simula.plugin.util.Global;
 import simula.plugin.util.Util;
 

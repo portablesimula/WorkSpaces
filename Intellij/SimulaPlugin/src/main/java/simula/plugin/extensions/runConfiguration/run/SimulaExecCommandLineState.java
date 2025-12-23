@@ -19,6 +19,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import simula.plugin.extensions.runConfiguration.DemoRunConfiguration;
 import simula.plugin.extensions.runConfiguration.DemoRunConfigurationOptions;
+import simula.plugin.util.Dialogs;
 import simula.plugin.util.Global;
 import simula.plugin.util.Util;
 
@@ -72,16 +73,20 @@ public class SimulaExecCommandLineState extends CommandLineState {
         String workDirectory =  project.getBasePath();
         String simulaOutDir = workDirectory + "/bin";
         String sourceFile = getCurrentFilePath(project);
+        Util.TRACE("SimulaExecCommandLineState.getCommandLine: sourceFile=" + sourceFile);
         Global.currentSourceFile = sourceFile;
         if(sourceFile == null) {
-            Util.IERR("SimulaCompiler.call: No Source file available");
+            Util.IERR("SimulaExecCommandLineState.getCommandLine: No Source file available");
             return null;
         }
+        String userDir = workDirectory + "/ssf";
+
 
         // TODO: DETTE MÅ RETTES FØR ENDELIG VERSJON
 //        String javaExePath = "java";
         String javaExePath = "C:\\Program Files\\Java\\jdk-25\\bin\\java.exe";
 
+        // Set up for Simula Compiler
         GeneralCommandLine commandLine = new GeneralCommandLine()
                 .withExePath(javaExePath)
                 .withParameters("-jar"
@@ -90,18 +95,23 @@ public class SimulaExecCommandLineState extends CommandLineState {
 //                        , "-noexec"
 //                       , "-verbose"
                 )
-                .withWorkDirectory(workDirectory) // Set working directory
+//                .withWorkDirectory(workDirectory) // Set working directory
+                .withWorkDirectory(userDir) // Set working directory
                 .withCharset(Charset.forName("UTF-8"));
+
+//        String userDir = workDirectory + "/ssf";
+//       commandLine.addParameters("-userDir", userDir);
+
         Map<String, String> optionMap = getOptionsMap(getEnvironment());
         if(optionMap != null) {
             DemoRunConfigurationOptions.setDefaults(optionMap);
-            Util.TRACE("SimulaCompiler.runCommandFromPlugin: optionMap=" + optionMap);
+            Util.TRACE("SimulaExecCommandLineState.getCommandLine: optionMap=" + optionMap);
 
-            if(optionMap.get("simula.compiler.verbose").equals("true")) commandLine.addParameters("-verbose");
-            if(optionMap.get("simula.compiler.caseSensitive").equals("true")) commandLine.addParameters("-caseSensitive");
-            if(optionMap.get("simula.compiler.noExecution").equals("true")) commandLine.addParameters("-noExecution");
-            if(optionMap.get("simula.compiler.warnings").equals("true")) commandLine.addParameters("-warnings");
-            if(optionMap.get("simula.compiler.noextension").equals("true")) commandLine.addParameters("-noextension");
+//            if(optionMap.get("simula.compiler.verbose").equals("true")) commandLine.addParameters("-verbose");
+//            if(optionMap.get("simula.compiler.caseSensitive").equals("true")) commandLine.addParameters("-caseSensitive");
+//            if(optionMap.get("simula.compiler.noExecution").equals("true")) commandLine.addParameters("-noExecution");
+//            if(optionMap.get("simula.compiler.warnings").equals("true")) commandLine.addParameters("-warnings");
+//            if(optionMap.get("simula.compiler.noextension").equals("true")) commandLine.addParameters("-noextension");
 
             if (optionMap.get("simula.runtime.verbose").equals("true")) commandLine.addParameters("-verbose");
             if (optionMap.get("simula.runtime.noPopup").equals("true")) commandLine.addParameters("-noPopup");
@@ -111,7 +121,7 @@ public class SimulaExecCommandLineState extends CommandLineState {
         }
 
         commandLine.addParameters(sourceFile);
-        Util.TRACE("SimulaCompiler.runCommandFromPlugin: commandLine="+commandLine);
+        Util.TRACE("SimulaExecCommandLineState.getCommandLine: commandLine="+commandLine);
         return commandLine;
     }
 
@@ -150,7 +160,7 @@ public class SimulaExecCommandLineState extends CommandLineState {
             if (currentFile != null) {
                 if(hasUnsavedChanges(currentFile)) {
                     String msg = "The file: \n"+currentFile+"\nHas unsaved changes - do you want to save it ?";
-                    int res = Util.optionDialog(msg,"Question", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,"Yes","No");
+                    int res = Dialogs.optionDialog(msg,"Question", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,"Yes","No");
                     Util.TRACE("SimulaCompiler.getCurrentFilePath: res="+res);
                     if(res == JOptionPane.YES_OPTION) updateVirtualFileContent(project, currentFile, editor.getDocument().getText());
                 }

@@ -1,4 +1,4 @@
-package simula.plugin.extensions.highlighterExtension.lexer;
+package simula.plugin.extensions.lexer;
 
 import com.intellij.psi.tree.IElementType;
 import simula.plugin.extensions.lang.SimulaLanguage;

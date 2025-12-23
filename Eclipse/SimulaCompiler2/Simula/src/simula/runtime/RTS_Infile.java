@@ -21,8 +21,6 @@ import java.util.concurrent.TimeoutException;
 
 import javax.swing.JOptionPane;
 
-import simula.compiler.utilities.Option;
-
 /// System class Infile.
 /// 
 /// <pre>

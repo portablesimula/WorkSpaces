@@ -153,14 +153,17 @@ public class RTS_File extends RTS_CLASS {
 	/// @param fileName the given fale name
 	/// @return the resulting file or null
 	protected File trySelectFile(final String fileName) {
+		IO.println("RTS_File.trySelectFile: " + fileName);
 		File file = new File(fileName);
 		if (file.exists())
 			return (file);
 		if (!file.isAbsolute()) {
 			File tryFile = new File(RTS_Option.RUNTIME_USER_DIR, fileName);
+			IO.println("RTS_File.trySelectFile: 1) " + tryFile);
 			if (tryFile.exists())
 				return (tryFile);
 			File dir = new File(System.getProperty("user.dir", null));
+			IO.println("RTS_File.trySelectFile: 2) " + tryFile);
 			tryFile = new File(dir, fileName);
 			if (tryFile.exists())
 				return (tryFile);
@@ -313,6 +316,9 @@ public class RTS_File extends RTS_CLASS {
 		try {
 			if (!file.isAbsolute() && RTS_Option.RUNTIME_USER_DIR.length() > 0) {
 				file = new File(RTS_Option.RUNTIME_USER_DIR + '/' + FILE_NAME.edText());
+				IO.println("RTS_File.doCreateAction: " + FILE_NAME.edText() + " ==> " + file);
+				IO.println("RTS_File.doCreateAction: RTS_Option.RUNTIME_USER_DIR" + RTS_Option.RUNTIME_USER_DIR);
+				IO.println("RTS_File.doCreateAction: System: " + System.getProperty("user.dir"));
 			}
 			if(RTS_Option.VERBOSE) IO.println("FILE.doCreateAction: " + _CREATE + " on "+file+", file.exists="+file.exists());
 			switch (_CREATE) {
