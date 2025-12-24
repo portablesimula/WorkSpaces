@@ -14,8 +14,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.ReadonlyStatusHandler;
 import com.intellij.openapi.vfs.VirtualFile;
-import simula.plugin.extensions.runConfiguration.DemoRunConfiguration;
-import simula.plugin.extensions.runConfiguration.DemoRunConfigurationOptions;
+import simula.plugin.extensions.runConfiguration.SimulaRunConfigurationOptions;
 import simula.plugin.util.Dialogs;
 import simula.plugin.util.Global;
 import simula.plugin.util.Util;
@@ -30,20 +29,20 @@ import java.util.Map;
 import java.util.Properties;
 
 // Called from: DemoRunConfiguration
-public class SimulaCompilerCommandLineState extends CommandLineState {
+public class SimulaCompileAndExecCommandLineState extends CommandLineState {
     Map<String, String> optionMap;
 
-    public SimulaCompilerCommandLineState(@NotNull ExecutionEnvironment environment, Map<String, String> optionMap) {
+    public SimulaCompileAndExecCommandLineState(@NotNull ExecutionEnvironment environment, Map<String, String> optionMap) {
         super(environment);
         this.optionMap = optionMap;
     }
 
     @Override
     protected @NotNull ProcessHandler startProcess() throws ExecutionException {
-        Util.TRACE("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        Util.TRACE("+++   SimulaCompilerCommandLineState.startProcess   +++");
-        Util.TRACE("+++               Call Simula Compiler              +++");
-        Util.TRACE("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        Util.TRACE("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        Util.TRACE("+++   SimulaCompilerCommandLineState.startProcess      +++");
+        Util.TRACE("+++   Call Simula Compiler which executes the result   +++");
+        Util.TRACE("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         // 1. Create a GeneralCommandLine object
         Util.TRACE("SimulaCommandLineState.startProcess: 1. Create a GeneralCommandLine object");
         GeneralCommandLine commandLine = getCommandLine();
@@ -94,7 +93,7 @@ public class SimulaCompilerCommandLineState extends CommandLineState {
 
 //        Map<String, String> optionMap = getOptionsMap(getEnvironment());
         if(optionMap != null) {
-            DemoRunConfigurationOptions.setDefaults(optionMap);
+            SimulaRunConfigurationOptions.setDefaults(optionMap);
             Util.TRACE("SimulaCompilerCommandLineState.getCommandLine: optionMap=" + optionMap);
 
             if(optionMap.get("simula.compiler.verbose").equals("true")) commandLine.addParameters("-verbose");

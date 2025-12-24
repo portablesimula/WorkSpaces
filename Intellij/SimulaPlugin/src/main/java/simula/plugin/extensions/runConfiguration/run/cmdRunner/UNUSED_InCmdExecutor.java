@@ -10,7 +10,7 @@ import com.intellij.openapi.wm.ToolWindowId;
 /**
  * @author Andrey Turbanov
  */
-public class InCmdExecutor extends Executor {
+public class UNUSED_InCmdExecutor extends Executor {
     public static final Icon cmdExecutorIcon = IconLoader.getIcon("/cmd.png");
     public static final String executorId = "RunInCmdExecutor";
 

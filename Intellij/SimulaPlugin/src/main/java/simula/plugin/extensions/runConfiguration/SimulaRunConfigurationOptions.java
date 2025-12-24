@@ -2,13 +2,10 @@ package simula.plugin.extensions.runConfiguration;
 
 import com.intellij.execution.configurations.RunConfigurationOptions;
 import com.intellij.openapi.components.StoredProperty;
-import simula.plugin.util.Util;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.Map;
 
-public class DemoRunConfigurationOptions extends RunConfigurationOptions {
+public class SimulaRunConfigurationOptions extends RunConfigurationOptions {
 
     // Declare the StoredProperty for the Map.
     // The 'this.<String, String>map()' method is a helper provided by RunConfigurationOptions
@@ -43,18 +40,14 @@ public class DemoRunConfigurationOptions extends RunConfigurationOptions {
         options.setValue(this, newOptions);
     }
 
-    private final StoredProperty<String> jarFileDir = string("").provideDelegate(this, "jarFileDirName");
-    public String getJarFileDirName() { return jarFileDir.getValue(this); }
-    public void setJarFileDirName(String dirName) { jarFileDir.setValue(this, dirName); }
-
     public static void setDefaults(Map<String, String> optionMap) {
         setDefaultOption(optionMap, "simula.compiler.compilerMode", "directClassFiles");
         setDefaultOption(optionMap, "simula.compiler.caseSensitive", "false");
-        setDefaultOption(optionMap, "simula.compiler.verbose", "true");
+        setDefaultOption(optionMap, "simula.compiler.verbose", "false");
         setDefaultOption(optionMap, "simula.compiler.noExecution", "false");
         setDefaultOption(optionMap, "simula.compiler.warnings", "false");
         setDefaultOption(optionMap, "simula.compiler.noextension", "false");
-        setDefaultOption(optionMap, "simula.runtime.verbose", "true");
+        setDefaultOption(optionMap, "simula.runtime.verbose", "false");
         setDefaultOption(optionMap, "simula.runtime.noPopup", "false");
         setDefaultOption(optionMap, "simula.runtime.blockTracing", "false");
         setDefaultOption(optionMap, "simula.runtime.gotoTracing", "false");

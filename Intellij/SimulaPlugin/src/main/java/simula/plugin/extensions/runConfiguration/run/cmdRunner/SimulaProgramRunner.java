@@ -2,6 +2,7 @@ package simula.plugin.extensions.runConfiguration.run.cmdRunner;
 
 import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.executors.DefaultRunExecutor;
+import com.intellij.execution.process.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.execution.ExecutionException;
@@ -14,9 +15,6 @@ import com.intellij.execution.configurations.ParametersList;
 import com.intellij.execution.configurations.RunProfile;
 import com.intellij.execution.configurations.RunProfileState;
 import com.intellij.execution.configurations.RunnerSettings;
-import com.intellij.execution.process.CapturingProcessHandler;
-import com.intellij.execution.process.ProcessNotCreatedException;
-import com.intellij.execution.process.ProcessOutput;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.GenericProgramRunner;
 import com.intellij.execution.ui.RunContentDescriptor;
@@ -54,9 +52,9 @@ import java.util.Map;
 /**
  * @author Andrey Turbanov
  */
-public class InCmdRunner extends GenericProgramRunner<RunnerSettings> {
+public class SimulaProgramRunner extends GenericProgramRunner<RunnerSettings> {
 
-    private static final Logger LOG = Logger.getInstance(InCmdRunner.class);
+    private static final Logger LOG = Logger.getInstance(SimulaProgramRunner.class);
     private Boolean terminalPluginEnabled;
 
     @NotNull
@@ -130,7 +128,30 @@ public class InCmdRunner extends GenericProgramRunner<RunnerSettings> {
             return null; // Execution failed or was cancelled
         }
 
+        OSProcessHandler processHandler = (OSProcessHandler) executionResult.getProcessHandler();
+        System.out.println("InCmdRunner.doExecute: processHandler: "+processHandler.getClass().getSimpleName());
+        processHandler.startNotify();
+//        processHandler.
+
+//        ExecutionConsole console = executionResult.getExecutionConsole();
+//        System.out.println("InCmdRunner.doExecute: Console: "+console.getClass().getSimpleName());
+//        System.out.println("InCmdRunner.doExecute: Component: "+console.getComponent().getClass().getSimpleName());
+//        if(console instanceof ConsoleViewImpl impl) {
+//            ProcessHandler processHandler = new TEST_SimulaKeyHandler();
+//            impl.attachToProcess(processHandler);
+//            processHandler.startNotify();
+//        }
+
         // 3. Create the RunContentDescriptor
+        //    When you override doExecute in your GenericProgramRunner,
+        //    you must ensure the console you attach to the RunContentDescriptor is interactive.
+        //    The standard TextConsoleBuilder creates a console that supports input by default if attached to a process.
+//        TextConsoleBuilder consoleBuilder = TextConsoleBuilderFactory.getInstance().createBuilder(project);
+//        ConsoleView consoleView = consoleBuilder.getConsole();
+//        TextConsoleBuilderFactory factory = TextConsoleBuilderFactory.getInstance();
+//        TextConsoleBuilder builder = factory.createBuilder(project);
+
+
         final RunContentDescriptor descriptor = new RunContentDescriptor(
                 executionResult.getExecutionConsole(),
                 executionResult.getProcessHandler(),

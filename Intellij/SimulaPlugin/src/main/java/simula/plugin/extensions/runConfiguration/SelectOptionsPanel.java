@@ -13,12 +13,12 @@ import java.util.Map;
 import java.util.Set;
 
 public class SelectOptionsPanel extends JPanel {
-    DemoSettingsEditor settingsEditor;
+    SimulaSettingsEditor settingsEditor;
     Map<String, String> getOptions() {
         return settingsEditor.optionsMap;
     }
 
-    public SelectOptionsPanel(DemoSettingsEditor settingsEditor) {
+    public SelectOptionsPanel(SimulaSettingsEditor settingsEditor) {
         this.settingsEditor = settingsEditor;
         JButton modeButton = new JButton("Set Compiler Mode");
         modeButton.addActionListener(new ActionListener() {
@@ -44,7 +44,7 @@ public class SelectOptionsPanel extends JPanel {
 
     /// Editor Utility: Set Compiler Mode.
     public JPanel selectModeOption() {
-        DemoRunConfigurationOptions.setDefaults(getOptions());
+        SimulaRunConfigurationOptions.setDefaults(getOptions());
         JPanel panel=new JPanel();
         panel.setBackground(Color.white);
         JCheckBox but1 = checkBox("viaJavaSource");
@@ -83,9 +83,9 @@ public class SelectOptionsPanel extends JPanel {
     }
 
     public JPanel selectCTOptions() {
-        DemoRunConfigurationOptions.setDefaults(getOptions());
+        SimulaRunConfigurationOptions.setDefaults(getOptions());
         JPanel panel=new JPanel();
-//        panel.setBackground(Color.white);
+        panel.setBackground(Color.white);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(new JLabel("Compiler Options:"));
         Set<String> names = getOptions().keySet();
@@ -98,9 +98,9 @@ public class SelectOptionsPanel extends JPanel {
     }
 
     public JPanel selectRTOptions() {
-        DemoRunConfigurationOptions.setDefaults(getOptions());
+        SimulaRunConfigurationOptions.setDefaults(getOptions());
         JPanel panel=new JPanel();
-//        panel.setBackground(Color.white);
+        panel.setBackground(Color.white);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(new JLabel("Runtime Options:"));
         Set<String> names = getOptions().keySet();

@@ -84,17 +84,18 @@
         <!-- Run Configuration -->
             <!-- Register your main configuration type first -->
             <!--configurationType implementation="simula.plugin.extensions.runConfiguration.SimulaRunConfigurationType"/-->
-            <configurationType implementation="simula.plugin.extensions.runConfiguration.DemoRunConfigurationType"/>
+            <configurationType implementation="simula.plugin.extensions.runConfiguration.SimulaRunConfigurationType"/>
 
             <!-- Register the producer to link it to the context menu -->
-            <runConfigurationProducer implementation="simula.plugin.extensions.runConfiguration.DemoFileRunConfigurationProducer"/>
+            <runConfigurationProducer implementation="simula.plugin.extensions.runConfiguration.SimulaFileRunConfigurationProducer"/>
 
+        <programRunner implementation="simula.plugin.extensions.runConfiguration.run.cmdRunner.SimulaProgramRunner"/>
 
-        <executor implementation="simula.plugin.extensions.runConfiguration.run.cmdRunner.InCmdExecutor"/>
-        <programRunner implementation="simula.plugin.extensions.runConfiguration.run.cmdRunner.InCmdRunner"/>
-        <projectConfigurable instance="simula.plugin.extensions.runConfiguration.run.cmdRunner.InCmdConfigurable"/>
-        <projectService serviceImplementation="simula.plugin.extensions.runConfiguration.run.cmdRunner.OptionsPatchConfiguration"/>
+        <!--executor implementation="simula.plugin.extensions.runConfiguration.run.cmdRunner.UNUSED_InCmdExecutor"/-->
+        <!--projectConfigurable instance="simula.plugin.extensions.runConfiguration.run.cmdRunner.UNUSED_InCmdConfigurable"/-->
+        <!--projectService serviceImplementation="simula.plugin.extensions.runConfiguration.run.cmdRunner.UNUSED_OptionsPatchConfiguration"/-->
 
+        <!--typedHandler implementation="simula.plugin.extensions.runConfiguration.run.cmdRunner.UNUSED_SimulaKeyHandler"/-->
 
     </extensions>
 

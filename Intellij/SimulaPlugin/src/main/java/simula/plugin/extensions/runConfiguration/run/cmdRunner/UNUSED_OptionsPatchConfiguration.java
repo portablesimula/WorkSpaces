@@ -9,7 +9,7 @@ import com.intellij.openapi.components.Storage;
  * @author Andrey Turbanov
  */
 @State(name = "RunInCmdPluginSettings", storages = {@Storage(value = "RunInCmd.xml")})
-public class OptionsPatchConfiguration implements PersistentStateComponent<OptionsPatchConfiguration> {
+public class UNUSED_OptionsPatchConfiguration implements PersistentStateComponent<UNUSED_OptionsPatchConfiguration> {
 
     public String toAddVmOptions = "";
     public String toRemoveVmOptions = "";
@@ -20,13 +20,13 @@ public class OptionsPatchConfiguration implements PersistentStateComponent<Optio
 
     @NotNull
     @Override
-    public OptionsPatchConfiguration getState() {
+    public UNUSED_OptionsPatchConfiguration getState() {
         if(true) throw new RuntimeException("OptionsPatchConfiguration.getState: ");
         return this;
     }
 
     @Override
-    public void loadState(OptionsPatchConfiguration state) {
+    public void loadState(UNUSED_OptionsPatchConfiguration state) {
         if(true) throw new RuntimeException("OptionsPatchConfiguration.loadState: ");
         toAddVmOptions = state.toAddVmOptions;
         toRemoveVmOptions = state.toRemoveVmOptions;

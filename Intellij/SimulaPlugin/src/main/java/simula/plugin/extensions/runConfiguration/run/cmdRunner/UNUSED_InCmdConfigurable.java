@@ -22,10 +22,10 @@ import java.util.Objects;
 /**
  * @author Andrey Turbanov
  */
-public class InCmdConfigurable implements Configurable {
+public class UNUSED_InCmdConfigurable implements Configurable {
 
     private final Project myProject;
-    private OptionsPatchConfiguration myState;
+    private UNUSED_OptionsPatchConfiguration myState;
     private JTextArea toAddVmOptions;
     private JTextArea toRemoveVmOptions;
     private JTextArea toAddProgramOptions;
@@ -34,7 +34,7 @@ public class InCmdConfigurable implements Configurable {
     private SpinnerNumberModel freePortSpinnerModel;
     private JCheckBox findFreePort;
 
-    public InCmdConfigurable(Project project) {
+    public UNUSED_InCmdConfigurable(Project project) {
 //        if(true) throw new RuntimeException("NEW InCmdConfigurable: ");
         myProject = project;
     }
@@ -57,7 +57,7 @@ public class InCmdConfigurable implements Configurable {
     @Override
     public JComponent createComponent() {
         if(true) throw new RuntimeException("InCmdConfigurable.createComponent: ");
-        myState = ServiceManager.getService(myProject, OptionsPatchConfiguration.class);
+        myState = ServiceManager.getService(myProject, UNUSED_OptionsPatchConfiguration.class);
 
         toAddVmOptions = new JTextArea(myState.toAddVmOptions);
         toRemoveVmOptions = new JTextArea(myState.toRemoveVmOptions);
@@ -105,14 +105,14 @@ public class InCmdConfigurable implements Configurable {
     @Override
     public void apply() throws ConfigurationException {
         if(true) throw new RuntimeException("InCmdConfigurable.apply: ");
-        OptionsPatchConfiguration state = new OptionsPatchConfiguration();
+        UNUSED_OptionsPatchConfiguration state = new UNUSED_OptionsPatchConfiguration();
         state.toAddVmOptions = toAddVmOptions.getText().trim();
         state.toRemoveVmOptions = toRemoveVmOptions.getText().trim();
         state.toAddProgramOptions = toAddProgramOptions.getText().trim();
         state.toRemoveProgramOptions = toRemoveProgramOptions.getText().trim();
         state.isRunInsideTerminal = runInTerminal.isSelected();
         state.startPort = findFreePort.isSelected() ? freePortSpinnerModel.getNumber().intValue() : null;
-        ServiceManager.getService(myProject, OptionsPatchConfiguration.class).loadState(state);
+        ServiceManager.getService(myProject, UNUSED_OptionsPatchConfiguration.class).loadState(state);
     }
 
     @Override

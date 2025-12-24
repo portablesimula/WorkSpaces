@@ -10,18 +10,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import simula.plugin.extensions.runConfiguration.DemoRunConfigurationOptions;
+import simula.plugin.extensions.runConfiguration.SimulaRunConfigurationOptions;
 import simula.plugin.util.Dialogs;
 import simula.plugin.util.Global;
 import simula.plugin.util.Util;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Map;
-import java.util.Properties;
 
 public class SimulaCompiler {
     private static Project project;
@@ -34,6 +30,10 @@ public class SimulaCompiler {
     private static String simulaOutDir;
 
     public static int call(ExecutionEnvironment environment, Map<String, String> optionMap) {
+        Util.TRACE("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        Util.TRACE("+++             SimulaCompiler.call                 +++");
+        Util.TRACE("+++        Call Simula Compiler with -noExec        +++");
+        Util.TRACE("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         project = environment.getProject();
         options = optionMap;
         Util.printProject("SimulaCompiler.call: ", project);
@@ -64,7 +64,7 @@ public class SimulaCompiler {
     }
 
 
-    public static int call(@NotNull Project prj, @NotNull DemoRunConfigurationOptions optn) {
+    public static int call(@NotNull Project prj, @NotNull SimulaRunConfigurationOptions optn) {
         project = prj;
 //        options = optn;
         if(options == null) Util.IERR("SimulaCompiler.call: ERROR: No Options available");
@@ -126,7 +126,7 @@ public class SimulaCompiler {
 
         if(options == null) Util.IERR("SimulaCompiler.runCommandFromPlugin: ERROR: No Options available");
 //        Map<String, String> options = options.getOptionsMap();
-        DemoRunConfigurationOptions.setDefaults(options);
+        SimulaRunConfigurationOptions.setDefaults(options);
        Util.TRACE("SimulaCompiler.runCommandFromPlugin: options=" + options);
         if(options.get("simula.compiler.verbose").equals("true")) commandLine.addParameters("-verbose");
         if(options.get("simula.compiler.caseSensitive").equals("true")) commandLine.addParameters("-caseSensitive");

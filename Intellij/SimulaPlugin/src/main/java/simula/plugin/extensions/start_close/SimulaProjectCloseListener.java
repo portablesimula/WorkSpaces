@@ -5,7 +5,6 @@ import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectCloseListener;
 import org.jetbrains.annotations.NotNull;
-import simula.plugin.extensions.runConfiguration.DemoRunConfiguration;
 import simula.plugin.util.Util;
 
 import java.util.List;

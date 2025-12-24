@@ -8,27 +8,12 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class DemoConfigurationFactory extends ConfigurationFactory {
+public class SimulaConfigurationFactory extends ConfigurationFactory {
 
-//    private static DemoConfigurationFactory INSTANCE;
-//
-//    protected DemoConfigurationFactory() {
-//        super(DemoRunConfigurationType.getInstance());
-//    }
-//
-//    public static @NotNull DemoConfigurationFactory getInstance() {
-//        if(DemoConfigurationFactory.INSTANCE == null) DemoConfigurationFactory.INSTANCE = new DemoConfigurationFactory();
-//        return DemoConfigurationFactory.INSTANCE;
-//    }
-
-    protected DemoConfigurationFactory(ConfigurationType type) {
+    protected SimulaConfigurationFactory(ConfigurationType type) {
         super(type);
     }
 
-//    @Override
-//    public @NotNull String getId() {
-//        return DemoRunConfigurationType.ID;
-//    }
     @Override
     public String getId() { return("Simula"); }
 
@@ -37,13 +22,13 @@ public class DemoConfigurationFactory extends ConfigurationFactory {
     @NotNull
     @Override
     public RunConfiguration createTemplateConfiguration(@NotNull Project project) {
-        return new DemoRunConfiguration(project, this, "Demo run config");
+        return new SimulaRunConfiguration(project, this, "Demo run config");
     }
 
     @Nullable
     @Override
     public Class<? extends BaseState> getOptionsClass() {
-        return DemoRunConfigurationOptions.class;
+        return SimulaRunConfigurationOptions.class;
     }
 
 }

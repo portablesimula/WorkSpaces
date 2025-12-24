@@ -17,8 +17,8 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.ReadonlyStatusHandler;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import simula.plugin.extensions.runConfiguration.DemoRunConfiguration;
-import simula.plugin.extensions.runConfiguration.DemoRunConfigurationOptions;
+import simula.plugin.extensions.runConfiguration.SimulaRunConfiguration;
+import simula.plugin.extensions.runConfiguration.SimulaRunConfigurationOptions;
 import simula.plugin.util.Dialogs;
 import simula.plugin.util.Global;
 import simula.plugin.util.Util;
@@ -56,9 +56,6 @@ public class SimulaExecCommandLineState extends CommandLineState {
 
         // 3. Optional: attach a console view (though CommandLineState usually handles this automatically)
         // The console view will display stdout/stderr
-//        ConsoleView consoleView = getConsoleViewFromToolWindow(getEnvironment().getProject(), "Simula Trace Console");
-//        if(consoleView != null) consoleView.attachToProcess(processHandler);
-//        SEE: Code below ...
 
         // 4. Return the handler
         return processHandler;
@@ -79,14 +76,8 @@ public class SimulaExecCommandLineState extends CommandLineState {
             Util.IERR("SimulaExecCommandLineState.getCommandLine: No Source file available");
             return null;
         }
-//       File src = new File(sourceFile).getParentFile().getPath();
-//        src.getPath();
-//        src.getParentFile()
-//        Util.TRACE("SimulaExecCommandLineState.getCommandLine: src.getPath=" + src.getParentFile().getPath());
-//        String userDir = workDirectory + "/ssf";
         String userDir = new File(sourceFile).getParentFile().getPath();
         Util.TRACE("SimulaExecCommandLineState.getCommandLine: userDir=" + userDir);
-
 
         // TODO: DETTE MÅ RETTES FØR ENDELIG VERSJON
 //        String javaExePath = "java";
@@ -95,29 +86,20 @@ public class SimulaExecCommandLineState extends CommandLineState {
         // Set up for Simula Compiler
         GeneralCommandLine commandLine = new GeneralCommandLine()
                 .withExePath(javaExePath)
-                .withParameters("-jar"
-                        , "C:/Users/omyhr/Simula/Simula-2.0/simula.jar"
-                        , "-output", simulaOutDir
-//                        , "-noexec"
-//                       , "-verbose"
-                )
-//                .withWorkDirectory(workDirectory) // Set working directory
+                .withParameters("-jar", "C:/Users/omyhr/Simula/Simula-2.0/simula.jar", "-output", simulaOutDir)
                 .withWorkDirectory(userDir) // Set working directory
                 .withCharset(Charset.forName("UTF-8"));
 
-//        String userDir = workDirectory + "/ssf";
-//       commandLine.addParameters("-userDir", userDir);
-
         Map<String, String> optionMap = getOptionsMap(getEnvironment());
         if(optionMap != null) {
-            DemoRunConfigurationOptions.setDefaults(optionMap);
+            SimulaRunConfigurationOptions.setDefaults(optionMap);
             Util.TRACE("SimulaExecCommandLineState.getCommandLine: optionMap=" + optionMap);
 
-//            if(optionMap.get("simula.compiler.verbose").equals("true")) commandLine.addParameters("-verbose");
-//            if(optionMap.get("simula.compiler.caseSensitive").equals("true")) commandLine.addParameters("-caseSensitive");
-//            if(optionMap.get("simula.compiler.noExecution").equals("true")) commandLine.addParameters("-noExecution");
-//            if(optionMap.get("simula.compiler.warnings").equals("true")) commandLine.addParameters("-warnings");
-//            if(optionMap.get("simula.compiler.noextension").equals("true")) commandLine.addParameters("-noextension");
+            if(optionMap.get("simula.compiler.verbose").equals("true")) commandLine.addParameters("-verbose");
+            if(optionMap.get("simula.compiler.caseSensitive").equals("true")) commandLine.addParameters("-caseSensitive");
+            if(optionMap.get("simula.compiler.noExecution").equals("true")) commandLine.addParameters("-noExecution");
+            if(optionMap.get("simula.compiler.warnings").equals("true")) commandLine.addParameters("-warnings");
+            if(optionMap.get("simula.compiler.noextension").equals("true")) commandLine.addParameters("-noextension");
 
             if (optionMap.get("simula.runtime.verbose").equals("true")) commandLine.addParameters("-verbose");
             if (optionMap.get("simula.runtime.noPopup").equals("true")) commandLine.addParameters("-noPopup");
@@ -133,10 +115,10 @@ public class SimulaExecCommandLineState extends CommandLineState {
 
     private Map<String, String> getOptionsMap(ExecutionEnvironment environment) {
         RunProfile runProfile = getEnvironment().getRunProfile();
-        if(runProfile instanceof DemoRunConfiguration myRunConfiguration) {
-            DemoRunConfigurationOptions options = myRunConfiguration.getState();
+        if(runProfile instanceof SimulaRunConfiguration myRunConfiguration) {
+            SimulaRunConfigurationOptions options = myRunConfiguration.getState();
             Map<String, String> optionMap = options.getOptionsMap();
-            DemoRunConfigurationOptions.setDefaults(optionMap);
+            SimulaRunConfigurationOptions.setDefaults(optionMap);
             Util.TRACE("SimulaCompiler.runCommandFromPlugin: optionMap=" + optionMap);
             return optionMap;
         }
@@ -200,46 +182,5 @@ public class SimulaExecCommandLineState extends CommandLineState {
             });
         }
     }
-
-//    private static ConsoleView getConsoleViewFromToolWindow(@NotNull Project project, @NotNull String toolWindowId) {
-//        ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
-//        ToolWindow toolWindow = toolWindowManager.getToolWindow(toolWindowId);
-//        if (toolWindow == null) return null;
-//        ContentManager contentManager = toolWindow.getContentManager();
-//        Content[] contents = contentManager.getContents();
-//        for (Content content : contents) {
-//            Component component = content.getComponent();
-//            // The ConsoleView itself is a Swing component. If you added the
-//            // ConsoleView component directly to the Content, you can check its type.
-//            if (component instanceof ConsoleView) {
-//                return (ConsoleView) component;
-//            }
-//            // If the ConsoleView is nested inside another JPanel (e.g., in a complex UI),
-//            // you might need a helper method to find it recursively within the component hierarchy.
-//            else {
-//                ConsoleView nestedView = findConsoleViewRecursively(component);
-//                if (nestedView != null) {
-//                    return nestedView;
-//                }
-//            }
-//        }
-//        return null;
-//    }
-//
-//    // Helper method to find a ConsoleView within a container hierarchy
-//    private static ConsoleView findConsoleViewRecursively(Component component) {
-//        if (component instanceof ConsoleView) {
-//            return (ConsoleView) component;
-//        }
-//        if (component instanceof Container) {
-//            for (Component child : ((Container) component).getComponents()) {
-//                ConsoleView found = findConsoleViewRecursively(child);
-//                if (found != null) {
-//                    return found;
-//                }
-//            }
-//        }
-//        return null;
-//    }
 
 }
