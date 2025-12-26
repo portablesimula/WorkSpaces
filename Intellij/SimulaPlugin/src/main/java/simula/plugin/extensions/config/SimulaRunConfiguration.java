@@ -1,4 +1,4 @@
-package simula.plugin.extensions.runConfiguration;
+package simula.plugin.extensions.config;
 
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
@@ -6,14 +6,15 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import simula.plugin.extensions.runConfiguration.run.SimulaCompileAndExecCommandLineState;
-import simula.plugin.extensions.runConfiguration.run.SimulaCompiler;
-import simula.plugin.extensions.runConfiguration.run.SimulaExecCommandLineState;
+import simula.plugin.extensions.exec.SimulaCompileAndExecCommandLineState;
+import simula.plugin.extensions.exec.SimulaCompiler;
+import simula.plugin.extensions.exec.SimulaRunJarfile;
+import simula.plugin.extensions.exec.SimulaExecJarfile;
 import simula.plugin.util.Util;
 
 import java.util.Map;
 
-public class SimulaRunConfiguration extends RunConfigurationBase<SimulaRunConfigurationOptions> {
+public class SimulaRunConfiguration extends RunConfigurationBase<SimulaSettings> {
 
     protected SimulaRunConfiguration(Project project,
                                      ConfigurationFactory factory,
@@ -23,8 +24,8 @@ public class SimulaRunConfiguration extends RunConfigurationBase<SimulaRunConfig
 
     @NotNull
     @Override
-    protected SimulaRunConfigurationOptions getOptions() {
-        return (SimulaRunConfigurationOptions) super.getOptions();
+    protected SimulaSettings getOptions() {
+        return (SimulaSettings) super.getOptions();
     }
 
     public Map<String, String> getOptionsMap() {
@@ -55,11 +56,17 @@ public class SimulaRunConfiguration extends RunConfigurationBase<SimulaRunConfig
             System.out.println("SimulaRunConfiguration.getState: environment.getModulePath: " + environment.getModulePath());
 
             // Call the Simula Compiler to produce the .jar file
-            int exitCode = SimulaCompiler.call(environment, optionMap);
+            int exitCode = SimulaCompiler.call(environment, getOptions());
 
             if(exitCode == 0) {
+                boolean TESTING = false;//true;
                 System.out.println("SimulaRunConfiguration.getState: Execute resulting .jar");
-                return new SimulaExecCommandLineState(environment, optionMap);
+                if(TESTING) {
+                    SimulaExecJarfile.call(environment, getOptions());
+                } else {
+//                    return new SimulaRunJarfile(environment, optionMap);
+                    return new SimulaRunJarfile(environment, getOptions());
+                }
             }
             return null;
         }
@@ -68,9 +75,9 @@ public class SimulaRunConfiguration extends RunConfigurationBase<SimulaRunConfig
     private Map<String, String> getOptionsMap(ExecutionEnvironment environment) {
         RunProfile runProfile = environment.getRunProfile();
         if(runProfile instanceof SimulaRunConfiguration myRunConfiguration) {
-            SimulaRunConfigurationOptions options = myRunConfiguration.getState();
+            SimulaSettings options = myRunConfiguration.getState();
             Map<String, String> optionMap = options.getOptionsMap();
-            SimulaRunConfigurationOptions.setDefaults(optionMap);
+            SimulaSettings.setDefaults(optionMap);
             Util.TRACE("SimulaRunConfiguration.getOptionsMap: " + optionMap);
             return optionMap;
         }

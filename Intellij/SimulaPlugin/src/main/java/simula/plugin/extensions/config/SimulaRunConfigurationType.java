@@ -1,4 +1,4 @@
-package simula.plugin.extensions.runConfiguration;
+package simula.plugin.extensions.config;
 
 import com.intellij.execution.configurations.ConfigurationTypeBase;
 import simula.plugin.util.Util;

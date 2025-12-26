@@ -1,4 +1,4 @@
-package simula.plugin.extensions.runConfiguration;
+package simula.plugin.extensions.config;
 
 import simula.plugin.util.Util;
 import simula.plugin.util.Dialogs;
@@ -44,7 +44,7 @@ public class SelectOptionsPanel extends JPanel {
 
     /// Editor Utility: Set Compiler Mode.
     public JPanel selectModeOption() {
-        SimulaRunConfigurationOptions.setDefaults(getOptions());
+        SimulaSettings.setDefaults(getOptions());
         JPanel panel=new JPanel();
         panel.setBackground(Color.white);
         JCheckBox but1 = checkBox("viaJavaSource");
@@ -83,7 +83,7 @@ public class SelectOptionsPanel extends JPanel {
     }
 
     public JPanel selectCTOptions() {
-        SimulaRunConfigurationOptions.setDefaults(getOptions());
+        SimulaSettings.setDefaults(getOptions());
         JPanel panel=new JPanel();
         panel.setBackground(Color.white);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -98,7 +98,7 @@ public class SelectOptionsPanel extends JPanel {
     }
 
     public JPanel selectRTOptions() {
-        SimulaRunConfigurationOptions.setDefaults(getOptions());
+        SimulaSettings.setDefaults(getOptions());
         JPanel panel=new JPanel();
         panel.setBackground(Color.white);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));

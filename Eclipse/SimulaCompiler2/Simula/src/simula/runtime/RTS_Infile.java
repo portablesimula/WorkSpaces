@@ -253,7 +253,7 @@ public class RTS_Infile extends RTS_Imagefile {
 				try {
 					return readInputWithTimeout(30, TimeUnit.SECONDS);
 				} catch (Exception e) {
-					IO.println("RTS_Infile.readLine: got" + e);
+					IO.println("RTS_Infile.readLine: got: " + e);
 			    	String line = prompt("Sorry - Sysin.inimage is Unavailable.", "Enter Input here:");
 			    	System.out.println("You entered: " + line);
 			    	return line;
@@ -313,7 +313,7 @@ public class RTS_Infile extends RTS_Imagefile {
 //    	IO.println("readInputWithTimeout: result="+result);
         if(result == null) {
         	IO.println("Throw RuntimeException !!!");
-        	throw new RuntimeException("");
+        	throw new RuntimeException("Timeout occurred. No input received within the time limit.");
         }
         return result;
     }

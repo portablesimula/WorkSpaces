@@ -1,4 +1,4 @@
-package simula.plugin.extensions.runConfiguration;
+package simula.plugin.extensions.config;
 
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
@@ -28,7 +28,7 @@ public class SimulaConfigurationFactory extends ConfigurationFactory {
     @Nullable
     @Override
     public Class<? extends BaseState> getOptionsClass() {
-        return SimulaRunConfigurationOptions.class;
+        return SimulaSettings.class;
     }
 
 }

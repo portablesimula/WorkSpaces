@@ -1,4 +1,4 @@
-package simula.plugin.extensions.runConfiguration.run;
+package simula.plugin.extensions.exec;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
@@ -37,8 +37,8 @@ public class RunExternalProcess {
         // 4. Display the console in a tool window
         // You need to define a tool window in your plugin.xml (e.g., id="MyCustomPluginConsole")
         ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
-//        ToolWindow toolWindow = toolWindowManager.getToolWindow("MyCustomPluginConsole"); // Replace with your tool window ID
-        ToolWindow toolWindow = toolWindowManager.getToolWindow("Simula"); // Replace with your tool window ID
+        ToolWindow toolWindow = toolWindowManager.getToolWindow("Simula Console"); // Replace with your tool window ID
+//        ToolWindow toolWindow = toolWindowManager.getToolWindow("Run"); // Replace with your tool window ID
 
         Util.TRACE("RunExternalProcess.exec: toolWindow="+toolWindow);
         if (toolWindow != null) {

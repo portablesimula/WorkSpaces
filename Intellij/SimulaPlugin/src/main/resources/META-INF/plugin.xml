@@ -55,7 +55,7 @@
 
         <lang.syntaxHighlighterFactory
                 language="Simula"
-                implementationClass="simula.plugin.extensions.highlighterExtension.SimulaSyntaxHighlighterFactory"/>
+                implementationClass="simula.plugin.extensions.highlighter.SimulaSyntaxHighlighterFactory"/>
 
         <!--lang.parserDefinition
                 language="Simula"
@@ -70,7 +70,7 @@
                 factoryClass="simula.plugin.extensions.toolWindows.ConsoleToolWindowFactory"
                 icon="/images/favico.png" /-->
 
-        <toolWindow id="Simula Trace" anchor="bottom"
+        <toolWindow id="Simula Console" anchor="bottom"
                     factoryClass="simula.plugin.extensions.toolWindows.ConsoleToolWindowFactory"
                     icon="/images/favico.png" />
 
@@ -83,19 +83,19 @@
 
         <!-- Run Configuration -->
             <!-- Register your main configuration type first -->
-            <!--configurationType implementation="simula.plugin.extensions.runConfiguration.SimulaRunConfigurationType"/-->
-            <configurationType implementation="simula.plugin.extensions.runConfiguration.SimulaRunConfigurationType"/>
+            <!--configurationType implementation="simula.plugin.extensions.config.SimulaRunConfigurationType"/-->
+            <configurationType implementation="simula.plugin.extensions.config.SimulaRunConfigurationType"/>
 
             <!-- Register the producer to link it to the context menu -->
-            <runConfigurationProducer implementation="simula.plugin.extensions.runConfiguration.SimulaFileRunConfigurationProducer"/>
+            <runConfigurationProducer implementation="simula.plugin.extensions.config.SimulaFileRunConfigurationProducer"/>
 
-        <programRunner implementation="simula.plugin.extensions.runConfiguration.run.cmdRunner.SimulaProgramRunner"/>
+        <programRunner implementation="simula.plugin.extensions.exec.SimulaProgramRunner"/>
 
-        <!--executor implementation="simula.plugin.extensions.runConfiguration.run.cmdRunner.UNUSED_InCmdExecutor"/-->
-        <!--projectConfigurable instance="simula.plugin.extensions.runConfiguration.run.cmdRunner.UNUSED_InCmdConfigurable"/-->
-        <!--projectService serviceImplementation="simula.plugin.extensions.runConfiguration.run.cmdRunner.UNUSED_OptionsPatchConfiguration"/-->
+        <!--executor implementation="simula.plugin.extensions.config.run.cmdRunner.UNUSED_InCmdExecutor"/-->
+        <!--projectConfigurable instance="simula.plugin.extensions.config.run.cmdRunner.UNUSED_InCmdConfigurable"/-->
+        <!--projectService serviceImplementation="simula.plugin.extensions.config.run.cmdRunner.UNUSED_OptionsPatchConfiguration"/-->
 
-        <!--typedHandler implementation="simula.plugin.extensions.runConfiguration.run.cmdRunner.UNUSED_SimulaKeyHandler"/-->
+        <!--typedHandler implementation="simula.plugin.extensions.config.run.cmdRunner.UNUSED_SimulaKeyHandler"/-->
 
     </extensions>
 

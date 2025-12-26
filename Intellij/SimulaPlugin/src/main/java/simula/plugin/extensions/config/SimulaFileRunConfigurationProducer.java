@@ -1,4 +1,4 @@
-package simula.plugin.extensions.runConfiguration;
+package simula.plugin.extensions.config;
 
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.execution.actions.LazyRunConfigurationProducer;

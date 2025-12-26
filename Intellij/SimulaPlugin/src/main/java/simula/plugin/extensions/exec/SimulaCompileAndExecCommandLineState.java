@@ -1,4 +1,4 @@
-package simula.plugin.extensions.runConfiguration.run;
+package simula.plugin.extensions.exec;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.*;
@@ -14,7 +14,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.ReadonlyStatusHandler;
 import com.intellij.openapi.vfs.VirtualFile;
-import simula.plugin.extensions.runConfiguration.SimulaRunConfigurationOptions;
+import simula.plugin.extensions.config.SimulaSettings;
 import simula.plugin.util.Dialogs;
 import simula.plugin.util.Global;
 import simula.plugin.util.Util;
@@ -93,7 +93,7 @@ public class SimulaCompileAndExecCommandLineState extends CommandLineState {
 
 //        Map<String, String> optionMap = getOptionsMap(getEnvironment());
         if(optionMap != null) {
-            SimulaRunConfigurationOptions.setDefaults(optionMap);
+            SimulaSettings.setDefaults(optionMap);
             Util.TRACE("SimulaCompilerCommandLineState.getCommandLine: optionMap=" + optionMap);
 
             if(optionMap.get("simula.compiler.verbose").equals("true")) commandLine.addParameters("-verbose");
