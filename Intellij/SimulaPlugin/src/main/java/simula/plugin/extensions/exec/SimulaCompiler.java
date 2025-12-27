@@ -24,25 +24,32 @@ public class SimulaCompiler {
         Util.TRACE("+++        Call Simula Compiler with -noExec        +++");
         Util.TRACE("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         Project project = environment.getProject();
-        Util.printProject("SimulaExecJarfile.call: ", project);
-        if (project == null) { Util.IERR("SimulaExecJarfile.call: project == null"); return -1; }
+        Util.printProject("SimulaCompiler.call: ", project);
+        if (project == null) { Util.IERR("SimulaCompiler.call: project == null"); return -1; }
 
         FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
         Editor editor = fileEditorManager.getSelectedTextEditor();
-        if (editor == null) { Util.IERR("SimulaExecJarfile.call: editor == null"); return -1; }
+        if (editor == null) { Util.IERR("SimulaCompiler.call: editor == null"); return -1; }
         VirtualFile currentFile = FileDocumentManager.getInstance().getFile(editor.getDocument());
         String workDirectory = currentFile.getParent().getPath();
         String simulaOutDir = workDirectory + "/bin";
 
         // askRunJarFile
-        String title = "AskRunJarFile: ";
+        String title = "AskRunSimulaCompiler: ";
         String msg = "Source File: " + currentFile;
-        msg +="\nWorkDirectory: " + workDirectory;
-        msg +="\n\nDo you want to run JarFile now ?\n\n";
+        msg +="\nWork   Directory: " + workDirectory;
+        msg +="\nOutput Directory: " + simulaOutDir;
+        msg +="\nJava    Home: " + System.getProperty("java.home");
+        msg +="\nJava Version: " + System.getProperty("java.version");
+        msg +="\n\nDo you want to run Simula now ?\n\n";
         int answer = Dialogs.optionDialog(msg,title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, "Start Simula", "Cancel");
         if(answer != JOptionPane.OK_OPTION) return 0;
-        System.out.println("SimulaExecJarfile.call: DO RUN JARFILE");
+        System.out.println("SimulaCompiler.call: DO RUN JARFILE");
 
+        System.out.println("SimulaCompiler.call: Java    Home: " + System.getProperty("java.home"));
+        System.out.println("SimulaCompiler.call: Java Version: " + System.getProperty("java.version"));
+
+        
         // TODO: DETTE MÅ RETTES FØR ENDELIG VERSJON
 //        String javaExePath = "java";
         String javaExePath = "C:\\Program Files\\Java\\jdk-25\\bin\\java.exe";
@@ -58,7 +65,7 @@ public class SimulaCompiler {
                 .withCharset(Charset.forName("UTF-8"));
         options.addCompilerOptions(commandLine);
         commandLine.addParameters(currentFile.getPath());
-        Util.TRACE("SimulaExecJarfile.call: commandLine="+commandLine);
+        Util.TRACE("SimulaCompiler.call: commandLine="+commandLine);
 
         try {
             RunExternalProcess.exec(project, commandLine);

@@ -3,7 +3,7 @@ plugins {
 //    id("org.jetbrains.kotlin.jvm") version "2.1.0"
 //    id("org.jetbrains.intellij.platform") version "2.7.1"
 
-    id("org.jetbrains.kotlin.jvm") version "2.2.21"
+    id("org.jetbrains.kotlin.jvm") version "2.3.0"
     id("org.jetbrains.intellij.platform") version "2.10.5"
 }
 
@@ -61,6 +61,24 @@ intellijPlatform {
 kotlin {
     compilerOptions {
 // MYH        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
-        jvmToolchain(21)
+
+//  This error occurs because your compileJava task is targeting JVM 25,
+        //  while your compileKotlin task is targeting JVM 24.
+        //  Kotlin currently does not support JVM 25 as a target,
+        //  leading the compiler to fall back to JVM 24 and creating an inconsistency.
+//  To fix this, you must align both tasks to the same supported JVM version
+        //  (e.g., JVM 21 or 24) using one of the following methods:
+      jvmToolchain(25)
+//        jvmToolchain(24)
+//        jvmToolchain(21)
     }
+}
+
+tasks.withType<Jar> {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+// If the error occurs during resource processing
+tasks.withType<ProcessResources> {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

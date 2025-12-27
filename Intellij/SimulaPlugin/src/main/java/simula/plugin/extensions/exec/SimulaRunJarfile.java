@@ -22,6 +22,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import simula.plugin.extensions.config.SimulaRunConfiguration;
 import simula.plugin.extensions.config.SimulaSettings;
+import simula.plugin.util.Dialogs;
 import simula.plugin.util.Util;
 
 import javax.swing.*;
@@ -88,9 +89,20 @@ public class SimulaRunJarfile extends CommandLineState {
         Editor editor = fileEditorManager.getSelectedTextEditor();
         if (editor == null) { Util.IERR("SimulaRunJarfile.call: editor == null"); return null; }
         VirtualFile currentFile = FileDocumentManager.getInstance().getFile(editor.getDocument());
+//        String workDirectory = currentFile.getParent().getParent().getPath();
         String workDirectory = currentFile.getParent().getPath();
         String name = currentFile.getNameWithoutExtension();
         String jarFile = workDirectory + "/bin/" + name + ".jar";
+
+
+        // askRunJarFile
+        String title = "AskRunJarFile: ";
+        String msg = "Jar File: " + jarFile;
+        msg +="\nWorkDirectory: " + workDirectory;
+        msg +="\n\nDo you want to run JarFile now ?\n\n";
+        int answer = Dialogs.optionDialog(msg,title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, "Execute", "Cancel");
+        if(answer != JOptionPane.OK_OPTION) return null;
+        System.out.println("SimulaRunJarfile.call: DO RUN JARFILE");
 
         // TODO: DETTE MÅ RETTES FØR ENDELIG VERSJON
 //        String javaExePath = "java";
