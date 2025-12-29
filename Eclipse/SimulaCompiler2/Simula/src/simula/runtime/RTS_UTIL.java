@@ -5,10 +5,17 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.runtime;
 
+import java.awt.Color;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.nio.charset.Charset;
+
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+
+import simula.compiler.utilities.Global;
 
 /// Utility class containing a lot of common stuff.
 /// 
@@ -33,7 +40,21 @@ public final class RTS_UTIL {
 	
 	/// Number of edit overflows.
 	static int numberOfEditOverflows;
-
+	
+	public static ImageIcon favicon; // Set by BPRG
+	public static ImageIcon simicon; // Set by BPRG
+	public static ImageIcon getFavicon() {
+		if(favicon == null) favicon = getIcon("simicon.png");
+		return favicon;
+	}
+	
+	public static ImageIcon getIcon(String name) {
+    	String resource = "/simula/runtime/icons/" + name;
+    	URL imageURL = NOTEXT.getClass().getResource(resource);
+    	if (imageURL != null)
+    		return new ImageIcon(imageURL);
+    	return null;
+	}
 
 
 	// *****************************************
@@ -456,15 +477,16 @@ public final class RTS_UTIL {
 	/// @param ident the program identifier
 	/// @param args the arguments
 	public static void BPRG(final String ident, final String[] args) {
+		RTS_UTIL.favicon = getIcon("favicon.png");
+		RTS_UTIL.simicon = getIcon("sim.png");
 		setRuntimeOptions(args);
 		RTS_Coroutine.INIT();
 		RTS_UTIL.numberOfEditOverflows = 0;
 		RTS_RTObject.startTimeMs = System.currentTimeMillis();
 		RTS_UTIL.progamIdent = ident;
 		if (RTS_RTObject._SYSIN == null) {
-			if (RTS_Option.BLOCK_TRACING) {
+			if (RTS_Option.BLOCK_TRACING)
 				RTS_UTIL.TRACE("Begin Execution of Simula Program: " + ident);
-			}
 			RTS_RTObject._SYSIN = new RTS_Infile(RTS_RTObject._CTX, new RTS_TXT("#sysin"));
 			RTS_RTObject._SYSOUT = new RTS_Printfile(RTS_RTObject._CTX, new RTS_TXT("#sysout"));
 			RTS_RTObject._SYSIN.open(RTS_ENVIRONMENT.blanks(RTS_RTObject._INPUT_LINELENGTH));
@@ -540,22 +562,10 @@ public final class RTS_UTIL {
 	/// Popup an error message box.
 	/// @param msg the error message
 	static void popUpError(final String msg) {
-		int res = optionDialog(msg + "\nDo you want to continue ?", "Error", JOptionPane.YES_NO_OPTION,
+		int res = RTS_Dialog.optionDialog(msg + "\nDo you want to continue ?", "Error", JOptionPane.YES_NO_OPTION,
 				JOptionPane.ERROR_MESSAGE, "Yes", "No");
 		if (res != JOptionPane.YES_OPTION)
 			throw new RTS_EndProgram("Simula - endProgram");
-	}
-
-	/// Brings up an option dialog.
-	/// @param msg the message to display
-	/// @param title the title string for the dialog
-	/// @param optionType an integer designating the options available on the dialog
-	/// @param messageType an integer designating the kind of message this is
-	/// @param option an array of objects indicating the possible choices the user can make
-	/// @return an integer indicating the option chosen by the user, or CLOSED_OPTION if the user closed the dialog
-	static int optionDialog(final Object msg, final String title, final int optionType, final int messageType, final String... option) {
-		int answer = JOptionPane.showOptionDialog(null, msg, title, optionType, messageType, null, option, option[0]);
-		return (answer);
 	}
 
 	/// List runtime options.
@@ -607,7 +617,7 @@ public final class RTS_UTIL {
 	static void ensureOpenRuntimeConsole() {
 		if (console == null) {
 			console = new RTS_ConsolePanel();
-			console.popup("Simula Runtime Console");
+			console.popup("Simula: " + RTS_UTIL.progamIdent);
 		}		
 	}
 

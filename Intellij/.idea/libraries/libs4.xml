@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="libs4">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/SimulaPlugin – Draft13/build/libs/SimulaPlugin-1.0-SNAPSHOT-base.jar!/" />
+      <root url="jar://$PROJECT_DIR$/SimulaPlugin – Draft13/build/libs/SimulaPlugin-1.0-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/SimulaPlugin – Draft13/build/libs/SimulaPlugin-1.0-SNAPSHOT-instrumented.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

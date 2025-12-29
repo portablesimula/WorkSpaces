@@ -129,6 +129,7 @@ public final class MakeSetup {
 	// ***************************************************************
 	private static void copySimulaIconFiles() throws IOException	{
 		printHeading("Copy Simula Icons .png's into "+RELEASE_HOME);
+		copyImageFile("favicon.png");
 		copyImageFile("sim.ico");
 		copyImageFile("sim.png");
 		copyImageFile("sim2.png");

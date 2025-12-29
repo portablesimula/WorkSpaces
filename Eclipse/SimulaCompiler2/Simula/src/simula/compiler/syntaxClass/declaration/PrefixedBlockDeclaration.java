@@ -95,7 +95,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		block.blockPrefix = blockPrefix;
 		block.prefix = blockPrefix.identifier;
 		block.isMainModule=isMainModule;
-		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse PrefixedBlock");
+		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse PrefixedBlock");
 		while (Declaration.acceptDeclaration(block)) Parse.accept(KeyWord.SEMICOLON);
 		while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
 			Statement stm = Statement.expectStatement();

@@ -5,9 +5,13 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.runtime;
 
+import java.awt.Component;
+import java.awt.HeadlessException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 
 /// System class File.
@@ -180,7 +184,15 @@ public class RTS_File extends RTS_CLASS {
 				}
 		}
 		if(! RTS_Option.noPopup) {
-			JFileChooser fileChooser = new JFileChooser(file.getParent());
+	    	JFileChooser fileChooser = new JFileChooser(file.getParent()) {
+	    	    @Override
+	    	    protected JDialog createDialog(Component parent) throws HeadlessException {
+	    	        JDialog dialog = super.createDialog(parent);
+	    	        if(RTS_UTIL.favicon != null)
+	    	        	dialog.setIconImage(RTS_UTIL.favicon.getImage());
+	    	        return dialog;
+	    	    }
+	    	};
 			fileChooser.setDialogTitle("Can't Open " + fileName + ", select another");
 			int answer = fileChooser.showOpenDialog(null);
 			if (answer == JFileChooser.APPROVE_OPTION) {

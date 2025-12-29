@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -19,6 +20,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 /// System class Infile.
@@ -239,7 +241,7 @@ public class RTS_Infile extends RTS_Imagefile {
     /// @return the text entered or "?CANCELLED"
     private static String prompt(String title, String msg) {
         // Prompt the user for input
-        String result = JOptionPane.showInputDialog(null, msg, title, JOptionPane.QUESTION_MESSAGE);
+        String result = RTS_Dialog.inputDialog( msg, title, JOptionPane.QUESTION_MESSAGE);
     	if(result == null) result = "?CANCELLED";
         return result;
     }

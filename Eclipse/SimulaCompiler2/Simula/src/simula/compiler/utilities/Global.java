@@ -37,6 +37,8 @@ public final class Global {
 	/// NOTE: When updating release id, change version in SimulaExtractor and RuntimeSystem
 	public static final String simulaReleaseID = "Simula-2.0";
 	
+	/// The Simula favicon
+	public static ImageIcon favicon;
 	/// A Simula icon
 	public static ImageIcon simIcon;
 	/// A small Simula icon
@@ -164,6 +166,7 @@ public final class Global {
 			if (SIMULA_VERSION != null) {
 				try {
 					File simdir = new File(SIMULA_HOME, SIMULA_VERSION);
+					favicon = new ImageIcon(new File(simdir, "icons/favicon.png").toString());
 					simIcon = new ImageIcon(new File(simdir, "icons/sim2.png").toString());
 					sIcon = new ImageIcon(new File(simdir, "icons/sim.png").toString());
 				} catch(Exception e) {}

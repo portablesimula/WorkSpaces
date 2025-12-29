@@ -5,16 +5,17 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.runtime;
 
+import java.awt.Component;
+import java.awt.HeadlessException;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-
-import simula.compiler.utilities.Global;
 
 /// System class ENVIRONMENT.
 /// 
@@ -1619,7 +1620,6 @@ public class RTS_ENVIRONMENT extends RTS_RTObject {
 		}
 	}
 
-
 	///// *********************************************************************
 	///// ** Utility: Procedure prompt
 	///// *********************************************************************
@@ -1631,12 +1631,10 @@ public class RTS_ENVIRONMENT extends RTS_RTObject {
     public static RTS_TXT prompt(RTS_TXT title, RTS_TXT msg) {
     	String tit = (title == null)? "Prompt" : title.edText();
     	String mss = (msg == null)? "Input" : msg.edText();
-        String result = JOptionPane.showInputDialog(null, mss, tit, JOptionPane.QUESTION_MESSAGE);
+        String result = RTS_Dialog.inputDialog(mss, tit, JOptionPane.QUESTION_MESSAGE);
     	if(result == null) result = "?CANCELLED";
 		return new RTS_TXT(result);
-    	
     }
-
 
 	///// *********************************************************************
 	///// ** Utility: Procedure confirmDialog
@@ -1649,9 +1647,7 @@ public class RTS_ENVIRONMENT extends RTS_RTObject {
     public static boolean confirmDialog(RTS_TXT title, RTS_TXT msg) {
     	String tit = (title == null)? "Prompt" : title.edText();
     	String mss = (msg == null)? "Input" : msg.edText();
-    	int result = JOptionPane.showConfirmDialog(null, mss, tit, JOptionPane.YES_NO_OPTION);
-		return result == JOptionPane.YES_OPTION;
-    	
+    	return RTS_Dialog.confirmDialog(mss, tit, JOptionPane.YES_NO_OPTION);
     }
 
 	///// *********************************************************************
@@ -1664,9 +1660,21 @@ public class RTS_ENVIRONMENT extends RTS_RTObject {
     /// @return the file selected or "?CANCELLED"
     public static RTS_TXT fileChooser(RTS_TXT title, RTS_TXT startDir) {
     	String tit = (title == null)? "Select File" : title.edText();
-    	String dir = (startDir == null)? null : startDir.edText();
+//    	String dir = (startDir == null)? null : startDir.edText();
+    	String dir = (startDir == null)? System.getProperty("user.dir") : startDir.edText();
     	String result = null;
-		JFileChooser fileChooser = new JFileChooser(dir);
+//		JFileChooser fileChooser = new JFileChooser(dir);
+    	JFileChooser fileChooser = new JFileChooser(dir) {
+    	    @Override
+    	    protected JDialog createDialog(Component parent) throws HeadlessException {
+    	        JDialog dialog = super.createDialog(parent);
+    	        // Load your icon
+//    	        Image icon = new ImageIcon(getClass().getResource("/path/to/icon.png")).getImage();
+    	        dialog.setIconImage(RTS_UTIL.favicon.getImage());
+    	        return dialog;
+    	    }
+    	};
+//    	chooser.showOpenDialog(frame);	
 		fileChooser.setDialogTitle(tit);
 		int answer = fileChooser.showDialog(null, "Select");
 		if (answer == JFileChooser.APPROVE_OPTION) {

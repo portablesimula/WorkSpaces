@@ -25,6 +25,8 @@ public class RTS_Frame extends JFrame {
 	
 	/// Create a new RTS_Frame
 	public RTS_Frame() {
+		if(RTS_UTIL.favicon != null)
+			this.setIconImage(RTS_UTIL.favicon.getImage());
 		addWindowListener(this);
 		if(openFrames == null) openFrames = new Vector<JFrame>();
 		openFrames.add(this);

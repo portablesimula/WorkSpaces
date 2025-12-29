@@ -413,6 +413,7 @@ public class RTS_Drawing extends RTS_Simset {
 		setFontSize(12);
 		if (DEBUG)
 			IO.println("Init: Current Font=" + currentFont);
+		frame.setTitle("Simula: " + RTS_UTIL.progamIdent);
 		frame.add(canvas);
 		frame.pack();
 		frame.setVisible(true);

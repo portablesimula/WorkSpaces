@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/SimulaPluginKopi/build/libs/SimulaPlugin-1.0-SNAPSHOT-instrumented.jar!/" />
+      <root url="jar://$PROJECT_DIR$/SimulaPluginKopi/build/libs/SimulaPlugin-1.0-SNAPSHOT-base.jar!/" />
+      <root url="jar://$PROJECT_DIR$/SimulaPluginKopi/build/libs/SimulaPlugin-1.0-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

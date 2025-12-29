@@ -1,39 +1,11 @@
-Simulation BEGIN
-   TEXT PROCEDURE status (p);
-   REF(Process) p;
-   BEGIN
-      status :- IF p.Terminated THEN "terminert" ELSE
-         IF p.Idle THEN "passiv" ELSE
-         IF p == Current THEN "aktiv" ELSE "suspendert";
-   END status;
-
-   PROCEDURE vis_status (id);
-   TEXT id;
-   BEGIN
-      OutText(id & ": ap er " & status(ap) & " og bp er " & status(bp));
-      OutImage;
-   END vis_status;
-
-   Process CLASS A;
-   BEGIN
-      vis_status("A1");
-      activate bp;
-      vis_status("A2");
-   END A;
-
-   Process CLASS B;
-   BEGIN
-      vis_status("B1");
-      reactivate ap;
-      vis_status("B2");
-   END B;
-
-   REF(A) ap;
-   REF(B) bp;
-   ap :- NEW A;   bp :- NEW B;
-   vis_status("P1");
-   ACTIVATE ap;
-   vis_status("P2");
-   Hold(100);
-   vis_status("P3");
-END
+begin
+Simset begin
+% inspect new Simset do begin
+	ref(Head) liste;
+	ref(Link) elt;
+	
+	elt :- liste.first;
+	
+end;
+end;	
+	

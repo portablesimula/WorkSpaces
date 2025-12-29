@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="coroutines-javaagent-legacy3">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/SimulaPlugin/.intellijPlatform/coroutines-javaagent-legacy.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

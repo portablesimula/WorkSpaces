@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/JavaHelloWorld/JavaHelloWorld.iml" filepath="$PROJECT_DIR$/JavaHelloWorld/JavaHelloWorld.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SimulaPlugin/SimulaPlugin.iml" filepath="$PROJECT_DIR$/SimulaPlugin/SimulaPlugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SimulaPlugin src/SimulaPlugin src.iml" filepath="$PROJECT_DIR$/SimulaPlugin src/SimulaPlugin src.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SimulaPlugin – Draft12/SimulaPlugin – Draft12.iml" filepath="$PROJECT_DIR$/SimulaPlugin – Draft12/SimulaPlugin – Draft12.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SimulaPlugin – Draft13/SimulaPlugin – Draft13.iml" filepath="$PROJECT_DIR$/SimulaPlugin – Draft13/SimulaPlugin – Draft13.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SimulaPlugin – Draft14 -- Backup/SimulaPlugin – Draft14 -- Backup.iml" filepath="$PROJECT_DIR$/SimulaPlugin – Draft14 -- Backup/SimulaPlugin – Draft14 -- Backup.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SimulaPluginKopi/SimulaPluginKopi.iml" filepath="$PROJECT_DIR$/SimulaPluginKopi/SimulaPluginKopi.iml" />
+    </modules>
+  </component>
+</project>

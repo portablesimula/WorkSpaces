@@ -15,6 +15,7 @@ import java.util.Vector;
 
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
@@ -202,7 +203,7 @@ public final class JavaSourceFileCoder {
 		s.append(edIndent() + "public static RTS_PROGINFO _INFO=new RTS_PROGINFO(\"");
 		s.append(Global.sourceFileName);
 		s.append("\",\"");
-		s.append(blockDeclaration.declarationKind + " " + blockDeclaration.identifier);
+		s.append(ObjectKind.edit(blockDeclaration.declarationKind) + " " + blockDeclaration.identifier);
 		s.append('"');
 		for (Integer i : lineMap) {
 			s.append(',');
