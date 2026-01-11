@@ -106,8 +106,7 @@ public abstract class SyntaxClass {
 
 	/// Create a new SyntaxClass.
 	protected SyntaxClass() {
-//		lineNumber = Global.sourceLineNumber;
-		lineNumber = Parse.prevToken.lineNumber;
+		lineNumber = Global.sourceLineNumber;
 	}
 
 	/// Perform semantic checking.

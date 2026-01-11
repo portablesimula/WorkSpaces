@@ -751,8 +751,7 @@ public final class RTS_UTIL {
 			int x = 0;
 			int javaLineNumber = elt.getLineNumber();
 			try {
-				while (lineMap[x] < javaLineNumber)
-					x = x + 2;
+				while (lineMap[x] < javaLineNumber) x = x + 2;
 				StringBuilder sb = new StringBuilder();
 				sb.append(lead + info.ident);
 				if (RTS_Option.VERBOSE)

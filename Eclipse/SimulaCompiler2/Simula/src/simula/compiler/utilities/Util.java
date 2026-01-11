@@ -6,12 +6,7 @@
 package simula.compiler.utilities;
 
 import java.awt.Color;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
@@ -19,8 +14,6 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-
-import simula.compiler.SimulaCompiler;
 
 /// A set of all static Utility Methods
 /// 
