@@ -41,12 +41,12 @@ import com.intellij.util.indexing.IndexingDataKeys;
 import com.intellij.util.text.CharArrayUtil;
 import com.intellij.util.text.CharSequenceSubSequence;
 
+import simula.compiler.utilities.LOG;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import testing.util.LOG;
 
 import javax.swing.*;
 import java.util.*;

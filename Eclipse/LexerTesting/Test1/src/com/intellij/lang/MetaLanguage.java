@@ -5,7 +5,7 @@ import com.intellij.openapi.extensions.ExtensionPointListener;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.extensions.PluginDescriptor;
 
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;

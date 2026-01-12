@@ -15,7 +15,7 @@ import com.intellij.reference.SoftReference;
 import com.intellij.util.text.CharArrayUtil;
 import com.intellij.util.text.ImmutableCharSequence;
 
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

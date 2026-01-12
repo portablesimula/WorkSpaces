@@ -6,7 +6,7 @@
 package it.unimi.dsi.fastutil.ints;
 
 import it.unimi.dsi.fastutil.Size64;
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 import java.util.Comparator;
 import java.util.List;

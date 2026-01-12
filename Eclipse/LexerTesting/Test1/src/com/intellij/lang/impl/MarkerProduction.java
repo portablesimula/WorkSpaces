@@ -19,7 +19,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.ExceptionUtil;
 import com.intellij.util.ObjectUtils;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

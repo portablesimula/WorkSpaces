@@ -1,4 +1,4 @@
-package simula.lang;
+package simula.parser;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.ParserDefinition;
@@ -12,8 +12,9 @@ import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 
 import simula.lexer.SimulaLexer;
-import simula.parser.SimulaParser;
 import simula.lang.SimulaLanguage;
+import simula.lang.SimulaLanguageFile;
+import simula.lang.SimulaTokenSets;
 
 public class SimulaParserDefinition implements ParserDefinition {
 

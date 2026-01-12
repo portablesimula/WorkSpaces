@@ -11,7 +11,7 @@ import com.intellij.util.ArrayFactory;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.containers.ContainerUtil;
 
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 import org.jetbrains.annotations.*;
 

@@ -14,14 +14,15 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.text.CharArrayUtil;
+
+import simula.compiler.utilities.LOG;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.SoftReference;
 
 import static com.intellij.reference.SoftReference.dereference;
-
-import testing.util.LOG;
 
 public abstract class LeafElement extends TreeElement implements LighterASTTokenNode {
 //	private static final Logger LOG = Logger.getInstance(LeafElement.class);

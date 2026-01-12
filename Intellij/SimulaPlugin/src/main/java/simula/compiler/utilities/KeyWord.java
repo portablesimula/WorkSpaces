@@ -3,15 +3,15 @@
 /// 
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
-package testing.scanner;
+package simula.compiler.utilities;
 
 /// The Simula Keywords and some additional symbols.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/EclipseWorkSpaces/blob/main/SimulaCompiler2/Simula/src/simula/compiler/utilities/KeyWord.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/utilities/KeyWord.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public interface NOT_USED_KeyWord {
+public interface KeyWord {
 //	/** Default Constructor: Not used */ private KeyWord() {}
 	// Simula Reserved Words
 	/** Simula Keyword */ public final static int ACTIVATE     = 1;
@@ -97,18 +97,19 @@ public interface NOT_USED_KeyWord {
 	/** Other Symbol */ public final static int DIV            = 80;
 	/** Other Symbol */ public final static int INTDIV         = 81;
 	/** Other Symbol */ public final static int EXP            = 82;
-	/** Other Symbol */ public final static int IDENTIFIER     = 83;
-	/** Other Symbol */ public final static int BOOLEANKONST   = 84;
-	/** Other Symbol */ public final static int INTEGERKONST   = 85;
-	/** Other Symbol */ public final static int CHARACTERKONST = 86;
-	/** Other Symbol */ public final static int REALKONST      = 87;
-	/** Other Symbol */ public final static int TEXTKONST      = 88;
-	/** Other Symbol */ public final static int OR_ELSE        = 89;
-	/** Other Symbol */ public final static int AND_THEN       = 90;
-	/** Other Symbol */ public final static int DOT            = 91;
-	/** Other Symbol */ public final static int NEWLINE        = 92;
-	/** Other Symbol */ public final static int STRING         = 93;
-	/** Other Symbol */ public final static int EOF	           = 94;
+	/** Other Symbol */ public final static int OR_ELSE        = 83;
+	/** Other Symbol */ public final static int AND_THEN       = 84;
+	/** Other Symbol */ public final static int DOT            = 85;
+	/** Other Symbol */ public final static int NEWLINE        = 86;
+	/** Other Symbol */ public final static int STRING         = 87;
+	/** Other Symbol */ public final static int EOF	           = 88;
+	/** Other Symbol */ public final static int AMPERSAND      = 89;
+	/** Other Symbol */ public final static int IDENTIFIER     = 90;
+	/** Other Symbol */ public final static int BOOLEANKONST   = 91;
+	/** Other Symbol */ public final static int INTEGERKONST   = 92;
+	/** Other Symbol */ public final static int CHARACTERKONST = 93;
+	/** Other Symbol */ public final static int REALKONST      = 94;
+	/** Other Symbol */ public final static int TEXTKONST      = 95;
 
 	/// Returns the corresponding String.
 	/// @param key the argument key.

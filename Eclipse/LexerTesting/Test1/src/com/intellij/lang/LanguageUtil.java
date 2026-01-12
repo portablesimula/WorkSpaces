@@ -15,7 +15,7 @@ import com.intellij.psi.templateLanguages.TemplateLanguage;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.containers.JBIterable;
 
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

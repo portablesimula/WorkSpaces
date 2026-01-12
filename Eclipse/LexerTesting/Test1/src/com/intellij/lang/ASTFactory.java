@@ -17,8 +17,8 @@ import com.intellij.psi.tree.ILazyParseableElementType;
 import com.intellij.psi.tree.ILeafElementType;
 import com.intellij.util.CharTable;
 
+import simula.compiler.utilities.LOG;
 import simula.lang.SimulaLanguage;
-import testing.util.LOG;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

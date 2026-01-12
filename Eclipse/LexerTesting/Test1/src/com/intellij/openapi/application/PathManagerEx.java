@@ -3,7 +3,7 @@ package com.intellij.openapi.application;
 
 import com.intellij.openapi.diagnostic.Logger;
 
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 import org.jetbrains.annotations.NotNull;
 

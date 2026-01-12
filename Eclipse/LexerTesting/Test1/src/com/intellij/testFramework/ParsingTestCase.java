@@ -25,8 +25,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.PsiFileFactoryImpl;
 
-import simula.lang.SimulaParserDefinition;
-import testing.util.Util;
+import simula.compiler.utilities.Util;
+import simula.parser.SimulaParserDefinition;
 
 //import com.intellij.openapi.options.SchemeManagerFactory;
 //import com.intellij.configurationStore.schemeManager.SchemeManagerFactory;

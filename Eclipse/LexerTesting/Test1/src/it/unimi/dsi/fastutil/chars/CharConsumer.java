@@ -6,7 +6,7 @@
 package it.unimi.dsi.fastutil.chars;
 
 import it.unimi.dsi.fastutil.SafeMath;
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 import java.util.Objects;
 import java.util.function.Consumer;

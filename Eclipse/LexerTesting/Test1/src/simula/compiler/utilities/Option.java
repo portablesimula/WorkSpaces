@@ -3,7 +3,7 @@
 /// 
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
-package testing.util;
+package simula.compiler.utilities;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;

@@ -8,7 +8,7 @@ package it.unimi.dsi.fastutil.ints;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 @FunctionalInterface
 public interface IntPredicate extends java.util.function.IntPredicate, Predicate<Integer> {

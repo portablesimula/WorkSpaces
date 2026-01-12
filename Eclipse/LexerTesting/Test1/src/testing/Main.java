@@ -11,13 +11,12 @@ import com.intellij.psi.tree.IFileElementType;
 import com.intellij.util.CharTable;
 import com.intellij.util.diff.FlyweightCapableTreeStructure;
 
+import simula.compiler.utilities.Global;
 import simula.lang.SimulaLanguage;
-import simula.lang.SimulaParserDefinition;
 import simula.lexer.SimulaLexer;
 import simula.parser.SimPsiBuilder;
 import simula.parser.SimulaParser;
-import testing.parser.SimpleParsingTest;
-import testing.util.Global;
+import simula.parser.SimulaParserDefinition;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.LighterASTNode;
@@ -47,7 +46,6 @@ public class Main {
 	
 	static void tester1() {
 		IO.println("*** BEGIN Lexer tester 1 ");
-//		Lexer lexer = new SimpleManualLexer();
 		Lexer lexer = new SimulaLexer();
 		LexerTester tester = new LexerTester(lexer);
 //		buffer = "abra ca dab";
@@ -100,7 +98,8 @@ public class Main {
 //		FlyweightCapableTreeStructure<LighterASTNode> zzz = builder.parseContents();
 		IO.println("Main.tester3: builder="+builder);
 		
-		SimulaParser parser = new SimulaParser(builder, TEST_TEXT);
+//		SimulaParser parser = new SimulaParser(builder, TEST_TEXT);
+		SimulaParser parser = new SimulaParser();
 		IElementType root = FILE;
 	    ASTNode tree = parser.parse(root, builder);
 

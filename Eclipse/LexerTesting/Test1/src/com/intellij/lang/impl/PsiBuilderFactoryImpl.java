@@ -6,7 +6,7 @@ import com.intellij.lexer.Lexer;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.tree.IElementType;
 
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -1,6 +1,9 @@
-package testing.util;
+package simula.compiler.utilities;
 
 import javax.swing.*;
+
+import simula.compiler.syntaxClass.declaration.DeclarationScope;
+
 import java.awt.*;
 import java.io.Console;
 
@@ -43,5 +46,11 @@ public class Global {
         UIManager.put("Panel.background", PanelBackground);
         return (answer);
     }
+
+
+	public static DeclarationScope getCurrentScope() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

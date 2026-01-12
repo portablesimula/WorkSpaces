@@ -7,7 +7,7 @@ package it.unimi.dsi.fastutil.ints;
 
 import java.util.ListIterator;
 
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 public interface IntListIterator extends IntBidirectionalIterator, ListIterator<Integer> {
     default void set(int k) {

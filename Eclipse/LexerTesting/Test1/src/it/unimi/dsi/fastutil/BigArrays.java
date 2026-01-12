@@ -7,7 +7,7 @@ package it.unimi.dsi.fastutil;
 
 import it.unimi.dsi.fastutil.ints.IntArrays;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;

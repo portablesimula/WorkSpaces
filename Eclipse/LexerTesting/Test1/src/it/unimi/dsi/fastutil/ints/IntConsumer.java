@@ -8,7 +8,7 @@ package it.unimi.dsi.fastutil.ints;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 @FunctionalInterface
 public interface IntConsumer extends Consumer<Integer>, java.util.function.IntConsumer {

@@ -50,7 +50,7 @@ import com.intellij.util.containers.UtilKt;
 import kotlinx.collections.immutable.ExtensionsKt;
 import kotlinx.collections.immutable.PersistentList;
 import kotlinx.collections.immutable.PersistentSet;
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 import java.util.Collection;
 import java.util.Collections;

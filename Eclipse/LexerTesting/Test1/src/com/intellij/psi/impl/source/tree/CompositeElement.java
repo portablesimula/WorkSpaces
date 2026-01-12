@@ -24,14 +24,15 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.ArrayFactory;
+
+import simula.compiler.utilities.LOG;
+
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
-
-import testing.util.LOG;
 
 public class CompositeElement extends TreeElement {
 //	private static final Logger LOG = Logger.getInstance(CompositeElement.class);

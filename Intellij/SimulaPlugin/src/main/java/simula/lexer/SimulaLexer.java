@@ -2,20 +2,22 @@ package simula.lexer;
 
 import java.util.LinkedList;
 
-
 import com.intellij.lexer.LexerBase;
-import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
+
+import simula.compiler.utilities.Global;
+import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.Util;
 import simula.lang.SimulaLanguage;
-import simula.plugin.util.Global;
-import simula.plugin.util.Util;
+
+
 
 public class SimulaLexer extends LexerBase {
-
     // Define custom token types (for a real plugin, these would be in a custom *TokenTypes class)
     public static final IElementType WORD = new IElementType("WORD", SimulaLanguage.INSTANCE);
 
-    private static final int DEBUG = 0;// 1;// 2;
+    private static final int DEBUG = 1;// 2;
 
     private CharSequence sourceText;
     private int textEndOffset;
@@ -29,7 +31,9 @@ public class SimulaLexer extends LexerBase {
     private final static int EOF_MARK=25;
 
     /// The Token queue. The method nextToken will pick Tokens from the queue first.
-    private LinkedList<IElementType> tokenQueue=new LinkedList<IElementType>();
+//    private LinkedList<IElementType> tokenQueue=new LinkedList<IElementType>();
+//    private LinkedList<QueueToken> tokenQueue=new LinkedList<QueueToken>();
+    private LinkedList<SimulaToken> tokenQueue=new LinkedList<SimulaToken>();
 
     @Override
     public void start(CharSequence buffer, int startOffset, int endOffset, int initialState) {
@@ -45,21 +49,46 @@ public class SimulaLexer extends LexerBase {
 
     @Override
     public void advance() {
-        if(DEBUG > 1) System.out.println("\nSimulaLexer.advance:"+" currentPosition="+currentPosition
-                +", textEndOffset="+textEndOffset+", tokenStartOffset="+tokenStartOffset+", tokenEndOffset="+tokenEndOffset);
-        if(DEBUG > 0)  {
-            CharSequence txt = sourceText.subSequence(tokenStartOffset, tokenEndOffset);
-            System.out.println("SimulaLexer.advance: "+tokenElementType+'['+tokenStartOffset+':'+tokenEndOffset+"]=\""+txt+"\"\n");
+
+        printQueue();
+        
+        if(! tokenQueue.isEmpty()) {
+//
+//            printQueue();
+//            
+//        	QueueToken token = tokenQueue.pop();
+//        	System.out.println("SimulaLexer.scanBasic: QUEUED: "+token);
+//        	Util.IERR();
+            IElementType qtoken = popToken();
+        	System.out.println("SimulaLexer.advance: QUEUED: "+qtoken);
+            return;
         }
+//        if(DEBUG > 1) System.out.println("\nSimulaLexer.advance:"+" currentPosition="+currentPosition
+//                +", textEndOffset="+textEndOffset+", tokenStartOffset="+tokenStartOffset+", tokenEndOffset="+tokenEndOffset);
+//        if(DEBUG > 0)  {
+//            CharSequence txt = sourceText.subSequence(tokenStartOffset, tokenEndOffset);
+//            System.out.println("SimulaLexer.advance: BEFORE "+tokenElementType+'['+tokenStartOffset+':'+tokenEndOffset+"]=\""+txt+"\"\n");
+////            Thread.dumpStack();
+//        }
         if (currentPosition >= textEndOffset) {
             tokenElementType = null;
+            System.out.println("SimulaLexer.advance: EOF ");
             return;
         }
         tokenStartOffset = currentPosition;
         tokenElementType = scanBasic();
         tokenEndOffset = currentPosition;
+        
+        if(DEBUG > 0)  {
+            CharSequence txt = sourceText.subSequence(tokenStartOffset, tokenEndOffset);
+            txt = txt.toString().replace("\n","\\n").replace("\r","");
+//            txt = txt.toString().replace("\n","..");
+            System.out.println("SimulaLexer.advance: LINE "+Global.sourceLineNumber+" AFTER "+tokenElementType+'['+tokenStartOffset+':'+tokenEndOffset+"]=\""+txt+"\"");
+//            Thread.dumpStack();
+        }
+       
         if(tokenStartOffset == tokenEndOffset) {
-            CharSequence xxx = sourceText.subSequence(tokenStartOffset-300, tokenStartOffset);
+            CharSequence xxx = sourceText.subSequence(tokenStartOffset-10, tokenStartOffset);
 //            Util.TRACE("SimulaLexer.advance: start="+tokenStartOffset+", end="+tokenEndOffset+", type="+tokenElementType);
             throw new RuntimeException("SimulaLexer.advance: start="+tokenStartOffset+", end="+tokenEndOffset+", type="+tokenElementType+"  "+xxx);
         }
@@ -115,6 +144,17 @@ public class SimulaLexer extends LexerBase {
         return 0;
     }
 
+    private boolean isWhitespace(int c) {
+    	if(Character.isWhitespace(c)) {
+    		if(c == '\n') {
+    			Global.sourceLineNumber++;
+    			System.out.println("SimulaLexer.isWhitespace: NEW LINE "+Global.sourceLineNumber+" ......................................................");
+//    			Util.IERR();
+    		}
+    		return true;
+    	}
+    	return false;
+    }
     private int pardepth;
     //********************************************************************************
     //**	                                                                 scanBasic
@@ -122,14 +162,15 @@ public class SimulaLexer extends LexerBase {
     /// Scan basic Token
     /// @return next Token
     private IElementType scanBasic() {
-        if(Global.TRACE_SCAN) Util.TRACE("SimulaScanner.scanBasic, "+edcurrent());
+        if(Global.TRACE_SCAN) Util.TRACE("SimulaLexer.scanBasic: "+edcurrent());
+//        System.out.println("SimulaLexer.scanBasic: "+edcurrent());
         while(true)	{
             getNext(); if(current == EOF_MARK) return(null);
-
+            
             if(Character.isLetter(current)) return(scanIdentifier());
 
-            if (Character.isWhitespace(current)) {
-                while (currentPosition < textEndOffset && Character.isWhitespace(sourceText.charAt(currentPosition))) {
+            if (isWhitespace(current)) {
+                while (currentPosition < textEndOffset && isWhitespace(sourceText.charAt(currentPosition))) {
                     currentPosition++;
                 }
                 return TokenType.WHITE_SPACE;
@@ -137,60 +178,61 @@ public class SimulaLexer extends LexerBase {
 
             switch(current) {
 
-                case '%': return(scanCommentToEndOfLine());
+                case '%': return scanCommentToEndOfLine();
+//	            case '%': return scanDirectiveLine();
 
 
                 case '0':case '1':case '2':case '3':case '4':
                 case '5':case '6':case '7':case '8':case '9': return scanNumber();
 
                 case '-':
-                    if(getNext() == '-')   return(scanCommentToEndOfLine());
-                    pushBack(current); 	   return(KeyWordToken.MINUS);
+                    if(getNext() == '-')   return scanCommentToEndOfLine();
+                    pushBack(current); 	   return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.MINUS);
 
                 case '.':
                     if(Character.isDigit(getNext())) { return(scanDotDigit(new StringBuilder())); }
-                    pushBack(current);     return KeyWordToken.DOT;
+                    pushBack(current);     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.DOT);
 
                 case '=':
-                    if(getNext() == '=')   return KeyWordToken.EQR;
+                    if(getNext() == '=')   return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.EQR);
                     if(current == '/')
-                        if(getNext() == '=')   return KeyWordToken.NER;
+                        if(getNext() == '=')   return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.NER);
                         else Util.error("Illegal character combination ="+(char)current);
-                    pushBack(current);     return KeyWordToken.EQ;
+                    pushBack(current);     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.EQ);
 
                 case '>':
-                    if(getNext() == '=')   return KeyWordToken.GE;
-                    pushBack(current);     return KeyWordToken.GT;
+                    if(getNext() == '=')   return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.GE);
+                    pushBack(current);     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.GT);
 
                 case '<':
-                    if(getNext() == '=')   return KeyWordToken.LE;
-                    pushBack(current);     return KeyWordToken.LT;
+                    if(getNext() == '=')   return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.LE);
+                    pushBack(current);     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.LT);
 
                 case '/':
-                    if(getNext() == '/')   return KeyWordToken.INTDIV;
-                    pushBack(current);     return KeyWordToken.DIV;
+                    if(getNext() == '/')   return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.INTDIV);
+                    pushBack(current);     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.DIV);
 
                 case ':':
-                    if(getNext() == '=')   return KeyWordToken.ASSIGNVALUE;
-                    if(getNext() == '-' && pardepth == 0) return KeyWordToken.ASSIGNREF;
-                    pushBack(current);     return KeyWordToken.COLON;
+                    if(getNext() == '=')   return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.ASSIGNVALUE);
+                    if(getNext() == '-' && pardepth == 0) return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.ASSIGNREF);
+                    pushBack(current);     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.COLON);
 
                 case '&':
                     if(getNext()=='&' || current=='-' || current=='+' || Character.isDigit(current))
                         return (scanDigitsExp(null));
-                    pushBack(current); return KeyWordToken.AMPERSAND;
+                    pushBack(current); return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.AMPERSAND);
                 case '!':  return(scanComment());
                 case '\'': return(scanCharacterConstant());
                 case '"': return(scanTextConstant());
 
-                case '+': return KeyWordToken.PLUS;
-                case '*': return KeyWordToken.MUL;
-                case ',': return KeyWordToken.COMMA;
-                case ';': return KeyWordToken.SEMICOLON;
-                case '(': pardepth++; return KeyWordToken.BEGPAR;
-                case ')': pardepth--; return KeyWordToken.ENDPAR;
-                case '[': return KeyWordToken.BEGBRACKET;
-                case ']': return KeyWordToken.ENDBRACKET;
+                case '+': return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.PLUS);
+                case '*': return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.MUL);
+                case ',': return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.COMMA);
+                case ';': return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.SEMICOLON);
+                case '(': pardepth++; return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.BEGPAR);
+                case ')': pardepth--; return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.ENDPAR);
+                case '[': return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.BEGBRACKET);
+                case ']': return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.ENDBRACKET);
 
 //	            case '\n':			/* NL (LF) */
 //	    	      if (editorMode) return SimulaTokenType.NEWLINE,Global.sourceLineNumber+1));
@@ -224,116 +266,116 @@ public class SimulaLexer extends LexerBase {
         String ident=(Global.CaseSensitive)?name:name.toLowerCase();
         switch(Character.toLowerCase(ident.charAt(0))) {
             case 'a':
-                if(ident.equals("activate"))     return(KeyWordToken.ACTIVATE);
-                if(ident.equals("after"))	     return(KeyWordToken.AFTER);
-                if(ident.equals("and"))			 return(KeyWordToken.AND);
-                if(ident.equals("and_then"))	 return(KeyWordToken.AND_THEN);
-                if(ident.equals("array"))	     return(KeyWordToken.ARRAY);
-                if(ident.equals("at"))		     return(KeyWordToken.AT);
+                if(ident.equals("activate"))     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.ACTIVATE);
+                if(ident.equals("after"))	     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.AFTER);
+                if(ident.equals("and"))			 return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.AND);
+                if(ident.equals("and_then"))	 return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.AND_THEN);
+                if(ident.equals("array"))	     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.ARRAY);
+                if(ident.equals("at"))		     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.AT);
                 break;
             case 'b':
-                if(ident.equals("before"))       return(KeyWordToken.BEFORE);
-                if(ident.equals("begin"))        return(KeyWordToken.BEGIN);
-                if(ident.equals("boolean"))      return(KeyWordToken.BOOLEAN);
+                if(ident.equals("before"))       return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.BEFORE);
+                if(ident.equals("begin"))        return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.BEGIN);
+                if(ident.equals("boolean"))      return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.BOOLEAN);
                 break;
             case 'c':
-                if(ident.equals("character"))	 return(KeyWordToken.CHARACTER);
-                if(ident.equals("class"))        return(KeyWordToken.CLASS);
-                if(ident.equals("comment"))      return(scanComment());
+                if(ident.equals("character"))	 return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.CHARACTER);
+                if(ident.equals("class"))        return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.CLASS);
+                if(ident.equals("comment"))      return scanComment();
                 break;
             case 'd':
-                if(ident.equals("delay"))   	 return(KeyWordToken.DELAY);
-                if(ident.equals("do")) 	    	 return(KeyWordToken.DO);
+                if(ident.equals("delay"))   	 return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.DELAY);
+                if(ident.equals("do")) 	    	 return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.DO);
                 break;
             case 'e':
-                if(ident.equals("else"))         return(KeyWordToken.ELSE);
+                if(ident.equals("else"))         return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.ELSE);
 
-	        	if(ident.equals("end"))   	     return(scanEndComment());
-//                if(ident.equals("end"))   	     return(KeyWord.END);
+	        	if(ident.equals("end"))   	     return scanEndComment();
+//                if(ident.equals("end"))   	     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.END;
 
-                if(ident.equals("eq"))	         return(KeyWordToken.EQ);
-                if(ident.equals("eqv"))	         return(KeyWordToken.EQV);
-                if(ident.equals("external"))     return(KeyWordToken.EXTERNAL);
+                if(ident.equals("eq"))	         return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.EQ);
+                if(ident.equals("eqv"))	         return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.EQV);
+                if(ident.equals("external"))     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.EXTERNAL);
                 break;
             case 'f':
-                if(ident.equals("false"))  	     return(KeyWordToken.FALSE);
-                if(ident.equals("for"))    	     return(KeyWordToken.FOR);
+                if(ident.equals("false"))  	     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.FALSE);
+                if(ident.equals("for"))    	     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.FOR);
                 break;
             case 'g':
-                if(ident.equals("ge"))           return(KeyWordToken.GE);
-                if(ident.equals("go"))           return(KeyWordToken.GO);
-                if(ident.equals("goto"))         return(KeyWordToken.GOTO);
-                if(ident.equals("gt"))           return(KeyWordToken.GT);
+                if(ident.equals("ge"))           return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.GE);
+                if(ident.equals("go"))           return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.GO);
+                if(ident.equals("goto"))         return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.GOTO);
+                if(ident.equals("gt"))           return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.GT);
                 break;
             case 'h':
-                if(ident.equals("hidden"))       return(KeyWordToken.HIDDEN);
+                if(ident.equals("hidden"))       return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.HIDDEN);
                 break;
             case 'i':
-                if(ident.equals("if"))	         return(KeyWordToken.IF);
-                if(ident.equals("imp"))   	     return(KeyWordToken.IMP);
-                if(ident.equals("in"))   	     return(KeyWordToken.IN);
-                if(ident.equals("inner"))	     return(KeyWordToken.INNER);
-                if(ident.equals("inspect")) 	 return(KeyWordToken.INSPECT);
-                if(ident.equals("integer"))	     return(KeyWordToken.INTEGER);
-                if(ident.equals("is"))           return(KeyWordToken.IS);
+                if(ident.equals("if"))	         return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.IF);
+                if(ident.equals("imp"))   	     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.IMP);
+                if(ident.equals("in"))   	     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.IN);
+                if(ident.equals("inner"))	     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.INNER);
+                if(ident.equals("inspect")) 	 return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.INSPECT);
+                if(ident.equals("integer"))	     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.INTEGER);
+                if(ident.equals("is"))           return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.IS);
                 break;
             case 'l':
-                if(ident.equals("label"))        return(KeyWordToken.LABEL);
-                if(ident.equals("le"))           return(KeyWordToken.LE);
-                if(ident.equals("long"))         return(KeyWordToken.LONG);
-                if(ident.equals("lt"))           return(KeyWordToken.LT);
+                if(ident.equals("label"))        return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.LABEL);
+                if(ident.equals("le"))           return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.LE);
+                if(ident.equals("long"))         return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.LONG);
+                if(ident.equals("lt"))           return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.LT);
                 break;
             case 'n':
-                if(ident.equals("name"))         return(KeyWordToken.NAME);
-                if(ident.equals("ne"))           return(KeyWordToken.NE);
-                if(ident.equals("new"))          return(KeyWordToken.NEW);
-                if(ident.equals("none"))         return(KeyWordToken.NONE);
-                if(ident.equals("not"))          return(KeyWordToken.NOT);
-                if(ident.equals("notext"))       return(KeyWordToken.NOTEXT);
+                if(ident.equals("name"))         return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.NAME);
+                if(ident.equals("ne"))           return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.NE);
+                if(ident.equals("new"))          return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.NEW);
+                if(ident.equals("none"))         return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.NONE);
+                if(ident.equals("not"))          return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.NOT);
+                if(ident.equals("notext"))       return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.NOTEXT);
                 break;
             case 'o':
-                if(ident.equals("or"))           return(KeyWordToken.OR);
-                if(ident.equals("or_else"))      return(KeyWordToken.OR_ELSE);
-                if(ident.equals("otherwise"))    return(KeyWordToken.OTHERWISE);
+                if(ident.equals("or"))           return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.OR);
+                if(ident.equals("or_else"))      return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.OR_ELSE);
+                if(ident.equals("otherwise"))    return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.OTHERWISE);
                 break;
             case 'p':
-                if(ident.equals("prior"))        return(KeyWordToken.PRIOR);
-                if(ident.equals("procedure"))    return(KeyWordToken.PROCEDURE);
-                if(ident.equals("protected"))    return(KeyWordToken.PROTECTED);
+                if(ident.equals("prior"))        return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.PRIOR);
+                if(ident.equals("procedure"))    return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.PROCEDURE);
+                if(ident.equals("protected"))    return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.PROTECTED);
                 break;
             case 'q':
-                if(ident.equals("qua"))          return(KeyWordToken.QUA);
+                if(ident.equals("qua"))          return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.QUA);
                 break;
             case 'r':
-                if(ident.equals("reactivate"))   return(KeyWordToken.REACTIVATE);
-                if(ident.equals("real"))         return(KeyWordToken.REAL);
-                if(ident.equals("ref"))          return(KeyWordToken.REF);
+                if(ident.equals("reactivate"))   return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.REACTIVATE);
+                if(ident.equals("real"))         return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.REAL);
+                if(ident.equals("ref"))          return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.REF);
                 break;
             case 's':
-                if(ident.equals("short"))  		 return(KeyWordToken.SHORT);
-                if(ident.equals("step"))   		 return(KeyWordToken.STEP);
-                if(ident.equals("switch")) 		 return(KeyWordToken.SWITCH);
+                if(ident.equals("short"))  		 return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.SHORT);
+                if(ident.equals("step"))   		 return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.STEP);
+                if(ident.equals("switch")) 		 return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.SWITCH);
                 break;
             case 't':
-                if(ident.equals("text"))  	     return(KeyWordToken.TEXT);
-                if(ident.equals("then"))  	     return(KeyWordToken.THEN);
-                if(ident.equals("this"))   	     return(KeyWordToken.THIS);
-                if(ident.equals("to"))           return(KeyWordToken.TO);
-                if(ident.equals("true"))   	     return(KeyWordToken.TRUE);
+                if(ident.equals("text"))  	     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.TEXT);
+                if(ident.equals("then"))  	     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.THEN);
+                if(ident.equals("this"))   	     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.THIS);
+                if(ident.equals("to"))           return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.TO);
+                if(ident.equals("true"))   	     return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.TRUE);
                 break;
             case 'u':
-                if(ident.equals("until"))        return(KeyWordToken.UNTIL);
+                if(ident.equals("until"))        return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.UNTIL);
                 break;
             case 'v':
-                if(ident.equals("value"))        return(KeyWordToken.VALUE);
-                if(ident.equals("virtual"))      return(KeyWordToken.VIRTUAL);
+                if(ident.equals("value"))        return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.VALUE);
+                if(ident.equals("virtual"))      return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.VIRTUAL);
                 break;
             case 'w':
-                if(ident.equals("when"))         return(KeyWordToken.WHEN);
-                if(ident.equals("while"))        return(KeyWordToken.WHILE);
+                if(ident.equals("when"))         return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.WHEN);
+                if(ident.equals("while"))        return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.WHILE);
                 break;
         }
-        return(new Identifier(ident, ident));
+        return(new Identifier(sourceText, tokenStartOffset, currentPosition, ident));
     }
 
     //********************************************************************************
@@ -405,7 +447,7 @@ public class SimulaLexer extends LexerBase {
         } catch (NumberFormatException e) {
             Util.error("Integer number out of range: "+result);
         }
-        return(new IntegerConst(result, res));
+        return new IntegerConst(sourceText, tokenStartOffset, currentPosition, res);
     }
 
 
@@ -438,10 +480,10 @@ public class SimulaLexer extends LexerBase {
         if(Global.TRACE_SCAN) Util.TRACE("scanDotDigit, result='"+result);
         pushBack(current);
         try {
-            return new RealConst(result, Float.parseFloat(result));
+            return new RealConst(sourceText, tokenStartOffset, currentPosition, Float.parseFloat(result));
         } catch(NumberFormatException e) {
             Util.error("Illegal number: "+result);
-            return new RealConst(result,0);
+            return new RealConst(sourceText, tokenStartOffset, currentPosition, 0);
         }
     }
 
@@ -478,11 +520,11 @@ public class SimulaLexer extends LexerBase {
         if(Global.TRACE_SCAN) Util.TRACE("scanDigitsExp, result='"+result);
         pushBack(current);
         try {
-            if(doubleAmpersand) return new RealConst(result, Double.parseDouble(result));
-            return new RealConst(result, Float.parseFloat(result));
+            if(doubleAmpersand) return new RealConst(sourceText, tokenStartOffset, currentPosition, Double.parseDouble(result));
+            return new RealConst(sourceText, tokenStartOffset, currentPosition, Float.parseFloat(result));
         } catch(NumberFormatException e) {
             Util.error("Illegal number: "+result);
-            return new RealConst(result,0);
+            return new RealConst(sourceText, tokenStartOffset, currentPosition, 0);
         }
     }
 
@@ -550,7 +592,7 @@ public class SimulaLexer extends LexerBase {
             pushBack(current);
         }
         if(Global.TRACE_SCAN) Util.TRACE("END scanCharacterConstant, result='"+result+"', "+edcurrent());
-        return new CharacterConst(""+((char)result), result);
+        return new CharacterConst(sourceText, tokenStartOffset, currentPosition, result);
     }
 
 
@@ -582,53 +624,67 @@ public class SimulaLexer extends LexerBase {
     /// @return next Token
     private IElementType scanTextConstant() {
         if(Global.TRACE_SCAN) Util.TRACE("scanTextConstant, "+edcurrent());
-        StringBuilder accumulatedTextConstant=new StringBuilder();
+        System.out.println("SimulaLexer.scanTextConstant: BEGIN -----------------------------------------------------------------------");
         LOOP:while(true) {
-            int firstLine= Global.sourceLineNumber;
-            int lastLine=firstLine;
-            // Scan simple-string:
-            while(getNext() != '"') {
-                if(current=='!') {
-                    int code=scanPossibleIsoCode();
-                    accumulatedTextConstant.append((char)code);
-                }
-                else if(current == EOF_MARK) {
-                    Util.error("Text constant is not terminated.");
-                    String result=accumulatedTextConstant.toString(); accumulatedTextConstant=null;
-                    if(Global.TRACE_SCAN) Util.TRACE("scanTextConstant(1): Result=\""+result+"\", "+edcurrent());
-//                    tokenQueue.add(SimulaElementTypes.TEXTCONST);
-                    tokenQueue.add(new TextConst(result, result));
-                    break LOOP;
-                } else accumulatedTextConstant.append((char)current);
-            }
-            tokenQueue.add(SimulaElementTypes.STRING);
-//            tokenQueue.add(new TextConst(result, result));
-            lastLine=Global.sourceLineNumber;
-            if(getNext() == '"') {
-                accumulatedTextConstant.append('"');
-                lastLine=Global.sourceLineNumber;
-            } else {
-                // Skip string-separator
-                while(currentIsStringSeparator()) getNext();
-                if(Global.TRACE_SCAN) Util.TRACE("scanTextConstant(2): "+edcurrent());
-                if(current!='"') {
-                    pushBack(current);
-                    String result=accumulatedTextConstant.toString(); accumulatedTextConstant=null;
-                    if(Global.TRACE_SCAN) Util.TRACE("scanTextConstant(2): Result=\""+result+"\", "+edcurrent());
-                    if(firstLine<lastLine)
-                        Util.warning("Illegal Text constant. Simple string span mutiple source lines ("+firstLine+':'+lastLine+"). See Simula Standard 1.6");
-//                    tokenQueue.add(SimulaElementTypes.TEXTCONST);
-                    tokenQueue.add(new TextConst(result, result));
-                    break LOOP;
-                }
-            }
+            scanSimpleString();
+            // Skip string-separators
+            while(scanStringSeparator());
+            if(Global.TRACE_SCAN) Util.TRACE("scanTextConstant(2): "+edcurrent());
+            System.out.println("scanTextConstant(2): "+edcurrent());
+            if(current!='"') {
+                pushBack(current);
+                break LOOP;
+            }            
         }
-        IElementType result=tokenQueue.remove();
-        return(result);
+        System.out.println("SimulaLexer.scanTextConstant: END -----------------------------------------------------------------------");
+        printQueue();
+        System.out.println("SimulaLexer.scanTextConstant: END -----------------------------------------------------------------------");
+        return popToken();
+    }
+    
+    //********************************************************************************
+    //**	                                                          scanSimpleString
+    //********************************************************************************
+    /// Scan and deliver a Simple String.
+    /// <pre>
+    ///  Reference-Syntax:
+    ///
+    ///         simple-string = " { iso-code |  non-quote-character  |  ""  }  "
+    ///
+    ///            iso-code = ! digit  [ digit ]  [ digit ]  !
+    ///
+    /// End-Condition: current is last character of construct
+    ///                getNext will return first character after construct
+    /// </pre>
+    /// @return next Token
+    private void scanSimpleString() {
+        StringBuilder sb=new StringBuilder();
+        LOOP:while(getNext() != '"') {
+        	switch(current) {
+	        	case ' ':
+	            	sb.append(' ');
+	            	break;
+	        	case '!':
+	                int code=scanPossibleIsoCode();
+	                sb.append((char)code);
+	                break;
+	        	case '\n':
+	                Util.warning("Illegal Text constant. Simple string span mutiple source lines. See Simula Standard 1.6"); 
+	                break LOOP;
+	        	case EOF_MARK:
+	                Util.error("Text constant is not terminated.");
+	                break LOOP;
+                default:
+                	if(! isWhitespace(current)) sb.append((char)current);
+        	}
+        }
+        String result=sb.toString();
+        if(Global.TRACE_SCAN) Util.TRACE("scanSimpleString: Result=\""+result+"\", "+edcurrent());
+        tokenQueueAdd("scanTextConstant", new SimpleString(sourceText, tokenStartOffset, currentPosition, result));
     }
 
     //********************************************************************************
-    //**	                                                  currentIsStringSeparator
+    //**	                                                       scanStringSeparator
     //********************************************************************************
     /// Scanner Utility: Check if current is a string separator.
     /// <pre>
@@ -647,21 +703,26 @@ public class SimulaLexer extends LexerBase {
     ///                getNext will return first character after construct
     /// </pre>
     /// @return true if current is a string separator
-    private boolean currentIsStringSeparator() {
+    private boolean scanStringSeparator() {
+    	getNext();
+        System.out.println("SimulaLexer.scanStringSeparator: " + edcurrent());
         if(current=='!') {
-            IElementType cc=scanComment();
-            tokenQueue.add(cc);
-            current=' '; return(true);
+            SimulaToken cc=scanComment();
+            tokenQueueAdd("scanStringSeparator", cc);
+//            current=' ';
+            return(true);
         } else if(Character.isLetter((char)current)) {
             String name=scanName();
+            System.out.println("SimulaLexer.scanStringSeparator: name=\""+name+'"');
             if(name.equalsIgnoreCase("COMMENT")) {
-                IElementType cc=scanComment();
-                tokenQueue.add(cc);
-                current=' '; return(true);
+                SimulaToken cc=scanComment();
+                tokenQueueAdd("scanStringSeparator", cc);
+//                current=' ';
+                return(true);
             } else pushBack(name);
             return(false);
         }
-        return(isWhiteSpace(current));
+        return(Character.isWhitespace(current));
     }
 
 
@@ -747,7 +808,7 @@ public class SimulaLexer extends LexerBase {
     ///                getNext will return first character after construct
     /// </pre>
     /// @return a Comment Token
-    private IElementType scanComment() {
+    private SimulaToken scanComment() {
         StringBuilder skipped = new StringBuilder();
         if (Global.TRACE_SCAN) Util.TRACE("BEGIN scanComment, " + edcurrent());
         while ((getNext() != ';') && current != EOF_MARK)
@@ -761,7 +822,7 @@ public class SimulaLexer extends LexerBase {
         }
         if (Global.TRACE_SCAN) Util.TRACE("END scanComment: " + edcurrent() + "  skipped=\"" + skipped + '"');
         if (Global.TRACE_COMMENTS) Util.TRACE("COMMENT:\"" + skipped + "\" Skipped and replaced with a SPACE");
-        return KeyWordToken.COMMENT;
+        return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.COMMENT);
     }
 
     // ********************************************************************************
@@ -786,7 +847,7 @@ public class SimulaLexer extends LexerBase {
         skipped.append((char) current);
         if (Global.TRACE_SCAN) Util.TRACE("END scanCommentToEndOfLine: " + edcurrent() + "  skipped=\"" + skipped + '"');
         if (Global.TRACE_COMMENTS) Util.TRACE("COMMENT:\"" + skipped + "\" Skipped and replaced with a SPACE");
-        return KeyWordToken.COMMENT;
+        return new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.COMMENT);
     }
 
     // ********************************************************************************
@@ -810,8 +871,9 @@ public class SimulaLexer extends LexerBase {
     /// </pre>
     /// @return next Token
     private IElementType scanEndComment() {
-        //Util.println("SimulaScanner.scanEndComment");
-        tokenQueue.add(KeyWordToken.COMMENT);
+        //Util.println("SimulaLexer.scanEndComment");
+        tokenQueueAdd("scanEndComment", new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.END));
+        
         StringBuilder skipped = new StringBuilder();
         if (Global.TRACE_SCAN) Util.TRACE("scanEndComment, " + edcurrent());
         int firstLine = Global.sourceLineNumber;
@@ -822,8 +884,11 @@ public class SimulaLexer extends LexerBase {
                 if (firstLine < lastLine && (skipped.length() > 0))
                     Util.warning("END-Comment span mutiple source lines");
 //				if(editorMode && accum.length()>0) tokenQueue.add(SimulaTokenType.COMMENT);
-                tokenQueue.add(KeyWordToken.COMMENT);
-                tokenQueue.add(SimulaElementTypes.TEGN);
+                currentPosition--;
+                tokenQueueAdd("scanEndComment", new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.COMMENT));
+                currentPosition++;
+//                tokenQueueAdd(SimulaElementTypes.TEGN);
+                tokenQueueAdd("scanEndComment", new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.SEMICOLON));
                 break LOOP;
             } else if (Character.isLetter(current)) {
                 String name = scanName();
@@ -833,20 +898,43 @@ public class SimulaLexer extends LexerBase {
                     if (Global.TRACE_COMMENTS) Util.TRACE("END-COMMENT:\"" + skipped + '"');
                     if (firstLine < lastLine && (skipped.length() > 0))
                         Util.warning("END-Comment span mutiple source lines");
-                    tokenQueue.add(KeyWordToken.COMMENT); break LOOP;
+                    tokenQueueAdd("scanEndComment", new KeyWordToken(sourceText, tokenStartOffset, currentPosition, KeyWord.COMMENT));
+                    break LOOP;
                 }
                 skipped.append(name); // lastLine=Global.sourceLineNumber;
-            } else if (!isWhiteSpace(current)) {
+            } else if (!Character.isWhitespace(current)) {
                 skipped.append((char) current);
                 lastLine = Global.sourceLineNumber;
             }
         }
-        tokenQueue.add(KeyWordToken.COMMENT);
-
         if (Global.TRACE_COMMENTS)
             Util.TRACE("ENDCOMMENT:\"" + skipped + '"');
-        IElementType res=tokenQueue.remove();
-        return(res);
+        System.out.println("SimulaLexer.scanEndComment: END -----------------------------------------------------------------------");
+        printQueue();
+        System.out.println("SimulaLexer.scanEndComment: END -----------------------------------------------------------------------");
+        return popToken();
+    }
+    
+    private void tokenQueueAdd(String debugString, SimulaToken token) {
+        System.out.println("SimulaLexer.tokenQueueAdd: "+debugString+": "+token);
+        tokenQueue.add(token);
+        tokenStartOffset = currentPosition;
+    }
+    
+    private SimulaToken popToken() {
+    	SimulaToken token = tokenQueue.pop();
+        tokenStartOffset = token.startOffset;
+        tokenEndOffset = token.endOffset;
+        currentPosition = tokenEndOffset;
+        System.out.println("SimulaLexer.popToken: "+token);
+        return(token);    	
+    }
+    
+    private void printQueue() {
+    	for(SimulaToken token:tokenQueue) {
+        	System.out.println("SimulaLexer.printQueue: token="+token);
+   		
+    	}
     }
 
 
@@ -909,23 +997,6 @@ public class SimulaLexer extends LexerBase {
         if (c < 32) return (false);
         if (c > 126) return (false);
         return (true);
-    }
-
-    /// Utility: Check if a character is a whiteSpace.
-    /// @param c the character
-    /// @return true if character c is a whiteSpace
-    private boolean isWhiteSpace(final int c) {
-        switch(c) {
-            case '\n':	/* NL (LF) */
-            case 32:    /* SPACE */
-            case '\b':	/* BS */
-            case '\t':	/* HT */
-            case 11:	/* VT */
-            case '\f':	/* FF */
-            case '\r':	/* CR */
-                return(true);
-            default: return(false);
-        }
     }
 
 }

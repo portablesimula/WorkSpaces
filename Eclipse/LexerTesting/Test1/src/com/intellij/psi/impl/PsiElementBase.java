@@ -19,13 +19,14 @@ import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.ReflectionUtil;
 import com.intellij.util.concurrency.annotations.RequiresBackgroundThread;
 import com.intellij.util.concurrency.annotations.RequiresReadLock;
+
+import simula.compiler.utilities.LOG;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import testing.util.LOG;
 
 public abstract class PsiElementBase extends ElementBase implements NavigatablePsiElement, Cloneable {
 //	private static final Logger LOG = Logger.getInstance(PsiElementBase.class);

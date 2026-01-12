@@ -1,9 +1,8 @@
-package testing.parser;
+package testing;
 
 import com.intellij.testFramework.ParsingTestCase;
 
-import simula.lang.SimulaParserDefinition;
-//import org.intellij.sdk.language.SimpleParserDefinition;
+import simula.parser.SimulaParserDefinition;
 
 public class SimpleParsingTest extends ParsingTestCase {
   public SimpleParsingTest() {

@@ -23,10 +23,11 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.IncorrectOperationException;
+
+import simula.compiler.utilities.LOG;
+
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
-import testing.util.LOG;
 
 public class LeafPsiElement extends LeafElement implements PsiElement, NavigationItem {
 //	private static final Logger LOG = Logger.getInstance(LeafPsiElement.class);

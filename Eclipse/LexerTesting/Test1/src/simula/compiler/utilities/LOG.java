@@ -1,4 +1,4 @@
-package testing.util;
+package simula.compiler.utilities;
 
 import java.io.IOException;
 
@@ -11,11 +11,11 @@ import com.intellij.psi.tree.IElementType;
 public class LOG {
 
 	public static void assertTrue(boolean b) {
-		if(!b) IO.println("LOG REPORTS(1) ASSERTION FAILED: ");
+		if(!b) System.out.println("LOG REPORTS(1) ASSERTION FAILED: ");
 	}
 
 	public static void assertTrue(boolean b, @NotNull IElementType contentElementType) {
-		if(!b) IO.println("LOG REPORTS(2) ASSERTION FAILED: ");
+		if(!b) System.out.println("LOG REPORTS(2) ASSERTION FAILED: ");
 	}
 	
 	public static void println(String msg) {
@@ -23,30 +23,30 @@ public class LOG {
 	}
 	
 	public static void error(String msg) {
-		IO.println("LOG REPORTS(1) ERROR: "+msg);
+		System.out.println("LOG REPORTS(1) ERROR: "+msg);
 		Thread.dumpStack();
 	}
 
 	public static void error(String msg, Throwable e) {
-		IO.println("LOG REPORTS(2) ERROR: "+msg);
+		System.out.println("LOG REPORTS(2) ERROR: "+msg);
 	}
 
 	public static void aerror(String msg, Attachment e) {
-		IO.println("LOG REPORTS(3) ERROR: "+msg);
+		System.out.println("LOG REPORTS(3) ERROR: "+msg);
 	}
 
 	public static void error(String msg, @NotNull PluginException byClass, Attachment attachment) {
-		IO.println("LOG REPORTS(4) ERROR: "+msg);
+		System.out.println("LOG REPORTS(4) ERROR: "+msg);
 	}
 
 
 	public static void warn(Throwable e) {
-		IO.println("LOG REPORTS(1) WARNING: "+e);
+		System.out.println("LOG REPORTS(1) WARNING: "+e);
 	}
 
 
 	public static void warn(String msg, RuntimeException runtimeException) {
-		IO.println("LOG REPORTS(2) WARNING: "+msg);
+		System.out.println("LOG REPORTS(2) WARNING: "+msg);
 	}
 
 

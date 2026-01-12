@@ -38,8 +38,8 @@ import com.intellij.util.ui.tree.TreeUtil;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import simula.compiler.utilities.LOG;
 import testing.Main;
-import testing.util.LOG;
 
 import org.jetbrains.annotations.*;
 

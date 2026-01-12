@@ -6,11 +6,7 @@
 package simula.compiler.syntaxClass;
 
 import java.io.IOException;
-import java.lang.classfile.CodeBuilder;
-
-import com.intellij.lang.PsiBuilder;
-
-import simula.lexer.KeyWord;
+//import java.lang.classfile.CodeBuilder;
 
 //import simula.compiler.AttributeInputStream;
 //import simula.compiler.AttributeOutputStream;
@@ -139,10 +135,10 @@ public abstract class SyntaxClass {
 
 	/// Assert that semantic checking done.
 	protected void ASSERT_SEMANTICS_CHECKED() {
-		if (!CHECKED) {
-			IO.println("FATAL error - THE Semantic checker not called: " + this.getClass().getName() + ", " + this);
-			System.exit(-1);
-		}
+//		if (!CHECKED) {
+//			IO.println("FATAL error - THE Semantic checker not called: " + this.getClass().getName() + ", " + this);
+//			System.exit(-1);
+//		}
 //		if (this instanceof Declaration decl) {
 //			if (decl.externalIdent == null) {
 //				Thread.dumpStack();
@@ -167,12 +163,12 @@ public abstract class SyntaxClass {
 		return (toString());
 	}
 
-	/// Build Java ClassFile ByteCode.
-	/// @param codeBuilder the codeBuilder to use.
-	public void buildByteCode(CodeBuilder codeBuilder) {
+//	/// Build Java ClassFile ByteCode.
+//	/// @param codeBuilder the codeBuilder to use.
+//	public void buildByteCode(CodeBuilder codeBuilder) {
 //		Util.IERR("Method buildByteCode need a redefinition in "+this.getClass().getSimpleName()
 //				+"\n\n            MAYBE: Use buildEvaluation(boolean destination,CodeBuilder codeBuilder)\n");
-	}
+//	}
 
 //	/// Utility print method.
 //	/// 

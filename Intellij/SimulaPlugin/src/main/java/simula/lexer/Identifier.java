@@ -1,15 +1,12 @@
 package simula.lexer;
 
-import com.intellij.psi.tree.IElementType;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import simula.lang.SimulaLanguage;
+import simula.compiler.utilities.KeyWord;
 
-public class Identifier extends IElementType {
-	@NonNls @NotNull public final String value;
+public class Identifier extends SimulaToken {
+	public final String value;
 
-	public Identifier(@NonNls @NotNull String debugName, @NonNls @NotNull String value) {
-		super(debugName, SimulaLanguage.INSTANCE);
+	public Identifier(CharSequence sourceText, int startOffset, int endOffset, String value) {
+		super(sourceText, startOffset, endOffset, KeyWord.IDENTIFIER, "IDENTIFIER");
 		this.value = value;
 	}
 

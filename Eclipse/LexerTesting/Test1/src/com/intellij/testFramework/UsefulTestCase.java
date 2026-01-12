@@ -40,7 +40,7 @@ import com.intellij.ui.IconManager;
 import com.intellij.util.*;
 import com.intellij.util.containers.*;
 
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 //import com.intellij.util.io.PathKt;
 //import com.intellij.util.ui.UIUtil;

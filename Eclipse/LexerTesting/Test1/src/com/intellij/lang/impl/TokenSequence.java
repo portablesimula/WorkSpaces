@@ -10,7 +10,7 @@ import com.intellij.openapi.util.Comparing;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.ArrayUtil;
 
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;

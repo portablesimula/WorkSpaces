@@ -81,7 +81,7 @@ public class SimulaSyntaxHighlighter extends SyntaxHighlighterBase {
         if (tokenType.equals(SimulaTypes.VALUE)) {
             return VALUE_KEYS;
         }
-        if (tokenType.equals(KeyWordToken.COMMENT)) {
+        if (tokenType.equals(SimulaTypes.COMMENT)) {
             return COMMENT_KEYS;
         }
         if (tokenType.equals(TokenType.BAD_CHARACTER)) {

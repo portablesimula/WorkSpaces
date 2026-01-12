@@ -1,16 +1,16 @@
-package testing.util;
+package simula.compiler.utilities;
 
 public class Util {
     public static void warning(String s) {
-    	IO.println("WARNING: "+s);
+    	System.out.println("WARNING: "+s);
     }
 
     public static void TRACE(String s) {
-    	IO.println("TRACE: "+s);
+    	System.out.println("TRACE: "+s);
     }
 
     public static void error(String s) {
-    	IO.println("ERROR: "+s);
+    	System.out.println("ERROR: "+s);
     }
 
     public static void ASSERT(boolean test, String s) {
@@ -32,12 +32,12 @@ public class Util {
     }
 
     public static void IERR() {
-    	IO.println("INTERNAL ERROR: ");
+    	System.out.println("INTERNAL ERROR: ");
     	System.exit(-1);
     }
 
     public static void IERR(String msg) {
-    	IO.println("INTERNAL ERROR: " + msg);
+    	System.out.println("INTERNAL ERROR: " + msg);
     	System.exit(-1);
     }
 }

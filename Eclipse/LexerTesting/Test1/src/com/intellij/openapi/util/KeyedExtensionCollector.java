@@ -9,7 +9,7 @@ import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.util.Java11Shim;
 import com.intellij.util.KeyedLazyInstance;
 import kotlinx.collections.immutable.PersistentList;
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 import org.jetbrains.annotations.*;
 

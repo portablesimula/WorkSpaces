@@ -29,6 +29,9 @@ import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.containers.ContainerUtil;
+
+import simula.compiler.utilities.LOG;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,8 +40,6 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import testing.util.LOG;
 
 public abstract class ASTDelegatePsiElement extends PsiElementBase {
 //	private static final Logger LOG = Logger.getInstance(ASTDelegatePsiElement.class);

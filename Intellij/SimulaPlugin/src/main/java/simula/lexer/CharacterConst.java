@@ -1,15 +1,12 @@
 package simula.lexer;
 
-import com.intellij.psi.tree.IElementType;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import simula.lang.SimulaLanguage;
+import simula.compiler.utilities.KeyWord;
 
-public class CharacterConst extends IElementType {
-	@NonNls @NotNull public final int value;
+public class CharacterConst extends SimulaToken {
+	public final int value;
 
-	public CharacterConst(@NonNls @NotNull String debugName, @NonNls @NotNull int value) {
-		super(debugName, SimulaLanguage.INSTANCE);
+	public CharacterConst(CharSequence sourceText, int startOffset, int endOffset, int value) {
+		super(sourceText, startOffset, endOffset, KeyWord.CHARACTERKONST, "CHARACTERKONST");
 		this.value = value;
 	}
 

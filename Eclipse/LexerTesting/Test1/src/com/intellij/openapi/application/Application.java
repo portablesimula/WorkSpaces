@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
-import testing.util.LOG;
+import simula.compiler.utilities.LOG;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
