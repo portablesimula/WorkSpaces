@@ -5,6 +5,9 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.expression;
 
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+
 //import java.lang.classfile.CodeBuilder;
 
 import simula.compiler.syntaxClass.SyntaxClass;
@@ -94,7 +97,9 @@ public abstract class Expression extends SyntaxClass {
 	public SyntaxClass backLink;
 
 	/// Expression.
-	public Expression(){}
+	public Expression(@NonNls @NotNull String debugName) {
+		super(debugName);
+	}
 
 //	/// Accept expression.
 //	/// <pre>

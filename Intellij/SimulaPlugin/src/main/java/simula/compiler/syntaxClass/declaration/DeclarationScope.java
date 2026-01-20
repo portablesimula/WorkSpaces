@@ -12,6 +12,9 @@ import java.io.IOException;
 //import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
 
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+
 //import simula.compiler.utilities.DeclarationList;
 //import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
@@ -57,8 +60,8 @@ public abstract class DeclarationScope extends Declaration  {
 	/// Create a new DeclarationScope.
 	/// 
 	/// @param ident scope identifier
-	protected DeclarationScope(final String ident) {
-		super(ident);
+	protected DeclarationScope(@NonNls @NotNull String debugName, final String ident) {
+		super(debugName, ident);
 //		declarationList = new DeclarationList(getClass().getSimpleName() + ':' + ident + ":Line=" + Global.sourceLineNumber);
 //		declaredIn = Global.getCurrentScope();
 //		Global.setScope(this);

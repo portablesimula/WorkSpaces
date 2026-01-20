@@ -38,7 +38,7 @@ public interface IntListIterator extends IntBidirectionalIterator, ListIterator<
     @Deprecated
     default Integer next() {
 //        return super.next();
-    	LOG.error("NOT IMPL");
+    	LOG.error("NOT IMPL: IntListIterator.next");
     	return null;
     }
 
@@ -46,7 +46,7 @@ public interface IntListIterator extends IntBidirectionalIterator, ListIterator<
     @Deprecated
     default Integer previous() {
 //        return super.previous();
-    	LOG.error("NOT IMPL");
+    	LOG.error("NOT IMPL: IntListIterator.previous");
     	return null;
     }
 }

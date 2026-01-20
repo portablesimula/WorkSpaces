@@ -160,45 +160,45 @@ public class LazyParseableElement extends CompositeElement {
 	}
 
 	private void ensureParsed() {
-		if (!ourParsingAllowed) {
-			LOG.error("Parsing not allowed!!!");
-		}
-		if (myParsed) return;
-
-		CharSequence text;
-		waitForLock(myLock);
-		try {
-			if (myParsed) return;
-
-			text = myText.get();
-			assert text != null;
-
-			FileElement fileElement = TreeUtil.getFileElement(this);
-			if (fileElement == null) {
-				LOG.error("Chameleons must not be parsed till they're in file tree: " + this);
-			}
-			else {
-				fileElement.assertReadAccessAllowed();
-			}
-
-			if (rawFirstChild() != null) {
-				LOG.error("Reentrant parsing?");
-			}
-
-			DebugUtil.performPsiModification("lazy-parsing", () -> {
-				TreeElement parsedNode = (TreeElement)((ILazyParseableElementTypeBase)getElementType()).parseContents(this);
-
-				if (parsedNode != null) {
-					assertTextLengthIntact(text, parsedNode);
-					setChildren(parsedNode);
-				}
-
-				myParsed = true;
-				myText = new SoftReference<>(text);
-			});
-		} finally {
-			myLock.unlock();
-		}
+//		if (!ourParsingAllowed) {
+//			LOG.error("Parsing not allowed!!!");
+//		}
+//		if (myParsed) return;
+//
+//		CharSequence text;
+//		waitForLock(myLock);
+//		try {
+//			if (myParsed) return;
+//
+//			text = myText.get();
+//			assert text != null;
+//
+//			FileElement fileElement = TreeUtil.getFileElement(this);
+//			if (fileElement == null) {
+//				LOG.error("Chameleons must not be parsed till they're in file tree: " + this);
+//			}
+//			else {
+//				fileElement.assertReadAccessAllowed();
+//			}
+//
+//			if (rawFirstChild() != null) {
+//				LOG.error("Reentrant parsing?");
+//			}
+//
+//			DebugUtil.performPsiModification("lazy-parsing", () -> {
+//				TreeElement parsedNode = (TreeElement)((ILazyParseableElementTypeBase)getElementType()).parseContents(this);
+//
+//				if (parsedNode != null) {
+//					assertTextLengthIntact(text, parsedNode);
+//					setChildren(parsedNode);
+//				}
+//
+//				myParsed = true;
+//				myText = new SoftReference<>(text);
+//			});
+//		} finally {
+//			myLock.unlock();
+//		}
 	}
 
 	private void assertTextLengthIntact(CharSequence text, TreeElement child) {

@@ -8,6 +8,19 @@ package simula.compiler.syntaxClass;
 import java.io.IOException;
 //import java.lang.classfile.CodeBuilder;
 
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import com.intellij.lang.Language;
+import com.intellij.lang.PsiBuilder;
+import com.intellij.psi.tree.IElementType;
+
+import simula.compiler.utilities.KeyWord;
+import simula.lang.SimulaLanguage;
+import simula.lexer.KeyWordToken;
+import simula.lexer.SimulaToken;
+
 //import simula.compiler.AttributeInputStream;
 //import simula.compiler.AttributeOutputStream;
 //import simula.compiler.JavaSourceFileCoder;
@@ -84,7 +97,13 @@ import java.io.IOException;
 /// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/SyntaxClass.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public abstract class SyntaxClass {
+public abstract class SyntaxClass extends IElementType {
+	
+	public SyntaxClass(@NonNls @NotNull String debugName) {
+		super(debugName, SimulaLanguage.INSTANCE);
+		// TODO Auto-generated constructor stub
+	}
+
 	/// Controls semantic checking.
 	/// 
 	/// Set true when the method doChecking() has been completed.
@@ -108,7 +127,25 @@ public abstract class SyntaxClass {
 //	protected SyntaxClass() {
 //		lineNumber = Global.sourceLineNumber;
 //	}
-//
+
+    
+    public static SimulaToken getSimToken(PsiBuilder simBuilder) {
+        return (SimulaToken)simBuilder.getTokenType();
+    }
+    
+    public static int getKeyWord(PsiBuilder simBuilder) {
+        return getSimToken(simBuilder).keyWord;
+    }
+
+    public static void consumeUntilSemicolon(PsiBuilder simBuilder) {
+        while (!simBuilder.eof() && getKeyWord(simBuilder) != KeyWord.SEMICOLON) {
+            simBuilder.advanceLexer();
+        }
+//        if (getKeyWord(simBuilder) == KeyWord.SEMICOLON) {
+//            simBuilder.advanceLexer();
+//        }
+    }
+
 //	/// Perform semantic checking.
 //	/// 
 //	/// This must be redefined in every subclass.

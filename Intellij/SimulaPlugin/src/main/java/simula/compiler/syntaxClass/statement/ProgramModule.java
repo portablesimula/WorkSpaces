@@ -87,7 +87,7 @@ public final class ProgramModule extends Statement {
 
 	/// Create a new ProgramModule.
 	public ProgramModule() {
-		super(0);
+		super("ProgramModule", 0);
 //		sysin=new VariableExpression("sysin");
 //		sysout=new VariableExpression("sysout");
 //		try	{

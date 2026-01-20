@@ -5,25 +5,27 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.declaration;
 
-//import java.lang.classfile.CodeBuilder;
-//import java.lang.classfile.Label;
-//import java.lang.classfile.constantpool.ConstantPoolBuilder;
+// import java.lang.classfile.CodeBuilder;
+// import java.lang.classfile.Label;
+// import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Stack;
 import java.util.Vector;
 
-//import simula.compiler.JavaSourceFileCoder;
-//import simula.compiler.parsing.Parse;
-//import simula.compiler.syntaxClass.Type;
+import com.intellij.lang.PsiBuilder;
+
+import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.parsing.Parse;
+import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.statement.Statement;
-//import simula.compiler.utilities.RTS;
+import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
-//import simula.compiler.utilities.ObjectKind;
-//import simula.compiler.utilities.ObjectList;
+import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
@@ -43,8 +45,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// If true; this is the outermost Subblock or Prefixed Block.
 	public boolean isMainModule;
 	
-//	/// The statements belonging to this block.
-//	public ObjectList<Statement> statements = new ObjectList<Statement>();
+	/// The statements belonging to this block.
+	public ObjectList<Statement> statements = new ObjectList<Statement>();
 
 	/// Last source line number
 	public int lastLineNumber;
@@ -71,22 +73,22 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// Note: First Local Variable is used by the outermost try-catch block.
 	public int nLocalVariables = 1;
 	
-//	/// Get current ClassDesc.
-//	/// @return the current ClassDesc.
-//	public static ClassDesc currentClassDesc() {
-//		return(currentBlock.getClassDesc());
-//	}
-//	
-//	/// Allocate slot for a local variable.
-//	/// @param type variable's type.
-//	/// @return slot for a local variable.
-//	public int allocateLocalVariable(Type type) {
-//		int res = nLocalVariables++;
-//		if(type.keyWord == Type.T_LONG_REAL) {
-//			nLocalVariables++;
-//		}
-//		return(res);
-//	}
+	/// Get current ClassDesc.
+	/// @return the current ClassDesc.
+	public static ClassDesc currentClassDesc() {
+		return(currentBlock.getClassDesc());
+	}
+	
+	/// Allocate slot for a local variable.
+	/// @param type variable's type.
+	/// @return slot for a local variable.
+	public int allocateLocalVariable(Type type) {
+		int res = nLocalVariables++;
+		if(type.keyWord == Type.T_LONG_REAL) {
+			nLocalVariables++;
+		}
+		return(res);
+	}
 
 	// ***********************************************************************************************
 	// *** CONSTRUCTORS
@@ -95,8 +97,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// 
 	/// Used by expectMaybeBlock, i.e. CompoundStatement, SubBlock or PrefixedBlock.
 	/// @param identifier the given identifier
-	protected BlockDeclaration(String identifier) {
-		super(identifier);
+	protected BlockDeclaration(final String debugName, final String identifier) {
+		super(debugName, identifier);
 	}
 
 	/// Create a new BlockDeclaration.
@@ -104,180 +106,180 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// This constructor is only used by ClassDeclaration. ProcedureDeclaration and MaybeBlockDeclaration.
 	/// @param identifier the block identifier
 	/// @param declarationKind the declaration kind
-	private BlockDeclaration(final String identifier,final int declarationKind) {
-		super(identifier);
+	private BlockDeclaration(final String debugName, final String identifier, final int declarationKind) {
+		super(debugName, identifier);
 		this.declarationKind = declarationKind;
 	}
 	
-//	/// Parse Utility: Expect formal-parameter-part and build the parameter list.
-//	/// <pre>
-//	/// Syntax:
-//	/// 
-//	///     formal-parameter-part = "(" identifier { , identifier } ")"
-//	/// </pre>
-//	/// 
-//	/// Precondition: BEGPAR is already read.
-//	/// @param pList the parameter list
-//	protected static void expectFormalParameterPart(final Vector<Parameter> pList) {
-//		do { // ParameterPart = Parameter ; { Parameter ; }
-//			new Parameter(Parse.expectIdentifier()).into(pList);
-//		} while (Parse.accept(KeyWord.COMMA));
-//		Parse.expect(KeyWord.ENDPAR);
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Coding: isBlockWithLocalClasses
-//	// ***********************************************************************************************
-//	/// Returns true if this block has local class(es).
-//	/// 
-//	/// @return true if this block has local class(es)
-//	protected boolean isBlockWithLocalClasses() {
-//		if (this.hasLocalClasses) return (true);
-//		if (this instanceof ClassDeclaration cls) {
-//			ClassDeclaration prfx = cls.getPrefixClass();
-//			if (prfx != null) return (prfx.isBlockWithLocalClasses());
-//		}
-//		return (false);
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Coding: isQPSystemBlock -- QPS System is any block with local class(es)
-//	// ***********************************************************************************************
-//	/// Returns true if this block is a QPS System block.
-//	/// 
-//	/// QPS System is any block with local class(es)
-//	/// 
-//	/// @return true if this block is a QPS System block
-//	protected boolean isQPSystemBlock() {
-//		switch (declarationKind) {
-//			case ObjectKind.SimulaProgram:
-//			case ObjectKind.SubBlock:
-//			case ObjectKind.PrefixedBlock:
-//				return (isBlockWithLocalClasses());
-//			default:
-//				return (false);
-//		}
-//	}
-//
-//	
-//	// ***********************************************************************************************
-//	// *** Coding Utility: AD'HOC Leading Label
-//	// ***********************************************************************************************
-//	/// The leading labels.
-//	protected Vector<String> labelcodeList;
-//	
-//	/// ClassFile coding utility: AD'HOC Leading Label
-//	/// @param labelcode argument
-//	public void addLeadingLabel(String labelcode) {
-//		if(this.labelcodeList==null) this.labelcodeList=new Vector<String>();
-//		this.labelcodeList.add(labelcode);
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Coding Utility: hasDeclaredLabel
-//	// ***********************************************************************************************
-//	/// Returns true if this block has one ore more local declared labels.
-//	/// @return true if this block has one ore more local declared labels.
-//	protected boolean hasDeclaredLabel() {
-//		ASSERT_SEMANTICS_CHECKED();
-//		return (labelList != null && labelList.declaredLabelSize() > 0);
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Coding Utility: hasAccumLabel
-//	// ***********************************************************************************************
-//	/// Returns true if this block has one ore more accumulated labels.
-//	/// @return true if this block has one ore more accumulated labels.
-//	protected boolean hasAccumLabel() {
-//		ASSERT_SEMANTICS_CHECKED();
-//		return (labelList != null && labelList.accumLabelSize() > 0);
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Utility: nearestEnclosingBlock
-//	// ***********************************************************************************************
-//	/// Returns the nearest Enclosing Block or null.
-//	/// @return the nearest Enclosing Block or null.
-//	protected BlockDeclaration nearestEnclosingBlock() {
-//		DeclarationScope scope = declaredIn;
-//		while(scope != null) {
-//			if(scope instanceof BlockDeclaration blk) return(blk);
-//			scope = scope.declaredIn;
-//		}
-//		return (null);
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Coding Utility: codeSTMBody
-//	// ***********************************************************************************************
-//	/// ClassFile coding utility: Code STM body
-//	protected void codeSTMBody() {
-//		if (hasAccumLabel()) {
-//			JavaSourceFileCoder.code(externalIdent + " _THIS=(" + externalIdent + ")_CUR;");
-//			JavaSourceFileCoder.code("_LOOP:while(_JTX>=0) {");
-//			JavaSourceFileCoder.code("try {");
-//			JavaSourceFileCoder.code("_JUMPTABLE(_JTX,"+labelList.accumLabelSize()+");","For ByteCode Engineering");			
-//			Global.currentJavaFileCoder.mustDoByteCodeEngineering=true;
-//		}
-//		codeStatements();
-//		if (hasAccumLabel()) {
-//			JavaSourceFileCoder.code("break _LOOP;");
-//			JavaSourceFileCoder.code("}");
-//			JavaSourceFileCoder.code("catch(RTS_LABEL q) {");
-//			
-//			JavaSourceFileCoder.code("RTS_RTObject._TREAT_GOTO_CATCH_BLOCK(_THIS, q);");
-//			
-//			JavaSourceFileCoder.code("_JTX=q.index; continue _LOOP;","EG. GOTO Lx");
-//			JavaSourceFileCoder.code("}");
-//			JavaSourceFileCoder.code("}");
-//		}
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Coding Utility: codeStatements
-//	// ***********************************************************************************************
-//	/// ClassFile coding utility: Code statements
-//	protected void codeStatements() {
-//		boolean duringSTM_Coding=Global.duringSTM_Coding;
-//		Global.duringSTM_Coding=true;
-//		for (Statement stm : statements) stm.doJavaCoding();
-//		Global.duringSTM_Coding=duringSTM_Coding;
-//	}
-//
-//    
-//	// ***********************************************************************************************
-//	// *** Coding Utility: codeStatements
-//	// ***********************************************************************************************
-//	/// ClassFile coding utility: Code Method Main
-//    protected void codeMethodMain() {
-//    	// GENERATES:
-//    	//
-//    	// public static void main(String[] args) {
-//    	//	 // System.setProperty("file.encoding","UTF-8");
-//    	//	 RTS_UTIL.BPRG("adHoc04", args);
-//    	//	 RTS_UTIL.RUN_STM(new adHoc04(_CTX));
-//    	// } // End of main
-//    	String progid = this.externalIdent;
-//		JavaSourceFileCoder.code("");
-//		JavaSourceFileCoder.code("public static void main(String[] args) {");
-//		JavaSourceFileCoder.debug("//System.setProperty(\"file.encoding\",\"UTF-8\");");
-//		JavaSourceFileCoder.code("RTS_UTIL.BPRG(\""+progid+"\", args);");
-//		if(this instanceof PrefixedBlockDeclaration pblk) {
-//			StringBuilder sb = new StringBuilder();
-//			sb.append("new " + getJavaIdentifier() + "(_CTX");
-//			if (pblk.blockPrefix != null && pblk.blockPrefix.hasArguments()) {
-//				for (Expression par : pblk.blockPrefix.checkedParams) {
-//					sb.append(',').append(par.toJavaCode());
-//				}
-//			} sb.append(")");
-//			JavaSourceFileCoder.code("RTS_UTIL.RUN_STM(" + sb + ");");
-//		} else {
-//			JavaSourceFileCoder.code("RTS_UTIL.RUN_STM(new " + getJavaIdentifier() + "(_CTX));");			
-//		}
-//		JavaSourceFileCoder.code("}", "End of main");
-//    }
-//	
-//	
+	/// Parse Utility: Expect formal-parameter-part and build the parameter list.
+	/// <pre>
+	/// Syntax:
+	/// 
+	///     formal-parameter-part = "(" identifier { , identifier } ")"
+	/// </pre>
+	/// 
+	/// Precondition: BEGPAR is already read.
+	/// @param pList the parameter list
+	protected static void expectFormalParameterPart(final PsiBuilder simBuilder, final Vector<Parameter> pList) {
+		do { // ParameterPart = Parameter ; { Parameter ; }
+			new Parameter(Parse.expectIdentifier(simBuilder)).into(pList);
+		} while (Parse.accept(simBuilder, KeyWord.COMMA));
+		Parse.expect(simBuilder, KeyWord.ENDPAR);
+	}
+
+	// ***********************************************************************************************
+	// *** Coding: isBlockWithLocalClasses
+	// ***********************************************************************************************
+	/// Returns true if this block has local class(es).
+	/// 
+	/// @return true if this block has local class(es)
+	protected boolean isBlockWithLocalClasses() {
+		if (this.hasLocalClasses) return (true);
+		if (this instanceof ClassDeclaration cls) {
+			ClassDeclaration prfx = cls.getPrefixClass();
+			if (prfx != null) return (prfx.isBlockWithLocalClasses());
+		}
+		return (false);
+	}
+
+	// ***********************************************************************************************
+	// *** Coding: isQPSystemBlock -- QPS System is any block with local class(es)
+	// ***********************************************************************************************
+	/// Returns true if this block is a QPS System block.
+	/// 
+	/// QPS System is any block with local class(es)
+	/// 
+	/// @return true if this block is a QPS System block
+	protected boolean isQPSystemBlock() {
+		switch (declarationKind) {
+			case ObjectKind.SimulaProgram:
+			case ObjectKind.SubBlock:
+			case ObjectKind.PrefixedBlock:
+				return (isBlockWithLocalClasses());
+			default:
+				return (false);
+		}
+	}
+
+	
+	// ***********************************************************************************************
+	// *** Coding Utility: AD'HOC Leading Label
+	// ***********************************************************************************************
+	/// The leading labels.
+	protected Vector<String> labelcodeList;
+	
+	/// ClassFile coding utility: AD'HOC Leading Label
+	/// @param labelcode argument
+	public void addLeadingLabel(String labelcode) {
+		if(this.labelcodeList==null) this.labelcodeList=new Vector<String>();
+		this.labelcodeList.add(labelcode);
+	}
+
+	// ***********************************************************************************************
+	// *** Coding Utility: hasDeclaredLabel
+	// ***********************************************************************************************
+	/// Returns true if this block has one ore more local declared labels.
+	/// @return true if this block has one ore more local declared labels.
+	protected boolean hasDeclaredLabel() {
+		ASSERT_SEMANTICS_CHECKED();
+		return (labelList != null && labelList.declaredLabelSize() > 0);
+	}
+
+	// ***********************************************************************************************
+	// *** Coding Utility: hasAccumLabel
+	// ***********************************************************************************************
+	/// Returns true if this block has one ore more accumulated labels.
+	/// @return true if this block has one ore more accumulated labels.
+	protected boolean hasAccumLabel() {
+		ASSERT_SEMANTICS_CHECKED();
+		return (labelList != null && labelList.accumLabelSize() > 0);
+	}
+
+	// ***********************************************************************************************
+	// *** Utility: nearestEnclosingBlock
+	// ***********************************************************************************************
+	/// Returns the nearest Enclosing Block or null.
+	/// @return the nearest Enclosing Block or null.
+	protected BlockDeclaration nearestEnclosingBlock() {
+		DeclarationScope scope = declaredIn;
+		while(scope != null) {
+			if(scope instanceof BlockDeclaration blk) return(blk);
+			scope = scope.declaredIn;
+		}
+		return (null);
+	}
+
+	// ***********************************************************************************************
+	// *** Coding Utility: codeSTMBody
+	// ***********************************************************************************************
+	/// ClassFile coding utility: Code STM body
+	protected void codeSTMBody() {
+		if (hasAccumLabel()) {
+			JavaSourceFileCoder.code(externalIdent + " _THIS=(" + externalIdent + ")_CUR;");
+			JavaSourceFileCoder.code("_LOOP:while(_JTX>=0) {");
+			JavaSourceFileCoder.code("try {");
+			JavaSourceFileCoder.code("_JUMPTABLE(_JTX,"+labelList.accumLabelSize()+");","For ByteCode Engineering");			
+			Global.currentJavaFileCoder.mustDoByteCodeEngineering=true;
+		}
+		codeStatements();
+		if (hasAccumLabel()) {
+			JavaSourceFileCoder.code("break _LOOP;");
+			JavaSourceFileCoder.code("}");
+			JavaSourceFileCoder.code("catch(RTS_LABEL q) {");
+			
+			JavaSourceFileCoder.code("RTS_RTObject._TREAT_GOTO_CATCH_BLOCK(_THIS, q);");
+			
+			JavaSourceFileCoder.code("_JTX=q.index; continue _LOOP;","EG. GOTO Lx");
+			JavaSourceFileCoder.code("}");
+			JavaSourceFileCoder.code("}");
+		}
+	}
+
+	// ***********************************************************************************************
+	// *** Coding Utility: codeStatements
+	// ***********************************************************************************************
+	/// ClassFile coding utility: Code statements
+	protected void codeStatements() {
+		boolean duringSTM_Coding=Global.duringSTM_Coding;
+		Global.duringSTM_Coding=true;
+		for (Statement stm : statements) stm.doJavaCoding();
+		Global.duringSTM_Coding=duringSTM_Coding;
+	}
+
+    
+	// ***********************************************************************************************
+	// *** Coding Utility: codeStatements
+	// ***********************************************************************************************
+	/// ClassFile coding utility: Code Method Main
+    protected void codeMethodMain() {
+    	// GENERATES:
+    	//
+    	// public static void main(String[] args) {
+    	//	 // System.setProperty("file.encoding","UTF-8");
+    	//	 RTS_UTIL.BPRG("adHoc04", args);
+    	//	 RTS_UTIL.RUN_STM(new adHoc04(_CTX));
+    	// } // End of main
+    	String progid = this.externalIdent;
+		JavaSourceFileCoder.code("");
+		JavaSourceFileCoder.code("public static void main(String[] args) {");
+		JavaSourceFileCoder.debug("//System.setProperty(\"file.encoding\",\"UTF-8\");");
+		JavaSourceFileCoder.code("RTS_UTIL.BPRG(\""+progid+"\", args);");
+		if(this instanceof PrefixedBlockDeclaration pblk) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("new " + getJavaIdentifier() + "(_CTX");
+			if (pblk.blockPrefix != null && pblk.blockPrefix.hasArguments()) {
+				for (Expression par : pblk.blockPrefix.checkedParams) {
+					sb.append(',').append(par.toJavaCode());
+				}
+			} sb.append(")");
+			JavaSourceFileCoder.code("RTS_UTIL.RUN_STM(" + sb + ");");
+		} else {
+			JavaSourceFileCoder.code("RTS_UTIL.RUN_STM(new " + getJavaIdentifier() + "(_CTX));");			
+		}
+		JavaSourceFileCoder.code("}", "End of main");
+    }
+	
+	
 //	// ***********************************************************************************************
 //	// *** ByteCoding: buildIsQPSystemBlock
 //	// ***********************************************************************************************
@@ -511,16 +513,16 @@ public abstract class BlockDeclaration extends DeclarationScope {
 //			.return_()
 //			.labelBinding(endScope);
 //	}
-//    
-//	/// Debug utility: print StatementList.
-//	/// @param indent the indentation.
-//	protected void printStatementList(int indent) {
-//		if(Option.internal.PRINT_SYNTAX_TREE > 2) {
-//			for(Statement s:statements) s.printTree(indent, this);
-//		} else {
-//			IO.println(edTreeIndent(indent) + ' ' + this.identifier + ' ' + (statements.size()) + " Statements ...");
-//		}
-//	}
+    
+	/// Debug utility: print StatementList.
+	/// @param indent the indentation.
+	protected void printStatementList(int indent) {
+		if(Option.internal.PRINT_SYNTAX_TREE > 2) {
+			for(Statement s:statements) s.printTree(indent, this);
+		} else {
+			IO.println(edTreeIndent(indent) + ' ' + this.identifier + ' ' + (statements.size()) + " Statements ...");
+		}
+	}
 	
 	@Override
 	public String toString() {

@@ -7,6 +7,8 @@ import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
 import com.intellij.psi.tree.IElementType;
 import simula.compiler.syntaxClass.statement.Statement;
+import simula.compiler.utilities.Util;
+import simula.lexer.SimulaElementTypes;
 
 //import lang.IElementType;
 
@@ -31,18 +33,19 @@ public class SimulaParser implements PsiParser {
     @NotNull
     @Override
     public ASTNode parse(@NotNull IElementType root, @NotNull PsiBuilder psiBuilder) {
-        System.out.println("SimulaParser.parse was called");
-//        if(true) throw new RuntimeException("SimulaParser.parse was called");
-
+        System.out.println("\nSimulaParser.parse was called +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("SimulaParser.parse: root="+root);
+//        psiBuilder.setDebugMode(true);
 
         // 1. Begin the root marker for the entire file
         final PsiBuilder.Marker rootMarker = psiBuilder.mark();
         System.out.println("SimulaParser.parse: rootMarker="+rootMarker);
-        System.out.println("SimulaParser.parse: psiBuilder.eof="+psiBuilder.eof());
+//        System.out.println("SimulaParser.parse: psiBuilder.eof="+psiBuilder.eof());
+//        Util.IERR();
 
         // 2. Iterate through the token stream
-        while (!psiBuilder.eof()) {
+//        while (!psiBuilder.eof()) {
+        if (!psiBuilder.eof()) {
 //            IElementType tokenType = psiBuilder.getTokenType();
 //            System.out.println("SimulaParser.parse: tokenType="+tokenType.getClass().getSimpleName() + "  " + tokenType);
 //
@@ -54,17 +57,24 @@ public class SimulaParser implements PsiParser {
 //                psiBuilder.advanceLexer();
 //            }
 
-            System.out.println("SimulaParser.parse: CALL parseStatement(psiBuilder)");
-//            Statement.parseStatement(psiBuilder);
-        	SimPsiBuilder simBuilder = (SimPsiBuilder) psiBuilder;
-            Statement.parseStatement(simBuilder);
+            System.out.println("\nSimulaParser.parse: CALL parseStatement(psiBuilder)");
+            Statement.parseStatement(psiBuilder);
         }
 
-
+        if (!psiBuilder.eof()) {
+            final PsiBuilder.Marker afterEndMarker = psiBuilder.mark();
+        	while (!psiBuilder.eof()) {
+    	        psiBuilder.advanceLexer();
+        	}
+        	afterEndMarker.done(SimulaElementTypes.TEXT_AFTER_FINAL_END);
+        }
 
         // 3. Close the root marker and return the tree
-        System.out.println("SimulaParser.parse: Close the root marker and return the tree: ");
+        System.out.println("\nSimulaParser.parse: Close the root marker: --------------------------------------------------");
         rootMarker.done(root);
+        
+        
+        System.out.println("\nSimulaParser.parse: Return the tree: --------------------------------------------------");
         return psiBuilder.getTreeBuilt();
     }
 

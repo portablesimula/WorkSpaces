@@ -34,6 +34,7 @@ import simula.lexer.KeyWordToken;
 //import simula.compiler.utilities.Option;
 //import simula.compiler.utilities.Util;
 import simula.lexer.SimulaElementTypes;
+import simula.lexer.SimulaToken;
 import simula.parser.SimPsiBuilder;
 
 /// Assignment Operation.
@@ -67,35 +68,34 @@ public final class AssignmentOperation extends Expression {
 	/// Indicates that this assignment is a text value assignment.
 	private boolean textValueAssignment = false; // Set by doChecking
 
-    public static void parseAssignment(SimPsiBuilder simBuilder) {
+//    public static void parseAssignment(SimPsiBuilder simBuilder) {
+    public static void parseAssignment(PsiBuilder simBuilder) {
         PsiBuilder.Marker assignMarker = simBuilder.mark();
         simBuilder.advanceLexer(); // consume identifier
 
 //        IElementType tokenType = builder.getTokenType();
 //        switch(((KeyWordToken)tokenType).keyWord) {
-        switch(simBuilder.getSimToken().keyWord) {
+//        switch(simBuilder.getSimToken().keyWord) {
+        SimulaToken simToken = getSimToken(simBuilder);
+        System.out.println("SimulaParser.parseAssignment: SWITCH ON "+simToken);
+        switch(simToken.keyWord) {
         case KeyWord.ASSIGNVALUE:
-            System.out.println("SimulaParser.parseAssignment: BEGIN");
+            System.out.println("SimulaParser.parseAssignment: BEGIN ASSIGNVALUE");
 //            Util.IERR("parseAssignment.ASSIGNVALUE: "+simBuilder.getSimToken());
             simBuilder.advanceLexer();
             // In a real parser, you'd call parseExpression(builder) here
-            simBuilder.consumeUntilSemicolon();
-            assignMarker.done(SimulaElementTypes.ASSIGNMENT_STATEMENT);
+            consumeUntilSemicolon(simBuilder);
+            simBuilder.advanceLexer(); // Consume semicolon
+            System.out.println("\nSimulaParser.parseAssignment: END ASSIGNVALUE ==> CALL assignMarker.done: "+assignMarker);
+            assignMarker.done(new AssignmentOperation(null, 0, null));
             break;
 		default:
-            Util.IERR("parseAssignment.default: "+simBuilder.getSimToken());
+            Util.IERR("parseAssignment.default: "+simToken);
+            System.out.println("\nSimulaParser.parseAssignment: CALL assignMarker.drop: "+assignMarker);
             assignMarker.drop(); // Not an assignment, backtrack or handle error
 			break;
         }
 
-//        if (builder.getTokenType() == KeyWord.ASSIGNVALUE) {
-//            builder.advanceLexer();
-//            // In a real parser, you'd call parseExpression(builder) here
-//            consumeUntilSemicolon(builder);
-//            assignMarker.done(SimulaElementTypes.ASSIGNMENT_STATEMENT);
-//        } else {
-//            assignMarker.drop(); // Not an assignment, backtrack or handle error
-//        }
     }
 
 	/// AssignmentOperation.
@@ -103,6 +103,7 @@ public final class AssignmentOperation extends Expression {
 	/// @param opr the operation
 	/// @param rhs the right hand side
 	public AssignmentOperation(final Expression lhs, final int opr, final Expression rhs) {
+		super("AssignmentOperation");
 		this.lhs = lhs;
 		this.opr = opr;
 		this.rhs = rhs;
@@ -114,7 +115,7 @@ public final class AssignmentOperation extends Expression {
 //			Util.error("Missing operand after " + KeyWord.edit(opr));
 //			this.rhs = new VariableExpression("UNKNOWN_");
 //		}
-		this.lhs.backLink = this.rhs.backLink = this;
+//		this.lhs.backLink = this.rhs.backLink = this;
 	}
 
 //	@Override

@@ -26,6 +26,9 @@ import com.intellij.util.*;
 import com.intellij.util.diff.FlyweightCapableTreeStructure;
 import com.intellij.util.graph.InboundSemiGraph;
 import com.intellij.util.graph.OutboundSemiGraph;
+
+import simula.compiler.utilities.LOG;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;

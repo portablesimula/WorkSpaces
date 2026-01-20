@@ -38,9 +38,9 @@ public class Main {
 	public static void main(String[] argv) {
 		IO.println("*** BEGIN main ");
 		Global.sourceLineNumber = 1;
-		tester1();
+//		tester1();
 //		try { tester2(); } catch (IOException e) { e.printStackTrace(); }
-//		tester3();
+		tester3();
 //		tester4();
 	}
 	
@@ -60,7 +60,8 @@ public class Main {
 	}
 
 //	public static String TEST_TEXT = "begin\r\n   iii := 444;\r\n--   outimage;\r\nend; ";
-	public static String TEST_TEXT = "begin\r\n   iii := 444;\r\n--   outimage;\r\n   outtext()\r\nend med en kommentar ! ;\r\nEtter final end";
+	public static String TEST_TEXT = "begin\r\n   iii := 444;\r\n--   outimage;\r\n   jjj := 555;\r\nend; ";
+//	public static String TEST_TEXT = "begin\r\n   iii := 444;\r\n--   outimage;\r\n   outtext()\r\nend med en kommentar ! ;\r\nEtter final end";
 //	public static String TEST_TEXT = "begin\r\n   outtext(\"Hello World!\");\r\n--   outimage;\r\nend; ";
 //	public static String TEST_TEXT = "begin\r\n   outtext(\"Hello \"\r\ncomment Kommentar;\r\n\" World!\");\r\n--   outimage;\r\nend; ";
 
@@ -91,19 +92,12 @@ public class Main {
 		// Use the factory to get an instance (which will be a PsiBuilderImpl)
 //		PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(parserDefinition, lexer, text);
 		PsiBuilderImpl builder = (PsiBuilderImpl) new PsiBuilderFactoryImpl().createBuilder(parserDefinition, lexer, TEST_TEXT);
-
-//		String originalText = builder.getOriginalText().toString();
-//		FlyweightCapableTreeStructure<LighterASTNode> xxx = builder.getLightTree();
-		
-//		FlyweightCapableTreeStructure<LighterASTNode> zzz = builder.parseContents();
 		IO.println("Main.tester3: builder="+builder);
 		
 //		SimulaParser parser = new SimulaParser(builder, TEST_TEXT);
 		SimulaParser parser = new SimulaParser();
 		IElementType root = FILE;
 	    ASTNode tree = parser.parse(root, builder);
-
-		
 //		ASTNode tree = builder.getTreeBuilt();
 		IO.println("Main.tester3: AST-tree: "+tree);
 	    printAST(tree, 4);
@@ -120,7 +114,7 @@ public class Main {
 	}
 	
 	static void tester5() {
-			IO.println("*** BEGIN tester 4 ");
+			IO.println("*** BEGIN tester 5 ");
 		Lexer lexer = new SimulaLexer();
 		ParserDefinition parserDefinition = new SimulaParserDefinition();
 
@@ -141,10 +135,11 @@ public class Main {
 	public static void printAST(ASTNode node, int indent) {
 	    // Print current node info
 	    String indentation = " ".repeat(indent);
-	    System.out.println(indentation + node.getElementType() + " (" + node.getTextRange() + ")" + node.getText());
+	    System.out.println(indentation + node.getElementType() + " (" + node.getTextRange() + ")" + node.getText().replace("\r", "\\r").replace("\n", "\\n"));
 	    
 	    // Recurse through children
 	    ASTNode child = node.getFirstChildNode();
+	    System.out.println("Main.printAST: child="+child);
 	    while (child != null) {
 	        printAST(child, indent + 2);
 	        child = child.getTreeNext();

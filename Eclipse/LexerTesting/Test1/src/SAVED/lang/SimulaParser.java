@@ -20,8 +20,8 @@ public class SimulaParser implements PsiParser {
 
         // 1. Begin the root marker for the entire file
         final PsiBuilder.Marker rootMarker = builder.mark();
-        System.out.println("SimulaParser.parse: rootMarker="+rootMarker);
-        System.out.println("SimulaParser.parse: builder.eof="+builder.eof());
+//        System.out.println("SimulaParser.parse: rootMarker="+rootMarker);
+//        System.out.println("SimulaParser.parse: builder.eof="+builder.eof());
 
         // 2. Iterate through the token stream
         while (!builder.eof()) {

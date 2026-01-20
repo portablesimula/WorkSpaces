@@ -39,6 +39,8 @@ import com.intellij.util.ui.tree.TreeUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import simula.compiler.utilities.LOG;
+import simula.compiler.utilities.Util;
+import simula.parser.SimulaASTFactory;
 import testing.Main;
 
 import org.jetbrains.annotations.*;
@@ -310,6 +312,15 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 	// exposed via getLatestDoneMarker method (used by Perl plugin)
 	@ApiStatus.Internal
 	public static class StartMarker extends ProductionMarker implements Marker, LighterASTSyntaxTreeBuilderBackedNode {
+		// Inherit:
+//		public abstract static class ProductionMarker implements Node, Production {
+//			final int markerId;
+//			protected final PsiBuilderImpl myBuilder;
+//			protected int myLexemeIndex = -1;
+//			protected ProductionMarker myParent;
+//			protected ProductionMarker myNext;
+
+		
 		private IElementType myType;
 		private int myDoneLexeme = -1;
 		private ProductionMarker myFirstChild;
@@ -317,8 +328,52 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 
 		StartMarker(int markerId, @NotNull PsiBuilderImpl builder) {
 			super(markerId, builder);
+			this.dumpMarker("NEW StartMarker: " + this);
+//			Util.IERR();
+		}
+		
+//		public void dumpMarker(PsiBuilderImpl builder) {
+		public void dumpMarker(String title) {
+			System.out.println("PsiBuilderImpl.StartMarker: dumpMarker: " + title + " ==================================================");
+			System.out.println("PsiBuilderImpl.StartMarker: dumpMarker: markerId: "+markerId);
+			System.out.println("PsiBuilderImpl.StartMarker: dumpMarker: myParent: "+myParent);
+			System.out.println("PsiBuilderImpl.StartMarker: dumpMarker: myNext: "+myNext);
+			System.out.println("PsiBuilderImpl.StartMarker: dumpMarker: myType: "+myType);
+			System.out.println("PsiBuilderImpl.StartMarker: dumpMarker: StartLexeme: "+myBuilder.edLexeme(myLexemeIndex));
+			System.out.println("PsiBuilderImpl.StartMarker: dumpMarker: DoneLexeme: "+myBuilder.edLexeme(myDoneLexeme));
+			
+			if(myDoneLexeme >= 0)
+				System.out.println("PsiBuilderImpl.StartMarker: dumpMarker: DoneLexeme: "+myBuilder.edLexeme(myLexemeIndex, myDoneLexeme));
 		}
 
+//		@Override
+//		public String toString() {
+//			if (myLexemeIndex < 0) return "<dropped>";
+//			boolean isDone = isDone();
+//			CharSequence originalText = myBuilder.getOriginalText();
+//			int startOffset = getStartOffset() - myBuilder.myOffset;
+//			int endOffset = isDone ? getEndOffset() - myBuilder.myOffset : myBuilder.getCurrentOffset();
+//			CharSequence text = originalText.subSequence(startOffset, endOffset);
+//			return isDone ? text.toString() : text + "...";
+//		}
+
+		@Override
+		public String toString() { // TODO: AD'HOC
+			String prefix = (myType == null)? "" : ""+myType + ": ";
+			prefix = prefix+"[markerId=" + this.markerId + "] tokens: ";
+			if(myDoneLexeme >= 0)
+				return prefix + myBuilder.edLexeme(myLexemeIndex, myDoneLexeme);
+			return prefix + myBuilder.edLexeme(myLexemeIndex) + " ...";
+		}
+
+		public String edMarker() { // TODO: AD'HOC
+			String prefix = (myType == null)? "" : ""+myType + ": ";
+			prefix = prefix+"[markerId=" + this.markerId + "] text: ";
+			if(myDoneLexeme >= 0)
+				return prefix + '"' + myBuilder.edLexeme2(myLexemeIndex, myDoneLexeme) + '"';
+			return prefix + myBuilder.edLexeme2(myLexemeIndex) + " ...";
+		}
+		
 		@Override
 		void clean() {
 			super.clean();
@@ -364,6 +419,7 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 		}
 
 		public void addChild(@NotNull ProductionMarker node) {
+//			Util.IERR("PsiBuilderImpl.addChild");
 			if (myFirstChild == null) {
 				myFirstChild = node;
 			}
@@ -380,6 +436,8 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 
 		@Override
 		public void drop() {
+			System.out.println("PsiBuilderImpl.drop: ");
+			if(true) throw new RuntimeException("TRACE AV dropMarker MÅ SKRIVES");
 			myBuilder.myProduction.dropMarker(this);
 		}
 
@@ -393,6 +451,7 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 			if (type == TokenType.ERROR_ELEMENT) {
 				LOG.warn("Error elements with empty message are discouraged. Please use builder.error() instead", new RuntimeException());
 			}
+//			System.out.println("PsiBuilderImpl.done: "+type.getClass()+" "+type);
 			myType = type;
 			myBuilder.processDone(this, null, null);
 		}
@@ -453,17 +512,6 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 			if (right != null) {
 				myBuilder.myOptionalData.assignBinder(markerId, right, true);
 			}
-		}
-
-		@Override
-		public String toString() {
-			if (myLexemeIndex < 0) return "<dropped>";
-			boolean isDone = isDone();
-			CharSequence originalText = myBuilder.getOriginalText();
-			int startOffset = getStartOffset() - myBuilder.myOffset;
-			int endOffset = isDone ? getEndOffset() - myBuilder.myOffset : myBuilder.getCurrentOffset();
-			CharSequence text = originalText.subSequence(startOffset, endOffset);
-			return isDone ? text.toString() : text + "…";
 		}
 
 		boolean isDone() {
@@ -888,16 +936,68 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 	public boolean whitespaceOrComment(IElementType token) {
 		return isWhitespaceOrComment(token);
 	}
+	
+	private String edLexeme(int index, int stop) { // TODO: AD'HOC
+		StringBuilder sb = new StringBuilder();
+		String sep = "";
+		for(int i = index;i<=stop;i++) {
+			sb.append(sep).append(edLexeme(i));
+			sep = "";
+		}
+		return sb.toString();
+	}
+	
+	private String edLexeme(int index) { // TODO: AD'HOC
+		String prefix = ""+index+':';
+//		if(eof()) return prefix+"EOF";
+		if(index < 0) return prefix+"UNDEFINED";
+		prefix="["+myLexStarts[index]+':'+myLexStarts[index + 1]+']';
+		String res = "";
+		try {
+			res = prefix+myText.subSequence(myLexStarts[index], myLexStarts[index + 1]).toString();
+		} catch(Exception e) {}
+		return res.replace("\r", "\\r").replace("\n", "\\n");
+	}
+	
+	private String edLexeme2(int index, int stop) { // TODO: AD'HOC
+		StringBuilder sb = new StringBuilder();
+		String sep = "";
+		for(int i = index;i<=stop;i++) {
+			sb.append(sep).append(edLexeme2(i));
+			sep = "";
+		}
+		return sb.toString();
+	}
+	
+	private String edLexeme2(int index) { // TODO: AD'HOC
+		if(index < 0) return "UNDEFINED";
+		String res = "";
+		try {
+			res = myText.subSequence(myLexStarts[index], myLexStarts[index + 1]).toString();
+		} catch(Exception e) {}
+		return res.replace("\r", "\\r").replace("\n", "\\n");
+	}
+	
+	private String edCurrentLexeme() { // TODO: AD'HOC
+//		if(eof()) return "EOF";
+//		return myText.subSequence(myLexStarts[myCurrentLexeme], myLexStarts[myCurrentLexeme + 1]).toString();
+		return(edLexeme(myCurrentLexeme));
+	}
 
 	@Override
 	public @NotNull Marker mark() {
-		LOG.println("PsiBuilderImpl.mark: myProduction="+myProduction);
+//		LOG.println("PsiBuilderImpl.mark: myProduction="+myProduction);
 		if (!myProduction.isEmpty()) {
 			skipWhitespace();
 		}
 
 		StartMarker marker = createMarker(myCurrentLexeme);
 		myProduction.addMarker(marker);
+//		myProduction.debugPrint("PsiBuilderImpl.mark: AFTER CREATE MARKER["+marker.markerId+"]: " + edCurrentLexeme());
+		LOG.println("PsiBuilderImpl.mark: StartMarker["+marker.markerId+"]="+marker);
+		LOG.println("PsiBuilderImpl.mark: StartMarker: "+myProduction);
+//		Thread.dumpStack();
+//		Util.IERR();
 		return marker;
 	}
 
@@ -941,7 +1041,11 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 	}
 
 	private void processDone(@NotNull StartMarker marker, @Nullable @Nls String errorMessage, @Nullable StartMarker before) {
+		System.out.println("PsiBuilderImpl.processDone: StartMarker: "+marker+" ERROR="+errorMessage+" before="+before);
+//		Util.IERR();
+		
 		doValidityChecks(marker, before);
+//		Util.IERR();
 
 		if (errorMessage != null) {
 			myOptionalData.setErrorMessage(marker.markerId, errorMessage);
@@ -951,8 +1055,14 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 		if (marker.myType.isLeftBound() && isEmpty(marker.myLexemeIndex, doneLexeme)) {
 			marker.setCustomEdgeTokenBinders(DEFAULT_RIGHT_BINDER, null);
 		}
+
+//		System.out.println("PsiBuilderImpl.processDone: DoneLexeme: "+edLexeme(doneLexeme));
+		
 		marker.myDoneLexeme = doneLexeme;
+		
 		myProduction.addDone(marker, before);
+		System.out.println("PsiBuilderImpl.processDone: myProduction="+myProduction);
+//		Util.IERR();
 	}
 
 	private boolean isEmpty(int startIdx, int endIdx) {
@@ -991,10 +1101,10 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 	}
 
 	private @NotNull ASTNode buildTree() {
-		LOG.println("PsiBuilderImpl.buildTree: ");
+		LOG.println("\n\nPsiBuilderImpl.buildTree: START BUILD AST TREE");
 		StartMarker rootMarker = prepareLightTree();
 		boolean possiblyTooDeep = myPsiFile != null && BlockSupport.isTooDeep(myPsiFile.getOriginalFile());
-		LOG.println("PsiBuilderImpl.buildTree: possiblyTooDeep="+possiblyTooDeep+", rootMarker="+rootMarker);
+		LOG.println("\n\nPsiBuilderImpl.buildTree: possiblyTooDeep="+possiblyTooDeep+", rootMarker="+rootMarker);
 
 		if (myOriginalTree != null && !possiblyTooDeep) {
 			DiffLog diffLog = merge(myOriginalTree, rootMarker, myLastCommittedText);
@@ -1004,6 +1114,7 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 		TreeElement rootNode = createRootAST(rootMarker);
 		LOG.println("PsiBuilderImpl.buildTree: rootNode="+rootNode);
 //		bind(rootMarker, (CompositeElement)rootNode);
+//		Util.IERR("AST-TREE  STOP");
 
 		if (possiblyTooDeep && !(rootNode instanceof FileElement)) {
 			ASTNode childNode = rootNode.getFirstChildNode();
@@ -1011,6 +1122,9 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 				childNode.putUserData(BlockSupport.TREE_DEPTH_LIMIT_EXCEEDED, Boolean.TRUE);
 			}
 		}
+		
+		LOG.println("PsiBuilderImpl.buildTree: myText="+(""+myText).replace("\r", "\\r").replace("\n", "\\n"));
+		LOG.println("PsiBuilderImpl.buildTree: rootNode.getText=\""+rootNode.getText().replace("\r", "\\r").replace("\n", "\\n")+'"');
 
 		if (LOG.isDebugEnabled() && rootNode.getTextLength() != myText.length()) {
 			LOG.error("Inconsistent root node. " +
@@ -1023,7 +1137,9 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 		}
 
 		LOG.println("PsiBuilderImpl.buildTree: return rootNode="+rootNode);
-//		Thread.dumpStack();
+		LOG.println("\n\nHER ER DET MYE JEG IKKE HAR FORSTÅTT !!!");
+		LOG.println("\nSJEKK DETTE SEINERE !!!\n\n");
+		Thread.dumpStack();
 		return rootNode;
 	}
 
@@ -1037,15 +1153,17 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 		LOG.println("PsiBuilderImpl.createRootAST: rootMarker="+rootMarker);
 		IElementType type = rootMarker.getTokenType();
 		LOG.println("PsiBuilderImpl.createRootAST: type="+type.getClass().getSimpleName()+"  "+type);
+//		Util.IERR();
 		
-//		TreeElement rootNode = type instanceof ILazyParseableElementType ?
-//				createLazy((ILazyParseableElementType)type, null, getASTFactory()) :
-//					createComposite(rootMarker, getASTFactory());
+		TreeElement rootNode = type instanceof ILazyParseableElementType ?
+				createLazy((ILazyParseableElementType)type, null, getASTFactory()) :
+					createComposite(rootMarker, getASTFactory());
 		
-		TreeElement rootNode = new FileElement(type, Main.TEST_TEXT);
+//		TreeElement rootNode = new FileElement(type, Main.TEST_TEXT);
 		
 //	    public static final IFileElementType SIMULA_FILE = new IFileElementType(SimulaLanguage.INSTANCE);
 		LOG.println("PsiBuilderImpl.createRootAST: rootNode="+rootNode.getClass().getSimpleName()+"  "+rootNode);
+//		Util.IERR();
 		
 		if (myCharTable == null) {
 			myCharTable = rootNode instanceof FileElement ? ((FileElement)rootNode).getCharTable() : new CharTableImpl();
@@ -1057,7 +1175,10 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 	}
 
 	private @Nullable ASTFactory getASTFactory() {
-		return myParserDefinition instanceof ASTFactory ? (ASTFactory)myParserDefinition : null;
+//		return myParserDefinition instanceof ASTFactory ? (ASTFactory)myParserDefinition : null;
+		LOG.println("PsiBuilderImpl.getASTFactory: CODE CHANGED");
+		return SimulaASTFactory.INSTANCE;
+//		return null;
 	}
 
 	private static final class ConvertFromTokensToASTBuilder implements DiffTreeChangeBuilder<ASTNode, LighterASTNode> {
@@ -1110,6 +1231,9 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 		}
 		// build tree only once to avoid threading issues in read-only PSI
 		StartMarker rootMarker = (StartMarker)Objects.requireNonNull(myProduction.getStartMarkerAt(0));
+		System.out.println("PsiBuilderImpl.prepareLightTree: "+rootMarker);
+		System.out.println("PsiBuilderImpl.prepareLightTree: myFirstChild="+rootMarker.myFirstChild);
+//		Util.IERR("PREPARE TREE - STOP HER");
 		if (rootMarker.myFirstChild != null) return rootMarker;
 
 		myTokenTypeChecked = true;
@@ -1125,20 +1249,27 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 		int curDepth = 0;
 		boolean hasCollapsedChameleons = false;
 		int[] productions = myProduction.elements();
+		System.out.println("\nPsiBuilderImpl.prepareLightTree: myProduction="+myProduction);
+//		Util.IERR("PREPARE TREE - STOP HER");
 		for (int i = 1, size = myProduction.size(); i < size; i++) {
 			int id = productions[i];
 			// id < 0 means "done" marker for marker with `-id` index.
 			ProductionMarker item = id > 0 ? pool.get(id) : null;
+//			if(item == null) Util.IERR("ITEM="+item);
 
 			if (item instanceof StartMarker) {
 				StartMarker marker = (StartMarker)item;
 				marker.myParent = curNode;
 				marker.myFirstChild = marker.myLastChild = marker.myNext = null;
+				
+				System.out.println("\nPsiBuilderImpl.prepareLightTree: curNode="+curNode);
+				System.out.println("PsiBuilderImpl.prepareLightTree: addChild="+marker);
 				curNode.addChild(marker);
 				nodes.addLast(curNode);
 				curNode = marker;
 				curDepth++;
 				if (curDepth > maxDepth) maxDepth = curDepth;
+//				printTree(rootMarker);
 			}
 			else if (item instanceof ErrorItem) {
 				item.myParent = curNode;
@@ -1159,6 +1290,8 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 				curDepth--;
 			}
 		}
+		printTree(rootMarker);
+//		Util.IERR("PREPARE TREE - STOP HER");
 
 		if (myCurrentLexeme < myLexemeCount) {
 			List<IElementType> missed = ContainerUtil.subArrayAsList(myLexTypes, myCurrentLexeme, myLexemeCount);
@@ -1181,6 +1314,29 @@ public class PsiBuilderImpl extends UnprotectedUserDataHolder implements PsiBuil
 
 		clearCachedTokenType();
 		return rootMarker;
+	}
+	
+	public static void printTree(StartMarker node) { // TODO: AD'HOC
+		System.out.println("\nPsiBuilderImpl.prepareLightTree: ====== BEGIN PRINT TREE ======");
+		printTree2(node, 1);
+		System.out.println("\nPsiBuilderImpl.prepareLightTree: ====== ENDOF PRINT TREE ======");
+		Util.IERR("STOPP HER INTIL VIDERE");
+	}
+	
+	public static void printTree2(StartMarker node, int indent) { // TODO: AD'HOC
+	    // Print current node info
+	    String indentation = " ".repeat(indent);
+//	    System.out.println(indentation + node.getElementType() + " (" + node.getTextRange() + ")" + node.getText().replace("\r", "\\r").replace("\n", "\\n"));
+//	    System.out.println(indentation + node);
+	    System.out.println(indentation + node.edMarker());
+	    
+	    // Recurse through children
+	    StartMarker child = (StartMarker) node.myFirstChild;
+//	    System.out.println("Main.printAST: child="+child);
+	    while (child != null) {
+	        printTree2(child, indent + 2);
+	        child = (StartMarker) child.myNext;
+	    }
 	}
 
 	private static boolean isCollapsedChameleon(@NotNull StartMarker marker) {

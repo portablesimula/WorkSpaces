@@ -45,7 +45,7 @@ public class LOG {
 	}
 
 
-	public static void warn(String msg, RuntimeException runtimeException) {
+	public static void warn(String msg, Throwable runtimeException) {
 		System.out.println("LOG REPORTS(2) WARNING: "+msg);
 	}
 
@@ -53,6 +53,11 @@ public class LOG {
 	public static boolean isDebugEnabled() {
 		// TODO Auto-generated method stub
 		return true;
+	}
+
+	public static void assertTrue(boolean b, String string) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

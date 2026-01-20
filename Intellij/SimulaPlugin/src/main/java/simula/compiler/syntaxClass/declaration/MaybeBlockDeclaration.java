@@ -15,9 +15,13 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
 
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 
+import simula.compiler.syntaxClass.expression.AssignmentOperation;
 import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Util;
@@ -73,7 +77,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	/// Create a new MaybeBlockDeclaration, i.e. CompoundStatement or SubBlock.
 	/// @param identifier block identifier
 	public MaybeBlockDeclaration(final String identifier) {
-		super(identifier);
+		super("MaybeBlockDeclaration", identifier);
 //		if(identifier != null)
 //			modifyIdentifier(identifier);
 //		else modifyIdentifier("Block" + lineNumber);
@@ -95,33 +99,34 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 //		return (module);
 //	}
 
-    public static void parseBlock(SimPsiBuilder simBuilder) {
+//    public static void parseBlock(SimPsiBuilder simBuilder) {
+    public static void parseBlock(PsiBuilder simBuilder) {
         PsiBuilder.Marker blockMarker = simBuilder.mark();
+        System.out.println("MaybeBlockDeclaration.parseBlock: blockMarker="+blockMarker);
         simBuilder.advanceLexer(); // consume BEGIN
 //        Util.IERR("parseBlock.BEGIN: "+simBuilder.getSimToken());
 
 //        while (!simBuilder.eof() && getKeyWord(simBuilder.getTokenType()) != KeyWord.END) {
-        while (!simBuilder.eof() && simBuilder.getSimToken().keyWord != KeyWord.END) {
-            System.out.println("SimulaParser.parseBlock: NOT END ==> parseStatement: "+simBuilder.getSimToken());
+//        while (!simBuilder.eof() && simBuilder.getSimToken().keyWord != KeyWord.END) {
+//        while (!simBuilder.eof() && ((SimulaToken)simBuilder.getTokenType()).keyWord != KeyWord.END) {
+        while (!simBuilder.eof() && getKeyWord(simBuilder) != KeyWord.END) {
+            System.out.println("\nSimulaParser.parseBlock: NOT END ==> parseStatement: "+simBuilder.getTokenType());
             Statement.parseStatement(simBuilder);
         }
 
         if(simBuilder.eof()) {
             blockMarker.error("Expected final 'END'");
 //        SimulaToken token = (SimulaToken) simBuilder.getTokenType();
-        } else if (simBuilder.getSimToken().keyWord == KeyWord.END) {
+//        } else if (((SimulaToken)simBuilder.getTokenType()).keyWord == KeyWord.END) {
+        } else if (getKeyWord(simBuilder) == KeyWord.END) {
 //        if (token.keyWord == KeyWord.END) {
             simBuilder.advanceLexer(); // consume END
-            blockMarker.done(SimulaElementTypes.BLOCK_ELEMENT);
+//            Util.IERR("NOT IMPL");
+            blockMarker.done(new MaybeBlockDeclaration("BLOCK_IDENT"));
         } else {
             blockMarker.error("Expected 'END'");
         }
     }
-    
-//    public static int getKeyWord(IElementType elt) {
-//        SimulaToken token = (SimulaToken) elt;
-//        return token.keyWord;
-//    }
 
 	// ***********************************************************************************************
 	// *** Parsing: expectMaybeBlock

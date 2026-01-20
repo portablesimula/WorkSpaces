@@ -1,6 +1,177 @@
-package com.intellij.openapi.util.registry
+//package com.intellij.openapi.util.registry
+//
+//public class Registry {
 
-public class Registry {
+package com.intellij.openapi.util.registry;
+
+import org.jetbrains.annotations.ApiStatus;
+//import org.jetbrains.annotations.NlsSafe;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.TestOnly;
+//import org.jdom.Element;
+
+import java.awt.Color;
+import java.lang.ref.Reference;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+public final class Registry {
+    @NonNls
+    public static final String REGISTRY_BUNDLE = "COMPILED_CODE";
+
+    private static Reference<Map<String, String>> bundledRegistry;
+//    private static final RegistryValueListener EMPTY_VALUE_LISTENER = null; // COMPILED_CODE
+    private static final Registry registry = null; // COMPILED_CODE
+
+//    private final LinkedHashMap<String, ValueWithSource> userProperties = new LinkedHashMap<>();
+    private final ConcurrentHashMap<String, RegistryValue> values = new ConcurrentHashMap<>();
+//    private Map<String, RegistryKeyDescriptor> contributedKeys = Map.of();
+    
+    private boolean isLoaded;
+    private CompletableFuture<Void> loadFuture;
+//    private RegistryValueListener valueChangeListener;
+    private final Function<String, RegistryValue> valueProducer = this::resolveValue;
+
+    public Registry() {
+    }
+
+    @NotNull
+    public static RegistryValue get(@NotNull @NonNls String key) {
+        return null; // COMPILED_CODE
+    }
+
+    @ApiStatus.Experimental
+    @ApiStatus.Internal
+    @NotNull
+    public static Supplier<Boolean> booleanValueHotSupplier(@NotNull @NonNls String key, boolean defaultValue) {
+        return null; // COMPILED_CODE
+    }
+
+    @ApiStatus.Internal
+    @NotNull
+    public static RegistryValue _getWithoutStateCheck(@NotNull @NonNls String key) {
+        return null; // COMPILED_CODE
+    }
+
+    public static boolean is(@NotNull @NonNls String key) {
+        return false; // COMPILED_CODE
+    }
+
+    public static boolean is(@NotNull @NonNls String key, boolean defaultValue) {
+        return defaultValue; // COMPILED_CODE
+    }
+
+    public static int intValue(@NotNull @NonNls String key) {
+        return 0; // COMPILED_CODE
+    }
+
+    public static int intValue(@NotNull @NonNls String key, int defaultValue) {
+        return 0; // COMPILED_CODE
+    }
+
+    public static int intValue(@NotNull @NonNls String key, int defaultValue, int minValue, int maxValue) {
+        return 0; // COMPILED_CODE
+    }
+
+    public static double doubleValue(@NotNull @NonNls String key) {
+        return 0.0; // COMPILED_CODE
+    }
+
+    public static double doubleValue(@NotNull @NonNls String key, double defaultValue) {
+        return 0.0; // COMPILED_CODE
+    }
+
+    @NotNull
+    public static String stringValue(@NotNull @NonNls String key) {
+        return ""; // COMPILED_CODE
+    }
+
+    @Nullable
+    public static Color getColor(@NotNull @NonNls String key, @Nullable Color defaultValue) {
+        return null; // COMPILED_CODE
+    }
+
+    public static Registry getInstance() {
+        return registry;
+    }
+
+    @ApiStatus.Internal
+    public static void markAsLoaded() {
+    }
+
+    @ApiStatus.Internal
+    @NotNull
+    public static List<RegistryValue> getAll() {
+        return null; // COMPILED_CODE
+    }
+
+//    @ApiStatus.Internal
+//    public static void setContributedKeys(@NotNull Map<String, RegistryKeyDescriptor> descriptors) {
+//    }
+//
+//    @ApiStatus.Internal
+//    public static void setValueChangeListener(@Nullable RegistryValueListener listener) {
+//    }
+
+    // Instance Methods
+    public boolean isInDefaultState() {
+        return false; // COMPILED_CODE
+    }
+
+    public boolean isRestartNeeded() {
+        return false; // COMPILED_CODE
+    }
+
+    private RegistryValue resolveValue(@NonNls String key) {
+        return null; // COMPILED_CODE
+    }
+
+    @TestOnly
+    public void reset() {
+    }
+
+    @Nullable
+//    @NlsSafe
+    public String getBundleValueOrNull(@NotNull @NonNls String key) {
+        return null; // COMPILED_CODE
+    }
+
+//    @NotNull
+////    @NlsSafe
+//    String getBundleValue(@NotNull @NonNls String key, @Nullable RegistryKeyDescriptor keyDescriptor) {
+//        return ""; // COMPILED_CODE
+//    }
+//
+//    @ApiStatus.Internal
+//    @NotNull
+//    public Element getState() {
+//        return null; // COMPILED_CODE
+//    }
+
+    public boolean isLoaded() {
+        return isLoaded;
+    }
+
+    private void setLoaded(boolean value) {
+        this.isLoaded = value;
+    }
+
+    // Merk: 'suspend' funksjoner i Kotlin har ingen direkte Java-ekvivalent utenom 
+    // bruk av et bibliotek som rXJava eller returnere en Future/Custom Continuation.
+    // Men i en stub-kontekst vil det se slik ut:
+    @ApiStatus.Internal
+    public Object awaitLoad(Object continuation) {
+        return null; 
+    }
+}
+
 
 	// Kotlin Code:
 	// Copyright 2000-2024 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license.
@@ -431,4 +602,4 @@ public class Registry {
 //	}
 
 	
-}
+

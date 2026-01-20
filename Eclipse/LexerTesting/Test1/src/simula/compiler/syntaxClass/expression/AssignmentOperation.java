@@ -6,35 +6,25 @@
 package simula.compiler.syntaxClass.expression;
 
 import java.io.IOException;
-//import java.lang.classfile.CodeBuilder;
-//import java.lang.classfile.constantpool.ConstantPoolBuilder;
-//import java.lang.classfile.constantpool.FieldRefEntry;
-
-import com.intellij.lang.PsiBuilder;
-import com.intellij.psi.tree.IElementType;
-
-import simula.compiler.syntaxClass.declaration.MaybeBlockDeclaration;
+// import java.lang.classfile.CodeBuilder;
+// import java.lang.classfile.constantpool.ConstantPoolBuilder;
+// import java.lang.classfile.constantpool.FieldRefEntry;
+import simula.compiler.AttributeInputStream;
+import simula.compiler.AttributeOutputStream;
+import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.Type;
+import simula.compiler.syntaxClass.declaration.ArrayDeclaration;
+import simula.compiler.syntaxClass.declaration.Declaration;
+import simula.compiler.syntaxClass.declaration.Parameter;
+import simula.compiler.syntaxClass.declaration.ProcedureDeclaration;
+import simula.compiler.syntaxClass.declaration.SimpleVariableDeclaration;
+import simula.compiler.utilities.RTS;
+import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.Meaning;
+import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.lexer.KeyWordToken;
-//import simula.compiler.AttributeInputStream;
-//import simula.compiler.AttributeOutputStream;
-//import simula.compiler.syntaxClass.SyntaxClass;
-//import simula.compiler.syntaxClass.Type;
-//import simula.compiler.syntaxClass.declaration.ArrayDeclaration;
-//import simula.compiler.syntaxClass.declaration.Declaration;
-//import simula.compiler.syntaxClass.declaration.Parameter;
-//import simula.compiler.syntaxClass.declaration.ProcedureDeclaration;
-//import simula.compiler.syntaxClass.declaration.SimpleVariableDeclaration;
-//import simula.compiler.utilities.RTS;
-//import simula.compiler.utilities.Global;
-//import simula.compiler.utilities.KeyWord;
-//import simula.compiler.utilities.Meaning;
-//import simula.compiler.utilities.ObjectKind;
-//import simula.compiler.utilities.Option;
-//import simula.compiler.utilities.Util;
-import simula.lexer.SimulaElementTypes;
-import simula.parser.SimPsiBuilder;
 
 /// Assignment Operation.
 /// 
@@ -67,192 +57,162 @@ public final class AssignmentOperation extends Expression {
 	/// Indicates that this assignment is a text value assignment.
 	private boolean textValueAssignment = false; // Set by doChecking
 
-    public static void parseAssignment(SimPsiBuilder simBuilder) {
-        PsiBuilder.Marker assignMarker = simBuilder.mark();
-        simBuilder.advanceLexer(); // consume identifier
-
-//        IElementType tokenType = builder.getTokenType();
-//        switch(((KeyWordToken)tokenType).keyWord) {
-        switch(simBuilder.getSimToken().keyWord) {
-        case KeyWord.ASSIGNVALUE:
-            System.out.println("SimulaParser.parseAssignment: BEGIN");
-//            Util.IERR("parseAssignment.ASSIGNVALUE: "+simBuilder.getSimToken());
-            simBuilder.advanceLexer();
-            // In a real parser, you'd call parseExpression(builder) here
-            simBuilder.consumeUntilSemicolon();
-            assignMarker.done(SimulaElementTypes.ASSIGNMENT_STATEMENT);
-            break;
-		default:
-            Util.IERR("parseAssignment.default: "+simBuilder.getSimToken());
-            assignMarker.drop(); // Not an assignment, backtrack or handle error
-			break;
-        }
-
-//        if (builder.getTokenType() == KeyWord.ASSIGNVALUE) {
-//            builder.advanceLexer();
-//            // In a real parser, you'd call parseExpression(builder) here
-//            consumeUntilSemicolon(builder);
-//            assignMarker.done(SimulaElementTypes.ASSIGNMENT_STATEMENT);
-//        } else {
-//            assignMarker.drop(); // Not an assignment, backtrack or handle error
-//        }
-    }
-
 	/// AssignmentOperation.
 	/// @param lhs the left hand side
 	/// @param opr the operation
 	/// @param rhs the right hand side
 	public AssignmentOperation(final Expression lhs, final int opr, final Expression rhs) {
+		super("AssignmentOperation");
 		this.lhs = lhs;
 		this.opr = opr;
 		this.rhs = rhs;
-//		if (this.lhs == null) {
-//			Util.error("Missing operand before " + KeyWord.edit(opr));
-//			this.lhs = new VariableExpression("UNKNOWN_");
-//		}
-//		if (this.rhs == null) {
-//			Util.error("Missing operand after " + KeyWord.edit(opr));
-//			this.rhs = new VariableExpression("UNKNOWN_");
-//		}
+		if (this.lhs == null) {
+			Util.error("Missing operand before " + KeyWord.edit(opr));
+			this.lhs = new VariableExpression("UNKNOWN_");
+		}
+		if (this.rhs == null) {
+			Util.error("Missing operand after " + KeyWord.edit(opr));
+			this.rhs = new VariableExpression("UNKNOWN_");
+		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
 
-//	@Override
-//	public void doChecking() {
-//		if (IS_SEMANTICS_CHECKED())
-//			return;
-//		Global.sourceLineNumber = lineNumber;
-//		if (Option.internal.TRACE_CHECKER)
-//			Util.TRACE("BEGIN Assignment" + toString() + ".doChecking - Current Scope Chain: "
-//					+ Global.getCurrentScope().edScopeChain());
-//		lhs.doChecking();
-//		Type toType = lhs.type;
-//		if (lhs instanceof VariableExpression var) {
-//			Meaning meaning = var.getMeaning();
-//			if (meaning.declaredAs instanceof SimpleVariableDeclaration dcl) {
-//				if (dcl.isConstant())
-//					Util.error("Assignment to Constant: '" + lhs + "' is Illegal");
-//			}
-//		} else {
-//			if (lhs.getWriteableVariable() == null)
-//				Util.error("Can't assign to " + lhs);
-//		}
-//		rhs.doChecking();
-//		Type fromType = rhs.type;
-//		if(toType.keyWord == Type.T_UNDEF) {
-//			lhs.type = fromType;
-//		}
-//		if (opr == KeyWord.ASSIGNVALUE)
-//			this.textValueAssignment = (toType.keyWord == Type.T_TEXT);
-//		rhs = (Expression) TypeConversion.testAndCreate(toType, rhs);
-//		this.type = toType;
-//		if (this.type == null)
-//			Util.error("doAssignmentChecking: Illegal types: " + toType + " := " + fromType);
-//		SET_SEMANTICS_CHECKED();
-//	}
-//
-//	// Returns true if this expression may be used as a statement.
-//	@Override
-//	public boolean maybeStatement() {
-//		ASSERT_SEMANTICS_CHECKED();
-//		return (true);
-//	}
-//
-//	@Override
-//	public String toJavaCode() {
-//		ASSERT_SEMANTICS_CHECKED();
-//		if (this.textValueAssignment)
-//			return (doCodeTextValueAssignment());
-//		else
-//			return (doCodeAssignment());
-//	}
-//
-//	// ***********************************************************************
-//	// *** Java CODE: doCodeTextValueAssignment
-//	// ***********************************************************************
-//	/// Java Coding Utility: Code text value assignment.
-//	/// @return the resulting Java source code
-//	private String doCodeTextValueAssignment() {
-//		StringBuilder s = new StringBuilder();
-//
-//		String target = lhs.toJavaCode();
-//
-//		if(lhs instanceof VariableExpression var) {
-//			if(!var.hasArguments()) {
-//				Declaration declaredAs = var.meaning.declaredAs;
-//				if(declaredAs instanceof ProcedureDeclaration proc) {
-//					if (proc.getRTBlockLevel() == Global.getCurrentScope().getRTBlockLevel()) {
-//						target = "_RESULT";
-//					} else {
-//						String cast = proc.getJavaIdentifier();
-//						target = "((" + cast + ")" + proc.edCTX() + ")._RESULT";
-//					}
-//				}
-//			}
-//		}
-//
-//		if (rhs instanceof Constant cnst) {
-//			Object value = cnst.value;
-//			if (value != null) {
-//				s.append("RTS_UTIL._ASGSTR(").append(target).append(",\"").append(value).append("\")");
-//				return (s.toString());
-//			}
-//		}
-//		s.append("RTS_UTIL._ASGTXT(").append(target).append(',').append(rhs.toJavaCode()).append(')');
-//		return (s.toString());			
-//	}
-//
-//	// ***********************************************************************
-//	// *** Java CODE: doCodeAssignment
-//	// ***********************************************************************
-//	/// Java Coding Utility: Code assignment.
-//	/// @return the resulting Java source code
-//	private String doCodeAssignment() {
-//		StringBuilder s = new StringBuilder();
-//		// -------------------------------------------------------------------------
-//		// CHECK FOR SPECIAL CASE:
-//		// OBJECT DOT ARRAY(x1,x2,...) := Expression ;
-//		// SHOULD BE CODED LIKES:
-//		// OBJECT.ARRAY.putELEMENT(OBJECT.ARRAY.index(x1,x2),Expression);
-//		// -------------------------------------------------------------------------
-//		if (lhs instanceof RemoteVariable rem) {
-//			Expression afterDot = ((RemoteVariable) lhs).var;
-//			if (afterDot instanceof VariableExpression varAfterDot && varAfterDot.hasArguments()) {
-//				Declaration decl = varAfterDot.meaning.declaredAs;
-//				Expression beforeDot = rem.obj;
-//				if (decl instanceof ArrayDeclaration)
-//					return (doAccessRemoteArray(beforeDot, varAfterDot, rhs.toJavaCode()));
-//				else if (decl instanceof Parameter par) {
-//					if (par.kind == Parameter.Kind.Array)
-//						return (doAccessRemoteArray(beforeDot, varAfterDot, rhs.toJavaCode()));
-//				}
-//
-//			}
-//		}
-//		s.append(lhs.put(rhs.get()));			
-//		return (s.toString());
-//	}
-//
-//	// ***********************************************************************
-//	// *** Java CODE: doAccessRemoteArray
-//	// ***********************************************************************
-//	/// Coding Utility: Code access remote array.
-//	/// @param beforeDot expression before dot
-//	/// @param array the array  variable
-//	/// @param rightPart right part of assignment
-//	/// @return the resulting Java source code
-//	private String doAccessRemoteArray(final Expression beforeDot, final VariableExpression array, final String rightPart) {
-//		String obj = beforeDot.toJavaCode();
-//		String remoteIdent = obj + '.' + array.edIdentifierAccess(true);
-//		Declaration decl = array.meaning.declaredAs;
-//		if(decl instanceof Parameter par) {
-//			String arrayType = par.type.getArrayType();
-//			remoteIdent = "(("+arrayType+")"+remoteIdent+")";
-//		}
-//		return (array.doPutELEMENT(remoteIdent, rightPart));
-//	}
-//
-//	
+	@Override
+	public void doChecking() {
+		if (IS_SEMANTICS_CHECKED())
+			return;
+		Global.sourceLineNumber = lineNumber;
+		if (Option.internal.TRACE_CHECKER)
+			Util.TRACE("BEGIN Assignment" + toString() + ".doChecking - Current Scope Chain: "
+					+ Global.getCurrentScope().edScopeChain());
+		lhs.doChecking();
+		Type toType = lhs.type;
+		if (lhs instanceof VariableExpression var) {
+			Meaning meaning = var.getMeaning();
+			if (meaning.declaredAs instanceof SimpleVariableDeclaration dcl) {
+				if (dcl.isConstant())
+					Util.error("Assignment to Constant: '" + lhs + "' is Illegal");
+			}
+		} else {
+			if (lhs.getWriteableVariable() == null)
+				Util.error("Can't assign to " + lhs);
+		}
+		rhs.doChecking();
+		Type fromType = rhs.type;
+		if(toType.keyWord == Type.T_UNDEF) {
+			lhs.type = fromType;
+		}
+		if (opr == KeyWord.ASSIGNVALUE)
+			this.textValueAssignment = (toType.keyWord == Type.T_TEXT);
+		rhs = (Expression) TypeConversion.testAndCreate(toType, rhs);
+		this.type = toType;
+		if (this.type == null)
+			Util.error("doAssignmentChecking: Illegal types: " + toType + " := " + fromType);
+		SET_SEMANTICS_CHECKED();
+	}
+
+	// Returns true if this expression may be used as a statement.
+	@Override
+	public boolean maybeStatement() {
+		ASSERT_SEMANTICS_CHECKED();
+		return (true);
+	}
+
+	@Override
+	public String toJavaCode() {
+		ASSERT_SEMANTICS_CHECKED();
+		if (this.textValueAssignment)
+			return (doCodeTextValueAssignment());
+		else
+			return (doCodeAssignment());
+	}
+
+	// ***********************************************************************
+	// *** Java CODE: doCodeTextValueAssignment
+	// ***********************************************************************
+	/// Java Coding Utility: Code text value assignment.
+	/// @return the resulting Java source code
+	private String doCodeTextValueAssignment() {
+		StringBuilder s = new StringBuilder();
+
+		String target = lhs.toJavaCode();
+
+		if(lhs instanceof VariableExpression var) {
+			if(!var.hasArguments()) {
+				Declaration declaredAs = var.meaning.declaredAs;
+				if(declaredAs instanceof ProcedureDeclaration proc) {
+					if (proc.getRTBlockLevel() == Global.getCurrentScope().getRTBlockLevel()) {
+						target = "_RESULT";
+					} else {
+						String cast = proc.getJavaIdentifier();
+						target = "((" + cast + ")" + proc.edCTX() + ")._RESULT";
+					}
+				}
+			}
+		}
+
+		if (rhs instanceof Constant cnst) {
+			Object value = cnst.value;
+			if (value != null) {
+				s.append("RTS_UTIL._ASGSTR(").append(target).append(",\"").append(value).append("\")");
+				return (s.toString());
+			}
+		}
+		s.append("RTS_UTIL._ASGTXT(").append(target).append(',').append(rhs.toJavaCode()).append(')');
+		return (s.toString());			
+	}
+
+	// ***********************************************************************
+	// *** Java CODE: doCodeAssignment
+	// ***********************************************************************
+	/// Java Coding Utility: Code assignment.
+	/// @return the resulting Java source code
+	private String doCodeAssignment() {
+		StringBuilder s = new StringBuilder();
+		// -------------------------------------------------------------------------
+		// CHECK FOR SPECIAL CASE:
+		// OBJECT DOT ARRAY(x1,x2,...) := Expression ;
+		// SHOULD BE CODED LIKES:
+		// OBJECT.ARRAY.putELEMENT(OBJECT.ARRAY.index(x1,x2),Expression);
+		// -------------------------------------------------------------------------
+		if (lhs instanceof RemoteVariable rem) {
+			Expression afterDot = ((RemoteVariable) lhs).var;
+			if (afterDot instanceof VariableExpression varAfterDot && varAfterDot.hasArguments()) {
+				Declaration decl = varAfterDot.meaning.declaredAs;
+				Expression beforeDot = rem.obj;
+				if (decl instanceof ArrayDeclaration)
+					return (doAccessRemoteArray(beforeDot, varAfterDot, rhs.toJavaCode()));
+				else if (decl instanceof Parameter par) {
+					if (par.kind == Parameter.Kind.Array)
+						return (doAccessRemoteArray(beforeDot, varAfterDot, rhs.toJavaCode()));
+				}
+
+			}
+		}
+		s.append(lhs.put(rhs.get()));			
+		return (s.toString());
+	}
+
+	// ***********************************************************************
+	// *** Java CODE: doAccessRemoteArray
+	// ***********************************************************************
+	/// Coding Utility: Code access remote array.
+	/// @param beforeDot expression before dot
+	/// @param array the array  variable
+	/// @param rightPart right part of assignment
+	/// @return the resulting Java source code
+	private String doAccessRemoteArray(final Expression beforeDot, final VariableExpression array, final String rightPart) {
+		String obj = beforeDot.toJavaCode();
+		String remoteIdent = obj + '.' + array.edIdentifierAccess(true);
+		Declaration decl = array.meaning.declaredAs;
+		if(decl instanceof Parameter par) {
+			String arrayType = par.type.getArrayType();
+			remoteIdent = "(("+arrayType+")"+remoteIdent+")";
+		}
+		return (array.doPutELEMENT(remoteIdent, rightPart));
+	}
+
+	
 //	/// Build Java ByteCode.
 //	@Override
 //	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
@@ -476,13 +436,13 @@ public final class AssignmentOperation extends Expression {
 //		}
 //		if(this.backLink == null) codeBuilder.pop();
 //	}
-//
-//
-//	@Override
-//	public String toString() {
-//		return ("(" + lhs + ' ' + KeyWord.edit(opr) + ' ' + rhs + ")");
-//	}
-//
+
+
+	@Override
+	public String toString() {
+		return ("(" + lhs + ' ' + KeyWord.edit(opr) + ' ' + rhs + ")");
+	}
+
 //	// ***********************************************************************************************
 //	// *** Attribute File I/O
 //	// ***********************************************************************************************

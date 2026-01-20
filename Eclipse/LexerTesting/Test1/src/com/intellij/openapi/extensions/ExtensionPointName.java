@@ -8,10 +8,10 @@
 
 	import com.intellij.openapi.Disposable;
 	import com.intellij.openapi.extensions.impl.ExtensionPointImpl;
-	import com.intellij.openapi.extensions.impl.ExtensionProcessingHelper;
+//	import com.intellij.openapi.extensions.impl.ExtensionProcessingHelper;
 	import com.intellij.util.ThreeState;
 	import com.intellij.util.containers.ContainerUtil;
-	import kotlinx.coroutines.CoroutineScope;
+//	import kotlinx.coroutines.CoroutineScope;
 	import org.jetbrains.annotations.ApiStatus;
 	import org.jetbrains.annotations.NonNls;
 	import org.jetbrains.annotations.NotNull;
@@ -27,7 +27,7 @@
 	/**
 	 * Provides access to an extension point.
 	 */
-	public class ExtensionPointName<T> extends BaseExtensionPointName<T> {
+	public non-sealed class ExtensionPointName<T> extends BaseExtensionPointName<T> {
 
 	    public ExtensionPointName(@NotNull @NonNls String name) {
 	        super(name);

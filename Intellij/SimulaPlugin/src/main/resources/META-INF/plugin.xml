@@ -57,10 +57,6 @@
                 language="Simula"
                 implementationClass="simula.plugin.extensions.highlighter.syntaxHighlighter.SimulaSyntaxHighlighterFactory"/>
 
-        <lang.parserDefinition
-                language="Simula"
-                implementationClass="simula.lang.SimulaParserDefinition"/>
-
         <!-- New Project -->
         <newProjectWizard.languageGenerator implementation="simula.plugin.extensions.newProject.SimulaNewProjectWizard"/>
         <!--treeStructureProvider implementation="simula.plugin.extensions.newProject.MyTreeStructureProvider"/-->
@@ -96,6 +92,15 @@
         <!--projectService serviceImplementation="simula.plugin.extensions.config.run.cmdRunner.UNUSED_OptionsPatchConfiguration"/-->
 
         <!--typedHandler implementation="simula.plugin.extensions.config.run.cmdRunner.UNUSED_SimulaKeyHandler"/-->
+
+        <!-- EXTENSIONS FOR PARSING ETC: -->
+
+        <!--lang.parserDefinition
+                language="Simula"
+                implementationClass="simula.parser.SimulaParserDefinition"/>
+
+        <lang.ast.factory language="Simula"
+             implementationClass="simula.parser.SimulaASTFactory"/-->
 
     </extensions>
 

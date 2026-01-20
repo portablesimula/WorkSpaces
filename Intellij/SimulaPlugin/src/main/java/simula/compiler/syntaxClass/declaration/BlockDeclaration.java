@@ -14,6 +14,9 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Stack;
 import java.util.Vector;
 
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+
 //import simula.compiler.JavaSourceFileCoder;
 //import simula.compiler.parsing.Parse;
 //import simula.compiler.syntaxClass.Type;
@@ -95,8 +98,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// 
 	/// Used by expectMaybeBlock, i.e. CompoundStatement, SubBlock or PrefixedBlock.
 	/// @param identifier the given identifier
-	protected BlockDeclaration(String identifier) {
-		super(identifier);
+	protected BlockDeclaration(@NonNls @NotNull String debugName, String identifier) {
+		super(debugName, identifier);
 	}
 
 	/// Create a new BlockDeclaration.
@@ -104,8 +107,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// This constructor is only used by ClassDeclaration. ProcedureDeclaration and MaybeBlockDeclaration.
 	/// @param identifier the block identifier
 	/// @param declarationKind the declaration kind
-	private BlockDeclaration(final String identifier,final int declarationKind) {
-		super(identifier);
+	private BlockDeclaration(@NonNls @NotNull String debugName, final String identifier, final int declarationKind) {
+		super(debugName, identifier);
 		this.declarationKind = declarationKind;
 	}
 	

@@ -26,6 +26,7 @@ import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.ArrayFactory;
 
 import simula.compiler.utilities.LOG;
+import simula.compiler.utilities.Util;
 
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -216,17 +217,25 @@ public class CompositeElement extends TreeElement {
 	 */
 	@Override
 	public @NotNull String getText() {
-		TreeElement firstChildNode = getFirstChildNode();
-		if (firstChildNode == null) {
-			return "";
-		}
-		else if (firstChildNode == getLastChildNode()) {
-			if (firstChildNode instanceof ForeignLeafPsiElement) {
-				return "";
-			}
-			return firstChildNode.getText();
-		}
+//		TreeElement firstChildNode = getFirstChildNode();
+//		if (firstChildNode == null) {
+//			return "";
+//		}
+//		else if (firstChildNode == getLastChildNode()) {
+//			if (firstChildNode instanceof ForeignLeafPsiElement) {
+//				return "";
+//			}
+//			return firstChildNode.getText();
+//		}
+//		return new String(textToCharArray());
+		LOG("CompositeElement.getText: CODE CHANGED");
 		return new String(textToCharArray());
+
+	}
+
+	private void LOG(String string) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
@@ -248,25 +257,28 @@ public class CompositeElement extends TreeElement {
 		int len = getTextLength();
 		char[] buffer = new char[len];
 		int endOffset;
-		try {
-			endOffset = AstBufferUtil.toBuffer(this, buffer, 0);
-		}
-		catch (ArrayIndexOutOfBoundsException e) {
-			@NonNls String msg = "Underestimated text length: " + len;
-			try {
-				int length = AstBufferUtil.toBuffer(this, new char[len], 0);
-				msg += ";\n repetition gives success (" + length + ")";
-			}
-			catch (ArrayIndexOutOfBoundsException e1) {
-				msg += ";\n repetition fails as well";
-			}
-			throw new RuntimeException(msg, e);
-		}
-		if (endOffset != len) {
-			@NonNls String msg = "len=" + len + ";\n endOffset=" + endOffset;
-			msg += diagnoseTextInconsistency(new String(buffer, 0, Math.min(len, endOffset)));
-			throw new AssertionError(msg);
-		}
+//		try {
+//			endOffset = AstBufferUtil.toBuffer(this, buffer, 0);
+//		}
+//		catch (ArrayIndexOutOfBoundsException e) {
+//			@NonNls String msg = "Underestimated text length: " + len;
+//			try {
+//				int length = AstBufferUtil.toBuffer(this, new char[len], 0);
+//				msg += ";\n repetition gives success (" + length + ")";
+//			}
+//			catch (ArrayIndexOutOfBoundsException e1) {
+//				msg += ";\n repetition fails as well";
+//			}
+//			throw new RuntimeException(msg, e);
+//		}
+//		if (endOffset != len) {
+//			@NonNls String msg = "len=" + len + ";\n endOffset=" + endOffset;
+//			msg += diagnoseTextInconsistency(new String(buffer, 0, Math.min(len, endOffset)));
+//			throw new AssertionError(msg);
+//		}
+//		return buffer;
+		LOG.println("CompositeElement.textToCharArray: CODE CHANGED");
+		for(int i=0;i<len;i++) buffer[i] = '*';
 		return buffer;
 	}
 

@@ -5,6 +5,9 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.statement;
 
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+
 //import java.lang.classfile.CodeBuilder;
 
 import com.intellij.lang.PsiBuilder;
@@ -31,6 +34,7 @@ import simula.lexer.Identifier;
 //import simula.compiler.utilities.Option;
 //import simula.compiler.utilities.Util;
 import simula.lexer.KeyWordToken;
+import simula.lexer.SimulaElementTypes;
 import simula.lexer.SimulaToken;
 import simula.parser.SimPsiBuilder;
 
@@ -69,7 +73,8 @@ public abstract class Statement extends SyntaxClass {
 	
 	/// Create a new Statement.
 	/// @param line the source line number
-	protected Statement(int line) {
+	protected Statement(@NonNls @NotNull String debugName, int line) {
+		super(debugName);
 		lineNumber=line;
 	}
 
@@ -99,40 +104,46 @@ public abstract class Statement extends SyntaxClass {
 //		return (statement);
 //	}
 
-    public static void parseStatement(SimPsiBuilder simBuilder) {
+//    public static void parseStatement(SimPsiBuilder simBuilder) {
+    public static void parseStatement(PsiBuilder simBuilder) {
         IElementType tokenType = simBuilder.getTokenType();
-        System.out.println("SimulaParser.parseStatement: tokenType="+tokenType.getClass().getSimpleName()+" "+tokenType+" "+simBuilder.getTokenText());
+//        System.out.println("Statement.parseStatement: tokenType="+tokenType.getClass().getSimpleName()+" "+tokenType+" "+simBuilder.getTokenText());
+        final PsiBuilder.Marker statementMarker = simBuilder.mark();
+        System.out.println("Statement.parseStatement: statementMarker="+statementMarker);
 
 //        switch(((KeyWordToken)tokenType).keyWord) {
-        SimulaToken simToken = simBuilder.getSimToken();
+//        SimulaToken simToken = simBuilder.getSimToken();
+//        SimulaToken simToken = (SimulaToken) simBuilder.getTokenType(); // ??????????????
+        SimulaToken simToken = getSimToken(simBuilder);
         switch(simToken.keyWord) {
         case KeyWord.BEGIN:
-            System.out.println("SimulaParser.parseStatement: BEGIN ==> parseBlock");
+            System.out.println("\nStatement.parseStatement: BEGIN ==> parseBlock");
 //            Util.IERR("Statement.BEGIN");
             MaybeBlockDeclaration.parseBlock(simBuilder);
+            System.out.println("\nStatement.parseStatement: END BLOCK_ELEMENT ==> CALL assignMarker.done: "+statementMarker);
+//            statementMarker.done(SimulaElementTypes.BLOCK_ELEMENT);
+            statementMarker.done(new MaybeBlockDeclaration("BlockIDENT"));
             break;
+//	    case KeyWord.SEMICOLON:
+//	    	// Parse.nextToken(); return (new DummyStatement(lineNumber)); // Dummy Statement
+//	    	DummyStatement.parseDummyStatement(simBuilder);
+//	    	break;
         case KeyWord.IDENTIFIER:
-            System.out.println("SimulaParser.parseStatement: IDENTIFIER ==> parseAssignment");
+            System.out.println("\nStatement.parseStatement: IDENTIFIER ==> parseAssignment");
 //            Util.IERR("Statement.IDENTIFIER");
         	AssignmentOperation.parseAssignment(simBuilder);
+            System.out.println("\nSimulaParser.parseAssignment: END ASSIGNMENT ==> CALL statementMarker.done: "+statementMarker);
+            statementMarker.done(SimulaElementTypes.STATEMENT);
         	break;
 		default:
 //	        Util.IERR("Statement.default");
 	        // Error handling or consuming unknown tokens
-            System.out.println("SimulaParser.parseStatement: default " + simToken);
+            System.out.println("\nSimulaParser.parseAssignment: CALL statementMarker.done: "+statementMarker);
+            System.out.println("\nStatement.parseStatement: default " + simToken);
+            statementMarker.error("Statement.parseStatement: default " + simToken);
 	        simBuilder.advanceLexer();
 			break;
         }
-//        if (tokenType == KeyWord.BEGIN) {
-//            System.out.println("SimulaParser.parseStatement: BEGIN ==> parseBlock");
-//            MaybeBlockDeclaration.parseBlock(builder);
-////        } else if (tokenType == SimulaElementTypes.IDENTIFIER) {
-//        } else if (tokenType instanceof Identifier) {
-//        	AssignmentOperation.parseAssignment(builder);
-//        } else {
-//            // Error handling or consuming unknown tokens
-//            builder.advanceLexer();
-//        }
     }
 
 //	/// Parse Utility: Expect an unlabeled statement.

@@ -19,6 +19,7 @@ import com.intellij.util.CharTable;
 
 import simula.compiler.utilities.LOG;
 import simula.lang.SimulaLanguage;
+import simula.parser.SimulaASTFactory;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -85,7 +86,8 @@ public abstract class ASTFactory {
 	private static ASTFactory factory(@NotNull IElementType type) {
 		LOG.println("ASTFactory.factory: CODE CHANGED");
 //		return LanguageASTFactory.INSTANCE.forLanguage(type.getLanguage());
-		return LanguageASTFactory.INSTANCE.forLanguage(SimulaLanguage.INSTANCE);
+//		return LanguageASTFactory.INSTANCE.forLanguage(SimulaLanguage.INSTANCE);
+		return SimulaASTFactory.INSTANCE;
 	}
 
 	public static @NotNull LeafElement whitespace(CharSequence text) {

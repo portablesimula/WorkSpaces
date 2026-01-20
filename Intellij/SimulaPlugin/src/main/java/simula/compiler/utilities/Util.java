@@ -33,11 +33,13 @@ public class Util {
 
     public static void IERR() {
     	System.out.println("INTERNAL ERROR: ");
+    	Thread.dumpStack();
     	System.exit(-1);
     }
 
     public static void IERR(String msg) {
     	System.out.println("INTERNAL ERROR: " + msg);
+    	Thread.dumpStack();
     	System.exit(-1);
     }
 }

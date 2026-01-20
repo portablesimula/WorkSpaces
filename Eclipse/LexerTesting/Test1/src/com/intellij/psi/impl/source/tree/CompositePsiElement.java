@@ -21,6 +21,9 @@ import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.IncorrectOperationException;
+
+import simula.compiler.utilities.LOG;
+
 import org.jetbrains.annotations.NotNull;
 
 public abstract class CompositePsiElement extends CompositeElement implements NavigatablePsiElement {

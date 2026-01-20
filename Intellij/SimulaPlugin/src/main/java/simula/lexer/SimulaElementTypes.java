@@ -17,8 +17,10 @@ public interface SimulaElementTypes {
 //	public static final IElementType END = new IElementType("END", SimulaLanguage.INSTANCE);
 //	public static final IElementType IDENTIFIER = new IElementType("BEGIN", SimulaLanguage.INSTANCE);
 
-	public static final IElementType BLOCK_ELEMENT = new IElementType("BLOCK_ELEMENT", SimulaLanguage.INSTANCE);
-	public static final IElementType ASSIGNMENT_STATEMENT = new IElementType("ASSIGNMENT_STATEMENT", SimulaLanguage.INSTANCE);
+//	public static final IElementType BLOCK_ELEMENT = new IElementType("BLOCK_ELEMENT", SimulaLanguage.INSTANCE);
+	public static final IElementType STATEMENT = new IElementType("STATEMENT", SimulaLanguage.INSTANCE);
+//	public static final IElementType ASSIGNMENT_OPERATION = new IElementType("ASSIGNMENT_OPERATION", SimulaLanguage.INSTANCE);
+	public static final IElementType TEXT_AFTER_FINAL_END = new IElementType("TEXT_AFTER_FINAL_END", SimulaLanguage.INSTANCE);
 
 //	public static final IElementType ASSIGN_OP = new IElementType("ASSIGN_OP", SimulaLanguage.INSTANCE);
 //	public static final IElementType SEMICOLON = new IElementType("SEMICOLON", SimulaLanguage.INSTANCE);

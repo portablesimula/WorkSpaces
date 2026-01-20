@@ -9,6 +9,9 @@ package simula.compiler.syntaxClass.declaration;
 //import java.lang.classfile.CodeBuilder;
 import java.util.Vector;
 
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+
 //import simula.compiler.parsing.Parse;
 //import simula.compiler.syntaxClass.ProtectedSpecification;
 import simula.compiler.syntaxClass.SyntaxClass;
@@ -67,7 +70,8 @@ public abstract class Declaration extends SyntaxClass {
 	// ***********************************************************************************************
 	/// Create a new Declaration.
 	/// @param identifier the given identifier
-	protected Declaration(final String identifier) {
+	protected Declaration(@NonNls @NotNull String debugName, final String identifier) {
+		super(debugName);
 		this.identifier = identifier;
 		this.externalIdent = identifier; // May be overwritten
 		declaredIn = Global.getCurrentScope();

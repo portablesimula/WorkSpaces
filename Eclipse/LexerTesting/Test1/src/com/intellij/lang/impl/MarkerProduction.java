@@ -20,11 +20,15 @@ import com.intellij.util.ExceptionUtil;
 import com.intellij.util.ObjectUtils;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import simula.compiler.utilities.LOG;
+import simula.compiler.utilities.Util;
+
+import java.util.ArrayList;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-final class MarkerProduction extends IntArrayList {
+//final class MarkerProduction extends IntArrayList {
+final class MarkerProduction extends ArrayList<Integer> {
 //	private static final Logger LOG = Logger.getInstance(MarkerProduction.class);
 	private static final int LINEAR_SEARCH_LIMIT = 20;
 	private final MarkerPool myPool;
@@ -35,16 +39,38 @@ final class MarkerProduction extends IntArrayList {
 		myPool = pool;
 		myOptionalData = optionalData;
 	}
+	
+	public void debugPrint(String title) { // TODO: AD'HOC
+		System.out.println("=== "+ title +" ===");
+		for(Integer obj:this) {
+			System.out.println(""+obj.getClass().getSimpleName()+" "+obj);
+		}
+	}
+
+	public int[] elements() {  // TODO: AD'HOC
+		int[] elts = new int[this.size()];
+		int i = 0;
+		for(Integer val:this) elts[i++] = val;
+		// TODO Auto-generated method stub
+		return elts;
+	}
+	
+	public int getInt(int index) {  // TODO: AD'HOC
+		return this.get(index);
+	}
 
 	void addBefore(PsiBuilderImpl.ProductionMarker marker, PsiBuilderImpl.ProductionMarker anchor) {
+		System.out.println("MarkerProduction.addBefore: " + marker.markerId);
 		add(indexOf(anchor), marker.markerId);
+		System.out.println("MarkerProduction.addBefore: " + this);
 	}
 
 	private int indexOf(PsiBuilderImpl.ProductionMarker marker) {
 		int idx = findLinearly(marker.markerId);
 		if (idx < 0) {
-			for (int i = findMarkerAtLexeme(marker.getLexemeIndex(false)); i < size; i++) {
-				if (a[i] == marker.markerId) {
+			for (int i = findMarkerAtLexeme(marker.getLexemeIndex(false)); i < size(); i++) {
+//				if (a[i] == marker.markerId) {
+				if (i >= 0 && this.get(i) == marker.markerId) {
 					idx = i;
 					break;
 				}
@@ -52,6 +78,7 @@ final class MarkerProduction extends IntArrayList {
 		}
 		if (idx < 0) {
 			LOG.error("Dropped or rolled-back marker");
+			Util.IERR();
 		}
 		return idx;
 	}
@@ -59,7 +86,7 @@ final class MarkerProduction extends IntArrayList {
 	private int findLinearly(int markerId) {
 		int low = Math.max(0, size() - LINEAR_SEARCH_LIMIT);
 		for (int i = size() - 1; i >= low; i--) {
-			if (a[i] == markerId) {
+			if (this.get(i) == markerId) {
 				return i;
 			}
 		}
@@ -78,6 +105,9 @@ final class MarkerProduction extends IntArrayList {
 
 	void addMarker(PsiBuilderImpl.ProductionMarker marker) {
 		add(marker.markerId);
+		System.out.println("MarkerProduction.addMarker: marker="+marker);
+		System.out.println("MarkerProduction.addMarker: marker.markerId="+marker.markerId);
+//		Util.IERR();
 	}
 
 	void rollbackTo(PsiBuilderImpl.ProductionMarker marker) {
@@ -113,6 +143,10 @@ final class MarkerProduction extends IntArrayList {
 
 	void addDone(PsiBuilderImpl.StartMarker marker, @Nullable PsiBuilderImpl.ProductionMarker anchorBefore) {
 		add(anchorBefore == null ? size() : indexOf(anchorBefore), -marker.markerId);
+//		int xxx = anchorBefore == null ? size() : indexOf(anchorBefore);
+//		System.out.println("MarkerProduction.addDone: add "+xxx+", "+(-marker.markerId)+"   "+this);
+//		add(xxx, -marker.markerId);
+//		Util.IERR();
 	}
 
 	@Nullable
@@ -151,7 +185,11 @@ final class MarkerProduction extends IntArrayList {
 
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	void doHeavyChecksOnMarkerDone(@NotNull PsiBuilderImpl.StartMarker doneMarker, @Nullable PsiBuilderImpl.StartMarker anchorBefore) {
+		System.out.println("MarkerProduction.doHeavyChecksOnMarkerDone: "+doneMarker);
+//		Util.IERR();
 		int idx = indexOf(doneMarker);
+		System.out.println("MarkerProduction.doHeavyChecksOnMarkerDone: idx="+idx);
+		Util.IERR();
 
 		int endIdx = size();
 		if (anchorBefore != null) {

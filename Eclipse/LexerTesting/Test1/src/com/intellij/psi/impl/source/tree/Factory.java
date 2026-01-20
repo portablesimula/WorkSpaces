@@ -15,6 +15,9 @@ import com.intellij.psi.impl.source.DummyHolderFactory;
 import com.intellij.psi.impl.source.codeStyle.CodeEditUtil;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.CharTable;
+
+import simula.compiler.utilities.LOG;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +27,7 @@ public final class Factory {
 
     public static @NotNull LeafElement createSingleLeafElement(@NotNull IElementType type, @NotNull CharSequence buffer, int startOffset, int endOffset, CharTable table, @NotNull PsiManager manager, PsiFile originalFile) {
         if (manager == null) {
-            $$$reportNull$$$0(2);
+            LOG.error("$$$reportNull$$$0(2)");
         }
 
         DummyHolder dummyHolder = DummyHolderFactory.createHolder(manager, table, type.getLanguage());
@@ -38,7 +41,7 @@ public final class Factory {
 
     public static @NotNull LeafElement createSingleLeafElement(@NotNull IElementType type, @NotNull CharSequence buffer, int startOffset, int endOffset, CharTable table, @NotNull PsiManager manager, boolean generatedFlag) {
         if (manager == null) {
-            $$$reportNull$$$0(6);
+            LOG.error("$$$reportNull$$$0(6)");
         }
 
         FileElement holderElement = DummyHolderFactory.createHolder(manager, table, type.getLanguage()).getTreeElement();
@@ -53,7 +56,7 @@ public final class Factory {
 
     public static @NotNull LeafElement createSingleLeafElement(@NotNull IElementType type, @NotNull CharSequence buffer, CharTable table, @NotNull PsiManager manager) {
         if (manager == null) {
-            $$$reportNull$$$0(10);
+            LOG.error("$$$reportNull$$$0(10)");
         }
 
         return createSingleLeafElement(type, buffer, 0, buffer.length(), table, manager);
@@ -61,7 +64,7 @@ public final class Factory {
 
     public static @NotNull LeafElement createSingleLeafElement(@NotNull IElementType type, @NotNull CharSequence buffer, int startOffset, int endOffset, @Nullable CharTable table, @NotNull PsiManager manager) {
         if (manager == null) {
-            $$$reportNull$$$0(13);
+            LOG.error("$$$reportNull$$$0(13)");
         }
 
         return createSingleLeafElement(type, buffer, startOffset, endOffset, table, manager, true);

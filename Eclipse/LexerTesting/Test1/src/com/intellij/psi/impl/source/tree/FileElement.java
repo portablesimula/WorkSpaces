@@ -15,6 +15,9 @@ import com.intellij.psi.stubs.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.CharTable;
 import com.intellij.util.diff.FlyweightCapableTreeStructure;
+
+import simula.compiler.utilities.Util;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,30 +48,32 @@ public class FileElement extends LazyParseableElement implements FileASTNode {
 
 	@Override
 	public @NotNull LighterAST getLighterAST() {
-		if (!isParsed()) {
-			LightLanguageStubDefinition lightStubFactory = getLightStubFactory();
-			if (lightStubFactory != null) {
-				FlyweightCapableTreeStructure<@NotNull LighterASTNode> structure = lightStubFactory.parseContentsLight(this);
-				return new FCTSBackedLighterAST(getCharTable(), structure);
-			}
-		}
-		return new TreeBackedLighterAST(this);
+//		if (!isParsed()) {
+//			LightLanguageStubDefinition lightStubFactory = getLightStubFactory();
+//			if (lightStubFactory != null) {
+//				FlyweightCapableTreeStructure<@NotNull LighterASTNode> structure = lightStubFactory.parseContentsLight(this);
+//				return new FCTSBackedLighterAST(getCharTable(), structure);
+//			}
+//		}
+//		return new TreeBackedLighterAST(this);
+		Util.IERR("NOT IMPL");
+		return null;
 	}
 
-	private @Nullable LightLanguageStubDefinition getLightStubFactory() {
-		Language language = getElementType().getLanguage();
-		LanguageStubDescriptor stubDescriptor = StubElementRegistryService.getInstance().getStubDescriptor(language);
-		if (stubDescriptor == null) {
-			return null;
-		}
-
-		LanguageStubDefinition stubDefinition = stubDescriptor.getStubDefinition();
-		if (!(stubDefinition instanceof LightLanguageStubDefinition)) {
-			return null;
-		}
-
-		return (LightLanguageStubDefinition)stubDefinition;
-	}
+//	private @Nullable LightLanguageStubDefinition getLightStubFactory() {
+//		Language language = getElementType().getLanguage();
+//		LanguageStubDescriptor stubDescriptor = StubElementRegistryService.getInstance().getStubDescriptor(language);
+//		if (stubDescriptor == null) {
+//			return null;
+//		}
+//
+//		LanguageStubDefinition stubDefinition = stubDescriptor.getStubDefinition();
+//		if (!(stubDefinition instanceof LightLanguageStubDefinition)) {
+//			return null;
+//		}
+//
+//		return (LightLanguageStubDefinition)stubDefinition;
+//	}
 
 	public FileElement(@NotNull IElementType type, CharSequence text) {
 		super(type, text);
@@ -103,45 +108,49 @@ public class FileElement extends LazyParseableElement implements FileASTNode {
 	@ApiStatus.Internal
 	public final @NotNull AstSpine getStubbedSpine() {
 		AstSpine result = myStubbedSpine;
-		if (result == null) {
-			PsiFileImpl file = (PsiFileImpl)getPsi();
-			LanguageStubDescriptor descriptor = file.getStubDescriptor();
-			if (descriptor == null) return AstSpine.EMPTY_SPINE;
-
-			result = RecursionManager.doPreventingRecursion(file, false, () -> {
-				return new AstSpine(calcStubbedDescendants(descriptor.getStubDefinition().getBuilder()));
-			});
-
-			if (result == null) {
-				throw new StackOverflowPreventedException("Endless recursion prevented");
-			}
-			myStubbedSpine = result;
-		}
-		return result;
+//		if (result == null) {
+//			PsiFileImpl file = (PsiFileImpl)getPsi();
+//			LanguageStubDescriptor descriptor = file.getStubDescriptor();
+//			if (descriptor == null) return AstSpine.EMPTY_SPINE;
+//
+//			result = RecursionManager.doPreventingRecursion(file, false, () -> {
+//				return new AstSpine(calcStubbedDescendants(descriptor.getStubDefinition().getBuilder()));
+//			});
+//
+//			if (result == null) {
+//				throw new StackOverflowPreventedException("Endless recursion prevented");
+//			}
+//			myStubbedSpine = result;
+//		}
+//		return result;
+		Util.IERR("NOT IMPL");
+		return null;
 	}
 
 	private List<CompositeElement> calcStubbedDescendants(StubBuilder builder) {
 		List<CompositeElement> result = new ArrayList<>();
 		result.add(this);
 
-		acceptTree(new RecursiveTreeElementWalkingVisitor() {
-			@Override
-			public void visitComposite(CompositeElement node) {
-				CompositeElement parent = node.getTreeParent();
-				if (parent != null && builder.skipChildProcessingWhenBuildingStubs(parent, node)) {
-					return;
-				}
-
-				IElementType type = node.getElementType();
-				StubElementFactory<?, ?> factory = StubElementRegistryService.getInstance().getStubFactory(type);
-				if (factory != null && factory.shouldCreateStub(node)) {
-					result.add(node);
-				}
-
-				super.visitNode(node);
-			}
-		});
-		return result;
+//		acceptTree(new RecursiveTreeElementWalkingVisitor() {
+//			@Override
+//			public void visitComposite(CompositeElement node) {
+//				CompositeElement parent = node.getTreeParent();
+//				if (parent != null && builder.skipChildProcessingWhenBuildingStubs(parent, node)) {
+//					return;
+//				}
+//
+//				IElementType type = node.getElementType();
+//				StubElementFactory<?, ?> factory = StubElementRegistryService.getInstance().getStubFactory(type);
+//				if (factory != null && factory.shouldCreateStub(node)) {
+//					result.add(node);
+//				}
+//
+//				super.visitNode(node);
+//			}
+//		});
+//		return result;
+		Util.IERR("NOT IMPL");
+		return null;
 	}
 
 }
