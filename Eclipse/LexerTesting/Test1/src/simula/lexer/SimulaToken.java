@@ -32,13 +32,19 @@ public class SimulaToken extends IElementType {
 
 	public String text() {
 		CharSequence txt = sourceText.subSequence(startOffset, endOffset);
+		String str = txt.toString();
+		return str;
+	}
+
+	public String edText() {
+		CharSequence txt = sourceText.subSequence(startOffset, endOffset);
 		String str = txt.toString().replace("\r", "\\r").replace("\n", "\\n");
 		return str;
 	}
 	
 	@Override
 	public String toString() {
-		return KeyWord.edit(keyWord) + '[' + startOffset + ':' + endOffset + "]=\"" + text() + '"';
+		return KeyWord.edit(keyWord) + '[' + startOffset + ':' + endOffset + "]=\"" + edText() + '"';
 	}
 
 }

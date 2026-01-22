@@ -36,7 +36,7 @@ public class Main {
 	static int initialState;
 
 	public static void main(String[] argv) {
-		IO.println("*** BEGIN main ");
+		System.out.println("*** BEGIN main ");
 		Global.sourceLineNumber = 1;
 //		tester1();
 //		try { tester2(); } catch (IOException e) { e.printStackTrace(); }
@@ -45,7 +45,7 @@ public class Main {
 	}
 	
 	static void tester1() {
-		IO.println("*** BEGIN Lexer tester 1 ");
+		System.out.println("*** BEGIN Lexer tester 1 ");
 		Lexer lexer = new SimulaLexer();
 		LexerTester tester = new LexerTester(lexer);
 //		buffer = "abra ca dab";
@@ -67,7 +67,7 @@ public class Main {
 
 	
 	static void tester2() throws IOException {
-		IO.println("*** BEGIN Lexer tester 2 ");
+		System.out.println("*** BEGIN Lexer tester 2 ");
 		Lexer lexer = new SimulaLexer();
 		LexerTester tester = new LexerTester(lexer);
 		String fileName = "C:/Users/omyhr/Simula/Simula-2.0/samples/HexDump.sim";
@@ -83,7 +83,7 @@ public class Main {
 	public static final IFileElementType FILE = new IFileElementType(SimulaLanguage.INSTANCE);
 
 	static void tester3() {
-		IO.println("*** BEGIN tester 3 ");
+		System.out.println("*** BEGIN tester 3 ");
 		ParserDefinition parserDefinition = new SimulaParserDefinition();
 		Lexer lexer = new SimulaLexer();
 //		String text = "your code to parse";
@@ -92,19 +92,20 @@ public class Main {
 		// Use the factory to get an instance (which will be a PsiBuilderImpl)
 //		PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(parserDefinition, lexer, text);
 		PsiBuilderImpl builder = (PsiBuilderImpl) new PsiBuilderFactoryImpl().createBuilder(parserDefinition, lexer, TEST_TEXT);
-		IO.println("Main.tester3: builder="+builder);
+		System.out.println("Main.tester3: builder="+builder);
 		
 //		SimulaParser parser = new SimulaParser(builder, TEST_TEXT);
+		Global.initiate();
 		SimulaParser parser = new SimulaParser();
 		IElementType root = FILE;
 	    ASTNode tree = parser.parse(root, builder);
 //		ASTNode tree = builder.getTreeBuilt();
-		IO.println("Main.tester3: AST-tree: "+tree);
+		System.out.println("Main.tester3: AST-tree: "+tree);
 	    printAST(tree, 4);
 	}
 
 	static void tester4() {
-		IO.println("*** BEGIN tester 4 ");
+		System.out.println("*** BEGIN tester 4 ");
 		SimpleParsingTest test = new SimpleParsingTest();
 		test.doSetup();
 		ParserDefinition parserDefinition = new SimulaParserDefinition();
@@ -114,7 +115,7 @@ public class Main {
 	}
 	
 	static void tester5() {
-			IO.println("*** BEGIN tester 5 ");
+			System.out.println("*** BEGIN tester 5 ");
 		Lexer lexer = new SimulaLexer();
 		ParserDefinition parserDefinition = new SimulaParserDefinition();
 

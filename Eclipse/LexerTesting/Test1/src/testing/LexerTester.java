@@ -79,7 +79,7 @@ public class LexerTester {
 		  }
 
 	  public void doSetText(CharSequence text) {
-			IO.println("Tester.doSetText: " + text);
+			System.out.println("Tester.doSetText: " + text);
 //		    if (Comparing.equal(myText, text)) return;
 		    text = ImmutableCharSequence.asImmutable(text);
 
@@ -110,10 +110,10 @@ public class LexerTester {
 		    processor.finish();
 
 		    if (textLength > 0 && (mySegments.mySegmentCount == 0 || mySegments.myEnds[mySegments.mySegmentCount - 1] != textLength)) {
-		    	IO.println("\nTester.doSetText: =========== ERROR ==========");
-		    	IO.println("Tester.doSetText: textLength="+textLength);
-		    	IO.println("Tester.doSetText: mySegments.mySegmentCount="+mySegments.mySegmentCount);
-		    	IO.println("Tester.doSetText: mySegments.myEnds[mySegments.mySegmentCount - 1]="+mySegments.myEnds[mySegments.mySegmentCount - 1]);
+		    	System.out.println("\nTester.doSetText: =========== ERROR ==========");
+		    	System.out.println("Tester.doSetText: textLength="+textLength);
+		    	System.out.println("Tester.doSetText: mySegments.mySegmentCount="+mySegments.mySegmentCount);
+		    	System.out.println("Tester.doSetText: mySegments.myEnds[mySegments.mySegmentCount - 1]="+mySegments.myEnds[mySegments.mySegmentCount - 1]);
 		      throw new IllegalStateException("Unexpected termination offset for lexer " + myLexer);
 		    }
 

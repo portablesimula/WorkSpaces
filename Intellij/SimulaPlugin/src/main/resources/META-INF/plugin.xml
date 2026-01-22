@@ -93,14 +93,16 @@
 
         <!--typedHandler implementation="simula.plugin.extensions.config.run.cmdRunner.UNUSED_SimulaKeyHandler"/-->
 
-        <!-- EXTENSIONS FOR PARSING ETC: -->
+        <!-- ***************************************** -->
+        <!-- ****** EXTENSIONS FOR PARSING ETC: ****** -->
+        <!-- ***************************************** -->
 
-        <!--lang.parserDefinition
+        <lang.parserDefinition
                 language="Simula"
                 implementationClass="simula.parser.SimulaParserDefinition"/>
 
         <lang.ast.factory language="Simula"
-             implementationClass="simula.parser.SimulaASTFactory"/-->
+             implementationClass="simula.parser.SimulaASTFactory"/>
 
     </extensions>
 

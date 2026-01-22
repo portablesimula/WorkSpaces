@@ -8,6 +8,8 @@ package simula.compiler.syntaxClass.statement;
 import java.io.IOException;
 import java.util.Vector;
 
+import com.intellij.lang.PsiBuilder;
+
 import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
@@ -86,8 +88,8 @@ public final class ProgramModule extends Statement {
 	}
 
 	/// Create a new ProgramModule.
-	public ProgramModule() {
-		super(0);
+	public ProgramModule(PsiBuilder simBuilder) {
+		super("", 0);
 		sysin=new VariableExpression("sysin");
 		sysout=new VariableExpression("sysout");
 		try	{
@@ -99,25 +101,25 @@ public final class ProgramModule extends Statement {
 			     .setClassDeclaration(StandardClass.Printfile);
 			Global.getCurrentScope().sourceBlockLevel=0;
 			while(Parse.accept(simBuilder, KeyWord.EXTERNAL)) {
-				externalHead = ExternalDeclaration.expectExternalHead(StandardClass.BASICIO);					
+				externalHead = ExternalDeclaration.expectExternalHead(simBuilder, StandardClass.BASICIO);					
 				Parse.expect(simBuilder, KeyWord.SEMICOLON);
 			}
 			// Now: Looking for ( program | procedure-declaration | class-declaration )
-			String ident=Parse.acceptIdentifier();
+			String ident=Parse.acceptIdentifier(simBuilder);
 			if(ident!=null) {
-				if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(ident);
-			    else { Parse.saveCurrentToken(); mainModule = doParseProgram(); }
+				if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, ident);
+			    else { Parse.saveCurrentToken(); mainModule = doParseProgram(simBuilder); }
 			}
-			else if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(null);
+			else if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(null, ident);
 			else {
-				Type type=Parse.acceptType();
-			    if(Parse.accept(simBuilder, KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(type);
-			    else mainModule = doParseProgram();
+				Type type=Parse.acceptType(simBuilder);
+			    if(Parse.accept(simBuilder, KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type);
+			    else mainModule = doParseProgram(simBuilder);
 			}
 			StandardClass.BASICIO.declarationList.add(mainModule);
 			
-			if(Parse.currentToken.keyWord != KeyWord.EOF) {
-				Util.warning("Text after Program end - starting with " + Parse.currentToken);
+			if(Parse.currentToken(simBuilder).keyWord != KeyWord.EOF) {
+				Util.warning("Text after Program end - starting with " + Parse.currentToken(simBuilder));
 			}
 			
 			if(Option.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
@@ -129,11 +131,11 @@ public final class ProgramModule extends Statement {
 	
 	/// Parse Simula Program by expecting a Statement.
 	/// @return the Program Statement.
-	private DeclarationScope doParseProgram() {
+	private DeclarationScope doParseProgram(final PsiBuilder simBuilder) {
 		BlockDeclaration mainBlock = new MaybeBlockDeclaration(Global.sourceName);
 		mainBlock.isMainModule = true;
 		mainBlock.declarationKind = ObjectKind.SimulaProgram;
-		Statement program = Statement.expectStatement();
+		Statement program = Statement.expectStatement(simBuilder);
 		mainBlock.statements.add(program);
 		return mainBlock;
 	}
@@ -154,7 +156,8 @@ public final class ProgramModule extends Statement {
 	/// @throws IOException if something went wrong
 	public void createJavaClassFile() throws IOException {
 		Global.sourceLineNumber = lineNumber;
-		mainModule.createJavaClassFile();
+//		mainModule.createJavaClassFile();
+		Util.IERR();
 	}
 
 	@Override
@@ -162,14 +165,14 @@ public final class ProgramModule extends Statement {
 
 	@Override
 	public void printTree(final int indent, final Object head) {
-		IO.println("BASICIO");
-		IO.println("    ... Standard Classes and Procedures");
+		System.out.println("BASICIO");
+		System.out.println("    ... Standard Classes and Procedures");
 		for(Declaration decl:StandardClass.BASICIO.declarationList) {
 			if(decl instanceof StandardProcedure) ; // Nothing
 			else if(decl instanceof StandardClass) ; // Nothing
 			else decl.printTree(1,this);
 		}
-		IO.println("=================================================================");
+		System.out.println("=================================================================");
 	}
 	
 	@Override

@@ -11,6 +11,8 @@ public class SimulaToken extends IElementType {
     CharSequence sourceText; // Pointer to the Whole FILE
     int startOffset;
     int endOffset;
+    
+    public int lineNumber;
 
 	public SimulaToken(CharSequence sourceText, int startOffset, int endOffset, int keyWord, String debugName) {
 		super(debugName, SimulaLanguage.INSTANCE);

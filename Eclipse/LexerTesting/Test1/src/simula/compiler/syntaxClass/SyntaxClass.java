@@ -166,7 +166,7 @@ public abstract class SyntaxClass extends IElementType {
 	/// Assert that semantic checking done.
 	protected void ASSERT_SEMANTICS_CHECKED() {
 		if (!CHECKED) {
-			IO.println("FATAL error - THE Semantic checker not called: " + this.getClass().getName() + ", " + this);
+			System.out.println("FATAL error - THE Semantic checker not called: " + this.getClass().getName() + ", " + this);
 			System.exit(-1);
 		}
 		if (this instanceof Declaration decl) {

@@ -73,7 +73,7 @@ public abstract class Statement extends SyntaxClass {
 	/// @return the statement
 	public static Statement expectStatement(PsiBuilder simBuilder) {
 		ObjectList<LabelDeclaration> labels = null;
-//		int lineNumber=Parse.currentToken.lineNumber;
+		int lineNumber=Parse.currentToken(simBuilder).lineNumber;
 //		if (Option.internal.TRACE_PARSE)
 //			Util.TRACE("Statement.doParse: LabeledStatement: lineNumber="+lineNumber+", current=" + Parse.currentToken	+ ", prev=" + Parse.prevToken);
 		String ident = Parse.acceptIdentifier(simBuilder);
@@ -201,10 +201,10 @@ public abstract class Statement extends SyntaxClass {
 		JavaSourceFileCoder.code(toJavaCode() + ';');
 	}
 
-	/// Build Java ByteCode.
-	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
-		Util.IERR("Method buildByteCode need a redefinition in "+this.getClass().getSimpleName());
-	}
+//	/// Build Java ByteCode.
+//	@Override
+//	public void buildByteCode(CodeBuilder codeBuilder) {
+//		Util.IERR("Method buildByteCode need a redefinition in "+this.getClass().getSimpleName());
+//	}
 
 }

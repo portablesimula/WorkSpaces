@@ -6,47 +6,35 @@
 package simula.compiler.syntaxClass.declaration;
 
 import java.io.IOException;
-//import java.lang.classfile.ClassFile;
-//import java.lang.classfile.CodeBuilder;
-//import java.lang.classfile.Label;
-//import java.lang.classfile.attribute.SourceFileAttribute;
-//import java.lang.classfile.constantpool.ConstantPoolBuilder;
-import java.lang.constant.ClassDesc;
+// import java.lang.classfile.ClassFile;
+// import java.lang.classfile.CodeBuilder;
+// import java.lang.classfile.Label;
+// import java.lang.classfile.attribute.SourceFileAttribute;
+// import java.lang.classfile.constantpool.ConstantPoolBuilder;
+//import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
 
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-
 import com.intellij.lang.PsiBuilder;
-import com.intellij.psi.tree.IElementType;
 
-import simula.compiler.syntaxClass.expression.AssignmentOperation;
+import simula.compiler.AttributeInputStream;
+import simula.compiler.AttributeOutputStream;
+import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.parsing.Parse;
+import simula.compiler.syntaxClass.statement.BlockStatement;
+import simula.compiler.syntaxClass.statement.DummyStatement;
 import simula.compiler.syntaxClass.statement.Statement;
-import simula.compiler.utilities.KeyWord;
-import simula.compiler.utilities.Util;
-import simula.lexer.SimulaElementTypes;
-import simula.lexer.SimulaToken;
-import simula.parser.SimPsiBuilder;
-
-//import simula.compiler.AttributeInputStream;
-//import simula.compiler.AttributeOutputStream;
-//import simula.compiler.JavaSourceFileCoder;
-//import simula.compiler.parsing.Parse;
-//import simula.compiler.syntaxClass.statement.BlockStatement;
-//import simula.compiler.syntaxClass.statement.DummyStatement;
-//import simula.compiler.syntaxClass.statement.Statement;
 //import simula.compiler.utilities.ClassHierarchy;
-//import simula.compiler.utilities.DeclarationList;
+import simula.compiler.utilities.DeclarationList;
 //import simula.compiler.utilities.RTS;
-//import simula.compiler.utilities.Global;
-//import simula.compiler.utilities.LabelList;
-//import simula.compiler.utilities.KeyWord;
-//import simula.compiler.utilities.Meaning;
-//import simula.compiler.utilities.ObjectKind;
-//import simula.compiler.utilities.ObjectList;
-//import simula.compiler.utilities.Option;
-//import simula.compiler.utilities.Util;
+import simula.compiler.utilities.Global;
+import simula.compiler.utilities.LabelList;
+import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.Meaning;
+import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.ObjectList;
+import simula.compiler.utilities.Option;
+import simula.compiler.utilities.Util;
 
 /// Maybe Block Declaration. I.e: CompoundStatement or SubBlock depends on
 /// whether it contains declarations.
@@ -78,9 +66,9 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	/// @param identifier block identifier
 	public MaybeBlockDeclaration(final String identifier) {
 		super("MaybeBlockDeclaration", identifier);
-//		if(identifier != null)
-//			modifyIdentifier(identifier);
-//		else modifyIdentifier("Block" + lineNumber);
+		if(identifier != null)
+			modifyIdentifier(identifier);
+		else modifyIdentifier("Block" + lineNumber);
 	}
 
 	// ***********************************************************************************************
@@ -98,8 +86,6 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 //		module.expectMaybeBlock(lineNumber);
 //		return (module);
 //	}
-
-//    public static void parseBlock(SimPsiBuilder simBuilder) {
     public static void parseBlock(PsiBuilder simBuilder) {
         PsiBuilder.Marker blockMarker = simBuilder.mark();
         System.out.println("MaybeBlockDeclaration.parseBlock: blockMarker="+blockMarker);
@@ -111,7 +97,8 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 //        while (!simBuilder.eof() && ((SimulaToken)simBuilder.getTokenType()).keyWord != KeyWord.END) {
         while (!simBuilder.eof() && getKeyWord(simBuilder) != KeyWord.END) {
             System.out.println("\nSimulaParser.parseBlock: NOT END ==> parseStatement: "+simBuilder.getTokenType());
-            Statement.parseStatement(simBuilder);
+//            Statement.parseStatement(simBuilder);
+            Statement.expectUnlabeledStatement(simBuilder);
         }
 
         if(simBuilder.eof()) {
@@ -146,204 +133,204 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	/// Pre-condition: BEGIN is already read.
 	/// @param line source line number
 	/// @return a BlockStatement
-//	public BlockStatement expectMaybeBlock(int line) {
-//		this.lineNumber=line;
-//		if (Option.internal.TRACE_PARSE)
-//			Parse.TRACE("Parse MayBeBlock");
-//		while (Declaration.acceptDeclaration(this))
-//			Parse.expect(KeyWord.SEMICOLON);
-//		while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
-//			Statement stm = Statement.expectStatement();
-//			if (stm != null) statements.add(stm);
-//		}
+	public BlockStatement expectMaybeBlock(PsiBuilder simBuilder, int line) {
+		this.lineNumber=line;
+		if (Option.internal.TRACE_PARSE)
+			Parse.TRACE("Parse MayBeBlock");
+		while (Declaration.acceptDeclaration(simBuilder, this))
+			Parse.expect(simBuilder, KeyWord.SEMICOLON);
+		while (!Parse.accept(simBuilder, KeyWord.END, KeyWord.EOF)) {
+			Statement stm = Statement.expectStatement(simBuilder);
+			if (stm != null) statements.add(stm);
+		}
 //		if (Parse.prevToken.keyWord == KeyWord.EOF) {
 //			Util.error("Illegal termination of block. Missing END.");
 //		}		
-//		if (declarationKind != ObjectKind.SimulaProgram) {
-//			if (!declarationList.isEmpty()) {
-//				declarationKind = ObjectKind.SubBlock;
-//			} else {
-//				declarationKind = ObjectKind.CompoundStatement;
-//				if (labelList != null && labelList.declaredLabelSize() != 0)
-//					moveLabelsFrom(this); // Label is also declaration
-//			}
-//		}
-//		this.lastLineNumber = Global.sourceLineNumber;
-//		BlockStatement blk = new BlockStatement(this);
-//		Global.setScope(declaredIn);
-//		return (blk);
-//	}
-//
-//	/// Utility: Moves labels from the givent block.
-//	/// 
-//	/// Special case: Labels in a CompoundStatement or ConnectionBlock.
-//	/// 
-//	/// Move Label Declaration to nearest enclosing Block which is not
-//	/// a CompoundStatement or ConnectionBlock.
-//	/// @param block the block containing labels to be moved
-//	static void moveLabelsFrom(DeclarationScope block) {
-//		DeclarationScope declaredIn = block.declaredIn;
-//		Vector<LabelDeclaration> labelList = block.labelList.getDeclaredLabels();
-//		DeclarationScope enc = declaredIn;
-//		while (enc.declarationKind == ObjectKind.CompoundStatement
-//				&& enc.declarationKind == ObjectKind.ConnectionBlock
-//				&& enc.declarationList.isEmpty())
-//			enc = enc.declaredIn;
-//		
-//		for (LabelDeclaration lab : labelList) {
-//			lab.movedTo=enc;
-//			if(enc.labelList == null) enc.labelList = new LabelList(enc);
-//			enc.labelList.add(lab);
-//			lab.declaredIn = enc;
-//		}
-//		block.labelList = null;
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Checking
-//	// ***********************************************************************************************
-//	@Override
-//	public void doChecking() {
-//		if (IS_SEMANTICS_CHECKED())	return;
-//		Global.sourceLineNumber = lineNumber;
-//		Global.enterScope(this);
-//			LabelList.accumLabelList(this);
-//			for (Declaration dcl : declarationList)	dcl.doChecking();
-//			for (Statement stm : statements) {
-//				stm.doChecking();
-//			}
-//		Global.exitScope();
-//		SET_SEMANTICS_CHECKED();
-//	}
-//	
-//	@Override
-//	public int getRTBlockLevel() {
-////		ASSERT_SEMANTICS_CHECKED(); // TODO: ER DETTE BRA ?
-//		int rtBlockLevel = declaredIn.getRTBlockLevel();
-//		if(declarationKind == ObjectKind.SubBlock)
-//			rtBlockLevel = rtBlockLevel+1;
-//		return rtBlockLevel;
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Utility: findVisibleAttributeMeaning
-//	// ***********************************************************************************************
-//	@Override
-//	public Meaning findVisibleAttributeMeaning(final String ident) {
-//		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("BEGIN Checking MayBeBlock for "+ident+" ================================== "+identifier+" ==================================");
-//		for (Declaration declaration : declarationList) {
-//			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Local "+declaration);
-//			if (Util.equals(ident, declaration.identifier))
-//				return (new Meaning(declaration, this, this, false));
-//		}
-//		if(labelList != null) for (LabelDeclaration label : labelList.getDeclaredLabels()) {
-//			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Label "+label);
-//			if (Util.equals(ident, label.identifier))
-//				return (new Meaning(label, this, this, false));
-//		}
-//		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("ENDOF Checking MayBeBlock for "+ident+" ================================== "+identifier+" ==================================");
-//		return (null);
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Coding: doJavaCoding
-//	// ***********************************************************************************************
-//	@Override
-//	public void doJavaCoding() {
-//		ASSERT_SEMANTICS_CHECKED();
-//		if (declarationKind == ObjectKind.CompoundStatement)
-//			doCompoundStatementCoding();
-//		else if (this.isPreCompiledFromFile != null) {
-//			if(Option.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
-//		} else doSubBlockCoding();
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Coding: CompoundStatement as Java Subblock
-//	// ***********************************************************************************************
-//	/// Java Coding utility: Code compound statement
-//	private void doCompoundStatementCoding() {
-//		Global.sourceLineNumber = lineNumber;
-//		ASSERT_SEMANTICS_CHECKED();
-//		Util.ASSERT(declarationList.isEmpty(), "Invariant");
-//		Util.ASSERT(labelList == null || labelList.declaredLabelSize() == 0, "Invariant");
-//		Global.enterScope(this);
-//		JavaSourceFileCoder.code("{");
-//		if(labelcodeList!=null) {
-//			for(String labCode:labelcodeList) {
-//				JavaSourceFileCoder.code(labCode);
-//			}
-//		}
-//		for (Statement stm : statements) stm.doJavaCoding();
-//		JavaSourceFileCoder.code("}");
-//		Global.exitScope();
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Coding: SUBBLOCK ==> .java file
-//	// ***********************************************************************************************
-//	/// Java Coding utility: Code sub-block
-//	private void doSubBlockCoding() {
-//		Global.sourceLineNumber = lineNumber;
-//		ASSERT_SEMANTICS_CHECKED();
-//		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
-//		Global.enterScope(this);
-//			labelList.setLabelIdexes();
-//			boolean duringSTM_Coding=Global.duringSTM_Coding;
-//			Global.duringSTM_Coding=false;
-//			JavaSourceFileCoder.code("@SuppressWarnings(\"unchecked\")");
-//			JavaSourceFileCoder.code("public final class " + getJavaIdentifier() + " extends RTS_BASICIO" + " {");
-//			JavaSourceFileCoder.debug("// SubBlock: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel() + ", firstLine="
-//					+ lineNumber + ", lastLine=" + lastLineNumber + ", hasLocalClasses="
-//					+ ((hasLocalClasses) ? "true" : "false") + ", System=" + ((isQPSystemBlock()) ? "true" : "false"));
-//			if (isQPSystemBlock())
-//				JavaSourceFileCoder.code("public boolean isQPSystemBlock() { return(true); }");
-//			if(this.hasAccumLabel()) {
-//				JavaSourceFileCoder.debug("// Declare local labels");
-//				for (LabelDeclaration lab : labelList.getAccumLabels())
-//					lab.declareLocalLabel(this);
-//			}
-//			JavaSourceFileCoder.debug("// Declare locals as attributes");
-//			for (Declaration decl : declarationList) decl.doJavaCoding();
-//			doCodeConstructor();
-//			Global.duringSTM_Coding=true;
-//			doCodeStatements();
-//			Global.duringSTM_Coding=duringSTM_Coding;
-//			if (this.isMainModule) codeMethodMain();
-//			javaCoder.codeProgramInfo();
-//			JavaSourceFileCoder.code("}", "End of SubBlock");
-//		Global.exitScope();
-//		javaCoder.closeJavaOutput();
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Coding Utility: doCodeConstructor
-//	// ***********************************************************************************************
-//	/// Java Coding utility: Code constructor
-//	private void doCodeConstructor() {
-//		JavaSourceFileCoder.debug("// Normal Constructor");
-//		JavaSourceFileCoder.code("public " + getJavaIdentifier() + "(RTS_RTObject staticLink) {");
-//		JavaSourceFileCoder.code("super(staticLink);");
-//		JavaSourceFileCoder.code("BBLK();");
-//		JavaSourceFileCoder.debug("// Declaration Code");
-//		for (Declaration decl : declarationList) decl.doDeclarationCoding();
-//		JavaSourceFileCoder.code("}");
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Coding Utility: doCodeStatements
-//	// ***********************************************************************************************
-//	/// Java Coding utility: Code statements
-//	private void doCodeStatements() {
-//		JavaSourceFileCoder.debug("// " + declarationKind + " Statements");
-//		JavaSourceFileCoder.code("@Override");
-//		JavaSourceFileCoder.code("public RTS_RTObject _STM() {");
-//		codeSTMBody();
-//		JavaSourceFileCoder.code("EBLK();");
-//		JavaSourceFileCoder.code("return(this);");
-//		JavaSourceFileCoder.code("}", "End of " + declarationKind + " Statements");
-//	}
-//	
+		if (declarationKind != ObjectKind.SimulaProgram) {
+			if (!declarationList.isEmpty()) {
+				declarationKind = ObjectKind.SubBlock;
+			} else {
+				declarationKind = ObjectKind.CompoundStatement;
+				if (labelList != null && labelList.declaredLabelSize() != 0)
+					moveLabelsFrom(this); // Label is also declaration
+			}
+		}
+		this.lastLineNumber = Global.sourceLineNumber;
+		BlockStatement blk = new BlockStatement(this);
+		Global.setScope(declaredIn);
+		return (blk);
+	}
+
+	/// Utility: Moves labels from the givent block.
+	/// 
+	/// Special case: Labels in a CompoundStatement or ConnectionBlock.
+	/// 
+	/// Move Label Declaration to nearest enclosing Block which is not
+	/// a CompoundStatement or ConnectionBlock.
+	/// @param block the block containing labels to be moved
+	static void moveLabelsFrom(DeclarationScope block) {
+		DeclarationScope declaredIn = block.declaredIn;
+		Vector<LabelDeclaration> labelList = block.labelList.getDeclaredLabels();
+		DeclarationScope enc = declaredIn;
+		while (enc.declarationKind == ObjectKind.CompoundStatement
+				&& enc.declarationKind == ObjectKind.ConnectionBlock
+				&& enc.declarationList.isEmpty())
+			enc = enc.declaredIn;
+		
+		for (LabelDeclaration lab : labelList) {
+			lab.movedTo=enc;
+			if(enc.labelList == null) enc.labelList = new LabelList(enc);
+			enc.labelList.add(lab);
+			lab.declaredIn = enc;
+		}
+		block.labelList = null;
+	}
+
+	// ***********************************************************************************************
+	// *** Checking
+	// ***********************************************************************************************
+	@Override
+	public void doChecking() {
+		if (IS_SEMANTICS_CHECKED())	return;
+		Global.sourceLineNumber = lineNumber;
+		Global.enterScope(this);
+			LabelList.accumLabelList(this);
+			for (Declaration dcl : declarationList)	dcl.doChecking();
+			for (Statement stm : statements) {
+				stm.doChecking();
+			}
+		Global.exitScope();
+		SET_SEMANTICS_CHECKED();
+	}
+	
+	@Override
+	public int getRTBlockLevel() {
+//		ASSERT_SEMANTICS_CHECKED(); // TODO: ER DETTE BRA ?
+		int rtBlockLevel = declaredIn.getRTBlockLevel();
+		if(declarationKind == ObjectKind.SubBlock)
+			rtBlockLevel = rtBlockLevel+1;
+		return rtBlockLevel;
+	}
+
+	// ***********************************************************************************************
+	// *** Utility: findVisibleAttributeMeaning
+	// ***********************************************************************************************
+	@Override
+	public Meaning findVisibleAttributeMeaning(final String ident) {
+		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("BEGIN Checking MayBeBlock for "+ident+" ================================== "+identifier+" ==================================");
+		for (Declaration declaration : declarationList) {
+			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Local "+declaration);
+			if (Util.equals(ident, declaration.identifier))
+				return (new Meaning(declaration, this, this, false));
+		}
+		if(labelList != null) for (LabelDeclaration label : labelList.getDeclaredLabels()) {
+			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Label "+label);
+			if (Util.equals(ident, label.identifier))
+				return (new Meaning(label, this, this, false));
+		}
+		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("ENDOF Checking MayBeBlock for "+ident+" ================================== "+identifier+" ==================================");
+		return (null);
+	}
+
+	// ***********************************************************************************************
+	// *** Coding: doJavaCoding
+	// ***********************************************************************************************
+	@Override
+	public void doJavaCoding() {
+		ASSERT_SEMANTICS_CHECKED();
+		if (declarationKind == ObjectKind.CompoundStatement)
+			doCompoundStatementCoding();
+		else if (this.isPreCompiledFromFile != null) {
+			if(Option.verbose) System.out.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
+		} else doSubBlockCoding();
+	}
+
+	// ***********************************************************************************************
+	// *** Coding: CompoundStatement as Java Subblock
+	// ***********************************************************************************************
+	/// Java Coding utility: Code compound statement
+	private void doCompoundStatementCoding() {
+		Global.sourceLineNumber = lineNumber;
+		ASSERT_SEMANTICS_CHECKED();
+		Util.ASSERT(declarationList.isEmpty(), "Invariant");
+		Util.ASSERT(labelList == null || labelList.declaredLabelSize() == 0, "Invariant");
+		Global.enterScope(this);
+		JavaSourceFileCoder.code("{");
+		if(labelcodeList!=null) {
+			for(String labCode:labelcodeList) {
+				JavaSourceFileCoder.code(labCode);
+			}
+		}
+		for (Statement stm : statements) stm.doJavaCoding();
+		JavaSourceFileCoder.code("}");
+		Global.exitScope();
+	}
+
+	// ***********************************************************************************************
+	// *** Coding: SUBBLOCK ==> .java file
+	// ***********************************************************************************************
+	/// Java Coding utility: Code sub-block
+	private void doSubBlockCoding() {
+		Global.sourceLineNumber = lineNumber;
+		ASSERT_SEMANTICS_CHECKED();
+		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
+		Global.enterScope(this);
+			labelList.setLabelIdexes();
+			boolean duringSTM_Coding=Global.duringSTM_Coding;
+			Global.duringSTM_Coding=false;
+			JavaSourceFileCoder.code("@SuppressWarnings(\"unchecked\")");
+			JavaSourceFileCoder.code("public final class " + getJavaIdentifier() + " extends RTS_BASICIO" + " {");
+			JavaSourceFileCoder.debug("// SubBlock: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel() + ", firstLine="
+					+ lineNumber + ", lastLine=" + lastLineNumber + ", hasLocalClasses="
+					+ ((hasLocalClasses) ? "true" : "false") + ", System=" + ((isQPSystemBlock()) ? "true" : "false"));
+			if (isQPSystemBlock())
+				JavaSourceFileCoder.code("public boolean isQPSystemBlock() { return(true); }");
+			if(this.hasAccumLabel()) {
+				JavaSourceFileCoder.debug("// Declare local labels");
+				for (LabelDeclaration lab : labelList.getAccumLabels())
+					lab.declareLocalLabel(this);
+			}
+			JavaSourceFileCoder.debug("// Declare locals as attributes");
+			for (Declaration decl : declarationList) decl.doJavaCoding();
+			doCodeConstructor();
+			Global.duringSTM_Coding=true;
+			doCodeStatements();
+			Global.duringSTM_Coding=duringSTM_Coding;
+			if (this.isMainModule) codeMethodMain();
+			javaCoder.codeProgramInfo();
+			JavaSourceFileCoder.code("}", "End of SubBlock");
+		Global.exitScope();
+		javaCoder.closeJavaOutput();
+	}
+
+	// ***********************************************************************************************
+	// *** Coding Utility: doCodeConstructor
+	// ***********************************************************************************************
+	/// Java Coding utility: Code constructor
+	private void doCodeConstructor() {
+		JavaSourceFileCoder.debug("// Normal Constructor");
+		JavaSourceFileCoder.code("public " + getJavaIdentifier() + "(RTS_RTObject staticLink) {");
+		JavaSourceFileCoder.code("super(staticLink);");
+		JavaSourceFileCoder.code("BBLK();");
+		JavaSourceFileCoder.debug("// Declaration Code");
+		for (Declaration decl : declarationList) decl.doDeclarationCoding();
+		JavaSourceFileCoder.code("}");
+	}
+
+	// ***********************************************************************************************
+	// *** Coding Utility: doCodeStatements
+	// ***********************************************************************************************
+	/// Java Coding utility: Code statements
+	private void doCodeStatements() {
+		JavaSourceFileCoder.debug("// " + declarationKind + " Statements");
+		JavaSourceFileCoder.code("@Override");
+		JavaSourceFileCoder.code("public RTS_RTObject _STM() {");
+		codeSTMBody();
+		JavaSourceFileCoder.code("EBLK();");
+		JavaSourceFileCoder.code("return(this);");
+		JavaSourceFileCoder.code("}", "End of " + declarationKind + " Statements");
+	}
+	
 //	// ***********************************************************************************************
 //	// *** ByteCoding: getClassDesc
 //	// ***********************************************************************************************
@@ -353,7 +340,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 //			return ((DeclarationScope)declaredIn).getClassDesc();
 //		return(RTS.CD.classDesc(externalIdent));
 //	}
-
+//
 //	// ***********************************************************************************************
 //	// *** ByteCoding: buildClassFile
 //	// ***********************************************************************************************
@@ -396,9 +383,8 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 //				}
 //		);
 //		return(bytes);
-//		return null;
 //	}
-
+//
 //	// ***********************************************************************************************
 //	// *** ByteCoding: buildConstructor
 //	// ***********************************************************************************************
@@ -460,7 +446,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 //		}
 //		Global.enterScope(this);
 //		if (this.isPreCompiledFromFile != null) {
-//			if(Option.verbose) IO.println("Skip  buildClassFile: "+this.identifier);			
+//			if(Option.verbose) System.out.println("Skip  buildClassFile: "+this.identifier);			
 //		} else {
 //			try { createJavaClassFile(); } catch (IOException e) { e.printStackTrace();	}
 //		}
@@ -538,89 +524,89 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 //		String block = ObjectKind.edit(declarationKind);
 //		String tail = (IS_SEMANTICS_CHECKED()) ? "  BL=" + getRTBlockLevel() : "";
 //		if(isPreCompiledFromFile != null) tail = tail + " From: " + isPreCompiledFromFile;
-//		IO.println(edTreeIndent(indent) + block + " " + identifier + tail + "  declaredIn="+this.declaredIn);
+//		System.out.println(edTreeIndent(indent) + block + " " + identifier + tail + "  declaredIn="+this.declaredIn);
 //		if(labelList != null) labelList.printTree(indent+1,this);
 //		printDeclarationList(indent+1);
 //		printStatementList(indent+1);
 //	}
-//
-//	@Override
-//	public String toString() {
-//		return identifier + '[' + externalIdent + "] Kind=" + declarationKind;
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Attribute File I/O
-//	// ***********************************************************************************************
-//
-//	/// Default constructor used by Attribute File I/O
-//	public MaybeBlockDeclaration() { super(null); }
-//
-//	@Override
-//	public void writeObject(AttributeOutputStream oupt) throws IOException {
-//		Util.TRACE_OUTPUT("BEGIN Write "+this.getClass().getSimpleName());
-//		oupt.writeKind(declarationKind);
-//		oupt.writeShort(OBJECT_SEQU);
-//
-//		// *** SyntaxClass
-//		oupt.writeShort(lineNumber);
-//		
-//		// *** Declaration
-//		oupt.writeString(identifier);
-//		oupt.writeString(externalIdent);
-//		oupt.writeType(type);
-//		oupt.writeObj(declaredIn);
-//		
-//		// *** DeclarationScope
-//		oupt.writeString(sourceFileName);
-//		oupt.writeBoolean(hasLocalClasses);
-//		LabelList.writeLabelList(labelList, oupt);
-//		DeclarationList decls = prep(declarationList);
-//		decls.writeObject(oupt);
-//
-//		// *** BlockDeclaration
-//		if (declarationKind == ObjectKind.CompoundStatement) {
-//			oupt.writeBoolean(isMainModule);
-//			oupt.writeObjectList(statements);
-//		}
-//	}
-//	
-//	/// Read and return a MaybeBlockDeclaration object.
-//	/// @param inpt the AttributeInputStream to read from
-//	/// @param declarationKind the declarationKind code
-//	/// @return the object read from the stream.
-//	/// @throws IOException if something went wrong.
-//	@SuppressWarnings("unchecked")
-//	public static MaybeBlockDeclaration readObject(AttributeInputStream inpt,int declarationKind) throws IOException {
-//		DeclarationScope scope = Global.getCurrentScope();
-//		MaybeBlockDeclaration blk = new MaybeBlockDeclaration();
-//		blk.declarationKind = declarationKind;
-//		blk.OBJECT_SEQU = inpt.readSEQU(blk);
-//		// *** SyntaxClass
-//		blk.lineNumber = inpt.readShort();
-//
-//		// *** Declaration
-//		blk.identifier = inpt.readString();
-//		blk.externalIdent = inpt.readString();
-//		blk.type = inpt.readType();
-//		blk.declaredIn = (DeclarationScope) inpt.readObj();
-//
-//		// *** DeclarationScope
-//		blk.sourceFileName = inpt.readString();
-//		blk.hasLocalClasses = inpt.readBoolean();
-//		blk.labelList = LabelList.readLabelList(inpt);
-//		blk.declarationList = DeclarationList.readObject(inpt);
-//
-//		// *** BlockDeclaration
-//		if (declarationKind == ObjectKind.CompoundStatement) {
-//			blk.isMainModule = inpt.readBoolean();
-//			blk.statements = (ObjectList<Statement>) inpt.readObjectList();
-//		}
-//
-//		Global.setScope(scope);
-//		blk.isPreCompiledFromFile = inpt.jarFileName;
-//		Util.TRACE_INPUT("MaybeBlockDeclaration: " + blk);
-//		return(blk);
-//	}
+
+	@Override
+	public String toString() {
+		return identifier + '[' + externalIdent + "] Kind=" + declarationKind;
+	}
+
+	// ***********************************************************************************************
+	// *** Attribute File I/O
+	// ***********************************************************************************************
+
+	/// Default constructor used by Attribute File I/O
+	public MaybeBlockDeclaration() { super("MaybeBlockDeclaration", null); }
+
+	@Override
+	public void writeObject(AttributeOutputStream oupt) throws IOException {
+		Util.TRACE_OUTPUT("BEGIN Write "+this.getClass().getSimpleName());
+		oupt.writeKind(declarationKind);
+		oupt.writeShort(OBJECT_SEQU);
+
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
+		
+		// *** Declaration
+		oupt.writeString(identifier);
+		oupt.writeString(externalIdent);
+		oupt.writeType(type);
+		oupt.writeObj(declaredIn);
+		
+		// *** DeclarationScope
+		oupt.writeString(sourceFileName);
+		oupt.writeBoolean(hasLocalClasses);
+		LabelList.writeLabelList(labelList, oupt);
+		DeclarationList decls = prep(declarationList);
+		decls.writeObject(oupt);
+
+		// *** BlockDeclaration
+		if (declarationKind == ObjectKind.CompoundStatement) {
+			oupt.writeBoolean(isMainModule);
+			oupt.writeObjectList(statements);
+		}
+	}
+	
+	/// Read and return a MaybeBlockDeclaration object.
+	/// @param inpt the AttributeInputStream to read from
+	/// @param declarationKind the declarationKind code
+	/// @return the object read from the stream.
+	/// @throws IOException if something went wrong.
+	@SuppressWarnings("unchecked")
+	public static MaybeBlockDeclaration readObject(AttributeInputStream inpt,int declarationKind) throws IOException {
+		DeclarationScope scope = Global.getCurrentScope();
+		MaybeBlockDeclaration blk = new MaybeBlockDeclaration();
+		blk.declarationKind = declarationKind;
+		blk.OBJECT_SEQU = inpt.readSEQU(blk);
+		// *** SyntaxClass
+		blk.lineNumber = inpt.readShort();
+
+		// *** Declaration
+		blk.identifier = inpt.readString();
+		blk.externalIdent = inpt.readString();
+		blk.type = inpt.readType();
+		blk.declaredIn = (DeclarationScope) inpt.readObj();
+
+		// *** DeclarationScope
+		blk.sourceFileName = inpt.readString();
+		blk.hasLocalClasses = inpt.readBoolean();
+		blk.labelList = LabelList.readLabelList(inpt);
+		blk.declarationList = DeclarationList.readObject(inpt);
+
+		// *** BlockDeclaration
+		if (declarationKind == ObjectKind.CompoundStatement) {
+			blk.isMainModule = inpt.readBoolean();
+			blk.statements = (ObjectList<Statement>) inpt.readObjectList();
+		}
+
+		Global.setScope(scope);
+		blk.isPreCompiledFromFile = inpt.jarFileName;
+		Util.TRACE_INPUT("MaybeBlockDeclaration: " + blk);
+		return(blk);
+	}
 
 }

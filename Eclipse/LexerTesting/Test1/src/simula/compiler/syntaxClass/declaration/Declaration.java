@@ -231,10 +231,10 @@ public abstract class Declaration extends SyntaxClass {
 	protected void verifyTree(final Object head) {
 		if(head instanceof Declaration decl) {
 			if(! decl.identifier.equals(this.declaredIn.identifier)) {
-				IO.println("\nDeclaration.verifyTree: Treating: "+this);
-				IO.println("Declaration.verifyTree: "+this.getClass().getSimpleName()+".head="+head);
-				IO.println("Declaration.verifyTree: head.identifier=" + decl.identifier);
-				IO.println("Declaration.verifyTree: declaredIn.identifier=" + declaredIn.identifier);
+				System.out.println("\nDeclaration.verifyTree: Treating: "+this);
+				System.out.println("Declaration.verifyTree: "+this.getClass().getSimpleName()+".head="+head);
+				System.out.println("Declaration.verifyTree: head.identifier=" + decl.identifier);
+				System.out.println("Declaration.verifyTree: declaredIn.identifier=" + declaredIn.identifier);
 				Util.IERR("verifyTree FAILED");
 			}
 		}

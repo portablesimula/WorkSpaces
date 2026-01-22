@@ -8,7 +8,7 @@ package simula.compiler.syntaxClass.declaration;
 // import java.lang.classfile.CodeBuilder;
 // import java.lang.classfile.Label;
 // import java.lang.classfile.constantpool.ConstantPoolBuilder;
-import java.lang.constant.ClassDesc;
+//import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Stack;
@@ -21,7 +21,7 @@ import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.statement.Statement;
-import simula.compiler.utilities.RTS;
+//import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
@@ -73,11 +73,11 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// Note: First Local Variable is used by the outermost try-catch block.
 	public int nLocalVariables = 1;
 	
-	/// Get current ClassDesc.
-	/// @return the current ClassDesc.
-	public static ClassDesc currentClassDesc() {
-		return(currentBlock.getClassDesc());
-	}
+//	/// Get current ClassDesc.
+//	/// @return the current ClassDesc.
+//	public static ClassDesc currentClassDesc() {
+//		return(currentBlock.getClassDesc());
+//	}
 	
 	/// Allocate slot for a local variable.
 	/// @param type variable's type.
@@ -520,7 +520,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 		if(Option.internal.PRINT_SYNTAX_TREE > 2) {
 			for(Statement s:statements) s.printTree(indent, this);
 		} else {
-			IO.println(edTreeIndent(indent) + ' ' + this.identifier + ' ' + (statements.size()) + " Statements ...");
+			System.out.println(edTreeIndent(indent) + ' ' + this.identifier + ' ' + (statements.size()) + " Statements ...");
 		}
 	}
 	

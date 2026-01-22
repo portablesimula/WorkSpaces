@@ -11,7 +11,7 @@ import java.io.IOException;
 // import java.lang.classfile.Label;
 // import java.lang.classfile.attribute.SourceFileAttribute;
 // import java.lang.classfile.constantpool.ConstantPoolBuilder;
-import java.lang.constant.ClassDesc;
+//import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
 
@@ -24,9 +24,9 @@ import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.statement.BlockStatement;
 import simula.compiler.syntaxClass.statement.DummyStatement;
 import simula.compiler.syntaxClass.statement.Statement;
-import simula.compiler.utilities.ClassHierarchy;
+//import simula.compiler.utilities.ClassHierarchy;
 import simula.compiler.utilities.DeclarationList;
-import simula.compiler.utilities.RTS;
+//import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.KeyWord;
@@ -241,7 +241,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		if (declarationKind == ObjectKind.CompoundStatement)
 			doCompoundStatementCoding();
 		else if (this.isPreCompiledFromFile != null) {
-			if(Option.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
+			if(Option.verbose) System.out.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
 		} else doSubBlockCoding();
 	}
 
@@ -331,16 +331,16 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		JavaSourceFileCoder.code("}", "End of " + declarationKind + " Statements");
 	}
 	
-	// ***********************************************************************************************
-	// *** ByteCoding: getClassDesc
-	// ***********************************************************************************************
-	@Override
-	public ClassDesc getClassDesc() {
-		if (declarationKind == ObjectKind.CompoundStatement)
-			return ((DeclarationScope)declaredIn).getClassDesc();
-		return(RTS.CD.classDesc(externalIdent));
-	}
-
+//	// ***********************************************************************************************
+//	// *** ByteCoding: getClassDesc
+//	// ***********************************************************************************************
+//	@Override
+//	public ClassDesc getClassDesc() {
+//		if (declarationKind == ObjectKind.CompoundStatement)
+//			return ((DeclarationScope)declaredIn).getClassDesc();
+//		return(RTS.CD.classDesc(externalIdent));
+//	}
+//
 //	// ***********************************************************************************************
 //	// *** ByteCoding: buildClassFile
 //	// ***********************************************************************************************
@@ -446,7 +446,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 //		}
 //		Global.enterScope(this);
 //		if (this.isPreCompiledFromFile != null) {
-//			if(Option.verbose) IO.println("Skip  buildClassFile: "+this.identifier);			
+//			if(Option.verbose) System.out.println("Skip  buildClassFile: "+this.identifier);			
 //		} else {
 //			try { createJavaClassFile(); } catch (IOException e) { e.printStackTrace();	}
 //		}
@@ -524,7 +524,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 //		String block = ObjectKind.edit(declarationKind);
 //		String tail = (IS_SEMANTICS_CHECKED()) ? "  BL=" + getRTBlockLevel() : "";
 //		if(isPreCompiledFromFile != null) tail = tail + " From: " + isPreCompiledFromFile;
-//		IO.println(edTreeIndent(indent) + block + " " + identifier + tail + "  declaredIn="+this.declaredIn);
+//		System.out.println(edTreeIndent(indent) + block + " " + identifier + tail + "  declaredIn="+this.declaredIn);
 //		if(labelList != null) labelList.printTree(indent+1,this);
 //		printDeclarationList(indent+1);
 //		printStatementList(indent+1);

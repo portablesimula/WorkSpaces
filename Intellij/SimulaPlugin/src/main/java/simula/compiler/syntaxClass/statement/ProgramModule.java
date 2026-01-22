@@ -8,24 +8,26 @@ package simula.compiler.syntaxClass.statement;
 import java.io.IOException;
 import java.util.Vector;
 
-//import simula.compiler.parsing.Parse;
-//import simula.compiler.syntaxClass.Type;
-//import simula.compiler.syntaxClass.declaration.BlockDeclaration;
-//import simula.compiler.syntaxClass.declaration.ClassDeclaration;
-//import simula.compiler.syntaxClass.declaration.ConnectionBlock;
-//import simula.compiler.syntaxClass.declaration.Declaration;
-//import simula.compiler.syntaxClass.declaration.DeclarationScope;
-//import simula.compiler.syntaxClass.declaration.ExternalDeclaration;
-//import simula.compiler.syntaxClass.declaration.MaybeBlockDeclaration;
-//import simula.compiler.syntaxClass.declaration.ProcedureDeclaration;
-//import simula.compiler.syntaxClass.declaration.StandardClass;
-//import simula.compiler.syntaxClass.declaration.StandardProcedure;
-//import simula.compiler.syntaxClass.expression.VariableExpression;
-//import simula.compiler.utilities.Global;
-//import simula.compiler.utilities.KeyWord;
-//import simula.compiler.utilities.ObjectKind;
-//import simula.compiler.utilities.Option;
-//import simula.compiler.utilities.Util;
+import com.intellij.lang.PsiBuilder;
+
+import simula.compiler.parsing.Parse;
+import simula.compiler.syntaxClass.Type;
+import simula.compiler.syntaxClass.declaration.BlockDeclaration;
+import simula.compiler.syntaxClass.declaration.ClassDeclaration;
+import simula.compiler.syntaxClass.declaration.ConnectionBlock;
+import simula.compiler.syntaxClass.declaration.Declaration;
+import simula.compiler.syntaxClass.declaration.DeclarationScope;
+import simula.compiler.syntaxClass.declaration.ExternalDeclaration;
+import simula.compiler.syntaxClass.declaration.MaybeBlockDeclaration;
+import simula.compiler.syntaxClass.declaration.ProcedureDeclaration;
+import simula.compiler.syntaxClass.declaration.StandardClass;
+import simula.compiler.syntaxClass.declaration.StandardProcedure;
+import simula.compiler.syntaxClass.expression.VariableExpression;
+import simula.compiler.utilities.Global;
+import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
+import simula.compiler.utilities.Util;
 
 /// Simula Program Module.
 /// 
@@ -53,126 +55,127 @@ import java.util.Vector;
 /// @author Øystein Myhre Andersen
 public final class ProgramModule extends Statement {
 	
-//	/// The Variable SYSIN.
-//	final private VariableExpression sysin;
-//	
-//	/// The Variable SYSOUT.
-//	final private VariableExpression sysout;
-//	
-//	/// The mainModule declaration.
-//	public DeclarationScope mainModule;
-//
-//	/// The external head
-//	public Vector<ExternalDeclaration> externalHead;
-//
-//	/// Returns the mainModule identifier.
-//	/// @return the mainModule identifier
-//	public String getIdentifier() { return(mainModule.identifier); }
-//
-//	/// Returns the relative file name.
-//	/// @return the relative file name
-//	public String getRelativeAttributeFileName() {
-//		if(mainModule.declarationKind==ObjectKind.Class) return(Global.packetName+"/CLASS.AF");
-//		if(mainModule.declarationKind==ObjectKind.Procedure) return(Global.packetName+"/PROCEDURE.AF");
-//		else return(null);
-//	}
-//	  
-//	/// Returns true if this program mainModule is executable.
-//	/// @return true if this program mainModule is executable
-//	public boolean isExecutable() {
-//		if(mainModule.declarationKind==ObjectKind.SimulaProgram) return(true);
-//		if(mainModule.declarationKind==ObjectKind.PrefixedBlock) return(true);
-//		else return(false);
-//	}
+	/// The Variable SYSIN.
+	final private VariableExpression sysin;
+	
+	/// The Variable SYSOUT.
+	final private VariableExpression sysout;
+	
+	/// The mainModule declaration.
+	public DeclarationScope mainModule;
+
+	/// The external head
+	public Vector<ExternalDeclaration> externalHead;
+
+	/// Returns the mainModule identifier.
+	/// @return the mainModule identifier
+	public String getIdentifier() { return(mainModule.identifier); }
+
+	/// Returns the relative file name.
+	/// @return the relative file name
+	public String getRelativeAttributeFileName() {
+		if(mainModule.declarationKind==ObjectKind.Class) return(Global.packetName+"/CLASS.AF");
+		if(mainModule.declarationKind==ObjectKind.Procedure) return(Global.packetName+"/PROCEDURE.AF");
+		else return(null);
+	}
+	  
+	/// Returns true if this program mainModule is executable.
+	/// @return true if this program mainModule is executable
+	public boolean isExecutable() {
+		if(mainModule.declarationKind==ObjectKind.SimulaProgram) return(true);
+		if(mainModule.declarationKind==ObjectKind.PrefixedBlock) return(true);
+		else return(false);
+	}
 
 	/// Create a new ProgramModule.
-	public ProgramModule() {
-		super("ProgramModule", 0);
-//		sysin=new VariableExpression("sysin");
-//		sysout=new VariableExpression("sysout");
-//		try	{
-//			if(Option.internal.TRACE_PARSE) Parse.TRACE("Parse Program");
-//			Global.setScope(StandardClass.BASICIO);		    	// BASICIO Begin
-//			new ConnectionBlock(sysin, null)                     	//    Inspect sysin do
-//			     .setClassDeclaration(StandardClass.Infile);
-//			new ConnectionBlock(sysout, null)                    	//    Inspect sysout do
-//			     .setClassDeclaration(StandardClass.Printfile);
-//			Global.getCurrentScope().sourceBlockLevel=0;
-//			while(Parse.accept(KeyWord.EXTERNAL)) {
-//				externalHead = ExternalDeclaration.expectExternalHead(StandardClass.BASICIO);					
-//				Parse.expect(KeyWord.SEMICOLON);
-//			}
-//			// Now: Looking for ( program | procedure-declaration | class-declaration )
-//			String ident=Parse.acceptIdentifier();
-//			if(ident!=null) {
-//				if(Parse.accept(KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(ident);
-//			    else { Parse.saveCurrentToken(); mainModule = doParseProgram(); }
-//			}
-//			else if(Parse.accept(KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(null);
-//			else {
-//				Type type=Parse.acceptType();
-//			    if(Parse.accept(KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(type);
-//			    else mainModule = doParseProgram();
-//			}
-//			StandardClass.BASICIO.declarationList.add(mainModule);
-//			
-//			if(Parse.currentToken.keyWord != KeyWord.EOF) {
-//				Util.warning("Text after Program end - starting with " + Parse.currentToken);
-//			}
-//			
-//			if(Option.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
-//		} catch(Throwable e) {
-//			e.printStackTrace();
-//			Util.IERR();
-//		}
+	public ProgramModule(PsiBuilder simBuilder) {
+		super("", 0);
+		sysin=new VariableExpression("sysin");
+		sysout=new VariableExpression("sysout");
+		try	{
+			if(Option.internal.TRACE_PARSE) Parse.TRACE("Parse Program");
+			Global.setScope(StandardClass.BASICIO);		    	// BASICIO Begin
+			new ConnectionBlock(sysin, null)                     	//    Inspect sysin do
+			     .setClassDeclaration(StandardClass.Infile);
+			new ConnectionBlock(sysout, null)                    	//    Inspect sysout do
+			     .setClassDeclaration(StandardClass.Printfile);
+			Global.getCurrentScope().sourceBlockLevel=0;
+			while(Parse.accept(simBuilder, KeyWord.EXTERNAL)) {
+				externalHead = ExternalDeclaration.expectExternalHead(simBuilder, StandardClass.BASICIO);					
+				Parse.expect(simBuilder, KeyWord.SEMICOLON);
+			}
+			// Now: Looking for ( program | procedure-declaration | class-declaration )
+			String ident=Parse.acceptIdentifier(simBuilder);
+			if(ident!=null) {
+				if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, ident);
+			    else { Parse.saveCurrentToken(); mainModule = doParseProgram(simBuilder); }
+			}
+			else if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(null, ident);
+			else {
+				Type type=Parse.acceptType(simBuilder);
+			    if(Parse.accept(simBuilder, KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type);
+			    else mainModule = doParseProgram(simBuilder);
+			}
+			StandardClass.BASICIO.declarationList.add(mainModule);
+			
+			if(Parse.currentToken(simBuilder).keyWord != KeyWord.EOF) {
+				Util.warning("Text after Program end - starting with " + Parse.currentToken(simBuilder));
+			}
+			
+			if(Option.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
+		} catch(Throwable e) {
+			e.printStackTrace();
+			Util.IERR();
+		}
 	}
 	
-//	/// Parse Simula Program by expecting a Statement.
-//	/// @return the Program Statement.
-//	private DeclarationScope doParseProgram() {
-//		BlockDeclaration mainBlock = new MaybeBlockDeclaration(Global.sourceName);
-//		mainBlock.isMainModule = true;
-//		mainBlock.declarationKind = ObjectKind.SimulaProgram;
-//		Statement program = Statement.expectStatement();
-//		mainBlock.statements.add(program);
-//		return mainBlock;
-//	}
-//
-//	@Override
-//	public void doChecking() {
-//		if(IS_SEMANTICS_CHECKED()) return;
-//		sysin.doChecking();
-//		sysout.doChecking();
-//		mainModule.doChecking();
-//		SET_SEMANTICS_CHECKED();
-//	}
-//  
-//	@Override
-//	public void doJavaCoding() { mainModule.doJavaCoding(); }
-//
-//	/// Create Java ClassFile.
-//	/// @throws IOException if something went wrong
-//	public void createJavaClassFile() throws IOException {
-//		Global.sourceLineNumber = lineNumber;
+	/// Parse Simula Program by expecting a Statement.
+	/// @return the Program Statement.
+	private DeclarationScope doParseProgram(final PsiBuilder simBuilder) {
+		BlockDeclaration mainBlock = new MaybeBlockDeclaration(Global.sourceName);
+		mainBlock.isMainModule = true;
+		mainBlock.declarationKind = ObjectKind.SimulaProgram;
+		Statement program = Statement.expectStatement(simBuilder);
+		mainBlock.statements.add(program);
+		return mainBlock;
+	}
+
+	@Override
+	public void doChecking() {
+		if(IS_SEMANTICS_CHECKED()) return;
+		sysin.doChecking();
+		sysout.doChecking();
+		mainModule.doChecking();
+		SET_SEMANTICS_CHECKED();
+	}
+  
+	@Override
+	public void doJavaCoding() { mainModule.doJavaCoding(); }
+
+	/// Create Java ClassFile.
+	/// @throws IOException if something went wrong
+	public void createJavaClassFile() throws IOException {
+		Global.sourceLineNumber = lineNumber;
 //		mainModule.createJavaClassFile();
-//	}
-//
-//	@Override
-//	public void print(final int indent) { mainModule.print(0); }
-//
-//	@Override
-//	public void printTree(final int indent, final Object head) {
-//		IO.println("BASICIO");
-//		IO.println("    ... Standard Classes and Procedures");
-//		for(Declaration decl:StandardClass.BASICIO.declarationList) {
-//			if(decl instanceof StandardProcedure) ; // Nothing
-//			else if(decl instanceof StandardClass) ; // Nothing
-//			else decl.printTree(1,this);
-//		}
-//		IO.println("=================================================================");
-//	}
-//	
-//	@Override
-//	public String toString() { return((mainModule==null)?"":""+mainModule.identifier); }
+		Util.IERR();
+	}
+
+	@Override
+	public void print(final int indent) { mainModule.print(0); }
+
+	@Override
+	public void printTree(final int indent, final Object head) {
+		System.out.println("BASICIO");
+		System.out.println("    ... Standard Classes and Procedures");
+		for(Declaration decl:StandardClass.BASICIO.declarationList) {
+			if(decl instanceof StandardProcedure) ; // Nothing
+			else if(decl instanceof StandardClass) ; // Nothing
+			else decl.printTree(1,this);
+		}
+		System.out.println("=================================================================");
+	}
+	
+	@Override
+	public String toString() { return((mainModule==null)?"":""+mainModule.identifier); }
 	
 }

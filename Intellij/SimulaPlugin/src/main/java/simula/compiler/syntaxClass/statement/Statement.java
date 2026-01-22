@@ -5,38 +5,29 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.statement;
 
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-
-//import java.lang.classfile.CodeBuilder;
+// import java.lang.classfile.CodeBuilder;
 
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 
-//import simula.compiler.JavaSourceFileCoder;
-//import simula.compiler.parsing.Parse;
+import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.declaration.DeclarationScope;
+import simula.compiler.syntaxClass.declaration.LabelDeclaration;
 import simula.compiler.syntaxClass.declaration.MaybeBlockDeclaration;
+import simula.compiler.syntaxClass.declaration.PrefixedBlockDeclaration;
 import simula.compiler.syntaxClass.expression.AssignmentOperation;
+import simula.compiler.syntaxClass.expression.Expression;
+import simula.compiler.syntaxClass.expression.VariableExpression;
+import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.LabelList;
+import simula.compiler.utilities.ObjectList;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.lexer.Identifier;
-//import simula.compiler.syntaxClass.declaration.DeclarationScope;
-//import simula.compiler.syntaxClass.declaration.LabelDeclaration;
-//import simula.compiler.syntaxClass.declaration.MaybeBlockDeclaration;
-//import simula.compiler.syntaxClass.declaration.PrefixedBlockDeclaration;
-//import simula.compiler.syntaxClass.expression.Expression;
-//import simula.compiler.syntaxClass.expression.VariableExpression;
-//import simula.compiler.utilities.Global;
-//import simula.compiler.utilities.KeyWord;
-//import simula.compiler.utilities.LabelList;
-//import simula.compiler.utilities.ObjectList;
-//import simula.compiler.utilities.Option;
-//import simula.compiler.utilities.Util;
-import simula.lexer.KeyWordToken;
 import simula.lexer.SimulaElementTypes;
 import simula.lexer.SimulaToken;
-import simula.parser.SimPsiBuilder;
 
 /// Statement.
 /// 
@@ -73,78 +64,95 @@ public abstract class Statement extends SyntaxClass {
 	
 	/// Create a new Statement.
 	/// @param line the source line number
-	protected Statement(@NonNls @NotNull String debugName, int line) {
+	protected Statement(String debugName, int line) {
 		super(debugName);
 		lineNumber=line;
 	}
 
-//	/// Parse a statement.
-//	/// @return the statement
-//	public static Statement expectStatement() {
-//		ObjectList<LabelDeclaration> labels = null;
-//		int lineNumber=Parse.currentToken.lineNumber;
+	/// Parse a statement.
+	/// @return the statement
+	public static Statement expectStatement(PsiBuilder simBuilder) {
+		ObjectList<LabelDeclaration> labels = null;
+		int lineNumber=Parse.currentToken(simBuilder).lineNumber;
 //		if (Option.internal.TRACE_PARSE)
 //			Util.TRACE("Statement.doParse: LabeledStatement: lineNumber="+lineNumber+", current=" + Parse.currentToken	+ ", prev=" + Parse.prevToken);
-//		String ident = Parse.acceptIdentifier();
-//		while (Parse.accept(KeyWord.COLON)) {
-//			if (ident != null) {
-//				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
-//				LabelDeclaration label = new LabelDeclaration(ident);
-//				labels.add(label);
-//				DeclarationScope scope = Global.getCurrentScope();
-//				if(scope.labelList == null) scope.labelList = new LabelList(scope); 
-//				scope.labelList.add(label);
-//			} else Util.error("Missplaced ':'");
-//			ident = Parse.acceptIdentifier();
-//		}
-//		if(ident!=null) Parse.saveCurrentToken(); // Not Label: Pushback
-//		Statement statement = expectUnlabeledStatement();
-//		if (labels != null && statement != null)
-//			statement = new LabeledStatement(lineNumber,labels, statement);
-//		return (statement);
-//	}
+		String ident = Parse.acceptIdentifier(simBuilder);
+		while (Parse.accept(simBuilder, KeyWord.COLON)) {
+			if (ident != null) {
+				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
+				LabelDeclaration label = new LabelDeclaration(ident);
+				labels.add(label);
+				DeclarationScope scope = Global.getCurrentScope();
+				if(scope.labelList == null) scope.labelList = new LabelList(scope); 
+				scope.labelList.add(label);
+			} else Util.error("Missplaced ':'");
+			ident = Parse.acceptIdentifier(simBuilder);
+		}
+		if(ident!=null) Parse.saveCurrentToken(); // Not Label: Pushback
+		Statement statement = expectUnlabeledStatement(simBuilder);
+		if (labels != null && statement != null)
+			statement = new LabeledStatement(lineNumber,labels, statement);
+		return (statement);
+	}
 
-//    public static void parseStatement(SimPsiBuilder simBuilder) {
-    public static void parseStatement(PsiBuilder simBuilder) {
-        IElementType tokenType = simBuilder.getTokenType();
-//        System.out.println("Statement.parseStatement: tokenType="+tokenType.getClass().getSimpleName()+" "+tokenType+" "+simBuilder.getTokenText());
-        final PsiBuilder.Marker statementMarker = simBuilder.mark();
-        System.out.println("Statement.parseStatement: statementMarker="+statementMarker);
 
-//        switch(((KeyWordToken)tokenType).keyWord) {
-//        SimulaToken simToken = simBuilder.getSimToken();
-//        SimulaToken simToken = (SimulaToken) simBuilder.getTokenType(); // ??????????????
-        SimulaToken simToken = getSimToken(simBuilder);
-        switch(simToken.keyWord) {
-        case KeyWord.BEGIN:
-            System.out.println("\nStatement.parseStatement: BEGIN ==> parseBlock");
-//            Util.IERR("Statement.BEGIN");
-            MaybeBlockDeclaration.parseBlock(simBuilder);
-            System.out.println("\nStatement.parseStatement: END BLOCK_ELEMENT ==> CALL assignMarker.done: "+statementMarker);
-//            statementMarker.done(SimulaElementTypes.BLOCK_ELEMENT);
-            statementMarker.done(new MaybeBlockDeclaration("BlockIDENT"));
-            break;
+//  public static void parseStatement(SimPsiBuilder simBuilder) {
+  public static Statement expectUnlabeledStatement(PsiBuilder simBuilder) {
+      IElementType tokenType = simBuilder.getTokenType();
+//      System.out.println("Statement.parseStatement: tokenType="+tokenType.getClass().getSimpleName()+" "+tokenType+" "+simBuilder.getTokenText());
+      final PsiBuilder.Marker statementMarker = simBuilder.mark();
+      System.out.println("Statement.parseStatement: statementMarker="+statementMarker);
+
+      SimulaToken simToken = getSimToken(simBuilder);
+      switch(simToken.keyWord) {
+      case KeyWord.BEGIN:
+          System.out.println("\nStatement.parseStatement: BEGIN ==> parseBlock");
+//          Util.IERR("Statement.BEGIN");
+          MaybeBlockDeclaration.parseBlock(simBuilder);
+          System.out.println("\nStatement.parseStatement: END BLOCK_ELEMENT ==> CALL assignMarker.done: "+statementMarker);
+//          statementMarker.done(SimulaElementTypes.BLOCK_ELEMENT);
+          statementMarker.done(new MaybeBlockDeclaration("BlockIDENT"));
+          break;
 //	    case KeyWord.SEMICOLON:
 //	    	// Parse.nextToken(); return (new DummyStatement(lineNumber)); // Dummy Statement
 //	    	DummyStatement.parseDummyStatement(simBuilder);
 //	    	break;
-        case KeyWord.IDENTIFIER:
-            System.out.println("\nStatement.parseStatement: IDENTIFIER ==> parseAssignment");
-//            Util.IERR("Statement.IDENTIFIER");
-        	AssignmentOperation.parseAssignment(simBuilder);
-            System.out.println("\nSimulaParser.parseAssignment: END ASSIGNMENT ==> CALL statementMarker.done: "+statementMarker);
-            statementMarker.done(SimulaElementTypes.STATEMENT);
-        	break;
+      case KeyWord.IDENTIFIER, KeyWord.NEW, KeyWord.THIS, KeyWord.BEGPAR:
+          System.out.println("\nStatement.parseStatement: IDENTIFIER ==> parseAssignment");
+//          Util.IERR("Statement.IDENTIFIER");
+      	
+      		Expression expr = Expression.acceptExpression(simBuilder);
+      		if(expr!=null) {
+      			if(expr instanceof VariableExpression var) {
+      				if (Parse.accept(simBuilder, KeyWord.BEGIN)) {
+      					Util.IERR("Statement.expectUnlabeledStatement: NOT IMPL");
+//      					//return new BlockStatement(PrefixedBlockDeclaration.expectPrefixedBlock(var,false));
+//      					Statement prfblk = new BlockStatement(PrefixedBlockDeclaration.expectPrefixedBlock(var,false));
+//      					statementMarker.done(prfblk);
+//      					return prfblk;
+      				}
+      			}
+//      			Statement statement = new StandaloneExpression(lineNumber,expr);
+      			Statement statement = new StandaloneExpression(simBuilder, Global.sourceLineNumber, expr);
+      			statementMarker.done(statement);
+      			return statement;
+      		}
+      	
+
+//          statementMarker.done(SimulaElementTypes.STATEMENT);
+      	break;
 		default:
 //	        Util.IERR("Statement.default");
 	        // Error handling or consuming unknown tokens
-            System.out.println("\nSimulaParser.parseAssignment: CALL statementMarker.done: "+statementMarker);
-            System.out.println("\nStatement.parseStatement: default " + simToken);
-            statementMarker.error("Statement.parseStatement: default " + simToken);
+          System.out.println("\nSimulaParser.parseAssignment: CALL statementMarker.done: "+statementMarker);
+          System.out.println("\nStatement.parseStatement: default " + simToken);
+          statementMarker.error("Statement.parseStatement: default " + simToken);
 	        simBuilder.advanceLexer();
 			break;
-        }
-    }
+      }
+      return null;
+  }
+
 
 //	/// Parse Utility: Expect an unlabeled statement.
 //	/// @return the resulting statement
@@ -157,7 +165,7 @@ public abstract class Statement extends SyntaxClass {
 //		    case KeyWord.IF:    Parse.nextToken(); return (new ConditionalStatement(lineNumber));
 //		    case KeyWord.GOTO:  Parse.nextToken(); return (new GotoStatement(lineNumber));
 //		    case KeyWord.GO:    Parse.nextToken(); 
-//				        if (!Parse.accept(KeyWord.TO))	Util.error("Missing 'TO' after 'GO'");
+//				        if (!Parse.accept(simBuilder, KeyWord.TO))	Util.error("Missing 'TO' after 'GO'");
 //				        return (new GotoStatement(lineNumber));
 //		    case KeyWord.FOR:        Parse.nextToken(); return (new ForStatement(lineNumber));
 //		    case KeyWord.WHILE:      Parse.nextToken(); return (new WhileStatement(lineNumber));
@@ -176,7 +184,7 @@ public abstract class Statement extends SyntaxClass {
 //		         Expression expr = Expression.acceptExpression();
 //		         if(expr!=null) {
 //		        	 if(expr instanceof VariableExpression var) {
-//		        		 if (Parse.accept(KeyWord.BEGIN))
+//		        		 if (Parse.accept(simBuilder, KeyWord.BEGIN))
 //		        			 return new BlockStatement(PrefixedBlockDeclaration.expectPrefixedBlock(var,false));
 //		        	 }
 //		        	 return (new StandaloneExpression(lineNumber,expr));
@@ -185,14 +193,14 @@ public abstract class Statement extends SyntaxClass {
 //    	Parse.skipMisplacedCurrentSymbol();
 //    	return(new DummyStatement(lineNumber));
 //	}
-//
-//	@Override
-//	public void doJavaCoding() {
-//		Global.sourceLineNumber=lineNumber;
-//		ASSERT_SEMANTICS_CHECKED();
-//		JavaSourceFileCoder.code(toJavaCode() + ';');
-//	}
-//
+
+	@Override
+	public void doJavaCoding() {
+		Global.sourceLineNumber=lineNumber;
+		ASSERT_SEMANTICS_CHECKED();
+		JavaSourceFileCoder.code(toJavaCode() + ';');
+	}
+
 //	/// Build Java ByteCode.
 //	@Override
 //	public void buildByteCode(CodeBuilder codeBuilder) {

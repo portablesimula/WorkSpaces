@@ -6,28 +6,24 @@
 package simula.compiler.syntaxClass;
 
 import java.io.IOException;
-//import java.lang.classfile.CodeBuilder;
+// import java.lang.classfile.CodeBuilder;
 
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import com.intellij.lang.Language;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 
+import simula.compiler.AttributeInputStream;
+import simula.compiler.AttributeOutputStream;
+import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.parsing.Parse;
+import simula.compiler.syntaxClass.declaration.Declaration;
+import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.Util;
 import simula.lang.SimulaLanguage;
-import simula.lexer.KeyWordToken;
 import simula.lexer.SimulaToken;
-
-//import simula.compiler.AttributeInputStream;
-//import simula.compiler.AttributeOutputStream;
-//import simula.compiler.JavaSourceFileCoder;
-//import simula.compiler.parsing.Parse;
-//import simula.compiler.syntaxClass.declaration.Declaration;
-//import simula.compiler.utilities.Global;
-//import simula.compiler.utilities.Util;
 
 /// The class SyntaxClass.
 /// 
@@ -98,12 +94,6 @@ import simula.lexer.SimulaToken;
 /// 
 /// @author Øystein Myhre Andersen
 public abstract class SyntaxClass extends IElementType {
-	
-	public SyntaxClass(@NonNls @NotNull String debugName) {
-		super(debugName, SimulaLanguage.INSTANCE);
-		// TODO Auto-generated constructor stub
-	}
-
 	/// Controls semantic checking.
 	/// 
 	/// Set true when the method doChecking() has been completed.
@@ -118,16 +108,19 @@ public abstract class SyntaxClass extends IElementType {
 	/// The source line number
 	public int lineNumber;
 	
-//	/// Set source line number.
-//	protected void setLineNumber() {
-//		Global.sourceLineNumber = lineNumber;
-//	}
-//
-//	/// Create a new SyntaxClass.
+	/// Set source line number.
+	protected void setLineNumber() {
+		Global.sourceLineNumber = lineNumber;
+	}
+
+	/// Create a new SyntaxClass.
 //	protected SyntaxClass() {
 //		lineNumber = Global.sourceLineNumber;
 //	}
-
+	public SyntaxClass(@NonNls @NotNull String debugName) {
+		super(debugName, SimulaLanguage.INSTANCE);
+		lineNumber = Global.sourceLineNumber;
+	}
     
     public static SimulaToken getSimToken(PsiBuilder simBuilder) {
         return (SimulaToken)simBuilder.getTokenType();
@@ -146,15 +139,15 @@ public abstract class SyntaxClass extends IElementType {
 //        }
     }
 
-//	/// Perform semantic checking.
-//	/// 
-//	/// This must be redefined in every subclass.
-//	public void doChecking() {
-//		if (IS_SEMANTICS_CHECKED())
-//			return;
-//		Global.sourceLineNumber = lineNumber;
-//		Util.IERR("The method 'doChecking' needs a redefinition in "+this.getClass().getSimpleName());
-//	}
+	/// Perform semantic checking.
+	/// 
+	/// This must be redefined in every subclass.
+	public void doChecking() {
+		if (IS_SEMANTICS_CHECKED())
+			return;
+		Global.sourceLineNumber = lineNumber;
+		Util.IERR("The method 'doChecking' needs a redefinition in "+this.getClass().getSimpleName());
+	}
 
 	/// Set semantic checked.
 	/// 
@@ -172,16 +165,16 @@ public abstract class SyntaxClass extends IElementType {
 
 	/// Assert that semantic checking done.
 	protected void ASSERT_SEMANTICS_CHECKED() {
-//		if (!CHECKED) {
-//			IO.println("FATAL error - THE Semantic checker not called: " + this.getClass().getName() + ", " + this);
-//			System.exit(-1);
-//		}
-//		if (this instanceof Declaration decl) {
-//			if (decl.externalIdent == null) {
-//				Thread.dumpStack();
-//				Util.error("External Identifier is not set -- "+this);
-//			}
-//		}
+		if (!CHECKED) {
+			System.out.println("FATAL error - THE Semantic checker not called: " + this.getClass().getName() + ", " + this);
+			System.exit(-1);
+		}
+		if (this instanceof Declaration decl) {
+			if (decl.externalIdent == null) {
+				Thread.dumpStack();
+				Util.error("External Identifier is not set -- "+this);
+			}
+		}
 	}
 
 	/// Output possible declaration Java code.
@@ -189,8 +182,8 @@ public abstract class SyntaxClass extends IElementType {
 
 	/// Output Java code.
 	public void doJavaCoding() {
-//		Global.sourceLineNumber = lineNumber;
-//		JavaSourceFileCoder.code(toJavaCode());
+		Global.sourceLineNumber = lineNumber;
+		JavaSourceFileCoder.code(toJavaCode());
 	}
 
 	/// Generate Java code for this Syntax Class.
@@ -207,20 +200,20 @@ public abstract class SyntaxClass extends IElementType {
 //				+"\n\n            MAYBE: Use buildEvaluation(boolean destination,CodeBuilder codeBuilder)\n");
 //	}
 
-//	/// Utility print method.
-//	/// 
-//	/// @param indent number of spaces leading the line
-//	public void print(final int indent) {
-//		Util.println(edIndent(indent) + this);
-//	}
-//
-//	/// Utility print syntax tree method.
-//	/// 
-//	/// @param indent number of spaces leading the lines
-//	/// @param head the head of the tree.
-//	public void printTree(final int indent, final Object head) {
-//		Util.IERR("Method printTree need a redefinition in "+this.getClass().getSimpleName());
-//	}
+	/// Utility print method.
+	/// 
+	/// @param indent number of spaces leading the line
+	public void print(final int indent) {
+		Util.println(edIndent(indent) + this);
+	}
+
+	/// Utility print syntax tree method.
+	/// 
+	/// @param indent number of spaces leading the lines
+	/// @param head the head of the tree.
+	public void printTree(final int indent, final Object head) {
+		Util.IERR("Method printTree need a redefinition in "+this.getClass().getSimpleName());
+	}
 
 	/// Utility: Returns a number of blanks followed by qualification of this
 	/// 
@@ -250,20 +243,20 @@ public abstract class SyntaxClass extends IElementType {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 
-//	/// Write a SyntaxClass object to a AttributeOutputStream.
-//	/// @param oupt the AttributeOutputStream to write to.
-//	/// @throws IOException if something went wrong.
-//	public void writeObject(AttributeOutputStream oupt) throws IOException {
-//		Util.IERR("Method 'writeObject' needs a redefinition in "+this.getClass().getSimpleName());
-//	}
-//
-//	/// Read and return a SyntaxClass object.
-//	/// @param inpt the AttributeInputStream to read from
-//	/// @return the object read from the stream.
-//	/// @throws IOException if something went wrong.
-//	public static SyntaxClass readObject(AttributeInputStream inpt) throws IOException {
-//		Util.IERR("Method 'readObject' needs a redefiniton");
-//		return(null);
-//	}
+	/// Write a SyntaxClass object to a AttributeOutputStream.
+	/// @param oupt the AttributeOutputStream to write to.
+	/// @throws IOException if something went wrong.
+	public void writeObject(AttributeOutputStream oupt) throws IOException {
+		Util.IERR("Method 'writeObject' needs a redefinition in "+this.getClass().getSimpleName());
+	}
+
+	/// Read and return a SyntaxClass object.
+	/// @param inpt the AttributeInputStream to read from
+	/// @return the object read from the stream.
+	/// @throws IOException if something went wrong.
+	public static SyntaxClass readObject(AttributeInputStream inpt) throws IOException {
+		Util.IERR("Method 'readObject' needs a redefiniton");
+		return(null);
+	}
 
 }

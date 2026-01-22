@@ -6,6 +6,8 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
 import com.intellij.psi.tree.IElementType;
+
+import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.Util;
 import simula.lexer.SimulaElementTypes;
@@ -58,7 +60,9 @@ public class SimulaParser implements PsiParser {
 //            }
 
             System.out.println("\nSimulaParser.parse: CALL parseStatement(psiBuilder)");
-            Statement statement = Statement.expectUnlabeledStatement(psiBuilder);
+//            Statement statement = Statement.expectUnlabeledStatement(psiBuilder);
+            ProgramModule program = new ProgramModule(psiBuilder);
+
         }
 
         if (!psiBuilder.eof()) {

@@ -25,16 +25,24 @@ import javax.swing.text.StyledDocument;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
+import com.intellij.psi.tree.IElementType;
+
 import simula.compiler.parsing.DefaultScanner;
 import simula.compiler.parsing.SimulaScanner;
+import simula.compiler.utilities.Global;
+import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Token;
 import simula.compiler.utilities.Util;
+import simula.lexer.SimulaLexer;
+import simula.lexer.SimulaToken;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.StringTokenizer;
@@ -192,12 +200,131 @@ public class SourceTextPanel extends JPanel {
     /// Fill the text pane with text from the source file reader.
     /// @param reader the source file reader
     /// @param caretPosition argument
-    void fillTextPane(Reader reader,int caretPosition) {
-    	switch(lang) {
-			case Simula: fillTextPane(caretPosition,new SimulaScanner(reader,true)); break;
-//			case Java:   fillTextPane(caretPosition,new DefaultScanner(reader)); break;
-			default:     fillTextPane(caretPosition,new DefaultScanner(reader)); break;
+    /// @throws IOException 
+    void fillTextPane(CharSequence txt,int caretPosition) {
+    	try {
+    		switch(lang) {
+//				case Simula: fillTextPane(caretPosition,new SimulaScanner(reader,true)); break;
+    			case Simula: fillTextPaneUsingLexer(caretPosition, txt); break;
+//				case Simula: fillTextPaneUsingParser(caretPosition,txt); break;
+//				case Java:   fillTextPane(caretPosition,new DefaultScanner(reader)); break;
+//				default:     fillTextPane(caretPosition,new DefaultScanner(reader)); break;
+    		}
+    	} catch(IOException e) {
+    		
     	}
+    }
+    
+	// ****************************************************************
+	// *** fillTextPane -- USING PSI_BUILDER  (PARSER)
+	// ****************************************************************
+    /// Fill the text pane with text delivered from the scanner.
+    /// @param caretPosition the caretPosition after the operations
+    /// @param preScanner the scanner to use
+    /// @throws IOException 
+    private void fillTextPaneUsingParser(int caretPosition,CharSequence txt) throws IOException {
+//    	FileInputStream inpt = new FileInputStream(fileName);
+//		byte[] bytes = inpt.readAllBytes();
+//		CharSequence buffer = new String(bytes);
+    	
+        Global.TRACE_SCAN = true;
+        Global.TRACE_COMMENTS = true;
+
+//        SimulaLexer lexer = new SimulaLexer();
+//		CharSequence buffer = txt;
+//		int startOffset = 0;
+//		int endOffset = buffer.length();
+//		int initialState = 0;
+//	    lexer.start(buffer, startOffset, endOffset, initialState);
+	    
+	    PsiBuilder simBuilder = new PsiBuilder();
+	    simBuilder.start(txt);
+	    
+		int lineNumber=1;
+		StyledDocument lin=new DefaultStyledDocument(); addStylesToDocument(lin);
+        editTextPane.setEditable(false);
+    	doc.removeUndoableEditListener(undoListener);
+		try {
+			SimulaToken token;
+			doc.remove(0, doc.getLength());
+			lin.insertString(lin.getLength(),edLineNumber(lineNumber++),styleLineNumber);
+//			while((token=lexer.nextToken())!=null) {
+			while((token=(SimulaToken) lexer.getTokenType())!=null) {
+				lexer.advance();
+			    String text=token.text();
+			    Style style=getStyle(Token.getStyleCode(token.keyWord));
+			    
+			    if(token.keyWord == KeyWord.NEWLINE)
+					lin.insertString(lin.getLength(),edLineNumber(lineNumber++), styleLineNumber);
+				doc.insertString(doc.getLength(), text, style);
+		    }
+		} catch (BadLocationException ble) {
+			System.err.println("Couldn't insert text into text pane.");
+		}
+		if(lineNumber>500) this.AUTO_REFRESH=false;
+		lineNumbers.setStyledDocument(lin);
+    	doc.addUndoableEditListener(undoListener);
+        editTextPane.setEditable(true);
+	    editTextPane.setCaretPosition(caretPosition);
+    }
+    
+	// ****************************************************************
+	// *** fillTextPane -- USING LEXER
+	// ****************************************************************
+    /// Fill the text pane with text delivered from the scanner.
+    /// @param caretPosition the caretPosition after the operations
+    /// @param preScanner the scanner to use
+    /// @throws IOException 
+    private void fillTextPaneUsingLexer(int caretPosition, CharSequence txt) throws IOException {
+//    	FileInputStream inpt = new FileInputStream(fileName);
+//		byte[] bytes = inpt.readAllBytes();
+//		CharSequence buffer = new String(bytes);
+    	
+        Global.TRACE_SCAN = true;
+        Global.TRACE_COMMENTS = true;
+
+        SimulaLexer lexer = new SimulaLexer();
+		CharSequence buffer = txt;
+		int startOffset = 0;
+		int endOffset = buffer.length();
+		int initialState = 0;
+	    lexer.start(buffer, startOffset, endOffset, initialState);
+	    
+		int lineNumber=1;
+		StyledDocument lin=new DefaultStyledDocument(); addStylesToDocument(lin);
+        editTextPane.setEditable(false);
+    	doc.removeUndoableEditListener(undoListener);
+		try {
+			SimulaToken token;
+			doc.remove(0, doc.getLength());
+			lin.insertString(lin.getLength(),edLineNumber(lineNumber++),styleLineNumber);
+//			while((token=lexer.nextToken())!=null) {
+			while((token=(SimulaToken) lexer.getTokenType())!=null) {
+				lexer.advance();
+			    String text=token.text();
+			    Style style=getStyle(Token.getStyleCode(token.keyWord));
+			    
+//				StringTokenizer tokenizer=new StringTokenizer(text,"\n",true);
+//				while(tokenizer.hasMoreTokens()) {
+//					String item=tokenizer.nextToken();
+//					if(item.equals("\n"))
+//						lin.insertString(lin.getLength(),edLineNumber(lineNumber++), styleLineNumber);
+//					doc.insertString(doc.getLength(), item, style);
+//				}
+
+			    if(token.keyWord == KeyWord.NEWLINE)
+					lin.insertString(lin.getLength(),edLineNumber(lineNumber++), styleLineNumber);
+				doc.insertString(doc.getLength(), text, style);
+
+		    }
+		} catch (BadLocationException ble) {
+			System.err.println("Couldn't insert text into text pane.");
+		}
+		if(lineNumber>500) this.AUTO_REFRESH=false;
+		lineNumbers.setStyledDocument(lin);
+    	doc.addUndoableEditListener(undoListener);
+        editTextPane.setEditable(true);
+	    editTextPane.setCaretPosition(caretPosition);
     }
     
 	// ****************************************************************
@@ -248,7 +375,7 @@ public class SourceTextPanel extends JPanel {
     	int maxCaret=txt.length()-1;
     	if(pos>maxCaret) pos=maxCaret;
     	if(pos<0) pos=0;
-	    fillTextPane(new StringReader(txt),pos+count);
+	    fillTextPane(txt,pos+count);
 	}
     
 	// ****************************************************************

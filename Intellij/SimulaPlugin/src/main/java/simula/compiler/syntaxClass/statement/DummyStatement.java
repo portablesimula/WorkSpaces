@@ -6,20 +6,15 @@
 package simula.compiler.syntaxClass.statement;
 
 import java.io.IOException;
-//import java.lang.classfile.CodeBuilder;
+// import java.lang.classfile.CodeBuilder;
 
-import com.intellij.lang.PsiBuilder;
-
-import simula.compiler.syntaxClass.expression.AssignmentOperation;
-//import simula.compiler.AttributeInputStream;
-//import simula.compiler.AttributeOutputStream;
-//import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.AttributeInputStream;
+import simula.compiler.AttributeOutputStream;
+import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.utilities.Global;
-import simula.compiler.utilities.KeyWord;
-//import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.lexer.SimulaToken;
 
 /// Dummy Statement.
 /// 
@@ -45,26 +40,19 @@ public final class DummyStatement extends Statement {
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": DummyStatement: "+this);
 	}
 
-    public static void parseDummyStatement(PsiBuilder simBuilder) {
-        PsiBuilder.Marker dummyMarker = simBuilder.mark();
-        simBuilder.advanceLexer(); // consume semicolon
-        dummyMarker.done(new DummyStatement(Global.sourceLineNumber));
-        System.out.println("\nSimulaParser.parseAssignment: CALL dummyMarker.done: "+dummyMarker);
-    }
+	@Override
+	public void doChecking() {
+		if (IS_SEMANTICS_CHECKED())	return;
+		// No Checking
+		SET_SEMANTICS_CHECKED();
+	}
 
-//	@Override
-//	public void doChecking() {
-//		if (IS_SEMANTICS_CHECKED())	return;
-//		// No Checking
-//		SET_SEMANTICS_CHECKED();
-//	}
-//
-//	@Override
-//	public void doJavaCoding() { /* No Coding */
-//		ASSERT_SEMANTICS_CHECKED();
-//		JavaSourceFileCoder.code(";");
-//	}
-//
+	@Override
+	public void doJavaCoding() { /* No Coding */
+		ASSERT_SEMANTICS_CHECKED();
+		JavaSourceFileCoder.code(";");
+	}
+
 //	@Override
 //	public void buildByteCode(CodeBuilder codeBuilder) {
 //	}
@@ -72,42 +60,42 @@ public final class DummyStatement extends Statement {
 //	@Override
 //	public void print(final int indent) {
 //	}
-//	
-//	@Override
-//	public void printTree(final int indent, final Object head) {
-//	}
-//
-//	@Override
-//	public String toString() {
-//		return ("DUMMY at Line "+lineNumber+" in "+Global.getCurrentScope().identifier);
-//	}
-//
-//	// ***********************************************************************************************
-//	// *** Attribute File I/O
-//	// ***********************************************************************************************
-//	/// Default constructor used by Attribute File I/O
-//	private DummyStatement() { super(0); }
-//
-//	@Override
-//	public void writeObject(AttributeOutputStream oupt) throws IOException {
-//		Util.TRACE_OUTPUT("writeDummyStatement: " + this);
-//		oupt.writeKind(ObjectKind.DummyStatement);
-//		oupt.writeShort(OBJECT_SEQU);
-//		// *** SyntaxClass
-//		oupt.writeShort(lineNumber);
-//	}
-//
-//	/// Read and return a DummyStatement object.
-//	/// @param inpt the AttributeInputStream to read from
-//	/// @return the DummyStatement object read from the stream.
-//	/// @throws IOException if something went wrong.
-//	public static DummyStatement readObject(AttributeInputStream inpt) throws IOException {
-//		DummyStatement stm = new DummyStatement();
-//		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-//		// *** SyntaxClass
-//		stm.lineNumber = inpt.readShort();
-//		Util.TRACE_INPUT("DummyStatement: " + stm);
-//		return(stm);
-//	}
+	
+	@Override
+	public void printTree(final int indent, final Object head) {
+	}
+
+	@Override
+	public String toString() {
+		return ("DUMMY at Line "+lineNumber+" in "+Global.getCurrentScope().identifier);
+	}
+
+	// ***********************************************************************************************
+	// *** Attribute File I/O
+	// ***********************************************************************************************
+	/// Default constructor used by Attribute File I/O
+	private DummyStatement() { super("DummyStatement", 0); }
+
+	@Override
+	public void writeObject(AttributeOutputStream oupt) throws IOException {
+		Util.TRACE_OUTPUT("writeDummyStatement: " + this);
+		oupt.writeKind(ObjectKind.DummyStatement);
+		oupt.writeShort(OBJECT_SEQU);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
+	}
+
+	/// Read and return a DummyStatement object.
+	/// @param inpt the AttributeInputStream to read from
+	/// @return the DummyStatement object read from the stream.
+	/// @throws IOException if something went wrong.
+	public static DummyStatement readObject(AttributeInputStream inpt) throws IOException {
+		DummyStatement stm = new DummyStatement();
+		stm.OBJECT_SEQU = inpt.readSEQU(stm);
+		// *** SyntaxClass
+		stm.lineNumber = inpt.readShort();
+		Util.TRACE_INPUT("DummyStatement: " + stm);
+		return(stm);
+	}
 
 }
