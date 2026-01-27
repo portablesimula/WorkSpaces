@@ -93,7 +93,8 @@ public final class Util {
 	/// Perform FORCED EXIT.
 	private static void FORCED_EXIT() {
 		System.out.println("FORCED EXIT");
-		if (Global.console == null) System.exit(-1);
+//		if (Global.console == null)
+			System.exit(-1);
 	}
 
 	/// Print a internal error message.
@@ -177,7 +178,8 @@ public final class Util {
 			u = u.replace('\n', (char) 0);
 			Global.console.write(u + '\n');
 		}
-		else System.out.println(s);
+//		else
+			System.out.println(s);
 	}  
 
 	/// Print a error message.
@@ -185,7 +187,8 @@ public final class Util {
 	public static void printError(final String s) {
 		String u = s.replace('\r', (char) 0);
 		if (Global.console != null)	Global.console.writeError(u + '\n');
-		else System.err.println(u);
+//		else
+			System.err.println(u);
 	}  
 
 	/// Print a warning message.
@@ -193,7 +196,8 @@ public final class Util {
 	public static void printWarning(final String s) {
 		String u = s.replace('\r', (char) 0);
 		if (Global.console != null)	Global.console.writeWarning(u + '\n');
-		else System.err.println(u);
+//		else
+			System.err.println(u);
 	}  
 
     //*******************************************************************************

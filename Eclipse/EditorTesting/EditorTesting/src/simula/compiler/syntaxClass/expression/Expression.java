@@ -8,21 +8,12 @@ package simula.compiler.syntaxClass.expression;
 import simula.editor.PsiBuilder;
 
 import simula.compiler.parsing.Parse;
-
-//// import java.lang.classfile.CodeBuilder;
-
-//import simula.compiler.syntaxClass.SyntaxClass;
-//import simula.compiler.syntaxClass.Type;
-//import simula.compiler.utilities.KeyWord;
-//import simula.compiler.utilities.Option;
-//import simula.compiler.utilities.Util;
-import simula.lexer.CharacterConst;
-import simula.lexer.Identifier;
-import simula.lexer.IntegerConst;
-import simula.lexer.RealConst;
-import simula.lexer.SimpleString;
-import simula.lexer.SimulaToken;
-
+import simula.psi.LexToken;
+import simula.token.CharacterConst;
+import simula.token.Identifier;
+import simula.token.IntegerConst;
+import simula.token.RealConst;
+import simula.token.SimpleString;
 //import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
@@ -129,7 +120,7 @@ public abstract class Expression extends SyntaxClass {
 //		} else return(acceptSimpleExpression());
 //	} 
 	public static Expression acceptExpression(PsiBuilder simBuilder) {
-        SimulaToken simToken = getSimToken(simBuilder);
+        LexToken simToken = getSimToken(simBuilder);
 		if(Parse.accept(simBuilder, KeyWord.IF)) {
 //			Expression condition=acceptExpression();
 //			Parse.expect(simBuilder, KeyWord.THEN); Expression thenExpression=acceptSimpleExpression();
@@ -273,7 +264,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression acceptRelation(PsiBuilder simBuilder) {   // Metode-form      
 		Expression expr = acceptAdditiveOperation(simBuilder);
-		SimulaToken prevToken = null;
+		LexToken prevToken = null;
 		if((prevToken = Parse.acceptRelationalOperator(simBuilder)) != null)   { 
 			int opr = prevToken.keyWord;
 			expr = new RelationalOperation(expr,opr,acceptAdditiveOperation(simBuilder));
@@ -288,7 +279,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression acceptAdditiveOperation(PsiBuilder simBuilder) {
 		Expression expr=acceptUNIMULDIV(simBuilder);
-		SimulaToken prevToken = null;
+		LexToken prevToken = null;
 		while( (prevToken = Parse.acceptToken(simBuilder, KeyWord.PLUS,KeyWord.MINUS)) != null) { 
 //			int opr=Parse.prevToken.getKeyWord();
 			int opr=prevToken.keyWord;
@@ -304,7 +295,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression acceptUNIMULDIV(PsiBuilder simBuilder) {
 		Expression expr;
-		SimulaToken prevToken = null;
+		LexToken prevToken = null;
 		if((prevToken = Parse.acceptToken(simBuilder, KeyWord.PLUS,KeyWord.MINUS)) != null) {
 			int opr=prevToken.keyWord;
 			if(opr==KeyWord.PLUS) expr=acceptMULDIV(simBuilder);
@@ -320,7 +311,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression acceptMULDIV(PsiBuilder simBuilder) {
 		Expression expr=acceptEXPON(simBuilder);
-		SimulaToken prevToken = null;
+		LexToken prevToken = null;
 		while((prevToken = Parse.acceptToken(simBuilder, KeyWord.MUL,KeyWord.DIV,KeyWord.INTDIV)) != null) {
 			int opr = prevToken.keyWord;
 			expr = ArithmeticExpression.create(expr,opr,acceptEXPON(simBuilder));
@@ -364,7 +355,7 @@ public abstract class Expression extends SyntaxClass {
 		// Merk: Alt som kan stå foran et postfix (DOT, IS, IN og QUA) må være et BASICEXPR
 		if(Option.internal.TRACE_PARSE) Parse.TRACE("Expression: acceptExpression");
 		Expression expr=null;
-		SimulaToken prevToken = Parse.currentToken(simBuilder);
+		LexToken prevToken = Parse.currentToken(simBuilder);
 		if(Parse.accept(simBuilder, KeyWord.BEGPAR)) { expr = acceptExpression(simBuilder); Parse.expect(simBuilder, KeyWord.ENDPAR); }
 		else if(Parse.accept(simBuilder, KeyWord.INTEGERKONST)) expr = new Constant(Type.Integer,((IntegerConst)prevToken).value);
 		else if(Parse.accept(simBuilder, KeyWord.REALKONST)) expr = Constant.createRealType(((RealConst)prevToken).value);
@@ -379,8 +370,8 @@ public abstract class Expression extends SyntaxClass {
 //			String ident=Parse.acceptIdentifier(simBuilder);
 			
 //			public static String acceptIdentifier(final PsiBuilder simBuilder) {
-			SimulaToken prevToken2 = Parse.currentToken(simBuilder) ;
-				SimulaToken token = null;
+			LexToken prevToken2 = Parse.currentToken(simBuilder) ;
+				LexToken token = null;
 				if ((token = Parse.acceptToken(simBuilder, KeyWord.IDENTIFIER)) != null) {
 					String ident = ((Identifier)token).value;
 					expr=VariableExpression.expectVariable(simBuilder, ident);

@@ -22,8 +22,8 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Token;
 import simula.compiler.utilities.Util;
-import simula.lexer.Identifier;
-import simula.lexer.SimulaToken;
+import simula.psi.LexToken;
+import simula.token.Identifier;
 
 /// External Declaration.
 /// <pre>

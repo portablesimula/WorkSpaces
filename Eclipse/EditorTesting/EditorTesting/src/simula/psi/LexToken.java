@@ -1,8 +1,8 @@
-package simula.lexer;
+package simula.psi;
 
 import simula.compiler.utilities.KeyWord;
 
-public class SimulaToken {// extends SyntaxClass {
+public class LexToken extends PsiElement {
 	public int keyWord;
 
     CharSequence sourceText; // Pointer to the Whole FILE
@@ -11,23 +11,30 @@ public class SimulaToken {// extends SyntaxClass {
     
     public int lineNumber;
 
-	public SimulaToken(CharSequence sourceText, int startOffset, int endOffset, int keyWord, String debugName) {
-//		super(debugName, SimulaLanguage.INSTANCE);
+	public LexToken(int tokenStartLine, CharSequence sourceText, int startOffset, int endOffset, int keyWord) {
+		super(KeyWord.edit(keyWord));
+		this.lineNumber = tokenStartLine;
 		this.keyWord = keyWord;
 		this.sourceText = sourceText;
 		this.startOffset = startOffset;
 		this.endOffset = endOffset;
+		IO.println("NEW LexToken(1) "+this);
 	}
 
-	public SimulaToken(int keyWord, String debugName) {
-//		super(debugName, SimulaLanguage.INSTANCE);
+	public LexToken(int tokenStartLine, int keyWord) {
+		super(KeyWord.edit(keyWord));
+		this.lineNumber = tokenStartLine;
 		this.keyWord = keyWord;
 //		this.sourceText = sourceText;
 //		this.startOffset = startOffset;
 //		this.endOffset = endOffset;
 	}
 
-	public String text() {
+	@Override public int getLineNumber() {
+		return lineNumber;
+	}
+
+	public String getText() {
 		CharSequence txt = sourceText.subSequence(startOffset, endOffset);
 		String str = txt.toString();
 		return str;
@@ -41,7 +48,7 @@ public class SimulaToken {// extends SyntaxClass {
 	
 	@Override
 	public String toString() {
-		return KeyWord.edit(keyWord) + '[' + startOffset + ':' + endOffset + "]=\"" + edText() + '"';
+		return "Line-" + lineNumber + ':' + KeyWord.edit(keyWord) + '[' + startOffset + ':' + endOffset + "]=\"" + edText() + '"';
 	}
 
 }

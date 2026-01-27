@@ -16,7 +16,8 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
 
 import simula.editor.PsiBuilder;
-
+import simula.psi.PsiTree;
+import simula.psi.LexToken;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -71,49 +72,48 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		else modifyIdentifier("Block" + lineNumber);
 	}
 
-	// ***********************************************************************************************
-	// *** createMainProgramBlock
-	// ***********************************************************************************************
-	/// Create the main program block. Used by ProgramModule.
-	/// 
-	/// @return the main program block
-//	public static MaybeBlockDeclaration createMainProgramBlock() {
-//		int lineNumber=Parse.prevToken.lineNumber;
-//		if (Option.internal.TRACE_PARSE)	Util.TRACE("BlockStatement.createMainProgramBlock: line="+lineNumber+" "+Parse.prevToken);
+//	// ***********************************************************************************************
+//	// *** createMainProgramBlock
+//	// ***********************************************************************************************
+//	/// Create the main program block. Used by ProgramModule.
+//	/// 
+//	/// @return the main program block
+//	public static MaybeBlockDeclaration createMainProgramBlock(PsiBuilder simBuilder, PsiTree root) {
+//		int lineNumber=444;//Parse.prevToken.lineNumber;
+////		if (Option.internal.TRACE_PARSE)
+////			Util.TRACE("BlockStatement.createMainProgramBlock: line="+lineNumber+" "+Parse.prevToken);
 //		MaybeBlockDeclaration module = new MaybeBlockDeclaration(Global.sourceName);
 //		module.isMainModule = true;
 //		module.declarationKind = ObjectKind.SimulaProgram;
-//		module.expectMaybeBlock(lineNumber);
+//		module.expectMaybeBlock(simBuilder, root, lineNumber);
 //		return (module);
 //	}
-    public static void parseBlock(PsiBuilder simBuilder) {
-        PsiBuilder.Marker blockMarker = simBuilder.mark();
-        System.out.println("MaybeBlockDeclaration.parseBlock: blockMarker="+blockMarker);
-        simBuilder.advanceLexer(); // consume BEGIN
-//        Util.IERR("parseBlock.BEGIN: "+simBuilder.getSimToken());
+	private static int SEQU = 1;
+	public static MaybeBlockDeclaration parseBlock(PsiBuilder simBuilder, PsiTree parent) {
+		Util.IERR("DENNE BRUKES !!!");
+		PsiTree psiTree = new PsiTree("MaybeBlockDeclaration-"+(SEQU++), parent);
+		simBuilder.setPsiTree(psiTree);
+		simBuilder.advanceLexer(); // consume BEGIN (add it to 'blk')
 
-//        while (!simBuilder.eof() && getKeyWord(simBuilder.getTokenType()) != KeyWord.END) {
-//        while (!simBuilder.eof() && simBuilder.getSimToken().keyWord != KeyWord.END) {
-//        while (!simBuilder.eof() && ((SimulaToken)simBuilder.getTokenType()).keyWord != KeyWord.END) {
-        while (!simBuilder.eof() && getKeyWord(simBuilder) != KeyWord.END) {
-            System.out.println("\nSimulaParser.parseBlock: NOT END ==> parseStatement: "+simBuilder.getTokenType());
-//            Statement.parseStatement(simBuilder);
-            Statement.expectUnlabeledStatement(simBuilder);
-        }
+		while (!simBuilder.eof() && getKeyWord(simBuilder) != KeyWord.END) {
+			System.out.println("\nSimulaParser.parseBlock: NOT END ==> parseStatement: "+simBuilder.getTokenType());
+			Statement statement = Statement.expectUnlabeledStatement(simBuilder, psiTree);
+			psiTree.addChild(statement.psiTree);
+		}
 
-        if(simBuilder.eof()) {
-            blockMarker.error("Expected final 'END'");
-//        SimulaToken token = (SimulaToken) simBuilder.getTokenType();
-//        } else if (((SimulaToken)simBuilder.getTokenType()).keyWord == KeyWord.END) {
-        } else if (getKeyWord(simBuilder) == KeyWord.END) {
-//        if (token.keyWord == KeyWord.END) {
-            simBuilder.advanceLexer(); // consume END
-//            Util.IERR("NOT IMPL");
-            blockMarker.done(new MaybeBlockDeclaration("BLOCK_IDENT"));
-        } else {
-            blockMarker.error("Expected 'END'");
-        }
-    }
+		MaybeBlockDeclaration block = new MaybeBlockDeclaration("BLOCK_IDENT");
+		if (getKeyWord(simBuilder) == KeyWord.END) {
+			simBuilder.advanceLexer(); // consume END (add it to 'blk')
+			psiTree.done(block);
+		} else if(simBuilder.eof()) {
+			psiTree.error(block, "Expected final 'END'");
+			Util.IERR("NOT IMPL");
+		} else {
+			psiTree.error(block, "Expected 'END'");
+			Util.IERR("NOT IMPL");
+		}
+		return block;
+	}
 
 	// ***********************************************************************************************
 	// *** Parsing: expectMaybeBlock
@@ -137,6 +137,13 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		this.lineNumber=line;
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse MayBeBlock");
+		
+//		PsiTree psiTree = new PsiTree("MaybeBlockDeclaration-"+(SEQU++), parent);
+//		simBuilder.setPsiTree(psiTree);
+		simBuilder.startSubtree("MaybeBlockDeclaration-"+(SEQU++));
+		
+		simBuilder.advanceLexer(); // consume BEGIN (add it to 'blk')
+//		Util.IERR("SJEKK DETTE");
 		while (Declaration.acceptDeclaration(simBuilder, this))
 			Parse.expect(simBuilder, KeyWord.SEMICOLON);
 		while (!Parse.accept(simBuilder, KeyWord.END, KeyWord.EOF)) {
@@ -156,9 +163,14 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 			}
 		}
 		this.lastLineNumber = Global.sourceLineNumber;
-		BlockStatement blk = new BlockStatement(this);
+		BlockStatement block = new BlockStatement(this);
+		
+//		psiTree.done(block);
+		simBuilder.doneSubtree(block);
+//		Util.IERR("SJEKK DETTE");
+		
 		Global.setScope(declaredIn);
-		return (blk);
+		return (block);
 	}
 
 	/// Utility: Moves labels from the givent block.

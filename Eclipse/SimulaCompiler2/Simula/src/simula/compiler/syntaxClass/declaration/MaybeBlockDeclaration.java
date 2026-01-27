@@ -69,21 +69,21 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		else modifyIdentifier("Block" + lineNumber);
 	}
 
-	// ***********************************************************************************************
-	// *** createMainProgramBlock
-	// ***********************************************************************************************
-	/// Create the main program block. Used by ProgramModule.
-	/// 
-	/// @return the main program block
-	public static MaybeBlockDeclaration createMainProgramBlock() {
-		int lineNumber=Parse.prevToken.lineNumber;
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("BlockStatement.createMainProgramBlock: line="+lineNumber+" "+Parse.prevToken);
-		MaybeBlockDeclaration module = new MaybeBlockDeclaration(Global.sourceName);
-		module.isMainModule = true;
-		module.declarationKind = ObjectKind.SimulaProgram;
-		module.expectMaybeBlock(lineNumber);
-		return (module);
-	}
+//	// ***********************************************************************************************
+//	// *** createMainProgramBlock
+//	// ***********************************************************************************************
+//	/// Create the main program block. Used by ProgramModule.
+//	/// 
+//	/// @return the main program block
+//	public static MaybeBlockDeclaration createMainProgramBlock() {
+//		int lineNumber=Parse.prevToken.lineNumber;
+//		if (Option.internal.TRACE_PARSE)	Util.TRACE("BlockStatement.createMainProgramBlock: line="+lineNumber+" "+Parse.prevToken);
+//		MaybeBlockDeclaration module = new MaybeBlockDeclaration(Global.sourceName);
+//		module.isMainModule = true;
+//		module.declarationKind = ObjectKind.SimulaProgram;
+//		module.expectMaybeBlock(lineNumber);
+//		return (module);
+//	}
 
 	// ***********************************************************************************************
 	// *** Parsing: expectMaybeBlock

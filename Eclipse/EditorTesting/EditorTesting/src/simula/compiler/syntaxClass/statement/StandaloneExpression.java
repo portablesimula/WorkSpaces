@@ -9,7 +9,7 @@ import java.io.IOException;
 // import java.lang.classfile.CodeBuilder;
 
 import simula.editor.PsiBuilder;
-
+import simula.psi.LexToken;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -21,7 +21,6 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.lexer.SimulaToken;
 
 /// Standalone Expression Statement.
 /// 
@@ -52,7 +51,7 @@ public final class StandaloneExpression extends Statement {
 		super("StandaloneExpression", line);
 		this.expression = expression;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": StandaloneExpression: "+this);
-		SimulaToken prevToken = null;
+		LexToken prevToken = null;
 		while ((prevToken = Parse.acceptToken(simBuilder, KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) != null) { 
 			this.expression = new AssignmentOperation(this.expression, prevToken.keyWord, expectStandaloneExpression(simBuilder));
 		}		
@@ -68,7 +67,7 @@ public final class StandaloneExpression extends Statement {
 	/// @return the resulting StandaloneExpression
 	private static Expression expectStandaloneExpression(PsiBuilder simBuilder) { 
 		Expression retExpr=Expression.expectExpression(simBuilder);
-		SimulaToken prevToken = null;
+		LexToken prevToken = null;
 		while ((prevToken = Parse.acceptToken(simBuilder, KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) != null) {
 			int opr=prevToken.keyWord;
 			retExpr=new AssignmentOperation(retExpr,opr,expectStandaloneExpression(simBuilder));

@@ -31,8 +31,9 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Token;
 import simula.compiler.utilities.Util;
-import simula.lexer.SimulaLexer;
-import simula.lexer.SimulaToken;
+import simula.psi.LexToken;
+import simula.psi.PsiTree;
+import simula.psi.SimulaLexer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -44,6 +45,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
 /// The Source text Panel.
 /// 
@@ -203,8 +205,8 @@ public class SourceTextPanel extends JPanel {
     	try {
     		switch(lang) {
 //				case Simula: fillTextPane(caretPosition,new SimulaScanner(reader,true)); break;
-    			case Simula: fillTextPaneUsingLexer(caretPosition, txt); break;
-//				case Simula: fillTextPaneUsingParser(caretPosition,txt); break;
+//    			case Simula: fillTextPaneUsingLexer(caretPosition, txt); break;
+				case Simula: fillTextPaneUsingParser(caretPosition,txt); break;
 //				case Java:   fillTextPane(caretPosition,new DefaultScanner(reader)); break;
 //				default:     fillTextPane(caretPosition,new DefaultScanner(reader)); break;
     		}
@@ -228,34 +230,45 @@ public class SourceTextPanel extends JPanel {
         Global.TRACE_SCAN = true;
         Global.TRACE_COMMENTS = true;
 
-        SimulaLexer lexer = new SimulaLexer();
-		CharSequence buffer = txt;
-		int startOffset = 0;
-		int endOffset = buffer.length();
-		int initialState = 0;
-	    lexer.start(buffer, startOffset, endOffset, initialState);
+//        SimulaLexer lexer = new SimulaLexer();
+//		CharSequence buffer = txt;
+//		int startOffset = 0;
+//		int endOffset = buffer.length();
+//		int initialState = 0;
+//	    lexer.start(buffer, startOffset, endOffset, initialState);
+	    
+	    PsiBuilder simBuilder = new PsiBuilder();
+	    simBuilder.start(txt);
+	    simBuilder.doParse();
+//	    PsiTree psiTree = simBuilder.getResultingTree();
+//	    psiTree.printTree("STOP HER INNTIL VIDERE");
+	    Util.IERR("STOP HER INNTIL VIDERE");
+//	    Vector<PsiNode> tokens = simBuilder.getResultingTokens();
 	    
 		int lineNumber=1;
 		StyledDocument lin=new DefaultStyledDocument(); addStylesToDocument(lin);
         editTextPane.setEditable(false);
     	doc.removeUndoableEditListener(undoListener);
 		try {
-			SimulaToken token;
+//			SimulaToken token;
 			doc.remove(0, doc.getLength());
 			lin.insertString(lin.getLength(),edLineNumber(lineNumber++),styleLineNumber);
 //			while((token=lexer.nextToken())!=null) {
-			while((token=(SimulaToken) lexer.getTokenType())!=null) {
-				lexer.advance();
-			    String text=token.text();
-			    Style style=getStyle(Token.getStyleCode(token.keyWord));
-				StringTokenizer tokenizer=new StringTokenizer(text,"\n",true);
-				while(tokenizer.hasMoreTokens()) {
-					String item=tokenizer.nextToken();
-					if(item.equals("\n"))
-						lin.insertString(lin.getLength(),edLineNumber(lineNumber++), styleLineNumber);
-					doc.insertString(doc.getLength(), item, style);
-				}
-		    }
+//			while((token=(SimulaToken) lexer.getTokenType())!=null) {
+//				lexer.advance();
+			
+//			// MÅ SKRIVES OM:
+//			for(PsiNode node: tokens) {
+//				if(node instanceof LexToken token) {
+//				    String text=token.text();
+//				    Style style=getStyle(Token.getStyleCode(token.keyWord));
+//				    if(token.keyWord == KeyWord.NEWLINE)
+//						lin.insertString(lin.getLength(),edLineNumber(lineNumber++), styleLineNumber);
+//					doc.insertString(doc.getLength(), text, style);
+//				}
+//		    }
+			
+			
 		} catch (BadLocationException ble) {
 			System.err.println("Couldn't insert text into text pane.");
 		}
@@ -293,11 +306,11 @@ public class SourceTextPanel extends JPanel {
         editTextPane.setEditable(false);
     	doc.removeUndoableEditListener(undoListener);
 		try {
-			SimulaToken token;
+			LexToken token;
 			doc.remove(0, doc.getLength());
 			lin.insertString(lin.getLength(),edLineNumber(lineNumber++),styleLineNumber);
 //			while((token=lexer.nextToken())!=null) {
-			while((token=(SimulaToken) lexer.getTokenType())!=null) {
+			while((token=(LexToken) lexer.getTokenType())!=null) {
 				lexer.advance();
 			    String text=token.text();
 			    Style style=getStyle(Token.getStyleCode(token.keyWord));

@@ -1,7 +1,7 @@
 package simula.parser;
 
 import simula.editor.PsiBuilder;
-
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.Util;
@@ -26,55 +26,45 @@ public class SimulaParser {// implements PsiParser {
 //    	simBuilder = new  SimPsiBuilder(psiBuilder, text);
 //	}
 	
-    @NotNull
-    @Override
-    public ASTNode parse(@NotNull SyntaxClass root, @NotNull PsiBuilder psiBuilder) {
+//    public ASTNode parse(SyntaxClass root, PsiBuilder psiBuilder) {
+    public SyntaxClass parse(SyntaxClass root, PsiBuilder psiBuilder) {
         System.out.println("\nSimulaParser.parse was called +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("SimulaParser.parse: root="+root);
 //        psiBuilder.setDebugMode(true);
 
         // 1. Begin the root marker for the entire file
-        final PsiBuilder.Marker rootMarker = psiBuilder.mark();
-        System.out.println("SimulaParser.parse: rootMarker="+rootMarker);
+//        System.out.println("SimulaParser.parse: rootMarker="+rootMarker);
 //        System.out.println("SimulaParser.parse: psiBuilder.eof="+psiBuilder.eof());
 //        Util.IERR();
 
         // 2. Iterate through the token stream
 //        while (!psiBuilder.eof()) {
         if (!psiBuilder.eof()) {
-//            SyntaxClass tokenType = psiBuilder.getTokenType();
-//            System.out.println("SimulaParser.parse: tokenType="+tokenType.getClass().getSimpleName() + "  " + tokenType);
-//
-//            // Example logic: if we see a KEY token, try to parse a full property
-//            if (tokenType == SimpleTypes.KEY) {
-//                parseProperty(psiBuilder);
-//            } else {
-//                // Skip unknown or whitespace tokens automatically handled by lexer
-//                psiBuilder.advanceLexer();
-//            }
-
-            System.out.println("\nSimulaParser.parse: CALL parseStatement(psiBuilder)");
-//            Statement statement = Statement.expectUnlabeledStatement(psiBuilder);
+            System.out.println("\nSimulaParser.parse: NEW ProgramModule(psiBuilder)");
             ProgramModule program = new ProgramModule(psiBuilder);
-
+            psiBuilder.psiRoot.printTree("SimulaParser.parse: END Program");
+            return program;
         }
 
-        if (!psiBuilder.eof()) {
-            final PsiBuilder.Marker afterEndMarker = psiBuilder.mark();
-        	while (!psiBuilder.eof()) {
-    	        psiBuilder.advanceLexer();
-        	}
-        	afterEndMarker.done(SimulaElementTypes.TEXT_AFTER_FINAL_END);
-        }
+//        if (!psiBuilder.eof()) {
+//            final PsiMarker afterEndMarker = psiBuilder.mark();
+//        	while (!psiBuilder.eof()) {
+//    	        psiBuilder.advanceLexer();
+//        	}
+//        	afterEndMarker.done(SimulaElementTypes.TEXT_AFTER_FINAL_END);
+//        }
 
         // 3. Close the root marker and return the tree
-        System.out.println("\nSimulaParser.parse: Close the root marker: --------------------------------------------------");
-        rootMarker.done(root);
+//        System.out.println("\nSimulaParser.parse: Close the root marker: --------------------------------------------------");
+//        rootMarker.done(root);
         
         
-        System.out.println("\nSimulaParser.parse: Return the tree: --------------------------------------------------");
-        return psiBuilder.getTreeBuilt();
+//        System.out.println("\nSimulaParser.parse: Return the tree: --------------------------------------------------");
+//        return psiBuilder.getTreeBuilt();
+//        psiBuilder.printPSI("End Parse");
+        return null;
     }
+
 
 //    private void parseStatement(PsiBuilder psiBuilder) {
 //        SyntaxClass tokenType = psiBuilder.getTokenType();
@@ -93,7 +83,7 @@ public class SimulaParser {// implements PsiParser {
 //    }
 //
 //    private void parseBlock(PsiBuilder psiBuilder) {
-//        PsiBuilder.Marker blockMarker = psiBuilder.mark();
+//        PsiMarker blockMarker = psiBuilder.mark();
 //        psiBuilder.advanceLexer(); // consume BEGIN
 //
 //        while (!psiBuilder.eof() && psiBuilder.getTokenType() != KeyWord.END) {
@@ -110,7 +100,7 @@ public class SimulaParser {// implements PsiParser {
 //    }
 //
 //    private void parseAssignment(PsiBuilder psiBuilder) {
-//        PsiBuilder.Marker assignMarker = psiBuilder.mark();
+//        PsiMarker assignMarker = psiBuilder.mark();
 //        psiBuilder.advanceLexer(); // consume identifier
 //
 //        if (psiBuilder.getTokenType() == KeyWord.ASSIGNVALUE) {
@@ -135,7 +125,7 @@ public class SimulaParser {// implements PsiParser {
 //    private void parseProperty(PsiBuilder psiBuilder) {
 //        if(true) throw new RuntimeException("SimulaParser.parseProperty was called");
 //        // Start a marker for a specific PSI element (e.g., Property)
-//        PsiBuilder.Marker propertyMarker = psiBuilder.mark();
+//        PsiMarker propertyMarker = psiBuilder.mark();
 //
 //        psiBuilder.advanceLexer(); // Consume KEY
 //

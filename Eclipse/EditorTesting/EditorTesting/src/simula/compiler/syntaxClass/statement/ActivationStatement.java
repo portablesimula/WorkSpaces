@@ -8,7 +8,7 @@ package simula.compiler.syntaxClass.statement;
 import java.io.IOException;
 
 import simula.editor.PsiBuilder;
-
+import simula.psi.LexToken;
 // import java.lang.classfile.CodeBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
@@ -25,7 +25,6 @@ import simula.compiler.utilities.Option;
 //import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Token;
 import simula.compiler.utilities.Util;
-import simula.lexer.SimulaToken;
 
 /// Activation Statement.
 /// 
@@ -104,13 +103,13 @@ public final class ActivationStatement extends Statement {
 	/// @param line the source line number
 	ActivationStatement(final PsiBuilder simBuilder, final int line) {
 		super("ActivationStatement", line);
-		SimulaToken activator = Parse.prevToken();
+		LexToken activator = Parse.prevToken();
 		REAC = activator.keyWord == KeyWord.REACTIVATE;
 		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse ActivationStatement");
 		object1 = Expression.expectExpression(simBuilder);
 		object1.backLink = this;
 		code = ActivationCode.direct;
-		SimulaToken prevToken = Parse.currentToken(simBuilder);
+		LexToken prevToken = Parse.currentToken(simBuilder);
 		if (Parse.accept(simBuilder, KeyWord.AT) || Parse.accept(simBuilder, KeyWord.DELAY)) {
 			code = (prevToken.keyWord == KeyWord.AT) ? ActivationCode.at : ActivationCode.delay;
 			time = Expression.expectExpression(simBuilder);

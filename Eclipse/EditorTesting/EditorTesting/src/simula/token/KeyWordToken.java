@@ -1,11 +1,12 @@
-package simula.lexer;
+package simula.token;
 
 import simula.compiler.utilities.KeyWord;
+import simula.psi.LexToken;
 
-public class KeyWordToken extends SimulaToken {
+public class KeyWordToken extends LexToken {
 	
-	public KeyWordToken(CharSequence sourceText, int startOffset, int endOffset, int keyWord) {
-		super(sourceText, startOffset, endOffset, keyWord, KeyWord.edit(keyWord));
+	public KeyWordToken(int tokenStartLine, CharSequence sourceText, int startOffset, int endOffset, int keyWord) {
+		super(tokenStartLine, sourceText, startOffset, endOffset, keyWord);
 	}
 
 //	private KeyWordToken(int keyWord, String debugName) { super(keyWord, debugName);	}

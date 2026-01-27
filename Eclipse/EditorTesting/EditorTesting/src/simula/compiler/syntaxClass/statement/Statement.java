@@ -25,8 +25,9 @@ import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.lexer.SimulaElementTypes;
-import simula.lexer.SimulaToken;
+import simula.psi.PsiTree;
+import simula.psi.LexToken;
+import simula.psi.PsiElement;
 
 /// Statement.
 /// 
@@ -68,13 +69,16 @@ public abstract class Statement extends SyntaxClass {
 		lineNumber=line;
 	}
 
+	private static int SEQU = 1;
 	/// Parse a statement.
 	/// @return the statement
 	public static Statement expectStatement(PsiBuilder simBuilder) {
+		simBuilder.startSubtree("Statement-"+(SEQU++));
+		
 		ObjectList<LabelDeclaration> labels = null;
 		int lineNumber=Parse.currentToken(simBuilder).lineNumber;
-//		if (Option.internal.TRACE_PARSE)
-//			Util.TRACE("Statement.doParse: LabeledStatement: lineNumber="+lineNumber+", current=" + Parse.currentToken	+ ", prev=" + Parse.prevToken);
+		if (Option.internal.TRACE_PARSE)
+			Util.TRACE("Statement.doParse: LabeledStatement: lineNumber="+lineNumber+", current=" + Parse.currentToken(simBuilder));//	+ ", prev=" + Parse.prevToken);
 		String ident = Parse.acceptIdentifier(simBuilder);
 		while (Parse.accept(simBuilder, KeyWord.COLON)) {
 			if (ident != null) {
@@ -89,34 +93,43 @@ public abstract class Statement extends SyntaxClass {
 		}
 		if(ident!=null) Parse.saveCurrentToken(); // Not Label: Pushback
 		Statement statement = expectUnlabeledStatement(simBuilder);
-		if (labels != null && statement != null)
+		if (labels != null && statement != null) {
+			Util.IERR("RETT OPP MHT PsiTree");
 			statement = new LabeledStatement(lineNumber,labels, statement);
+		}
+		simBuilder.doneSubtree(statement);
 		return (statement);
 	}
 
+	public static Statement expectUnlabeledStatement(PsiBuilder simBuilder) {
+		LexToken simToken = getSimToken(simBuilder);
+		switch(simToken.keyWord) {
+		case KeyWord.COMMENT:
+			IO.println("consume COMMENT: "+simToken+"  (add it to 'blk')");
+		case KeyWord.NEWLINE, KeyWord.WHITESPACES:
+			DummyStatement dum = new DummyStatement(Global.sourceLineNumber);
+			simBuilder.startSubtree("DummyStatement");
+			simBuilder.advanceLexer(); // consume NEWLINE or WHITESPACES  (add it to 'current tree')
+			simBuilder.doneSubtree(dum);
+	
+			return dum;
+		case KeyWord.BEGIN:
+			// case KeyWord.BEGIN: Parse.nextToken(); return (new MaybeBlockDeclaration(null).expectMaybeBlock(lineNumber));
+			System.out.println("\nStatement.parseStatement: BEGIN ==> parseBlock");
+          int lineNumber = 555;
+          MaybeBlockDeclaration block = new MaybeBlockDeclaration(null);
+          block.expectMaybeBlock(simBuilder, lineNumber);
+          BlockStatement blockStatement = new BlockStatement(block);
+          simBuilder.doneSubtree(blockStatement);
+          return blockStatement;
 
-//  public static void parseStatement(SimPsiBuilder simBuilder) {
-  public static Statement expectUnlabeledStatement(PsiBuilder simBuilder) {
-      final PsiBuilder.Marker statementMarker = simBuilder.mark();
-      System.out.println("Statement.parseStatement: statementMarker="+statementMarker);
-
-      SimulaToken simToken = getSimToken(simBuilder);
-      switch(simToken.keyWord) {
-      case KeyWord.BEGIN:
-          System.out.println("\nStatement.parseStatement: BEGIN ==> parseBlock");
-//          Util.IERR("Statement.BEGIN");
-          MaybeBlockDeclaration.parseBlock(simBuilder);
-          System.out.println("\nStatement.parseStatement: END BLOCK_ELEMENT ==> CALL assignMarker.done: "+statementMarker);
-//          statementMarker.done(SimulaElementTypes.BLOCK_ELEMENT);
-          statementMarker.done(new MaybeBlockDeclaration("BlockIDENT"));
-          break;
 //	    case KeyWord.SEMICOLON:
 //	    	// Parse.nextToken(); return (new DummyStatement(lineNumber)); // Dummy Statement
 //	    	DummyStatement.parseDummyStatement(simBuilder);
 //	    	break;
       case KeyWord.IDENTIFIER, KeyWord.NEW, KeyWord.THIS, KeyWord.BEGPAR:
           System.out.println("\nStatement.parseStatement: IDENTIFIER ==> parseAssignment");
-//          Util.IERR("Statement.IDENTIFIER");
+          Util.IERR("Statement.IDENTIFIER");
       	
       		Expression expr = Expression.acceptExpression(simBuilder);
       		if(expr!=null) {
@@ -131,7 +144,7 @@ public abstract class Statement extends SyntaxClass {
       			}
 //      			Statement statement = new StandaloneExpression(lineNumber,expr);
       			Statement statement = new StandaloneExpression(simBuilder, Global.sourceLineNumber, expr);
-      			statementMarker.done(statement);
+//      			statementMarker.done(statement);
       			return statement;
       		}
       	
@@ -139,12 +152,14 @@ public abstract class Statement extends SyntaxClass {
 //          statementMarker.done(SimulaElementTypes.STATEMENT);
       	break;
 		default:
-//	        Util.IERR("Statement.default");
+	        Util.IERR("Statement.default: " + KeyWord.edit(simToken.keyWord));
 	        // Error handling or consuming unknown tokens
-          System.out.println("\nSimulaParser.parseAssignment: CALL statementMarker.done: "+statementMarker);
+          System.out.println("\nSimulaParser.parseAssignment: CALL statementMarker.done: ");//+statementMarker);
           System.out.println("\nStatement.parseStatement: default " + simToken);
-          statementMarker.error("Statement.parseStatement: default " + simToken);
-	        simBuilder.advanceLexer();
+//          statementMarker.error("Statement.parseStatement: default " + simToken);
+          
+//          // DETTE MÅ IMPLEMENTERES !!!
+//	        simBuilder.advanceLexer(); //  (add it to 'blk')
 			break;
       }
       return null;

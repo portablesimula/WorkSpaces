@@ -13,7 +13,7 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
 
 import simula.editor.PsiBuilder;
-
+import simula.psi.LexToken;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -33,7 +33,6 @@ import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 //import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
-import simula.lexer.SimulaToken;
 
 /// For Statement.
 /// 
@@ -162,7 +161,7 @@ public final class ForStatement extends Statement {
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ForStatement");
 		controlVariable = new VariableExpression(Parse.expectIdentifier(simBuilder));
-		SimulaToken prevToken = Parse.currentToken(simBuilder);
+		LexToken prevToken = Parse.currentToken(simBuilder);
 		if (!Parse.accept(simBuilder, KeyWord.ASSIGNVALUE))
 			Parse.expect(simBuilder, KeyWord.ASSIGNREF);
 		assignmentOperator = prevToken.keyWord;

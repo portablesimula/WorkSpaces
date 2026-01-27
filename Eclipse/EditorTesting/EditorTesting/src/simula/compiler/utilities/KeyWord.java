@@ -111,6 +111,7 @@ public interface KeyWord {
 	/** Other Symbol */ public final static int REALKONST      = 94;
 	/** Other Symbol */ public final static int TEXTKONST      = 95;
 	/** Other Symbol */ public final static int WHITESPACES    = 96;
+	/** Other Symbol */ public final static int BAD_CHARACTERS = 97;
 	
 	/// Returns the corresponding String.
 	/// @param key the argument key.

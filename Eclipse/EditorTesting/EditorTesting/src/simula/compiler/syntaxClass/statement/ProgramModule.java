@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.util.Vector;
 
 import simula.editor.PsiBuilder;
-
+import simula.psi.LexToken;
+import simula.psi.PsiTree;
 import simula.compiler.parsing.Parse;
+import simula.compiler.syntaxClass.Comment;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -89,7 +91,9 @@ public final class ProgramModule extends Statement {
 
 	/// Create a new ProgramModule.
 	public ProgramModule(PsiBuilder simBuilder) {
-		super("", 0);
+		super("ProgramModule", 0);
+		simBuilder.startSubtree("ProgramModule");
+
 		sysin=new VariableExpression("sysin");
 		sysout=new VariableExpression("sysout");
 		try	{
@@ -101,9 +105,15 @@ public final class ProgramModule extends Statement {
 			     .setClassDeclaration(StandardClass.Printfile);
 			Global.getCurrentScope().sourceBlockLevel=0;
 			while(Parse.accept(simBuilder, KeyWord.EXTERNAL)) {
-				externalHead = ExternalDeclaration.expectExternalHead(simBuilder, StandardClass.BASICIO);					
+				externalHead = ExternalDeclaration.expectExternalHead(simBuilder, StandardClass.BASICIO);		
+				Util.IERR("ADD ExternalDeclaration TO PsiTree");
 				Parse.expect(simBuilder, KeyWord.SEMICOLON);
 			}
+			
+//			// FOR TEST:
+//			simBuilder.psiTree.addChild(new PsiTree("BASICIO", psiTree));
+//			simBuilder.psiTree.addChild(new PsiTree("Drawing", psiTree));
+			
 			// Now: Looking for ( program | procedure-declaration | class-declaration )
 			String ident=Parse.acceptIdentifier(simBuilder);
 			if(ident!=null) {
@@ -116,10 +126,21 @@ public final class ProgramModule extends Statement {
 			    if(Parse.accept(simBuilder, KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type);
 			    else mainModule = doParseProgram(simBuilder);
 			}
+			simBuilder.doneSubtree(mainModule);
 			StandardClass.BASICIO.declarationList.add(mainModule);
 			
-			if(Parse.currentToken(simBuilder).keyWord != KeyWord.EOF) {
-				Util.warning("Text after Program end - starting with " + Parse.currentToken(simBuilder));
+			LexToken token = Parse.currentToken(simBuilder);
+			if(token != null && token.keyWord != KeyWord.EOF) {
+				simBuilder.startSubtree("TextAfterProgramEnd");
+				Comment dum = new Comment();
+				while(!simBuilder.eof()) simBuilder.advanceLexer(); // consume tokens  (add it to 'current tree')
+				simBuilder.doneSubtree(dum);
+//				IO.println("NEW ProgramModule: TextAfterEnd: \"" + dum.psiTree.getText().replace("\n", "\\n") + '"');
+				String textAfterEnd = dum.psiTree.getText().replaceAll("\\s+", ""); // Remove WhiteSpaces			
+//				IO.println("NEW ProgramModule: TextAfterEnd: \"" + textAfterEnd + '"');
+//				simBuilder.psiRoot.printTree("");
+				if(! textAfterEnd.equals(";")) Util.warning("Text after Program end: \"" + textAfterEnd + '"');
+//				Util.IERR();
 			}
 			
 			if(Option.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
@@ -133,10 +154,15 @@ public final class ProgramModule extends Statement {
 	/// @return the Program Statement.
 	private DeclarationScope doParseProgram(final PsiBuilder simBuilder) {
 		BlockDeclaration mainBlock = new MaybeBlockDeclaration(Global.sourceName);
+		simBuilder.startSubtree("MainProgramBlock");
+		
 		mainBlock.isMainModule = true;
 		mainBlock.declarationKind = ObjectKind.SimulaProgram;
+//		IO.println("ProramModule.doParseProgram: do expectStatement");
+//		Util.IERR();
 		Statement program = Statement.expectStatement(simBuilder);
 		mainBlock.statements.add(program);
+//		mainBlock.psiTree.addChild(program.psiTree);
 		return mainBlock;
 	}
 

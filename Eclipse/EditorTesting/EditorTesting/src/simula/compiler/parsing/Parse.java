@@ -7,8 +7,8 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.Util;
 import simula.editor.PsiBuilder;
-import simula.lexer.Identifier;
-import simula.lexer.SimulaToken;
+import simula.psi.LexToken;
+import simula.token.Identifier;
 
 
 /// The Simula Parser Utilities.
@@ -83,14 +83,14 @@ public interface Parse {
 		Util.IERR("Parse.saveCurrentToken: KAN IKKE BRUKES: FORSØK  drop()  eller rollbackTo()");
 	}
 
-	public static SimulaToken prevToken() {
+	public static LexToken prevToken() {
 		Util.IERR("Parse.prevToken: KAN IKKE BRUKES: SKRIV OM KODEN");
 		return null;
 	}
 
 	/// Return the current Token.
-	public static SimulaToken currentToken(final PsiBuilder simBuilder) {
-        return (SimulaToken)simBuilder.getTokenType();
+	public static LexToken currentToken(final PsiBuilder simBuilder) {
+        return (LexToken)simBuilder.getTokenType();
 	}
 	
 	/// Advance to next Token.
@@ -128,12 +128,12 @@ public interface Parse {
 //			}
 ////		acceptTrace(0, keys);
 //		return false;
-		SimulaToken token = acceptToken(simBuilder, keys); 
+		LexToken token = acceptToken(simBuilder, keys); 
 		return token != null;
 	}
 
-	public static SimulaToken acceptToken(final PsiBuilder simBuilder, final int... keys) {
-        SimulaToken currentToken = currentToken(simBuilder);
+	public static LexToken acceptToken(final PsiBuilder simBuilder, final int... keys) {
+        LexToken currentToken = currentToken(simBuilder);
 		for (int key : keys)
 //			if (Parse.currentToken.getKeyWord() == key) {
 			if (currentToken.keyWord == key) {
@@ -156,7 +156,7 @@ public interface Parse {
 	/// Test to accept an identifier.
 	/// @return the identifier or null
 	public static String acceptIdentifier(final PsiBuilder simBuilder) {
-		SimulaToken token = null;
+		LexToken token = null;
 		if ((token = Parse.acceptToken(simBuilder, KeyWord.IDENTIFIER)) != null)
 			return (((Identifier)token).value);
 		return (null);
@@ -167,7 +167,7 @@ public interface Parse {
 	/// If failing to do so, an error is printed.
 	/// @return the identifier or null
 	public static String expectIdentifier(final PsiBuilder simBuilder) {
-        SimulaToken currentToken = currentToken(simBuilder);
+        LexToken currentToken = currentToken(simBuilder);
 		if (acceptIdentifier(simBuilder) != null)
 			return (((Identifier)currentToken).value);
 		LOG.error("Got symbol " + currentToken + " while expecting an Identifier");
@@ -186,7 +186,7 @@ public interface Parse {
 		else if(accept(simBuilder, KeyWord.LONG)) { Parse.expect(simBuilder, KeyWord.REAL); type=Type.LongReal; }
 		else if(accept(simBuilder, KeyWord.TEXT)) type=Type.Text;
 		else if(accept(simBuilder, KeyWord.REF))	{
-			Parse.expect(simBuilder, KeyWord.BEGPAR); SimulaToken classIdentifier=Parse.currentToken(simBuilder);
+			Parse.expect(simBuilder, KeyWord.BEGPAR); LexToken classIdentifier=Parse.currentToken(simBuilder);
 			Parse.expect(simBuilder, KeyWord.IDENTIFIER); Parse.expect(simBuilder, KeyWord.ENDPAR); 
 			type=Type.Ref(classIdentifier.toString()); 
 		}
@@ -195,9 +195,9 @@ public interface Parse {
 	
 	/// Test to accept a postfix operator ( DOT, IS, IN, QUA).
 	/// @return true if the keyword is accepted, false otherwise.
-	public static SimulaToken acceptPostfixOprator(final PsiBuilder simBuilder) {
+	public static LexToken acceptPostfixOprator(final PsiBuilder simBuilder) {
 		//   DOT | IS | IN | QUA
-		SimulaToken prevToken = null;
+		LexToken prevToken = null;
 		if((prevToken = acceptToken(simBuilder, KeyWord.DOT)) != null) return(prevToken);
 		if((prevToken = acceptToken(simBuilder, KeyWord.IS)) != null) return(prevToken);
 		if((prevToken = acceptToken(simBuilder, KeyWord.IN)) != null) return(prevToken);
@@ -211,8 +211,8 @@ public interface Parse {
 	///	     =  <  |  <=  |  =  |  >=  |  >  |  <> | == | =/=
 	/// </pre>
 	/// @return true if the keyword is accepted, false otherwise.
-	public static SimulaToken acceptRelationalOperator(final PsiBuilder simBuilder) {
-		SimulaToken prevToken = null;
+	public static LexToken acceptRelationalOperator(final PsiBuilder simBuilder) {
+		LexToken prevToken = null;
 		if((prevToken = acceptToken(simBuilder, KeyWord.LT)) != null) return(prevToken);
 		if((prevToken = acceptToken(simBuilder, KeyWord.LE)) != null) return(prevToken);
 		if((prevToken = acceptToken(simBuilder, KeyWord.EQ)) != null) return(prevToken);

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Vector;
 
 import simula.editor.PsiBuilder;
-
+import simula.psi.LexToken;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -45,7 +45,6 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.lexer.SimulaToken;
 
 /// Procedure Declaration.
 /// <pre>
@@ -175,7 +174,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @param pList the parameter list
 	/// @return true: if mode-part was present.
 	private static boolean acceptModePart(PsiBuilder simBuilder, Vector<Parameter> pList) {
-		SimulaToken prevToken = Parse.currentToken(simBuilder);
+		LexToken prevToken = Parse.currentToken(simBuilder);
 		if (Parse.accept(simBuilder, KeyWord.VALUE, KeyWord.NAME)) {
 			int mode = (prevToken.keyWord == KeyWord.VALUE)
 					? Parameter.Mode.value

@@ -17,8 +17,8 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Util;
 import simula.editor.PsiBuilder;
-import simula.lang.SimulaLanguage;
-import simula.lexer.SimulaToken;
+import simula.psi.PsiTree;
+import simula.psi.LexToken;
 
 /// The class SyntaxClass.
 /// 
@@ -88,7 +88,9 @@ import simula.lexer.SimulaToken;
 /// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/SyntaxClass.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public abstract class SyntaxClass { // extends SyntaxClass {
+public abstract class SyntaxClass {//extends CompositePsiElement {
+	public PsiTree psiTree;
+	
 	/// Controls semantic checking.
 	/// 
 	/// Set true when the method doChecking() has been completed.
@@ -117,8 +119,8 @@ public abstract class SyntaxClass { // extends SyntaxClass {
 		lineNumber = Global.sourceLineNumber;
 	}
     
-    public static SimulaToken getSimToken(PsiBuilder simBuilder) {
-        return (SimulaToken)simBuilder.getTokenType();
+    public static LexToken getSimToken(PsiBuilder simBuilder) {
+        return (LexToken)simBuilder.getTokenType();
     }
     
     public static int getKeyWord(PsiBuilder simBuilder) {
