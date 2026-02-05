@@ -92,19 +92,20 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	/// @return the resulting PrefixedBlockDeclaration
 	public static PrefixedBlockDeclaration expectPrefixedBlock(final PsiBuilder simBuilder, final VariableExpression blockPrefix,boolean isMainModule) {
 		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(isMainModule);
-		block.lineNumber=Parse.prevToken().lineNumber;
+		block.lineNumber=simBuilder.getSourceLineNumber();
 		block.declarationKind=ObjectKind.PrefixedBlock;
 		Util.ASSERT(blockPrefix != null,"blockPrefix == null");
 		block.blockPrefix = blockPrefix;
 		block.prefix = blockPrefix.identifier;
 		block.isMainModule=isMainModule;
 		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse PrefixedBlock");
-		while (Declaration.acceptDeclaration(simBuilder, block)) Parse.accept(simBuilder, KeyWord.SEMICOLON);
+//		while (Declaration.acceptDeclaration(simBuilder, block)) Parse.accept(simBuilder, KeyWord.SEMICOLON);
+		Declaration.acceptDeclarations(simBuilder, block);
 		while (!Parse.accept(simBuilder, KeyWord.END, KeyWord.EOF)) {
-			Statement stm = Statement.expectStatement(simBuilder);
+			Statement stm = Statement.acceptStatement(simBuilder);
 			if (stm != null) block.statements.add(stm);
 		}
-		if (Parse.prevToken().keyWord == KeyWord.EOF) {
+		if (Parse.prevToken(simBuilder).keyWord == KeyWord.EOF) {
 			Util.error("Illegal termination of prefixed block. Missing END.");
 		}
 		block.lastLineNumber = Global.sourceLineNumber;

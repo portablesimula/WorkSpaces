@@ -195,6 +195,8 @@ public class ClassDeclaration extends BlockDeclaration {
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Line " + cls.lineNumber + ": ClassDeclaration: " + cls);
 		Global.setScope(cls.declaredIn);
+		simBuilder.doneSubtree(cls);
+		simBuilder.startSubtree("NextDeclaration");
 		return (cls);
 	}
 	
@@ -356,32 +358,34 @@ public class ClassDeclaration extends BlockDeclaration {
 			Statement stm;
 			if (Option.internal.TRACE_PARSE)
 				Parse.TRACE("Parse Block");
-			while (Declaration.acceptDeclaration(simBuilder, cls)) {
-				Parse.accept(simBuilder, KeyWord.SEMICOLON);
-			}
+//			while (Declaration.acceptDeclaration(simBuilder, cls)) {
+//				Parse.accept(simBuilder, KeyWord.SEMICOLON);
+//			}
+			Declaration.acceptDeclarations(simBuilder, cls);
 			boolean seen = false;
 			while (!Parse.accept(simBuilder, KeyWord.END, KeyWord.EOF)) {
-				stm = Statement.expectStatement(simBuilder);
+				stm = Statement.acceptStatement(simBuilder);
 				if (stm != null)
 					cls.statements.add(stm);
 				if (Parse.accept(simBuilder, KeyWord.INNER)) {
 					if (seen)
 						Util.error("Max one INNER per Block");
 					else
-						cls.statements.add(new InnerStatement(Parse.currentToken(simBuilder).lineNumber));
+						cls.statements.add(InnerStatement.ofExplicit(simBuilder));
 					seen = true;
 				}
 			}
-			if (Parse.prevToken().keyWord == KeyWord.EOF) {
+			if (Parse.prevToken(simBuilder).keyWord == KeyWord.EOF) {
 				Util.error("Illegal termination of class declaration. Missing END.");
 			}
 			if (!seen)
-				cls.statements.add(new InnerStatement(Parse.currentToken(simBuilder).lineNumber)); // Implicit INNER
+				cls.statements.add(InnerStatement.ofImplicit(simBuilder)); // Implicit INNER
 		}
 		else {
-			if(Parse.currentToken(simBuilder).keyWord != KeyWord.SEMICOLON)
-				cls.statements.add(Statement.expectStatement(simBuilder));
-			cls.statements.add(new InnerStatement(Parse.currentToken(simBuilder).lineNumber)); // Implicit INNER
+//			if(Parse.currentToken(simBuilder).keyWord != KeyWord.SEMICOLON)
+			if(Parse.getParserToken(simBuilder).keyWord != KeyWord.SEMICOLON)
+				cls.statements.add(Statement.acceptStatement(simBuilder));
+			cls.statements.add(InnerStatement.ofImplicit(simBuilder)); // Implicit INNER
 		}
 	}
 

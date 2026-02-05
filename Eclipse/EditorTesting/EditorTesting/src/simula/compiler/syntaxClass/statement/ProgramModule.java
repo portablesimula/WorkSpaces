@@ -90,12 +90,74 @@ public final class ProgramModule extends Statement {
 	}
 
 	/// Create a new ProgramModule.
-	public ProgramModule(PsiBuilder simBuilder) {
+//	public ProgramModule(PsiBuilder simBuilder) {
+	public ProgramModule() {
 		super("ProgramModule", 0);
-		simBuilder.startSubtree("ProgramModule");
+//		simBuilder.startSubtree("ProgramModule");
 
 		sysin=new VariableExpression("sysin");
 		sysout=new VariableExpression("sysout");
+//		try	{
+//			if(Option.internal.TRACE_PARSE) Parse.TRACE("Parse Program");
+//			Global.setScope(StandardClass.BASICIO);		    	// BASICIO Begin
+//			new ConnectionBlock(sysin, null)                     	//    Inspect sysin do
+//			     .setClassDeclaration(StandardClass.Infile);
+//			new ConnectionBlock(sysout, null)                    	//    Inspect sysout do
+//			     .setClassDeclaration(StandardClass.Printfile);
+//			Global.getCurrentScope().sourceBlockLevel=0;
+//			while(Parse.accept(simBuilder, KeyWord.EXTERNAL)) {
+//				externalHead = ExternalDeclaration.expectExternalHead(simBuilder, StandardClass.BASICIO);		
+//				Util.IERR("ADD ExternalDeclaration TO PsiTree");
+//				Parse.expect(simBuilder, KeyWord.SEMICOLON);
+//			}
+//			
+////			// FOR TEST:
+////			simBuilder.psiTree.addChild(new PsiTree("BASICIO", psiTree));
+////			simBuilder.psiTree.addChild(new PsiTree("Drawing", psiTree));
+//			
+//			// Now: Looking for ( program | procedure-declaration | class-declaration )
+//			String ident=Parse.acceptIdentifier(simBuilder);
+//			if(ident!=null) {
+//				if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, ident);
+//			    else { Parse.rollBack(); mainModule = doParseProgram(simBuilder); }
+//			}
+//			else if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(null, ident);
+//			else {
+//				Type type=Parse.acceptType(simBuilder);
+//			    if(Parse.accept(simBuilder, KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type);
+//			    else mainModule = doParseProgram(simBuilder);
+//			}
+//			simBuilder.doneSubtree(mainModule);
+//			StandardClass.BASICIO.declarationList.add(mainModule);
+//			
+//			LexToken token = Parse.currentToken(simBuilder);
+//			if(token != null && token.keyWord != KeyWord.EOF) {
+//				simBuilder.startSubtree("TextAfterProgramEnd");
+//				Comment dum = new Comment();
+//				while(!simBuilder.eof()) simBuilder.advanceLexer(); // consume tokens  (add it to 'current tree')
+//				simBuilder.doneSubtree(dum);
+////				IO.println("NEW ProgramModule: TextAfterEnd: \"" + dum.psiTree.getText().replace("\n", "\\n") + '"');
+//				String textAfterEnd = dum.psiTree.getText().replaceAll("\\s+", ""); // Remove WhiteSpaces			
+////				IO.println("NEW ProgramModule: TextAfterEnd: \"" + textAfterEnd + '"');
+////				simBuilder.psiRoot.printTree("");
+//				if(! textAfterEnd.equals(";")) Util.warning("Text after Program end: \"" + textAfterEnd + '"');
+////				Util.IERR();
+//			}
+//			
+//			if(Option.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
+//		} catch(Throwable e) {
+//			e.printStackTrace();
+//			Util.IERR();
+//		}
+	}
+	
+
+	/// Create a new ProgramModule.
+	public void doBuild(PsiBuilder simBuilder) {
+		simBuilder.startSubtree("ProgramModule");
+
+//		sysin=new VariableExpression("sysin");
+//		sysout=new VariableExpression("sysout");
 		try	{
 			if(Option.internal.TRACE_PARSE) Parse.TRACE("Parse Program");
 			Global.setScope(StandardClass.BASICIO);		    	// BASICIO Begin
@@ -118,7 +180,7 @@ public final class ProgramModule extends Statement {
 			String ident=Parse.acceptIdentifier(simBuilder);
 			if(ident!=null) {
 				if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, ident);
-			    else { Parse.saveCurrentToken(); mainModule = doParseProgram(simBuilder); }
+			    else { Parse.rollBack(simBuilder); mainModule = doParseProgram(simBuilder); }
 			}
 			else if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(null, ident);
 			else {
@@ -129,7 +191,7 @@ public final class ProgramModule extends Statement {
 			simBuilder.doneSubtree(mainModule);
 			StandardClass.BASICIO.declarationList.add(mainModule);
 			
-			LexToken token = Parse.currentToken(simBuilder);
+			LexToken token = Parse.getParserToken(simBuilder);
 			if(token != null && token.keyWord != KeyWord.EOF) {
 				simBuilder.startSubtree("TextAfterProgramEnd");
 				Comment dum = new Comment();
@@ -158,9 +220,9 @@ public final class ProgramModule extends Statement {
 		
 		mainBlock.isMainModule = true;
 		mainBlock.declarationKind = ObjectKind.SimulaProgram;
-//		IO.println("ProramModule.doParseProgram: do expectStatement");
+//		IO.println("ProramModule.doParseProgram: do acceptStatement");
 //		Util.IERR();
-		Statement program = Statement.expectStatement(simBuilder);
+		Statement program = Statement.acceptStatement(simBuilder);
 		mainBlock.statements.add(program);
 //		mainBlock.psiTree.addChild(program.psiTree);
 		return mainBlock;

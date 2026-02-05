@@ -56,16 +56,20 @@ public final class ConditionalStatement extends Statement {
 	/// @param line the source line number
 	ConditionalStatement(PsiBuilder simBuilder, final int line) {
 		super("ConditionalStatement", line);
+
+		simBuilder.startSubtree("ConditionalStatement");
+		simBuilder.consume(KeyWord.IF); //  (add it to 'current tree')
+
 		condition = Expression.expectExpression(simBuilder);
 		Parse.expect(simBuilder, KeyWord.THEN);
 		Statement elseStatement = null;
 		if (Parse.accept(simBuilder, KeyWord.ELSE)) {
-			thenStatement = new DummyStatement(Parse.currentToken(simBuilder).lineNumber);
-			elseStatement = Statement.expectStatement(simBuilder);
+			thenStatement = new DummyStatement(Parse.getParserToken(simBuilder).lineNumber);
+			elseStatement = Statement.acceptStatement(simBuilder);
 		} else {
-		    thenStatement = Statement.expectStatement(simBuilder);
+		    thenStatement = Statement.acceptStatement(simBuilder);
 		    if (Parse.accept(simBuilder, KeyWord.ELSE)) {
-			    elseStatement = Statement.expectStatement(simBuilder);
+			    elseStatement = Statement.acceptStatement(simBuilder);
 		    }
 		}
 		this.elseStatement=elseStatement;

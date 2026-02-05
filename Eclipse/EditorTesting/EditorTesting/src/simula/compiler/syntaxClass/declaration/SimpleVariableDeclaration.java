@@ -124,6 +124,8 @@ public class SimpleVariableDeclaration extends Declaration {
 				if (Parse.accept(simBuilder, KeyWord.EQ))
 					typeDeclaration.constantElement = Expression.expectExpression(simBuilder);
 				declarationList.add(typeDeclaration);
+				simBuilder.doneSubtree(typeDeclaration);
+				simBuilder.startSubtree("NextDeclaration");
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
 	}
 

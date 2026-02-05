@@ -119,22 +119,22 @@ public abstract class SyntaxClass {//extends CompositePsiElement {
 		lineNumber = Global.sourceLineNumber;
 	}
     
-    public static LexToken getSimToken(PsiBuilder simBuilder) {
-        return (LexToken)simBuilder.getTokenType();
-    }
-    
-    public static int getKeyWord(PsiBuilder simBuilder) {
-        return getSimToken(simBuilder).keyWord;
-    }
-
-    public static void consumeUntilSemicolon(PsiBuilder simBuilder) {
-        while (!simBuilder.eof() && getKeyWord(simBuilder) != KeyWord.SEMICOLON) {
-            simBuilder.advanceLexer();
-        }
-//        if (getKeyWord(simBuilder) == KeyWord.SEMICOLON) {
+//    public static LexToken getSimToken(PsiBuilder simBuilder) {
+//        return (LexToken)simBuilder.getCurrentLexerToken();
+//    }
+//    
+//    public static int getKeyWord(PsiBuilder simBuilder) {
+//        return getSimToken(simBuilder).keyWord;
+//    }
+//
+//    public static void consumeUntilSemicolon(PsiBuilder simBuilder) {
+//        while (!simBuilder.eof() && getKeyWord(simBuilder) != KeyWord.SEMICOLON) {
 //            simBuilder.advanceLexer();
 //        }
-    }
+////        if (getKeyWord(simBuilder) == KeyWord.SEMICOLON) {
+////            simBuilder.advanceLexer();
+////        }
+//    }
 
 	/// Perform semantic checking.
 	/// 

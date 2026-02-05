@@ -3,7 +3,7 @@
 /// 
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
-package simula.editor;
+package simula.psi.viewer;
 
 import java.awt.BorderLayout;
 import java.awt.Choice;
@@ -50,6 +50,8 @@ import simula.compiler.utilities.ConsolePanel;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.editor.RTOption;
+import simula.editor.SourceTextPanel;
 
 /// The SimulaEditor.
 /// 
@@ -58,16 +60,16 @@ import simula.compiler.utilities.Util;
 /// 
 /// @author Øystein Myhre Andersen
 @SuppressWarnings("serial")
-public class SimulaEditor extends JFrame {
+public class SimulaPsiViewer extends JFrame {
 	
 	/// The tabbed pane.
     static JTabbedPane tabbedPane; 
     
     /// The menu bar.
-    static EditorMenues menuBar;
+    static PsiViewerMenues menuBar;
     
     /// The current SourceTextPanel
-    static SourceTextPanel current;
+    static PsiTextPanel current;
     
     /// The autoRefresher
     static AutoRefresher autoRefresher;
@@ -82,7 +84,6 @@ public class SimulaEditor extends JFrame {
     /// SimulaEditor: Main Entry for TESTING ONLY.
     /// @param args the arguments
      public static void main(String[] args) {
- 		System.setProperty("sun.java2d.uiScale", "0.7"); // Scales by 200%
 		Global.packetName="simprog";
 		String userDir="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/Simula";
 		Global.simulaRtsLib=new File(userDir,"bin"); // To use Eclipse Project's simula.runtime  Download
@@ -91,10 +92,12 @@ public class SimulaEditor extends JFrame {
 		Global.sampleSourceDir=new File(userDir+"/src/simulaTestPrograms/samples");
 		Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 			public void uncaughtException(Thread thread, Throwable e) {
-				System.out.print("SimulaEditor.UncaughtExceptionHandler: GOT Exception: " + e);
+				System.out.print("SimulaEditor.UncaughtExceptionHandler: GOT Exception: " + e.getMessage());
+				e.printStackTrace();
+//				System.out.print("SimulaEditor.UncaughtExceptionHandler: GOT Exception: " + e);
 		}});
 		Option.internal.INLINE_TESTING=true;
-		SimulaEditor editor=new SimulaEditor();
+		SimulaPsiViewer editor=new SimulaPsiViewer();
     	editor.setVisible(true);
     }
             
@@ -102,16 +105,18 @@ public class SimulaEditor extends JFrame {
 	// *** Constructor
 	// ****************************************************************
     /// Create a new SimulaEditor.
-    public SimulaEditor() {
+    public SimulaPsiViewer() {
 		Global.initiate();
         try { setIconImage(Global.favicon.getImage()); } 
         catch (Exception e) {}// Util.IERR("Impossible",e); }
+        
 		Global.console=new ConsolePanel();
-    	String revision=Global.getSimulaProperty("simula.revision","?");
-    	String dated=Global.getSimulaProperty("simula.setup.dated","?");
-        String releaseID=Global.simulaReleaseID+'R'+revision;
-		Global.simulaVersion="SimulaEditor ("+releaseID+ " built "+dated+" using "+Util.getJavaID()+")";
-        Global.console.write(Global.simulaVersion+"\n");
+        
+//    	String revision=Global.getSimulaProperty("simula.revision","?");
+//    	String dated=Global.getSimulaProperty("simula.setup.dated","?");
+//        String releaseID=Global.simulaReleaseID+'R'+revision;
+		Global.simulaVersion="Simula PSI Viewer";
+//        Global.console.write(Global.simulaVersion+"\n");
         
         // Set the initial size of the window
         int frameHeight=800;//500;
@@ -134,7 +139,7 @@ public class SimulaEditor extends JFrame {
         tabbedPane.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Component selected=tabbedPane.getSelectedComponent();
-				if(selected instanceof SourceTextPanel panel) {
+				if(selected instanceof PsiTextPanel panel) {
 					current=panel;
 					menuBar.updateMenuItems();
 				}
@@ -148,7 +153,7 @@ public class SimulaEditor extends JFrame {
         autoRefresher=new AutoRefresher(); autoRefresher.start();
 
         // Set the Menus
-        menuBar=new EditorMenues();
+        menuBar=new PsiViewerMenues();
         this.setJMenuBar(menuBar);
         this.setVisible(true);
         
@@ -384,7 +389,7 @@ public class SimulaEditor extends JFrame {
     /// Remove selected tab.
     static void removeSelectedTab() {
     	tabbedPane.removeTabAt(tabbedPane.getSelectedIndex());
-        current=(SourceTextPanel)tabbedPane.getSelectedComponent();
+        current=(PsiTextPanel)tabbedPane.getSelectedComponent();
         menuBar.updateMenuItems();
     }
     
@@ -397,55 +402,65 @@ public class SimulaEditor extends JFrame {
     static void doNewTabbedPanel(File file,Language lang) {
     	new Thread(new Runnable() {
     		public void run() {
-     			current=new SourceTextPanel(file,lang,menuBar.popupMenu);
+     			current=new PsiTextPanel(file, menuBar.popupMenu);
     			tabbedPane.addTab((file==null)?"unnamed":file.getName(), null, current, "Tool tip ...");
     			// select the last tab
     			tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
     			current.fileChanged=false;
-    			if(file==null)current.fillTextPane(new StringReader("begin\n\nend;\n"),0);
+    			if(file==null)current.fillTextPane("begin\n\nend;\n",0);
     			else if(lang==Language.Simula) {
-    				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
-    					  current.fillTextPane(reader,0);
+    				try {
+//    					Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
+//    					current.fillTextPane(reader,0);
+    			    	FileInputStream inpt = new FileInputStream(file);
+    					byte[] bytes = inpt.readAllBytes();
+    					CharSequence buffer = new String(bytes);
+    					current.fillTextPane(buffer,0);
     				} catch(IOException e) { Util.IERR("Impossible",e); }
     			}
-    			else if(lang==Language.Jar) {
-    				current.fillTextPane(getJarFileReader(file),0);
-    			}
-    			else if(lang==Language.Other) {
-    				current.fillTextPane(getHexFileReader(file),0);
-    			}
+//    			else if(lang==Language.Jar) {
+//    				current.fillTextPane(getJarFileReader(file),0);
+//    			}
+//    			else if(lang==Language.Other) {
+//    				current.fillTextPane(getHexFileReader(file),0);
+//    			}
     			else if(lang==Language.Text)
-    				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
-    				current.fillTextPane(reader,0);
+    				try {
+//    					Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
+//    					current.fillTextPane(reader,0);
+    			    	FileInputStream inpt = new FileInputStream(file);
+    					byte[] bytes = inpt.readAllBytes();
+    					CharSequence buffer = new String(bytes);
+    					current.fillTextPane(buffer,0);
     			} catch(IOException e) { Util.IERR("Impossible",e); }
     			menuBar.updateMenuItems();
     		}}).start();
     }
     
-    /// Utility: Get HexFile Reader.
-    /// @param file the file to read
-    /// @return The resulting reader
-    private static Reader getHexFileReader(File file) {
-    	StringBuilder sb=new StringBuilder();
-    	String hexPart="",charPart="";
-    	FileInputStream inpt;
-    	try { inpt=new FileInputStream(file);
-    		int b;
-    		while((b=inpt.read()) != -1) {
-    			hexPart=hexPart+' '+AppendLeadingZeroes(Integer.toHexString(b),2);
-    			charPart=charPart+((b>31 && b<128)?((char)b):'.');
-    			if((charPart.length())>15) {
-    				sb.append("  "+hexPart+"  "+charPart+"\n");
-    				hexPart=""; charPart="";
-    			}
-    		}
-    		if((charPart.length())>0) {
-    	    	while(hexPart.length()<(16*3)) hexPart=hexPart+" ";
-				sb.append("  "+hexPart+"  "+charPart+"\n");    			
-    		}
-    	} catch(IOException e) { Util.IERR("Impossible",e); }
-    	return(new StringReader(sb.toString()));
-    }
+//    /// Utility: Get HexFile Reader.
+//    /// @param file the file to read
+//    /// @return The resulting reader
+//    private static Reader getHexFileReader(File file) {
+//    	StringBuilder sb=new StringBuilder();
+//    	String hexPart="",charPart="";
+//    	FileInputStream inpt;
+//    	try { inpt=new FileInputStream(file);
+//    		int b;
+//    		while((b=inpt.read()) != -1) {
+//    			hexPart=hexPart+' '+AppendLeadingZeroes(Integer.toHexString(b),2);
+//    			charPart=charPart+((b>31 && b<128)?((char)b):'.');
+//    			if((charPart.length())>15) {
+//    				sb.append("  "+hexPart+"  "+charPart+"\n");
+//    				hexPart=""; charPart="";
+//    			}
+//    		}
+//    		if((charPart.length())>0) {
+//    	    	while(hexPart.length()<(16*3)) hexPart=hexPart+" ";
+//				sb.append("  "+hexPart+"  "+charPart+"\n");    			
+//    		}
+//    	} catch(IOException e) { Util.IERR("Impossible",e); }
+//    	return(new StringReader(sb.toString()));
+//    }
     
     /// Utility: Append leading zeroes.
     /// @param s the input string
@@ -456,61 +471,61 @@ public class SimulaEditor extends JFrame {
     	return(s.toUpperCase());
     }
    
-    /// Get .jar file Reader
-    /// @param file the file
-    /// @return a .jar file Reader
-    private static Reader getJarFileReader(File file) {
-    	StringBuilder sb=new StringBuilder();
-    	sb.append("File: "+file).append("\n");
-    	if(!(file.exists() && file.canRead())) {
-    		sb.append("Can't read .jar file: "+file).append("\n");
-    	} else {
-    		JarFile jarFile=null;
-    		try {
-    			jarFile=new JarFile(file);
-    			Manifest manifest=jarFile.getManifest();
-    			Attributes mainAttributes=manifest.getMainAttributes();
-    			Set<Object> keys=mainAttributes.keySet();
-    			for(Object key:keys) {
-    				String val=mainAttributes.getValue(key.toString());
-    				sb.append(key.toString()+"=\""+val+"\"").append("\n");
-    			}
-
-    			Enumeration<JarEntry> entries=jarFile.entries();
-    			while(entries.hasMoreElements()) {
-    				JarEntry entry=entries.nextElement();
-    				String size=""+entry.getSize();
-    				while(size.length()<6) size=" "+size;
-    				FileTime fileTime=entry.getLastModifiedTime();
-    				String date = DateTimeFormatter.ofPattern("uuuu-MMM-dd HH:mm:ss", Locale.getDefault())
-    						.withZone(ZoneId.systemDefault()).format(fileTime.toInstant());
-    				sb.append("Jar-Entry: "+size+"  "+date+"  \""+entry+"\"").append("\n");
-    			}
-    		} catch(IOException e) {
-    			Util.IERR("Caused by:",e);
-    		} finally {
-    			if(jarFile!=null)
-    				try { jarFile.close(); } catch (IOException e) { e.printStackTrace(); }
-    		}
-    	}
-    	return(new StringReader(sb.toString()));
-    }
-	
-	// ****************************************************************
-	// *** doRunJarFile
-	// ****************************************************************
-    /// Run the given .jar file
-    /// @param jarFile the file
-	static void doRunJarFile(File jarFile) {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				String userDir=jarFile.getParentFile().getParent();
-				String[] cmds= {"java","-jar",jarFile.toString(),"-userDir",userDir};
-				Util.execute(cmds);
-			}
-		}).start();
-	}
+//    /// Get .jar file Reader
+//    /// @param file the file
+//    /// @return a .jar file Reader
+//    private static Reader getJarFileReader(File file) {
+//    	StringBuilder sb=new StringBuilder();
+//    	sb.append("File: "+file).append("\n");
+//    	if(!(file.exists() && file.canRead())) {
+//    		sb.append("Can't read .jar file: "+file).append("\n");
+//    	} else {
+//    		JarFile jarFile=null;
+//    		try {
+//    			jarFile=new JarFile(file);
+//    			Manifest manifest=jarFile.getManifest();
+//    			Attributes mainAttributes=manifest.getMainAttributes();
+//    			Set<Object> keys=mainAttributes.keySet();
+//    			for(Object key:keys) {
+//    				String val=mainAttributes.getValue(key.toString());
+//    				sb.append(key.toString()+"=\""+val+"\"").append("\n");
+//    			}
+//
+//    			Enumeration<JarEntry> entries=jarFile.entries();
+//    			while(entries.hasMoreElements()) {
+//    				JarEntry entry=entries.nextElement();
+//    				String size=""+entry.getSize();
+//    				while(size.length()<6) size=" "+size;
+//    				FileTime fileTime=entry.getLastModifiedTime();
+//    				String date = DateTimeFormatter.ofPattern("uuuu-MMM-dd HH:mm:ss", Locale.getDefault())
+//    						.withZone(ZoneId.systemDefault()).format(fileTime.toInstant());
+//    				sb.append("Jar-Entry: "+size+"  "+date+"  \""+entry+"\"").append("\n");
+//    			}
+//    		} catch(IOException e) {
+//    			Util.IERR("Caused by:",e);
+//    		} finally {
+//    			if(jarFile!=null)
+//    				try { jarFile.close(); } catch (IOException e) { e.printStackTrace(); }
+//    		}
+//    	}
+//    	return(new StringReader(sb.toString()));
+//    }
+//	
+//	// ****************************************************************
+//	// *** doRunJarFile
+//	// ****************************************************************
+//    /// Run the given .jar file
+//    /// @param jarFile the file
+//	static void doRunJarFile(File jarFile) {
+//		new Thread(new Runnable() {
+//			@Override
+//			public void run() {
+//				String userDir=jarFile.getParentFile().getParent();
+//				String[] cmds= {"java","-jar",jarFile.toString(),"-userDir",userDir};
+//				Util.execute(cmds);
+//			}
+//		}).start();
+//	}
 	    
     // ****************************************************************
     // *** AutoRefresher

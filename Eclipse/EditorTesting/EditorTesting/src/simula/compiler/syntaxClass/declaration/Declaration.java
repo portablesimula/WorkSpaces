@@ -127,11 +127,21 @@ public abstract class Declaration extends SyntaxClass {
 		else if (warning)
 			Util.warning(identifier + " is alrerady defined in " + declaredIn.identifier);
 	}
+	
+	/// Repeatedly parse a declaration and add it to the given BlockDeclaration's' declaration list.
+	/// Continue until there are no more declarations.
+	/// @param enclosure the owning block.
+	protected static void acceptDeclarations(final PsiBuilder simBuilder, final BlockDeclaration enclosure) {
+		simBuilder.startSubtree("Declaration");
+		while (Declaration.acceptDeclaration(simBuilder, enclosure))
+			Parse.accept(simBuilder, KeyWord.SEMICOLON);
+		simBuilder.dropSubtree();
+	}
 
 	/// Parse a declaration and add it to the given declaration list.
 	/// @param enclosure the owning block.
 	/// @return true if a declaration was found, false otherwise
-	protected static boolean acceptDeclaration(final PsiBuilder simBuilder, final BlockDeclaration enclosure) {
+	private static boolean acceptDeclaration(final PsiBuilder simBuilder, final BlockDeclaration enclosure) {
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse Declaration");
 		DeclarationList declarationList=enclosure.declarationList;
@@ -140,7 +150,7 @@ public abstract class Declaration extends SyntaxClass {
 			if (Parse.accept(simBuilder, KeyWord.CLASS))
 				declarationList.add(ClassDeclaration.expectClassDeclaration(simBuilder, prefix));
 			else {
-				Parse.saveCurrentToken(); // Identifier is NOT a class prefix.
+				Parse.rollBack(simBuilder); // Identifier is NOT a class prefix.
 				return (false);
 			}
 		} else if (Parse.accept(simBuilder, KeyWord.ARRAY))
@@ -153,12 +163,12 @@ public abstract class Declaration extends SyntaxClass {
 			Parse.expect(simBuilder, KeyWord.PROCEDURE);
 			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type));
 		} else if (Parse.accept(simBuilder, KeyWord.CLASS))
-			declarationList.add(ClassDeclaration.expectClassDeclaration(null, prefix));
+			declarationList.add(ClassDeclaration.expectClassDeclaration(simBuilder, prefix));
 		else if (Parse.accept(simBuilder, KeyWord.SWITCH)) {
 			String ident = Parse.acceptIdentifier(simBuilder);
 			if (ident == null) {
 				// Switch Statement
-				Parse.saveCurrentToken();
+				Parse.rollBack(simBuilder);
 				return (false);
 			}
 			declarationList.add(new SwitchDeclaration(simBuilder, ident));
@@ -166,12 +176,18 @@ public abstract class Declaration extends SyntaxClass {
 			ExternalDeclaration.expectExternalHead(simBuilder, enclosure);
 		else {
 			Type type = Parse.acceptType(simBuilder);
-			if (type == null)
+			if (type == null) {
+//				simBuilder.dropSubtree();
 				return (false);
-			if (Parse.accept(simBuilder, KeyWord.PROCEDURE))
+			}
+			if (Parse.accept(simBuilder, KeyWord.PROCEDURE)) {
+//				Util.IERR("NOT IMPL");
 				declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type));
-			else if (Parse.accept(simBuilder, KeyWord.ARRAY))
+			}
+			else if (Parse.accept(simBuilder, KeyWord.ARRAY)) {
+//				Util.IERR("NOT IMPL");
 				ArrayDeclaration.expectArrayDeclaration(simBuilder, type, declarationList);
+			}
 			else 
 				SimpleVariableDeclaration.expectSimpleVariable(simBuilder, type, declarationList);
 			

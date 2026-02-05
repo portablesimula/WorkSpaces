@@ -11,10 +11,12 @@ import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.editor.PsiBuilder;
 
 /// Inner Statement.
 /// 
@@ -32,14 +34,33 @@ import simula.compiler.utilities.Util;
 /// @author Øystein Myhre Andersen
 public final class InnerStatement extends Statement {
 
+	public static InnerStatement ofExplicit(final PsiBuilder simBuilder) {
+		simBuilder.startSubtree("InnerStatement");
+		simBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
+		 return new InnerStatement(simBuilder);		
+	}
+
+	public static InnerStatement ofImplicit(final PsiBuilder simBuilder) {
+		 return new InnerStatement(simBuilder);		
+	}
+	
 	/// Create a new InnerStatement.
 	/// @param line the source line number
-	 public InnerStatement(final int line) {
-		super("InnerStatement", line);
+//	 public InnerStatement(final PsiBuilder simBuilder, boolean implicit, final int line) {
+	 private InnerStatement(final PsiBuilder simBuilder) {
+		super("InnerStatement", simBuilder.getSourceLineNumber());
+
+//		if(! implicit) {
+//			simBuilder.startSubtree("InnerStatement");
+//			simBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
+//		}
+
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": InnerStatement: "+this);
-		ClassDeclaration cls=(ClassDeclaration)Global.getCurrentScope();
-		cls.statements1 = cls.statements;
-		cls.statements = new ObjectList<Statement>();
+		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
+//			ClassDeclaration cls=(ClassDeclaration)Global.getCurrentScope();
+			cls.statements1 = cls.statements;
+			cls.statements = new ObjectList<Statement>();
+		} else Util.error("Missplaced Inner");
 	}
 
 	@Override

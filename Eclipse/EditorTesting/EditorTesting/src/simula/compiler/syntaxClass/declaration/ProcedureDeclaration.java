@@ -139,7 +139,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public static ProcedureDeclaration expectProcedureDeclaration(final PsiBuilder simBuilder, final Type type) {
 		ProcedureDeclaration proc = new ProcedureDeclaration(null, ObjectKind.Procedure);
 		proc.sourceFileName = Global.sourceFileName;
-		proc.lineNumber=Parse.prevToken().lineNumber;
+		proc.lineNumber = simBuilder.getSourceLineNumber();
 		proc.type = type;
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ProcedureDeclaration, type=" + type);
@@ -156,6 +156,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Line "+proc.lineNumber+": ProcedureDeclaration: "+proc);
 		Global.setScope(proc.declaredIn);
+		simBuilder.doneSubtree(proc);
+		simBuilder.startSubtree("NextDeclaration");
 		return (proc);
 	}
 	
@@ -174,7 +176,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @param pList the parameter list
 	/// @return true: if mode-part was present.
 	private static boolean acceptModePart(PsiBuilder simBuilder, Vector<Parameter> pList) {
-		LexToken prevToken = Parse.currentToken(simBuilder);
+		LexToken prevToken = Parse.getParserToken(simBuilder);
 		if (Parse.accept(simBuilder, KeyWord.VALUE, KeyWord.NAME)) {
 			int mode = (prevToken.keyWord == KeyWord.VALUE)
 					? Parameter.Mode.value
@@ -275,20 +277,21 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		if (Parse.accept(simBuilder, KeyWord.BEGIN)) {
 			Statement stm;
 			if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse Procedure Block");
-			while (Declaration.acceptDeclaration(simBuilder, proc)) {
-				Parse.accept(simBuilder, KeyWord.SEMICOLON);
-			}
+//			while (Declaration.acceptDeclaration(simBuilder, proc)) {
+//				Parse.accept(simBuilder, KeyWord.SEMICOLON);
+//			}
+			Declaration.acceptDeclarations(simBuilder, proc);
 //			Vector<Statement> stmList = proc.statements;
 			ObjectList<Statement> stmList = proc.statements;
 			while (!Parse.accept(simBuilder, KeyWord.END, KeyWord.EOF)) {
-				stm = Statement.expectStatement(simBuilder);
+				stm = Statement.acceptStatement(simBuilder);
 				if (stm != null) stmList.add(stm);
 			}
-			if (Parse.prevToken().keyWord == KeyWord.EOF) {
+			if (Parse.prevToken(simBuilder).keyWord == KeyWord.EOF) {
 				Util.error("Illegal termination of procedure declaration. Missing END.");
 			}
 		}
-		else proc.statements.add(Statement.expectStatement(simBuilder));
+		else proc.statements.add(Statement.acceptStatement(simBuilder));
 	}
 
 	// ***********************************************************************************************

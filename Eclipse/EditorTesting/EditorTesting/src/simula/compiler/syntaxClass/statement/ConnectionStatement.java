@@ -128,6 +128,10 @@ public final class ConnectionStatement extends Statement {
 	/// @param line the source line number
 	ConnectionStatement(final PsiBuilder simBuilder, final int line) {
 		super("ConnectionStatement", line);
+
+		simBuilder.startSubtree("ConnectionStatement");
+		simBuilder.consume(KeyWord.INSPECT); //  (add it to 'current tree')
+
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ConnectionStatement");
 		objectExpression = Expression.expectExpression(simBuilder);
@@ -155,7 +159,7 @@ public final class ConnectionStatement extends Statement {
 			ConnectionBlock connectionBlock = new ConnectionBlock(inspectedVariable, null);
 			DeclarationScope prevScope = Global.getCurrentScope();
 			Global.setScope(connectionBlock);
-			Statement statement = Statement.expectStatement(simBuilder);
+			Statement statement = Statement.acceptStatement(simBuilder);
 			Global.setScope(prevScope);
 			
 			connectionPart.add(new ConnectionDoPart(this,connectionBlock, statement));
@@ -166,14 +170,14 @@ public final class ConnectionStatement extends Statement {
 				Parse.expect(simBuilder, KeyWord.DO);
 				ConnectionBlock connectionBlock = new ConnectionBlock(inspectedVariable, classIdentifier);
 				hasWhenPart = true;
-				Statement statement = Statement.expectStatement(simBuilder);
+				Statement statement = Statement.acceptStatement(simBuilder);
 				connectionPart.add(new ConnectionWhenPart(this,classIdentifier, connectionBlock, statement));
 				connectionBlock.end();
 			}
 		}
 		if(!(hasDoPart | hasWhenPart)) Util.error("Incomplete Inspect statement: "+objectExpression);
 		Statement otherwise = null;
-		if (Parse.accept(simBuilder, KeyWord.OTHERWISE)) otherwise = Statement.expectStatement(simBuilder);
+		if (Parse.accept(simBuilder, KeyWord.OTHERWISE)) otherwise = Statement.acceptStatement(simBuilder);
 		this.otherwise=otherwise;
 		this.hasWhenPart=hasWhenPart;
 		if (Option.internal.TRACE_PARSE)

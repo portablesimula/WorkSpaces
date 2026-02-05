@@ -13,11 +13,13 @@ import simula.editor.PsiBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.Parameter;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
@@ -54,8 +56,13 @@ public final class GotoStatement extends Statement {
 
 	/// Create a new GotoStatement.
 	/// @param line source line
-	GotoStatement(final PsiBuilder simBuilder, final int line) {
+	GotoStatement(final PsiBuilder simBuilder, final int keyWord, final int line) {
 		super("GotoStatement", line);
+		simBuilder.startSubtree("GotoStatement");
+		simBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to 'current tree')
+		if(keyWord != KeyWord.GOTO) {
+	        if (!Parse.accept(simBuilder, KeyWord.TO))	Util.error("Missing 'TO' after 'GO'");
+		}
 		label = Expression.expectExpression(simBuilder);
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+this.lineNumber+": GotoStatement: "+this);
 	}

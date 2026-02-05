@@ -91,6 +91,9 @@ import simula.compiler.utilities.Util;
 /// @author Øystein Myhre Andersen
 /// @author Stein Krogdahl
 public abstract class Expression extends SyntaxClass {
+	
+	private static final boolean TEST1 = false;//true;
+	private static final boolean TEST2 = !TEST1;
 
 	/// The type
 	public Type type = null;
@@ -120,16 +123,22 @@ public abstract class Expression extends SyntaxClass {
 //		} else return(acceptSimpleExpression());
 //	} 
 	public static Expression acceptExpression(PsiBuilder simBuilder) {
-        LexToken simToken = getSimToken(simBuilder);
+		simBuilder.startSubtree("Expression");
+//		Util.IERR();
 		if(Parse.accept(simBuilder, KeyWord.IF)) {
-//			Expression condition=acceptExpression();
-//			Parse.expect(simBuilder, KeyWord.THEN); Expression thenExpression=acceptSimpleExpression();
-//			Parse.expect(simBuilder, KeyWord.ELSE); Expression elseExpression=acceptExpression();
-//			Expression expr=new ConditionalExpression(Type.Boolean,condition,thenExpression,elseExpression);
-//			if(Option.internal.TRACE_PARSE) Util.TRACE("Expression: ParseExpression, result="+expr);
-//			return(expr);
-			throw new RuntimeException("Expression.acceptExpression: NOT IMPL");
-		} else return(acceptSimpleExpression(simBuilder));
+			Expression condition=acceptExpression(simBuilder);
+			Parse.expect(simBuilder, KeyWord.THEN); Expression thenExpression=acceptSimpleExpression(simBuilder);
+			Parse.expect(simBuilder, KeyWord.ELSE); Expression elseExpression=acceptExpression(simBuilder);
+			Expression expr=new ConditionalExpression(Type.Boolean,condition,thenExpression,elseExpression);
+			if(Option.internal.TRACE_PARSE) Util.TRACE("Expression: ParseExpression, result="+expr);
+			if(true) throw new RuntimeException("Expression.acceptExpression: NOT IMPL: "+expr);
+			simBuilder.doneSubtree(expr);
+			return expr;
+		} else {
+			Expression expr= acceptSimpleExpression(simBuilder);
+			simBuilder.doneSubtree(expr);
+			return expr;
+		}
 	} 
 	
 	/// Expect expression.
@@ -164,10 +173,14 @@ public abstract class Expression extends SyntaxClass {
 	///        
 	/// @return Expression or null if no expression is found.
 	private static Expression acceptSimpleExpression(PsiBuilder simBuilder)  {   
+		if(TEST1) simBuilder.startSubtree("acceptSimpleExpression");
 		Expression expr = acceptANDTHEN(simBuilder);
 		while(Parse.accept(simBuilder, KeyWord.OR_ELSE))  {
+			if(TEST2) simBuilder.startSubtree("acceptSimpleExpression");
 			expr=new BooleanExpression(expr,KeyWord.OR_ELSE,acceptANDTHEN(simBuilder));
+			if(TEST2) simBuilder.doneSubtree(expr);
 		}
+		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
 
@@ -177,9 +190,14 @@ public abstract class Expression extends SyntaxClass {
 	/// </pre>
 	/// @return an expression
 	private static Expression acceptANDTHEN(PsiBuilder simBuilder) {
+		if(TEST1) simBuilder.startSubtree("acceptANDTHEN");
 		Expression expr = acceptEQV(simBuilder);
-		while(Parse.accept(simBuilder, KeyWord.AND_THEN))
+		while(Parse.accept(simBuilder, KeyWord.AND_THEN)) {
+			if(TEST2) simBuilder.startSubtree("acceptANDTHEN");
 			expr=new BooleanExpression(expr,KeyWord.AND_THEN,acceptEQV(simBuilder));
+			if(TEST2) simBuilder.doneSubtree(expr);
+		}
+		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
 
@@ -189,9 +207,14 @@ public abstract class Expression extends SyntaxClass {
 	/// </pre>
 	/// @return an expression
 	private static Expression acceptEQV(PsiBuilder simBuilder) { 
+		if(TEST1) simBuilder.startSubtree("acceptEQV");
 		Expression expr=acceptIMP(simBuilder);
-		while(Parse.accept(simBuilder, KeyWord.EQV))
+		while(Parse.accept(simBuilder, KeyWord.EQV)) {
+			if(TEST2) simBuilder.startSubtree("acceptEQV");
 			expr=new BooleanExpression(expr,KeyWord.EQV,acceptIMP(simBuilder));
+			if(TEST2) simBuilder.doneSubtree(expr);
+		}
+		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
 
@@ -201,9 +224,14 @@ public abstract class Expression extends SyntaxClass {
 	/// </pre>
 	/// @return an expression
 	private static Expression acceptIMP(PsiBuilder simBuilder) {
+		if(TEST1) simBuilder.startSubtree("acceptIMP");
 		Expression expr=acceptOR(simBuilder);
-		while(Parse.accept(simBuilder, KeyWord.IMP))
+		while(Parse.accept(simBuilder, KeyWord.IMP)) {
+			if(TEST2) simBuilder.startSubtree("acceptIMP");
 			expr=new BooleanExpression(expr,KeyWord.IMP,acceptOR(simBuilder));
+			if(TEST2) simBuilder.doneSubtree(expr);
+		}
+		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
 
@@ -213,9 +241,14 @@ public abstract class Expression extends SyntaxClass {
 	/// </pre>
 	/// @return an expression
 	private static Expression acceptOR(PsiBuilder simBuilder) {
+		if(TEST1) simBuilder.startSubtree("acceptOR");
 		Expression expr=acceptAND(simBuilder);
-		while(Parse.accept(simBuilder, KeyWord.OR))
+		while(Parse.accept(simBuilder, KeyWord.OR)) {
+			if(TEST2) simBuilder.startSubtree("acceptOR");
 			expr=new BooleanExpression(expr,KeyWord.OR,acceptAND(simBuilder));
+			if(TEST2) simBuilder.doneSubtree(expr);
+		}
+		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
 
@@ -225,9 +258,14 @@ public abstract class Expression extends SyntaxClass {
 	/// </pre>
 	/// @return an expression
 	private static Expression acceptAND(PsiBuilder simBuilder) {
+		if(TEST1) simBuilder.startSubtree("acceptAND");
 		Expression expr=acceptNOT(simBuilder);
-		while(Parse.accept(simBuilder, KeyWord.AND))
+		while(Parse.accept(simBuilder, KeyWord.AND)) {
+			if(TEST2) simBuilder.startSubtree("acceptAND");
 			expr=new BooleanExpression(expr,KeyWord.AND,acceptNOT(simBuilder));
+			if(TEST2) simBuilder.doneSubtree(expr);
+		}
+		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
 
@@ -237,10 +275,14 @@ public abstract class Expression extends SyntaxClass {
 	/// </pre>
 	/// @return an expression
 	private static Expression  acceptNOT(PsiBuilder simBuilder) {
+		if(TEST1) simBuilder.startSubtree("acceptNOT");
 		Expression expr;
 		if(Parse.accept(simBuilder, KeyWord.NOT)) {
+			if(TEST2) simBuilder.startSubtree("acceptNOT");
 			expr=UnaryOperation.create(KeyWord.NOT,acceptTEXTCONC(simBuilder));
+			if(TEST2) simBuilder.doneSubtree(expr);
 		} else expr = acceptTEXTCONC(simBuilder);
+		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
 
@@ -250,9 +292,14 @@ public abstract class Expression extends SyntaxClass {
 	/// </pre>
 	/// @return an expression
 	private static Expression acceptTEXTCONC(PsiBuilder simBuilder) {
+		if(TEST1) simBuilder.startSubtree("acceptTEXTCONC");
 		Expression expr=acceptRelation(simBuilder);
-		while(Parse.accept(simBuilder, KeyWord.CONC))
+		while(Parse.accept(simBuilder, KeyWord.CONC)) {
+			if(TEST2) simBuilder.startSubtree("acceptTEXTCONC");
 			expr=new TextExpression(expr,acceptRelation(simBuilder));
+			if(TEST2) simBuilder.doneSubtree(expr);
+		}
+		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
 
@@ -263,12 +310,16 @@ public abstract class Expression extends SyntaxClass {
 	/// </pre>
 	/// @return an expression
 	private static Expression acceptRelation(PsiBuilder simBuilder) {   // Metode-form      
+		if(TEST1) simBuilder.startSubtree("acceptRelation");
 		Expression expr = acceptAdditiveOperation(simBuilder);
 		LexToken prevToken = null;
 		if((prevToken = Parse.acceptRelationalOperator(simBuilder)) != null)   { 
 			int opr = prevToken.keyWord;
+			if(TEST2) simBuilder.startSubtree("acceptRelation");
 			expr = new RelationalOperation(expr,opr,acceptAdditiveOperation(simBuilder));
+			if(TEST2) simBuilder.doneSubtree(expr);
 		}
+		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
 
@@ -278,13 +329,16 @@ public abstract class Expression extends SyntaxClass {
 	/// </pre>
 	/// @return an expression
 	private static Expression acceptAdditiveOperation(PsiBuilder simBuilder) {
+		if(TEST1) simBuilder.startSubtree("acceptAdditiveOperation");
 		Expression expr=acceptUNIMULDIV(simBuilder);
-		LexToken prevToken = null;
-		while( (prevToken = Parse.acceptToken(simBuilder, KeyWord.PLUS,KeyWord.MINUS)) != null) { 
-//			int opr=Parse.prevToken.getKeyWord();
-			int opr=prevToken.keyWord;
+		LexToken accepted = null;
+		while( (accepted = Parse.acceptParserToken(simBuilder, KeyWord.PLUS,KeyWord.MINUS)) != null) { 
+			int opr=accepted.keyWord;
+			if(TEST2) simBuilder.startSubtree("acceptAdditiveOperation");
 			expr=ArithmeticExpression.create(expr,opr,acceptMULDIV(simBuilder));
+			if(TEST2) simBuilder.doneSubtree(expr);
 		}
+		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
 
@@ -294,13 +348,19 @@ public abstract class Expression extends SyntaxClass {
 	/// </pre>
 	/// @return an expression
 	private static Expression acceptUNIMULDIV(PsiBuilder simBuilder) {
+		if(TEST1) simBuilder.startSubtree("acceptUNIMULDIV");
 		Expression expr;
 		LexToken prevToken = null;
-		if((prevToken = Parse.acceptToken(simBuilder, KeyWord.PLUS,KeyWord.MINUS)) != null) {
+		if((prevToken = Parse.acceptParserToken(simBuilder, KeyWord.PLUS,KeyWord.MINUS)) != null) {
 			int opr=prevToken.keyWord;
 			if(opr==KeyWord.PLUS) expr=acceptMULDIV(simBuilder);
-			else expr=UnaryOperation.create(opr,acceptMULDIV(simBuilder));
+			else {
+				if(TEST2) simBuilder.startSubtree("acceptUNIMULDIV");
+				expr=UnaryOperation.create(opr,acceptMULDIV(simBuilder));
+				if(TEST2) simBuilder.doneSubtree(expr);
+			}
 		} else expr = acceptMULDIV(simBuilder);
+		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
 
@@ -310,12 +370,17 @@ public abstract class Expression extends SyntaxClass {
 	/// </pre>
 	/// @return an expression
 	private static Expression acceptMULDIV(PsiBuilder simBuilder) {
+		if(TEST1) simBuilder.startSubtree("acceptMULDIV");
+		simBuilder.startSubtree("acceptMULDIV");
 		Expression expr=acceptEXPON(simBuilder);
-		LexToken prevToken = null;
-		while((prevToken = Parse.acceptToken(simBuilder, KeyWord.MUL,KeyWord.DIV,KeyWord.INTDIV)) != null) {
-			int opr = prevToken.keyWord;
+		LexToken accepted = null;
+		while((accepted = Parse.acceptParserToken(simBuilder, KeyWord.MUL,KeyWord.DIV,KeyWord.INTDIV)) != null) {
+			int opr = accepted.keyWord;
+			if(TEST2) simBuilder.startSubtree("acceptMULDIV");
 			expr = ArithmeticExpression.create(expr,opr,acceptEXPON(simBuilder));
+			if(TEST2) simBuilder.doneSubtree(expr);
 		}
+		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
 
@@ -325,9 +390,14 @@ public abstract class Expression extends SyntaxClass {
 	/// </pre>
 	/// @return an expression
 	private static Expression acceptEXPON(PsiBuilder simBuilder) {
+		if(TEST1) simBuilder.startSubtree("acceptEXPON");
 		Expression expr=acceptBASICEXPR(simBuilder);
-		while(Parse.accept(simBuilder, KeyWord.EXP))
+		while(Parse.accept(simBuilder, KeyWord.EXP)) {
+			if(TEST2) simBuilder.startSubtree("acceptEXPON");
 			expr = ArithmeticExpression.create(expr,KeyWord.EXP,acceptBASICEXPR(simBuilder));
+			if(TEST2) simBuilder.doneSubtree(expr);
+		}
+		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
 
@@ -354,8 +424,10 @@ public abstract class Expression extends SyntaxClass {
 		// Dette er vel kanskje det samme som “primary”?
 		// Merk: Alt som kan stå foran et postfix (DOT, IS, IN og QUA) må være et BASICEXPR
 		if(Option.internal.TRACE_PARSE) Parse.TRACE("Expression: acceptExpression");
+		if(TEST1) simBuilder.startSubtree("acceptBASICEXPR");
+		if(TEST2) simBuilder.startSubtree("acceptBASICEXPR");
 		Expression expr=null;
-		LexToken prevToken = Parse.currentToken(simBuilder);
+		LexToken prevToken = Parse.getParserToken(simBuilder);
 		if(Parse.accept(simBuilder, KeyWord.BEGPAR)) { expr = acceptExpression(simBuilder); Parse.expect(simBuilder, KeyWord.ENDPAR); }
 		else if(Parse.accept(simBuilder, KeyWord.INTEGERKONST)) expr = new Constant(Type.Integer,((IntegerConst)prevToken).value);
 		else if(Parse.accept(simBuilder, KeyWord.REALKONST)) expr = Constant.createRealType(((RealConst)prevToken).value);
@@ -370,9 +442,9 @@ public abstract class Expression extends SyntaxClass {
 //			String ident=Parse.acceptIdentifier(simBuilder);
 			
 //			public static String acceptIdentifier(final PsiBuilder simBuilder) {
-			LexToken prevToken2 = Parse.currentToken(simBuilder) ;
+			LexToken prevToken2 = Parse.getParserToken(simBuilder) ;
 				LexToken token = null;
-				if ((token = Parse.acceptToken(simBuilder, KeyWord.IDENTIFIER)) != null) {
+				if ((token = Parse.acceptParserToken(simBuilder, KeyWord.IDENTIFIER)) != null) {
 					String ident = ((Identifier)token).value;
 					expr=VariableExpression.expectVariable(simBuilder, ident);
 				}
@@ -399,6 +471,8 @@ public abstract class Expression extends SyntaxClass {
 			}
 		}
 //		if(Option.internal.TRACE_PARSE) Parse.TRACE("Expression: acceptBasicExpression returns: "+expr);
+		if(TEST1) simBuilder.doneSubtree(expr);
+		if(TEST2) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
   

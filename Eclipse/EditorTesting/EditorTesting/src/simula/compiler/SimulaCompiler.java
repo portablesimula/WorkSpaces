@@ -224,8 +224,10 @@ public final class SimulaCompiler {
 		// ***************************************************************
 		Global.javaSourceFileCoders = new Vector<JavaSourceFileCoder>();
 		Parse.initiateParser(reader);
-		programModule = new ProgramModule(null);
+		programModule = new ProgramModule();
 		Global.programModule = programModule;
+		Util.IERR("DETTE MÅ SKRIVES OM");
+		
 		if (Option.internal.TRACING) {
 			Util.println("END Parsing, resulting Program: \"" + programModule + "\"");
 			if (Option.internal.TRACE_PARSE && programModule != null)

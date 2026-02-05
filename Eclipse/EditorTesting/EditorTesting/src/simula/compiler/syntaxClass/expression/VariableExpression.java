@@ -180,7 +180,7 @@ public final class VariableExpression extends Expression {
 	/// @return the created Variable
 	public static VariableExpression expectVariable(final PsiBuilder simBuilder, final String ident) {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse Variable, current=" + Parse.currentToken(simBuilder));
+			Util.TRACE("Parse Variable, current=" + Parse.currentLexToken(simBuilder));
 		VariableExpression variable = new VariableExpression(ident);
 		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
 			variable.params = new Vector<Expression>();

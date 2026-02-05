@@ -2,11 +2,11 @@ package simula.parser;
 
 import simula.compiler.utilities.Util;
 
-public interface Marker {// extends Marker {
+public interface REMOVED_Marker {// extends Marker {
 
 	static class IElementType {}
 
-	IElementType getTokenType();
+	IElementType getCurrentLexerToken();
 
 	int getStartOffset();
 
@@ -34,7 +34,7 @@ public interface Marker {// extends Marker {
 
 
 	//public interface Marker extends Production {
-	Marker precede();
+	REMOVED_Marker precede();
 
 	void drop();
 
@@ -42,23 +42,23 @@ public interface Marker {// extends Marker {
 
 	void done(IElementType var1);
 
-	default void doneBefore(IElementType type, Marker before) {
+	default void doneBefore(IElementType type, REMOVED_Marker before) {
 		if (before == null) Util.IERR();
-		this.doneBefore(type, (Marker)before);
+		this.doneBefore(type, (REMOVED_Marker)before);
 	}
 
-	default void doneBefore(IElementType type, Marker before, String errorMessage) {
+	default void doneBefore(IElementType type, REMOVED_Marker before, String errorMessage) {
 		if (before == null) Util.IERR();
-		this.doneBefore(type, (Marker)before, errorMessage);
+		this.doneBefore(type, (REMOVED_Marker)before, errorMessage);
 	}
 
 	void collapse(IElementType var1);
 
 	void error(String var1);
 
-	default void errorBefore(String message, Marker before) {
+	default void errorBefore(String message, REMOVED_Marker before) {
 		if (before == null) Util.IERR();
-		this.errorBefore(message, (Marker)before);
+		this.errorBefore(message, (REMOVED_Marker)before);
 	}
 
 	void setCustomEdgeTokenBinders(WhitespacesAndCommentsBinder var1, WhitespacesAndCommentsBinder var2);

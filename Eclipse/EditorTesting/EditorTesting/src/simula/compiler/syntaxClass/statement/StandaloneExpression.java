@@ -51,9 +51,12 @@ public final class StandaloneExpression extends Statement {
 		super("StandaloneExpression", line);
 		this.expression = expression;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": StandaloneExpression: "+this);
+		IO.println("Line "+lineNumber+": StandaloneExpression: "+this+"   "+simBuilder.getCurrentLexerToken());
 		LexToken prevToken = null;
-		while ((prevToken = Parse.acceptToken(simBuilder, KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) != null) { 
+		while ((prevToken = Parse.acceptParserToken(simBuilder, KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF)) != null) { 
+//			simBuilder.startSubtree("StandaloneExpression");
 			this.expression = new AssignmentOperation(this.expression, prevToken.keyWord, expectStandaloneExpression(simBuilder));
+//			simBuilder.doneSubtree(this.expression);
 		}		
 	}
 
@@ -68,7 +71,7 @@ public final class StandaloneExpression extends Statement {
 	private static Expression expectStandaloneExpression(PsiBuilder simBuilder) { 
 		Expression retExpr=Expression.expectExpression(simBuilder);
 		LexToken prevToken = null;
-		while ((prevToken = Parse.acceptToken(simBuilder, KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) != null) {
+		while ((prevToken = Parse.acceptParserToken(simBuilder, KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) != null) {
 			int opr=prevToken.keyWord;
 			retExpr=new AssignmentOperation(retExpr,opr,expectStandaloneExpression(simBuilder));
 		}

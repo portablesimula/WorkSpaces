@@ -3,7 +3,7 @@
 /// 
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
-package simula.editor;
+package simula.psi.viewer;
 
 import java.awt.Color;
 import java.awt.Desktop;
@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.undo.UndoManager;
 
@@ -39,6 +40,8 @@ import simula.compiler.SimulaCompiler;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.editor.PsiBuilder;
+import simula.psi.PsiTree;
 
 /// The editor's menues.
 /// 
@@ -47,7 +50,7 @@ import simula.compiler.utilities.Util;
 /// 
 /// @author Øystein Myhre Andersen
 @SuppressWarnings("serial")
-public class EditorMenues extends JMenuBar {
+public class PsiViewerMenues extends JMenuBar {
 	
 	/// Create a Menu item with toolTip.
 	/// @param ident item identifier
@@ -78,8 +81,8 @@ public class EditorMenues extends JMenuBar {
 	/** Menu item */ private JMenuItem undo=new JMenuItem("Undo");
 	///** Menu item */ private JMenuItem redo=new JMenuItem("Redo");
     
-    /** Menu */ private JMenu runMenu=new JMenu("Run");
-    /** Menu item */ private JMenuItem run = new JMenuItem("Run");
+    /** Menu */ private JMenu psiMenu=new JMenu("PSI");
+    /** Menu item */ private JMenuItem build = new JMenuItem("Build PSI Tree");
     /** Menu item */ private JMenuItem debug = new JMenuItem("Debug");
     
     /** Menu */ private JMenu settings=new JMenu("Settings");
@@ -115,7 +118,7 @@ public class EditorMenues extends JMenuBar {
 	/** Popup Menu item */ private JMenuItem paste2=new JMenuItem(new DefaultEditorKit.PasteAction());
 	/** Popup Menu item */ private JMenuItem undo2=new JMenuItem("Undo");
 	///** Popup Menu item */ private JMenuItem redo2=new JMenuItem("Redo");
-    /** Popup Menu item */ private JMenuItem run2 = new JMenuItem("Run");
+    /** Popup Menu item */ private JMenuItem build2 = new JMenuItem("Run");
     /** Popup Menu item */ private JMenuItem debug2 = new JMenuItem("Debug");
 	/** Popup Menu item */ private JCheckBox autoRefresh2=new JCheckBox("AutoRefresh");
     /** Popup Menu item */ private JMenuItem setWorkSpace2 = new JMenuItem("Select WorkSpace");
@@ -134,7 +137,7 @@ public class EditorMenues extends JMenuBar {
 	// *** Constructor
 	// ****************************************************************
     /// Create a new instance of EditorMenues.
- 	public EditorMenues() {
+ 	public PsiViewerMenues() {
     	fileMenu.add(newFile); newFile.addActionListener(actionListener);
     	fileMenu.add(openFile); openFile.addActionListener(actionListener);
     	fileMenu.addSeparator();
@@ -156,9 +159,9 @@ public class EditorMenues extends JMenuBar {
         editMenu.addSeparator();
         editMenu.add(refresh); refresh.setEnabled(false); refresh.addActionListener(actionListener);
 		this.add(editMenu);
-		runMenu.add(run); run.setEnabled(false); run.addActionListener(actionListener);
-		runMenu.add(debug); debug.setEnabled(false); debug.addActionListener(actionListener);
-		this.add(runMenu);
+		psiMenu.add(build); build.setEnabled(false); build.addActionListener(actionListener);
+		psiMenu.add(debug); debug.setEnabled(false); debug.addActionListener(actionListener);
+		this.add(psiMenu);
 		settings.add(autoRefresh); autoRefresh.setEnabled(false); autoRefresh.addActionListener(actionListener);
         settings.add(compilerMode); compilerMode.addActionListener(actionListener);
         settings.add(setWorkSpace); setWorkSpace.addActionListener(actionListener);
@@ -193,7 +196,7 @@ public class EditorMenues extends JMenuBar {
 		refresh.setAccelerator(KeyStroke.getKeyStroke('R', InputEvent.CTRL_DOWN_MASK));
 		undo.setAccelerator(KeyStroke.getKeyStroke('Z', InputEvent.CTRL_DOWN_MASK));
 		//redo.setAccelerator(KeyStroke.getKeyStroke('Y', InputEvent.CTRL_DOWN_MASK));
-	    run.setAccelerator(KeyStroke.getKeyStroke('B', InputEvent.CTRL_DOWN_MASK));
+	    build.setAccelerator(KeyStroke.getKeyStroke('B', InputEvent.CTRL_DOWN_MASK));
 	    about.setAccelerator(KeyStroke.getKeyStroke('H', InputEvent.CTRL_DOWN_MASK));
 		newFile2.setAccelerator(KeyStroke.getKeyStroke('N', InputEvent.CTRL_DOWN_MASK));
 	    openFile2.setAccelerator(KeyStroke.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK));
@@ -206,7 +209,7 @@ public class EditorMenues extends JMenuBar {
 		refresh2.setAccelerator(KeyStroke.getKeyStroke('R', InputEvent.CTRL_DOWN_MASK));
 		undo2.setAccelerator(KeyStroke.getKeyStroke('Z', InputEvent.CTRL_DOWN_MASK));
 		//redo2.setAccelerator(KeyStroke.getKeyStroke('Y', InputEvent.CTRL_DOWN_MASK));
-	    run2.setAccelerator(KeyStroke.getKeyStroke('B', InputEvent.CTRL_DOWN_MASK));
+	    build2.setAccelerator(KeyStroke.getKeyStroke('B', InputEvent.CTRL_DOWN_MASK));
 	    about2.setAccelerator(KeyStroke.getKeyStroke('H', InputEvent.CTRL_DOWN_MASK));
 	}
 	
@@ -219,7 +222,7 @@ public class EditorMenues extends JMenuBar {
         popupMenu.add(newFile2); newFile2.addActionListener(actionListener);
 		popupMenu.add(openFile2); openFile2.addActionListener(actionListener);
         popupMenu.addSeparator();
-        popupMenu.add(run2); run2.setEnabled(false); run2.addActionListener(actionListener);
+        popupMenu.add(build2); build2.setEnabled(false); build2.addActionListener(actionListener);
         popupMenu.add(debug2); debug2.setEnabled(false); debug2.addActionListener(actionListener);
         popupMenu.addSeparator();
         popupMenu.add(saveFile2); saveFile2.setEnabled(false); saveFile2.addActionListener(actionListener);
@@ -260,10 +263,10 @@ public class EditorMenues extends JMenuBar {
 	// ****************************************************************
 	/// Update menu items.
 	public void updateMenuItems() {
-		SourceTextPanel current=SimulaEditor.current;
+		PsiTextPanel current=SimulaPsiViewer.current;
 		boolean source=false;
 		boolean text=false;
-		boolean mayRun=false;
+		boolean mayBuild=true;
 		boolean fileChanged=false;
 		boolean auto=false;
 		boolean canUndo=false;
@@ -271,15 +274,15 @@ public class EditorMenues extends JMenuBar {
 			source=true;
 			String editText=current.editTextPane.getText();
 			if(editText!=null && editText.trim().length()!=0) text=true; 
-			if(current.lang==SimulaEditor.Language.Simula && text) mayRun=true;
-			if(current.lang==SimulaEditor.Language.Simula && editText!=null && editText.trim().length()!=0) text=true; 
+//			if(current.lang==SimulaPsiViewer.Language.Simula && text) mayBuild=true;
+//			if(current.lang==SimulaPsiViewer.Language.Simula && editText!=null && editText.trim().length()!=0) text=true; 
 			fileChanged=current.fileChanged;
 			auto=source && current.AUTO_REFRESH;
 			UndoManager undoManager = current.getUndoManager();
 			canUndo=undoManager.canUndo();
 		}
 		saveFile.setEnabled(fileChanged); saveFile2.setEnabled(fileChanged);
-		saveAs.setEnabled(mayRun);        saveAs2.setEnabled(mayRun);
+		saveAs.setEnabled(mayBuild);        saveAs2.setEnabled(mayBuild);
 		close.setEnabled(source);         close2.setEnabled(source);
 		closeAll.setEnabled(source);      closeAll2.setEnabled(source);
 		cut.setEnabled(text);             cut2.setEnabled(text);
@@ -287,13 +290,13 @@ public class EditorMenues extends JMenuBar {
 		paste.setEnabled(source);         paste2.setEnabled(source);
 //		search.setEnabled(text);          search2.setEnabled(text);
 		refresh.setEnabled(text);         refresh2.setEnabled(text);
-		run.setEnabled(mayRun);           run2.setEnabled(mayRun);
-		debug.setEnabled(mayRun);         debug2.setEnabled(mayRun);
+		build.setEnabled(mayBuild);         build2.setEnabled(mayBuild);
+		debug.setEnabled(mayBuild);         debug2.setEnabled(mayBuild);
 		autoRefresh.setSelected(auto);    autoRefresh2.setSelected(auto);
 		autoRefresh.setEnabled(source);   autoRefresh2.setEnabled(source);
 		undo.setEnabled(canUndo);         undo2.setEnabled(canUndo);
 //		redo.setEnabled(canRedo);         redo2.setEnabled(canRedo);
-		SimulaEditor.autoRefresher.reset();
+		SimulaPsiViewer.autoRefresher.reset();
 	}	
 	
 	// ****************************************************************
@@ -303,8 +306,8 @@ public class EditorMenues extends JMenuBar {
 	ActionListener actionListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			Object item=e.getSource();
-			SourceTextPanel current=SimulaEditor.current;
-			if(item==newFile || item==newFile2) SimulaEditor.doNewTabbedPanel(null,SimulaEditor.Language.Simula);
+			PsiTextPanel current=SimulaPsiViewer.current;
+			if(item==newFile || item==newFile2) SimulaPsiViewer.doNewTabbedPanel(null,SimulaPsiViewer.Language.Simula);
 			else if(item==openFile || item==openFile2) doOpenFileAction();
 			else if(item==saveFile || item==saveFile2) doSaveCurrentFile(false);
 			else if(item==saveAs   || item==saveAs2) doSaveCurrentFile(true);
@@ -314,7 +317,7 @@ public class EditorMenues extends JMenuBar {
 			else if(item==undo || item==undo2) undoAction();
 //			else if(item==redo || item==redo2) redoAction();
 			else if(item==refresh || item==refresh2) current.doRefresh();
-			else if(item==run   || item==run2) doRunAction();
+			else if(item==build   || item==build2) doBuildPsiTreeAction();
 			else if(item==debug || item==debug2) doDebugAction();
 			else if(item==autoRefresh) current.AUTO_REFRESH=autoRefresh.isSelected();
 			else if(item==autoRefresh2) current.AUTO_REFRESH=autoRefresh2.isSelected();
@@ -325,7 +328,7 @@ public class EditorMenues extends JMenuBar {
 			else if(item==workSpaces || item==workSpaces2) removeWorkspacesAction();
 			else if(item==compilerMode || item==compilerMode2) Option.setCompilerMode();
 			else if(item==compilerOption || item==compilerOption2) Option.selectCompilerOptions();
-			else if(item==runtimeOption  || item==runtimeOption2) RTOption.selectRuntimeOptions();			
+//			else if(item==runtimeOption  || item==runtimeOption2) RTOption.selectRuntimeOptions();			
 			else if(item==about || item==about2) doAboutAction();
 			else if(item==more || item==more2) doMoreAction();
 		}
@@ -337,24 +340,24 @@ public class EditorMenues extends JMenuBar {
 	/// Open file action
 	private void doOpenFileAction() {
         JFileChooser fileChooser = new JFileChooser(Global.currentWorkspace);
-        if (fileChooser.showOpenDialog(SimulaEditor.tabbedPane)==JFileChooser.APPROVE_OPTION) {
+        if (fileChooser.showOpenDialog(SimulaPsiViewer.tabbedPane)==JFileChooser.APPROVE_OPTION) {
         	File file=fileChooser.getSelectedFile();
     		if(!file.exists()) { Util.popUpError("Can't open file\n"+file); return; }
     		String lowName=file.getName().toLowerCase();
     		if(lowName.endsWith(".sim")) {
-    			SimulaEditor.doNewTabbedPanel(file,SimulaEditor.Language.Simula);
+    			SimulaPsiViewer.doNewTabbedPanel(file,SimulaPsiViewer.Language.Simula);
             	Global.setCurrentWorkspace(fileChooser.getCurrentDirectory());
     		}
-    		else if(lowName.endsWith(".jar")) {
-    			IO.println("EditorMenues.doOpenFileAction: "+file);
-    				int res = Util.optionDialog("Executable Jarfile\nDo you want to execute ?",
-    						"Execute or List Jarfile", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, "Yes", "No");
-    				if (res == JOptionPane.YES_OPTION)
-    	    			 SimulaEditor.doRunJarFile(file);
-    				else SimulaEditor.doNewTabbedPanel(file,SimulaEditor.Language.Jar);
-    		}
-    		else if(isTextFile(lowName)) SimulaEditor.doNewTabbedPanel(file,SimulaEditor.Language.Text);
-    		else SimulaEditor.doNewTabbedPanel(file,SimulaEditor.Language.Other);
+//    		else if(lowName.endsWith(".jar")) {
+//    			IO.println("EditorMenues.doOpenFileAction: "+file);
+//    				int res = Util.optionDialog("Executable Jarfile\nDo you want to execute ?",
+//    						"Execute or List Jarfile", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, "Yes", "No");
+//    				if (res == JOptionPane.YES_OPTION)
+//    	    			 SimulaPsiViewer.doRunJarFile(file);
+//    				else SimulaPsiViewer.doNewTabbedPanel(file,SimulaPsiViewer.Language.Jar);
+//    		}
+    		else if(isTextFile(lowName)) SimulaPsiViewer.doNewTabbedPanel(file,SimulaPsiViewer.Language.Text);
+    		else SimulaPsiViewer.doNewTabbedPanel(file,SimulaPsiViewer.Language.Other);
     		
         }
 	}
@@ -374,10 +377,10 @@ public class EditorMenues extends JMenuBar {
 	/// Do save current source file.
 	/// @param saveAs true if a file chooser is wanted
 	void doSaveCurrentFile(boolean saveAs) {
-		SourceTextPanel current=SimulaEditor.current;
+		PsiTextPanel current=SimulaPsiViewer.current;
 		if(saveAs || current.sourceFile==null) {
 	        JFileChooser fileChooser = new JFileChooser(Global.currentWorkspace);
-	        if (fileChooser.showSaveDialog(SimulaEditor.tabbedPane)!=JFileChooser.APPROVE_OPTION) return; // Do Nothing
+	        if (fileChooser.showSaveDialog(SimulaPsiViewer.tabbedPane)!=JFileChooser.APPROVE_OPTION) return; // Do Nothing
 	        File file=fileChooser.getSelectedFile();
 	        Global.setCurrentWorkspace(fileChooser.getCurrentDirectory());
 	        if(file.exists() && overwriteDialog(file)!=JOptionPane.YES_OPTION) return; // Do Nothing
@@ -385,7 +388,7 @@ public class EditorMenues extends JMenuBar {
 	        	if(noSimTypeDialog(file)!=JOptionPane.OK_OPTION) return; // Do Nothing
 	        }
 	        current.sourceFile=file;
-	        SimulaEditor.setSelectedTabTitle(file.getName());
+	        SimulaPsiViewer.setSelectedTabTitle(file.getName());
 	        current.fileChanged=true;
 		}
     	if(current.fileChanged)	try {
@@ -403,7 +406,7 @@ public class EditorMenues extends JMenuBar {
 	/// Close current file acation.
 	private void doCloseCurrentFileAction() {
 			maybeSaveCurrentFile();
-			SimulaEditor.removeSelectedTab();
+			SimulaPsiViewer.removeSelectedTab();
 	}
 	
     // ****************************************************************
@@ -411,7 +414,7 @@ public class EditorMenues extends JMenuBar {
     // ****************************************************************
 	/// Close action.
 	void doCloseAllAction() {
-		while(SimulaEditor.tabbedPane.getSelectedIndex()>=0)
+		while(SimulaPsiViewer.tabbedPane.getSelectedIndex()>=0)
 		    doCloseCurrentFileAction();
 	}
 	
@@ -431,7 +434,7 @@ public class EditorMenues extends JMenuBar {
 	/// 
 	/// Also used by RunMeny.
 	void maybeSaveCurrentFile() {
-		SourceTextPanel current=SimulaEditor.current;
+		PsiTextPanel current=SimulaPsiViewer.current;
 		if(current==null) return; if(!current.fileChanged) return;
 		if(saveDialog(current.sourceFile)==JOptionPane.YES_OPTION) doSaveCurrentFile(false);
 	}
@@ -466,7 +469,7 @@ public class EditorMenues extends JMenuBar {
 	// ****************************************************************
 	/// The undo action
 	private void undoAction() {
-		SourceTextPanel current=SimulaEditor.current;
+		PsiTextPanel current=SimulaPsiViewer.current;
 		current.getUndoManager().undo();
 		current.fileChanged=true; current.refreshNeeded=true;
 		updateMenuItems();
@@ -476,19 +479,26 @@ public class EditorMenues extends JMenuBar {
 //	// *** redoAction
 //	// ****************************************************************
 //	private void redoAction() {
-//		SourceTextPanel current=SimulaEditor.current;
+//		PsiTextPanel current=SimulaPsiViewer.current;
 //		current.getUndoManager().redo();
 //		current.fileChanged=true; current.refreshNeeded=true;
 //		updateMenuItems();
 //	}
 	
 	// ****************************************************************
-	// *** doRunAction
+	// *** doBuildPsiTreeAction
 	// ****************************************************************
-	/// The run action
-	private void doRunAction() {
-		Option.internal.DEBUGGING=false;
-		doStartRunning();
+	/// The build action
+	private void doBuildPsiTreeAction() {
+		SwingUtilities.invokeLater(() -> {
+			Option.internal.DEBUGGING=false;
+			PsiTextPanel current=SimulaPsiViewer.current;
+			PsiBuilder simBuilder = new PsiBuilder();
+			simBuilder.start(current.getText());
+			Global.programModule.doBuild(simBuilder);
+			PsiTree psiTree = simBuilder.getRoot();
+			psiTree.popUp();
+		});
 	}
 	
 	// ****************************************************************
@@ -497,51 +507,52 @@ public class EditorMenues extends JMenuBar {
 	/// The debug action
 	private void doDebugAction() {
 		Option.internal.DEBUGGING=true;
-		RTOption.VERBOSE=true;
-		RTOption.selectRuntimeOptions();
-		doStartRunning();
+//		RTOption.VERBOSE=true;
+//		RTOption.selectRuntimeOptions();
+//		doStartRunning();
+		Util.IERR("NOT IMPL");
 	}
 	
-	// ****************************************************************
-	// *** doStartRunning
-	// ****************************************************************
-	/// Utility: Start running current Simula program.
-	private void doStartRunning() {
-		maybeSaveCurrentFile();
-       	File file=SimulaEditor.current.sourceFile;
-		if(file==null) {
-			file=new File(Global.getTempFileDir("simula/tmp/"),"unnamed.sim");
-			file.getParentFile().mkdirs();
-		} else if(file.getName().toLowerCase().endsWith(".jar")) {
-			SimulaEditor.doRunJarFile(file);
-			return;
-		}
-		try {
-			Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-				public void uncaughtException(Thread thread, Throwable e) {
-					System.out.print("EditorMenues.UncaughtExceptionHandler: GOT Exception: " + e);
-			}});
-			// Start compiler ....
-			Util.ASSERT(SimulaEditor.current!=null,"EditorMenues.doRunAction: Invariant-1");
-			String text=SimulaEditor.current.editTextPane.getText();
-			StringReader reader=new StringReader(text);
-			String name=(file!=null)?file.getPath():Global.tempJavaFileDir+"/unnamed.sim";
-			if(file!=null) Option.internal.RUNTIME_USER_DIR=Global.currentWorkspace.toString();
-			new Thread(new Runnable() {
-				public void run() {
-					try { new SimulaCompiler(name,reader).doCompile(); }
-					catch (IOException e) { Util.IERR("Compiler Error: ", e); }
-
-				}}).start();
-		} catch(Exception e) { Util.popUpError("Can't run: "+e);}
-	}
+//	// ****************************************************************
+//	// *** doStartRunning
+//	// ****************************************************************
+//	/// Utility: Start running current Simula program.
+//	private void doStartRunning() {
+//		maybeSaveCurrentFile();
+//       	File file=SimulaPsiViewer.current.sourceFile;
+//		if(file==null) {
+//			file=new File(Global.getTempFileDir("simula/tmp/"),"unnamed.sim");
+//			file.getParentFile().mkdirs();
+//		} else if(file.getName().toLowerCase().endsWith(".jar")) {
+//			SimulaPsiViewer.doRunJarFile(file);
+//			return;
+//		}
+//		try {
+//			Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+//				public void uncaughtException(Thread thread, Throwable e) {
+//					System.out.print("EditorMenues.UncaughtExceptionHandler: GOT Exception: " + e);
+//			}});
+//			// Start compiler ....
+//			Util.ASSERT(SimulaPsiViewer.current!=null,"EditorMenues.doBuildPsiTreeAction: Invariant-1");
+//			String text=SimulaPsiViewer.current.editTextPane.getText();
+//			StringReader reader=new StringReader(text);
+//			String name=(file!=null)?file.getPath():Global.tempJavaFileDir+"/unnamed.sim";
+//			if(file!=null) Option.internal.RUNTIME_USER_DIR=Global.currentWorkspace.toString();
+//			new Thread(new Runnable() {
+//				public void run() {
+//					try { new SimulaCompiler(name,reader).doCompile(); }
+//					catch (IOException e) { Util.IERR("Compiler Error: ", e); }
+//
+//				}}).start();
+//		} catch(Exception e) { Util.popUpError("Can't build: "+e);}
+//	}
     
 	// ****************************************************************
 	// *** selectWorkspaceAction
 	// ****************************************************************
 	/// Select Workspace action.
 	private void selectWorkspaceAction() {
-    	SimulaEditor.doSelectWorkspace();
+    	SimulaPsiViewer.doSelectWorkspace();
     }	
     
 	// ****************************************************************
@@ -549,7 +560,7 @@ public class EditorMenues extends JMenuBar {
 	// ****************************************************************
 	/// Select Java directory action.
     private void selectJavaDirAction() {
-    	SimulaEditor.doSelectJavaDir();
+    	SimulaPsiViewer.doSelectJavaDir();
     }	
     
 	// ****************************************************************
@@ -557,7 +568,7 @@ public class EditorMenues extends JMenuBar {
 	// ****************************************************************
 	/// Select output directory action.
     private void selectOutputDirAction() {
-    	SimulaEditor.doSelectOutputDir();
+    	SimulaPsiViewer.doSelectOutputDir();
     }	
     
 	// ****************************************************************
@@ -565,7 +576,7 @@ public class EditorMenues extends JMenuBar {
 	// ****************************************************************
 	/// Select ExtLibDir action.
     private void selectExtLibDirAction() {
-    	SimulaEditor.doSelectExtLibDir();
+    	SimulaPsiViewer.doSelectExtLibDir();
     	Global.storeWorkspaceProperties();
     }	
 

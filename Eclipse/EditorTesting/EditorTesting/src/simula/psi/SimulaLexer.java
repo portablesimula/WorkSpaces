@@ -13,7 +13,7 @@ import simula.token.KeyWordToken;
 import simula.token.RealConst;
 import simula.token.SimpleString;
 
-public class SimulaLexer {// extends LexerBase {
+public class SimulaLexer {
 
     private static final int DEBUG = 1;// 2;
     
@@ -24,7 +24,7 @@ public class SimulaLexer {// extends LexerBase {
     private int textEndOffset;
     private int currentPosition;
 
-    private LexToken tokenElementType;
+    private LexToken currentLexerToken;
     private int tokenStartOffset;
     private int tokenEndOffset;
 
@@ -44,8 +44,7 @@ public class SimulaLexer {// extends LexerBase {
     	tokens = new Vector<LexToken>();
     }
 
-//    @Override
-    public void start(CharSequence buffer, int startOffset, int endOffset, int initialState) {
+    public void start(CharSequence buffer, int startOffset, int endOffset) {
     	IO.println(("SimulaLexer.start: " + buffer).replace("\r", "\\r").replace("\n", "\\n"));
         sourceText = buffer;
         sourceLineNumber = 1;
@@ -53,103 +52,62 @@ public class SimulaLexer {// extends LexerBase {
         currentPosition = startOffset;
         tokenStartOffset = startOffset;
         tokenEndOffset = startOffset;
-        // In a real incremental lexer, initialState would be used to restore context
-        // For this simple example, we assume we always start from the beginning (initialState 0)
         advance();
     }
 
-//    @Override
     public void advance() {
         if(! tokenQueue.isEmpty()) {
             LexToken qtoken = popToken();
 //        	System.out.println("\nSimulaLexer.advance: POP OFF QUEUED TOKEN: "+qtoken);
         	tokenStartOffset = qtoken.startOffset;
         	tokenEndOffset = qtoken.endOffset;
-        	tokenElementType = qtoken;
+        	currentLexerToken = qtoken;
         	
-            System.out.println("SimulaLexer.advance: QLINE "+tokenElementType.lineNumber+"                      NEW CURRENT: "+tokenElementType);
-            tokens.add(tokenElementType);
+            System.out.println("SimulaLexer.advance: QLINE "+currentLexerToken.lineNumber+"                      NEW CURRENT: "+currentLexerToken);
+            tokens.add(currentLexerToken);
             return;
         }
         if (currentPosition >= textEndOffset) {
-            tokenElementType = null;
+            currentLexerToken = null;
 //            System.out.println("SimulaLexer.advance: EOF ");
 //            Thread.dumpStack();
             return;
         }
         tokenStartLine = this.sourceLineNumber;
         tokenStartOffset = currentPosition;
-        tokenElementType = scanBasic();
+        currentLexerToken = scanBasic();
         tokenEndOffset = currentPosition;
         Global.sourceLineNumber = this.sourceLineNumber;
-        tokens.add(tokenElementType);
+        tokens.add(currentLexerToken);
         
         if(DEBUG > 0)  {
-            System.out.println("SimulaLexer.advance: LINE "+tokenElementType.lineNumber+"                       NEW CURRENT: "+tokenElementType);
+            System.out.println("SimulaLexer.advance: LINE "+currentLexerToken.lineNumber+"                       NEW CURRENT: "+currentLexerToken);
         }
        
         if(tokenStartOffset == tokenEndOffset) {
             CharSequence xxx = sourceText.subSequence(tokenStartOffset-10, tokenStartOffset);
-//            Util.TRACE("SimulaLexer.advance: start="+tokenStartOffset+", end="+tokenEndOffset+", type="+tokenElementType);
-            throw new RuntimeException("SimulaLexer.advance: start="+tokenStartOffset+", end="+tokenEndOffset+", type="+tokenElementType+"  "+xxx);
+//            Util.TRACE("SimulaLexer.advance: start="+tokenStartOffset+", end="+tokenEndOffset+", type="+currentLexerToken);
+            throw new RuntimeException("SimulaLexer.advance: start="+tokenStartOffset+", end="+tokenEndOffset+", type="+currentLexerToken+"  "+xxx);
         }
     }
+    
+	public void rollBackToBefore(LexToken prev) {
+		IO.println("SimulaLexer.rollBackToBefore: "+prev+", currentPosition="+currentPosition);
+		currentPosition = prev.startOffset;
+		advance();
+	}
 
-    /**
-     * Returns the buffer sequence over which the lexer is running. This method should return the
-     * same buffer instance which was passed to the {@code start()} method.
-     *
-     * @return the lexer buffer.
-     */
-//    @Override
-//    public CharSequence getBufferSequence() {
-//        throw new RuntimeException("SimulaLexer.getBufferSequence: \""+sourceText+'"');
-////        return sourceText;
-//    }
-
-    /**
-     * Returns the offset at which the lexer will stop lexing. This method should return
-     * the length of the buffer or the value passed in the {@code endOffset} parameter
-     * to the {@code start()} method.
-     *
-     * @return the lexing end offset
-     */
-//    @Override
-//    public int getBufferEnd() {
-//        throw new RuntimeException("SimulaLexer.getBufferEnd: ");
-////        return textEndOffset;
-//    }
-
-//    @Override
-    public LexToken getTokenType() {
-        if(DEBUG > 1) System.out.println("SimulaLexer.getTokenType: "+tokenElementType);
-        return tokenElementType;
+	public LexToken getCurrentLexerToken() {
+        if(DEBUG > 1) System.out.println("SimulaLexer.getCurrentLexerToken: "+currentLexerToken);
+        return currentLexerToken;
     }
 
     public LexToken nextToken() {
-        LexToken next = tokenElementType;
+    	Util.IERR("GAMMEL: BLE BRUKT AV DefaultScanner OG SimulaScanner");
+        LexToken next = currentLexerToken;
         advance();
         if(DEBUG > 1) System.out.println("SimulaLexer.nextToken: "+next);
         return next;
-    }
-
-//    @Override
-    public int getTokenStart() {
-        if(DEBUG > 1) System.out.println("SimulaLexer.getTokenStart: "+tokenStartOffset);
-        return tokenStartOffset;
-    }
-
-//    @Override
-    public int getTokenEnd() {
-        if(DEBUG > 1) System.out.println("SimulaLexer.getTokenEnd: "+tokenEndOffset);
-        return tokenEndOffset;
-    }
-
-//    @Override
-    public int getState() {
-        // State is represented by a single integer number
-        // For this simple, stateless lexer, we return 0
-        return 0;
     }
 
     private boolean isWhitespace(int c) {
@@ -157,12 +115,14 @@ public class SimulaLexer {// extends LexerBase {
     		if(c == '\n') {
     			this.sourceLineNumber++;
 //    			System.out.println("SimulaLexer.isWhitespace: NEW LINE "+Global.sourceLineNumber+" ......................................................");
-//    			Util.IERR();
     		}
     		return true;
     	}
     	return false;
     }
+    
+    
+    
     private int pardepth;
     //********************************************************************************
     //**	                                                                 scanBasic
@@ -230,7 +190,8 @@ public class SimulaLexer {// extends LexerBase {
 
                 case ':':
                     if(getNext() == '=')   return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.ASSIGNVALUE);
-                    if(getNext() == '-' && pardepth == 0) return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.ASSIGNREF);
+//                    if(getNext() == '-' && pardepth == 0) return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.ASSIGNREF);
+                    if(current == '-' && pardepth == 0) return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.ASSIGNREF);
                     pushBack(current);     return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.COLON);
 
                 case '&':
@@ -860,6 +821,7 @@ public class SimulaLexer {// extends LexerBase {
         if (Global.TRACE_SCAN) Util.TRACE("BEGIN scanCommentToEndOfLine, " + edcurrent());
         while ((getNext() != '\n') && current != EOF_MARK)
             skipped.append((char) current);
+        sourceLineNumber++;
         skipped.append((char) current);
         if (Global.TRACE_SCAN) Util.TRACE("END scanCommentToEndOfLine: " + edcurrent() + "  skipped=\"" + skipped + '"');
         if (Global.TRACE_COMMENTS) Util.TRACE("COMMENT:\"" + skipped + "\" Skipped and replaced with a SPACE");

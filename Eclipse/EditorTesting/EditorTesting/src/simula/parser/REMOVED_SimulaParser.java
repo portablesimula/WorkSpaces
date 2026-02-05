@@ -17,17 +17,17 @@ import simula.compiler.utilities.Util;
 //import simula.plugin.extensions.lexer.SimulaElementTypes;
 //import simula.plugin.extensions.lexer.KeyWord;
 
-public class SimulaParser {// implements PsiParser {
-//	SimPsiBuilder simBuilder;
-//	String text;
-//	
-//	public SimulaParser(@NotNull PsiBuilder psiBuilder, String text) {
-//		this.text = text;
-//    	simBuilder = new  SimPsiBuilder(psiBuilder, text);
-//	}
+public class REMOVED_SimulaParser {// implements PsiParser {
+	PsiBuilder simBuilder;
+	String text;
+	
+	public REMOVED_SimulaParser(PsiBuilder psiBuilder, String text) {
+		this.text = text;
+    	simBuilder = new  SimPsiBuilder(psiBuilder, text);
+	}
 	
 //    public ASTNode parse(SyntaxClass root, PsiBuilder psiBuilder) {
-    public SyntaxClass parse(SyntaxClass root, PsiBuilder psiBuilder) {
+    public SyntaxClass parse(int dum, SyntaxClass root, PsiBuilder psiBuilder) {
         System.out.println("\nSimulaParser.parse was called +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("SimulaParser.parse: root="+root);
 //        psiBuilder.setDebugMode(true);
@@ -67,7 +67,7 @@ public class SimulaParser {// implements PsiParser {
 
 
 //    private void parseStatement(PsiBuilder psiBuilder) {
-//        SyntaxClass tokenType = psiBuilder.getTokenType();
+//        SyntaxClass tokenType = psiBuilder.getCurrentLexerToken();
 //        System.out.println("SimulaParser.parseStatement: tokenType="+tokenType.getClass().getSimpleName()+" "+tokenType+" "+psiBuilder.getTokenText());
 //
 //        if (tokenType == KeyWord.BEGIN) {
@@ -86,12 +86,12 @@ public class SimulaParser {// implements PsiParser {
 //        PsiMarker blockMarker = psiBuilder.mark();
 //        psiBuilder.advanceLexer(); // consume BEGIN
 //
-//        while (!psiBuilder.eof() && psiBuilder.getTokenType() != KeyWord.END) {
+//        while (!psiBuilder.eof() && psiBuilder.getCurrentLexerToken() != KeyWord.END) {
 //            System.out.println("SimulaParser.parseBlock: NOT END ==> parseStatement");
 //            parseStatement(psiBuilder);
 //        }
 //
-//        if (psiBuilder.getTokenType() == KeyWord.END) {
+//        if (psiBuilder.getCurrentLexerToken() == KeyWord.END) {
 //            psiBuilder.advanceLexer(); // consume END
 //            blockMarker.done(SimulaElementTypes.BLOCK_ELEMENT);
 //        } else {
@@ -103,7 +103,7 @@ public class SimulaParser {// implements PsiParser {
 //        PsiMarker assignMarker = psiBuilder.mark();
 //        psiBuilder.advanceLexer(); // consume identifier
 //
-//        if (psiBuilder.getTokenType() == KeyWord.ASSIGNVALUE) {
+//        if (psiBuilder.getCurrentLexerToken() == KeyWord.ASSIGNVALUE) {
 //            psiBuilder.advanceLexer();
 //            // In a real parser, you'd call parseExpression(psiBuilder) here
 //            consumeUntilSemicolon(psiBuilder);
@@ -114,10 +114,10 @@ public class SimulaParser {// implements PsiParser {
 //    }
 //
 //    public static void consumeUntilSemicolon(PsiBuilder psiBuilder) {
-//        while (!psiBuilder.eof() && psiBuilder.getTokenType() != KeyWord.SEMICOLON) {
+//        while (!psiBuilder.eof() && psiBuilder.getCurrentLexerToken() != KeyWord.SEMICOLON) {
 //            psiBuilder.advanceLexer();
 //        }
-//        if (psiBuilder.getTokenType() == KeyWord.SEMICOLON) {
+//        if (psiBuilder.getCurrentLexerToken() == KeyWord.SEMICOLON) {
 //            psiBuilder.advanceLexer();
 //        }
 //    }
@@ -129,10 +129,10 @@ public class SimulaParser {// implements PsiParser {
 //
 //        psiBuilder.advanceLexer(); // Consume KEY
 //
-//        if (psiBuilder.getTokenType() == SimpleTypes.SEPARATOR) {
+//        if (psiBuilder.getCurrentLexerToken() == SimpleTypes.SEPARATOR) {
 //            psiBuilder.advanceLexer(); // Consume SEPARATOR (=)
 //
-//            if (psiBuilder.getTokenType() == SimpleTypes.VALUE) {
+//            if (psiBuilder.getCurrentLexerToken() == SimpleTypes.VALUE) {
 //                psiBuilder.advanceLexer(); // Consume VALUE
 //            } else {
 //                psiBuilder.error("Value expected");

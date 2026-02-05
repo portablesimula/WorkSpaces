@@ -37,9 +37,14 @@ public final class InnerStatement extends Statement {
 	 public InnerStatement(final int line) {
 		super(line);
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": InnerStatement: "+this);
-		ClassDeclaration cls=(ClassDeclaration)Global.getCurrentScope();
-		cls.statements1 = cls.statements;
-		cls.statements = new ObjectList<Statement>();
+//		ClassDeclaration cls=(ClassDeclaration)Global.getCurrentScope();
+//		cls.statements1 = cls.statements;
+//		cls.statements = new ObjectList<Statement>();
+		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
+//			ClassDeclaration cls=(ClassDeclaration)Global.getCurrentScope();
+			cls.statements1 = cls.statements;
+			cls.statements = new ObjectList<Statement>();
+		} else Util.error("Missplaced Inner");
 	}
 
 	@Override

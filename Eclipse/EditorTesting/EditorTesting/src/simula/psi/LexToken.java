@@ -51,4 +51,10 @@ public class LexToken extends PsiElement {
 		return "Line-" + lineNumber + ':' + KeyWord.edit(keyWord) + '[' + startOffset + ':' + endOffset + "]=\"" + edText() + '"';
 	}
 
+	public boolean isWhiteSpaces() {
+		if(keyWord == KeyWord.NEWLINE) return true;
+		if(keyWord == KeyWord.WHITESPACES) return true;
+		return false;
+	}
+
 }

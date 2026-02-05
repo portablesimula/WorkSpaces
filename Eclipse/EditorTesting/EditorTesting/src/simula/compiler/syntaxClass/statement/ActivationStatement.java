@@ -103,13 +103,19 @@ public final class ActivationStatement extends Statement {
 	/// @param line the source line number
 	ActivationStatement(final PsiBuilder simBuilder, final int line) {
 		super("ActivationStatement", line);
-		LexToken activator = Parse.prevToken();
+
+		simBuilder.startSubtree("ActivationStatement");
+		LexToken activator = Parse.getParserToken(simBuilder);
 		REAC = activator.keyWord == KeyWord.REACTIVATE;
+		simBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to 'current tree')
+
+//		LexToken activator = Parse.prevToken();
+//		REAC = activator.keyWord == KeyWord.REACTIVATE;
 		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse ActivationStatement");
 		object1 = Expression.expectExpression(simBuilder);
 		object1.backLink = this;
 		code = ActivationCode.direct;
-		LexToken prevToken = Parse.currentToken(simBuilder);
+		LexToken prevToken = Parse.getParserToken(simBuilder);
 		if (Parse.accept(simBuilder, KeyWord.AT) || Parse.accept(simBuilder, KeyWord.DELAY)) {
 			code = (prevToken.keyWord == KeyWord.AT) ? ActivationCode.at : ActivationCode.delay;
 			time = Expression.expectExpression(simBuilder);

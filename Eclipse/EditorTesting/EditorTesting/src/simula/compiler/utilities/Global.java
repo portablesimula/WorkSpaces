@@ -24,6 +24,7 @@ import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.editor.RTOption;
+import simula.psi.viewer.PsiTreePanel;
 
 /// Global Variables.
 /// 
@@ -177,6 +178,9 @@ public final class Global {
 				} catch(Exception e) {}
 			}
 		}
+		
+        ProgramModule programModule = new ProgramModule();
+		Global.programModule = programModule;
 	}
 
 	/// The declaration scope stack.

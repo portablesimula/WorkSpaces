@@ -50,11 +50,15 @@ public final class WhileStatement extends Statement {
 	/// @param line the source line number
 	WhileStatement(final PsiBuilder simBuilder, final int line) {
 		super("WhileStatement", line);
+
+		simBuilder.startSubtree("WhileStatement");
+		simBuilder.consume(KeyWord.WHILE); //  (add it to 'current tree')
+
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse WhileStatement: line="+line+", current=" + Parse.currentToken(simBuilder));
+			Util.TRACE("Parse WhileStatement: line="+line+", current=" + Parse.currentLexToken(simBuilder));
 		condition = Expression.expectExpression(simBuilder);
 		Parse.expect(simBuilder, KeyWord.DO);
-		doStatement = Statement.expectStatement(simBuilder);
+		doStatement = Statement.acceptStatement(simBuilder);
 		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber+": WhileStatement: "+this);
 	}
 

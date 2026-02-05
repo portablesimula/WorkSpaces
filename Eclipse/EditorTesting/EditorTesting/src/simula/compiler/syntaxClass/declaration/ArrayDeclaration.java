@@ -145,7 +145,7 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param declarationList the given declaration list
 	static void expectArrayDeclaration(final PsiBuilder simBuilder, final Type type, final DeclarationList declarationList) {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ArrayDeclaration, type=" + type + ", current=" + Parse.currentToken(simBuilder));
+			Util.TRACE("Parse ArrayDeclaration, type=" + type + ", current=" + Parse.getParserToken(simBuilder));
 		do {
 			if (Option.internal.TRACE_PARSE)
 				Parse.TRACE("Parse ArraySegment");
@@ -168,7 +168,10 @@ public final class ArrayDeclaration extends Declaration {
 			Parse.expect(simBuilder, KeyWord.ENDPAR);
 			for (Enumeration<String> e = identList.elements(); e.hasMoreElements();) {
 				String identifier = e.nextElement();
-				declarationList.add(new ArrayDeclaration(identifier.toString(), type, boundPairList));
+				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(identifier.toString(), type, boundPairList);
+				declarationList.add(arrayDeclaration);
+				simBuilder.doneSubtree(arrayDeclaration);
+				simBuilder.startSubtree("NextDeclaration");
 			}
 			
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));

@@ -158,10 +158,14 @@ public final class ForStatement extends Statement {
 	/// @param line the source line number
 	ForStatement(final PsiBuilder simBuilder, final int line) {
 		super("ForStatement", line);
+
+		simBuilder.startSubtree("ForStatement");
+		simBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
+
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ForStatement");
 		controlVariable = new VariableExpression(Parse.expectIdentifier(simBuilder));
-		LexToken prevToken = Parse.currentToken(simBuilder);
+		LexToken prevToken = Parse.getParserToken(simBuilder);
 		if (!Parse.accept(simBuilder, KeyWord.ASSIGNVALUE))
 			Parse.expect(simBuilder, KeyWord.ASSIGNREF);
 		assignmentOperator = prevToken.keyWord;
@@ -169,7 +173,7 @@ public final class ForStatement extends Statement {
 			forList.add(expectForListElement(simBuilder));
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		Parse.expect(simBuilder, KeyWord.DO);
-		Statement doStatement = Statement.expectStatement(simBuilder);
+		Statement doStatement = Statement.acceptStatement(simBuilder);
 		if (doStatement == null) {
 			Util.error("No statement following DO in For statement");
 			doStatement = new DummyStatement(line);

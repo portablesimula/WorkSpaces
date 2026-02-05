@@ -97,7 +97,7 @@ public final class SwitchStatement extends Statement {
 //	/// The lookupSwitc cases.
 //	private	List<SwitchCase> lookupSwitchCases;
 
-	/// Indicator: har NONE case.
+	/// Indicator: has NONE case.
 	private boolean has_NONE_case;
 	
 //	/// The beginning of the default handler block.
@@ -110,6 +110,10 @@ public final class SwitchStatement extends Statement {
 	/// @param line the source line number
 	SwitchStatement(final PsiBuilder simBuilder, final int line) {
 		super("SwitchStatement", line);
+
+		simBuilder.startSubtree("SwitchStatement");
+		simBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
+
 		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse SwitchStatement: line="+line);
 		Parse.expect(simBuilder, KeyWord.BEGPAR);
 		lowKey = Expression.expectExpression(simBuilder);
@@ -132,7 +136,7 @@ public final class SwitchStatement extends Statement {
 				while(Parse.accept(simBuilder, KeyWord.COMMA)) caseKeyList.add(expectCasePair(simBuilder));
 			}
 			Parse.expect(simBuilder, KeyWord.DO);
-			Statement statement = Statement.expectStatement(simBuilder);
+			Statement statement = Statement.acceptStatement(simBuilder);
 			Parse.accept(simBuilder, KeyWord.SEMICOLON);
 			switchCases.add(new SwitchWhenPart(caseKeyList, statement));
 		}
