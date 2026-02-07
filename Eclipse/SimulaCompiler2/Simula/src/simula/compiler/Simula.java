@@ -95,7 +95,7 @@ import simula.editor.SimulaEditor;
 ///         NOTE: In this mode, the editor will terminate after the first program execution
 ///
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/Simula.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/Simula.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 /// 

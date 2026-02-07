@@ -12,7 +12,7 @@ package simula.runtime;
 /// </pre>
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/runtime/FOR_SingleElt.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/runtime/FOR_SingleElt.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 /// @param <T> the type of this element

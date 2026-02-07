@@ -17,7 +17,7 @@ package simula.runtime;
 /// Sect. 2.3.4 Array Quantities
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_ARRAY.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/runtime/RTS_ARRAY.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public abstract class RTS_ARRAY {

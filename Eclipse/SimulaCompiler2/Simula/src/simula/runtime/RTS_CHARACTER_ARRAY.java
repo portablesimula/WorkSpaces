@@ -11,7 +11,7 @@ package simula.runtime;
 /// This class represent a Simula character array. 
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_CHARACTER_ARRAY.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/runtime/RTS_CHARACTER_ARRAY.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class RTS_CHARACTER_ARRAY extends RTS_ARRAY {

@@ -25,7 +25,7 @@ import simula.compiler.syntaxClass.declaration.LabelDeclaration;
 /// A list of LabelDeclarations.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/utilities/LabelList.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/LabelList.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen

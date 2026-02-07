@@ -28,7 +28,7 @@ import simula.editor.RTOption;
 /// Global Variables.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/utilities/Global.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/Global.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class Global {
