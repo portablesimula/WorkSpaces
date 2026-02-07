@@ -9,7 +9,6 @@ import java.io.Reader;
 
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.KeyWord;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Token;
 import simula.compiler.utilities.Util;
 

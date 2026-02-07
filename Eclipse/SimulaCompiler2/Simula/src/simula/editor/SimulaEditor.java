@@ -59,44 +59,56 @@ import simula.compiler.utilities.Util;
 /// @author Øystein Myhre Andersen
 @SuppressWarnings("serial")
 public class SimulaEditor extends JFrame {
-	
-	/// The tabbed pane.
-    static JTabbedPane tabbedPane; 
-    
-    /// The menu bar.
-    static EditorMenues menuBar;
-    
-    /// The current SourceTextPanel
-    static SourceTextPanel current;
-    
-    /// The autoRefresher
-    static AutoRefresher autoRefresher;
-    
-    /// Available languages.
-     public enum Language { /** Simula */Simula,/** Jar file */Jar,/** Text file */Text,/** other */ Other }
 
-    
+	/// The tabbed pane.
+	static JTabbedPane tabbedPane; 
+
+	/// The menu bar.
+	static EditorMenues menuBar;
+
+	/// The current SourceTextPanel
+	static SourceTextPanel current;
+
+	/// The autoRefresher
+	static AutoRefresher autoRefresher;
+
+	/// Available languages.
+	public enum Language { /** Simula */Simula,/** Jar file */Jar,/** Text file */Text,/** other */ Other }
+
+
 	// ****************************************************************
 	// *** SimulaEditor: Main Entry for TESTING ONLY
 	// ****************************************************************
-    /// SimulaEditor: Main Entry for TESTING ONLY.
-    /// @param args the arguments
-     public static void main(String[] args) {
- 		System.setProperty("sun.java2d.uiScale", "0.7"); // Scales by 200%
+	/// SimulaEditor: Main Entry for TESTING ONLY.
+	/// @param args the arguments
+	public static void main(String[] args) {
 		Global.packetName="simprog";
 		String userDir="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/Simula";
 		Global.simulaRtsLib=new File(userDir,"bin"); // To use Eclipse Project's simula.runtime  Download
 		RTOption.InitRuntimeOptions();
-    	Option.InitCompilerOptions();
+		Option.InitCompilerOptions();
 		Global.sampleSourceDir=new File(userDir+"/src/simulaTestPrograms/samples");
 		Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 			public void uncaughtException(Thread thread, Throwable e) {
 				System.out.print("SimulaEditor.UncaughtExceptionHandler: GOT Exception: " + e);
-		}});
+				e.printStackTrace();
+			}});
 		Option.internal.INLINE_TESTING=true;
+		setUIScale(); // Must be done before any Swing Component is created.
 		SimulaEditor editor=new SimulaEditor();
-    	editor.setVisible(true);
-    }
+		editor.setVisible(true);
+	}
+
+	/// Set UI-Scale factor
+	/// See: https://docs.oracle.com/en/java/javase/25/troubleshoot/java-2d-properties.html
+	public static void setUIScale() {
+     	Global.loadUserSettings();
+		IO.println("SimulaEditor.setUIScale: " + Option.editorUIScale);
+		if(! Option.editorUIScale.equals("1")) {
+			IO.println("SimulaEditor.setUIScale: setProperty(\"sun.java2d.uiScale\", " + Option.editorUIScale + ')');
+			System.setProperty("sun.java2d.uiScale", Option.editorUIScale);
+		}
+	}
             
 	// ****************************************************************
 	// *** Constructor
@@ -121,7 +133,7 @@ public class SimulaEditor extends JFrame {
 
         // Set the title of the window
         setTitle(Global.simulaVersion);
-       	Global.loadWorkspaceProperties();
+//     	Global.loadUserSettings();
     	
         // Set the default close operation (exit when it gets closed)
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -501,13 +513,21 @@ public class SimulaEditor extends JFrame {
 	// ****************************************************************
     /// Run the given .jar file
     /// @param jarFile the file
-	static void doRunJarFile(File jarFile) {
+	public static void doRunJarFile(File jarFile) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				String userDir=jarFile.getParentFile().getParent();
-				String[] cmds= {"java","-jar",jarFile.toString(),"-userDir",userDir};
-				Util.execute(cmds);
+				IO.println("SimulaEditor.doRunJarFile: Option.editorUIScale="+Option.editorUIScale);
+				if(!Option.editorUIScale.equals("1")) {
+					// java -Dsun.java2d.uiScale=2 -jar application.jar
+					String uiScaleOption = "-Dsun.java2d.uiScale=" + Option.editorUIScale;
+					String[] cmds= {"java", uiScaleOption, "-jar",jarFile.toString(), "-userDir",userDir};
+					Util.execute(cmds);					
+				} else {
+					String[] cmds= {"java","-jar",jarFile.toString(),"-userDir",userDir};
+					Util.execute(cmds);
+				}
 			}
 		}).start();
 	}

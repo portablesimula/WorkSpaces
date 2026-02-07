@@ -5,7 +5,6 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.runtime;
 
-import java.awt.Color;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -13,9 +12,6 @@ import java.nio.charset.Charset;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-
-import simula.compiler.utilities.Global;
 
 /// Utility class containing a lot of common stuff.
 /// 
@@ -41,13 +37,22 @@ public final class RTS_UTIL {
 	/// Number of edit overflows.
 	static int numberOfEditOverflows;
 	
-	public static ImageIcon favicon; // Set by BPRG
+	/// The Simula big S Icon
 	public static ImageIcon simicon; // Set by BPRG
+	
+	/// The Simula FavIcon
+	public static ImageIcon favicon; // Set by BPRG
+	
+	/// Returns the Simula FavIcon
+	/// @return the Simula FavIcon
 	public static ImageIcon getFavicon() {
 		if(favicon == null) favicon = getIcon("simicon.png");
 		return favicon;
 	}
 	
+	/// Returns a Simula named Icon
+	/// @param name the icon name
+	/// @return a Simula named Icon
 	public static ImageIcon getIcon(String name) {
     	String resource = "/simula/runtime/icons/" + name;
     	URL imageURL = NOTEXT.getClass().getResource(resource);
@@ -388,7 +393,6 @@ public final class RTS_UTIL {
 			}
 			
 		} else if (e instanceof Error) {
-			String msg = e.getClass().getSimpleName();
 			RTS_UTIL.printError(threadID + "SIMULA RUNTIME(3) ERROR: " + e);
 			RTS_UTIL.printSimulaStackTrace(e, 0);
 			if (RTS_Option.VERBOSE)

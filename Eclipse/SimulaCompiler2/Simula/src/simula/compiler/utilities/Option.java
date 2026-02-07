@@ -5,12 +5,15 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.utilities;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.net.URI;
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -21,6 +24,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 /// Compile Time Options.
 /// 
@@ -29,6 +34,10 @@ import javax.swing.JPanel;
 /// 
 /// @author Øystein Myhre Andersen
 public final class Option {
+	
+	/// The UI-Scale factor
+	/// See: https://docs.oracle.com/en/java/javase/25/troubleshoot/java-2d-properties.html
+	public static String editorUIScale;
 
 	/// The Compiler Modes.
 	public enum CompilerMode { 
@@ -139,6 +148,7 @@ public final class Option {
 	
 	/// Initiate Compiler options.
 	public static void InitCompilerOptions() {
+		Option.editorUIScale = "1.0";
 //		CompilerMode compilerMode=CompilerMode.viaJavaSource;
 		compilerMode=CompilerMode.directClassFiles;
 //		compilerMode=CompilerMode.simulaClassLoader;
@@ -154,6 +164,7 @@ public final class Option {
 	/// Get Compiler options from property file.
 	/// @param properties the properties used.
 	public static void getCompilerOptions(Properties properties) {
+		Option.editorUIScale = properties.getProperty("simula.editor.UIScale", "1.0");
 		setCompilerMode(properties.getProperty("simula.compiler.option.mode", "directClassFiles"));
 		Option.CaseSensitive = properties.getProperty("simula.compiler.option.CaseSensitive", "false").equalsIgnoreCase("true");
 		Option.verbose = properties.getProperty("simula.compiler.option.verbose", "false").equalsIgnoreCase("true");
@@ -165,6 +176,7 @@ public final class Option {
 	/// Set Compiler options in property file.
 	/// @param properties the properties used.
 	public static void setCompilerOptions(Properties properties) {
+		properties.setProperty("simula.editor.UIScale", Option.editorUIScale);
 		properties.setProperty("simula.compiler.option.mode", ""+Option.compilerMode);
 		properties.setProperty("simula.compiler.option.CaseSensitive", ""+Option.CaseSensitive);
 		properties.setProperty("simula.compiler.option.verbose", ""+Option.verbose);
@@ -172,6 +184,75 @@ public final class Option {
 		properties.setProperty("simula.compiler.option.WARNINGS", ""+Option.WARNINGS);
 		properties.setProperty("simula.compiler.option.EXTENSIONS", ""+Option.EXTENSIONS);
 	}
+	
+    // ****************************************************************
+    // *** resetUIScale
+    // ****************************************************************
+    /// Reset the UI-Scale factor dialog.
+    public static void resetUIScale() {
+		String text ="Set the system property (sun.java2d.uiScale) to"
+					+"\noverride the UI scaling factor for Swing and AWT."
+					+"\nIt is particularly useful for apps on High-DPI displays." 
+					+"\n"
+					+"\nAlternatively, you can specify the scaling factor"
+					+"\nwith an environment variable: "
+					+"\n"
+					+"\n     J2D_UISCALE=2.0"
+					+"\n"
+					+"\nThis change requires a restart to take effect." 
+					+"\n";
+
+		// Create sub-panel
+		JPanel panel2 = new JPanel();
+		panel2.setBackground(Color.white);
+		JTextField textField = new JTextField(editorUIScale, 4);
+        panel2.add(new JLabel("Set UI-Scale:")); panel2.add(textField); panel2.add(new JLabel("Eg. 1.5 means 150%"));
+        
+
+    	JPanel panel=new JPanel();
+		panel.setBackground(Color.white);
+    	JTextArea textArea=new JTextArea(text);
+    	panel.setLayout(new BorderLayout());
+    	panel.add(textArea,BorderLayout.NORTH);
+    	panel.add(panel2,BorderLayout.CENTER);
+		int answer = Util.optionDialog(panel,"Reset UI-Scale",JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,"Ok","Cancel","More Info");
+		IO.println("Option.resetUIScale: answer="+answer+", OK_OPTION="+JOptionPane.OK_OPTION);
+		if(answer == 2) {
+			if(Desktop.isDesktopSupported()) {
+				Desktop desktop = Desktop.getDesktop();
+				try { desktop.browse(new URI("https://docs.oracle.com/en/java/javase/25/troubleshoot/java-2d-properties.html"));
+				} catch (Exception ex) {}
+			}
+		} else if(answer == JOptionPane.OK_OPTION) {
+			String value = textField.getText();
+			if(!value.equals(Option.editorUIScale))
+			try {
+				Float.parseFloat(value); // Check legal number
+				Option.editorUIScale = textField.getText();
+
+//				IO.println("Option.resetUIScale: editorUIScale="+editorUIScale);
+		    	Global.storeWorkspaceProperties();
+				int res=Util.optionDialog("\nDo you want to restart now ?","Restart ?",JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, "Yes", "No");
+				if(res == JOptionPane.YES_OPTION) {
+//					IO.println("Option.resetUIScale: DO RESTART !");
+					String home = Global.getSimulaProperty("simula.home", null);
+					File jarFile = new File(home + "/Simula-2.0/simula.jar");
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							String[] cmds= {"java","-jar",jarFile.toString()};
+							Util.execute(cmds);
+						}
+					}).start();
+					System.exit(0);
+				}
+
+			} catch(Exception e) {
+//				e.printStackTrace();
+				Util.popUpError(e.getClass().getSimpleName() + "\n" + e.getMessage() + "\n\nUI-Scale factor not changed.\n");
+			}
+		}
+    }
 
 	/// Editor Utility: Set Compiler Mode.
 	public static void setCompilerMode() {

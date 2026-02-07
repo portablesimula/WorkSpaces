@@ -246,8 +246,9 @@ public final class Global {
 	/// @param defaultValue default value
 	/// @return a Simula property
 	public static String getSimulaProperty(String key, String defaultValue) {
-		if (simulaProperties == null)
+		if (simulaProperties == null) {
 			loadProperties();
+		}
 		return (simulaProperties.getProperty(key, defaultValue));
 	}
 
@@ -271,58 +272,52 @@ public final class Global {
 	}
 
 	// **********************************************************
-	// *** WORKSPACES
+	// *** USER SETTINGS
 	// **********************************************************
-	/// The Simula workspace .xml file.
-	private static File simulaWorkspacesFile;
+	/// The Simula User Settings .xml file.
+	private static File simulaUserSettingsFile;
 	
 	/// The Simula workspace properties.
-	private static Properties simulaWorkspaces;
+	private static Properties simulaUserSettings;
 
 	/// Load Workspace properties.
-	public static void loadWorkspaceProperties() {
-		simulaWorkspaces = new Properties();
+	public static void loadUserSettings() {
+		simulaUserSettings = new Properties();
 		String USER_HOME = System.getProperty("user.home");
 		File simulaPropertiesDir = new File(USER_HOME, ".simula");
-		simulaWorkspacesFile = new File(simulaPropertiesDir, "workspaces.xml");
+//		simulaUserSettingsFile = new File(simulaPropertiesDir, "workspaces.xml");
+		simulaUserSettingsFile = new File(simulaPropertiesDir, "settings.xml");
 		workspaces = new ArrayDeque<File>();
-		if (simulaWorkspacesFile.exists()) {
+		if (simulaUserSettingsFile.exists()) {
 			try {
+				loadProperties();
 				Option.getCompilerOptions(simulaProperties);
-				simulaWorkspaces.loadFromXML(new FileInputStream(simulaWorkspacesFile));
+				simulaUserSettings.loadFromXML(new FileInputStream(simulaUserSettingsFile));
 				
-				Option.getCompilerOptions(simulaWorkspaces);
-				RTOption.getRuntimeOptions(simulaWorkspaces);
+				Option.getCompilerOptions(simulaUserSettings);
+				RTOption.getRuntimeOptions(simulaUserSettings);
 				
-				String ext = simulaWorkspaces.getProperty("simula.extLib", null);
-				// Util.println("Global.loadWorkspaceProperties: extLib="+ext);
+				String ext = simulaUserSettings.getProperty("simula.extLib", null);
+				// Util.println("Global.loadUserSettings: extLib="+ext);
 				if (ext != null)
 					Global.extLib = new File(ext);
-				
-//				for (int i = 1; i <= MAX_WORKSPACE; i++) {
-//					String ws = simulaWorkspaces.getProperty("simula.workspace." + i, null);
-//					if (ws != null) {
-//						if (ws.contains("Simula-Beta-0.3"))
-//							ws = ws.replace("Simula-Beta-0.3", "Simula-1.0");
-//						// Util.println("Global.loadWorkspaceProperties: ADD "+ws);
-//						workspaces.add(new File(ws));
-//					}
-//				}
-				
-				String count = simulaWorkspaces.getProperty("simula.workspace.count","0");
+				String count = simulaUserSettings.getProperty("simula.workspace.count","0");
 //				IO.println("Global.loadSPortEditorProperties: count="+count);
 				int n =  Integer.decode(count).intValue();
 				for(int i=0;i<n;i++) {
-					String ws = simulaWorkspaces.getProperty("simula.workspace." + (i+1));
+					String ws = simulaUserSettings.getProperty("simula.workspace." + (i+1));
 //					IO.println("Global.loadSPortEditorProperties: workspace="+ws);
 					if(ws != null) {
 						File workspace = new File(ws);
 						if(workspace.exists()) workspaces.add(new File(ws));
 					}
 				}
+				
+				Option.editorUIScale = simulaUserSettings.getProperty("simula.editor.UIScale", "1.0");
 
 			} catch (Exception e) {
-				Util.popUpError("Can't load: " + simulaWorkspacesFile + "\nGot error: " + e);
+				e.printStackTrace();
+				Util.popUpError("Can't load: " + simulaUserSettingsFile + "\nGot error: " + e);
 			}
 		}
 		if (workspaces.isEmpty()) {
@@ -343,20 +338,20 @@ public final class Global {
 
 	/// Store Workspace properties.
 	public static void storeWorkspaceProperties() {
-		simulaWorkspaces = new Properties();
-		Option.setCompilerOptions(simulaWorkspaces);
-		RTOption.setRuntimeOptions(simulaWorkspaces);
+		simulaUserSettings = new Properties();
+		Option.setCompilerOptions(simulaUserSettings);
+		RTOption.setRuntimeOptions(simulaUserSettings);
 		if (Global.extLib != null)
-			simulaWorkspaces.setProperty("simula.extLib", Global.extLib.toString());
-		simulaWorkspaces.setProperty("simula.workspace.count", ""+workspaces.size());
+			simulaUserSettings.setProperty("simula.extLib", Global.extLib.toString());
+		simulaUserSettings.setProperty("simula.workspace.count", ""+workspaces.size());
 		int i = 1;
 		for (File ws : workspaces) {
-			simulaWorkspaces.setProperty("simula.workspace." + (i++), ws.toString());
+			simulaUserSettings.setProperty("simula.workspace." + (i++), ws.toString());
 		}
 		Global.currentWorkspace = workspaces.getFirst();
-		simulaWorkspacesFile.getParentFile().mkdirs();
+		simulaUserSettingsFile.getParentFile().mkdirs();
 		try {
-			simulaWorkspaces.storeToXML(new FileOutputStream(simulaWorkspacesFile), "Simula Editor Properties");
+			simulaUserSettings.storeToXML(new FileOutputStream(simulaUserSettingsFile), "Simula Editor Properties");
 		} catch (Exception e) {
 			Util.IERR();
 		}

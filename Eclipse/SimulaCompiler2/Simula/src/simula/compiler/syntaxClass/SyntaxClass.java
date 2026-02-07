@@ -11,7 +11,6 @@ import java.lang.classfile.CodeBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Util;

@@ -92,6 +92,7 @@ public class EditorMenues extends JMenuBar {
     /** Menu item */ private JMenuItem setExtLibDir = defJMenuItem("Select ExtLib Dir.","Specify where to search for precompiled classes and \r\n"
     																+ "procedures. If not found, output directory is also searched. ");
     /** Menu item */ private JMenuItem workSpaces = new JMenuItem("Remove WorkSpaces");
+    /** Menu item */ private JMenuItem editorUIScale = new JMenuItem("Resert UIScale");
     /** Menu item */ private JMenuItem compilerMode = new JMenuItem("Compiler Mode");
     /** Menu item */ private JMenuItem compilerOption = new JMenuItem("Compiler Options");
     /** Menu item */ private JMenuItem runtimeOption = new JMenuItem("Runtime Options");
@@ -123,6 +124,7 @@ public class EditorMenues extends JMenuBar {
     /** Popup Menu item */ private JMenuItem setOutputDir2 = new JMenuItem("Select Output Dir.");
     /** Popup Menu item */ private JMenuItem setExtLibDir2 = new JMenuItem("Select ExtLib Dir.");
     /** Popup Menu item */ private JMenuItem workSpaces2 = new JMenuItem("Remove WorkSpaces");
+    /** Popup Menu item */ private JMenuItem editorUIScale2 = new JMenuItem("Reset UIScale");
     /** Popup Menu item */ private JMenuItem compilerMode2 = new JMenuItem("Compiler Mode");
     /** Popup Menu item */ private JMenuItem compilerOption2 = new JMenuItem("Compiler Options");
     /** Popup Menu item */ private JMenuItem runtimeOption2 = new JMenuItem("Runtime Options");
@@ -160,6 +162,7 @@ public class EditorMenues extends JMenuBar {
 		runMenu.add(debug); debug.setEnabled(false); debug.addActionListener(actionListener);
 		this.add(runMenu);
 		settings.add(autoRefresh); autoRefresh.setEnabled(false); autoRefresh.addActionListener(actionListener);
+        settings.add(editorUIScale); editorUIScale.addActionListener(actionListener);
         settings.add(compilerMode); compilerMode.addActionListener(actionListener);
         settings.add(setWorkSpace); setWorkSpace.addActionListener(actionListener);
         settings.add(setJavaDir); setJavaDir.addActionListener(actionListener);
@@ -242,6 +245,7 @@ public class EditorMenues extends JMenuBar {
         popupMenu.addSeparator();
         popupMenu.add(autoRefresh2); autoRefresh2.setEnabled(false); autoRefresh2.addActionListener(actionListener);
         popupMenu.addSeparator();
+        popupMenu.add(editorUIScale2); editorUIScale2.addActionListener(actionListener);
         popupMenu.add(compilerMode2); compilerMode2.addActionListener(actionListener);
         popupMenu.add(setWorkSpace2); setWorkSpace2.addActionListener(actionListener);
         popupMenu.add(setJavaDir2); setJavaDir2.addActionListener(actionListener);
@@ -323,6 +327,7 @@ public class EditorMenues extends JMenuBar {
 			else if(item==setOutputDir || item==setOutputDir2) selectOutputDirAction();
 			else if(item==setExtLibDir || item==setExtLibDir2) selectExtLibDirAction();
 			else if(item==workSpaces || item==workSpaces2) removeWorkspacesAction();
+			else if(item==editorUIScale || item==editorUIScale2) Option.resetUIScale();
 			else if(item==compilerMode || item==compilerMode2) Option.setCompilerMode();
 			else if(item==compilerOption || item==compilerOption2) Option.selectCompilerOptions();
 			else if(item==runtimeOption  || item==runtimeOption2) RTOption.selectRuntimeOptions();			
@@ -520,6 +525,7 @@ public class EditorMenues extends JMenuBar {
 			Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 				public void uncaughtException(Thread thread, Throwable e) {
 					System.out.print("EditorMenues.UncaughtExceptionHandler: GOT Exception: " + e);
+					e.printStackTrace();
 			}});
 			// Start compiler ....
 			Util.ASSERT(SimulaEditor.current!=null,"EditorMenues.doRunAction: Invariant-1");

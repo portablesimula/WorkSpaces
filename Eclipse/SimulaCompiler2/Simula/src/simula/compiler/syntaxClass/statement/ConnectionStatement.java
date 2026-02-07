@@ -21,7 +21,6 @@ import simula.compiler.syntaxClass.declaration.ConnectionBlock;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.InspectVariableDeclaration;
 import simula.compiler.syntaxClass.declaration.MaybeBlockDeclaration;
-import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.expression.AssignmentOperation;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.VariableExpression;

@@ -307,6 +307,7 @@ public final class Util {
 			String line = "";
 			for (int i = 0; i < cmdarray.length; i++)
 				line = line + " " + cmdarray[i];
+//			IO.println("Util.execute: " + line);
 			Util.println("Execute: " + line);
 		}
 		ProcessBuilder processBuilder = new ProcessBuilder(cmdarray);

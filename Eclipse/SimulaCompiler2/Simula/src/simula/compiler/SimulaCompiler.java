@@ -6,9 +6,7 @@
 package simula.compiler;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.Vector;
@@ -365,6 +363,11 @@ public final class SimulaCompiler {
 		Vector<String> cmds = new Vector<String>();
 		cmds.add("java");
    		if(Option.compilerMode != Option.CompilerMode.simulaClassLoader) {
+			if(Option.editorUIScale != null  && !Option.editorUIScale.equals("1")) {
+				// java -Dsun.java2d.uiScale=2 -jar application.jar
+				String uiScaleOption = "-Dsun.java2d.uiScale=" + Option.editorUIScale;
+				cmds.add(uiScaleOption);
+			}
 			cmds.add("-jar");
 			cmds.add(jarFile);
 		}

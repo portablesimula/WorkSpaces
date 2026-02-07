@@ -1,15 +1,19 @@
+/// (CC) This work is licensed under a Creative Commons
+/// Attribution 4.0 International License.
+/// 
+/// You find a copy of the License on the following
+/// page: https://creativecommons.org/licenses/by/4.0/
 package simula.runtime;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.HeadlessException;
-import java.io.File;
-
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+/// RTS Dialog utilities
+/// 
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/runtime/RTS_Dialog.java"><b>Source File</b></a>.
+/// 
+/// @author Øystein Myhre Andersen
 public interface RTS_Dialog {
 	
 	/// Brings up an option dialog.
@@ -34,7 +38,6 @@ public interface RTS_Dialog {
 	/// Brings up an input dialog.
 	/// @param msg the message to display
 	/// @param title the title string for the dialog
-	/// @param optionType an integer designating the options available on the dialog
 	/// @param messageType an integer designating the kind of message this is
 	/// @return the resulting String
 	public static String inputDialog(final Object msg, final String title, final int messageType) {
@@ -53,7 +56,6 @@ public interface RTS_Dialog {
 	/// Brings up an confirm dialog.
 	/// @param msg the message to display
 	/// @param title the title string for the dialog
-	/// @param optionType an integer designating the options available on the dialog
 	/// @param messageType an integer designating the kind of message this is
 	/// @return the resulting String
 	public static boolean confirmDialog(final Object msg, final String title, final int messageType) {
