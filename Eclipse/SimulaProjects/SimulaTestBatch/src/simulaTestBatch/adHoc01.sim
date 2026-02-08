@@ -1,0 +1,51 @@
+COMMENT
+This program sorts an array of positive integers using Simula's class 
+Simulation. It is not the best way to sort an array, but I think it is
+a good demonstration of what you can do with that class.
+
+Code written by dag@ifi.uio.no based on an article I read a long time ago.
+;
+
+BEGIN
+   PROCEDURE sort_array (a);
+   INTEGER ARRAY a;
+   Simulation BEGIN
+      Process CLASS Number (val);
+      INTEGER val;
+      BEGIN
+         a(a_ix) := val;  a_ix := a_ix+1;
+      END CLASS Number;
+
+      INTEGER a_max, a_ix, ix;
+      a_ix := LowerBound(a,1);
+      FOR ix := LowerBound(a,1) STEP 1 UNTIL UpperBound(a,1) DO BEGIN
+         IF a(ix) > a_max THEN a_max := a(ix);
+         ACTIVATE NEW Number(a(ix)) AT a(ix);
+      END FOR;
+      Hold(a_max+1);
+   END sort_array;
+
+   PROCEDURE print_array (a);
+   INTEGER ARRAY a;
+   BEGIN
+      INTEGER ix;
+      FOR ix := LowerBound(a,1) STEP 1 UNTIL UpperBound(a,1) DO BEGIN
+         IF ix > LowerBound(a,1) THEN OutChar(' ');
+         OutInt(a(ix),0);
+      END FOR;
+      OutImage;
+   END print_array;
+
+   INTEGER n;  n := 10;
+   BEGIN
+      INTEGER ARRAY data(1:n);
+      INTEGER u, ix;
+
+      u := 654321;
+      FOR ix := 1 STEP 1 UNTIL n DO
+         data(ix) := RandInt(1, 999, u);
+      OutText("Before sorting: ");  print_array(data);
+      sort_array(data);
+      OutText("After sorting: ");  print_array(data);
+   END; 
+END PROGRAM.

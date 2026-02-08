@@ -1,0 +1,11 @@
+begin
+Simset begin
+% inspect new Simset do begin
+	ref(Head) liste;
+	ref(Link) elt;
+	
+	elt :- liste.first;
+	
+end;
+end;	
+	

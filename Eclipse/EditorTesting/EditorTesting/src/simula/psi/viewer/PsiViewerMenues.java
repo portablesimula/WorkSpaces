@@ -488,7 +488,7 @@ public class PsiViewerMenues extends JMenuBar {
 	// ****************************************************************
 	// *** doBuildPsiTreeAction
 	// ****************************************************************
-	/// The build action
+	/// The build PSI Tree action
 	private void doBuildPsiTreeAction() {
 		SwingUtilities.invokeLater(() -> {
 			Option.internal.DEBUGGING=false;

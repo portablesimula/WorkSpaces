@@ -1,0 +1,71 @@
+
+% ===============================================   Main   program =============
+%  PROGRAM NAME:   SIMULA TEST NO 167
+%
+%  PURPOSE:     Test Activate at/delay
+%
+%  METHOD:      Try it and see if it work as expected.
+%
+%  WRITTEN BY:  Dag Langemyhr and MYH
+% ==============================================================================
+external class SimulaTest;
+
+SimulaTest(167,"--- Test Activate at/delay") begin
+	text array facit(0:17);
+	integer traceCase;
+   
+	procedure trace(msg); text msg; begin
+		if verbose then
+		begin outtext(msg); outimage; end;
+		if msg ne facit(traceCase) then begin
+			err("Case " & edit(traceCase));
+			outtext("Trace: """ & msg & """"); outimage;
+			outtext("Facit: """ & facit(traceCase) & """"); outimage;
+		end;
+		traceCase:=traceCase+1;
+	end;
+
+	
+% ========================================================
+	
+	facit(0) :- "At START";
+	
+	facit(1) :- "do A:c"; -- delay 5 prior
+	facit(2) :- "do A:a"; -- at 5 
+	facit(3) :- "do A:e"; -- delay 5
+	facit(4) :- "do A:f"; -- delay 15 prior
+	facit(5) :- "do A:b"; -- at 15
+	facit(6) :- "do A:d"; -- delay 15
+	
+	facit(7) :- "At END";
+	
+% ========================================================
+
+		Simulation begin
+		
+		   Process class AA(id); text id; begin
+		   	   trace("do A:" & id);
+		   end;
+		
+		   ref(AA) a,b,c,d,e,f;
+		   
+		   trace("At START");
+		   a :- new AA("a");
+		   b :- new AA("b");
+		   c :- new AA("c");
+		   d :- new AA("d");
+		   e :- new AA("e");
+		   f :- new AA("f");
+		   
+		   activate a at 5;
+		   activate b at 15;
+		   activate c delay 5 prior;
+		   activate d delay 15;
+		   activate e delay 5;
+		   activate f delay 15 prior;
+		   
+		   hold(100);
+		   trace("At END");
+		end
+
+ end

@@ -1,0 +1,8 @@
+begin
+	text res;
+	outtext("Input: "); breakoutimage; inimage;
+	res :- copy("abra ca dab");
+%	res :- prompt("TITLE", "Hvor mange: ");
+	outtext(res);
+	
+end;

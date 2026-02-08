@@ -229,6 +229,26 @@ public class ClassDeclaration extends BlockDeclaration {
 		}
 	}
 
+	private static void acceptValuePart(final Vector<Parameter> pList) {
+		if (Parse.accept(KeyWord.VALUE)) {
+			do {
+				String identifier = Parse.expectIdentifier();
+				Parameter parameter = null;
+				for (Parameter par : pList)
+					if (Util.equals(identifier, par.identifier)) {
+						parameter = par;
+						break;
+					}
+				if (parameter == null) {
+					Util.error("Identifier " + identifier + " is not defined in this scope");
+					parameter = new Parameter(identifier);
+				}
+				parameter.setMode(Parameter.Mode.value);
+			} while (Parse.accept(KeyWord.COMMA));
+			Parse.expect(KeyWord.SEMICOLON);
+		}
+	}
+
 	// ***********************************************************************************************
 	// *** PARSING: acceptParameterSpecificationPart
 	// ***********************************************************************************************

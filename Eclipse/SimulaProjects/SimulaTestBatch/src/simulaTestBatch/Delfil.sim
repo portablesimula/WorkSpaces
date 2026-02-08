@@ -1,0 +1,7 @@
+begin
+	ref(infile) inpt;
+	ref(outfile) out1, out2;
+	
+	outtext("STARTING ....");
+
+end;
