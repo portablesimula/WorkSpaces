@@ -30,8 +30,9 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Connection Statement.
 /// 
@@ -130,7 +131,7 @@ public final class ConnectionStatement extends Statement {
 			Parse.TRACE("Parse ConnectionStatement");
 		objectExpression = Expression.expectExpression();
 		objectExpression.backLink = this;
-		String ident = "_inspect_" + lineNumber + '_' + (SEQUX++);
+		String ident = "_inspect_" + lineNumber() + '_' + (SEQUX++);
 		inspectedVariable = new VariableExpression(ident);
 		DeclarationScope scope = Global.getCurrentScope();
 		inspectVariableDeclaration = new InspectVariableDeclaration(Type.Ref("RTObject"), ident, scope, this);
@@ -175,20 +176,19 @@ public final class ConnectionStatement extends Statement {
 		this.otherwise=otherwise;
 		this.hasWhenPart=hasWhenPart;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line "+this.lineNumber+": ConnectionStatement: "+this);
+			Util.TRACE("Line "+this.lineNumber()+": ConnectionStatement: "+this);
 	}
 
 	ConnectionStatement(final PsiBuilder simBuilder, final int line) {
 		super(line);
-
-		simBuilder.startSubtree("ConnectionStatement");
+		PsiTree inspectTree = simBuilder.startSubtree(ConnectionStatement.class, "ConnectionStatement");
 		simBuilder.consume(KeyWord.INSPECT); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ConnectionStatement");
 		objectExpression = Expression.expectExpression(simBuilder);
 		objectExpression.backLink = this;
-		String ident = "_inspect_" + lineNumber + '_' + (SEQUX++);
+		String ident = "_inspect_" + lineNumber() + '_' + (SEQUX++);
 		inspectedVariable = new VariableExpression(ident);
 		DeclarationScope scope = Global.getCurrentScope();
 		inspectVariableDeclaration = new InspectVariableDeclaration(Type.Ref("RTObject"), ident, scope, this);
@@ -233,13 +233,14 @@ public final class ConnectionStatement extends Statement {
 		this.otherwise=otherwise;
 		this.hasWhenPart=hasWhenPart;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line "+this.lineNumber+": ConnectionStatement: "+this);
+			Util.TRACE("Line "+this.lineNumber()+": ConnectionStatement: "+this);
+		simBuilder.doneSubtree(inspectTree, this);
 	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ConnectionStatement(" + toString() + ").doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());		
 		objectExpression.doChecking();
@@ -259,7 +260,7 @@ public final class ConnectionStatement extends Statement {
 
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code("{");
 		JavaSourceFileCoder.debug("// BEGIN INSPECTION ");
@@ -339,7 +340,8 @@ public final class ConnectionStatement extends Statement {
 	@Override
 	public String toString() {
 		String otherwisePart = (otherwise == null)?"":" OTHERWISE " + otherwise;
-		return ("INSPECT " + inspectedVariable + " " + connectionPart + otherwisePart);
+//		return ("INSPECT " + inspectedVariable + " " + connectionPart + otherwisePart);
+		return edStatement("INSPECT " + inspectedVariable + " " + connectionPart + otherwisePart);
 	}
 
 	// ***********************************************************************************************
@@ -356,7 +358,7 @@ public final class ConnectionStatement extends Statement {
 		oupt.writeKind(ObjectKind.ConnectionStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** ConnectionStatement
 		oupt.writeObj(objectExpression);
 		oupt.writeObj(inspectedVariable);
@@ -375,7 +377,7 @@ public final class ConnectionStatement extends Statement {
 		ConnectionStatement stm = new ConnectionStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.lineNumber = inpt.readShort();
+		stm.OLD_lineNumber = inpt.readShort();
 		// *** ConnectionStatement
 		stm.objectExpression = (Expression) inpt.readObj();
 		stm.inspectedVariable = (VariableExpression) inpt.readObj();

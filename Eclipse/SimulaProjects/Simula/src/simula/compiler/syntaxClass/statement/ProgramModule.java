@@ -8,6 +8,10 @@ package simula.compiler.syntaxClass.statement;
 import java.io.IOException;
 import java.util.Vector;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Comment;
 import simula.compiler.syntaxClass.Type;
@@ -27,8 +31,8 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
 import simula.psi.LexToken;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 
 /// Simula Program Module.
@@ -135,7 +139,7 @@ public final class ProgramModule extends Statement {
 	/// Create a new ProgramModule.
 	public ProgramModule(PsiBuilder simBuilder) {
 		super(0);
-		simBuilder.startSubtree("ProgramModule");
+		simBuilder.startSubtree(DeclarationScope.class, "ProgramModule");
 
 		sysin=new VariableExpression("sysin");
 		sysout=new VariableExpression("sysout");
@@ -163,7 +167,7 @@ public final class ProgramModule extends Statement {
 				if(PsiParse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, ident);
 			    else { PsiParse.rollBack(simBuilder); mainModule = doParseProgram(simBuilder); }
 			}
-			else if(PsiParse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(null, ident);
+			else if(PsiParse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, ident);
 			else {
 				Type type=PsiParse.acceptType(simBuilder);
 			    if(PsiParse.accept(simBuilder, KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type);
@@ -174,7 +178,7 @@ public final class ProgramModule extends Statement {
 			
 			LexToken token = PsiParse.getParserToken(simBuilder);
 			if(token != null && token.keyWord != KeyWord.EOF) {
-				simBuilder.startSubtree("TextAfterProgramEnd");
+				simBuilder.startSubtree(Comment.class, "TextAfterProgramEnd");
 				Comment dum = new Comment();
 				while(!simBuilder.eof()) simBuilder.advanceLexer(); // consume tokens  (add it to 'current tree')
 				simBuilder.doneSubtree(dum);
@@ -197,7 +201,7 @@ public final class ProgramModule extends Statement {
 	/// @return the Program Statement.
 	private DeclarationScope doParseProgram(final PsiBuilder simBuilder) {
 		BlockDeclaration mainBlock = new MaybeBlockDeclaration(Global.sourceName);
-		simBuilder.startSubtree("MainProgramBlock");
+		simBuilder.startSubtree(Statement.class, "MainProgramBlock");
 		
 		mainBlock.isMainModule = true;
 		mainBlock.declarationKind = ObjectKind.SimulaProgram;
@@ -206,6 +210,7 @@ public final class ProgramModule extends Statement {
 		Statement program = Statement.acceptStatement(simBuilder);
 		mainBlock.statements.add(program);
 //		mainBlock.psiTree.addChild(program.psiTree);
+		simBuilder.doneSubtree(this);
 		return mainBlock;
 	}
 
@@ -236,7 +241,7 @@ public final class ProgramModule extends Statement {
 	/// Create Java ClassFile.
 	/// @throws IOException if something went wrong
 	public void createJavaClassFile() throws IOException {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		mainModule.createJavaClassFile();
 	}
 
@@ -256,6 +261,42 @@ public final class ProgramModule extends Statement {
 	}
 	
 	@Override
-	public String toString() { return((mainModule==null)?"":""+mainModule.identifier); }
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode n = new DefaultMutableTreeNode("BASICIO");
+        model.insertNodeInto(n, parent, parent.getChildCount());
+
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        IO.println("ProgramModule.addSyntaxNodes: newNode="+newNode);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+        
+		for(Declaration decl:StandardClass.BASICIO.declarationList) {
+			if(decl instanceof StandardProcedure) ; // Nothing
+			else if(decl instanceof StandardClass) ; // Nothing
+			else decl.addSyntaxNodes(tree, model, newNode);
+		}
+
+        tree.doLayout();
+    }
+
+//	private void addNodes(int indent, JTree tree,DefaultTreeModel model, DefaultMutableTreeNode parent, SyntaxClass elt) {
+////		char cc = (char)(0x00B6);
+//		char cc = (char)(0x204B);
+////		String xxx = "" + cc + elt.getLineNumber() + ": " + elt.debugName + " |" + elt.getText() +"|";
+////        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(xxx);
+//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(elt);
+//        model.insertNodeInto(newNode, parent, parent.getChildCount());
+//		if(elt instanceof PsiTree psiTree) {
+//	        for(PsiElement subelt:psiTree.getChildren()) {
+//	        	addNodes(indent++, tree, model, newNode, subelt);
+//	        }
+//		}
+//	}
+
+	
+	@Override
+	public String toString() {
+//		return((mainModule==null)?"":""+mainModule.identifier);
+		return edStatement((mainModule==null)?"MAIN":mainModule.identifier);
+	}
 	
 }

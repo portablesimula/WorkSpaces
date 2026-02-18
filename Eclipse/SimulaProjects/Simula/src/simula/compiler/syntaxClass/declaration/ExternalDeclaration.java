@@ -19,7 +19,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Token;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 import simula.token.Identifier;
 
@@ -260,7 +260,7 @@ public final class ExternalDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -277,7 +277,7 @@ public final class ExternalDeclaration extends Declaration {
 		ext.OBJECT_SEQU = inpt.readSEQU(ext);
 
 		// *** SyntaxClass
-		ext.lineNumber = inpt.readShort();
+		ext.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		ext.identifier = inpt.readString();

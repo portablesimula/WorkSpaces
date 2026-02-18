@@ -22,9 +22,10 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Token;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
 import simula.psi.LexToken;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Activation Statement.
 /// 
@@ -119,13 +120,12 @@ public final class ActivationStatement extends Statement {
 			object2 = Expression.expectExpression();
 			object2.backLink = this;
 		}
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": ActivationStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": ActivationStatement: "+this);
 	}
 
 	ActivationStatement(final PsiBuilder simBuilder, final int line) {
 		super(line);
-
-		simBuilder.startSubtree("ActivationStatement");
+		PsiTree actTree = simBuilder.startSubtree(ActivationStatement.class, "ActivationStatement");
 		LexToken activator = PsiParse.getParserToken(simBuilder);
 		REAC = activator.keyWord == KeyWord.REACTIVATE;
 		simBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to 'current tree')
@@ -147,7 +147,8 @@ public final class ActivationStatement extends Statement {
 			object2 = Expression.expectExpression(simBuilder);
 			object2.backLink = this;
 		}
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": ActivationStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": ActivationStatement: "+this);
+		simBuilder.doneSubtree(actTree, this);
 	}
 
 	@Override
@@ -328,11 +329,12 @@ public final class ActivationStatement extends Statement {
 		if (prior) pri = " PRIOR";
 		String activator = ((REAC) ? "REACTIVATE " : "ACTIVATE ") + object1;
 		switch (code) {
-		    case at, delay:     return (activator + ' ' + code + ' ' + time + pri);
-		    case before, after: return (activator + ' ' + code + ' ' + object2);
-		    case direct:
-		    default: return (activator);
+		    case at, delay:     activator += " " + code + ' ' + time + pri; break;
+		    case before, after: activator += " " + code + ' ' + object2; break;
+		    default:
 		}
+		return edStatement(activator);
+
 	}
 
 	// ***********************************************************************************************
@@ -347,7 +349,7 @@ public final class ActivationStatement extends Statement {
 		oupt.writeKind(ObjectKind.ActivationStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** ActivationStatement
 		oupt.writeBoolean(REAC);
 		oupt.writeObj(object1);
@@ -364,7 +366,7 @@ public final class ActivationStatement extends Statement {
 		ActivationStatement stm = new ActivationStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.lineNumber = inpt.readShort();
+		stm.OLD_lineNumber = inpt.readShort();
 		// *** ActivationStatement
 		stm.REAC = inpt.readBoolean();
 		stm.object1 = (Expression) inpt.readObj();

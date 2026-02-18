@@ -27,7 +27,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 
 /// ObjectGenerator i.e. new Object expression.
@@ -124,7 +124,7 @@ public final class ObjectGenerator extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ObjectGenerator(" + classIdentifier + ").doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());
 		meaning = Global.getCurrentScope().findMeaning(classIdentifier);
@@ -283,7 +283,7 @@ public final class ObjectGenerator extends Expression {
 		oupt.writeKind(ObjectKind.ObjectGenerator);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -305,7 +305,7 @@ public final class ObjectGenerator extends Expression {
 		ObjectGenerator gen = new ObjectGenerator();
 		gen.OBJECT_SEQU = inpt.readSEQU(gen);
 		// *** SyntaxClass
-		gen.lineNumber = inpt.readShort();
+		gen.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		gen.type = inpt.readType();
 		gen.backLink = (SyntaxClass) inpt.readObj();

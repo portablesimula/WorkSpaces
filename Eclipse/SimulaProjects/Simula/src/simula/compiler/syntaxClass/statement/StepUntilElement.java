@@ -368,7 +368,7 @@ public class StepUntilElement extends ForListElement {
 		oupt.writeKind(ObjectKind.StepUntilElement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** ForListElement
 		oupt.writeObj(forStatement);
 		oupt.writeObj(expr1);
@@ -384,7 +384,7 @@ public class StepUntilElement extends ForListElement {
 		StepUntilElement elt = new StepUntilElement();
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
 		// *** SyntaxClass
-		elt.lineNumber = inpt.readShort();
+		elt.OLD_lineNumber = inpt.readShort();
 		// *** ForListElement
 		elt.forStatement = (ForStatement) inpt.readObj();
 		elt.expr1 = (Expression) inpt.readObj();

@@ -140,7 +140,7 @@ public final class HiddenSpecification extends SyntaxClass {
 		oupt.writeKind(ObjectKind.HiddenSpecification);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** HiddenSpecification
 		oupt.writeString(identifier);
 		oupt.writeObj(definedIn);
@@ -154,7 +154,7 @@ public final class HiddenSpecification extends SyntaxClass {
 		HiddenSpecification spec = new HiddenSpecification();
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
 		// *** SyntaxClass
-		spec.lineNumber = inpt.readShort();
+		spec.OLD_lineNumber = inpt.readShort();
 		// *** HiddenSpecification
 		spec.identifier = inpt.readString();
 		spec.definedIn = (ClassDeclaration) inpt.readObj();

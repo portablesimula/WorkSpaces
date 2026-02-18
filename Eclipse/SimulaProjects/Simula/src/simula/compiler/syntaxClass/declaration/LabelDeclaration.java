@@ -57,7 +57,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		DeclarationScope declaredIn = Global.getCurrentScope();
 		this.externalIdent = "_LABEL_" + declaredIn.externalIdent + '_' + identifier + '_' + declaredIn.prefixLevel();
 		type.doChecking(declaredIn);
@@ -79,7 +79,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// Declare a local Label.
 	/// @param encloser the BlockDeclaration to update.
 	public void declareLocalLabel(BlockDeclaration encloser) {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		String ident = getJavaIdentifier();
 		int prefixLevel=0;
 		if(movedTo != null) {
@@ -235,7 +235,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -261,7 +261,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		lab.OBJECT_SEQU = inpt.readSEQU(lab);
 
 		// *** SyntaxClass
-		lab.lineNumber = inpt.readShort();
+		lab.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		lab.identifier = inpt.readString();

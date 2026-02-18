@@ -41,7 +41,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 
 /// Variable.
@@ -233,7 +233,7 @@ public final class VariableExpression extends Expression {
 			return;
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN Variable(" + identifier + ").doChecking: type=" + type);
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		Declaration declaredAs = getMeaning().declaredAs;
 		if (declaredAs != null)
 			this.type = declaredAs.type;
@@ -771,7 +771,7 @@ public final class VariableExpression extends Expression {
 
 			case ObjectKind.ContextFreeMethod:
 				if (Util.equals(identifier, "sourceline"))
-					 Constant.buildIntConst(codeBuilder, this.lineNumber);
+					 Constant.buildIntConst(codeBuilder, this.lineNumber());
 				else BuildCP.staticStandardProcedure(this,codeBuilder);
 				break;
 
@@ -932,16 +932,32 @@ public final class VariableExpression extends Expression {
 	public void printTree(final int indent, final Object head) {
 		IO.println(edTreeIndent(indent)+this);
 	}
+	
+	public static String edParams(Vector<Expression> par) {
+		if(par == null) return "par==null";
+		StringBuilder sb = new StringBuilder();
+//		sb.append("TEST: "+par+" ");
+		String sep = "(";
+		for(Expression p:par) {
+			sb.append(sep).append(p); sep = ", ";
+		}
+		sb.append(")");
+		return sb.toString();
+	}
 
-	// ***********************************************************************
-	// *** Utility: toString
-	// ***********************************************************************
 	@Override
 	public String toString() {
-		if (params == null)
-			return ("" + identifier + "  type=" + this.type);
-		else
-			return (("" + identifier + params).replace('[', '(').replace(']', ')') );// + "  backLink=" + this.backLink);
+		StringBuilder sb = new StringBuilder(identifier);
+		Vector<Expression> par = (checkedParams != null)? checkedParams : params;
+//		sb.append("TEST: "+par+" ");
+		if (par == null) {
+			if(type != null) sb.append("  type=").append(type);
+		} else {
+//			return (("" + identifier + params).replace('[', '(').replace(']', ')') );
+//			sb.append(params);
+			sb.append(edParams(par));
+		}
+		return sb.toString();
 	}
 
 	// ***********************************************************************************************
@@ -957,7 +973,7 @@ public final class VariableExpression extends Expression {
 		oupt.writeKind(ObjectKind.VariableExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -981,7 +997,7 @@ public final class VariableExpression extends Expression {
 		VariableExpression var = new VariableExpression();
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 		// *** SyntaxClass
-		var.lineNumber = inpt.readShort();
+		var.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		var.type = inpt.readType();
 		var.backLink = (SyntaxClass) inpt.readObj();

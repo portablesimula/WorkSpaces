@@ -148,7 +148,7 @@ public final class ConnectionBlock extends DeclarationScope {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		Global.enterScope(this);
 		if (whenClassIdentifier != null) {
 			Meaning meaning = findMeaning(whenClassIdentifier);
@@ -169,7 +169,7 @@ public final class ConnectionBlock extends DeclarationScope {
 
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		Global.enterScope(this);
 		JavaSourceFileCoder.code("{");
@@ -258,7 +258,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		oupt.writeShort(OBJECT_SEQU);
 		
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		
 		// *** Declaration
 		//oupt.writeString(identifier);
@@ -291,7 +291,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
 		
 		// *** SyntaxClass
-		blk.lineNumber = inpt.readShort();
+		blk.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		//blk.identifier = inpt.readString();

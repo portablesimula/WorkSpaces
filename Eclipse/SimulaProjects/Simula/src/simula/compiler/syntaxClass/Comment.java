@@ -5,14 +5,7 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass;
 
-import java.io.IOException;
-// import java.lang.classfile.CodeBuilder;
-
-import simula.compiler.AttributeInputStream;
-import simula.compiler.AttributeOutputStream;
-import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.utilities.Global;
-import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
@@ -37,7 +30,7 @@ public final class Comment extends SyntaxClass {
 	/// @param line the source line number
 	public Comment() {
 //		super("Comment");
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": DummyStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": DummyStatement: "+this);
 	}
 
 	@Override
@@ -67,7 +60,7 @@ public final class Comment extends SyntaxClass {
 
 	@Override
 	public String toString() {
-		return ("DUMMY at Line "+lineNumber+" in "+Global.getCurrentScope().identifier);
+		return ("DUMMY at Line "+lineNumber()+" in "+Global.getCurrentScope().identifier);
 	}
 
 //	// ***********************************************************************************************
@@ -82,7 +75,7 @@ public final class Comment extends SyntaxClass {
 //		oupt.writeKind(ObjectKind.DummyStatement);
 //		oupt.writeShort(OBJECT_SEQU);
 //		// *** SyntaxClass
-//		oupt.writeShort(lineNumber);
+//		oupt.writeShort(lineNumber());
 //	}
 //
 //	/// Read and return a DummyStatement object.
@@ -93,7 +86,7 @@ public final class Comment extends SyntaxClass {
 //		Comment stm = new Comment();
 //		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 //		// *** SyntaxClass
-//		stm.lineNumber = inpt.readShort();
+//		stm.OLD_lineNumber = inpt.readShort();
 //		Util.TRACE_INPUT("DummyStatement: " + stm);
 //		return(stm);
 //	}

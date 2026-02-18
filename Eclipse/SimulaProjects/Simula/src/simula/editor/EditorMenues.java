@@ -41,7 +41,9 @@ import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiTree;
+import simula.psi.SyntaxTree;
 
 /// The editor's menues.
 /// 
@@ -85,6 +87,7 @@ public class EditorMenues extends JMenuBar {
     /** Menu item */ private JMenuItem run = new JMenuItem("Run");
     /** Menu item */ private JMenuItem debug = new JMenuItem("Debug");
     /** Menu item */ private JMenuItem build = new JMenuItem("Build PSI Tree");
+    /** Menu item */ private JMenuItem syntax = new JMenuItem("Build Syntax Tree");
     
     /** Menu */ private JMenu settings=new JMenu("Settings");
 	/** CheckBox */ private JCheckBox autoRefresh=new JCheckBox("AutoRefresh");
@@ -122,7 +125,8 @@ public class EditorMenues extends JMenuBar {
 	///** Popup Menu item */ private JMenuItem redo2=new JMenuItem("Redo");
     /** Popup Menu item */ private JMenuItem run2 = new JMenuItem("Run");
     /** Popup Menu item */ private JMenuItem debug2 = new JMenuItem("Debug");
-    /** Popup Menu item */ private JMenuItem build2 = new JMenuItem("Run");
+    /** Popup Menu item */ private JMenuItem build2 = new JMenuItem("Build Psi Tree");
+    /** Popup Menu item */ private JMenuItem syntax2 = new JMenuItem("Build Syntax Tree");
 	/** Popup Menu item */ private JCheckBox autoRefresh2=new JCheckBox("AutoRefresh");
     /** Popup Menu item */ private JMenuItem setWorkSpace2 = new JMenuItem("Select WorkSpace");
     /** Popup Menu item */ private JMenuItem setJavaDir2 = new JMenuItem("Select Java Dir.");
@@ -166,6 +170,7 @@ public class EditorMenues extends JMenuBar {
 		runMenu.add(run); run.setEnabled(false); run.addActionListener(actionListener);
 		runMenu.add(debug); debug.setEnabled(false); debug.addActionListener(actionListener);
 		runMenu.add(build); build.setEnabled(false); build.addActionListener(actionListener);
+		runMenu.add(syntax); syntax.setEnabled(false); syntax.addActionListener(actionListener);
 		this.add(runMenu);
 		settings.add(autoRefresh); autoRefresh.setEnabled(false); autoRefresh.addActionListener(actionListener);
         settings.add(editorUIScale); editorUIScale.addActionListener(actionListener);
@@ -233,6 +238,7 @@ public class EditorMenues extends JMenuBar {
         popupMenu.add(run2); run2.setEnabled(false); run2.addActionListener(actionListener);
         popupMenu.add(debug2); debug2.setEnabled(false); debug2.addActionListener(actionListener);
         popupMenu.add(build2); build2.setEnabled(false); build2.addActionListener(actionListener);
+        popupMenu.add(syntax2); syntax2.setEnabled(false); syntax2.addActionListener(actionListener);
         popupMenu.addSeparator();
         popupMenu.add(saveFile2); saveFile2.setEnabled(false); saveFile2.addActionListener(actionListener);
         popupMenu.add(saveAs2); saveAs2.setEnabled(false); saveAs2.addActionListener(actionListener);
@@ -304,6 +310,7 @@ public class EditorMenues extends JMenuBar {
 		run.setEnabled(mayRun);           run2.setEnabled(mayRun);
 		debug.setEnabled(mayRun);         debug2.setEnabled(mayRun);
 		build.setEnabled(mayBuild);       build2.setEnabled(mayBuild);
+		syntax.setEnabled(mayBuild);      syntax2.setEnabled(mayBuild);
 		autoRefresh.setSelected(auto);    autoRefresh2.setSelected(auto);
 		autoRefresh.setEnabled(source);   autoRefresh2.setEnabled(source);
 		undo.setEnabled(canUndo);         undo2.setEnabled(canUndo);
@@ -332,6 +339,7 @@ public class EditorMenues extends JMenuBar {
 			else if(item==run   || item==run2) doRunAction();
 			else if(item==debug || item==debug2) doDebugAction();
 			else if(item==build   || item==build2) doBuildPsiTreeAction();
+			else if(item==syntax   || item==syntax2) doBuildSyntaxTreeAction();
 			else if(item==autoRefresh) current.AUTO_REFRESH=autoRefresh.isSelected();
 			else if(item==autoRefresh2) current.AUTO_REFRESH=autoRefresh2.isSelected();
 			else if(item==setWorkSpace || item==setWorkSpace2) selectWorkspaceAction();
@@ -567,7 +575,42 @@ public class EditorMenues extends JMenuBar {
 //			Global.programModule.doBuild(simBuilder);
 			Global.programModule = new ProgramModule(simBuilder);
 			PsiTree psiTree = simBuilder.getRoot();
+			
+			if(! psiTree.getText().equals(current.getText())) {
+				String curTxt = (""+current.getText()).replace("\r", "\\r").replace("\n", "\\n");
+				String psiTxt = (psiTree.getText()).replace("\r", "\\r").replace("\n", "\\n");
+				IO.println("EditorMenues.doBuildPsiTreeAction: curTxt: "+curTxt);
+				IO.println("EditorMenues.doBuildPsiTreeAction: psiTxt: "+psiTxt);
+				Util.IERR("Resulting text differ from original text");
+				Util.STOP();
+			}
+			else IO.println("EditorMenues.doBuildPsiTreeAction: DONE - OK");
+			
 			psiTree.popUp();
+		});
+	}
+	
+	// ****************************************************************
+	// *** doBuildPsiTreeAction
+	// ****************************************************************
+	/// The build PSI Tree action
+	private void doBuildSyntaxTreeAction() {
+		SwingUtilities.invokeLater(() -> {
+			Option.internal.DEBUGGING=false;
+			SourceTextPanel current=SimulaEditor.current;
+			PsiBuilder simBuilder = new PsiBuilder();
+			simBuilder.start(current.getText());
+//			Global.programModule.doBuild(simBuilder);
+			Global.programModule = new ProgramModule(simBuilder);
+//			PsiTree psiTree = simBuilder.getRoot();
+//			psiTree.popUp();
+			
+			Global.programModule.printTree(1, this);
+			
+			SyntaxTree syntaxTree = new SyntaxTree(Global.programModule);
+			syntaxTree.popUp();
+			Thread.dumpStack();
+//			Util.STOP();
 		});
 	}
     

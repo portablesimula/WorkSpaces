@@ -43,8 +43,8 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
 import simula.psi.LexToken;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 
 /// Procedure Declaration.
@@ -140,7 +140,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public static ProcedureDeclaration expectProcedureDeclaration(final Type type) {
 		ProcedureDeclaration proc = new ProcedureDeclaration(null, ObjectKind.Procedure);
 		proc.sourceFileName = Global.sourceFileName;
-		proc.lineNumber=Parse.prevToken.lineNumber;
+		proc.OLD_lineNumber=Parse.prevToken.lineNumber;
 		proc.type = type;
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ProcedureDeclaration, type=" + type);
@@ -155,7 +155,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 
 		proc.lastLineNumber = Global.sourceLineNumber;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line "+proc.lineNumber+": ProcedureDeclaration: "+proc);
+			Util.TRACE("Line "+proc.lineNumber()+": ProcedureDeclaration: "+proc);
 		Global.setScope(proc.declaredIn);
 		return (proc);
 	}
@@ -163,7 +163,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public static ProcedureDeclaration expectProcedureDeclaration(final PsiBuilder simBuilder, final Type type) {
 		ProcedureDeclaration proc = new ProcedureDeclaration(null, ObjectKind.Procedure);
 		proc.sourceFileName = Global.sourceFileName;
-		proc.lineNumber = simBuilder.getSourceLineNumber();
+		proc.OLD_lineNumber = simBuilder.getSourceLineNumber();
 		proc.type = type;
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ProcedureDeclaration, type=" + type);
@@ -178,10 +178,10 @@ public class ProcedureDeclaration extends BlockDeclaration {
 
 		proc.lastLineNumber = Global.sourceLineNumber;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line "+proc.lineNumber+": ProcedureDeclaration: "+proc);
+			Util.TRACE("Line "+proc.lineNumber()+": ProcedureDeclaration: "+proc);
 		Global.setScope(proc.declaredIn);
 		simBuilder.doneSubtree(proc);
-		simBuilder.startSubtree("NextDeclaration");
+		simBuilder.startSubtree(Declaration.class, "NextDeclaration");
 		return (proc);
 	}
 
@@ -423,7 +423,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		Global.enterScope(this);
 			LabelList.accumLabelList(this);
 			if(type != null) {
@@ -535,7 +535,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Generate java source code for this Procedure.
 	private void doProcedureCoding() {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(Option.verbose) IO.println("Skip  doProcedureCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
@@ -547,7 +547,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			JavaSourceFileCoder.code("@SuppressWarnings(\"unchecked\")");
 			JavaSourceFileCoder.code("public final class " + getJavaIdentifier() + " extends RTS_PROCEDURE {");
 			JavaSourceFileCoder.debug("// ProcedureDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
-						+ ", firstLine=" + lineNumber + ", lastLine=" + lastLineNumber + ", hasLocalClasses="
+						+ ", firstLine=" + lineNumber() + ", lastLine=" + lastLineNumber + ", hasLocalClasses="
 						+ ((hasLocalClasses) ? "true" : "false") + ", System=" + ((isQPSystemBlock()) ? "true" : "false"));
 			if (isQPSystemBlock())
 				JavaSourceFileCoder.code("public boolean isQPSystemBlock() { return(true); }");
@@ -1091,7 +1091,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		
 	@Override
 	public void buildDeclaration(ClassBuilder classBuilder, BlockDeclaration encloser) {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		try {
 			this.createJavaClassFile();
 		} catch (IOException e) {
@@ -1101,7 +1101,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 
 	@Override
 	public void buildInitAttribute(CodeBuilder codeBuilder) {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		// NOTHING
 	}
 
@@ -1115,7 +1115,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		labelContextStack.push(labelContext);
 		labelContext = this;
 		for (Statement stm : statements) {
-			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.lineNumber);
+			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.lineNumber());
 			stm.buildByteCode(codeBuilder);
 		}
 		labelContext = labelContextStack.pop();
@@ -1198,7 +1198,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 		
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 
 		// *** Declaration
 		oupt.writeString(externalIdent);
@@ -1225,7 +1225,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		pro.OBJECT_SEQU = inpt.readSEQU(pro);
 
 		// *** SyntaxClass
-		pro.lineNumber = inpt.readShort();
+		pro.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		pro.externalIdent = inpt.readString();

@@ -14,24 +14,67 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.declaration.Declaration;
+import simula.compiler.syntaxClass.expression.Expression;
+import simula.compiler.syntaxClass.statement.Statement;
+import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Util;
 
 //Base class for composite nodes (branching nodes)
 public class PsiTree extends PsiElement {
+	public Class<?> clazz; // Expected syntax Class
 	public SyntaxClass syntaxClass;
 	protected final List<PsiElement> children = new ArrayList<>();
-	private String error;
+//	private String error;
 	
-	public PsiTree(String debugName, PsiTree parent) {
+	public PsiTree(Class<?> clazz, String debugName, PsiTree parent) {
 		super(debugName);
+		this.clazz = clazz;
 		this.parent = parent;
+	}
+	
+	public int level() {
+		if(parent == null) return 1;
+		return(parent.level() +1);
+	}
+	
+	public boolean isDeclarationTree() {
+		return clazz == Declaration.class;
+	}
+	
+	public boolean isExpressionTree() {
+		return clazz == Expression.class;
+	}
+	
+	public boolean isStatementTree() {
+		return clazz == Statement.class;
+	}
+	
+	public boolean is(Class<?> clazz) {
+		return this.clazz == clazz;
+	}
+	
+	public boolean in(Class<?> clazz) {
+		return this.clazz.isAssignableFrom(clazz);
+//		return clazz.isAssignableFrom(this.clazz);
+	}
+	
+	public void checkLegalClass(Class<?> clazz) {
+		if(this.clazz != clazz) {
+//			if(this.clazz.isAssignableFrom(clazz))
+			if(clazz.isAssignableFrom(this.clazz))
+				Util.IERR("The class " + clazz.getSimpleName() + " is not an instance of " + this.clazz.getSimpleName());
+		}
 	}
 
 	public void addChild(PsiElement child) {
 //		if (child instanceof BasePsiElement) {
 //			((BasePsiElement) child).setParent(this); 
 //		}
-		if(child == null) Util.IERR("addChild NULL !!");
+		if(child == null) {
+//			Util.IERR("addChild NULL !!");
+			return;
+		}
 		children.add(child);
 	}
 	
@@ -54,8 +97,25 @@ public class PsiTree extends PsiElement {
 		return children.removeLast();
 	}
 
+
 	public LexToken getLastChild() {
-		return (LexToken) children.getLast();
+		if(children.getLast() instanceof LexToken token)
+			return token;
+		return null;
+	}
+	
+	public LexToken getLastParserChild() {
+		int n = children.size();
+//		IO.println("PsiTree.getLastParserChild: "+n);
+//		this.printPsiTree("PsiTree.getLastParserChild: ");
+		for(int i=n-1;n>=0;i--) {
+			PsiElement elt = children.get(i);
+//			IO.println("PsiTree.getLastParserChild: CHECK elt "+i+": "+elt);
+			if(elt instanceof LexToken token && token.isParserToken()) {
+				return token;
+			}
+		}
+		return null;
 	}
 
 	public List<PsiElement> getChildren() { return children; }
@@ -101,7 +161,7 @@ public class PsiTree extends PsiElement {
 //        tree.addMouseListener(ml);
         tree.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-        		IO.println("PsiTree'mousePressed: " + e);
+//        		IO.println("PsiTree'mousePressed: " + e);
                 int selRow = tree.getRowForLocation(e.getX(), e.getY());
                 TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
                 if(selRow != -1) {
@@ -127,13 +187,16 @@ public class PsiTree extends PsiElement {
     	expandAllNodes(tree, 0, tree.getRowCount());
         
         model.reload(root); 
+        
+	    tree.repaint();
+	    
         return tree;
 	}
 	
 	private void addNodes(int indent, JTree tree,DefaultTreeModel model, DefaultMutableTreeNode parent, PsiElement elt) {
 //		char cc = (char)(0x00B6);
-		char cc = (char)(0x204B);
-		String xxx = "" + cc + elt.getLineNumber() + ": " + elt.debugName + " |" + elt.getText() +"|";
+//		char cc = (char)(0x204B);
+//		String xxx = "" + cc + elt.getLineNumber() + ": " + elt.debugName + " |" + elt.getText() +"|";
 //        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(xxx);
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(elt);
         model.insertNodeInto(newNode, parent, parent.getChildCount());
@@ -145,14 +208,18 @@ public class PsiTree extends PsiElement {
 	}
 
 	private void gotSingleClick(int selRow, TreePath selPath) {
-		IO.println("PsiTree.getJTree: gotSingleClick: selRow=" + selRow);
-		IO.println("PsiTree.getJTree: gotSingleClick: selPath=" + selPath);
-		IO.println("PsiTree.getJTree: gotSingleClick: lastPathComponent=" + selPath.getLastPathComponent().getClass().getSimpleName());
-		IO.println("PsiTree.getJTree: gotSingleClick: lastPathComponent=" + selPath.getLastPathComponent());
+//		IO.println("PsiTree.getJTree: gotSingleClick: selRow=" + selRow);
+//		IO.println("PsiTree.getJTree: gotSingleClick: selPath=" + selPath);
+//		IO.println("PsiTree.getJTree: gotSingleClick: lastPathComponent=" + selPath.getLastPathComponent().getClass().getSimpleName());
+//		IO.println("PsiTree.getJTree: gotSingleClick: lastPathComponent=" + selPath.getLastPathComponent());
 		DefaultMutableTreeNode last = (DefaultMutableTreeNode) selPath.getLastPathComponent();
-		IO.println("PsiTree.getJTree: gotSingleClick: userObject=" + last.getUserObject().getClass().getSimpleName());
+//		IO.println("PsiTree.getJTree: gotSingleClick: userObject=" + last.getUserObject().getClass().getSimpleName());
 		PsiElement psiElement = (PsiElement) last.getUserObject();
-		IO.println("PsiTree.getJTree: gotSingleClick: GOT: " + psiElement);
+   		IO.println("PsiTree.getJTree: gotSingleClick: GOT PSI ELEMENT:  " + psiElement);
+		if(psiElement instanceof PsiTree psiTree) {
+			IO.println("PsiTree.getJTree: gotSingleClick: GOT SYNTAX CLASS: " + psiTree.syntaxClass);
+			if(psiTree.syntaxClass != null) psiTree.syntaxClass.printTree(1, "GOT SYNTAX CLASS: ");
+		}
 //		Util.IERR("");
 	}
 
@@ -171,7 +238,33 @@ public class PsiTree extends PsiElement {
 	        // If expanding rows added new visible rows, recurse to expand them too
 	        expandAllNodes(tree, rowCount, tree.getRowCount());
 	    }
+//	    tree.repaint();
 	}
+	
+//	public static void setTreeExpandedState(JTree tree, boolean expanded) {
+//        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getModel().getRoot();
+//        setNodeExpandedState(tree, node, expanded);
+//    }
+//
+////    public static void setNodeExpandedState(JTree tree, DefaultMutableTreeNode node, boolean expanded) {
+////        ArrayList<DefaultMutableTreeNode> list = Collections.list(node.children());
+////        for (DefaultMutableTreeNode treeNode : list) {
+//    public static void setNodeExpandedState(JTree tree, TreeNode treeNode2, boolean expanded) {
+//        ArrayList<TreeNode> list = (ArrayList<TreeNode>) Collections.list(treeNode2.children());
+//        for (TreeNode treeNode : list) {
+//            setNodeExpandedState(tree, treeNode, expanded);
+//        }
+//        if (!expanded && treeNode2.isRoot()) {
+//            return;
+//        }
+//        TreePath path = new TreePath(treeNode2.getPath());
+//        if (expanded) {
+//            tree.expandPath(path);
+//        } else {
+//            tree.collapsePath(path);
+//        }
+//    }
+
 
 
 
@@ -179,9 +272,11 @@ public class PsiTree extends PsiElement {
 	public void popUp() {
 		JTree tree = this.getJTree();
 //		SwingUtilities.invokeLater(() -> {
-			JFrame frame = new JFrame("JTree Scroll Example");
+			JFrame frame = new JFrame("Program Structure Tree");
 //			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	        try { frame.setIconImage(Global.favicon.getImage()); } 
+	        catch (Exception e) {}// Util.IERR("Impossible",e); }
 
 			JScrollPane scrollPane = new JScrollPane(tree);
 			frame.add(scrollPane, BorderLayout.CENTER);
@@ -190,6 +285,16 @@ public class PsiTree extends PsiElement {
 			frame.setLocationRelativeTo(null);
 			frame.setVisible(true);
 //		});
+	}
+	
+	public String edChildren() {
+		StringBuilder sb = new StringBuilder();
+		String sep ="";
+        for (PsiElement child : getChildren()) {
+            sb.append(sep).append(child);
+            sep = ", ";
+        }
+		return sb.toString();
 	}
 
     public void printPsiTree(String title) {
@@ -209,7 +314,7 @@ public class PsiTree extends PsiElement {
     }
 
 	@Override public String toString() {
-		return "PsiTree(" + debugName + ") Text=\"" + getText().replace("\n", "\\n").replace("\r", "\\r") + '"';
+		return "Line-" + this.getLineNumber() + ":PsiTree(" + debugName + ":" + level() + ") Text=\"" + getText().replace("\n", "\\n").replace("\r", "\\r") + '"';
 	}
 
 }

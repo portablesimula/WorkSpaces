@@ -27,7 +27,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 
 /// Simple Variable Declaration.
@@ -138,7 +138,7 @@ public class SimpleVariableDeclaration extends Declaration {
 				typeDeclaration.constantElement = Expression.expectExpression(simBuilder);
 			declarationList.add(typeDeclaration);
 			simBuilder.doneSubtree(typeDeclaration);
-			simBuilder.startSubtree("NextDeclaration");
+			simBuilder.startSubtree(Declaration.class, "NextDeclaration");
 		} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
 	}
 
@@ -146,7 +146,7 @@ public class SimpleVariableDeclaration extends Declaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		type.doChecking(Global.getCurrentScope());
 		if (constantElement != null) {
 			constantElement.doChecking();
@@ -264,7 +264,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -286,7 +286,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
 		// *** SyntaxClass
-		var.lineNumber = inpt.readShort();
+		var.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		var.identifier = inpt.readString();

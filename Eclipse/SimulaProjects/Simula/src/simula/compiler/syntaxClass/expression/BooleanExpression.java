@@ -122,6 +122,7 @@ public final class BooleanExpression extends Expression {
 		this.lhs = lhs;
 		this.opr = opr;
 		this.rhs = rhs;
+		IO.println("NEW BooleanExpression: "+this);
 		if (this.lhs == null) {
 			Util.error("Missing operand before " + KeyWord.edit(opr));
 			this.lhs = new VariableExpression("UNKNOWN_");
@@ -136,7 +137,7 @@ public final class BooleanExpression extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN BooleanOperation" + toString() + ".doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());
 		switch (opr) {
@@ -264,7 +265,7 @@ public final class BooleanExpression extends Expression {
 		oupt.writeKind(ObjectKind.BooleanExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -282,7 +283,7 @@ public final class BooleanExpression extends Expression {
 		BooleanExpression expr = new BooleanExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-		expr.lineNumber = inpt.readShort();
+		expr.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

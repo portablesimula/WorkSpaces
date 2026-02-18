@@ -1,7 +1,5 @@
 package simula.compiler.utilities;
 
-import java.io.IOException;
-
 import simula.compiler.syntaxClass.SyntaxClass;
 
 public class LOG {

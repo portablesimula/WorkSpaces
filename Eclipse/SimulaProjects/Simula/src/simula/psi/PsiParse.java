@@ -5,9 +5,6 @@ import java.io.Reader;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.LOG;
-import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
-import simula.psi.LexToken;
 import simula.token.Identifier;
 
 
@@ -89,6 +86,11 @@ public interface PsiParse {
 		return simBuilder.prevToken();
 	}
 
+	public static LexToken prevParserToken(final PsiBuilder simBuilder) {
+//		Util.IERR("Parse.prevToken: KAN IKKE BRUKES: SKRIV OM KODEN");
+		return simBuilder.prevParserToken();
+	}
+
 //	/// Return the current Token.
 //	public static LexToken currentToken(final PsiBuilder simBuilder) {
 //        return (LexToken)simBuilder.getCurrentLexerToken();
@@ -134,13 +136,52 @@ public interface PsiParse {
 
 	public static LexToken acceptParserToken(final PsiBuilder simBuilder, final int... keywords) {
         LexToken currentToken = getParserToken(simBuilder);
+        int currentKeyWord = (currentToken == null)? KeyWord.EOF : currentToken.keyWord;
 		for (int keyword : keywords)
-			if (currentToken.keyWord == keyword) {
+			if (currentKeyWord == keyword) {
 				nextToken(simBuilder);
 //				System.out.println("Line "+ Global.sourceLineNumber+": Parse.accept: " + KeyWord.edit(key) + " accepted, nextToken: " + Parse.currentToken);
+//				System.out.println("PsiParse.accept: " + KeyWord.edit(keyword) + " accepted, nextToken: " + PsiParse.currentLexToken(simBuilder));
 				return currentToken;
 			}
 		return null;
+	}
+	
+	// while lift =/= none and then wayup do ; 
+	// b := aaa and then ccc;
+	public static boolean accept_AND_THEN(final PsiBuilder simBuilder) {
+//		IO.println("\nPsiParse.accept_AND_THEN: BEGIN ======================================================================");
+		if(accept(simBuilder, KeyWord.AND_THEN)) {
+			IO.println("PsiParse.accept_AND_THEN: GOT: AND_THEN");
+			return true;
+		}
+		if(accept(simBuilder, KeyWord.AND)) {
+			LexToken prv = simBuilder.getCurrentLexerToken();
+			IO.println("PsiParse.accept_AND_THEN: MAYBE AND THEN prv="+prv);
+			if(accept(simBuilder, KeyWord.THEN)) {
+				IO.println("PsiParse.accept_AND_THEN: GOT: AND THEN prv="+prv);
+				return true;
+			}
+			IO.println("PsiParse.accept_AND_THEN: FAILED --> ROLLBACK prv="+prv);
+			simBuilder.rollBackTo(prv);
+		}
+		return false;
+	}
+
+	public static boolean accept_AND_ONLY(final PsiBuilder simBuilder) {
+//		IO.println("\nPsiParse.accept_AND_THEN: BEGIN ======================================================================");
+		LexToken prv = simBuilder.getCurrentLexerToken();
+		if(accept(simBuilder, KeyWord.AND)) {
+			IO.println("PsiParse.accept_AND_ONLY: MAYBE AND THEN prv="+prv);
+			if(accept(simBuilder, KeyWord.THEN)) {
+				IO.println("PsiParse.accept_AND_ONLY: GOT: AND THEN prv="+prv);
+				simBuilder.rollBackTo(prv);
+				return false;
+			}
+			IO.println("PsiParse.accept_AND_ONLY: prv="+prv);
+			return true;
+		}
+		return false;
 	}
 
 
@@ -155,7 +196,7 @@ public interface PsiParse {
 	public static String acceptIdentifier(final PsiBuilder simBuilder) {
 		LexToken token = null;
 		if ((token = PsiParse.acceptParserToken(simBuilder, KeyWord.IDENTIFIER)) != null)
-			return (((Identifier)token).value);
+			return ((Identifier)token).value;
 		return (null);
 	}
 
@@ -166,7 +207,7 @@ public interface PsiParse {
 	public static String expectIdentifier(final PsiBuilder simBuilder) {
         LexToken currentToken = getParserToken(simBuilder);
 		if (acceptIdentifier(simBuilder) != null)
-			return (((Identifier)currentToken).value);
+			return ((Identifier)currentToken).value;
 		LOG.error("Got symbol " + currentToken + " while expecting an Identifier");
 		return (null);
 	}  

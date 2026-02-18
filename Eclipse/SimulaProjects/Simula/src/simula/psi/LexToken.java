@@ -18,17 +18,19 @@ public class LexToken extends PsiElement {
 		this.sourceText = sourceText;
 		this.startOffset = startOffset;
 		this.endOffset = endOffset;
-		IO.println("NEW LexToken(1) "+this);
+//		IO.println("NEW LexToken: "+this);
+//		IO.println("NEW LexToken: "+this+"  CALLED FROM: "+calledFrom(3, 25));
+//		Thread.dumpStack();
 	}
 
-	public LexToken(int tokenStartLine, int keyWord) {
-		super(KeyWord.edit(keyWord));
-		this.lineNumber = tokenStartLine;
-		this.keyWord = keyWord;
-//		this.sourceText = sourceText;
-//		this.startOffset = startOffset;
-//		this.endOffset = endOffset;
-	}
+//	public LexToken(int tokenStartLine, int keyWord) {
+//		super(KeyWord.edit(keyWord));
+//		this.lineNumber = tokenStartLine;
+//		this.keyWord = keyWord;
+////		this.sourceText = sourceText;
+////		this.startOffset = startOffset;
+////		this.endOffset = endOffset;
+//	}
 
 	@Override public int getLineNumber() {
 		return lineNumber;
@@ -41,9 +43,13 @@ public class LexToken extends PsiElement {
 	}
 
 	public String edText() {
-		CharSequence txt = sourceText.subSequence(startOffset, endOffset);
-		String str = txt.toString().replace("\r", "\\r").replace("\n", "\\n");
+		try {
+			CharSequence txt = sourceText.subSequence(startOffset, endOffset);
+			String str = txt.toString().replace("\r", "\\r").replace("\n", "\\n");
 		return str;
+		} catch(Exception e) {
+			return "EOF";
+		}
 	}
 	
 	@Override
@@ -51,10 +57,17 @@ public class LexToken extends PsiElement {
 		return "Line-" + lineNumber + ':' + KeyWord.edit(keyWord) + '[' + startOffset + ':' + endOffset + "]=\"" + edText() + '"';
 	}
 
-	public boolean isWhiteSpaces() {
-		if(keyWord == KeyWord.NEWLINE) return true;
-		if(keyWord == KeyWord.WHITESPACES) return true;
-		return false;
+	public boolean isParserToken() {
+		if(keyWord == KeyWord.NEWLINE) return false;
+		if(keyWord == KeyWord.WHITESPACES) return false;
+		if(keyWord == KeyWord.COMMENT) return false;
+		return true;
 	}
+
+//	public boolean isWhiteSpaces() {
+//		if(keyWord == KeyWord.NEWLINE) return true;
+//		if(keyWord == KeyWord.WHITESPACES) return true;
+//		return false;
+//	}
 
 }

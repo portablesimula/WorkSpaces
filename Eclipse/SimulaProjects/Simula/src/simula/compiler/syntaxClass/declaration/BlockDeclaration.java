@@ -14,6 +14,10 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Stack;
 import java.util.Vector;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
@@ -26,7 +30,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 
 /// Block Declaration.
@@ -531,6 +535,15 @@ public abstract class BlockDeclaration extends DeclarationScope {
 		}
 	}
 	
+	protected void addStatementNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        IO.println("BlockDeclaration.addStatementNodes: statements.size="+statements.size());
+		for(Statement s:statements) {
+			DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(s);
+	        IO.println("BlockDeclaration.addSyntaxNodes: newNode="+newNode);
+	        model.insertNodeInto(newNode, parent, parent.getChildCount());
+		}
+	}
+
 	@Override
 	public String toString() {
 		return ("" + identifier + '[' + externalIdent + "] ObjectKind=" + declarationKind);

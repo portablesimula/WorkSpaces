@@ -21,9 +21,10 @@ import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
 import simula.psi.LexToken;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Statement.
 /// 
@@ -61,7 +62,7 @@ public abstract class Statement extends SyntaxClass {
 	/// Create a new Statement.
 	/// @param line the source line number
 	protected Statement(int line) {
-		lineNumber=line;
+		OLD_lineNumber=line;
 	}
 
 	/// Parse a statement.
@@ -135,17 +136,21 @@ public abstract class Statement extends SyntaxClass {
 	/// Parse a statement.
 	/// @return the statement
 	public static Statement acceptStatement(PsiBuilder simBuilder) {
-		simBuilder.startSubtree("Statement-"+(SEQU++));
+		PsiTree stmTree = simBuilder.startSubtree(Statement.class, "Statement-"+(SEQU++));
+		IO.println("Statement.acceptStatement: stmTree="+stmTree.debugName);
 		
 		ObjectList<LabelDeclaration> labels = null;
 		int lineNumber=PsiParse.getParserToken(simBuilder).lineNumber;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Statement.acceptStatement: LabeledStatement: lineNumber="+lineNumber+", current=" + PsiParse.getParserToken(simBuilder));//	+ ", prev=" + PsiParse.prevToken);
 		String ident = PsiParse.acceptIdentifier(simBuilder);
+		PsiTree labTree = simBuilder.startSubtree(LabelDeclaration.class, "LabelDeclaration");
 		while (PsiParse.accept(simBuilder, KeyWord.COLON)) {
 			if (ident != null) {
 				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
 				LabelDeclaration label = new LabelDeclaration(ident);
+				simBuilder.doneSubtree(labTree, label);
+				labTree = simBuilder.startSubtree(LabelDeclaration.class, "LabelDeclaration");
 				labels.add(label);
 				DeclarationScope scope = Global.getCurrentScope();
 				if(scope.labelList == null) scope.labelList = new LabelList(scope); 
@@ -153,8 +158,9 @@ public abstract class Statement extends SyntaxClass {
 			} else Util.error("Missplaced ':'");
 			ident = PsiParse.acceptIdentifier(simBuilder);
 		}
+		simBuilder.dropSubtree(labTree);
 		if(ident!=null) {
-			IO.println("\n\nStatement.acceptStatement: ROLL BACK: "+ident);
+			IO.println("\n\nStatement.acceptStatement: NOT LABEL ==> ROLL BACK: "+ident);
 			PsiParse.rollBack(simBuilder); // Not Label: rollBack
 		}
 		Statement statement = acceptUnlabeledStatement(simBuilder);
@@ -162,7 +168,11 @@ public abstract class Statement extends SyntaxClass {
 			Util.IERR("RETT OPP MHT PsiTree");
 			statement = new LabeledStatement(lineNumber,labels, statement);
 		}
-		simBuilder.doneSubtree(statement);
+		IO.println("Statement.acceptStatement END: stmTree="+stmTree.debugName);
+//		simBuilder.doneSubtree(stmTree, statement);
+		if(statement != null)
+			 simBuilder.doneSubtree(stmTree, statement);
+		else simBuilder.dropSubtree();
 		return (statement);
 	}
 
@@ -181,7 +191,7 @@ public abstract class Statement extends SyntaxClass {
 		switch(keyWord) {
 			case KeyWord.BEGIN:
 				// case KeyWord.BEGIN: PsiParse.nextToken(); return (new MaybeBlockDeclaration(null).expectMaybeBlock(lineNumber));
-				System.out.println("\nStatement.parseStatement: BEGIN ==> parseBlock");
+				System.out.println("\nStatement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
 				MaybeBlockDeclaration block = new MaybeBlockDeclaration(null);
 				block.expectMaybeBlock(simBuilder, lineNumber);
 				statement = new BlockStatement(block); break;
@@ -204,11 +214,12 @@ public abstract class Statement extends SyntaxClass {
 		    case KeyWord.EOF:		 statement = new DummyStatement(lineNumber); // Dummy Statement, keep EOF
 
 			case KeyWord.IDENTIFIER, KeyWord.NEW, KeyWord.THIS, KeyWord.BEGPAR:
-				System.out.println("\nStatement.parseStatement: IDENTIFIER");
+				System.out.println("\nStatement.acceptUnlabeledStatement: IDENTIFIER");
 				Expression expr = Expression.acceptExpression(simBuilder);
-				System.out.println("\nStatement.parseStatement: IDENTIFIER: expr="+expr);
+				System.out.println("\nStatement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr);
 				if(expr!=null) {
 					if(expr instanceof VariableExpression var) {
+						System.out.println("Statement.acceptUnlabeledStatement: GOT VariableExpression: "+var);
 						if (PsiParse.accept(simBuilder, KeyWord.BEGIN)) {
 //							Util.IERR("Statement.acceptUnlabeledStatement: PREFIXED BLOCK: NOT IMPL");
 	      					//return new BlockStatement(PrefixedBlockDeclaration.expectPrefixedBlock(var,false));
@@ -222,7 +233,7 @@ public abstract class Statement extends SyntaxClass {
 				break;
 				
 			default:
-		        Util.IERR("Statement.default: " + KeyWord.edit(simToken.keyWord));
+		        Util.IERR("Statement.default: " + KeyWord.edit(simToken.keyWord) + " " + (char)simToken.keyWord);
 		        // Error handling or consuming unknown tokens
 	          System.out.println("\nSimulaParser.parseAssignment: CALL statementMarker.done: ");//+statementMarker);
 	          System.out.println("\nStatement.parseStatement: default " + simToken);
@@ -232,9 +243,9 @@ public abstract class Statement extends SyntaxClass {
 	//	        simBuilder.advanceLexer(); //  (add it to 'blk')
 				break;
 		}
-		if(statement != null)
-			 simBuilder.doneSubtree(statement);
-		else simBuilder.dropSubtree();
+//		if(statement != null)
+//			 simBuilder.doneSubtree(statement);
+//		else simBuilder.dropSubtree();
 		return statement;
   }
 
@@ -242,7 +253,7 @@ public abstract class Statement extends SyntaxClass {
 
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code(toJavaCode() + ';');
 	}
@@ -251,6 +262,24 @@ public abstract class Statement extends SyntaxClass {
 	@Override
 	public void buildByteCode(CodeBuilder codeBuilder) {
 		Util.IERR("Method buildByteCode need a redefinition in "+this.getClass().getSimpleName());
+	}
+
+
+	public String edStatement(String phrase) {
+//		return new StringBuilder("Line ")
+//				.append(lineNumber)
+//				.append(' ')
+//				.append(getClass().getSimpleName())
+//				.append(": ")
+//				.append(phrase)
+//				.toString();
+		return new StringBuilder(getClass().getSimpleName())
+				.append("[Line ")
+				.append(lineNumber())
+				.append(": ")
+				.append(phrase)
+				.append("]")
+				.toString();
 	}
 
 }

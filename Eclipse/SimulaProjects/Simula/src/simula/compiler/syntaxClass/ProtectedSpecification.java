@@ -113,7 +113,7 @@ public final class ProtectedSpecification extends SyntaxClass {
 		oupt.writeKind(ObjectKind.ProtectedSpecification);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** ProtectedSpecification
 		oupt.writeString(identifier);
 		oupt.writeObj(definedIn);
@@ -127,7 +127,7 @@ public final class ProtectedSpecification extends SyntaxClass {
 		ProtectedSpecification spec = new ProtectedSpecification();
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
 		// *** SyntaxClass
-		spec.lineNumber = inpt.readShort();
+		spec.OLD_lineNumber = inpt.readShort();
 		// *** ProtectedSpecification
 		spec.identifier = inpt.readString();
 		spec.definedIn = (ClassDeclaration) inpt.readObj();

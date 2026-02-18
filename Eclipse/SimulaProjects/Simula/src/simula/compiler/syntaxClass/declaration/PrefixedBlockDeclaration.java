@@ -31,7 +31,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 
 /// Prefixed Block Declaration.
@@ -79,7 +79,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		super(null);
 		if(isMainModule)
 			modifyIdentifier(Global.sourceName);
-		else modifyIdentifier("PBLK" + lineNumber);
+		else modifyIdentifier("PBLK" + lineNumber());
 	}
 
 	// ***********************************************************************************************
@@ -91,7 +91,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	/// @return the resulting PrefixedBlockDeclaration
 	public static PrefixedBlockDeclaration expectPrefixedBlock(final VariableExpression blockPrefix,boolean isMainModule) {
 		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(isMainModule);
-		block.lineNumber=Parse.prevToken.lineNumber;
+		block.OLD_lineNumber=Parse.prevToken.lineNumber;
 		block.declarationKind=ObjectKind.PrefixedBlock;
 		Util.ASSERT(blockPrefix != null,"blockPrefix == null");
 		block.blockPrefix = blockPrefix;
@@ -107,14 +107,14 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 			Util.error("Illegal termination of prefixed block. Missing END.");
 		}
 		block.lastLineNumber = Global.sourceLineNumber;
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+block.lineNumber+": PrefixedBlockDeclaration: "+block);
+		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+block.lineNumber()+": PrefixedBlockDeclaration: "+block);
 		Global.setScope(block.declaredIn);
 		return block;
 	}
 
 	public static PrefixedBlockDeclaration expectPrefixedBlock(final PsiBuilder simBuilder, final VariableExpression blockPrefix,boolean isMainModule) {
 		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(isMainModule);
-		block.lineNumber=simBuilder.getSourceLineNumber();
+		block.OLD_lineNumber=simBuilder.getSourceLineNumber();
 		block.declarationKind=ObjectKind.PrefixedBlock;
 		Util.ASSERT(blockPrefix != null,"blockPrefix == null");
 		block.blockPrefix = blockPrefix;
@@ -131,7 +131,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 			Util.error("Illegal termination of prefixed block. Missing END.");
 		}
 		block.lastLineNumber = Global.sourceLineNumber;
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+block.lineNumber+": PrefixedBlockDeclaration: "+block);
+		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+block.lineNumber()+": PrefixedBlockDeclaration: "+block);
 		Global.setScope(block.declaredIn);
 		return block;
 	}
@@ -142,7 +142,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		Global.enterScope(this.declaredIn);
 			blockPrefix.doChecking();
 			prefix = blockPrefix.identifier;
@@ -167,7 +167,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// ***********************************************************************************************
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(Option.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);	
@@ -185,7 +185,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 			else line = line + " extends RTS_BASICIO";
 			JavaSourceFileCoder.code(line + " {");
 			JavaSourceFileCoder.debug("// PrefixedBlockDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
-					+ ", firstLine=" + lineNumber + ", lastLine=" + lastLineNumber + ", hasLocalClasses="
+					+ ", firstLine=" + lineNumber() + ", lastLine=" + lastLineNumber + ", hasLocalClasses="
 					+ ((hasLocalClasses) ? "true" : "false") + ", System=" + ((isQPSystemBlock()) ? "true" : "false")
 					+ ", detachUsed=" + ((detachUsed) ? "true" : "false"));
 			if (isQPSystemBlock())
@@ -240,7 +240,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	
 	@Override
 	public void buildByteCode(CodeBuilder codeBuilder) {
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(Option.verbose)
@@ -390,7 +390,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		oupt.writeString(identifier);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		
 		// *** Declaration
 		//oupt.writeString(identifier);
@@ -432,7 +432,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		pbl.declarationKind = ObjectKind.Class;
 		pbl.OBJECT_SEQU = inpt.readSEQU(pbl);
 		// *** SyntaxClass
-		pbl.lineNumber = inpt.readShort();
+		pbl.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		//pbl.identifier = inpt.readString();

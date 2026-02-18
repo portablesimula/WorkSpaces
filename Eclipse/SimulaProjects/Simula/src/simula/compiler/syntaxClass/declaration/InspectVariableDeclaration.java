@@ -57,7 +57,7 @@ public class InspectVariableDeclaration extends Declaration {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ConnectionStatement(" + toString() + ").doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());
 		connectionStatement.doChecking();
@@ -138,7 +138,7 @@ public class InspectVariableDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -160,7 +160,7 @@ public class InspectVariableDeclaration extends Declaration {
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
 		// *** SyntaxClass
-		var.lineNumber = inpt.readShort();
+		var.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		var.identifier = inpt.readString();

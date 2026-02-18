@@ -84,7 +84,7 @@ public final class RemoteVariable extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN RemoteVariable" + toString() + ".doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());
 		this.type = doRemoteChecking(obj, var);
@@ -97,7 +97,7 @@ public final class RemoteVariable extends Expression {
 	/// @param attr remote attribute
 	/// @return the attribute's type
 	private Type doRemoteChecking(final Expression obj, final Expression attr) {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		Type result;
 		obj.doChecking();
 		Type objType = obj.type;
@@ -306,7 +306,7 @@ public final class RemoteVariable extends Expression {
 		oupt.writeKind(ObjectKind.RemoteVariable);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -323,7 +323,7 @@ public final class RemoteVariable extends Expression {
 		RemoteVariable rem = new RemoteVariable();
 		rem.OBJECT_SEQU = inpt.readSEQU(rem);
 		// *** SyntaxClass
-		rem.lineNumber = inpt.readShort();
+		rem.OLD_lineNumber = inpt.readShort();
 		// *** SyntaxClass
 		rem.type = inpt.readType();
 		rem.backLink = (SyntaxClass) inpt.readObj();

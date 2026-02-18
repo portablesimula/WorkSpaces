@@ -20,8 +20,9 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Conditional Statement.
 /// 
@@ -69,13 +70,13 @@ public final class ConditionalStatement extends Statement {
 		    }
 		}
 		this.elseStatement=elseStatement;
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": IfStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": IfStatement: "+this);
 	}
 
 	ConditionalStatement(PsiBuilder simBuilder, final int line) {
 		super(line);
 
-		simBuilder.startSubtree("ConditionalStatement");
+		PsiTree ifTree = simBuilder.startSubtree(ConditionalStatement.class, "ConditionalStatement");
 		simBuilder.consume(KeyWord.IF); //  (add it to 'current tree')
 
 		condition = Expression.expectExpression(simBuilder);
@@ -91,7 +92,8 @@ public final class ConditionalStatement extends Statement {
 		    }
 		}
 		this.elseStatement=elseStatement;
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": IfStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": IfStatement: "+this);
+		simBuilder.doneSubtree(ifTree, this);
 	}
 
 	@Override
@@ -125,7 +127,7 @@ public final class ConditionalStatement extends Statement {
 	
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code("if(_VALUE(" + condition.toJavaCode() + ")) {");
 		thenStatement.doJavaCoding();
@@ -165,8 +167,8 @@ public final class ConditionalStatement extends Statement {
 
 	@Override
 	public String toString() {
-		return ("IF " + condition + " THEN " + thenStatement + " ELSE "
-				+ elseStatement + ';');
+//		return ("IF " + condition + " THEN " + thenStatement + " ELSE "	+ elseStatement + ';');
+		return edStatement("IF " + condition + " THEN " + thenStatement + " ELSE "	+ elseStatement + ';');
 	}
 	
 
@@ -184,7 +186,7 @@ public final class ConditionalStatement extends Statement {
 		oupt.writeKind(ObjectKind.ConditionalStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** ConditionalStatement
 		oupt.writeObj(condition);
 		oupt.writeObj(thenStatement);
@@ -199,7 +201,7 @@ public final class ConditionalStatement extends Statement {
 		ConditionalStatement stm = new ConditionalStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.lineNumber = inpt.readShort();
+		stm.OLD_lineNumber = inpt.readShort();
 		// *** ConditionalStatement
 		stm.condition = (Expression) inpt.readObj();
 		stm.thenStatement = (Statement) inpt.readObj();

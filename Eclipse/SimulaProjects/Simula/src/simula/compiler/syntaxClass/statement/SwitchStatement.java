@@ -24,8 +24,9 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Switch Statement.
 /// 
@@ -137,13 +138,13 @@ public final class SwitchStatement extends Statement {
 			switchCases.add(new SwitchWhenPart(caseKeyList, statement));
 		}
 		Parse.expect(KeyWord.END);
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber+": SwitchStatement: "+this);
+		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber()+": SwitchStatement: "+this);
 	}
 
 	SwitchStatement(final PsiBuilder simBuilder, final int line) {
 		super(line);
 
-		simBuilder.startSubtree("SwitchStatement");
+		PsiTree swtTree = simBuilder.startSubtree(SwitchStatement.class, "SwitchStatement");
 		simBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);
@@ -173,7 +174,8 @@ public final class SwitchStatement extends Statement {
 			switchCases.add(new SwitchWhenPart(caseKeyList, statement));
 		}
 		PsiParse.expect(simBuilder, KeyWord.END);
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber+": SwitchStatement: "+this);
+		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber()+": SwitchStatement: "+this);
+		simBuilder.doneSubtree(swtTree, this);
 	}
 
 	/// Parse Utility: Expect case pair.
@@ -346,7 +348,7 @@ public final class SwitchStatement extends Statement {
 	@Override
     public void doChecking() {
     	if(IS_SEMANTICS_CHECKED()) return;
-    	Global.sourceLineNumber=lineNumber;
+    	Global.sourceLineNumber=lineNumber();
     	if(Option.internal.TRACE_CHECKER) Util.TRACE("BEGIN SwitchStatement("+toString()+").doChecking - Current Scope Chain: "+Global.getCurrentScope().edScopeChain());    
     	lowKey.doChecking(); hiKey.doChecking();
     	switchKey.doChecking();
@@ -368,7 +370,7 @@ public final class SwitchStatement extends Statement {
 	
 	@Override
     public void doJavaCoding() {
-    	Global.sourceLineNumber=lineNumber;
+    	Global.sourceLineNumber=lineNumber();
 	    ASSERT_SEMANTICS_CHECKED();
 	    StringBuilder sb=new StringBuilder();
 	    sb.append("if(").append(switchKey.toJavaCode()).append("<").append(lowKey.toJavaCode());
@@ -459,7 +461,7 @@ public final class SwitchStatement extends Statement {
 		oupt.writeKind(ObjectKind.SwitchStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** SwitchStatement
 		oupt.writeObj(lowKey);
 		oupt.writeObj(hiKey);
@@ -474,7 +476,7 @@ public final class SwitchStatement extends Statement {
 		SwitchStatement stm = new SwitchStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.lineNumber = inpt.readShort();
+		stm.OLD_lineNumber = inpt.readShort();
 		stm.lowKey = (Expression) inpt.readObj();
 		stm.hiKey = (Expression) inpt.readObj();
 		stm.switchKey = (Expression) inpt.readObj();

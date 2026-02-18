@@ -173,7 +173,7 @@ public final class Parameter extends Declaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		if (kind == 0) {
 			Util.error("Parameter " + identifier + " is not specified -- assumed Simple Integer");
 			kind = Kind.Simple;

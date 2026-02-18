@@ -64,6 +64,19 @@ public final class Util {
 		return (answer);
 	}
 
+	
+	public static String calledFrom(int startIndex, int endIndex) {
+		StackTraceElement[] elt = Thread.currentThread().getStackTrace();
+		StringBuilder sb = new StringBuilder();
+		int n = Math.min(elt.length, endIndex);
+		String sep ="";
+		for(int i=startIndex;i<n;i++) {
+			String className = elt[i].getMethodName();
+			sb.append(sep).append(className); sep=",";
+		}
+		return sb.toString();
+	}
+
 	/// Number of error messages.
 	public static int nError;
 
@@ -73,6 +86,12 @@ public final class Util {
 		String err = edLINE(": Error: " + msg);
 		nError++;
 		printError(err);
+	}
+
+	/// Exit with Thread.dumpStack
+	public static void STOP() {
+		Thread.dumpStack();
+		System.exit(-1);;
 	}
 
 	/// Print the internal error message: IMPOSSIBLE.
@@ -185,7 +204,8 @@ public final class Util {
 	public static void printError(final String s) {
 		String u = s.replace('\r', (char) 0);
 		if (Global.console != null)	Global.console.writeError(u + '\n');
-		else System.err.println(u);
+//		else
+			System.err.println(u);
 	}  
 
 	/// Print a warning message.
@@ -193,7 +213,8 @@ public final class Util {
 	public static void printWarning(final String s) {
 		String u = s.replace('\r', (char) 0);
 		if (Global.console != null)	Global.console.writeWarning(u + '\n');
-		else System.err.println(u);
+//		else
+			System.err.println(u);
 	}  
 
     //*******************************************************************************

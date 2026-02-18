@@ -11,7 +11,6 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-
 import java.lang.constant.ClassDesc;
 import simula.compiler.syntaxClass.OverLoad;
 import simula.compiler.syntaxClass.Type;
@@ -1117,7 +1116,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param className the class's name
 	private StandardClass(String prefix,String className) {
 		this(className);
-		this.prefix=prefix;
+		this.prefix = prefix;
 		if(Option.compilerMode == Option.CompilerMode.simulaClassLoader) {
 			ClassDesc CD_ThisClass = ClassDesc.of("simula.runtime.RTS_" + className); 
 			ClassDesc CD_SuperClass = ClassDesc.of("simula.runtime.RTS_" + prefix); 

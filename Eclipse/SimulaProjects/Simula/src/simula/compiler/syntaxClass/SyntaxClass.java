@@ -8,6 +8,10 @@ package simula.compiler.syntaxClass;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -100,17 +104,31 @@ public abstract class SyntaxClass {
 	public int OBJECT_SEQU;
 	
 	/// The source line number
-	public int lineNumber;
+	protected int OLD_lineNumber;
+	public int lineNumber() {
+		if(psiTree != null) return psiTree.getLineNumber();
+		return OLD_lineNumber;
+	}
 	
 	/// Set source line number.
 	protected void setLineNumber() {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = OLD_lineNumber;
 	}
 
 	/// Create a new SyntaxClass.
 	protected SyntaxClass() {
-		lineNumber = Global.sourceLineNumber;
+		OLD_lineNumber = Global.sourceLineNumber;
 	}
+	
+//	public SyntaxTree buildSyntaxTree() {
+//		
+//	}
+
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+		IO.println("Method addSyntaxNodes need a redefinition in "+this.getClass().getSimpleName());
+		Util.IERR("Method addSyntaxNodes need a redefinition in "+this.getClass().getSimpleName());
+    }
+
 
 	/// Perform semantic checking.
 	/// 
@@ -118,7 +136,7 @@ public abstract class SyntaxClass {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		Util.IERR("The method 'doChecking' needs a redefinition in "+this.getClass().getSimpleName());
 	}
 
@@ -155,7 +173,7 @@ public abstract class SyntaxClass {
 
 	/// Output Java code.
 	public void doJavaCoding() {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		JavaSourceFileCoder.code(toJavaCode());
 	}
 
@@ -197,7 +215,7 @@ public abstract class SyntaxClass {
 		String s = "";
 		while ((i--) > 0)
 			s = s + "    ";
-		return (s+"Line "+this.lineNumber+": "+this.getClass().getSimpleName()+"    ");
+		return (s+"Line "+this.lineNumber()+": "+this.getClass().getSimpleName()+"    ");
 	}
 
 	/// Utility: Returns a number of blanks.

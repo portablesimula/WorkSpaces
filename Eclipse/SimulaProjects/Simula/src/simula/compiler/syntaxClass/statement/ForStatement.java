@@ -30,9 +30,10 @@ import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
 import simula.psi.LexToken;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// For Statement.
 /// 
@@ -175,13 +176,12 @@ public final class ForStatement extends Statement {
 		}
 		this.doStatement = doStatement;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line " + this.lineNumber + ": ForStatement: " + this);
+			Util.TRACE("Line " + this.lineNumber() + ": ForStatement: " + this);
 	}
 
 	ForStatement(final PsiBuilder simBuilder, final int line) {
 		super(line);
-
-		simBuilder.startSubtree("ForStatement");
+		PsiTree forTree = simBuilder.startSubtree(ForStatement.class, "ForStatement");
 		simBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
@@ -202,7 +202,8 @@ public final class ForStatement extends Statement {
 		}
 		this.doStatement = doStatement;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line " + this.lineNumber + ": ForStatement: " + this);
+			Util.TRACE("Line " + this.lineNumber() + ": ForStatement: " + this);
+		simBuilder.doneSubtree(forTree, this);
 	}
 
 	/// Parse a for-list element.
@@ -239,7 +240,7 @@ public final class ForStatement extends Statement {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		controlVariable.doChecking();
 		Declaration decl = controlVariable.meaning.declaredAs;
 		if (decl instanceof Parameter par && par.mode == Parameter.Mode.name)
@@ -275,10 +276,10 @@ public final class ForStatement extends Statement {
 		//      // Statements ...
 		// }
 		// ------------------------------------------------------------
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		boolean refType = controlVariable.type.isReferenceType();
-		String CB = "CB_" + lineNumber;
+		String CB = "CB_" + lineNumber();
 		JavaSourceFileCoder.code("for(boolean " + CB + ":new FOR_List(");
 		char del = ' ';
 		for (ForListElement elt : forList) {
@@ -349,7 +350,8 @@ public final class ForStatement extends Statement {
 	@Override
 	public String toString() {
 		String fl = forList.toString().replace('[', ' ').replace(']', ' ');
-		return ("FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + " DO " + doStatement);
+//		return ("FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + " DO " + doStatement);
+		return edStatement("FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + " DO " + doStatement);
 	}
 
 
@@ -375,7 +377,7 @@ public final class ForStatement extends Statement {
 		//      // Statements ...
 		// }
 		// ------------------------------------------------------------
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		
 		codeBuilder
@@ -436,7 +438,7 @@ public final class ForStatement extends Statement {
 		oupt.writeKind(ObjectKind.ForStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** ForStatement
 		oupt.writeObj(controlVariable);
 		oupt.writeShort(assignmentOperator);
@@ -453,7 +455,7 @@ public final class ForStatement extends Statement {
 		ForStatement stm = new ForStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.lineNumber = inpt.readShort();
+		stm.OLD_lineNumber = inpt.readShort();
 		// *** ForStatement
 		stm.controlVariable = (VariableExpression) inpt.readObj();
 		stm.assignmentOperator = inpt.readShort();

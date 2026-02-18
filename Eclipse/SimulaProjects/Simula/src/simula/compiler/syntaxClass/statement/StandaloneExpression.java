@@ -19,9 +19,10 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
 import simula.psi.LexToken;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Standalone Expression Statement.
 /// 
@@ -51,7 +52,7 @@ public final class StandaloneExpression extends Statement {
 	StandaloneExpression(final int line,final Expression expression) {
 		super(line);
 		this.expression = expression;
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": StandaloneExpression: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": StandaloneExpression: "+this);
 		while (Parse.accept(KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) { 
 			this.expression = new AssignmentOperation(this.expression, Parse.prevToken.getKeyWord(),expectStandaloneExpression());
 		}		
@@ -59,15 +60,20 @@ public final class StandaloneExpression extends Statement {
 
 	StandaloneExpression(final PsiBuilder simBuilder, final int line,final Expression expression) {
 		super(line);
+		PsiTree stalonTree = simBuilder.startSubtree(StandaloneExpression.class, "StandaloneExpression");
 		this.expression = expression;
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": StandaloneExpression: "+this);
-		IO.println("Line "+lineNumber+": StandaloneExpression: "+this+"   "+simBuilder.getCurrentLexerToken());
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": StandaloneExpression: "+this);
+		IO.println("Line "+lineNumber()+": StandaloneExpression: "+this+"   "+simBuilder.getCurrentLexerToken());
 		LexToken prevToken = null;
+		PsiTree asgTree = simBuilder.startSubtree(AssignmentOperation.class, "First'AssignmentOperation");
 		while ((prevToken = PsiParse.acceptParserToken(simBuilder, KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF)) != null) { 
-//			simBuilder.startSubtree("StandaloneExpression");
+			IO.println("NEW StandaloneExpression: prevToken="+prevToken);
 			this.expression = new AssignmentOperation(this.expression, prevToken.keyWord, expectStandaloneExpression(simBuilder));
-//			simBuilder.doneSubtree(this.expression);
+			simBuilder.doneSubtree(this);
+			asgTree = simBuilder.startSubtree(AssignmentOperation.class, "Next'AssignmentOperation");
 		}		
+		simBuilder.dropSubtree(asgTree);
+		simBuilder.doneSubtree(stalonTree, this);
 	}
 
 	/// Parse a standalone expression.
@@ -94,13 +100,14 @@ public final class StandaloneExpression extends Statement {
 			int opr=prevToken.keyWord;
 			retExpr=new AssignmentOperation(retExpr,opr,expectStandaloneExpression(simBuilder));
 		}
+		IO.println("StandaloneExpression.expectStandaloneExpression: RETURN: "+retExpr+" ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 		return retExpr;
 	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		if (Option.internal.TRACE_CHECKER) Util.TRACE("StandaloneExpression("+expression+").doChecking - Current Scope Chain: "+Global.getCurrentScope().edScopeChain());
 		expression.doChecking();
 		if(!expression.maybeStatement()) Util.error("Illegal/Missplaced Expression: "+expression);
@@ -110,7 +117,7 @@ public final class StandaloneExpression extends Statement {
 	
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		JavaSourceFileCoder.code(toJavaCode() + ';');
 	}
 
@@ -138,7 +145,8 @@ public final class StandaloneExpression extends Statement {
 
 	@Override
 	public String toString() {
-		return ("STANDALONE " + expression);
+//		return ("Line " + this.lineNumber+ ": " + this.getClass().getSimpleName() + " { " + expression + " }");
+		return edStatement(expression.toString());
 	}
 
 	// ***********************************************************************************************
@@ -155,7 +163,7 @@ public final class StandaloneExpression extends Statement {
 		oupt.writeKind(ObjectKind.StandaloneExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** StandaloneExpression
 		oupt.writeObj(expression);
 	}
@@ -168,7 +176,7 @@ public final class StandaloneExpression extends Statement {
 		StandaloneExpression stm = new StandaloneExpression();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.lineNumber = inpt.readShort();
+		stm.OLD_lineNumber = inpt.readShort();
 		// *** StandaloneExpression
 		stm.expression = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("StandaloneExpression: " + stm);

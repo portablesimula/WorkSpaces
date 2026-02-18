@@ -164,7 +164,7 @@ public class ForListElement extends SyntaxClass {
 		oupt.writeKind(ObjectKind.ForListElement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** ForListElement
 		oupt.writeObj(forStatement);
 		oupt.writeObj(expr1);
@@ -178,7 +178,7 @@ public class ForListElement extends SyntaxClass {
 		ForListElement elt = new ForListElement();
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
 		// *** SyntaxClass
-		elt.lineNumber = inpt.readShort();
+		elt.OLD_lineNumber = inpt.readShort();
 		// *** ForListElement
 		elt.forStatement = (ForStatement) inpt.readObj();
 		elt.expr1 = (Expression) inpt.readObj();

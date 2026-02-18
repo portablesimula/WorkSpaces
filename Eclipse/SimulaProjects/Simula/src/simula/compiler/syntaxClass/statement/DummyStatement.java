@@ -11,7 +11,6 @@ import java.lang.classfile.CodeBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.utilities.Global;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
@@ -37,7 +36,7 @@ public final class DummyStatement extends Statement {
 	/// @param line the source line number
 	DummyStatement(final int line) {
 		super(line);
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": DummyStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": DummyStatement: "+this);
 	}
 
 	@Override
@@ -67,7 +66,7 @@ public final class DummyStatement extends Statement {
 
 	@Override
 	public String toString() {
-		return ("DUMMY at Line "+lineNumber+" in "+Global.getCurrentScope().identifier);
+		return edStatement(";");
 	}
 
 	// ***********************************************************************************************
@@ -82,7 +81,7 @@ public final class DummyStatement extends Statement {
 		oupt.writeKind(ObjectKind.DummyStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 	}
 
 	/// Read and return a DummyStatement object.
@@ -93,7 +92,7 @@ public final class DummyStatement extends Statement {
 		DummyStatement stm = new DummyStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.lineNumber = inpt.readShort();
+		stm.OLD_lineNumber = inpt.readShort();
 		Util.TRACE_INPUT("DummyStatement: " + stm);
 		return(stm);
 	}

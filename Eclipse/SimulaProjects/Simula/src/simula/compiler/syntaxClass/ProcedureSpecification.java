@@ -15,7 +15,7 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
 
 /// Procedure Specification.
 /// <pre>

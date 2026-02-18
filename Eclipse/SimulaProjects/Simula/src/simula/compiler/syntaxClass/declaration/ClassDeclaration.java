@@ -40,7 +40,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 
 /// Simula Class Declaration.
@@ -171,7 +171,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	public static ClassDeclaration expectClassDeclaration(final String prefix) {
 		ClassDeclaration cls = new ClassDeclaration(null);
 		cls.sourceFileName = Global.sourceFileName;
-		cls.lineNumber = Parse.prevToken.lineNumber;
+		cls.OLD_lineNumber = Parse.prevToken.lineNumber;
 		cls.prefix = prefix;
 		cls.declaredIn.hasLocalClasses = true;
 		if (cls.prefix == null)
@@ -193,16 +193,16 @@ public class ClassDeclaration extends BlockDeclaration {
 		cls.lastLineNumber = Global.sourceLineNumber;
 		cls.type = Type.Ref(cls.identifier);
 		if (Option.internal.TRACE_PARSE)
-			Parse.TRACE("Line " + cls.lineNumber + ": ClassDeclaration: " + cls);
+			Parse.TRACE("Line " + cls.lineNumber() + ": ClassDeclaration: " + cls);
 		Global.setScope(cls.declaredIn);
 		return (cls);
 	}
 
-	public static ClassDeclaration expectClassDeclaration(final PsiBuilder simBuilder, final String prefix) {
+	public static ClassDeclaration expectClassDeclaration(final PsiBuilder simBuilder, final String ident) {
 		ClassDeclaration cls = new ClassDeclaration(null);
 		cls.sourceFileName = Global.sourceFileName;
-//		cls.lineNumber = PsiParse.prevToken.lineNumber;
-		cls.prefix = prefix;
+//		cls.OLD_lineNumber = PsiParse.prevToken.lineNumber;
+		cls.prefix = ident;
 		cls.declaredIn.hasLocalClasses = true;
 		if (cls.prefix == null)
 			cls.prefix = StandardClass.CLASS.identifier;
@@ -223,10 +223,10 @@ public class ClassDeclaration extends BlockDeclaration {
 		cls.lastLineNumber = Global.sourceLineNumber;
 		cls.type = Type.Ref(cls.identifier);
 		if (Option.internal.TRACE_PARSE)
-			PsiParse.TRACE("Line " + cls.lineNumber + ": ClassDeclaration: " + cls);
+			PsiParse.TRACE("Line " + cls.lineNumber() + ": ClassDeclaration: " + cls);
 		Global.setScope(cls.declaredIn);
 		simBuilder.doneSubtree(cls);
-		simBuilder.startSubtree("NextDeclaration");
+		simBuilder.startSubtree(Declaration.class, "NextDeclaration");
 		return (cls);
 	}
 
@@ -570,7 +570,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		Global.enterScope(this);
 		if(Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ClassDeclaration("+this.identifier+").doChecking");
@@ -861,7 +861,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			return (cls);
 		}
 		Util.error("Prefix " + prefix + " is not a Class but " + decl.getClass().getSimpleName()
-				+ " Declared in " + this.sourceFileName + " at line " + decl.lineNumber);
+				+ " Declared in " + this.sourceFileName + " at line " + decl.lineNumber());
 		printStaticChain("",0);
 		return (null);
 	}
@@ -964,7 +964,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			if(Option.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);	
 			return;
 		}
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
 		Global.enterScope(this);
 			labelList.setLabelIdexes();
@@ -973,7 +973,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			line = line + " extends " + getPrefixClass().getJavaIdentifier();
 			JavaSourceFileCoder.code(line + " {");
 			JavaSourceFileCoder.debug("// ClassDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
-					+ ", PrefixLevel=" + prefixLevel() + ", firstLine=" + lineNumber + ", lastLine=" + lastLineNumber
+					+ ", PrefixLevel=" + prefixLevel() + ", firstLine=" + lineNumber() + ", lastLine=" + lastLineNumber
 					+ ", hasLocalClasses=" + ((hasLocalClasses) ? "true" : "false") + ", System="
 					+ ((isQPSystemBlock()) ? "true" : "false") + ", detachUsed=" + ((detachUsed) ? "true" : "false"));
 			if (isQPSystemBlock())
@@ -1365,7 +1365,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	
 	@Override
 	public void buildDeclaration(ClassBuilder classBuilder, BlockDeclaration encloser) {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		try {
 			this.createJavaClassFile();
 		} catch (IOException e) {
@@ -1375,7 +1375,7 @@ public class ClassDeclaration extends BlockDeclaration {
 
 	@Override
 	public void buildInitAttribute(CodeBuilder codeBuilder) {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 	}
 
 	// ***********************************************************************************************
@@ -1467,7 +1467,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			if (prfx != null) prfx.buildStatementsBeforeInner(codeBuilder);
 		}
 		if(statements1 != null) for (Statement stm : statements1) {
-			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.lineNumber);
+			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.lineNumber());
 			stm.buildByteCode(codeBuilder);
 		}
 	}
@@ -1479,7 +1479,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @param codeBuilder the codeBuilder to use.
 	private void buildStatementsAfterInner(CodeBuilder codeBuilder) {
 		for (Statement stm : statements){
-			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.lineNumber);
+			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.lineNumber());
 			stm.buildByteCode(codeBuilder);
 		}
 		if (hasRealPrefix()) {
@@ -1560,7 +1560,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 		
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		
 		// *** Declaration
 		//oupt.writeString(identifier);
@@ -1602,7 +1602,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		cls.OBJECT_SEQU = inpt.readSEQU(cls);
 		
 		// *** SyntaxClass
-		cls.lineNumber = inpt.readShort();
+		cls.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		//identifier = inpt.readString();

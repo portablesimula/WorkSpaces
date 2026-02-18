@@ -49,7 +49,7 @@ public final class LabeledStatement extends Statement {
 		super(line);
 		this.labels = labels;
 		this.statement = statement;
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": LabeledStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": LabeledStatement: "+this);
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public final class LabeledStatement extends Statement {
 
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code("{");
 		for (LabelDeclaration decl:labels) {
@@ -82,7 +82,7 @@ public final class LabeledStatement extends Statement {
 
 	@Override
 	public void buildByteCode(CodeBuilder codeBuilder) {
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		for (LabelDeclaration lab:labels)
 			lab.doBind(codeBuilder); // Bind Label
@@ -100,7 +100,14 @@ public final class LabeledStatement extends Statement {
 
 	@Override
 	public String toString() {
-		return ("" + labels + ':');
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for(LabelDeclaration lab:labels) {
+			if(! first) sb.append("Line").append(lab.lineNumber()).append(": "); first = false;
+			sb.append(lab.identifier).append(": ");
+		}
+		
+		return edStatement(sb.toString() + statement);
 	}
 
 	// ***********************************************************************************************
@@ -117,7 +124,7 @@ public final class LabeledStatement extends Statement {
 		oupt.writeKind(ObjectKind.LabeledStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** LabeledStatement
 		oupt.writeObj(statement);
 		oupt.writeObjectList(labels);
@@ -132,7 +139,7 @@ public final class LabeledStatement extends Statement {
 		LabeledStatement stm = new LabeledStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.lineNumber = inpt.readShort();
+		stm.OLD_lineNumber = inpt.readShort();
 		// *** LabeledStatement
 		stm.statement = (Statement) inpt.readObj();
 		stm.labels = (ObjectList<LabelDeclaration>) inpt.readObjectList();

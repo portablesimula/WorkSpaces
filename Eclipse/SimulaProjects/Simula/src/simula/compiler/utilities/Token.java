@@ -154,7 +154,7 @@ public final class Token {
 		case KeyWord.ENDBRACKET:	return ("]");
 		case KeyWord.EXP:			return ("**");
 		case KeyWord.DOT:			return (".");
-		case KeyWord.CONC:			return ("&");
+		case KeyWord.AMPERSAND:		return ("&");
 
 		case KeyWord.EQ:			return ("=");
 		case KeyWord.GE:			return (">=");

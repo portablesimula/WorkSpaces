@@ -21,8 +21,9 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// While Statement.
 /// 
@@ -55,13 +56,12 @@ public final class WhileStatement extends Statement {
 		condition = Expression.expectExpression();
 		Parse.expect(KeyWord.DO);
 		doStatement = Statement.expectStatement();
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber+": WhileStatement: "+this);
+		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber()+": WhileStatement: "+this);
 	}
 
 	WhileStatement(final PsiBuilder simBuilder, final int line) {
 		super(line);
-
-		simBuilder.startSubtree("WhileStatement");
+		PsiTree whileTree = simBuilder.startSubtree(WhileStatement.class, "WhileStatement");
 		simBuilder.consume(KeyWord.WHILE); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
@@ -69,13 +69,14 @@ public final class WhileStatement extends Statement {
 		condition = Expression.expectExpression(simBuilder);
 		PsiParse.expect(simBuilder, KeyWord.DO);
 		doStatement = Statement.acceptStatement(simBuilder);
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber+": WhileStatement: "+this);
+		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber()+": WhileStatement: "+this);
+		simBuilder.doneSubtree(whileTree, this);
 	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		condition.doChecking(); condition.backLink=this;
 		if (condition.type == null || condition.type.keyWord != Type.T_BOOLEAN) Util.error("While condition is not Boolean");
 		doStatement.doChecking();
@@ -84,7 +85,7 @@ public final class WhileStatement extends Statement {
 
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code("while(" + condition.toJavaCode() + ") {");
 		doStatement.doJavaCoding();
@@ -139,7 +140,7 @@ public final class WhileStatement extends Statement {
 		oupt.writeKind(ObjectKind.WhileStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** WhileStatement
 		oupt.writeObj(condition);
 		oupt.writeObj(doStatement);
@@ -153,7 +154,7 @@ public final class WhileStatement extends Statement {
 		WhileStatement stm = new WhileStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.lineNumber = inpt.readShort();
+		stm.OLD_lineNumber = inpt.readShort();
 		// *** WhileStatement
 		stm.condition  = (Expression) inpt.readObj();
 		stm.doStatement = (Statement) inpt.readObj();

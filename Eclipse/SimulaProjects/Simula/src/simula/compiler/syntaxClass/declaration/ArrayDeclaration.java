@@ -36,7 +36,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 
 /// Array Declaration.
@@ -187,6 +187,7 @@ public final class ArrayDeclaration extends Declaration {
 				identList.add(PsiParse.expectIdentifier(simBuilder));
 			} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
 			PsiParse.expect(simBuilder, KeyWord.BEGPAR);
+			simBuilder.setParsingBoundPairList(true);
 			// BoundPairList = BoundPair { , BoundPair }
 			if (Option.internal.TRACE_PARSE)
 				PsiParse.TRACE("Parse BoundPairList");
@@ -198,12 +199,13 @@ public final class ArrayDeclaration extends Declaration {
 				boundPairList.add(new BoundPair(LB, UB));
 			} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
 			PsiParse.expect(simBuilder, KeyWord.ENDPAR);
+			simBuilder.setParsingBoundPairList(false);
 			for (Enumeration<String> e = identList.elements(); e.hasMoreElements();) {
 				String identifier = e.nextElement();
 				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(identifier.toString(), type, boundPairList);
 				declarationList.add(arrayDeclaration);
 				simBuilder.doneSubtree(arrayDeclaration);
-				simBuilder.startSubtree("NextDeclaration");
+				simBuilder.startSubtree(Declaration.class, "NextDeclaration");
 			}
 			
 		} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
@@ -247,7 +249,7 @@ public final class ArrayDeclaration extends Declaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		if (type == null)
 			type = Type.Real;
 		type.doChecking(declaredIn);
@@ -259,7 +261,7 @@ public final class ArrayDeclaration extends Declaration {
 
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		// --------------------------------------------------------------------
 		// public RTS_REAL_ARRAY rTab=null;
@@ -271,7 +273,7 @@ public final class ArrayDeclaration extends Declaration {
 
 	@Override
 	public void doDeclarationCoding() {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		// --------------------------------------------------------------------
 		// integer array A(1:4,4:6,6:12);
@@ -295,7 +297,7 @@ public final class ArrayDeclaration extends Declaration {
 	
 	@Override
 	public void buildDeclaration(ClassBuilder classBuilder, BlockDeclaration encloser) {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		classBuilder.withField(identifier, RTS.CD.RTS_ARRAY(type), fieldBuilder -> {
 			fieldBuilder
@@ -587,7 +589,7 @@ public final class ArrayDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -611,7 +613,7 @@ public final class ArrayDeclaration extends Declaration {
 		arr.OBJECT_SEQU = inpt.readSEQU(arr);
 
 		// *** SyntaxClass
-		arr.lineNumber = inpt.readShort();
+		arr.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		arr.identifier = inpt.readString();

@@ -86,7 +86,7 @@ public abstract class BuildCPF {
 					Declaration decl=var.meaning.declaredAs;
 					if(decl instanceof StandardProcedure) {
 						if(Util.equals(decl.identifier, "sourceline")) {
-							actualParameter=new Constant(Type.Integer,actualParameter.lineNumber);
+							actualParameter=new Constant(Type.Integer,actualParameter.lineNumber());
 							actualParameter.doChecking();
 						}
 					}

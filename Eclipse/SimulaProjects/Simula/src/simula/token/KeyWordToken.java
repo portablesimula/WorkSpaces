@@ -1,6 +1,5 @@
 package simula.token;
 
-import simula.compiler.utilities.KeyWord;
 import simula.psi.LexToken;
 
 public class KeyWordToken extends LexToken {

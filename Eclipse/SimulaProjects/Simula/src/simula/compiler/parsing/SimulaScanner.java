@@ -191,7 +191,7 @@ public final class SimulaScanner extends DefaultScanner {
 				    if(getNext()=='&' || current=='-' || current=='+' || Character.isDigit(current)) 
 					return (scanDigitsExp(null));
 				
-				    pushBack(current); return (newToken(KeyWord.CONC));
+				    pushBack(current); return (newToken(KeyWord.AMPERSAND));
 	            case '!':  return(scanComment());
 	            case '\'': return(scanCharacterConstant());
 	            case '\"': return(scanTextConstant());

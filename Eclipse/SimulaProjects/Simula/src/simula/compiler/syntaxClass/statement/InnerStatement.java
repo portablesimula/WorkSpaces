@@ -16,7 +16,8 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
+import simula.psi.PsiTree;
 
 /// Inner Statement.
 /// 
@@ -36,9 +37,9 @@ public final class InnerStatement extends Statement {
 
 	/// Create a new InnerStatement.
 	/// @param line the source line number
-	 public InnerStatement(final int line) {
+	public InnerStatement(final int line) {
 		super(line);
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": InnerStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": InnerStatement: "+this);
 //		ClassDeclaration cls=(ClassDeclaration)Global.getCurrentScope();
 //		cls.statements1 = cls.statements;
 //		cls.statements = new ObjectList<Statement>();
@@ -49,45 +50,48 @@ public final class InnerStatement extends Statement {
 		} else Util.error("Missplaced Inner");
 	}
 
-		public static InnerStatement ofExplicit(final PsiBuilder simBuilder) {
-			simBuilder.startSubtree("InnerStatement");
-			simBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
-			 return new InnerStatement(simBuilder);		
-		}
+	public static InnerStatement ofExplicit(final PsiBuilder simBuilder) {
+		 PsiTree inrTree = simBuilder.startSubtree(InnerStatement.class, "InnerStatement");
+		 simBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
+		 InnerStatement innerStatement = new InnerStatement(simBuilder);		
+		 simBuilder.doneSubtree(inrTree, innerStatement);
+		 return innerStatement;
+	}
 
-		public static InnerStatement ofImplicit(final PsiBuilder simBuilder) {
-			 return new InnerStatement(simBuilder);		
-		}
+	public static InnerStatement ofImplicit(final PsiBuilder simBuilder) {
+		 PsiTree inrTree = simBuilder.startSubtree(InnerStatement.class, "InnerStatement");
+		 InnerStatement innerStatement = new InnerStatement(simBuilder);		
+		 simBuilder.doneSubtree(inrTree, innerStatement);
+		 return innerStatement;
+	}
 		
-		/// Create a new InnerStatement.
-		/// @param line the source line number
-//		 public InnerStatement(final PsiBuilder simBuilder, boolean implicit, final int line) {
-		 private InnerStatement(final PsiBuilder simBuilder) {
-			super(simBuilder.getSourceLineNumber());
-
-//			if(! implicit) {
-//				simBuilder.startSubtree("InnerStatement");
-//				simBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
-//			}
-
-			if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": InnerStatement: "+this);
-			if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
-//				ClassDeclaration cls=(ClassDeclaration)Global.getCurrentScope();
-				cls.statements1 = cls.statements;
-				cls.statements = new ObjectList<Statement>();
-			} else Util.error("Missplaced Inner");
-		}
+	/// Create a new InnerStatement.
+	/// @param line the source line number
+//	public InnerStatement(final PsiBuilder simBuilder, boolean implicit, final int line) {
+	private InnerStatement(final PsiBuilder simBuilder) {
+		super(simBuilder.getSourceLineNumber());
+//		if(! implicit) {
+//			simBuilder.startSubtree("InnerStatement");
+//			simBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
+//		}
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": InnerStatement: "+this);
+		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
+//			ClassDeclaration cls=(ClassDeclaration)Global.getCurrentScope();
+			cls.statements1 = cls.statements;
+			cls.statements = new ObjectList<Statement>();
+		} else Util.error("Missplaced Inner");
+	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		SET_SEMANTICS_CHECKED();
 	}
 	
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		// No code !
 	}
 
@@ -109,7 +113,7 @@ public final class InnerStatement extends Statement {
 
 	@Override
 	public String toString() {
-		return ("INNER");
+		return edStatement("INNER");
 	}
 
 	// ***********************************************************************************************
@@ -126,7 +130,7 @@ public final class InnerStatement extends Statement {
 		oupt.writeKind(ObjectKind.InnerStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 	}
 
 	/// Read and return an InnerStatement object.
@@ -137,7 +141,7 @@ public final class InnerStatement extends Statement {
 		InnerStatement stm = new InnerStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.lineNumber = inpt.readShort();
+		stm.OLD_lineNumber = inpt.readShort();
 		Util.TRACE_INPUT("InnerStatement: " + stm);
 		return(stm);
 	}	

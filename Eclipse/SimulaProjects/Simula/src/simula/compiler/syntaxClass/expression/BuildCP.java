@@ -241,13 +241,13 @@ public class BuildCP {
 		if (id.equalsIgnoreCase("detach")) {
 			variable.checkedParams = new Vector<Expression>();
 			// Push extra parameter 'sourceLineNumber'
-			Constant c = new Constant(Type.Integer, variable.lineNumber);
+			Constant c = new Constant(Type.Integer, variable.lineNumber());
 			variable.checkedParams.add(c);
 			return true;
 		} else if( id.equalsIgnoreCase("call") | id.equalsIgnoreCase("resume")) {
 			if(variable.checkedParams.size() == 1) {
 				// Push extra parameter 'sourceLineNumber'
-				Constant c = new Constant(Type.Integer, variable.lineNumber);
+				Constant c = new Constant(Type.Integer, variable.lineNumber());
 				variable.checkedParams.add(c);
 				return true;
 			}

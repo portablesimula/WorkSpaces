@@ -12,6 +12,10 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
@@ -346,6 +350,19 @@ public abstract class DeclarationScope extends Declaration  {
 		if(labelList != null) for(LabelDeclaration d:labelList.getDeclaredLabels()) d.printTree(indent,this);
 	}
 	
+	protected void addDeclarationNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        IO.println("BlockDeclaration.addDeclarationNodes: declarationList.size="+declarationList.size());
+		for(Declaration d:declarationList) {
+			DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(d);
+	        IO.println("BlockDeclaration.addSyntaxNodes: newNode="+newNode);
+	        model.insertNodeInto(newNode, parent, parent.getChildCount());
+		}
+		if(labelList != null) {
+//			for(LabelDeclaration d:labelList.getDeclaredLabels()) d.printTree(indent,this);
+			Util.IERR("NOT IMPL");
+		}
+	}
+
 	/// Debug utility: edScope
 	/// @return edited scope String
 	public String edScope() {

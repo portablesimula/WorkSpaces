@@ -192,7 +192,7 @@ public class SourceTextPanel extends JPanel {
 //		String text = doc.getText(doc.getStartPosition(), doc.getLength());
 		try {
 			String text = doc.getText(0, doc.getLength());
-			IO.println("SourceTextPanel.getText: " + text.replace("\r", "\\r").replace("\n", "\\n"));
+			IO.println("SourceTextPanel.getText: |" + text.replace("\r", "\\r").replace("\n", "\\n")+'|');
 			return text;
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block

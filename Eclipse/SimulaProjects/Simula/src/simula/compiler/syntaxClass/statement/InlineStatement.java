@@ -46,7 +46,7 @@ public final class InlineStatement extends Statement {
 
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if(kind.equalsIgnoreCase("detach")) JavaSourceFileCoder.code("detach();","Process'detach");
 		else if(kind.equalsIgnoreCase("terminate")) JavaSourceFileCoder.code("terminate();","Process'terminate");
@@ -57,7 +57,7 @@ public final class InlineStatement extends Statement {
 
 	@Override
 	public void buildByteCode(CodeBuilder codeBuilder) {
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if(kind.equalsIgnoreCase("detach")) {
 			codeBuilder.aload(0);

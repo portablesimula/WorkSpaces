@@ -43,7 +43,7 @@ public class UndefinedDeclaration extends Declaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		if(type != null) type.doChecking(Global.getCurrentScope());
 		
 		SET_SEMANTICS_CHECKED();
@@ -127,7 +127,7 @@ public class UndefinedDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -149,7 +149,7 @@ public class UndefinedDeclaration extends Declaration {
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
 		// *** SyntaxClass
-		var.lineNumber = inpt.readShort();
+		var.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		var.identifier = inpt.readString();

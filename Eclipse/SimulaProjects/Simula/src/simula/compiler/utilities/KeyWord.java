@@ -25,7 +25,7 @@ public class KeyWord {
 	/** Simula Keyword */ public final static int CHARACTER    = 9;
 	/** Simula Keyword */ public final static int CLASS        = 10;
 	/** Simula Keyword */ public final static int COMMENT      = 11;
-	/** Simula Keyword */ public final static int CONC         = 12;
+	/** Simula Keyword */ public final static int AMPERSAND    = 12;
 	/** Simula Keyword */ public final static int DELAY        = 13;
 	/** Simula Keyword */ public final static int DO           = 14;
 	/** Simula Keyword */ public final static int ELSE         = 15;
@@ -104,15 +104,14 @@ public class KeyWord {
 	/** Other Symbol */ public final static int NEWLINE        = 86;
 	/** Other Symbol */ public final static int STRING         = 87;
 	/** Other Symbol */ public final static int EOF	           = 88;
-	/** Other Symbol */ public final static int AMPERSAND      = 89;
+	/** Other Symbol */ public final static int WHITESPACES    = 89;
 	/** Other Symbol */ public final static int IDENTIFIER     = 90;
 	/** Other Symbol */ public final static int BOOLEANKONST   = 91;
 	/** Other Symbol */ public final static int INTEGERKONST   = 92;
 	/** Other Symbol */ public final static int CHARACTERKONST = 93;
 	/** Other Symbol */ public final static int REALKONST      = 94;
 	/** Other Symbol */ public final static int TEXTKONST      = 95;
-	/** Other Symbol */ public final static int WHITESPACES    = 96;
-	/** Other Symbol */ public final static int BAD_CHARACTERS = 97;
+	/** Other Symbol */ public final static int BAD_CHARACTERS = 96;
 
 	/// Returns the corresponding String.
 	/// @param key the argument key.
@@ -130,7 +129,7 @@ public class KeyWord {
 			case CHARACTER  : return("CHARACTER");
 			case CLASS      : return("CLASS");
 			case COMMENT    : return("COMMENT");
-			case CONC       : return("CONC");
+			case AMPERSAND  : return("AMPERSAND");
 			case DELAY      : return("DELAY");
 			case DO         : return("DO");
 			case ELSE       : return("ELSE");

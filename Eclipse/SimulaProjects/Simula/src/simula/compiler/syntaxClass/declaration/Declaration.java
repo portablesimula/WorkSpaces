@@ -18,7 +18,7 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiBuilder;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 
 /// Declaration.
@@ -240,7 +240,7 @@ public abstract class Declaration extends SyntaxClass {
 	/// Continue until there are no more declarations.
 	/// @param enclosure the owning block.
 	protected static void acceptDeclarations(final PsiBuilder simBuilder, final BlockDeclaration enclosure) {
-		simBuilder.startSubtree("Declaration");
+		simBuilder.startSubtree(Declaration.class, "Declaration");
 		while (Declaration.acceptDeclaration(simBuilder, enclosure))
 			PsiParse.accept(simBuilder, KeyWord.SEMICOLON);
 		simBuilder.dropSubtree();
@@ -280,14 +280,14 @@ public abstract class Declaration extends SyntaxClass {
 	/// Output Java ByteCode. Build init code for an Attribute.
 	/// @param codeBuilder the codeBuilder to use.
 	public void buildInitAttribute(CodeBuilder codeBuilder) {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		Util.IERR("Method buildInitAttribute need a redefinition in "+this.getClass().getSimpleName());
 	}
 
 	/// Output Java ByteCode. Build declaration code for an Attribute.
 	/// @param codeBuilder the codeBuilder to use.
 	public void buildDeclarationCode(CodeBuilder codeBuilder) {
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		// Default: No code
 	}
 	

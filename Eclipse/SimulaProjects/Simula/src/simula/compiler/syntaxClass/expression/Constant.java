@@ -148,7 +148,7 @@ public final class Constant extends Expression {
 	@Override
     public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		this.type.doChecking(Global.getCurrentScope());
 		SET_SEMANTICS_CHECKED();
 	}
@@ -298,7 +298,7 @@ public final class Constant extends Expression {
 	@Override
 	public String toString() {
 		if(type != null && type.keyWord == Type.T_TEXT) return("\""+value+'"');
-		return("Constant type="+type+", value="+value);
+		return("Constant(" + type + ':' + value + ')');
 	}
 
 	
@@ -314,7 +314,7 @@ public final class Constant extends Expression {
 		oupt.writeKind(ObjectKind.Constant);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -330,7 +330,7 @@ public final class Constant extends Expression {
 		Constant cnst = new Constant();
 		cnst.OBJECT_SEQU = inpt.readSEQU(cnst);
 		// *** SyntaxClass
-		cnst.lineNumber = inpt.readShort();
+		cnst.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		cnst.type = inpt.readType();
 		cnst.backLink = (SyntaxClass) inpt.readObj();

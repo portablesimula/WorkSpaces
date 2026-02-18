@@ -101,7 +101,7 @@ public final class ObjectRelation extends Expression {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ObjectRelation" + toString() + ".doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());
 		classDeclaration = getQualification(classIdentifier);
@@ -171,7 +171,7 @@ public final class ObjectRelation extends Expression {
 		oupt.writeKind(ObjectKind.ObjectRelation);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -188,7 +188,7 @@ public final class ObjectRelation extends Expression {
 	public static ObjectRelation readObject(AttributeInputStream inpt) throws IOException {
 		ObjectRelation expr = new ObjectRelation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		expr.lineNumber = inpt.readShort();
+		expr.OLD_lineNumber = inpt.readShort();
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();
 		expr.lhs = (Expression) inpt.readObj();

@@ -110,7 +110,7 @@ public final class TextExpression extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED()) return;
-		Global.sourceLineNumber = lineNumber;
+		Global.sourceLineNumber = lineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN TextOperation" + toString() + ".doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());
 		// TEXT & TEXT
@@ -164,7 +164,7 @@ public final class TextExpression extends Expression {
 		oupt.writeKind(ObjectKind.TextExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -181,7 +181,7 @@ public final class TextExpression extends Expression {
 		TextExpression expr = new TextExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-		expr.lineNumber = inpt.readShort();
+		expr.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

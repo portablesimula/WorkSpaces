@@ -56,9 +56,9 @@ public final class BlockStatement extends Statement {
 	/// Create a new BlockStatement.
 	/// @param blockDeclaration the BlockDeclaration
 	public BlockStatement(final BlockDeclaration blockDeclaration) {
-		super(blockDeclaration.lineNumber);
+		super(blockDeclaration.lineNumber());
 		this.blockDeclaration = blockDeclaration;
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": BlockStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": BlockStatement: "+this);
 	}
 	
 	/// Check if this BlockStatement is a CompoundStatement.
@@ -82,7 +82,7 @@ public final class BlockStatement extends Statement {
 	
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if(blockDeclaration.declarationKind!=ObjectKind.CompoundStatement) {
 			String staticLink=blockDeclaration.declaredIn.edCTX();
@@ -110,7 +110,7 @@ public final class BlockStatement extends Statement {
 
 	@Override
 	public void buildByteCode(CodeBuilder codeBuilder) {
-		Global.sourceLineNumber=lineNumber;
+		Global.sourceLineNumber=lineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		blockDeclaration.buildByteCode(codeBuilder);
 	}
@@ -127,7 +127,7 @@ public final class BlockStatement extends Statement {
 
 	@Override
 	public String toString() {
-		return ("BLOCK " + blockDeclaration);
+		return edStatement(""+blockDeclaration);
 	}
 
 	// ***********************************************************************************************
@@ -143,7 +143,7 @@ public final class BlockStatement extends Statement {
 		oupt.writeKind(ObjectKind.BlockStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		oupt.writeShort(lineNumber());
 		// *** BlockStatement
 		oupt.writeObj(blockDeclaration);
 	}
@@ -156,7 +156,7 @@ public final class BlockStatement extends Statement {
 		BlockStatement stm = new BlockStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.lineNumber = inpt.readShort();
+		stm.OLD_lineNumber = inpt.readShort();
 		// *** BlockStatement
 		stm.blockDeclaration = (BlockDeclaration) inpt.readObj();
 
