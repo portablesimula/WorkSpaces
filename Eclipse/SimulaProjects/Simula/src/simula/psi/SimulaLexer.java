@@ -216,7 +216,8 @@ public class SimulaLexer {
                     
                 case '!':  return(scanComment());
                 case '\'': return(scanCharacterConstant());
-                case '"': return(scanTextConstant());
+//                case '"': return(scanTextConstant());
+                case '"': return(scanSimpleString());
 
                 case '+': return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.PLUS);
                 case '*': return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.MUL);
@@ -621,23 +622,23 @@ public class SimulaLexer {
     ///                getNext will return first character after construct
     /// </pre>
     /// @return next Token
-    private LexToken scanTextConstant() {
+    private LexToken OLD_scanTextConstant() {
         if(Global.TRACE_SCAN) Util.TRACE("scanTextConstant, "+edcurrent());
-//        IO.println("SimulaLexer.scanTextConstant: BEGIN -----------------------------------------------------------------------");
+        IO.println("SimulaLexer.scanTextConstant: BEGIN -----------------------------------------------------------------------");
         LOOP:while(true) {
-            scanSimpleString();
+            OLD_scanSimpleString();
             // Skip string-separators
             while(scanStringSeparator());
             if(Global.TRACE_SCAN) Util.TRACE("scanTextConstant(2): "+edcurrent());
-//            IO.println("scanTextConstant(2): "+edcurrent());
+            IO.println("scanTextConstant(2): "+edcurrent());
             if(current!='"') {
                 pushBack(current);
                 break LOOP;
             }            
         }
-//        IO.println("SimulaLexer.scanTextConstant: END -----------------------------------------------------------------------");
-//        printQueue();
-//        IO.println("SimulaLexer.scanTextConstant: END -----------------------------------------------------------------------");
+        IO.println("SimulaLexer.scanTextConstant: END -----------------------------------------------------------------------");
+        printQueue();
+        IO.println("SimulaLexer.scanTextConstant: END -----------------------------------------------------------------------");
         return popToken();
     }
     
@@ -656,10 +657,20 @@ public class SimulaLexer {
     ///                getNext will return first character after construct
     /// </pre>
     /// @return next Token
-    private void scanSimpleString() {
+    private void OLD_scanSimpleString() {
         StringBuilder sb=new StringBuilder();
-        LOOP:while(getNext() != '"') {
-        	switch(current) {
+//        LOOP:while(getNext() != '"') {
+//	    	switch(current) {
+        LOOP:while(true) {
+        	switch(getNext()) {
+        		case '"':
+                    if(getNext() == '"') {
+                    	sb.append('"');
+                    } else {
+                    	pushBack(current);
+                    	break LOOP;
+                    }
+        			break;
 	        	case ' ':
 	            	sb.append(' ');
 	            	break;
@@ -681,7 +692,42 @@ public class SimulaLexer {
         if(Global.TRACE_SCAN) Util.TRACE("scanSimpleString: Result=\""+result+"\", "+edcurrent());
         tokenQueueAdd("scanTextConstant", new SimpleString(tokenStartLine, sourceText, tokenStartOffset, currentPosition, result));
     }
-
+    private LexToken scanSimpleString() {
+        StringBuilder sb=new StringBuilder();
+//      LOOP:while(getNext() != '"') {
+//	    	switch(current) {
+      LOOP:while(true) {
+      	switch(getNext()) {
+      		case '"':
+                  if(getNext() == '"') {
+                  	sb.append('"');
+                  } else {
+                  	pushBack(current);
+                  	break LOOP;
+                  }
+      			break;
+	        	case ' ':
+	            	sb.append(' ');
+	            	break;
+	        	case '!':
+	                int code=scanPossibleIsoCode();
+	                sb.append((char)code);
+	                break;
+	        	case '\n':
+	                Util.warning("Illegal Text constant. Simple string span mutiple source lines. See Simula Standard 1.6"); 
+	                break LOOP;
+	        	case EOF_MARK:
+	                Util.error("Text constant is not terminated.");
+	                break LOOP;
+              default:
+              	if(! isWhitespace(current)) sb.append((char)current);
+      	}
+      }
+      String result=sb.toString();
+      if(Global.TRACE_SCAN) Util.TRACE("scanSimpleString: Result=\""+result+"\", "+edcurrent());
+      return new SimpleString(tokenStartLine, sourceText, tokenStartOffset, currentPosition, result);
+    }
+    
     //********************************************************************************
     //**	                                                       scanStringSeparator
     //********************************************************************************
@@ -917,7 +963,7 @@ public class SimulaLexer {
     }
     
     private void tokenQueueAdd(String debugString, LexToken token) {
-        IO.println("SimulaLexer.tokenQueueAdd: "+debugString+": "+token);
+//        IO.println("SimulaLexer.tokenQueueAdd: "+debugString+": "+token);
         tokenQueue.add(token);
         tokenStartOffset = currentPosition;
     }
@@ -931,12 +977,11 @@ public class SimulaLexer {
         return(token);    	
     }
     
-//    private void printQueue() {
-//    	for(LexToken token:tokenQueue) {
-//        	IO.println("SimulaLexer.printQueue: token="+token);
-//   		
-//    	}
-//    }
+    private void printQueue() {
+    	for(LexToken token:tokenQueue) {
+        	IO.println("SimulaLexer.printQueue: token="+token);
+    	}
+    }
 
 
 

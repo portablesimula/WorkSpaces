@@ -147,8 +147,6 @@ public interface PsiParse {
 		return null;
 	}
 	
-	// while lift =/= none and then wayup do ; 
-	// b := aaa and then ccc;
 	public static boolean accept_AND_THEN(final PsiBuilder simBuilder) {
 //		IO.println("\nPsiParse.accept_AND_THEN: BEGIN ======================================================================");
 		if(accept(simBuilder, KeyWord.AND_THEN)) {
@@ -179,6 +177,41 @@ public interface PsiParse {
 				return false;
 			}
 			IO.println("PsiParse.accept_AND_ONLY: prv="+prv);
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean accept_OR_ELSE(final PsiBuilder simBuilder) {
+//		IO.println("\nPsiParse.accept_OR_ELSE: BEGIN ======================================================================");
+		if(accept(simBuilder, KeyWord.OR_ELSE)) {
+			IO.println("PsiParse.accept_OR_ELSE: GOT: OR_ELSE");
+			return true;
+		}
+		if(accept(simBuilder, KeyWord.OR)) {
+			LexToken prv = simBuilder.getCurrentLexerToken();
+			IO.println("PsiParse.accept_OR_ELSE: MAYBE OR ELSE prv="+prv);
+			if(accept(simBuilder, KeyWord.ELSE)) {
+				IO.println("PsiParse.accept_OR_ELSE: GOT: OR ELSE prv="+prv);
+				return true;
+			}
+			IO.println("PsiParse.accept_OR_ELSE: FAILED --> ROLLBACK prv="+prv);
+			simBuilder.rollBackTo(prv);
+		}
+		return false;
+	}
+
+	public static boolean accept_OR_ONLY(final PsiBuilder simBuilder) {
+//		IO.println("\nPsiParse.accept_OR_THEN: BEGIN ======================================================================");
+		LexToken prv = simBuilder.getCurrentLexerToken();
+		if(accept(simBuilder, KeyWord.OR)) {
+			IO.println("PsiParse.accept_OR_ONLY: MAYBE OR ELSE prv="+prv);
+			if(accept(simBuilder, KeyWord.ELSE)) {
+				IO.println("PsiParse.accept_OR_ONLY: GOT: OR ELSE prv="+prv);
+				simBuilder.rollBackTo(prv);
+				return false;
+			}
+			IO.println("PsiParse.accept_OR_ONLY: prv="+prv);
 			return true;
 		}
 		return false;

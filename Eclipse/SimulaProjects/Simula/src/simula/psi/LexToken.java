@@ -18,8 +18,8 @@ public class LexToken extends PsiElement {
 		this.sourceText = sourceText;
 		this.startOffset = startOffset;
 		this.endOffset = endOffset;
-//		IO.println("NEW LexToken: "+this);
-//		IO.println("NEW LexToken: "+this+"  CALLED FROM: "+calledFrom(3, 25));
+		IO.println("NEW LexToken: "+this);
+//		IO.println("NEW LexToken: "+this+"  CALLED FROM: " + Util.calledFrom(3, 25));
 //		Thread.dumpStack();
 	}
 

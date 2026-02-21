@@ -235,12 +235,13 @@ public abstract class Statement extends SyntaxClass {
 			default:
 		        Util.IERR("Statement.default: " + KeyWord.edit(simToken.keyWord) + " " + (char)simToken.keyWord);
 		        // Error handling or consuming unknown tokens
-	          System.out.println("\nSimulaParser.parseAssignment: CALL statementMarker.done: ");//+statementMarker);
-	          System.out.println("\nStatement.parseStatement: default " + simToken);
+		        System.out.println("\nSimulaParser.parseAssignment: CALL statementMarker.done: ");//+statementMarker);
+		        System.out.println("\nStatement.parseStatement: default " + simToken);
 	//          statementMarker.error("Statement.parseStatement: default " + simToken);
 	          
 	//          // DETTE MÅ IMPLEMENTERES !!!
 	//	        simBuilder.advanceLexer(); //  (add it to 'blk')
+		        Util.STOP();
 				break;
 		}
 //		if(statement != null)

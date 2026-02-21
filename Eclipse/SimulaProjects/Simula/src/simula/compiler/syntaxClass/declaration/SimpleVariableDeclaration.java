@@ -242,9 +242,12 @@ public class SimpleVariableDeclaration extends Declaration {
 
 	@Override
 	public String toString() {
-		String s = identifier + " Type=" + type;
+//		String s = identifier + " Type=" + type;
+//		if (constantElement != null)
+//			s = s + ", constantElement=" + constantElement.toString();
+		String s = type + " " + identifier;
 		if (constantElement != null)
-			s = s + ", constantElement=" + constantElement.toString();
+			s = s + "=" + constantElement.toString();
 		return (s);
 	}
 

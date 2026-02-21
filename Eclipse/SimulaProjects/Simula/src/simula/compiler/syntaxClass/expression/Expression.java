@@ -21,6 +21,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.token.CharacterConst;
 import simula.token.Identifier;
 import simula.token.IntegerConst;
@@ -95,7 +96,8 @@ public abstract class Expression extends SyntaxClass {
 
 	private static final boolean TEST1 = false;
 	private static final boolean TEST2 = false;
-	private static final boolean TEST3 = true;
+	private static final boolean TEST3 = false;//true;
+	private static final boolean TEST4 = true;
 
 	/// The type
 	public Type type = null;
@@ -393,20 +395,22 @@ public abstract class Expression extends SyntaxClass {
 //		} else return(acceptSimpleExpression());
 //	} 
 	public static Expression acceptExpression(PsiBuilder simBuilder) {
-//		PsiTree exprTree = simBuilder.startSubtree(Expression.class, "Expression");
+		PsiTree exprTree = simBuilder.startSubtree(Expression.class, "Expression");
 //		Util.IERR();
 		if(PsiParse.accept(simBuilder, KeyWord.IF)) {
 			Expression condition=acceptExpression(simBuilder);
-			PsiParse.expect(simBuilder, KeyWord.THEN); Expression thenExpression=acceptSimpleExpression(simBuilder);
-			PsiParse.expect(simBuilder, KeyWord.ELSE); Expression elseExpression=acceptExpression(simBuilder);
+			PsiParse.expect(simBuilder, KeyWord.THEN);
+				PsiTree thenTree = simBuilder.startSubtree(Expression.class, "Expression");
+				Expression thenExpression=acceptSimpleExpression(simBuilder, thenTree);
+			PsiParse.expect(simBuilder, KeyWord.ELSE);
+				Expression elseExpression=acceptExpression(simBuilder);
 			Expression expr=new ConditionalExpression(Type.Boolean,condition,thenExpression,elseExpression);
 			if(Option.internal.TRACE_PARSE) Util.TRACE("Expression: ParseExpression, result="+expr);
 //			if(true) throw new RuntimeException("Expression.acceptExpression: NOT IMPL: "+expr);
-			simBuilder.doneSubtree(expr);
+			simBuilder.doneSubtree(exprTree, expr);
 			return expr;
 		} else {
-			if(TEST3) simBuilder.startSubtree(Expression.class, "acceptExpression");
-			Expression expr= acceptSimpleExpression(simBuilder);
+			Expression expr= acceptSimpleExpression(simBuilder, exprTree);
 			if(expr != null)
 //				 simBuilder.doneSubtree(exprTree, expr);
 				 simBuilder.doneSubtree(expr);
@@ -448,12 +452,14 @@ public abstract class Expression extends SyntaxClass {
 	/// </pre>             
 	///        
 	/// @return Expression or null if no expression is found.
-	private static Expression acceptSimpleExpression(PsiBuilder simBuilder)  {   
+	private static Expression acceptSimpleExpression(PsiBuilder simBuilder, PsiTree exprTree)  {   
 		if(TEST1) simBuilder.startSubtree(Expression.class, "acceptSimpleExpression");
-		Expression expr = acceptANDTHEN(simBuilder);
-		while(PsiParse.accept(simBuilder, KeyWord.OR_ELSE))  {
+		if(TEST4) simBuilder.startSubtree(Expression.class, "acceptSimpleExpression");
+		Expression expr = acceptANDTHEN(simBuilder, exprTree);
+//		while(PsiParse.accept(simBuilder, KeyWord.OR_ELSE))  {
+		while(PsiParse.accept_OR_ELSE(simBuilder)) {
 			if(TEST2) simBuilder.startSubtree(Expression.class, "acceptSimpleExpression");
-			expr=new BooleanExpression(expr,KeyWord.OR_ELSE,acceptANDTHEN(simBuilder));
+			expr=new BooleanExpression(expr,KeyWord.OR_ELSE,acceptANDTHEN(simBuilder, exprTree));
 			if(TEST2) simBuilder.doneSubtree(expr);
 		}
 		if(TEST1) simBuilder.doneSubtree(expr);
@@ -465,13 +471,13 @@ public abstract class Expression extends SyntaxClass {
 	/// BooleanTertiary =  Equivalence  { AND THEN  Equivalence }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptANDTHEN(PsiBuilder simBuilder) {
+	private static Expression acceptANDTHEN(PsiBuilder simBuilder, PsiTree exprTree) {
 		if(TEST1) simBuilder.startSubtree(Expression.class, "acceptANDTHEN");
-		Expression expr = acceptEQV(simBuilder);
+		Expression expr = acceptEQV(simBuilder, exprTree);
 //		while(PsiParse.accept(simBuilder, KeyWord.AND_THEN)) {
 		while(PsiParse.accept_AND_THEN(simBuilder)) {
 			if(TEST2) simBuilder.startSubtree(Expression.class, "acceptANDTHEN");
-			expr=new BooleanExpression(expr,KeyWord.AND_THEN,acceptEQV(simBuilder));
+			expr=new BooleanExpression(expr,KeyWord.AND_THEN,acceptEQV(simBuilder, exprTree));
 			if(TEST2) simBuilder.doneSubtree(expr);
 		}
 		if(TEST1) simBuilder.doneSubtree(expr);
@@ -483,12 +489,12 @@ public abstract class Expression extends SyntaxClass {
 	/// Equivalence  =  Implication  { EQV  Implication }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptEQV(PsiBuilder simBuilder) { 
+	private static Expression acceptEQV(PsiBuilder simBuilder, PsiTree exprTree) { 
 		if(TEST1) simBuilder.startSubtree(Expression.class, "acceptEQV");
-		Expression expr=acceptIMP(simBuilder);
+		Expression expr=acceptIMP(simBuilder, exprTree);
 		while(PsiParse.accept(simBuilder, KeyWord.EQV)) {
 			if(TEST2) simBuilder.startSubtree(Expression.class, "acceptEQV");
-			expr=new BooleanExpression(expr,KeyWord.EQV,acceptIMP(simBuilder));
+			expr=new BooleanExpression(expr,KeyWord.EQV,acceptIMP(simBuilder, exprTree));
 			if(TEST2) simBuilder.doneSubtree(expr);
 		}
 		if(TEST1) simBuilder.doneSubtree(expr);
@@ -500,12 +506,12 @@ public abstract class Expression extends SyntaxClass {
 	/// Implication =  BooleanTerm  { IMP  BooleanTerm }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptIMP(PsiBuilder simBuilder) {
+	private static Expression acceptIMP(PsiBuilder simBuilder, PsiTree exprTree) {
 		if(TEST1) simBuilder.startSubtree(Expression.class, "acceptIMP");
-		Expression expr=acceptOR(simBuilder);
+		Expression expr=acceptOR(simBuilder, exprTree);
 		while(PsiParse.accept(simBuilder, KeyWord.IMP)) {
 			if(TEST2) simBuilder.startSubtree(Expression.class, "acceptIMP");
-			expr=new BooleanExpression(expr,KeyWord.IMP,acceptOR(simBuilder));
+			expr=new BooleanExpression(expr,KeyWord.IMP,acceptOR(simBuilder, exprTree));
 			if(TEST2) simBuilder.doneSubtree(expr);
 		}
 		if(TEST1) simBuilder.doneSubtree(expr);
@@ -517,12 +523,13 @@ public abstract class Expression extends SyntaxClass {
 	/// BooleanTerm  =  BooleanFactor  { OR  BooleanFactor }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptOR(PsiBuilder simBuilder) {
+	private static Expression acceptOR(PsiBuilder simBuilder, PsiTree exprTree) {
 		if(TEST1) simBuilder.startSubtree(Expression.class, "acceptOR");
-		Expression expr=acceptAND(simBuilder);
-		while(PsiParse.accept(simBuilder, KeyWord.OR)) {
+		Expression expr=acceptAND(simBuilder, exprTree);
+//		while(PsiParse.accept(simBuilder, KeyWord.OR)) {
+		while(PsiParse.accept_OR_ONLY(simBuilder)) {
 			if(TEST2) simBuilder.startSubtree(Expression.class, "acceptOR");
-			expr=new BooleanExpression(expr,KeyWord.OR,acceptAND(simBuilder));
+			expr=new BooleanExpression(expr,KeyWord.OR,acceptAND(simBuilder, exprTree));
 			if(TEST2) simBuilder.doneSubtree(expr);
 		}
 		if(TEST1) simBuilder.doneSubtree(expr);
@@ -534,14 +541,14 @@ public abstract class Expression extends SyntaxClass {
 	/// BooleanFactor =  BooleanSecondary  { AND  BooleanSecondary }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptAND(PsiBuilder simBuilder) {
+	private static Expression acceptAND(PsiBuilder simBuilder, PsiTree exprTree) {
 		if(TEST1) simBuilder.startSubtree(Expression.class, "acceptAND");
-		Expression expr=acceptNOT(simBuilder);
+		Expression expr=acceptNOT(simBuilder, exprTree);
 //		while(PsiParse.accept(simBuilder, KeyWord.AND)) {
 		while(PsiParse.accept_AND_ONLY(simBuilder)) {
 			if(TEST2) simBuilder.startSubtree(Expression.class, "acceptAND");
 			IO.println("Expression.acceptAND: ");
-			expr=new BooleanExpression(expr,KeyWord.AND,acceptNOT(simBuilder));
+			expr=new BooleanExpression(expr,KeyWord.AND,acceptNOT(simBuilder, exprTree));
 			if(TEST2) simBuilder.doneSubtree(expr);
 		}
 		if(TEST1) simBuilder.doneSubtree(expr);
@@ -553,14 +560,14 @@ public abstract class Expression extends SyntaxClass {
 	/// BooleanSecondary  =  [ NOT ]  BooleanPrimary
 	/// </pre>
 	/// @return an expression
-	private static Expression  acceptNOT(PsiBuilder simBuilder) {
+	private static Expression  acceptNOT(PsiBuilder simBuilder, PsiTree exprTree) {
 		if(TEST1) simBuilder.startSubtree(Expression.class, "acceptNOT");
 		Expression expr;
 		if(PsiParse.accept(simBuilder, KeyWord.NOT)) {
 			if(TEST2) simBuilder.startSubtree(Expression.class, "acceptNOT");
-			expr=UnaryOperation.create(KeyWord.NOT,acceptTEXTCONC(simBuilder));
+			expr=UnaryOperation.create(KeyWord.NOT,acceptTEXTCONC(simBuilder, exprTree));
 			if(TEST2) simBuilder.doneSubtree(expr);
-		} else expr = acceptTEXTCONC(simBuilder);
+		} else expr = acceptTEXTCONC(simBuilder, exprTree);
 		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
@@ -570,13 +577,13 @@ public abstract class Expression extends SyntaxClass {
 	/// BooleanPrimary  =  TextPrimary  { & TextPrimary }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptTEXTCONC(PsiBuilder simBuilder) {
+	private static Expression acceptTEXTCONC(PsiBuilder simBuilder, PsiTree exprTree) {
 		if(TEST1) simBuilder.startSubtree(Expression.class, "acceptTEXTCONC");
-		Expression expr=acceptRelation(simBuilder);
+		Expression expr=acceptRelation(simBuilder, exprTree);
 //		while(PsiParse.accept(simBuilder, KeyWord.CONC)) {
 		while(PsiParse.accept(simBuilder, KeyWord.AMPERSAND)) {
 			if(TEST2) simBuilder.startSubtree(Expression.class, "acceptTEXTCONC");
-			expr=new TextExpression(expr,acceptRelation(simBuilder));
+			expr=new TextExpression(expr,acceptRelation(simBuilder, exprTree));
 			if(TEST2) simBuilder.doneSubtree(expr);
 		}
 		if(TEST1) simBuilder.doneSubtree(expr);
@@ -589,14 +596,14 @@ public abstract class Expression extends SyntaxClass {
 	///    RelationOperator  =  <  |  <=  |  =  |  >=  |  >  |  <> |  ==  |  =/=
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptRelation(PsiBuilder simBuilder) {   // Metode-form      
+	private static Expression acceptRelation(PsiBuilder simBuilder, PsiTree exprTree) {   // Metode-form      
 		if(TEST1) simBuilder.startSubtree(Expression.class, "acceptRelation");
-		Expression expr = acceptAdditiveOperation(simBuilder);
+		Expression expr = acceptAdditiveOperation(simBuilder, exprTree);
 		LexToken prevToken = null;
 		if((prevToken = PsiParse.acceptRelationalOperator(simBuilder)) != null)   { 
 			int opr = prevToken.keyWord;
 			if(TEST2) simBuilder.startSubtree(Expression.class, "acceptRelation");
-			expr = new RelationalOperation(expr,opr,acceptAdditiveOperation(simBuilder));
+			expr = new RelationalOperation(expr,opr,acceptAdditiveOperation(simBuilder, exprTree));
 			if(TEST2) simBuilder.doneSubtree(expr);
 		}
 		if(TEST1) simBuilder.doneSubtree(expr);
@@ -608,16 +615,26 @@ public abstract class Expression extends SyntaxClass {
 	/// SimpleArithmeticExpression  =  UnaryTerm  {  ( + | - )  Term }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptAdditiveOperation(PsiBuilder simBuilder) {
+	private static Expression acceptAdditiveOperation(PsiBuilder simBuilder, PsiTree exprTree) {
 		if(TEST1) simBuilder.startSubtree(Expression.class, "acceptAdditiveOperation");
-		Expression expr=acceptUNIMULDIV(simBuilder);
+		Expression expr=acceptUNIMULDIV(simBuilder, exprTree);
 		LexToken accepted = null;
 		while( (accepted = PsiParse.acceptParserToken(simBuilder, KeyWord.PLUS,KeyWord.MINUS)) != null) { 
 			int opr=accepted.keyWord;
-			if(TEST2) simBuilder.startSubtree(Expression.class, "acceptAdditiveOperation");
-			expr=ArithmeticExpression.create(expr,opr,acceptMULDIV(simBuilder));
-			if(TEST2) simBuilder.doneSubtree(expr);
+			if(TEST4) {
+				expr=ArithmeticExpression.create(expr,opr,acceptMULDIV(simBuilder, exprTree));
+				simBuilder.doneSubtree(exprTree, expr);
+				IO.println("Expression.acceptAdditiveOperation: DONE: " + expr);
+				exprTree = simBuilder.startSubtree(Expression.class, "NextExpression");
+			} else
+			expr=ArithmeticExpression.create(expr,opr,acceptMULDIV(simBuilder, exprTree));
 		}
+		if(TEST4) {
+//			simBuilder.dropSubtree(exprTree); // ???? SKAL DENNE VÆRE MED ???
+			Util.IERR("Rett alle de andre tilsvarende som denne med TEST4. Fjern TEST1, TEST2 og TEST3 og rydd !!!");
+			Util.STOP();
+		}
+
 		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
@@ -627,19 +644,19 @@ public abstract class Expression extends SyntaxClass {
 	/// UnaryTerm  =  [ + | - ]  Term
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptUNIMULDIV(PsiBuilder simBuilder) {
+	private static Expression acceptUNIMULDIV(PsiBuilder simBuilder, PsiTree exprTree) {
 		if(TEST1) simBuilder.startSubtree(Expression.class, "acceptUNIMULDIV");
 		Expression expr;
 		LexToken prevToken = null;
 		if((prevToken = PsiParse.acceptParserToken(simBuilder, KeyWord.PLUS,KeyWord.MINUS)) != null) {
 			int opr=prevToken.keyWord;
-			if(opr==KeyWord.PLUS) expr=acceptMULDIV(simBuilder);
+			if(opr==KeyWord.PLUS) expr=acceptMULDIV(simBuilder, exprTree);
 			else {
 				if(TEST2) simBuilder.startSubtree(Expression.class, "acceptUNIMULDIV");
-				expr=UnaryOperation.create(opr,acceptMULDIV(simBuilder));
+				expr=UnaryOperation.create(opr,acceptMULDIV(simBuilder, exprTree));
 				if(TEST2) simBuilder.doneSubtree(expr);
 			}
-		} else expr = acceptMULDIV(simBuilder);
+		} else expr = acceptMULDIV(simBuilder, exprTree);
 		if(TEST1) simBuilder.doneSubtree(expr);
 		return(expr);
 	}
@@ -649,15 +666,15 @@ public abstract class Expression extends SyntaxClass {
 	/// Term  =  Factor  {  ( * | / | // )  Factor }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptMULDIV(PsiBuilder simBuilder) {
+	private static Expression acceptMULDIV(PsiBuilder simBuilder, PsiTree exprTree) {
 		if(TEST1) simBuilder.startSubtree(Expression.class, "acceptMULDIV");
 		simBuilder.startSubtree(Expression.class, "acceptMULDIV");
-		Expression expr=acceptEXPON(simBuilder);
+		Expression expr=acceptEXPON(simBuilder, exprTree);
 		LexToken accepted = null;
 		while((accepted = PsiParse.acceptParserToken(simBuilder, KeyWord.MUL,KeyWord.DIV,KeyWord.INTDIV)) != null) {
 			int opr = accepted.keyWord;
 			if(TEST2) simBuilder.startSubtree(Expression.class, "acceptMULDIV");
-			expr = ArithmeticExpression.create(expr,opr,acceptEXPON(simBuilder));
+			expr = ArithmeticExpression.create(expr,opr,acceptEXPON(simBuilder, exprTree));
 			if(TEST2) simBuilder.doneSubtree(expr);
 		}
 		if(TEST1) simBuilder.doneSubtree(expr);
@@ -669,12 +686,12 @@ public abstract class Expression extends SyntaxClass {
 	/// Factor  =  BasicExpression  { **  BasicExpression }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptEXPON(PsiBuilder simBuilder) {
+	private static Expression acceptEXPON(PsiBuilder simBuilder, PsiTree exprTree) {
 		if(TEST1) simBuilder.startSubtree(Expression.class, "acceptEXPON");
-		Expression expr=acceptBASICEXPR(simBuilder);
+		Expression expr=acceptBASICEXPR(simBuilder, exprTree);
 		while(PsiParse.accept(simBuilder, KeyWord.EXP)) {
 			if(TEST2) simBuilder.startSubtree(Expression.class, "acceptEXPON");
-			expr = ArithmeticExpression.create(expr,KeyWord.EXP,acceptBASICEXPR(simBuilder));
+			expr = ArithmeticExpression.create(expr,KeyWord.EXP,acceptBASICEXPR(simBuilder, exprTree));
 			if(TEST2) simBuilder.doneSubtree(expr);
 		}
 		if(TEST1) simBuilder.doneSubtree(expr);
@@ -700,7 +717,7 @@ public abstract class Expression extends SyntaxClass {
 	/// 		SubscriptedVariable  =  Identifier  "("  Expression  {  ,  Expression  }  ")"
 	/// </pre>
 	/// @return Expression or null if no expression is found.
-	private static Expression acceptBASICEXPR(PsiBuilder simBuilder) {
+	private static Expression acceptBASICEXPR(PsiBuilder simBuilder, PsiTree exprTree) {
 		// Dette er vel kanskje det samme som “primary”?
 		// Merk: Alt som kan stå foran et postfix (DOT, IS, IN og QUA) må være et BASICEXPR
 		if(Option.internal.TRACE_PARSE) PsiParse.TRACE("Expression: acceptExpression");
