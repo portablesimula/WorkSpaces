@@ -1,7 +1,9 @@
 package simula.psi;
 
 import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.token.SimpleString;
 
@@ -32,73 +34,105 @@ public class PsiBuilder {
     	return lexer.getSourceLineNumber();
     }
 
-	public PsiTree startSubtree(Class<?> clazz, String debugName) {
-
-		getParserToken(); // Skiped LexTokens into current psiTree.
-//        IO.println("PsiBuilder.startSubtree: ============================ startSubtree: " + debugName + ", parent =" + ((psiTree == null)?"null":psiTree.parent));
+	public int startSubtree(Class<?> clazz, String debugName) {
+		getParserToken(); // Get next Parser Token while skipped LexTokens are added to current psiTree.
 		psiTree = new PsiTree(clazz, debugName, psiTree);
 		psiTree.parent.addChild(psiTree);
-//		IO.println("   ".repeat(psiTree.level())+"PsiBuilder.startSubtree("+psiTree.level()+"): "+debugName+" CALLED FROM: "+Util.calledFrom(3,6));
-//        IO.println("PsiBuilder.startSubtree: ============================ startSubtree: " + psiTree.debugName + ", parent =" + ((psiTree == null)?"null":psiTree.parent));
-//        psiRoot.printTree("============================ startSubtree: " + psiTree.debugName + " ROOT " + psiRoot.debugName);
-		return psiTree;
+		if(Option.TRACE_PSITREE_START_DONE > 0) {
+			IO.println("   ".repeat(psiTree.level())+"PsiBuilder.startSubtree("+psiTree.level()+"): "+debugName+" CALLED FROM: "+Util.calledFrom(3,6));
+//	        IO.println("PsiBuilder.startSubtree: ============================ startSubtree: " + psiTree.debugName + ", parent =" + ((psiTree == null)?"null":psiTree.parent));
+//	        psiRoot.printTree("============================ startSubtree: " + psiTree.debugName + " ROOT " + psiRoot.debugName);
+		}
+		return psiTree.level();
 	}
 	
-	public void doneSubtree(PsiTree psiTree, SyntaxClass element) {
-		if(psiTree != this.psiTree) {
-			IO.println("\nPsiBuilder.doneSubtree("+psiTree.level()+"): Wrong matching PsiTree. ");
-			IO.println("PsiBuilder.doneSubtree: Curr-Tree: " + psiTree);
-			IO.println("PsiBuilder.doneSubtree: Expecting: " + this.psiTree);
-			int level1 = psiTree.level();
-			int level2 = this.psiTree.level();
-			PsiTree curr = this.psiTree;
-			while(level1++ < level2) {
-				IO.println("PsiBuilder.doneSubtree: PsiTree NOT TERMINATED: " + curr);
-				curr = curr.parent;
-			}
-//			Util.IERR("PsiBuilder.doneSubtree: Wrong matching PsiTree - Got " + psiTree.clazz.getSimpleName() + " while expecting " + this.psiTree.clazz.getSimpleName());
-			Util.IERR("PsiBuilder.doneSubtree: Wrong matching PsiTree - Current " + this.psiTree.debugName + " while expecting " + psiTree.debugName);
-//			Util.STOP();
-		}
+	public void doneSubtree(SyntaxClass element, int psiTreeLevel, String debugName) {
+		checkLevelAndDebugName(psiTreeLevel, debugName);
 		doneSubtree(element);
 	}
 	
-//	public void doneDeclaration(SyntaxClass element) {
-//		if(! (element instanceof Declaration)) Util.IERR("");
-//		doneSubtree(element);
-//	}
+	private void checkLevelAndDebugName(int psiTreeLevel, String debugName) {
+		if(psiTreeLevel != this.psiTree.level() || !debugName.equals(this.psiTree.debugName)) {
+			System.err.println("\nPsiBuilder.doneSubtree("+psiTree.level()+"): Wrong matching PsiTree. ");
+//			IO.println("PsiBuilder.doneSubtree: Curr-Tree: " + psiTreeLevel);
+//			IO.println("PsiBuilder.doneSubtree: Expecting: " + this.psiTree);
+			int level1 = psiTreeLevel;
+			int level2 = this.psiTree.level();
+			PsiTree curr = this.psiTree;
+			while(level1++ < level2) {
+				System.err.println("PsiBuilder.doneSubtree: PsiTree NOT TERMINATED: " + curr);
+				dropSubtree();
+				curr = curr.parent;
+			}
+//			Util.IERR("PsiBuilder.doneSubtree: Wrong matching PsiTree - Current "
+//					+ this.psiTree.debugName + " on level " + this.psiTree.level()
+//					+ " while expecting " + debugName + " on level " + psiTreeLevel);
+			Util.IERR("PsiBuilder.doneSubtree: Wrong matching PsiTree: DONE SubTree " + debugName + " on level " + psiTreeLevel
+					+ " while current top psiTree is " + this.psiTree.debugName + " on level " + this.psiTree.level());
+//			Util.STOP();
+		}
+	}
 	
 	public void doneSubtree(SyntaxClass element) {
-//		IO.println("   ".repeat(psiTree.level())+"PsiBuilder.doneSubtree("+psiTree.level()+"): "+psiTree.debugName+" CALLED FROM: "+Util.calledFrom(3,6));
-//		if(! (element instanceof psiTree.clazz)) Util.IERR("");
-//		if(! (psiTree.in(element.getClass()))) Util.IERR("");
-		psiTree.checkLegalClass(element.getClass());
-//        psiTree.debugName = element.getClass().getSimpleName();
+		this.psiTree.checkLEVELS();
+		if(psiTree.isEmpty()) {
+			IO.println("PsiBuilder.doneSubtree: TREE IS EMPTY: " + element);
+//			Util.IERR("PsiBuilder.doneSubtree: TREE IS EMPTY: " + element);
+//			Util.STOP();
+			dropSubtree();
+			return;
+		}
+		if(Option.TRACE_PSITREE_START_DONE > 0) {
+			IO.println("   ".repeat(psiTree.level())+"PsiBuilder.doneSubtree("+psiTree.level()+"): "
+					+psiTree.debugName+" "+element.getClass().getSimpleName()+"="+element+", CALLED FROM: "+Util.calledFrom(3,6));
+		}
         psiTree.debugName = psiTree.debugName + " ==> " + element.getClass().getSimpleName();
         element.psiTree = psiTree;
         psiTree.syntaxClass = element;
-//        psiTree.printPsiTree("============================ doneSubtree: " + psiTree.debugName);
-//        psiRoot.printPsiTree("============================ doneSubtree: ROOT " + psiRoot.debugName);
-        
+		if(Option.TRACE_PSITREE_START_DONE > 1) {
+	        psiTree.printPsiTree("============================ doneSubtree: " + psiTree.debugName);
+	        psiRoot.printPsiTree("============================ doneSubtree: ROOT " + psiRoot.debugName);
+		}        
         psiTree = psiTree.parent;
+	}
+	
+	public void doneAndStartSubtree1(SyntaxClass element, Class<?> clazz, String debugName) {
+//		doneSubtree(element);
+//		startSubtree(clazz, debugName+"-1");
+	}
+	
+	public void doneAndStartSubtree2(SyntaxClass element, Class<?> clazz, String debugName) {
+//		if(this.psiTree.isEmpty())
+//			 dropSubtree();
+//		else
+			doneSubtree(element);
+		startSubtree(clazz, debugName+"-2");
 	}
 
 	
-	
-	public void dropSubtree(PsiTree psiTree) {
-		if(psiTree != this.psiTree) Util.IERR("");
+//	public void dropSubtree(int psiTreeLevel) {
+//		if(psiTreeLevel != this.psiTree.level()) Util.IERR("");
+	public void dropSubtree(int psiTreeLevel, String debugName) {
+		checkLevelAndDebugName(psiTreeLevel, debugName);
 		dropSubtree();
 	}
 	
 	public void dropSubtree() {
-		IO.println("   ".repeat(psiTree.level())+"PsiBuilder.dropSubtree("+psiTree.level()+"): "+psiTree.debugName+" CALLED FROM: "+Util.calledFrom(3,6));
-//		IO.println("============================================= DROP SUB-TREE ====================================================================");
-//		psiTree.printPsiTree("============================ dropSubtree: " + psiTree.debugName);
+		this.psiTree.checkLEVELS();
+		if(Option.TRACE_PSITREE_START_DONE > 0) {
+			if(psiTree.level() == 5) IO.println("\n");
+			IO.println("   ".repeat(psiTree.level())+"PsiBuilder.dropSubtree("+psiTree.level()+"): "+psiTree.debugName+" CALLED FROM: "+Util.calledFrom(3,6));
+//			IO.println("============================================= DROP SUB-TREE ====================================================================");
+//			psiTree.printPsiTree("============================ dropSubtree: " + psiTree.debugName);
+			psiRoot.printPsiTree("============================ dropSubtree: ROOT TREE BEFORE DROP TREE " + psiRoot.debugName);
+		}
 		psiTree.parent.removeLastChild();
 		psiTree.parent.addTree(psiTree);
         psiTree = psiTree.parent;
-//		psiRoot.printPsiTree("============================ dropSubtree: ROOT " + psiRoot.debugName);
-//		Util.IERR("PsiBuilder.dropSubtree: NOT IMPL");
+		if(Option.TRACE_PSITREE_START_DONE > 0) {
+			psiRoot.printPsiTree("============================ dropSubtree: RESULTING ROOT TREE " + psiRoot.debugName);
+//			Util.IERR("PsiBuilder.dropSubtree: NOT IMPL");
+		}
 	}
 	
 	public void advanceLexer() {
@@ -180,9 +214,9 @@ public class PsiBuilder {
 	/// Return 'Parser' token. Skip Comment, Whitespace and Newline tokens.
     public LexToken getParserToken() {
     	LexToken token = getParserToken1();
-//    	System.out.println("SimulaLexer.getParserToken: RETURN TOKEN: "+token);
+//    	IO.println("SimulaLexer.getParserToken: RETURN TOKEN: "+token);
     	if(token instanceof SimpleString) {
-        	System.out.println("SimulaLexer.getParserToken: GOT SIMPLE STRING: "+token);
+        	IO.println("SimulaLexer.getParserToken: GOT SIMPLE STRING: "+token);
         	int tokenStartLine = token.getLineNumber();
         	int tokenStartOffset = token.startOffset;
     		String result = "";
@@ -191,10 +225,10 @@ public class PsiBuilder {
         		result += str.value;
 				PsiParse.nextToken(this);
         		token = getParserToken1();
-            	System.out.println("SimulaLexer.getParserToken: WHILE SIMPLE STRING: "+result);
-            	System.out.println("SimulaLexer.getParserToken: WHILE NEXT TOKEN: "+token);
+            	IO.println("SimulaLexer.getParserToken: WHILE SIMPLE STRING: "+result);
+            	IO.println("SimulaLexer.getParserToken: WHILE NEXT TOKEN: "+token);
         	}
-        	System.out.println("SimulaLexer.getParserToken: RETURN TEXT: "+result);
+        	IO.println("SimulaLexer.getParserToken: RETURN TEXT: "+result);
         	int currentPosition = token.endOffset;
         	CharSequence sourceText = token.sourceText;
             token = new SimpleString(tokenStartLine, sourceText, tokenStartOffset, currentPosition, result);
@@ -205,24 +239,24 @@ public class PsiBuilder {
     }
     
     private LexToken getParserToken1() {
-    	// if(DEBUG > 1) System.out.println("SimulaLexer.getParserToken: "+currentLexerToken);
+    	// if(DEBUG > 1) IO.println("SimulaLexer.getParserToken: "+currentLexerToken);
         while(true) {
     		LexToken token = lexer.getCurrentLexerToken();
-//        	System.out.println("SimulaLexer.getParserToken: "+token);
+//        	IO.println("SimulaLexer.getParserToken: "+token);
     		if(token == null) {
 //    			public LexToken(int tokenStartLine, CharSequence sourceText, int startOffset, int endOffset, int keyWord) {
     			token = lexer.getEOFToken();
 //    			return null;
     		}
-//        	System.out.println("PsiBuilder.getParserToken: "+token);
+//        	IO.println("PsiBuilder.getParserToken: "+token);
         	if(token.keyWord == KeyWord.NEWLINE);          // Skip
         	else if(token.keyWord == KeyWord.WHITESPACES); // Skip
         	else if(token.keyWord == KeyWord.COMMENT);     // Skip
         	else {
-//            	System.out.println("SimulaLexer.getParserToken: RETURN TOKEN: "+token);
+//            	IO.println("SimulaLexer.getParserToken: RETURN TOKEN: "+token);
         		return token;
         	}
-//        	System.out.println("SimulaLexer.getParserToken: SKIP TOKEN: "+token);
+//        	IO.println("SimulaLexer.getParserToken: SKIP TOKEN: "+token);
         	advanceLexer();
 		}
     }

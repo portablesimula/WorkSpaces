@@ -49,19 +49,19 @@ public final class WhileStatement extends Statement {
 
 	/// Create a new WhileStatement.
 	/// @param line the source line number
-	WhileStatement(int line) {
-		super(line);
-		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse WhileStatement: line="+line+", current=" + Parse.currentToken);
-		condition = Expression.expectExpression();
-		Parse.expect(KeyWord.DO);
-		doStatement = Statement.expectStatement();
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber()+": WhileStatement: "+this);
-	}
+//	WhileStatement(int line) {
+//		super(line);
+//		if (Option.internal.TRACE_PARSE)
+//			Util.TRACE("Parse WhileStatement: line="+line+", current=" + Parse.currentToken);
+//		condition = Expression.expectExpression();
+//		Parse.expect(KeyWord.DO);
+//		doStatement = Statement.expectStatement();
+//		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber()+": WhileStatement: "+this);
+//	}
 
 	WhileStatement(final PsiBuilder simBuilder, final int line) {
 		super(line);
-		PsiTree whileTree = simBuilder.startSubtree(WhileStatement.class, "WhileStatement");
+		int whileTree = simBuilder.startSubtree(WhileStatement.class, "WhileStatement");
 		simBuilder.consume(KeyWord.WHILE); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
@@ -70,7 +70,7 @@ public final class WhileStatement extends Statement {
 		PsiParse.expect(simBuilder, KeyWord.DO);
 		doStatement = Statement.acceptStatement(simBuilder);
 		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber()+": WhileStatement: "+this);
-		simBuilder.doneSubtree(whileTree, this);
+		simBuilder.doneSubtree(this, whileTree, "WhileStatement");
 	}
 
 	@Override

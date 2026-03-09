@@ -1,6 +1,7 @@
 package simula.psi;
 
 import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.Option;
 
 public class LexToken extends PsiElement {
 	public int keyWord;
@@ -18,7 +19,7 @@ public class LexToken extends PsiElement {
 		this.sourceText = sourceText;
 		this.startOffset = startOffset;
 		this.endOffset = endOffset;
-		IO.println("NEW LexToken: "+this);
+		if(Option.TRACE_NEW_LEXTOKEN >0) IO.println("NEW LexToken: "+this);
 //		IO.println("NEW LexToken: "+this+"  CALLED FROM: " + Util.calledFrom(3, 25));
 //		Thread.dumpStack();
 	}

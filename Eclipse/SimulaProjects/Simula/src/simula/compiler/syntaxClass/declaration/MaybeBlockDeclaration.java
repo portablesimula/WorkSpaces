@@ -144,8 +144,11 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse MayBeBlock");
 		
-		PsiTree blkTree = simBuilder.startSubtree(BlockStatement.class, "MaybeBlockDeclaration-"+(SEQU++));
-//		simBuilder.advanceLexer(); // consume BEGIN (add it to 'current tree')
+		String debugName = "MaybeBlockDeclaration-"+(SEQU++);
+		int blkTree = simBuilder.startSubtree(BlockStatement.class, debugName);
+		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("BlockStatement expectMaybeBlock: BEGIN " + debugName + " Level: " + blkTree);
+
+		//		simBuilder.advanceLexer(); // consume BEGIN (add it to 'current tree')
 		simBuilder.consume(KeyWord.BEGIN); // (add it to 'current tree')
 
 //		while (Declaration.acceptDeclaration(simBuilder, this))
@@ -170,7 +173,9 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		this.lastLineNumber = Global.sourceLineNumber;
 		BlockStatement block = new BlockStatement(this);
 		
-		simBuilder.doneSubtree(blkTree, block);
+		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("BlockStatement expectMaybeBlock: ENDOF " + debugName + " Level: " + blkTree + "  " + block);
+		simBuilder.doneSubtree(block, blkTree, debugName);
+//		simBuilder.doneSubtree(block);
 		
 		Global.setScope(declaredIn);
 		return (block);

@@ -11,9 +11,11 @@ import java.lang.classfile.CodeBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 
 /// Dummy Statement.
 /// 
@@ -34,9 +36,24 @@ public final class DummyStatement extends Statement {
 	
 	/// Create a new DummyStatement.
 	/// @param line the source line number
-	DummyStatement(final int line) {
+	private DummyStatement(final int line) {
 		super(line);
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": DummyStatement: "+this);
+	}
+
+	public static DummyStatement ofExplicit(final PsiBuilder simBuilder, final int line) {
+		 int inrTree = simBuilder.startSubtree(InnerStatement.class, "DummyStatement");
+		 simBuilder.consume(KeyWord.SEMICOLON); //  (add it to 'current tree')
+		 DummyStatement dummyStatement = new DummyStatement(line);		
+		 simBuilder.doneSubtree(dummyStatement, inrTree, "DummyStatement");
+		 return dummyStatement;
+	}
+
+	public static DummyStatement ofImplicit(final PsiBuilder simBuilder, final int line) {
+		 int inrTree = simBuilder.startSubtree(InnerStatement.class, "DummyStatement");
+		 DummyStatement dummyStatement = new DummyStatement(line);		
+		 simBuilder.doneSubtree(dummyStatement, inrTree, "DummyStatement");
+		 return dummyStatement;
 	}
 
 	@Override

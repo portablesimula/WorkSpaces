@@ -71,8 +71,17 @@ public final class Util {
 		int n = Math.min(elt.length, endIndex);
 		String sep ="";
 		for(int i=startIndex;i<n;i++) {
-			String className = elt[i].getMethodName();
-			sb.append(sep).append(className); sep=",";
+			String methodName = elt[i].getMethodName();
+//			String className = elt[i].getClassName();
+			String fileName = elt[i].getFileName();
+			String className = fileName.replace(".java", "");
+			int line = elt[i].getLineNumber();
+			
+			String ref = "(" + fileName + ':' + line + ')';
+			
+//			sb.append(sep).append(className).append('.').append(methodName).append("[line ").append(line).append(']').append(elt[i]); sep=",  ";
+			sb.append(sep).append(className).append('.').append(methodName).append(ref); sep=",  ";
+//			sb.append(sep).append(elt[i]); sep=",";
 		}
 		return sb.toString();
 	}
@@ -119,7 +128,7 @@ public final class Util {
 	/// @param msg the message
 	/// @param e any Throwable
 	public static void IERR(final String msg,final Throwable e) {
-		String err = edLINE(": Internal error - " + msg +"  "+ e);
+		String err = edLINE(": Internal error - " + msg +"\nCaused by:");
 		nError++;
 		printError(err);
 		e.printStackTrace();

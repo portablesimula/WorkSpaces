@@ -215,16 +215,16 @@ public final class ProgramModule extends Statement {
 	}
 
 
-	/// Parse Simula Program by expecting a Statement.
-	/// @return the Program Statement.
-	private DeclarationScope doParseProgram() {
-		BlockDeclaration mainBlock = new MaybeBlockDeclaration(Global.sourceName);
-		mainBlock.isMainModule = true;
-		mainBlock.declarationKind = ObjectKind.SimulaProgram;
-		Statement program = Statement.expectStatement();
-		mainBlock.statements.add(program);
-		return mainBlock;
-	}
+//	/// Parse Simula Program by expecting a Statement.
+//	/// @return the Program Statement.
+//	private DeclarationScope doParseProgram() {
+//		BlockDeclaration mainBlock = new MaybeBlockDeclaration(Global.sourceName);
+//		mainBlock.isMainModule = true;
+//		mainBlock.declarationKind = ObjectKind.SimulaProgram;
+//		Statement program = Statement.expectStatement();
+//		mainBlock.statements.add(program);
+//		return mainBlock;
+//	}
 
 	@Override
 	public void doChecking() {

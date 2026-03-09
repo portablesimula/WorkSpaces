@@ -60,20 +60,32 @@ public final class StandaloneExpression extends Statement {
 
 	StandaloneExpression(final PsiBuilder simBuilder, final int line,final Expression expression) {
 		super(line);
-		PsiTree stalonTree = simBuilder.startSubtree(StandaloneExpression.class, "StandaloneExpression");
+//		int stalonTree = simBuilder.startSubtree(StandaloneExpression.class, "StandaloneExpression");
+		
+		IO.println("\nNEW StandaloneExpression: expr="+expression);
+		simBuilder.printPSI("NEW StandaloneExpression: expr="+expression);
+
 		this.expression = expression;
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": StandaloneExpression: "+this);
-		IO.println("Line "+lineNumber()+": StandaloneExpression: "+this+"   "+simBuilder.getCurrentLexerToken());
+		if (Option.internal.TRACE_PARSE) {
+			Util.TRACE("Line "+lineNumber()+": StandaloneExpression: "+this);
+			IO.println("Line "+lineNumber()+": StandaloneExpression: "+this+"   "+simBuilder.getCurrentLexerToken());
+		}
 		LexToken prevToken = null;
-		PsiTree asgTree = simBuilder.startSubtree(AssignmentOperation.class, "First'AssignmentOperation");
+//		PsiTree asgTree = simBuilder.startSubtree(AssignmentOperation.class, "First'AssignmentOperation");
 		while ((prevToken = PsiParse.acceptParserToken(simBuilder, KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF)) != null) { 
 			IO.println("NEW StandaloneExpression: prevToken="+prevToken);
+			int asgTree = simBuilder.startSubtree(AssignmentOperation.class, "AssignmentOperation");
 			this.expression = new AssignmentOperation(this.expression, prevToken.keyWord, expectStandaloneExpression(simBuilder));
-			simBuilder.doneSubtree(this);
-			asgTree = simBuilder.startSubtree(AssignmentOperation.class, "Next'AssignmentOperation");
+			simBuilder.doneSubtree(this, asgTree, "AssignmentOperation");
+//			simBuilder.doneSubtree(this);
+//			simBuilder.startSubtree(AssignmentOperation.class, "Next'AssignmentOperation");
 		}		
-		simBuilder.dropSubtree(asgTree);
-		simBuilder.doneSubtree(stalonTree, this);
+//		simBuilder.dropSubtree();
+//		simBuilder.doneSubtree(this, stalonTree, "StandaloneExpression");
+		
+		IO.println("\nEND NEW StandaloneExpression: expr="+expression);
+		simBuilder.printPSI("END NEW StandaloneExpression: expr="+expression);
+
 	}
 
 	/// Parse a standalone expression.

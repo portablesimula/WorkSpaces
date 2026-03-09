@@ -125,63 +125,63 @@ public final class ConnectionStatement extends Statement {
 	/// 
 	/// Pre-Condition: INSPECT  is already read.
 	/// @param line the source line number
-	ConnectionStatement(final int line) {
-		super(line);
-		if (Option.internal.TRACE_PARSE)
-			Parse.TRACE("Parse ConnectionStatement");
-		objectExpression = Expression.expectExpression();
-		objectExpression.backLink = this;
-		String ident = "_inspect_" + lineNumber() + '_' + (SEQUX++);
-		inspectedVariable = new VariableExpression(ident);
-		DeclarationScope scope = Global.getCurrentScope();
-		inspectVariableDeclaration = new InspectVariableDeclaration(Type.Ref("RTObject"), ident, scope, this);
-		
-		LOOP: while (scope instanceof ConnectionBlock
-				|| (scope instanceof MaybeBlockDeclaration && scope.declarationList.size() == 0 )) {
-			if(scope instanceof BlockDeclaration blk && blk.isMainModule) break LOOP;
-			DeclarationScope declaredIn = scope.declaredIn;
-			scope = declaredIn;
-		}
-			
-//		IO.println("NEW ConnectionStatement: add inspectVariableDeclaration to "+scope);
-		scope.declarationList.add(inspectVariableDeclaration);
-		inspectVariableDeclaration.declaredIn = scope;
-
-		boolean hasDoPart=false;
-		boolean hasWhenPart=false;
-		if (Parse.accept(KeyWord.DO)) {
-			hasDoPart = true;
-			ConnectionBlock connectionBlock = new ConnectionBlock(inspectedVariable, null);
-			DeclarationScope prevScope = Global.getCurrentScope();
-			Global.setScope(connectionBlock);
-			Statement statement = Statement.expectStatement();
-			Global.setScope(prevScope);
-			
-			connectionPart.add(new ConnectionDoPart(this,connectionBlock, statement));
-			connectionBlock.end();
-		} else {
-			while (Parse.accept(KeyWord.WHEN)) {
-				String classIdentifier = Parse.expectIdentifier();
-				Parse.expect(KeyWord.DO);
-				ConnectionBlock connectionBlock = new ConnectionBlock(inspectedVariable, classIdentifier);
-				hasWhenPart = true;
-				Statement statement = Statement.expectStatement();
-				connectionPart.add(new ConnectionWhenPart(this,classIdentifier, connectionBlock, statement));
-				connectionBlock.end();
-			}
-		}
-		if(!(hasDoPart | hasWhenPart)) Util.error("Incomplete Inspect statement: "+objectExpression);
-		Statement otherwise = null;
-		if (Parse.accept(KeyWord.OTHERWISE)) otherwise = Statement.expectStatement();
-		this.otherwise=otherwise;
-		this.hasWhenPart=hasWhenPart;
-		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line "+this.lineNumber()+": ConnectionStatement: "+this);
-	}
+//	ConnectionStatement(final int line) {
+//		super(line);
+//		if (Option.internal.TRACE_PARSE)
+//			Parse.TRACE("Parse ConnectionStatement");
+//		objectExpression = Expression.expectExpression();
+//		objectExpression.backLink = this;
+//		String ident = "_inspect_" + lineNumber() + '_' + (SEQUX++);
+//		inspectedVariable = new VariableExpression(ident);
+//		DeclarationScope scope = Global.getCurrentScope();
+//		inspectVariableDeclaration = new InspectVariableDeclaration(Type.Ref("RTObject"), ident, scope, this);
+//		
+//		LOOP: while (scope instanceof ConnectionBlock
+//				|| (scope instanceof MaybeBlockDeclaration && scope.declarationList.size() == 0 )) {
+//			if(scope instanceof BlockDeclaration blk && blk.isMainModule) break LOOP;
+//			DeclarationScope declaredIn = scope.declaredIn;
+//			scope = declaredIn;
+//		}
+//			
+////		IO.println("NEW ConnectionStatement: add inspectVariableDeclaration to "+scope);
+//		scope.declarationList.add(inspectVariableDeclaration);
+//		inspectVariableDeclaration.declaredIn = scope;
+//
+//		boolean hasDoPart=false;
+//		boolean hasWhenPart=false;
+//		if (Parse.accept(KeyWord.DO)) {
+//			hasDoPart = true;
+//			ConnectionBlock connectionBlock = new ConnectionBlock(inspectedVariable, null);
+//			DeclarationScope prevScope = Global.getCurrentScope();
+//			Global.setScope(connectionBlock);
+//			Statement statement = Statement.expectStatement();
+//			Global.setScope(prevScope);
+//			
+//			connectionPart.add(new ConnectionDoPart(this,connectionBlock, statement));
+//			connectionBlock.end();
+//		} else {
+//			while (Parse.accept(KeyWord.WHEN)) {
+//				String classIdentifier = Parse.expectIdentifier();
+//				Parse.expect(KeyWord.DO);
+//				ConnectionBlock connectionBlock = new ConnectionBlock(inspectedVariable, classIdentifier);
+//				hasWhenPart = true;
+//				Statement statement = Statement.expectStatement();
+//				connectionPart.add(new ConnectionWhenPart(this,classIdentifier, connectionBlock, statement));
+//				connectionBlock.end();
+//			}
+//		}
+//		if(!(hasDoPart | hasWhenPart)) Util.error("Incomplete Inspect statement: "+objectExpression);
+//		Statement otherwise = null;
+//		if (Parse.accept(KeyWord.OTHERWISE)) otherwise = Statement.expectStatement();
+//		this.otherwise=otherwise;
+//		this.hasWhenPart=hasWhenPart;
+//		if (Option.internal.TRACE_PARSE)
+//			Util.TRACE("Line "+this.lineNumber()+": ConnectionStatement: "+this);
+//	}
 
 	ConnectionStatement(final PsiBuilder simBuilder, final int line) {
 		super(line);
-		PsiTree inspectTree = simBuilder.startSubtree(ConnectionStatement.class, "ConnectionStatement");
+		int inspectTree = simBuilder.startSubtree(ConnectionStatement.class, "ConnectionStatement");
 		simBuilder.consume(KeyWord.INSPECT); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
@@ -200,7 +200,7 @@ public final class ConnectionStatement extends Statement {
 			scope = declaredIn;
 		}
 			
-//		System.out.println("NEW ConnectionStatement: add inspectVariableDeclaration to "+scope);
+//		IO.println("NEW ConnectionStatement: add inspectVariableDeclaration to "+scope);
 		scope.declarationList.add(inspectVariableDeclaration);
 		inspectVariableDeclaration.declaredIn = scope;
 
@@ -234,7 +234,7 @@ public final class ConnectionStatement extends Statement {
 		this.hasWhenPart=hasWhenPart;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Line "+this.lineNumber()+": ConnectionStatement: "+this);
-		simBuilder.doneSubtree(inspectTree, this);
+		simBuilder.doneSubtree(this, inspectTree, "ConnectionStatement");
 	}
 
 	@Override

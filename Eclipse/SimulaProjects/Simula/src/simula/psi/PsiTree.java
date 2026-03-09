@@ -1,5 +1,9 @@
 package simula.psi;
 
+import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Util;
+
 import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -13,59 +17,77 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import simula.compiler.syntaxClass.SyntaxClass;
-import simula.compiler.syntaxClass.declaration.Declaration;
-import simula.compiler.syntaxClass.expression.Expression;
-import simula.compiler.syntaxClass.statement.Statement;
-import simula.compiler.utilities.Global;
-import simula.compiler.utilities.Util;
-
 //Base class for composite nodes (branching nodes)
 public class PsiTree extends PsiElement {
-	public Class<?> clazz; // Expected syntax Class
+	private int LEVEL;
+//	public Class<?> clazz; // Expected syntax Class
 	public SyntaxClass syntaxClass;
 	protected final List<PsiElement> children = new ArrayList<>();
 //	private String error;
 	
 	public PsiTree(Class<?> clazz, String debugName, PsiTree parent) {
 		super(debugName);
-		this.clazz = clazz;
+//		this.clazz = clazz;
 		this.parent = parent;
+		this.LEVEL = (parent == null)? 1 : parent.LEVEL + 1;
+		checkLEVELS(this.LEVEL);
 	}
 	
 	public int level() {
-		if(parent == null) return 1;
-		return(parent.level() +1);
+//		if(parent == null) return 1;
+//		return(parent.level() +1);
+		return LEVEL;
 	}
 	
-	public boolean isDeclarationTree() {
-		return clazz == Declaration.class;
+	public void checkLEVELS() {
+		checkLEVELS(this.LEVEL);
 	}
 	
-	public boolean isExpressionTree() {
-		return clazz == Expression.class;
-	}
-	
-	public boolean isStatementTree() {
-		return clazz == Statement.class;
-	}
-	
-	public boolean is(Class<?> clazz) {
-		return this.clazz == clazz;
-	}
-	
-	public boolean in(Class<?> clazz) {
-		return this.clazz.isAssignableFrom(clazz);
-//		return clazz.isAssignableFrom(this.clazz);
-	}
-	
-	public void checkLegalClass(Class<?> clazz) {
-		if(this.clazz != clazz) {
-//			if(this.clazz.isAssignableFrom(clazz))
-			if(clazz.isAssignableFrom(this.clazz))
-				Util.IERR("The class " + clazz.getSimpleName() + " is not an instance of " + this.clazz.getSimpleName());
+	public void checkLEVELS(int expected) {
+		if(this.level() != expected) {
+			Util.IERR("PsiTree.checkLEVELS: FAILED !!!");
+			Util.STOP();
+		}
+//		else IO.println("PsiTree.checkLEVELS: Level " + LEVEL + ": " + this.debugName + " OK");
+		
+		if(parent != null) {
+			parent.checkLEVELS(level() - 1);
 		}
 	}
+	
+//	public boolean isDeclarationTree() {
+//		return clazz == Declaration.class;
+//	}
+//	
+//	public boolean isExpressionTree() {
+//		return clazz == Expression.class;
+//	}
+//	
+//	public boolean isStatementTree() {
+//		return clazz == Statement.class;
+//	}
+//	
+//	public boolean is(Class<?> clazz) {
+//		return this.clazz == clazz;
+//	}
+//	
+//	public boolean in(Class<?> clazz) {
+//		return this.clazz.isAssignableFrom(clazz);
+////		return clazz.isAssignableFrom(this.clazz);
+//	}
+//	
+//	public static void checkLegalClass(PsiTree psiTree, Class<?> clazz) {
+//		try {
+//			if(psiTree.clazz != clazz) {
+////				if(this.clazz.isAssignableFrom(clazz))
+//				if(clazz.isAssignableFrom(psiTree.clazz))
+//					Util.IERR("The class " + clazz.getSimpleName() + " is not an instance of " + psiTree.clazz.getSimpleName());
+//			}
+//		} catch (Exception e) {
+//			Util.IERR("The 'checkLegalClass' FAILED: psiTree=" + psiTree
+//					+ "\n" + " ".repeat(56)  + "clazz=" + clazz, e);						
+//		}
+//	}
 
 	public void addChild(PsiElement child) {
 //		if (child instanceof BasePsiElement) {
@@ -298,14 +320,16 @@ public class PsiTree extends PsiElement {
 	}
 
     public void printPsiTree(String title) {
-    	IO.println("====== PrintTree: " + title + " ======");
+    	IO.println("====== BEGIN - PrintTree: " + title + " ======");
     	printPsiTree(this, 1);
+    	IO.println("====== ENDOF - PrintTree: " + title + " ======");
     }
 
     private static void printPsiTree(PsiElement element, int depth) {
     	int line = element.getLineNumber();
+    	String level = (element instanceof PsiTree psiTree)? (": Level "+psiTree.level()) : "";
     	String text = element.getText().replace("\r", "\\r").replace("\n", "\\n");
-    	System.out.println("  ".repeat(depth) + "Line " + line + ": " + element.getClass().getSimpleName() + "("+element.debugName+"): [" + text + "]");
+    	IO.println("  ".repeat(depth) + "Line " + line + level + ": " + element.getClass().getSimpleName() + "("+element.debugName+"): [" + text + "]");
         if(element instanceof PsiTree subTree) {
 	        for (PsiElement child : subTree.getChildren()) {
 	            printPsiTree(child, depth + 1);

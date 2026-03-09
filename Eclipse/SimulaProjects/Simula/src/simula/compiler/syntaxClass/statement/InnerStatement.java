@@ -51,17 +51,17 @@ public final class InnerStatement extends Statement {
 	}
 
 	public static InnerStatement ofExplicit(final PsiBuilder simBuilder) {
-		 PsiTree inrTree = simBuilder.startSubtree(InnerStatement.class, "InnerStatement");
+		 int inrTree = simBuilder.startSubtree(InnerStatement.class, "InnerStatement");
 		 simBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
 		 InnerStatement innerStatement = new InnerStatement(simBuilder);		
-		 simBuilder.doneSubtree(inrTree, innerStatement);
+		 simBuilder.doneSubtree(innerStatement, inrTree, "InnerStatement");
 		 return innerStatement;
 	}
 
 	public static InnerStatement ofImplicit(final PsiBuilder simBuilder) {
-		 PsiTree inrTree = simBuilder.startSubtree(InnerStatement.class, "InnerStatement");
+		 int inrTree = simBuilder.startSubtree(InnerStatement.class, "InnerStatement");
 		 InnerStatement innerStatement = new InnerStatement(simBuilder);		
-		 simBuilder.doneSubtree(inrTree, innerStatement);
+		 simBuilder.doneSubtree(innerStatement, inrTree, "InnerStatement");
 		 return innerStatement;
 	}
 		

@@ -144,7 +144,7 @@ public final class SwitchStatement extends Statement {
 	SwitchStatement(final PsiBuilder simBuilder, final int line) {
 		super(line);
 
-		PsiTree swtTree = simBuilder.startSubtree(SwitchStatement.class, "SwitchStatement");
+		int swtTree = simBuilder.startSubtree(SwitchStatement.class, "SwitchStatement");
 		simBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);
@@ -175,7 +175,7 @@ public final class SwitchStatement extends Statement {
 		}
 		PsiParse.expect(simBuilder, KeyWord.END);
 		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber()+": SwitchStatement: "+this);
-		simBuilder.doneSubtree(swtTree, this);
+		simBuilder.doneSubtree(this, swtTree, "SwitchStatement");
 	}
 
 	/// Parse Utility: Expect case pair.

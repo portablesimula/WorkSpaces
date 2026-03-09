@@ -65,91 +65,92 @@ public abstract class Statement extends SyntaxClass {
 		OLD_lineNumber=line;
 	}
 
-	/// Parse a statement.
-	/// @return the statement
-	public static Statement expectStatement() {
-		ObjectList<LabelDeclaration> labels = null;
-		int lineNumber=Parse.currentToken.lineNumber;
-		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Statement.doParse: LabeledStatement: lineNumber="+lineNumber+", current=" + Parse.currentToken	+ ", prev=" + Parse.prevToken);
-		String ident = Parse.acceptIdentifier();
-		while (Parse.accept(KeyWord.COLON)) {
-			if (ident != null) {
-				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
-				LabelDeclaration label = new LabelDeclaration(ident);
-				labels.add(label);
-				DeclarationScope scope = Global.getCurrentScope();
-				if(scope.labelList == null) scope.labelList = new LabelList(scope); 
-				scope.labelList.add(label);
-			} else Util.error("Missplaced ':'");
-			ident = Parse.acceptIdentifier();
-		}
-		if(ident!=null) Parse.saveCurrentToken(); // Not Label: Pushback
-		Statement statement = expectUnlabeledStatement();
-		if (labels != null && statement != null)
-			statement = new LabeledStatement(lineNumber,labels, statement);
-		return (statement);
-	}
-
-	/// Parse Utility: Expect an unlabeled statement.
-	/// @return the resulting statement
-	private static Statement expectUnlabeledStatement() {
-		int lineNumber=Parse.currentToken.lineNumber;
-		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Statement.doUnlabeledStatement: lineNumber="+lineNumber+", current=" + Parse.currentToken	+ ", prev=" + Parse.prevToken);
-		switch(Parse.currentToken.getKeyWord()) {
-		    case KeyWord.BEGIN: Parse.nextToken(); return (new MaybeBlockDeclaration(null).expectMaybeBlock(lineNumber));
-		    case KeyWord.IF:    Parse.nextToken(); return (new ConditionalStatement(lineNumber));
-		    case KeyWord.GOTO:  Parse.nextToken(); return (new GotoStatement(lineNumber));
-		    case KeyWord.GO:    Parse.nextToken(); 
-				        if (!Parse.accept(KeyWord.TO))	Util.error("Missing 'TO' after 'GO'");
-				        return (new GotoStatement(lineNumber));
-		    case KeyWord.FOR:        Parse.nextToken(); return (new ForStatement(lineNumber));
-		    case KeyWord.WHILE:      Parse.nextToken(); return (new WhileStatement(lineNumber));
-		    case KeyWord.INSPECT:    Parse.nextToken(); return (new ConnectionStatement(lineNumber));
-		    case KeyWord.SWITCH:	 if(Option.EXTENSIONS) {
-		    							 Parse.nextToken(); return (new SwitchStatement(lineNumber));
-		    						 } break;
-		    case KeyWord.ACTIVATE:   Parse.nextToken(); return (new ActivationStatement(lineNumber));
-		    case KeyWord.REACTIVATE: Parse.nextToken(); return (new ActivationStatement(lineNumber));
-		    case KeyWord.INNER:      Parse.nextToken(); return (new InnerStatement(lineNumber));
-		    case KeyWord.SEMICOLON:  Parse.nextToken(); return (new DummyStatement(lineNumber)); // Dummy Statement
-		    case KeyWord.END:        return (new DummyStatement(lineNumber)); // Dummy Statement, keep END
-		    case KeyWord.EOF:    	 return (new DummyStatement(lineNumber)); // Dummy Statement, keep EOF
-		
-		    case KeyWord.IDENTIFIER: case KeyWord.NEW: case KeyWord.THIS: case KeyWord.BEGPAR:
-		         Expression expr = Expression.acceptExpression();
-		         if(expr!=null) {
-		        	 if(expr instanceof VariableExpression var) {
-		        		 if (Parse.accept(KeyWord.BEGIN))
-		        			 return new BlockStatement(PrefixedBlockDeclaration.expectPrefixedBlock(var,false));
-		        	 }
-		        	 return (new StandaloneExpression(lineNumber,expr));
-		         }
-		}
-    	Parse.skipMisplacedCurrentSymbol();
-    	return(new DummyStatement(lineNumber));
-	}
+//	/// Parse a statement.
+//	/// @return the statement
+//	public static Statement expectStatement() {
+//		ObjectList<LabelDeclaration> labels = null;
+//		int lineNumber=Parse.currentToken.lineNumber;
+//		if (Option.internal.TRACE_PARSE)
+//			Util.TRACE("Statement.doParse: LabeledStatement: lineNumber="+lineNumber+", current=" + Parse.currentToken	+ ", prev=" + Parse.prevToken);
+//		String ident = Parse.acceptIdentifier();
+//		while (Parse.accept(KeyWord.COLON)) {
+//			if (ident != null) {
+//				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
+//				LabelDeclaration label = new LabelDeclaration(ident);
+//				labels.add(label);
+//				DeclarationScope scope = Global.getCurrentScope();
+//				if(scope.labelList == null) scope.labelList = new LabelList(scope); 
+//				scope.labelList.add(label);
+//			} else Util.error("Missplaced ':'");
+//			ident = Parse.acceptIdentifier();
+//		}
+//		if(ident!=null) Parse.saveCurrentToken(); // Not Label: Pushback
+//		Statement statement = expectUnlabeledStatement();
+//		if (labels != null && statement != null)
+//			statement = new LabeledStatement(lineNumber,labels, statement);
+//		return (statement);
+//	}
+//
+//	/// Parse Utility: Expect an unlabeled statement.
+//	/// @return the resulting statement
+//	private static Statement expectUnlabeledStatement() {
+//		int lineNumber=Parse.currentToken.lineNumber;
+//		if (Option.internal.TRACE_PARSE)
+//			Util.TRACE("Statement.doUnlabeledStatement: lineNumber="+lineNumber+", current=" + Parse.currentToken	+ ", prev=" + Parse.prevToken);
+//		switch(Parse.currentToken.getKeyWord()) {
+//		    case KeyWord.BEGIN: Parse.nextToken(); return (new MaybeBlockDeclaration(null).expectMaybeBlock(lineNumber));
+//		    case KeyWord.IF:    Parse.nextToken(); return (new ConditionalStatement(lineNumber));
+//		    case KeyWord.GOTO:  Parse.nextToken(); return (new GotoStatement(lineNumber));
+//		    case KeyWord.GO:    Parse.nextToken(); 
+//				        if (!Parse.accept(KeyWord.TO))	Util.error("Missing 'TO' after 'GO'");
+//				        return (new GotoStatement(lineNumber));
+//		    case KeyWord.FOR:        Parse.nextToken(); return (new ForStatement(lineNumber));
+//		    case KeyWord.WHILE:      Parse.nextToken(); return (new WhileStatement(lineNumber));
+//		    case KeyWord.INSPECT:    Parse.nextToken(); return (new ConnectionStatement(lineNumber));
+//		    case KeyWord.SWITCH:	 if(Option.EXTENSIONS) {
+//		    							 Parse.nextToken(); return (new SwitchStatement(lineNumber));
+//		    						 } break;
+//		    case KeyWord.ACTIVATE:   Parse.nextToken(); return (new ActivationStatement(lineNumber));
+//		    case KeyWord.REACTIVATE: Parse.nextToken(); return (new ActivationStatement(lineNumber));
+//		    case KeyWord.INNER:      Parse.nextToken(); return (new InnerStatement(lineNumber));
+//		    case KeyWord.SEMICOLON:  Parse.nextToken(); return (new DummyStatement(lineNumber)); // Dummy Statement
+//		    case KeyWord.END:        return (new DummyStatement(lineNumber)); // Dummy Statement, keep END
+//		    case KeyWord.EOF:    	 return (new DummyStatement(lineNumber)); // Dummy Statement, keep EOF
+//		
+//		    case KeyWord.IDENTIFIER: case KeyWord.NEW: case KeyWord.THIS: case KeyWord.BEGPAR:
+//		         Expression expr = Expression.acceptExpression();
+//		         if(expr!=null) {
+//		        	 if(expr instanceof VariableExpression var) {
+//		        		 if (Parse.accept(KeyWord.BEGIN))
+//		        			 return new BlockStatement(PrefixedBlockDeclaration.expectPrefixedBlock(var,false));
+//		        	 }
+//		        	 return (new StandaloneExpression(lineNumber,expr));
+//		         }
+//		}
+//    	Parse.skipMisplacedCurrentSymbol();
+//    	return(new DummyStatement(lineNumber));
+//	}
 
 
 	private static int SEQU = 1;
 	/// Parse a statement.
 	/// @return the statement
 	public static Statement acceptStatement(PsiBuilder simBuilder) {
-		PsiTree stmTree = simBuilder.startSubtree(Statement.class, "Statement-"+(SEQU++));
-		IO.println("Statement.acceptStatement: stmTree="+stmTree.debugName);
+		String debugName = "Statement-"+(SEQU++);
+		int stmTree = simBuilder.startSubtree(Statement.class, debugName);
+		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("Statement.acceptStatement: BEGIN Level: " + stmTree);
 		
 		ObjectList<LabelDeclaration> labels = null;
 		int lineNumber=PsiParse.getParserToken(simBuilder).lineNumber;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Statement.acceptStatement: LabeledStatement: lineNumber="+lineNumber+", current=" + PsiParse.getParserToken(simBuilder));//	+ ", prev=" + PsiParse.prevToken);
 		String ident = PsiParse.acceptIdentifier(simBuilder);
-		PsiTree labTree = simBuilder.startSubtree(LabelDeclaration.class, "LabelDeclaration");
+		int labTree = simBuilder.startSubtree(LabelDeclaration.class, "LabelDeclaration");
 		while (PsiParse.accept(simBuilder, KeyWord.COLON)) {
 			if (ident != null) {
 				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
 				LabelDeclaration label = new LabelDeclaration(ident);
-				simBuilder.doneSubtree(labTree, label);
+				simBuilder.doneSubtree(label, labTree, "LabelDeclaration");
 				labTree = simBuilder.startSubtree(LabelDeclaration.class, "LabelDeclaration");
 				labels.add(label);
 				DeclarationScope scope = Global.getCurrentScope();
@@ -158,9 +159,9 @@ public abstract class Statement extends SyntaxClass {
 			} else Util.error("Missplaced ':'");
 			ident = PsiParse.acceptIdentifier(simBuilder);
 		}
-		simBuilder.dropSubtree(labTree);
+		simBuilder.dropSubtree(labTree, "LabelDeclaration");
 		if(ident!=null) {
-			IO.println("\n\nStatement.acceptStatement: NOT LABEL ==> ROLL BACK: "+ident);
+			if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("\n\nStatement.acceptStatement: NOT LABEL ==> ROLL BACK: "+ident);
 			PsiParse.rollBack(simBuilder); // Not Label: rollBack
 		}
 		Statement statement = acceptUnlabeledStatement(simBuilder);
@@ -168,18 +169,20 @@ public abstract class Statement extends SyntaxClass {
 			Util.IERR("RETT OPP MHT PsiTree");
 			statement = new LabeledStatement(lineNumber,labels, statement);
 		}
-		IO.println("Statement.acceptStatement END: stmTree="+stmTree.debugName);
+		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("Statement.acceptStatement ENDOF Level: "+stmTree + ", statement="+statement);
+		simBuilder.printPSI("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
 //		simBuilder.doneSubtree(stmTree, statement);
-		if(statement != null)
-			 simBuilder.doneSubtree(stmTree, statement);
-		else simBuilder.dropSubtree();
+//		if(statement != null)
+//			 simBuilder.doneSubtree(statement, stmTree, debugName);
+//		else simBuilder.dropSubtree();
 		return (statement);
 	}
 
+	/// Invariant: All Statement handlers starts with 'startSubtree' and ends with 'doneSubtree'.
 	private static Statement acceptUnlabeledStatement(PsiBuilder simBuilder) {
 //		LexToken simToken = getSimToken(simBuilder);
 		LexToken simToken = PsiParse.getParserToken(simBuilder);
-		IO.println("\nStatement.acceptUnlabeledStatement: "+simToken);
+		if(Option.TRACE_ACCEPT_STATEMENT > 1) IO.println("\nStatement.acceptUnlabeledStatement: "+simToken);
 		int lineNumber = simToken.lineNumber;
 		Statement statement = null;
 		int keyWord = simToken.keyWord;
@@ -191,7 +194,7 @@ public abstract class Statement extends SyntaxClass {
 		switch(keyWord) {
 			case KeyWord.BEGIN:
 				// case KeyWord.BEGIN: PsiParse.nextToken(); return (new MaybeBlockDeclaration(null).expectMaybeBlock(lineNumber));
-				System.out.println("\nStatement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
+				if(Option.TRACE_ACCEPT_STATEMENT > 1) IO.println("\nStatement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
 				MaybeBlockDeclaration block = new MaybeBlockDeclaration(null);
 				block.expectMaybeBlock(simBuilder, lineNumber);
 				statement = new BlockStatement(block); break;
@@ -208,18 +211,37 @@ public abstract class Statement extends SyntaxClass {
 		    case KeyWord.ACTIVATE,
 		         KeyWord.REACTIVATE: statement = new ActivationStatement(simBuilder, lineNumber); break;
 //		    case KeyWord.INNER:		 statement = new InnerStatement(simBuilder, false, lineNumber);
-		    case KeyWord.INNER:		 statement = InnerStatement.ofExplicit(simBuilder);
-		    case KeyWord.SEMICOLON:	 statement = new DummyStatement(lineNumber); simBuilder.consume(KeyWord.SEMICOLON); break;
-		    case KeyWord.END:		 statement = new DummyStatement(lineNumber); // Dummy Statement, keep END
-		    case KeyWord.EOF:		 statement = new DummyStatement(lineNumber); // Dummy Statement, keep EOF
+		    case KeyWord.INNER:		 statement = InnerStatement.ofExplicit(simBuilder); break;
+		    case KeyWord.SEMICOLON:	 statement = DummyStatement.ofExplicit(simBuilder, lineNumber); break;
+		    case KeyWord.END:	  // statement = DummyStatement.ofImplicit(simBuilder, lineNumber); break; // Dummy Statement, keep END
+		    case KeyWord.EOF:		 statement = DummyStatement.ofImplicit(simBuilder, lineNumber); break; // Dummy Statement, keep EOF
 
-			case KeyWord.IDENTIFIER, KeyWord.NEW, KeyWord.THIS, KeyWord.BEGPAR:
-				System.out.println("\nStatement.acceptUnlabeledStatement: IDENTIFIER");
+//			case KeyWord.IDENTIFIER, KeyWord.NEW, KeyWord.THIS, KeyWord.BEGPAR:
+			case KeyWord.NEW, KeyWord.THIS, KeyWord.BEGPAR:
+				// new classIdentifier ...
+				// this classIdentifier ...
+				// BEGPAR ????
+				Util.IERR("DETTE MÅ SKRIVES");
+				Util.STOP();
+				break;
+			case KeyWord.IDENTIFIER:
+				if(Option.TRACE_ACCEPT_STATEMENT > 2) {
+					IO.println("\nStatement.acceptUnlabeledStatement: IDENTIFIER");
+					simBuilder.printPSI("Statement.acceptUnlabeledStatement: IDENTIFIER");
+				}
+				
 				Expression expr = Expression.acceptExpression(simBuilder);
-				System.out.println("\nStatement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr);
+				IO.println("\n\nStatement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr+" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
+				
+				if(Option.TRACE_ACCEPT_STATEMENT > 2) {
+					IO.println("\nStatement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr);
+					expr.psiTree.printPsiTree("Statement.acceptUnlabeledStatement: IDENTIFIER");
+					simBuilder.printPSI("Statement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr);
+				}
+				
 				if(expr!=null) {
 					if(expr instanceof VariableExpression var) {
-						System.out.println("Statement.acceptUnlabeledStatement: GOT VariableExpression: "+var);
+						if(Option.TRACE_ACCEPT_STATEMENT > 1) IO.println("Statement.acceptUnlabeledStatement: GOT VariableExpression: "+var);
 						if (PsiParse.accept(simBuilder, KeyWord.BEGIN)) {
 //							Util.IERR("Statement.acceptUnlabeledStatement: PREFIXED BLOCK: NOT IMPL");
 	      					//return new BlockStatement(PrefixedBlockDeclaration.expectPrefixedBlock(var,false));
@@ -235,8 +257,8 @@ public abstract class Statement extends SyntaxClass {
 			default:
 		        Util.IERR("Statement.default: " + KeyWord.edit(simToken.keyWord) + " " + (char)simToken.keyWord);
 		        // Error handling or consuming unknown tokens
-		        System.out.println("\nSimulaParser.parseAssignment: CALL statementMarker.done: ");//+statementMarker);
-		        System.out.println("\nStatement.parseStatement: default " + simToken);
+		        IO.println("\nSimulaParser.parseAssignment: CALL statementMarker.done: ");//+statementMarker);
+		        IO.println("\nStatement.parseStatement: default " + simToken);
 	//          statementMarker.error("Statement.parseStatement: default " + simToken);
 	          
 	//          // DETTE MÅ IMPLEMENTERES !!!

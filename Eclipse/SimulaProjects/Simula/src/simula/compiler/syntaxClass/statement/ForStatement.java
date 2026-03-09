@@ -157,31 +157,31 @@ public final class ForStatement extends Statement {
 
 	/// Create a new ForStatement.
 	/// @param line the source line number
-	ForStatement(final int line) {
-		super(line);
-		if (Option.internal.TRACE_PARSE)
-			Parse.TRACE("Parse ForStatement");
-		controlVariable = new VariableExpression(Parse.expectIdentifier());
-		if (!Parse.accept(KeyWord.ASSIGNVALUE))
-			Parse.expect(KeyWord.ASSIGNREF);
-		assignmentOperator = Parse.prevToken.getKeyWord();
-		do {
-			forList.add(expectForListElement());
-		} while (Parse.accept(KeyWord.COMMA));
-		Parse.expect(KeyWord.DO);
-		Statement doStatement = Statement.expectStatement();
-		if (doStatement == null) {
-			Util.error("No statement following DO in For statement");
-			doStatement = new DummyStatement(line);
-		}
-		this.doStatement = doStatement;
-		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line " + this.lineNumber() + ": ForStatement: " + this);
-	}
+//	ForStatement(final int line) {
+//		super(line);
+//		if (Option.internal.TRACE_PARSE)
+//			Parse.TRACE("Parse ForStatement");
+//		controlVariable = new VariableExpression(Parse.expectIdentifier());
+//		if (!Parse.accept(KeyWord.ASSIGNVALUE))
+//			Parse.expect(KeyWord.ASSIGNREF);
+//		assignmentOperator = Parse.prevToken.getKeyWord();
+//		do {
+//			forList.add(expectForListElement());
+//		} while (Parse.accept(KeyWord.COMMA));
+//		Parse.expect(KeyWord.DO);
+//		Statement doStatement = Statement.expectStatement();
+//		if (doStatement == null) {
+//			Util.error("No statement following DO in For statement");
+//			doStatement = new DummyStatement(line);
+//		}
+//		this.doStatement = doStatement;
+//		if (Option.internal.TRACE_PARSE)
+//			Util.TRACE("Line " + this.lineNumber() + ": ForStatement: " + this);
+//	}
 
 	ForStatement(final PsiBuilder simBuilder, final int line) {
 		super(line);
-		PsiTree forTree = simBuilder.startSubtree(ForStatement.class, "ForStatement");
+		int forTree = simBuilder.startSubtree(ForStatement.class, "ForStatement");
 		simBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
@@ -198,12 +198,12 @@ public final class ForStatement extends Statement {
 		Statement doStatement = Statement.acceptStatement(simBuilder);
 		if (doStatement == null) {
 			Util.error("No statement following DO in For statement");
-			doStatement = new DummyStatement(line);
+			doStatement = DummyStatement.ofImplicit(simBuilder, line);
 		}
 		this.doStatement = doStatement;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Line " + this.lineNumber() + ": ForStatement: " + this);
-		simBuilder.doneSubtree(forTree, this);
+		simBuilder.doneSubtree(this, forTree, "ForStatement");
 	}
 
 	/// Parse a for-list element.

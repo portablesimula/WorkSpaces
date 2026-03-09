@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.token.CharacterConst;
 import simula.token.Identifier;
@@ -95,7 +96,7 @@ public class SimulaLexer {
 	}
 
 	public void rollBackToBefore(LexToken prev) {
-		IO.println("SimulaLexer.rollBackToBefore: "+prev+", currentPosition="+currentPosition);
+		if(Option.TRACE_NEW_LEXTOKEN > 0) IO.println("SimulaLexer.rollBackToBefore: "+prev+", currentPosition="+currentPosition);
 //		Thread.dumpStack();
 		currentPosition = prev.startOffset;
 		nextLineNumber = prev.lineNumber;

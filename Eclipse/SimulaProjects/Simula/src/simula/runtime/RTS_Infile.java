@@ -255,7 +255,7 @@ public class RTS_Infile extends RTS_Imagefile {
 				} catch (Exception e) {
 					IO.println("RTS_Infile.readLine: got: " + e);
 			    	String line = prompt("Sorry - Sysin.inimage is Unavailable.", "Enter Input here:");
-			    	System.out.println("You entered: " + line);
+			    	IO.println("You entered: " + line);
 			    	return line;
 				}
 			} else {
@@ -299,13 +299,13 @@ public class RTS_Infile extends RTS_Imagefile {
         String result = null;
 
         try {
-//            System.out.println("Please enter input within " + timeout + " seconds:");
+//            IO.println("Please enter input within " + timeout + " seconds:");
             result = future.get(timeout, unit); // Wait with a timeout
         } catch (TimeoutException e) {
-            System.out.println("\nTimeout occurred. No input received within the time limit.");
+            IO.println("\nTimeout occurred. No input received within the time limit.");
             future.cancel(true); // Cancel the running task
         } catch (InterruptedException | ExecutionException e) {
-            System.out.println("An error occurred while reading input.");
+            IO.println("An error occurred while reading input.");
             e.printStackTrace();
         } finally {
             executor.shutdownNow(); // Always shut down the executor

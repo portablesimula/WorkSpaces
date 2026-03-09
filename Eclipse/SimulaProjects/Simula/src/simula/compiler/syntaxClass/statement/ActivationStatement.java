@@ -102,30 +102,30 @@ public final class ActivationStatement extends Statement {
 
 	/// Create a new ActivationStatement.
 	/// @param line the source line number
-	ActivationStatement(final int line) {
-		super(line);
-		Token activator = Parse.prevToken;
-		REAC = activator.getKeyWord() == KeyWord.REACTIVATE;
-		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse ActivationStatement");
-		object1 = Expression.expectExpression();
-		object1.backLink = this;
-		code = ActivationCode.direct;
-		if (Parse.accept(KeyWord.AT) || Parse.accept(KeyWord.DELAY)) {
-			code = (Parse.prevToken.getKeyWord() == KeyWord.AT) ? ActivationCode.at : ActivationCode.delay;
-			time = Expression.expectExpression();
-			time.backLink = this;
-			if (Parse.accept(KeyWord.PRIOR)) prior = true;
-		} else if (Parse.accept(KeyWord.BEFORE) || Parse.accept(KeyWord.AFTER)) {
-			code = (Parse.prevToken.getKeyWord() == KeyWord.BEFORE) ? ActivationCode.before : ActivationCode.after;
-			object2 = Expression.expectExpression();
-			object2.backLink = this;
-		}
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": ActivationStatement: "+this);
-	}
+//	ActivationStatement(final int line) {
+//		super(line);
+//		Token activator = Parse.prevToken;
+//		REAC = activator.getKeyWord() == KeyWord.REACTIVATE;
+//		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse ActivationStatement");
+//		object1 = Expression.expectExpression();
+//		object1.backLink = this;
+//		code = ActivationCode.direct;
+//		if (Parse.accept(KeyWord.AT) || Parse.accept(KeyWord.DELAY)) {
+//			code = (Parse.prevToken.getKeyWord() == KeyWord.AT) ? ActivationCode.at : ActivationCode.delay;
+//			time = Expression.expectExpression();
+//			time.backLink = this;
+//			if (Parse.accept(KeyWord.PRIOR)) prior = true;
+//		} else if (Parse.accept(KeyWord.BEFORE) || Parse.accept(KeyWord.AFTER)) {
+//			code = (Parse.prevToken.getKeyWord() == KeyWord.BEFORE) ? ActivationCode.before : ActivationCode.after;
+//			object2 = Expression.expectExpression();
+//			object2.backLink = this;
+//		}
+//		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": ActivationStatement: "+this);
+//	}
 
 	ActivationStatement(final PsiBuilder simBuilder, final int line) {
 		super(line);
-		PsiTree actTree = simBuilder.startSubtree(ActivationStatement.class, "ActivationStatement");
+		int actTree = simBuilder.startSubtree(ActivationStatement.class, "ActivationStatement");
 		LexToken activator = PsiParse.getParserToken(simBuilder);
 		REAC = activator.keyWord == KeyWord.REACTIVATE;
 		simBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to 'current tree')
@@ -148,7 +148,7 @@ public final class ActivationStatement extends Statement {
 			object2.backLink = this;
 		}
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": ActivationStatement: "+this);
-		simBuilder.doneSubtree(actTree, this);
+		simBuilder.doneSubtree(this, actTree, "ActivationStatement");
 	}
 
 	@Override
