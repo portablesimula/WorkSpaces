@@ -175,40 +175,40 @@ public final class ArrayDeclaration extends Declaration {
 		} while (Parse.accept(KeyWord.COMMA));
 	}
 
-	static void expectArrayDeclaration(final PsiBuilder simBuilder, final Type type, final DeclarationList declarationList) {
+	static void expectArrayDeclaration(final PsiBuilder psiBuilder, final Type type, final DeclarationList declarationList) {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ArrayDeclaration, type=" + type + ", current=" + PsiParse.getParserToken(simBuilder));
+			Util.TRACE("Parse ArrayDeclaration, type=" + type + ", current=" + PsiParse.getParserToken(psiBuilder));
 		do {
 			if (Option.internal.TRACE_PARSE)
 				PsiParse.TRACE("Parse ArraySegment");
 			// IdentifierList = Identifier { , Identifier }
 			Vector<String> identList = new Vector<String>();
 			do {
-				identList.add(PsiParse.expectIdentifier(simBuilder));
-			} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
-			PsiParse.expect(simBuilder, KeyWord.BEGPAR);
-			simBuilder.setParsingBoundPairList(true);
+				identList.add(PsiParse.expectIdentifier(psiBuilder));
+			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
+			PsiParse.expect(psiBuilder, KeyWord.BEGPAR);
+			psiBuilder.setParsingBoundPairList(true);
 			// BoundPairList = BoundPair { , BoundPair }
 			if (Option.internal.TRACE_PARSE)
 				PsiParse.TRACE("Parse BoundPairList");
 			Vector<BoundPair> boundPairList = new Vector<BoundPair>();
 			do {
-				Expression LB = Expression.expectExpression(simBuilder);
-				PsiParse.expect(simBuilder, KeyWord.COLON);
-				Expression UB = Expression.expectExpression(simBuilder);
+				Expression LB = Expression.expectExpression(psiBuilder);
+				PsiParse.expect(psiBuilder, KeyWord.COLON);
+				Expression UB = Expression.expectExpression(psiBuilder);
 				boundPairList.add(new BoundPair(LB, UB));
-			} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
-			PsiParse.expect(simBuilder, KeyWord.ENDPAR);
-			simBuilder.setParsingBoundPairList(false);
+			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
+			PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
+			psiBuilder.setParsingBoundPairList(false);
 			for (Enumeration<String> e = identList.elements(); e.hasMoreElements();) {
 				String identifier = e.nextElement();
 				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(identifier.toString(), type, boundPairList);
 				declarationList.add(arrayDeclaration);
-				simBuilder.doneSubtree(arrayDeclaration);
-				simBuilder.startSubtree(Declaration.class, "NextDeclaration");
+				psiBuilder.doneSubtree(arrayDeclaration);
+				psiBuilder.startSubtree(Declaration.class, "NextDeclaration");
 			}
 			
-		} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
+		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 	}
 
 	/// Utility Class to hold a BoundPair.

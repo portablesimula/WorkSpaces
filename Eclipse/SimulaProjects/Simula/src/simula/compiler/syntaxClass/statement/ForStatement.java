@@ -179,31 +179,31 @@ public final class ForStatement extends Statement {
 //			Util.TRACE("Line " + this.lineNumber() + ": ForStatement: " + this);
 //	}
 
-	ForStatement(final PsiBuilder simBuilder, final int line) {
+	ForStatement(final PsiBuilder psiBuilder, final int line) {
 		super(line);
-		int forTree = simBuilder.startSubtree(ForStatement.class, "ForStatement");
-		simBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
+		int forTree = psiBuilder.startSubtree(ForStatement.class, "ForStatement");
+		psiBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ForStatement");
-		controlVariable = new VariableExpression(PsiParse.expectIdentifier(simBuilder));
-		LexToken prevToken = PsiParse.getParserToken(simBuilder);
-		if (!PsiParse.accept(simBuilder, KeyWord.ASSIGNVALUE))
-			PsiParse.expect(simBuilder, KeyWord.ASSIGNREF);
+		controlVariable = new VariableExpression(PsiParse.expectIdentifier(psiBuilder));
+		LexToken prevToken = PsiParse.getParserToken(psiBuilder);
+		if (!PsiParse.accept(psiBuilder, KeyWord.ASSIGNVALUE))
+			PsiParse.expect(psiBuilder, KeyWord.ASSIGNREF);
 		assignmentOperator = prevToken.keyWord;
 		do {
-			forList.add(expectForListElement(simBuilder));
-		} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
-		PsiParse.expect(simBuilder, KeyWord.DO);
-		Statement doStatement = Statement.acceptStatement(simBuilder);
+			forList.add(expectForListElement(psiBuilder));
+		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
+		PsiParse.expect(psiBuilder, KeyWord.DO);
+		Statement doStatement = Statement.acceptStatement(psiBuilder);
 		if (doStatement == null) {
 			Util.error("No statement following DO in For statement");
-			doStatement = DummyStatement.ofImplicit(simBuilder, line);
+			doStatement = DummyStatement.ofImplicit(psiBuilder, line);
 		}
 		this.doStatement = doStatement;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Line " + this.lineNumber() + ": ForStatement: " + this);
-		simBuilder.doneSubtree(this, forTree, "ForStatement");
+		psiBuilder.doneSubtree(this, forTree, "ForStatement");
 	}
 
 	/// Parse a for-list element.
@@ -222,16 +222,16 @@ public final class ForStatement extends Statement {
 			return (new ForListElement(this, expr1));
 	}
 
-	private ForListElement expectForListElement(PsiBuilder simBuilder) {
+	private ForListElement expectForListElement(PsiBuilder psiBuilder) {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ForListElement");
-		Expression expr1 = Expression.expectExpression(simBuilder);
-		if (PsiParse.accept(simBuilder, KeyWord.WHILE))
-			return (new ForWhileElement(this, expr1, Expression.expectExpression(simBuilder)));
-		if (PsiParse.accept(simBuilder, KeyWord.STEP)) {
-			Expression expr2 = Expression.expectExpression(simBuilder);
-			PsiParse.expect(simBuilder, KeyWord.UNTIL);
-			return (new StepUntilElement(this, expr1, expr2, Expression.expectExpression(simBuilder)));
+		Expression expr1 = Expression.expectExpression(psiBuilder);
+		if (PsiParse.accept(psiBuilder, KeyWord.WHILE))
+			return (new ForWhileElement(this, expr1, Expression.expectExpression(psiBuilder)));
+		if (PsiParse.accept(psiBuilder, KeyWord.STEP)) {
+			Expression expr2 = Expression.expectExpression(psiBuilder);
+			PsiParse.expect(psiBuilder, KeyWord.UNTIL);
+			return (new StepUntilElement(this, expr1, expr2, Expression.expectExpression(psiBuilder)));
 		} else
 			return (new ForListElement(this, expr1));
 	}

@@ -110,52 +110,52 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	/// Pre-condition: BEGIN is already read.
 	/// @param line source line number
 	/// @return a BlockStatement
-	public BlockStatement expectMaybeBlock(int line) {
-		this.OLD_lineNumber=line;
-		if (Option.internal.TRACE_PARSE)
-			Parse.TRACE("Parse MayBeBlock");
-		while (Declaration.acceptDeclaration(this))
-			Parse.expect(KeyWord.SEMICOLON);
-		while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
-			Statement stm = Statement.expectStatement();
-			if (stm != null) statements.add(stm);
-		}
-		if (Parse.prevToken.keyWord == KeyWord.EOF) {
-			Util.error("Illegal termination of block. Missing END.");
-		}		
-		if (declarationKind != ObjectKind.SimulaProgram) {
-			if (!declarationList.isEmpty()) {
-				declarationKind = ObjectKind.SubBlock;
-			} else {
-				declarationKind = ObjectKind.CompoundStatement;
-				if (labelList != null && labelList.declaredLabelSize() != 0)
-					moveLabelsFrom(this); // Label is also declaration
-			}
-		}
-		this.lastLineNumber = Global.sourceLineNumber;
-		BlockStatement blk = new BlockStatement(this);
-		Global.setScope(declaredIn);
-		return (blk);
-	}
+//	public BlockStatement expectMaybeBlock(int line) {
+//		this.OLD_lineNumber=line;
+//		if (Option.internal.TRACE_PARSE)
+//			Parse.TRACE("Parse MayBeBlock");
+//		while (Declaration.acceptDeclaration(this))
+//			Parse.expect(KeyWord.SEMICOLON);
+//		while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
+//			Statement stm = Statement.expectStatement();
+//			if (stm != null) statements.add(stm);
+//		}
+//		if (Parse.prevToken.keyWord == KeyWord.EOF) {
+//			Util.error("Illegal termination of block. Missing END.");
+//		}		
+//		if (declarationKind != ObjectKind.SimulaProgram) {
+//			if (!declarationList.isEmpty()) {
+//				declarationKind = ObjectKind.SubBlock;
+//			} else {
+//				declarationKind = ObjectKind.CompoundStatement;
+//				if (labelList != null && labelList.declaredLabelSize() != 0)
+//					moveLabelsFrom(this); // Label is also declaration
+//			}
+//		}
+//		this.lastLineNumber = Global.sourceLineNumber;
+//		BlockStatement blk = new BlockStatement(this);
+//		Global.setScope(declaredIn);
+//		return (blk);
+//	}
 
 	private static int SEQU = 1;
-	public BlockStatement expectMaybeBlock(PsiBuilder simBuilder, int line) {
+	public BlockStatement expectMaybeBlock(PsiBuilder psiBuilder, int line) {
 		this.OLD_lineNumber=line;
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse MayBeBlock");
 		
 		String debugName = "MaybeBlockDeclaration-"+(SEQU++);
-		int blkTree = simBuilder.startSubtree(BlockStatement.class, debugName);
+		int blkTree = psiBuilder.startSubtree(BlockStatement.class, debugName);
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("BlockStatement expectMaybeBlock: BEGIN " + debugName + " Level: " + blkTree);
 
-		//		simBuilder.advanceLexer(); // consume BEGIN (add it to 'current tree')
-		simBuilder.consume(KeyWord.BEGIN); // (add it to 'current tree')
+		//		psiBuilder.advanceLexer(); // consume BEGIN (add it to 'current tree')
+		psiBuilder.consume(KeyWord.BEGIN); // (add it to 'current tree')
 
-//		while (Declaration.acceptDeclaration(simBuilder, this))
-//			Parse.expect(simBuilder, KeyWord.SEMICOLON);
-		Declaration.acceptDeclarations(simBuilder, this);
-		while (!PsiParse.accept(simBuilder, KeyWord.END, KeyWord.EOF)) {
-			Statement stm = Statement.acceptStatement(simBuilder);
+//		while (Declaration.acceptDeclaration(psiBuilder, this))
+//			Parse.expect(psiBuilder, KeyWord.SEMICOLON);
+		Declaration.acceptDeclarations(psiBuilder, this);
+		while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
+			Statement stm = Statement.acceptStatement(psiBuilder);
 			if (stm != null) statements.add(stm);
 		}
 //		if (PsiParse.prevToken.keyWord == KeyWord.EOF) {
@@ -174,8 +174,8 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		BlockStatement block = new BlockStatement(this);
 		
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("BlockStatement expectMaybeBlock: ENDOF " + debugName + " Level: " + blkTree + "  " + block);
-		simBuilder.doneSubtree(block, blkTree, debugName);
-//		simBuilder.doneSubtree(block);
+		psiBuilder.doneSubtree(block, blkTree, debugName);
+//		psiBuilder.doneSubtree(block);
 		
 		Global.setScope(declaredIn);
 		return (block);

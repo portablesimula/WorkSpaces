@@ -73,27 +73,27 @@ public final class ConditionalStatement extends Statement {
 //		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": IfStatement: "+this);
 //	}
 
-	ConditionalStatement(PsiBuilder simBuilder, final int line) {
+	ConditionalStatement(PsiBuilder psiBuilder, final int line) {
 		super(line);
 
-		int ifTree = simBuilder.startSubtree(ConditionalStatement.class, "ConditionalStatement");
-		simBuilder.consume(KeyWord.IF); //  (add it to 'current tree')
+		int ifTree = psiBuilder.startSubtree(ConditionalStatement.class, "ConditionalStatement");
+		psiBuilder.consume(KeyWord.IF); //  (add it to 'current tree')
 
-		condition = Expression.expectExpression(simBuilder);
-		PsiParse.expect(simBuilder, KeyWord.THEN);
+		condition = Expression.expectExpression(psiBuilder);
+		PsiParse.expect(psiBuilder, KeyWord.THEN);
 		Statement elseStatement = null;
-		if (PsiParse.accept(simBuilder, KeyWord.ELSE)) {
-			thenStatement = DummyStatement.ofImplicit(simBuilder, PsiParse.getParserToken(simBuilder).lineNumber);
-			elseStatement = Statement.acceptStatement(simBuilder);
+		if (PsiParse.accept(psiBuilder, KeyWord.ELSE)) {
+			thenStatement = DummyStatement.ofImplicit(psiBuilder, PsiParse.getParserToken(psiBuilder).lineNumber);
+			elseStatement = Statement.acceptStatement(psiBuilder);
 		} else {
-		    thenStatement = Statement.acceptStatement(simBuilder);
-		    if (PsiParse.accept(simBuilder, KeyWord.ELSE)) {
-			    elseStatement = Statement.acceptStatement(simBuilder);
+		    thenStatement = Statement.acceptStatement(psiBuilder);
+		    if (PsiParse.accept(psiBuilder, KeyWord.ELSE)) {
+			    elseStatement = Statement.acceptStatement(psiBuilder);
 		    }
 		}
 		this.elseStatement=elseStatement;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": IfStatement: "+this);
-		simBuilder.doneSubtree(this, ifTree, "ConditionalStatement");
+		psiBuilder.doneSubtree(this, ifTree, "ConditionalStatement");
 	}
 
 	@Override

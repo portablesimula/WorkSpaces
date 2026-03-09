@@ -61,16 +61,16 @@ public final class GotoStatement extends Statement {
 //		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+this.lineNumber()+": GotoStatement: "+this);
 //	}
 
-	GotoStatement(final PsiBuilder simBuilder, final int keyWord, final int line) {
+	GotoStatement(final PsiBuilder psiBuilder, final int keyWord, final int line) {
 		super(line);
-		int gotoTree = simBuilder.startSubtree(GotoStatement.class, "GotoStatement");
-		simBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to 'current tree')
+		int gotoTree = psiBuilder.startSubtree(GotoStatement.class, "GotoStatement");
+		psiBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to 'current tree')
 		if(keyWord != KeyWord.GOTO) {
-	        if (!PsiParse.accept(simBuilder, KeyWord.TO))	Util.error("Missing 'TO' after 'GO'");
+	        if (!PsiParse.accept(psiBuilder, KeyWord.TO))	Util.error("Missing 'TO' after 'GO'");
 		}
-		label = Expression.expectExpression(simBuilder);
+		label = Expression.expectExpression(psiBuilder);
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+this.lineNumber()+": GotoStatement: "+this);
-		simBuilder.doneSubtree(this, gotoTree, "GotoStatement");
+		psiBuilder.doneSubtree(this, gotoTree, "GotoStatement");
 	}
 
 	@Override

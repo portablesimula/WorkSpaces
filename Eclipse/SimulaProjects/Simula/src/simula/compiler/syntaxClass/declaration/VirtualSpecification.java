@@ -109,68 +109,68 @@ public final class VirtualSpecification extends Declaration {
 	/// </pre>
 	/// Precondition: VIRTUAL  is already read.
 	/// @param cls the ClassDeclaration
-	static void expectVirtualPart(final ClassDeclaration cls) {
-		Parse.expect(KeyWord.COLON);
+//	static void expectVirtualPart(final ClassDeclaration cls) {
+//		Parse.expect(KeyWord.COLON);
+//		LOOP: while (true) {
+//			Type type;
+//			if (Parse.accept(KeyWord.SWITCH)) {
+//				expectIdentifierList(cls, Type.Label, Kind.Switch);
+//			} else if (Parse.accept(KeyWord.LABEL)) {
+//				expectIdentifierList(cls, Type.Label, Kind.Label);
+//			} else {
+//				type = Parse.acceptType();
+//				if (!Parse.accept(KeyWord.PROCEDURE))
+//					break LOOP;
+//
+//				String identifier = Parse.expectIdentifier();
+//				ProcedureSpecification procedureSpec = null;
+//				if (Parse.accept(KeyWord.IS)) {
+//					if(type != null) Util.error("An IS-specified virtual procedure can have its type only after IS.");
+//					type = Parse.acceptType();
+//					Parse.expect(KeyWord.PROCEDURE);
+//					procedureSpec = ProcedureSpecification.expectProcedureSpecification(type);						
+//					cls.virtualSpecList
+//							.add(new VirtualSpecification(identifier, type, Kind.Procedure, cls.prefixLevel(), procedureSpec));
+//				} else {
+//					cls.virtualSpecList.add(new VirtualSpecification(identifier, type, Kind.Procedure, cls.prefixLevel(), null));
+//					if (Parse.accept(KeyWord.COMMA))
+//						expectIdentifierList(cls, type, Kind.Procedure);
+//					else
+//						Parse.expect(KeyWord.SEMICOLON);
+//				}
+//			}
+//		}
+//		if(cls.virtualSpecList.size()==0) Util.error("Missing virtual specifier after VIRTUAL:");
+//	}
+
+	static void expectVirtualPart(final PsiBuilder psiBuilder, final ClassDeclaration cls) {
+		PsiParse.expect(psiBuilder, KeyWord.COLON);
 		LOOP: while (true) {
 			Type type;
-			if (Parse.accept(KeyWord.SWITCH)) {
-				expectIdentifierList(cls, Type.Label, Kind.Switch);
-			} else if (Parse.accept(KeyWord.LABEL)) {
-				expectIdentifierList(cls, Type.Label, Kind.Label);
+			if (PsiParse.accept(psiBuilder, KeyWord.SWITCH)) {
+				expectIdentifierList(psiBuilder, cls, Type.Label, Kind.Switch);
+			} else if (PsiParse.accept(psiBuilder, KeyWord.LABEL)) {
+				expectIdentifierList(psiBuilder, cls, Type.Label, Kind.Label);
 			} else {
-				type = Parse.acceptType();
-				if (!Parse.accept(KeyWord.PROCEDURE))
+				type = PsiParse.acceptType(psiBuilder);
+				if (!PsiParse.accept(psiBuilder, KeyWord.PROCEDURE))
 					break LOOP;
 
-				String identifier = Parse.expectIdentifier();
+				String identifier = PsiParse.expectIdentifier(psiBuilder);
 				ProcedureSpecification procedureSpec = null;
-				if (Parse.accept(KeyWord.IS)) {
+				if (PsiParse.accept(psiBuilder, KeyWord.IS)) {
 					if(type != null) Util.error("An IS-specified virtual procedure can have its type only after IS.");
-					type = Parse.acceptType();
-					Parse.expect(KeyWord.PROCEDURE);
-					procedureSpec = ProcedureSpecification.expectProcedureSpecification(type);						
+					type = PsiParse.acceptType(psiBuilder);
+					PsiParse.expect(psiBuilder, KeyWord.PROCEDURE);
+					procedureSpec = ProcedureSpecification.expectProcedureSpecification(psiBuilder, type);						
 					cls.virtualSpecList
 							.add(new VirtualSpecification(identifier, type, Kind.Procedure, cls.prefixLevel(), procedureSpec));
 				} else {
 					cls.virtualSpecList.add(new VirtualSpecification(identifier, type, Kind.Procedure, cls.prefixLevel(), null));
-					if (Parse.accept(KeyWord.COMMA))
-						expectIdentifierList(cls, type, Kind.Procedure);
+					if (PsiParse.accept(psiBuilder, KeyWord.COMMA))
+						expectIdentifierList(psiBuilder, cls, type, Kind.Procedure);
 					else
-						Parse.expect(KeyWord.SEMICOLON);
-				}
-			}
-		}
-		if(cls.virtualSpecList.size()==0) Util.error("Missing virtual specifier after VIRTUAL:");
-	}
-
-	static void expectVirtualPart(final PsiBuilder simBuilder, final ClassDeclaration cls) {
-		PsiParse.expect(simBuilder, KeyWord.COLON);
-		LOOP: while (true) {
-			Type type;
-			if (PsiParse.accept(simBuilder, KeyWord.SWITCH)) {
-				expectIdentifierList(simBuilder, cls, Type.Label, Kind.Switch);
-			} else if (PsiParse.accept(simBuilder, KeyWord.LABEL)) {
-				expectIdentifierList(simBuilder, cls, Type.Label, Kind.Label);
-			} else {
-				type = PsiParse.acceptType(simBuilder);
-				if (!PsiParse.accept(simBuilder, KeyWord.PROCEDURE))
-					break LOOP;
-
-				String identifier = PsiParse.expectIdentifier(simBuilder);
-				ProcedureSpecification procedureSpec = null;
-				if (PsiParse.accept(simBuilder, KeyWord.IS)) {
-					if(type != null) Util.error("An IS-specified virtual procedure can have its type only after IS.");
-					type = PsiParse.acceptType(simBuilder);
-					PsiParse.expect(simBuilder, KeyWord.PROCEDURE);
-					procedureSpec = ProcedureSpecification.expectProcedureSpecification(simBuilder, type);						
-					cls.virtualSpecList
-							.add(new VirtualSpecification(identifier, type, Kind.Procedure, cls.prefixLevel(), procedureSpec));
-				} else {
-					cls.virtualSpecList.add(new VirtualSpecification(identifier, type, Kind.Procedure, cls.prefixLevel(), null));
-					if (PsiParse.accept(simBuilder, KeyWord.COMMA))
-						expectIdentifierList(simBuilder, cls, type, Kind.Procedure);
-					else
-						PsiParse.expect(simBuilder, KeyWord.SEMICOLON);
+						PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 				}
 			}
 		}
@@ -194,12 +194,12 @@ public final class VirtualSpecification extends Declaration {
 		Parse.expect(KeyWord.SEMICOLON);
 	}
 
-	private static void expectIdentifierList(final PsiBuilder simBuilder, final ClassDeclaration cls, final Type type, final int kind) {
+	private static void expectIdentifierList(final PsiBuilder psiBuilder, final ClassDeclaration cls, final Type type, final int kind) {
 		do {
-			String identifier = PsiParse.expectIdentifier(simBuilder);
+			String identifier = PsiParse.expectIdentifier(psiBuilder);
 			cls.virtualSpecList.add(new VirtualSpecification(identifier, type, kind, cls.prefixLevel(), null));
-		} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
-		PsiParse.expect(simBuilder, KeyWord.SEMICOLON);
+		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
+		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 	}
 
 	@Override

@@ -103,18 +103,18 @@ public final class ObjectGenerator extends Expression {
 		return (expr);
 	}
 
-	static Expression expectNew(PsiBuilder simBuilder) {
+	static Expression expectNew(PsiBuilder psiBuilder) {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ObjectGenerator, current=" + PsiParse.currentLexToken(simBuilder));
-		String classIdentifier = PsiParse.expectIdentifier(simBuilder);
+			Util.TRACE("Parse ObjectGenerator, current=" + PsiParse.currentLexToken(psiBuilder));
+		String classIdentifier = PsiParse.expectIdentifier(psiBuilder);
 		Vector<Expression> params = new Vector<Expression>();
-		if (PsiParse.accept(simBuilder, KeyWord.BEGPAR)) {
+		if (PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) {
 			do {
-				Expression par=acceptExpression(simBuilder);
+				Expression par=acceptExpression(psiBuilder);
 				if(par==null) Util.error("Missing class parameter");
 				else params.add(par);
-			} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
-			PsiParse.expect(simBuilder, KeyWord.ENDPAR);
+			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
+			PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
 		}
 
 		Expression expr = new ObjectGenerator(classIdentifier, params);

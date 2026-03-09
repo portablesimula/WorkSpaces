@@ -179,14 +179,14 @@ public final class ConnectionStatement extends Statement {
 //			Util.TRACE("Line "+this.lineNumber()+": ConnectionStatement: "+this);
 //	}
 
-	ConnectionStatement(final PsiBuilder simBuilder, final int line) {
+	ConnectionStatement(final PsiBuilder psiBuilder, final int line) {
 		super(line);
-		int inspectTree = simBuilder.startSubtree(ConnectionStatement.class, "ConnectionStatement");
-		simBuilder.consume(KeyWord.INSPECT); //  (add it to 'current tree')
+		int inspectTree = psiBuilder.startSubtree(ConnectionStatement.class, "ConnectionStatement");
+		psiBuilder.consume(KeyWord.INSPECT); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ConnectionStatement");
-		objectExpression = Expression.expectExpression(simBuilder);
+		objectExpression = Expression.expectExpression(psiBuilder);
 		objectExpression.backLink = this;
 		String ident = "_inspect_" + lineNumber() + '_' + (SEQUX++);
 		inspectedVariable = new VariableExpression(ident);
@@ -206,35 +206,35 @@ public final class ConnectionStatement extends Statement {
 
 		boolean hasDoPart=false;
 		boolean hasWhenPart=false;
-		if (PsiParse.accept(simBuilder, KeyWord.DO)) {
+		if (PsiParse.accept(psiBuilder, KeyWord.DO)) {
 			hasDoPart = true;
 			ConnectionBlock connectionBlock = new ConnectionBlock(inspectedVariable, null);
 			DeclarationScope prevScope = Global.getCurrentScope();
 			Global.setScope(connectionBlock);
-			Statement statement = Statement.acceptStatement(simBuilder);
+			Statement statement = Statement.acceptStatement(psiBuilder);
 			Global.setScope(prevScope);
 			
 			connectionPart.add(new ConnectionDoPart(this,connectionBlock, statement));
 			connectionBlock.end();
 		} else {
-			while (PsiParse.accept(simBuilder, KeyWord.WHEN)) {
-				String classIdentifier = PsiParse.expectIdentifier(simBuilder);
-				PsiParse.expect(simBuilder, KeyWord.DO);
+			while (PsiParse.accept(psiBuilder, KeyWord.WHEN)) {
+				String classIdentifier = PsiParse.expectIdentifier(psiBuilder);
+				PsiParse.expect(psiBuilder, KeyWord.DO);
 				ConnectionBlock connectionBlock = new ConnectionBlock(inspectedVariable, classIdentifier);
 				hasWhenPart = true;
-				Statement statement = Statement.acceptStatement(simBuilder);
+				Statement statement = Statement.acceptStatement(psiBuilder);
 				connectionPart.add(new ConnectionWhenPart(this,classIdentifier, connectionBlock, statement));
 				connectionBlock.end();
 			}
 		}
 		if(!(hasDoPart | hasWhenPart)) Util.error("Incomplete Inspect statement: "+objectExpression);
 		Statement otherwise = null;
-		if (PsiParse.accept(simBuilder, KeyWord.OTHERWISE)) otherwise = Statement.acceptStatement(simBuilder);
+		if (PsiParse.accept(psiBuilder, KeyWord.OTHERWISE)) otherwise = Statement.acceptStatement(psiBuilder);
 		this.otherwise=otherwise;
 		this.hasWhenPart=hasWhenPart;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Line "+this.lineNumber()+": ConnectionStatement: "+this);
-		simBuilder.doneSubtree(this, inspectTree, "ConnectionStatement");
+		psiBuilder.doneSubtree(this, inspectTree, "ConnectionStatement");
 	}
 
 	@Override

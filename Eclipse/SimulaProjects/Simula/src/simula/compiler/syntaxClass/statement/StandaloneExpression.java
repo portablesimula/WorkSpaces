@@ -58,33 +58,33 @@ public final class StandaloneExpression extends Statement {
 		}		
 	}
 
-	StandaloneExpression(final PsiBuilder simBuilder, final int line,final Expression expression) {
+	StandaloneExpression(final PsiBuilder psiBuilder, final int line,final Expression expression) {
 		super(line);
-//		int stalonTree = simBuilder.startSubtree(StandaloneExpression.class, "StandaloneExpression");
+//		int stalonTree = psiBuilder.startSubtree(StandaloneExpression.class, "StandaloneExpression");
 		
 		IO.println("\nNEW StandaloneExpression: expr="+expression);
-		simBuilder.printPSI("NEW StandaloneExpression: expr="+expression);
+		psiBuilder.printPSI("NEW StandaloneExpression: expr="+expression);
 
 		this.expression = expression;
 		if (Option.internal.TRACE_PARSE) {
 			Util.TRACE("Line "+lineNumber()+": StandaloneExpression: "+this);
-			IO.println("Line "+lineNumber()+": StandaloneExpression: "+this+"   "+simBuilder.getCurrentLexerToken());
+			IO.println("Line "+lineNumber()+": StandaloneExpression: "+this+"   "+psiBuilder.getCurrentLexerToken());
 		}
 		LexToken prevToken = null;
-//		PsiTree asgTree = simBuilder.startSubtree(AssignmentOperation.class, "First'AssignmentOperation");
-		while ((prevToken = PsiParse.acceptParserToken(simBuilder, KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF)) != null) { 
+//		PsiTree asgTree = psiBuilder.startSubtree(AssignmentOperation.class, "First'AssignmentOperation");
+		while ((prevToken = PsiParse.acceptParserToken(psiBuilder, KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF)) != null) { 
 			IO.println("NEW StandaloneExpression: prevToken="+prevToken);
-			int asgTree = simBuilder.startSubtree(AssignmentOperation.class, "AssignmentOperation");
-			this.expression = new AssignmentOperation(this.expression, prevToken.keyWord, expectStandaloneExpression(simBuilder));
-			simBuilder.doneSubtree(this, asgTree, "AssignmentOperation");
-//			simBuilder.doneSubtree(this);
-//			simBuilder.startSubtree(AssignmentOperation.class, "Next'AssignmentOperation");
+			int asgTree = psiBuilder.startSubtree(AssignmentOperation.class, "AssignmentOperation");
+			this.expression = new AssignmentOperation(this.expression, prevToken.keyWord, expectStandaloneExpression(psiBuilder));
+			psiBuilder.doneSubtree(this, asgTree, "AssignmentOperation");
+//			psiBuilder.doneSubtree(this);
+//			psiBuilder.startSubtree(AssignmentOperation.class, "Next'AssignmentOperation");
 		}		
-//		simBuilder.dropSubtree();
-//		simBuilder.doneSubtree(this, stalonTree, "StandaloneExpression");
+//		psiBuilder.dropSubtree();
+//		psiBuilder.doneSubtree(this, stalonTree, "StandaloneExpression");
 		
 		IO.println("\nEND NEW StandaloneExpression: expr="+expression);
-		simBuilder.printPSI("END NEW StandaloneExpression: expr="+expression);
+		psiBuilder.printPSI("END NEW StandaloneExpression: expr="+expression);
 
 	}
 
@@ -105,12 +105,12 @@ public final class StandaloneExpression extends Statement {
 		return retExpr;
 	}
 
-	private static Expression expectStandaloneExpression(PsiBuilder simBuilder) { 
-		Expression retExpr=Expression.expectExpression(simBuilder);
+	private static Expression expectStandaloneExpression(PsiBuilder psiBuilder) { 
+		Expression retExpr=Expression.expectExpression(psiBuilder);
 		LexToken prevToken = null;
-		while ((prevToken = PsiParse.acceptParserToken(simBuilder, KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) != null) {
+		while ((prevToken = PsiParse.acceptParserToken(psiBuilder, KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) != null) {
 			int opr=prevToken.keyWord;
-			retExpr=new AssignmentOperation(retExpr,opr,expectStandaloneExpression(simBuilder));
+			retExpr=new AssignmentOperation(retExpr,opr,expectStandaloneExpression(psiBuilder));
 		}
 		IO.println("StandaloneExpression.expectStandaloneExpression: RETURN: "+retExpr+" ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 		return retExpr;

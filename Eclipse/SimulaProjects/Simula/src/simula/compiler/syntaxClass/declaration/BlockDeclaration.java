@@ -131,11 +131,11 @@ public abstract class BlockDeclaration extends DeclarationScope {
 		Parse.expect(KeyWord.ENDPAR);
 	}
 
-	protected static void expectFormalParameterPart(final PsiBuilder simBuilder, final Vector<Parameter> pList) {
+	protected static void expectFormalParameterPart(final PsiBuilder psiBuilder, final Vector<Parameter> pList) {
 		do { // ParameterPart = Parameter ; { Parameter ; }
-			new Parameter(PsiParse.expectIdentifier(simBuilder)).into(pList);
-		} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
-		PsiParse.expect(simBuilder, KeyWord.ENDPAR);
+			new Parameter(PsiParse.expectIdentifier(psiBuilder)).into(pList);
+		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
+		PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
 	}
 
 	// ***********************************************************************************************

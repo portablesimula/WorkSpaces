@@ -135,60 +135,60 @@ public abstract class Statement extends SyntaxClass {
 	private static int SEQU = 1;
 	/// Parse a statement.
 	/// @return the statement
-	public static Statement acceptStatement(PsiBuilder simBuilder) {
+	public static Statement acceptStatement(PsiBuilder psiBuilder) {
 		String debugName = "Statement-"+(SEQU++);
-		int stmTree = simBuilder.startSubtree(Statement.class, debugName);
+		int stmTree = psiBuilder.startSubtree(Statement.class, debugName);
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("Statement.acceptStatement: BEGIN Level: " + stmTree);
 		
 		ObjectList<LabelDeclaration> labels = null;
-		int lineNumber=PsiParse.getParserToken(simBuilder).lineNumber;
+		int lineNumber=PsiParse.getParserToken(psiBuilder).lineNumber;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Statement.acceptStatement: LabeledStatement: lineNumber="+lineNumber+", current=" + PsiParse.getParserToken(simBuilder));//	+ ", prev=" + PsiParse.prevToken);
-		String ident = PsiParse.acceptIdentifier(simBuilder);
-		int labTree = simBuilder.startSubtree(LabelDeclaration.class, "LabelDeclaration");
-		while (PsiParse.accept(simBuilder, KeyWord.COLON)) {
+			Util.TRACE("Statement.acceptStatement: LabeledStatement: lineNumber="+lineNumber+", current=" + PsiParse.getParserToken(psiBuilder));//	+ ", prev=" + PsiParse.prevToken);
+		String ident = PsiParse.acceptIdentifier(psiBuilder);
+		int labTree = psiBuilder.startSubtree(LabelDeclaration.class, "LabelDeclaration");
+		while (PsiParse.accept(psiBuilder, KeyWord.COLON)) {
 			if (ident != null) {
 				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
 				LabelDeclaration label = new LabelDeclaration(ident);
-				simBuilder.doneSubtree(label, labTree, "LabelDeclaration");
-				labTree = simBuilder.startSubtree(LabelDeclaration.class, "LabelDeclaration");
+				psiBuilder.doneSubtree(label, labTree, "LabelDeclaration");
+				labTree = psiBuilder.startSubtree(LabelDeclaration.class, "LabelDeclaration");
 				labels.add(label);
 				DeclarationScope scope = Global.getCurrentScope();
 				if(scope.labelList == null) scope.labelList = new LabelList(scope); 
 				scope.labelList.add(label);
 			} else Util.error("Missplaced ':'");
-			ident = PsiParse.acceptIdentifier(simBuilder);
+			ident = PsiParse.acceptIdentifier(psiBuilder);
 		}
-		simBuilder.dropSubtree(labTree, "LabelDeclaration");
+		psiBuilder.dropSubtree(labTree, "LabelDeclaration");
 		if(ident!=null) {
 			if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("\n\nStatement.acceptStatement: NOT LABEL ==> ROLL BACK: "+ident);
-			PsiParse.rollBack(simBuilder); // Not Label: rollBack
+			PsiParse.rollBack(psiBuilder); // Not Label: rollBack
 		}
-		Statement statement = acceptUnlabeledStatement(simBuilder);
+		Statement statement = acceptUnlabeledStatement(psiBuilder);
 		if (labels != null && statement != null) {
 			Util.IERR("RETT OPP MHT PsiTree");
 			statement = new LabeledStatement(lineNumber,labels, statement);
 		}
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("Statement.acceptStatement ENDOF Level: "+stmTree + ", statement="+statement);
-		simBuilder.printPSI("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
-//		simBuilder.doneSubtree(stmTree, statement);
+		psiBuilder.printPSI("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
+//		psiBuilder.doneSubtree(stmTree, statement);
 //		if(statement != null)
-//			 simBuilder.doneSubtree(statement, stmTree, debugName);
-//		else simBuilder.dropSubtree();
+//			 psiBuilder.doneSubtree(statement, stmTree, debugName);
+//		else psiBuilder.dropSubtree();
 		return (statement);
 	}
 
 	/// Invariant: All Statement handlers starts with 'startSubtree' and ends with 'doneSubtree'.
-	private static Statement acceptUnlabeledStatement(PsiBuilder simBuilder) {
-//		LexToken simToken = getSimToken(simBuilder);
-		LexToken simToken = PsiParse.getParserToken(simBuilder);
+	private static Statement acceptUnlabeledStatement(PsiBuilder psiBuilder) {
+//		LexToken simToken = getSimToken(psiBuilder);
+		LexToken simToken = PsiParse.getParserToken(psiBuilder);
 		if(Option.TRACE_ACCEPT_STATEMENT > 1) IO.println("\nStatement.acceptUnlabeledStatement: "+simToken);
 		int lineNumber = simToken.lineNumber;
 		Statement statement = null;
 		int keyWord = simToken.keyWord;
 		
-//		simBuilder.startSubtree("Statement-"+(SEQU++));
-//		simBuilder.advanceLexer(); // consume simToken (add it to 'current tree')
+//		psiBuilder.startSubtree("Statement-"+(SEQU++));
+//		psiBuilder.advanceLexer(); // consume simToken (add it to 'current tree')
 
 //		switch(simToken.keyWord) {
 		switch(keyWord) {
@@ -196,25 +196,25 @@ public abstract class Statement extends SyntaxClass {
 				// case KeyWord.BEGIN: PsiParse.nextToken(); return (new MaybeBlockDeclaration(null).expectMaybeBlock(lineNumber));
 				if(Option.TRACE_ACCEPT_STATEMENT > 1) IO.println("\nStatement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
 				MaybeBlockDeclaration block = new MaybeBlockDeclaration(null);
-				block.expectMaybeBlock(simBuilder, lineNumber);
+				block.expectMaybeBlock(psiBuilder, lineNumber);
 				statement = new BlockStatement(block); break;
 				
-			case KeyWord.IF:		 statement = new ConditionalStatement(simBuilder, lineNumber); break;
+			case KeyWord.IF:		 statement = new ConditionalStatement(psiBuilder, lineNumber); break;
 		    case KeyWord.GO,
-		         KeyWord.GOTO:		 statement = new GotoStatement(simBuilder, keyWord, lineNumber); break;
-		    case KeyWord.FOR:		 statement = new ForStatement(simBuilder, lineNumber); break;
-		    case KeyWord.WHILE:		 statement = new WhileStatement(simBuilder, lineNumber); break;
-		    case KeyWord.INSPECT:	 statement = new ConnectionStatement(simBuilder, lineNumber); break;
+		         KeyWord.GOTO:		 statement = new GotoStatement(psiBuilder, keyWord, lineNumber); break;
+		    case KeyWord.FOR:		 statement = new ForStatement(psiBuilder, lineNumber); break;
+		    case KeyWord.WHILE:		 statement = new WhileStatement(psiBuilder, lineNumber); break;
+		    case KeyWord.INSPECT:	 statement = new ConnectionStatement(psiBuilder, lineNumber); break;
 		    case KeyWord.SWITCH:	 if(Option.EXTENSIONS) {
-		    							 statement = new SwitchStatement(simBuilder, lineNumber);
+		    							 statement = new SwitchStatement(psiBuilder, lineNumber);
 		    						 } break;
 		    case KeyWord.ACTIVATE,
-		         KeyWord.REACTIVATE: statement = new ActivationStatement(simBuilder, lineNumber); break;
-//		    case KeyWord.INNER:		 statement = new InnerStatement(simBuilder, false, lineNumber);
-		    case KeyWord.INNER:		 statement = InnerStatement.ofExplicit(simBuilder); break;
-		    case KeyWord.SEMICOLON:	 statement = DummyStatement.ofExplicit(simBuilder, lineNumber); break;
-		    case KeyWord.END:	  // statement = DummyStatement.ofImplicit(simBuilder, lineNumber); break; // Dummy Statement, keep END
-		    case KeyWord.EOF:		 statement = DummyStatement.ofImplicit(simBuilder, lineNumber); break; // Dummy Statement, keep EOF
+		         KeyWord.REACTIVATE: statement = new ActivationStatement(psiBuilder, lineNumber); break;
+//		    case KeyWord.INNER:		 statement = new InnerStatement(psiBuilder, false, lineNumber);
+		    case KeyWord.INNER:		 statement = InnerStatement.ofExplicit(psiBuilder); break;
+		    case KeyWord.SEMICOLON:	 statement = DummyStatement.ofExplicit(psiBuilder, lineNumber); break;
+		    case KeyWord.END:	  // statement = DummyStatement.ofImplicit(psiBuilder, lineNumber); break; // Dummy Statement, keep END
+		    case KeyWord.EOF:		 statement = DummyStatement.ofImplicit(psiBuilder, lineNumber); break; // Dummy Statement, keep EOF
 
 //			case KeyWord.IDENTIFIER, KeyWord.NEW, KeyWord.THIS, KeyWord.BEGPAR:
 			case KeyWord.NEW, KeyWord.THIS, KeyWord.BEGPAR:
@@ -227,30 +227,30 @@ public abstract class Statement extends SyntaxClass {
 			case KeyWord.IDENTIFIER:
 				if(Option.TRACE_ACCEPT_STATEMENT > 2) {
 					IO.println("\nStatement.acceptUnlabeledStatement: IDENTIFIER");
-					simBuilder.printPSI("Statement.acceptUnlabeledStatement: IDENTIFIER");
+					psiBuilder.printPSI("Statement.acceptUnlabeledStatement: IDENTIFIER");
 				}
 				
-				Expression expr = Expression.acceptExpression(simBuilder);
+				Expression expr = Expression.acceptExpression(psiBuilder);
 				IO.println("\n\nStatement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr+" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
 				
 				if(Option.TRACE_ACCEPT_STATEMENT > 2) {
 					IO.println("\nStatement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr);
 					expr.psiTree.printPsiTree("Statement.acceptUnlabeledStatement: IDENTIFIER");
-					simBuilder.printPSI("Statement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr);
+					psiBuilder.printPSI("Statement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr);
 				}
 				
 				if(expr!=null) {
 					if(expr instanceof VariableExpression var) {
 						if(Option.TRACE_ACCEPT_STATEMENT > 1) IO.println("Statement.acceptUnlabeledStatement: GOT VariableExpression: "+var);
-						if (PsiParse.accept(simBuilder, KeyWord.BEGIN)) {
+						if (PsiParse.accept(psiBuilder, KeyWord.BEGIN)) {
 //							Util.IERR("Statement.acceptUnlabeledStatement: PREFIXED BLOCK: NOT IMPL");
 	      					//return new BlockStatement(PrefixedBlockDeclaration.expectPrefixedBlock(var,false));
-	      					Statement prfblk = new BlockStatement(PrefixedBlockDeclaration.expectPrefixedBlock(simBuilder, var,false));
+	      					Statement prfblk = new BlockStatement(PrefixedBlockDeclaration.expectPrefixedBlock(psiBuilder, var,false));
 //	      					statementMarker.done(prfblk);
 	      					return prfblk;
 	      				}
 	      			}
-	      			statement = new StandaloneExpression(simBuilder, Global.sourceLineNumber, expr);
+	      			statement = new StandaloneExpression(psiBuilder, Global.sourceLineNumber, expr);
 	      		}
 				break;
 				
@@ -262,13 +262,13 @@ public abstract class Statement extends SyntaxClass {
 	//          statementMarker.error("Statement.parseStatement: default " + simToken);
 	          
 	//          // DETTE MÅ IMPLEMENTERES !!!
-	//	        simBuilder.advanceLexer(); //  (add it to 'blk')
+	//	        psiBuilder.advanceLexer(); //  (add it to 'blk')
 		        Util.STOP();
 				break;
 		}
 //		if(statement != null)
-//			 simBuilder.doneSubtree(statement);
-//		else simBuilder.dropSubtree();
+//			 psiBuilder.doneSubtree(statement);
+//		else psiBuilder.dropSubtree();
 		return statement;
   }
 

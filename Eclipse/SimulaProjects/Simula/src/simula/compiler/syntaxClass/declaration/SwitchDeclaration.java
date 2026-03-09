@@ -63,13 +63,13 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		Global.setScope(declaredIn);
 	}
 
-	public SwitchDeclaration(PsiBuilder simBuilder, final String ident) {
+	public SwitchDeclaration(PsiBuilder psiBuilder, final String ident) {
 		super(ident,ObjectKind.Procedure);
 		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchDeclaration");
 		this.type = Type.Label;
-		PsiParse.expect(simBuilder, KeyWord.ASSIGNVALUE);
-		do { switchList.add(Expression.expectExpression(simBuilder));
-		} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
+		PsiParse.expect(psiBuilder, KeyWord.ASSIGNVALUE);
+		do { switchList.add(Expression.expectExpression(psiBuilder));
+		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchDeclaration(3), switchList=" + switchList);
 		new Parameter("_SW", Type.Integer, Parameter.Kind.Simple).into(parameterList);
 		Global.setScope(declaredIn);

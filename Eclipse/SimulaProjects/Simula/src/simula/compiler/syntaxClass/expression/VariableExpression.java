@@ -199,22 +199,22 @@ public final class VariableExpression extends Expression {
 		return (variable);
 	}
 
-	public static VariableExpression expectVariable(final PsiBuilder simBuilder, final String ident) {
+	public static VariableExpression expectVariable(final PsiBuilder psiBuilder, final String ident) {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse Variable, current=" + PsiParse.currentLexToken(simBuilder));
+			Util.TRACE("Parse Variable, current=" + PsiParse.currentLexToken(psiBuilder));
 		VariableExpression variable = new VariableExpression(ident);
-		if (PsiParse.accept(simBuilder, KeyWord.BEGPAR)) {
+		if (PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) {
 			variable.params = new Vector<Expression>();
 			do {
-				Expression par = acceptExpression(simBuilder);
+				Expression par = acceptExpression(psiBuilder);
 				if (par == null)
 					Util.error("Missing procedure parameter");
 				else{
 					variable.params.add(par);
 					par.backLink = variable;
 				}
-			} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
-			PsiParse.expect(simBuilder, KeyWord.ENDPAR);
+			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
+			PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
 		}
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW Variable: " + variable);

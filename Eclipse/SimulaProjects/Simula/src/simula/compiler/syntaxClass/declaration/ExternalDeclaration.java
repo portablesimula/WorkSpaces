@@ -173,21 +173,21 @@ public final class ExternalDeclaration extends Declaration {
 		return externalDeclarations;
 	}
 	
-	public static Vector<ExternalDeclaration> expectExternalHead(final PsiBuilder simBuilder, final BlockDeclaration enclosure) {
-		String kind = PsiParse.acceptIdentifier(simBuilder);
+	public static Vector<ExternalDeclaration> expectExternalHead(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
+		String kind = PsiParse.acceptIdentifier(psiBuilder);
 		if (kind != null)
 			Util.error("*** NOT IMPLEMENTED: " + "External " + kind + " Procedure");
-		Type expectedType = PsiParse.acceptType(simBuilder);
-		if (!(PsiParse.accept(simBuilder, KeyWord.CLASS) || PsiParse.accept(simBuilder, KeyWord.PROCEDURE)))
+		Type expectedType = PsiParse.acceptType(psiBuilder);
+		if (!(PsiParse.accept(psiBuilder, KeyWord.CLASS) || PsiParse.accept(psiBuilder, KeyWord.PROCEDURE)))
 			Util.error("parseExternalDeclaration: Expecting CLASS or PROCEDURE");
 
 		Vector<ExternalDeclaration> externalDeclarations = new Vector<ExternalDeclaration>();
-		String identifier = PsiParse.expectIdentifier(simBuilder);
+		String identifier = PsiParse.expectIdentifier(psiBuilder);
 		LOOP: while (true) {
 			Identifier externalIdentifier = null;
-			if (PsiParse.accept(simBuilder, KeyWord.EQ)) {
-				externalIdentifier = (Identifier) PsiParse.currentLexToken(simBuilder);
-				PsiParse.expect(simBuilder, KeyWord.TEXTKONST);
+			if (PsiParse.accept(psiBuilder, KeyWord.EQ)) {
+				externalIdentifier = (Identifier) PsiParse.currentLexToken(psiBuilder);
+				PsiParse.expect(psiBuilder, KeyWord.TEXTKONST);
 			}
 			String extIdentitier = (externalIdentifier==null)?null:externalIdentifier.value;
 			
@@ -209,13 +209,13 @@ public final class ExternalDeclaration extends Declaration {
 				}
 			}
 
-			if (PsiParse.accept(simBuilder, KeyWord.IS)) {
+			if (PsiParse.accept(psiBuilder, KeyWord.IS)) {
 				Util.error("*** NOT IMPLEMENTED: " + "External non-Simula Procedure");
 				break LOOP;
 			}
-			if (!PsiParse.accept(simBuilder, KeyWord.COMMA))
+			if (!PsiParse.accept(psiBuilder, KeyWord.COMMA))
 				break LOOP;
-			identifier = PsiParse.expectIdentifier(simBuilder);
+			identifier = PsiParse.expectIdentifier(psiBuilder);
 		}
 		return externalDeclarations;
 	}

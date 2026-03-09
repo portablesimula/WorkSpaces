@@ -130,105 +130,105 @@ public abstract class Declaration extends SyntaxClass {
 	/// Parse a declaration and add it to the given declaration list.
 	/// @param enclosure the owning block.
 	/// @return true if a declaration was found, false otherwise
-	protected static boolean acceptDeclaration(final BlockDeclaration enclosure) {
-		if (Option.internal.TRACE_PARSE)
-			Parse.TRACE("Parse Declaration");
-		DeclarationList declarationList=enclosure.declarationList;
-		String prefix = Parse.acceptIdentifier();
-		if (prefix != null) {
-			if (Parse.accept(KeyWord.CLASS))
-				declarationList.add(ClassDeclaration.expectClassDeclaration(prefix));
-			else {
-				Parse.saveCurrentToken(); // Identifier is NOT a class prefix.
-				return (false);
-			}
-		} else if (Parse.accept(KeyWord.ARRAY))
-			ArrayDeclaration.expectArrayDeclaration(Type.Real, declarationList); // Default type real for arrays
-		else if (Parse.accept(KeyWord.PROCEDURE))
-			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(null));
-		else if (Parse.accept(KeyWord.PRIOR)) {
-			Util.warning("Keyword 'prior' ignored - prior procedure is not implemented");
-			Type type = Parse.acceptType();
-			Parse.expect(KeyWord.PROCEDURE);
-			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(type));
-		} else if (Parse.accept(KeyWord.CLASS))
-			declarationList.add(ClassDeclaration.expectClassDeclaration(null));
-		else if (Parse.accept(KeyWord.SWITCH)) {
-			String ident = Parse.acceptIdentifier();
-			if (ident == null) {
-				// Switch Statement
-				Parse.saveCurrentToken();
-				return (false);
-			}
-			declarationList.add(new SwitchDeclaration(ident));
-		} else if (Parse.accept(KeyWord.EXTERNAL))
-			ExternalDeclaration.expectExternalHead(enclosure);
-		else {
-			Type type = Parse.acceptType();
-			if (type == null)
-				return (false);
-			if (Parse.accept(KeyWord.PROCEDURE))
-				declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(type));
-			else if (Parse.accept(KeyWord.ARRAY))
-				ArrayDeclaration.expectArrayDeclaration(type, declarationList);
-			else 
-				SimpleVariableDeclaration.expectSimpleVariable(type, declarationList);
-			
-			if (Option.internal.TRACE_PARSE)
-				Parse.TRACE("Parse Declaration(2)");
-		}
-		return (true);
-	}
+//	protected static boolean acceptDeclaration(final BlockDeclaration enclosure) {
+//		if (Option.internal.TRACE_PARSE)
+//			Parse.TRACE("Parse Declaration");
+//		DeclarationList declarationList=enclosure.declarationList;
+//		String prefix = Parse.acceptIdentifier();
+//		if (prefix != null) {
+//			if (Parse.accept(KeyWord.CLASS))
+//				declarationList.add(ClassDeclaration.expectClassDeclaration(prefix));
+//			else {
+//				Parse.saveCurrentToken(); // Identifier is NOT a class prefix.
+//				return (false);
+//			}
+//		} else if (Parse.accept(KeyWord.ARRAY))
+//			ArrayDeclaration.expectArrayDeclaration(Type.Real, declarationList); // Default type real for arrays
+//		else if (Parse.accept(KeyWord.PROCEDURE))
+//			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(null));
+//		else if (Parse.accept(KeyWord.PRIOR)) {
+//			Util.warning("Keyword 'prior' ignored - prior procedure is not implemented");
+//			Type type = Parse.acceptType();
+//			Parse.expect(KeyWord.PROCEDURE);
+//			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(type));
+//		} else if (Parse.accept(KeyWord.CLASS))
+//			declarationList.add(ClassDeclaration.expectClassDeclaration(null));
+//		else if (Parse.accept(KeyWord.SWITCH)) {
+//			String ident = Parse.acceptIdentifier();
+//			if (ident == null) {
+//				// Switch Statement
+//				Parse.saveCurrentToken();
+//				return (false);
+//			}
+//			declarationList.add(new SwitchDeclaration(ident));
+//		} else if (Parse.accept(KeyWord.EXTERNAL))
+//			ExternalDeclaration.expectExternalHead(enclosure);
+//		else {
+//			Type type = Parse.acceptType();
+//			if (type == null)
+//				return (false);
+//			if (Parse.accept(KeyWord.PROCEDURE))
+//				declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(type));
+//			else if (Parse.accept(KeyWord.ARRAY))
+//				ArrayDeclaration.expectArrayDeclaration(type, declarationList);
+//			else 
+//				SimpleVariableDeclaration.expectSimpleVariable(type, declarationList);
+//			
+//			if (Option.internal.TRACE_PARSE)
+//				Parse.TRACE("Parse Declaration(2)");
+//		}
+//		return (true);
+//	}
 	
-	private static boolean acceptDeclaration(final PsiBuilder simBuilder, final BlockDeclaration enclosure) {
+	private static boolean acceptDeclaration(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse Declaration");
 		DeclarationList declarationList=enclosure.declarationList;
-		String prefix = PsiParse.acceptIdentifier(simBuilder);
+		String prefix = PsiParse.acceptIdentifier(psiBuilder);
 		if (prefix != null) {
-			if (PsiParse.accept(simBuilder, KeyWord.CLASS))
-				declarationList.add(ClassDeclaration.expectClassDeclaration(simBuilder, prefix));
+			if (PsiParse.accept(psiBuilder, KeyWord.CLASS))
+				declarationList.add(ClassDeclaration.expectClassDeclaration(psiBuilder, prefix));
 			else {
-				PsiParse.rollBack(simBuilder); // Identifier is NOT a class prefix.
+				PsiParse.rollBack(psiBuilder); // Identifier is NOT a class prefix.
 				return (false);
 			}
-		} else if (PsiParse.accept(simBuilder, KeyWord.ARRAY))
-			ArrayDeclaration.expectArrayDeclaration(simBuilder, Type.Real, declarationList); // Default type real for arrays
-		else if (PsiParse.accept(simBuilder, KeyWord.PROCEDURE))
-			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(simBuilder, null));
-		else if (PsiParse.accept(simBuilder, KeyWord.PRIOR)) {
+		} else if (PsiParse.accept(psiBuilder, KeyWord.ARRAY))
+			ArrayDeclaration.expectArrayDeclaration(psiBuilder, Type.Real, declarationList); // Default type real for arrays
+		else if (PsiParse.accept(psiBuilder, KeyWord.PROCEDURE))
+			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(psiBuilder, null));
+		else if (PsiParse.accept(psiBuilder, KeyWord.PRIOR)) {
 			Util.warning("Keyword 'prior' ignored - prior procedure is not implemented");
-			Type type = PsiParse.acceptType(simBuilder);
-			PsiParse.expect(simBuilder, KeyWord.PROCEDURE);
-			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type));
-		} else if (PsiParse.accept(simBuilder, KeyWord.CLASS))
-			declarationList.add(ClassDeclaration.expectClassDeclaration(simBuilder, prefix));
-		else if (PsiParse.accept(simBuilder, KeyWord.SWITCH)) {
-			String ident = PsiParse.acceptIdentifier(simBuilder);
+			Type type = PsiParse.acceptType(psiBuilder);
+			PsiParse.expect(psiBuilder, KeyWord.PROCEDURE);
+			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(psiBuilder, type));
+		} else if (PsiParse.accept(psiBuilder, KeyWord.CLASS))
+			declarationList.add(ClassDeclaration.expectClassDeclaration(psiBuilder, prefix));
+		else if (PsiParse.accept(psiBuilder, KeyWord.SWITCH)) {
+			String ident = PsiParse.acceptIdentifier(psiBuilder);
 			if (ident == null) {
 				// Switch Statement
-				PsiParse.rollBack(simBuilder);
+				PsiParse.rollBack(psiBuilder);
 				return (false);
 			}
-			declarationList.add(new SwitchDeclaration(simBuilder, ident));
-		} else if (PsiParse.accept(simBuilder, KeyWord.EXTERNAL))
-			ExternalDeclaration.expectExternalHead(simBuilder, enclosure);
+			declarationList.add(new SwitchDeclaration(psiBuilder, ident));
+		} else if (PsiParse.accept(psiBuilder, KeyWord.EXTERNAL))
+			ExternalDeclaration.expectExternalHead(psiBuilder, enclosure);
 		else {
-			Type type = PsiParse.acceptType(simBuilder);
+			Type type = PsiParse.acceptType(psiBuilder);
 			if (type == null) {
-//				simBuilder.dropSubtree();
+//				psiBuilder.dropSubtree();
 				return (false);
 			}
-			if (PsiParse.accept(simBuilder, KeyWord.PROCEDURE)) {
+			if (PsiParse.accept(psiBuilder, KeyWord.PROCEDURE)) {
 //				Util.IERR("NOT IMPL");
-				declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type));
+				declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(psiBuilder, type));
 			}
-			else if (PsiParse.accept(simBuilder, KeyWord.ARRAY)) {
+			else if (PsiParse.accept(psiBuilder, KeyWord.ARRAY)) {
 //				Util.IERR("NOT IMPL");
-				ArrayDeclaration.expectArrayDeclaration(simBuilder, type, declarationList);
+				ArrayDeclaration.expectArrayDeclaration(psiBuilder, type, declarationList);
 			}
 			else 
-				SimpleVariableDeclaration.expectSimpleVariable(simBuilder, type, declarationList);
+				SimpleVariableDeclaration.expectSimpleVariable(psiBuilder, type, declarationList);
 			
 			if (Option.internal.TRACE_PARSE)
 				PsiParse.TRACE("Parse Declaration(2)");
@@ -239,11 +239,11 @@ public abstract class Declaration extends SyntaxClass {
 	/// Repeatedly parse a declaration and add it to the given BlockDeclaration's' declaration list.
 	/// Continue until there are no more declarations.
 	/// @param enclosure the owning block.
-	protected static void acceptDeclarations(final PsiBuilder simBuilder, final BlockDeclaration enclosure) {
-		simBuilder.startSubtree(Declaration.class, "Declaration");
-		while (Declaration.acceptDeclaration(simBuilder, enclosure))
-			PsiParse.accept(simBuilder, KeyWord.SEMICOLON);
-		simBuilder.dropSubtree();
+	protected static void acceptDeclarations(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
+		psiBuilder.startSubtree(Declaration.class, "Declaration");
+		while (Declaration.acceptDeclaration(psiBuilder, enclosure))
+			PsiParse.accept(psiBuilder, KeyWord.SEMICOLON);
+		psiBuilder.dropSubtree();
 	}
 
 	// ***********************************************************************************************

@@ -50,29 +50,29 @@ public final class InnerStatement extends Statement {
 		} else Util.error("Missplaced Inner");
 	}
 
-	public static InnerStatement ofExplicit(final PsiBuilder simBuilder) {
-		 int inrTree = simBuilder.startSubtree(InnerStatement.class, "InnerStatement");
-		 simBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
-		 InnerStatement innerStatement = new InnerStatement(simBuilder);		
-		 simBuilder.doneSubtree(innerStatement, inrTree, "InnerStatement");
+	public static InnerStatement ofExplicit(final PsiBuilder psiBuilder) {
+		 int inrTree = psiBuilder.startSubtree(InnerStatement.class, "InnerStatement");
+		 psiBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
+		 InnerStatement innerStatement = new InnerStatement(psiBuilder);		
+		 psiBuilder.doneSubtree(innerStatement, inrTree, "InnerStatement");
 		 return innerStatement;
 	}
 
-	public static InnerStatement ofImplicit(final PsiBuilder simBuilder) {
-		 int inrTree = simBuilder.startSubtree(InnerStatement.class, "InnerStatement");
-		 InnerStatement innerStatement = new InnerStatement(simBuilder);		
-		 simBuilder.doneSubtree(innerStatement, inrTree, "InnerStatement");
+	public static InnerStatement ofImplicit(final PsiBuilder psiBuilder) {
+		 int inrTree = psiBuilder.startSubtree(InnerStatement.class, "InnerStatement");
+		 InnerStatement innerStatement = new InnerStatement(psiBuilder);		
+		 psiBuilder.doneSubtree(innerStatement, inrTree, "InnerStatement");
 		 return innerStatement;
 	}
 		
 	/// Create a new InnerStatement.
 	/// @param line the source line number
-//	public InnerStatement(final PsiBuilder simBuilder, boolean implicit, final int line) {
-	private InnerStatement(final PsiBuilder simBuilder) {
-		super(simBuilder.getSourceLineNumber());
+//	public InnerStatement(final PsiBuilder psiBuilder, boolean implicit, final int line) {
+	private InnerStatement(final PsiBuilder psiBuilder) {
+		super(psiBuilder.getSourceLineNumber());
 //		if(! implicit) {
-//			simBuilder.startSubtree("InnerStatement");
-//			simBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
+//			psiBuilder.startSubtree("InnerStatement");
+//			psiBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
 //		}
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": InnerStatement: "+this);
 		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {

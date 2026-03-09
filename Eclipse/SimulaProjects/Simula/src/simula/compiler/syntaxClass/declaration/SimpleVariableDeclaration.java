@@ -127,19 +127,19 @@ public class SimpleVariableDeclaration extends Declaration {
 		} while (Parse.accept(KeyWord.COMMA));
 	}
 
-	static void expectSimpleVariable(final PsiBuilder simBuilder, final Type type, final DeclarationList declarationList) {
+	static void expectSimpleVariable(final PsiBuilder psiBuilder, final Type type, final DeclarationList declarationList) {
 		// identifier-list = identifier { , identifier }
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse IdentifierList");
 		do {
-			String ident = PsiParse.expectIdentifier(simBuilder);
+			String ident = PsiParse.expectIdentifier(psiBuilder);
 			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(type, ident);
-			if (PsiParse.accept(simBuilder, KeyWord.EQ))
-				typeDeclaration.constantElement = Expression.expectExpression(simBuilder);
+			if (PsiParse.accept(psiBuilder, KeyWord.EQ))
+				typeDeclaration.constantElement = Expression.expectExpression(psiBuilder);
 			declarationList.add(typeDeclaration);
-			simBuilder.doneSubtree(typeDeclaration);
-			simBuilder.startSubtree(Declaration.class, "NextDeclaration");
-		} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
+			psiBuilder.doneSubtree(typeDeclaration);
+			psiBuilder.startSubtree(Declaration.class, "NextDeclaration");
+		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 	}
 
 	@Override

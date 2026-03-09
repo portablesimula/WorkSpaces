@@ -123,32 +123,32 @@ public final class ActivationStatement extends Statement {
 //		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": ActivationStatement: "+this);
 //	}
 
-	ActivationStatement(final PsiBuilder simBuilder, final int line) {
+	ActivationStatement(final PsiBuilder psiBuilder, final int line) {
 		super(line);
-		int actTree = simBuilder.startSubtree(ActivationStatement.class, "ActivationStatement");
-		LexToken activator = PsiParse.getParserToken(simBuilder);
+		int actTree = psiBuilder.startSubtree(ActivationStatement.class, "ActivationStatement");
+		LexToken activator = PsiParse.getParserToken(psiBuilder);
 		REAC = activator.keyWord == KeyWord.REACTIVATE;
-		simBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to 'current tree')
+		psiBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to 'current tree')
 
 //		LexToken activator = PsiParse.prevToken();
 //		REAC = activator.keyWord == KeyWord.REACTIVATE;
 		if (Option.internal.TRACE_PARSE) PsiParse.TRACE("Parse ActivationStatement");
-		object1 = Expression.expectExpression(simBuilder);
+		object1 = Expression.expectExpression(psiBuilder);
 		object1.backLink = this;
 		code = ActivationCode.direct;
-		LexToken prevToken = PsiParse.getParserToken(simBuilder);
-		if (PsiParse.accept(simBuilder, KeyWord.AT) || PsiParse.accept(simBuilder, KeyWord.DELAY)) {
+		LexToken prevToken = PsiParse.getParserToken(psiBuilder);
+		if (PsiParse.accept(psiBuilder, KeyWord.AT) || PsiParse.accept(psiBuilder, KeyWord.DELAY)) {
 			code = (prevToken.keyWord == KeyWord.AT) ? ActivationCode.at : ActivationCode.delay;
-			time = Expression.expectExpression(simBuilder);
+			time = Expression.expectExpression(psiBuilder);
 			time.backLink = this;
-			if (PsiParse.accept(simBuilder, KeyWord.PRIOR)) prior = true;
-		} else if (PsiParse.accept(simBuilder, KeyWord.BEFORE) || PsiParse.accept(simBuilder, KeyWord.AFTER)) {
+			if (PsiParse.accept(psiBuilder, KeyWord.PRIOR)) prior = true;
+		} else if (PsiParse.accept(psiBuilder, KeyWord.BEFORE) || PsiParse.accept(psiBuilder, KeyWord.AFTER)) {
 			code = (prevToken.keyWord == KeyWord.BEFORE) ? ActivationCode.before : ActivationCode.after;
-			object2 = Expression.expectExpression(simBuilder);
+			object2 = Expression.expectExpression(psiBuilder);
 			object2.backLink = this;
 		}
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": ActivationStatement: "+this);
-		simBuilder.doneSubtree(this, actTree, "ActivationStatement");
+		psiBuilder.doneSubtree(this, actTree, "ActivationStatement");
 	}
 
 	@Override

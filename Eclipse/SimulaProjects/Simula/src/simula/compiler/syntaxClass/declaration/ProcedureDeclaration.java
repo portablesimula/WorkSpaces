@@ -137,51 +137,51 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// 
 	/// @param type procedure's type
 	/// @return a newly created ProcedureDeclaration
-	public static ProcedureDeclaration expectProcedureDeclaration(final Type type) {
+//	public static ProcedureDeclaration expectProcedureDeclaration(final Type type) {
+//		ProcedureDeclaration proc = new ProcedureDeclaration(null, ObjectKind.Procedure);
+//		proc.sourceFileName = Global.sourceFileName;
+//		proc.OLD_lineNumber=Parse.prevToken.lineNumber;
+//		proc.type = type;
+//		if (Option.internal.TRACE_PARSE)
+//			Parse.TRACE("Parse ProcedureDeclaration, type=" + type);
+//		proc.modifyIdentifier(Parse.expectIdentifier());
+//		if (Parse.accept(KeyWord.BEGPAR)) {
+//			expectFormalParameterPart(proc.parameterList);
+//			Parse.expect(KeyWord.SEMICOLON);
+//			while(acceptModePart(proc.parameterList));
+//			expectSpecificationPart(proc);
+//		} else Parse.expect(KeyWord.SEMICOLON);
+//		expectProcedureBody(proc);
+//
+//		proc.lastLineNumber = Global.sourceLineNumber;
+//		if (Option.internal.TRACE_PARSE)
+//			Util.TRACE("Line "+proc.lineNumber()+": ProcedureDeclaration: "+proc);
+//		Global.setScope(proc.declaredIn);
+//		return (proc);
+//	}
+
+	public static ProcedureDeclaration expectProcedureDeclaration(final PsiBuilder psiBuilder, final Type type) {
 		ProcedureDeclaration proc = new ProcedureDeclaration(null, ObjectKind.Procedure);
 		proc.sourceFileName = Global.sourceFileName;
-		proc.OLD_lineNumber=Parse.prevToken.lineNumber;
+		proc.OLD_lineNumber = psiBuilder.getSourceLineNumber();
 		proc.type = type;
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ProcedureDeclaration, type=" + type);
-		proc.modifyIdentifier(Parse.expectIdentifier());
-		if (Parse.accept(KeyWord.BEGPAR)) {
-			expectFormalParameterPart(proc.parameterList);
-			Parse.expect(KeyWord.SEMICOLON);
-			while(acceptModePart(proc.parameterList));
-			expectSpecificationPart(proc);
-		} else Parse.expect(KeyWord.SEMICOLON);
-		expectProcedureBody(proc);
+		proc.modifyIdentifier(PsiParse.expectIdentifier(psiBuilder));
+		if (PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) {
+			expectFormalParameterPart(psiBuilder, proc.parameterList);
+			PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
+			while(acceptModePart(psiBuilder, proc.parameterList));
+			expectSpecificationPart(psiBuilder, proc);
+		} else PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
+		expectProcedureBody(psiBuilder, proc);
 
 		proc.lastLineNumber = Global.sourceLineNumber;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Line "+proc.lineNumber()+": ProcedureDeclaration: "+proc);
 		Global.setScope(proc.declaredIn);
-		return (proc);
-	}
-
-	public static ProcedureDeclaration expectProcedureDeclaration(final PsiBuilder simBuilder, final Type type) {
-		ProcedureDeclaration proc = new ProcedureDeclaration(null, ObjectKind.Procedure);
-		proc.sourceFileName = Global.sourceFileName;
-		proc.OLD_lineNumber = simBuilder.getSourceLineNumber();
-		proc.type = type;
-		if (Option.internal.TRACE_PARSE)
-			Parse.TRACE("Parse ProcedureDeclaration, type=" + type);
-		proc.modifyIdentifier(PsiParse.expectIdentifier(simBuilder));
-		if (PsiParse.accept(simBuilder, KeyWord.BEGPAR)) {
-			expectFormalParameterPart(simBuilder, proc.parameterList);
-			PsiParse.expect(simBuilder, KeyWord.SEMICOLON);
-			while(acceptModePart(simBuilder, proc.parameterList));
-			expectSpecificationPart(simBuilder, proc);
-		} else PsiParse.expect(simBuilder, KeyWord.SEMICOLON);
-		expectProcedureBody(simBuilder, proc);
-
-		proc.lastLineNumber = Global.sourceLineNumber;
-		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line "+proc.lineNumber()+": ProcedureDeclaration: "+proc);
-		Global.setScope(proc.declaredIn);
-		simBuilder.doneSubtree(proc);
-		simBuilder.startSubtree(Declaration.class, "NextDeclaration");
+		psiBuilder.doneSubtree(proc);
+		psiBuilder.startSubtree(Declaration.class, "NextDeclaration");
 		return (proc);
 	}
 
@@ -224,14 +224,14 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		return(false);
 	}
 	
-	private static boolean acceptModePart(PsiBuilder simBuilder, Vector<Parameter> pList) {
-		LexToken prevToken = PsiParse.getParserToken(simBuilder);
-		if (PsiParse.accept(simBuilder, KeyWord.VALUE, KeyWord.NAME)) {
+	private static boolean acceptModePart(PsiBuilder psiBuilder, Vector<Parameter> pList) {
+		LexToken prevToken = PsiParse.getParserToken(psiBuilder);
+		if (PsiParse.accept(psiBuilder, KeyWord.VALUE, KeyWord.NAME)) {
 			int mode = (prevToken.keyWord == KeyWord.VALUE)
 					? Parameter.Mode.value
 					: Parameter.Mode.name;
 			do {
-				String identifier = PsiParse.expectIdentifier(simBuilder);
+				String identifier = PsiParse.expectIdentifier(psiBuilder);
 				Parameter parameter = null;
 				for (Parameter par : pList)
 					if (Util.equals(identifier, par.identifier)) {
@@ -243,8 +243,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					parameter = new Parameter(identifier);
 				}
 				parameter.setMode(mode);
-			} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
-			PsiParse.expect(simBuilder, KeyWord.SEMICOLON);
+			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
+			PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 			return(true);
 		}
 		return(false);
@@ -313,20 +313,20 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		}
 	}
 
-	private static void expectSpecificationPart(PsiBuilder simBuilder, ProcedureDeclaration proc) {
+	private static void expectSpecificationPart(PsiBuilder psiBuilder, ProcedureDeclaration proc) {
 		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse ParameterSpecifications");
 		LOOP: while(true) {
 			Type type;
 			int kind = Parameter.Kind.Simple;
-			if (PsiParse.accept(simBuilder, KeyWord.SWITCH)) {
+			if (PsiParse.accept(psiBuilder, KeyWord.SWITCH)) {
 				type = Type.Label;
 				kind = Parameter.Kind.Procedure;
-			} else if (PsiParse.accept(simBuilder, KeyWord.LABEL))
+			} else if (PsiParse.accept(psiBuilder, KeyWord.LABEL))
 				type = Type.Label;
 			else {
-				type = PsiParse.acceptType(simBuilder);
+				type = PsiParse.acceptType(psiBuilder);
 				//if (type == null) return (false);
-				if (PsiParse.accept(simBuilder, KeyWord.ARRAY)) {
+				if (PsiParse.accept(psiBuilder, KeyWord.ARRAY)) {
 					if (type == null) {
 						// See Simula Standard 5.2 -
 						// If no type is given the type real is understood.
@@ -334,11 +334,11 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					}
 					kind = Parameter.Kind.Array;
 				}
-				else if (PsiParse.accept(simBuilder, KeyWord.PROCEDURE)) kind = Parameter.Kind.Procedure;
+				else if (PsiParse.accept(psiBuilder, KeyWord.PROCEDURE)) kind = Parameter.Kind.Procedure;
 				else if(type == null) break LOOP;
 			}
 			do {
-				String identifier = PsiParse.expectIdentifier(simBuilder);
+				String identifier = PsiParse.expectIdentifier(psiBuilder);
 				Parameter parameter = null;
 				for (Parameter par : proc.parameterList)
 					if (Util.equals(identifier,par.identifier)) { parameter = par; break; }
@@ -347,8 +347,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					parameter = new Parameter(identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
-			} while (PsiParse.accept(simBuilder, KeyWord.COMMA));
-			PsiParse.expect(simBuilder, KeyWord.SEMICOLON);
+			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
+			PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 			continue LOOP;
 		}
 		for (Parameter par : proc.parameterList) {
@@ -375,45 +375,45 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// </pre>
 	/// 
 	/// @param proc the procedure
-	private static void expectProcedureBody(ProcedureDeclaration proc) {
-		if (Parse.accept(KeyWord.BEGIN)) {
-			Statement stm;
-			if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse Procedure Block");
-			while (Declaration.acceptDeclaration(proc)) {
-				Parse.accept(KeyWord.SEMICOLON);
-			}
-//			Vector<Statement> stmList = proc.statements;
-			ObjectList<Statement> stmList = proc.statements;
-			while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
-				stm = Statement.expectStatement();
-				if (stm != null) stmList.add(stm);
-			}
-			if (Parse.prevToken.keyWord == KeyWord.EOF) {
-				Util.error("Illegal termination of procedure declaration. Missing END.");
-			}
-		}
-		else proc.statements.add(Statement.expectStatement());
-	}
+//	private static void expectProcedureBody(ProcedureDeclaration proc) {
+//		if (Parse.accept(KeyWord.BEGIN)) {
+//			Statement stm;
+//			if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse Procedure Block");
+//			while (Declaration.acceptDeclaration(proc)) {
+//				Parse.accept(KeyWord.SEMICOLON);
+//			}
+////			Vector<Statement> stmList = proc.statements;
+//			ObjectList<Statement> stmList = proc.statements;
+//			while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
+//				stm = Statement.expectStatement();
+//				if (stm != null) stmList.add(stm);
+//			}
+//			if (Parse.prevToken.keyWord == KeyWord.EOF) {
+//				Util.error("Illegal termination of procedure declaration. Missing END.");
+//			}
+//		}
+//		else proc.statements.add(Statement.expectStatement());
+//	}
 
-	private static void expectProcedureBody(PsiBuilder simBuilder, ProcedureDeclaration proc) {
-		if (PsiParse.accept(simBuilder, KeyWord.BEGIN)) {
+	private static void expectProcedureBody(PsiBuilder psiBuilder, ProcedureDeclaration proc) {
+		if (PsiParse.accept(psiBuilder, KeyWord.BEGIN)) {
 			Statement stm;
 			if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse Procedure Block");
-//			while (Declaration.acceptDeclaration(simBuilder, proc)) {
-//				PsiParse.accept(simBuilder, KeyWord.SEMICOLON);
+//			while (Declaration.acceptDeclaration(psiBuilder, proc)) {
+//				PsiParse.accept(psiBuilder, KeyWord.SEMICOLON);
 //			}
-			Declaration.acceptDeclarations(simBuilder, proc);
+			Declaration.acceptDeclarations(psiBuilder, proc);
 //			Vector<Statement> stmList = proc.statements;
 			ObjectList<Statement> stmList = proc.statements;
-			while (!PsiParse.accept(simBuilder, KeyWord.END, KeyWord.EOF)) {
-				stm = Statement.acceptStatement(simBuilder);
+			while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
+				stm = Statement.acceptStatement(psiBuilder);
 				if (stm != null) stmList.add(stm);
 			}
-			if (PsiParse.prevToken(simBuilder).keyWord == KeyWord.EOF) {
+			if (PsiParse.prevToken(psiBuilder).keyWord == KeyWord.EOF) {
 				Util.error("Illegal termination of procedure declaration. Missing END.");
 			}
 		}
-		else proc.statements.add(Statement.acceptStatement(simBuilder));
+		else proc.statements.add(Statement.acceptStatement(psiBuilder));
 	}
 
 	// ***********************************************************************************************

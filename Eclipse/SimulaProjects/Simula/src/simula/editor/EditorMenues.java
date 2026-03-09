@@ -570,11 +570,11 @@ public class EditorMenues extends JMenuBar {
 		SwingUtilities.invokeLater(() -> {
 			Option.internal.DEBUGGING=false;
 			SourceTextPanel current=SimulaEditor.current;
-			PsiBuilder simBuilder = new PsiBuilder();
-			simBuilder.start(current.getText());
-//			Global.programModule.doBuild(simBuilder);
-			Global.programModule = new ProgramModule(simBuilder);
-			PsiTree psiTree = simBuilder.getRoot();
+			PsiBuilder psiBuilder = new PsiBuilder();
+			psiBuilder.start(current.getText());
+//			Global.programModule.doBuild(psiBuilder);
+			Global.programModule = new ProgramModule(psiBuilder);
+			PsiTree psiTree = psiBuilder.getRoot();
 			
 			if(! psiTree.getText().equals(current.getText())) {
 				String curTxt = (""+current.getText()).replace("\r", "\\r").replace("\n", "\\n");
@@ -598,11 +598,11 @@ public class EditorMenues extends JMenuBar {
 		SwingUtilities.invokeLater(() -> {
 			Option.internal.DEBUGGING=false;
 			SourceTextPanel current=SimulaEditor.current;
-			PsiBuilder simBuilder = new PsiBuilder();
-			simBuilder.start(current.getText());
-//			Global.programModule.doBuild(simBuilder);
-			Global.programModule = new ProgramModule(simBuilder);
-//			PsiTree psiTree = simBuilder.getRoot();
+			PsiBuilder psiBuilder = new PsiBuilder();
+			psiBuilder.start(current.getText());
+//			Global.programModule.doBuild(psiBuilder);
+			Global.programModule = new ProgramModule(psiBuilder);
+//			PsiTree psiTree = psiBuilder.getRoot();
 //			psiTree.popUp();
 			
 			Global.programModule.printTree(1, this);

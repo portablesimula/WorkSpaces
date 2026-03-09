@@ -109,73 +109,73 @@ public final class SwitchStatement extends Statement {
 
 	/// Create a new SwitchStatement.
 	/// @param line the source line number
-	SwitchStatement(int line) {
-		super(line);
-		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse SwitchStatement: line="+line);
-		Parse.expect(KeyWord.BEGPAR);
-		lowKey = Expression.expectExpression();
-		Parse.expect(KeyWord.COLON);
-		hiKey = Expression.expectExpression();
-		Parse.expect(KeyWord.ENDPAR);
-		switchKey = Expression.expectExpression();
-		switchKey.backLink=this;
-		Parse.expect(KeyWord.BEGIN);
-		has_NONE_case=false;
-		while (Parse.accept(KeyWord.WHEN)) {
-			Vector<SwitchInterval> caseKeyList=new Vector<SwitchInterval>();
-			if (Parse.accept(KeyWord.NONE)) {
-				caseKeyList.add(null);
-				if(has_NONE_case) Util.error("NONE Case is already used");
-				has_NONE_case=true;
-			}
-			else {
-				caseKeyList.add(expectCasePair());
-				while(Parse.accept(KeyWord.COMMA)) caseKeyList.add(expectCasePair());
-			}
-			Parse.expect(KeyWord.DO);
-			Statement statement = Statement.expectStatement();
-			Parse.accept(KeyWord.SEMICOLON);
-			switchCases.add(new SwitchWhenPart(caseKeyList, statement));
-		}
-		Parse.expect(KeyWord.END);
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber()+": SwitchStatement: "+this);
-	}
+//	SwitchStatement(int line) {
+//		super(line);
+//		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse SwitchStatement: line="+line);
+//		Parse.expect(KeyWord.BEGPAR);
+//		lowKey = Expression.expectExpression();
+//		Parse.expect(KeyWord.COLON);
+//		hiKey = Expression.expectExpression();
+//		Parse.expect(KeyWord.ENDPAR);
+//		switchKey = Expression.expectExpression();
+//		switchKey.backLink=this;
+//		Parse.expect(KeyWord.BEGIN);
+//		has_NONE_case=false;
+//		while (Parse.accept(KeyWord.WHEN)) {
+//			Vector<SwitchInterval> caseKeyList=new Vector<SwitchInterval>();
+//			if (Parse.accept(KeyWord.NONE)) {
+//				caseKeyList.add(null);
+//				if(has_NONE_case) Util.error("NONE Case is already used");
+//				has_NONE_case=true;
+//			}
+//			else {
+//				caseKeyList.add(expectCasePair());
+//				while(Parse.accept(KeyWord.COMMA)) caseKeyList.add(expectCasePair());
+//			}
+//			Parse.expect(KeyWord.DO);
+//			Statement statement = Statement.expectStatement();
+//			Parse.accept(KeyWord.SEMICOLON);
+//			switchCases.add(new SwitchWhenPart(caseKeyList, statement));
+//		}
+//		Parse.expect(KeyWord.END);
+//		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber()+": SwitchStatement: "+this);
+//	}
 
-	SwitchStatement(final PsiBuilder simBuilder, final int line) {
+	SwitchStatement(final PsiBuilder psiBuilder, final int line) {
 		super(line);
 
-		int swtTree = simBuilder.startSubtree(SwitchStatement.class, "SwitchStatement");
-		simBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
+		int swtTree = psiBuilder.startSubtree(SwitchStatement.class, "SwitchStatement");
+		psiBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);
-		PsiParse.expect(simBuilder, KeyWord.BEGPAR);
-		lowKey = Expression.expectExpression(simBuilder);
-		PsiParse.expect(simBuilder, KeyWord.COLON);
-		hiKey = Expression.expectExpression(simBuilder);
-		PsiParse.expect(simBuilder, KeyWord.ENDPAR);
-		switchKey = Expression.expectExpression(simBuilder);
+		PsiParse.expect(psiBuilder, KeyWord.BEGPAR);
+		lowKey = Expression.expectExpression(psiBuilder);
+		PsiParse.expect(psiBuilder, KeyWord.COLON);
+		hiKey = Expression.expectExpression(psiBuilder);
+		PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
+		switchKey = Expression.expectExpression(psiBuilder);
 		switchKey.backLink=this;
-		PsiParse.expect(simBuilder, KeyWord.BEGIN);
+		PsiParse.expect(psiBuilder, KeyWord.BEGIN);
 		has_NONE_case=false;
-		while (PsiParse.accept(simBuilder, KeyWord.WHEN)) {
+		while (PsiParse.accept(psiBuilder, KeyWord.WHEN)) {
 			Vector<SwitchInterval> caseKeyList=new Vector<SwitchInterval>();
-			if (PsiParse.accept(simBuilder, KeyWord.NONE)) {
+			if (PsiParse.accept(psiBuilder, KeyWord.NONE)) {
 				caseKeyList.add(null);
 				if(has_NONE_case) Util.error("NONE Case is already used");
 				has_NONE_case=true;
 			}
 			else {
-				caseKeyList.add(expectCasePair(simBuilder));
-				while(PsiParse.accept(simBuilder, KeyWord.COMMA)) caseKeyList.add(expectCasePair(simBuilder));
+				caseKeyList.add(expectCasePair(psiBuilder));
+				while(PsiParse.accept(psiBuilder, KeyWord.COMMA)) caseKeyList.add(expectCasePair(psiBuilder));
 			}
-			PsiParse.expect(simBuilder, KeyWord.DO);
-			Statement statement = Statement.acceptStatement(simBuilder);
-			PsiParse.accept(simBuilder, KeyWord.SEMICOLON);
+			PsiParse.expect(psiBuilder, KeyWord.DO);
+			Statement statement = Statement.acceptStatement(psiBuilder);
+			PsiParse.accept(psiBuilder, KeyWord.SEMICOLON);
 			switchCases.add(new SwitchWhenPart(caseKeyList, statement));
 		}
-		PsiParse.expect(simBuilder, KeyWord.END);
+		PsiParse.expect(psiBuilder, KeyWord.END);
 		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber()+": SwitchStatement: "+this);
-		simBuilder.doneSubtree(this, swtTree, "SwitchStatement");
+		psiBuilder.doneSubtree(this, swtTree, "SwitchStatement");
 	}
 
 	/// Parse Utility: Expect case pair.
@@ -187,10 +187,10 @@ public final class SwitchStatement extends Statement {
 		return(new SwitchInterval(lowCase,hiCase));
 	}
 
-	private SwitchInterval expectCasePair(final PsiBuilder simBuilder) {
-		Expression lowCase=Expression.expectExpression(simBuilder);
+	private SwitchInterval expectCasePair(final PsiBuilder psiBuilder) {
+		Expression lowCase=Expression.expectExpression(psiBuilder);
 		Expression hiCase=null;
-		if(PsiParse.accept(simBuilder, KeyWord.COLON)) hiCase=Expression.expectExpression(simBuilder);
+		if(PsiParse.accept(psiBuilder, KeyWord.COLON)) hiCase=Expression.expectExpression(psiBuilder);
 		return(new SwitchInterval(lowCase,hiCase));
 	}
 

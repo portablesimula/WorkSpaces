@@ -76,39 +76,39 @@ public interface PsiParse {
 //		nextToken();
 	}
 
-	public static void rollBack(final PsiBuilder simBuilder) {
-		simBuilder.rollBack();
+	public static void rollBack(final PsiBuilder psiBuilder) {
+		psiBuilder.rollBack();
 //		Util.IERR("Parse.rollBack: KAN IKKE BRUKES: FORSØK  drop()  eller rollbackTo()");
 	}
 
-	public static LexToken prevToken(final PsiBuilder simBuilder) {
+	public static LexToken prevToken(final PsiBuilder psiBuilder) {
 //		Util.IERR("Parse.prevToken: KAN IKKE BRUKES: SKRIV OM KODEN");
-		return simBuilder.prevToken();
+		return psiBuilder.prevToken();
 	}
 
-	public static LexToken prevParserToken(final PsiBuilder simBuilder) {
+	public static LexToken prevParserToken(final PsiBuilder psiBuilder) {
 //		Util.IERR("Parse.prevToken: KAN IKKE BRUKES: SKRIV OM KODEN");
-		return simBuilder.prevParserToken();
+		return psiBuilder.prevParserToken();
 	}
 
 //	/// Return the current Token.
-//	public static LexToken currentToken(final PsiBuilder simBuilder) {
-//        return (LexToken)simBuilder.getCurrentLexerToken();
+//	public static LexToken currentToken(final PsiBuilder psiBuilder) {
+//        return (LexToken)psiBuilder.getCurrentLexerToken();
 //	}
 
 	/// Return the current Token.
-	public static LexToken currentLexToken(final PsiBuilder simBuilder) {
-        return (LexToken)simBuilder.getCurrentLexerToken();
+	public static LexToken currentLexToken(final PsiBuilder psiBuilder) {
+        return (LexToken)psiBuilder.getCurrentLexerToken();
 	}
 
 	/// Return the Parser current Token.
-	public static LexToken getParserToken(final PsiBuilder simBuilder) {
-        return (LexToken)simBuilder.getParserToken();
+	public static LexToken getParserToken(final PsiBuilder psiBuilder) {
+        return (LexToken)psiBuilder.getParserToken();
 	}
 	
 	/// Advance to next Token.
-	public static void nextToken(final PsiBuilder simBuilder) {
-		simBuilder.advanceLexer();
+	public static void nextToken(final PsiBuilder psiBuilder) {
+		psiBuilder.advanceLexer();
 	}
 
 	/// Expect the given KeyWord.
@@ -116,9 +116,9 @@ public interface PsiParse {
 	/// If it is not accepted an error message is given.
 	/// @param key a keyword
 	/// @return true if the keyword was accepted, otherwise false
-	public static boolean expect(final PsiBuilder simBuilder, final int key) {
-		if (accept(simBuilder, key)) return (true);
-		LOG.error("Got symbol '" + PsiParse.currentLexToken(simBuilder) + "' while expecting KeyWord " + KeyWord.edit(key).toLowerCase());
+	public static boolean expect(final PsiBuilder psiBuilder, final int key) {
+		if (accept(psiBuilder, key)) return (true);
+		LOG.error("Got symbol '" + PsiParse.currentLexToken(psiBuilder) + "' while expecting KeyWord " + KeyWord.edit(key).toLowerCase());
 		return (false);
 	}
 
@@ -129,51 +129,51 @@ public interface PsiParse {
 	/// thus setting prevToken.
 	/// @param keys t the given keywords
 	/// @return true if a keyword is accepted, false otherwise.
-	public static boolean accept(final PsiBuilder simBuilder, final int... keywords) {
-		LexToken token = acceptParserToken(simBuilder, keywords); 
+	public static boolean accept(final PsiBuilder psiBuilder, final int... keywords) {
+		LexToken token = acceptParserToken(psiBuilder, keywords); 
 		return token != null;
 	}
 
-	public static LexToken acceptParserToken(final PsiBuilder simBuilder, final int... keywords) {
-        LexToken currentToken = getParserToken(simBuilder);
+	public static LexToken acceptParserToken(final PsiBuilder psiBuilder, final int... keywords) {
+        LexToken currentToken = getParserToken(psiBuilder);
         int currentKeyWord = (currentToken == null)? KeyWord.EOF : currentToken.keyWord;
 		for (int keyword : keywords)
 			if (currentKeyWord == keyword) {
-				nextToken(simBuilder);
+				nextToken(psiBuilder);
 //				IO.println("Line "+ Global.sourceLineNumber+": Parse.accept: " + KeyWord.edit(key) + " accepted, nextToken: " + Parse.currentToken);
-//				IO.println("PsiParse.accept: " + KeyWord.edit(keyword) + " accepted, nextToken: " + PsiParse.currentLexToken(simBuilder));
+//				IO.println("PsiParse.accept: " + KeyWord.edit(keyword) + " accepted, nextToken: " + PsiParse.currentLexToken(psiBuilder));
 				return currentToken;
 			}
 		return null;
 	}
 	
-	public static boolean accept_AND_THEN(final PsiBuilder simBuilder) {
+	public static boolean accept_AND_THEN(final PsiBuilder psiBuilder) {
 //		IO.println("\nPsiParse.accept_AND_THEN: BEGIN ======================================================================");
-		if(accept(simBuilder, KeyWord.AND_THEN)) {
+		if(accept(psiBuilder, KeyWord.AND_THEN)) {
 			IO.println("PsiParse.accept_AND_THEN: GOT: AND_THEN");
 			return true;
 		}
-		if(accept(simBuilder, KeyWord.AND)) {
-			LexToken prv = simBuilder.getCurrentLexerToken();
+		if(accept(psiBuilder, KeyWord.AND)) {
+			LexToken prv = psiBuilder.getCurrentLexerToken();
 			IO.println("PsiParse.accept_AND_THEN: MAYBE AND THEN prv="+prv);
-			if(accept(simBuilder, KeyWord.THEN)) {
+			if(accept(psiBuilder, KeyWord.THEN)) {
 				IO.println("PsiParse.accept_AND_THEN: GOT: AND THEN prv="+prv);
 				return true;
 			}
 			IO.println("PsiParse.accept_AND_THEN: FAILED --> ROLLBACK prv="+prv);
-			simBuilder.rollBackTo(prv);
+			psiBuilder.rollBackTo(prv);
 		}
 		return false;
 	}
 
-	public static boolean accept_AND_ONLY(final PsiBuilder simBuilder) {
+	public static boolean accept_AND_ONLY(final PsiBuilder psiBuilder) {
 //		IO.println("\nPsiParse.accept_AND_THEN: BEGIN ======================================================================");
-		LexToken prv = simBuilder.getCurrentLexerToken();
-		if(accept(simBuilder, KeyWord.AND)) {
+		LexToken prv = psiBuilder.getCurrentLexerToken();
+		if(accept(psiBuilder, KeyWord.AND)) {
 			IO.println("PsiParse.accept_AND_ONLY: MAYBE AND THEN prv="+prv);
-			if(accept(simBuilder, KeyWord.THEN)) {
+			if(accept(psiBuilder, KeyWord.THEN)) {
 				IO.println("PsiParse.accept_AND_ONLY: GOT: AND THEN prv="+prv);
-				simBuilder.rollBackTo(prv);
+				psiBuilder.rollBackTo(prv);
 				return false;
 			}
 			IO.println("PsiParse.accept_AND_ONLY: prv="+prv);
@@ -182,33 +182,33 @@ public interface PsiParse {
 		return false;
 	}
 	
-	public static boolean accept_OR_ELSE(final PsiBuilder simBuilder) {
+	public static boolean accept_OR_ELSE(final PsiBuilder psiBuilder) {
 //		IO.println("\nPsiParse.accept_OR_ELSE: BEGIN ======================================================================");
-		if(accept(simBuilder, KeyWord.OR_ELSE)) {
+		if(accept(psiBuilder, KeyWord.OR_ELSE)) {
 			IO.println("PsiParse.accept_OR_ELSE: GOT: OR_ELSE");
 			return true;
 		}
-		if(accept(simBuilder, KeyWord.OR)) {
-			LexToken prv = simBuilder.getCurrentLexerToken();
+		if(accept(psiBuilder, KeyWord.OR)) {
+			LexToken prv = psiBuilder.getCurrentLexerToken();
 			IO.println("PsiParse.accept_OR_ELSE: MAYBE OR ELSE prv="+prv);
-			if(accept(simBuilder, KeyWord.ELSE)) {
+			if(accept(psiBuilder, KeyWord.ELSE)) {
 				IO.println("PsiParse.accept_OR_ELSE: GOT: OR ELSE prv="+prv);
 				return true;
 			}
 			IO.println("PsiParse.accept_OR_ELSE: FAILED --> ROLLBACK prv="+prv);
-			simBuilder.rollBackTo(prv);
+			psiBuilder.rollBackTo(prv);
 		}
 		return false;
 	}
 
-	public static boolean accept_OR_ONLY(final PsiBuilder simBuilder) {
+	public static boolean accept_OR_ONLY(final PsiBuilder psiBuilder) {
 //		IO.println("\nPsiParse.accept_OR_THEN: BEGIN ======================================================================");
-		LexToken prv = simBuilder.getCurrentLexerToken();
-		if(accept(simBuilder, KeyWord.OR)) {
+		LexToken prv = psiBuilder.getCurrentLexerToken();
+		if(accept(psiBuilder, KeyWord.OR)) {
 			IO.println("PsiParse.accept_OR_ONLY: MAYBE OR ELSE prv="+prv);
-			if(accept(simBuilder, KeyWord.ELSE)) {
+			if(accept(psiBuilder, KeyWord.ELSE)) {
 				IO.println("PsiParse.accept_OR_ONLY: GOT: OR ELSE prv="+prv);
-				simBuilder.rollBackTo(prv);
+				psiBuilder.rollBackTo(prv);
 				return false;
 			}
 			IO.println("PsiParse.accept_OR_ONLY: prv="+prv);
@@ -219,16 +219,16 @@ public interface PsiParse {
 
 
 	/// Skip misplaced current symbol.
-	public static void skipMisplacedCurrentSymbol(final PsiBuilder simBuilder) {
-		LOG.error("Misplaced symbol: "+PsiParse.currentLexToken(simBuilder)+" -- Ignored");
-		nextToken(simBuilder);
+	public static void skipMisplacedCurrentSymbol(final PsiBuilder psiBuilder) {
+		LOG.error("Misplaced symbol: "+PsiParse.currentLexToken(psiBuilder)+" -- Ignored");
+		nextToken(psiBuilder);
 	}
 	
 	/// Test to accept an identifier.
 	/// @return the identifier or null
-	public static String acceptIdentifier(final PsiBuilder simBuilder) {
+	public static String acceptIdentifier(final PsiBuilder psiBuilder) {
 		LexToken token = null;
-		if ((token = PsiParse.acceptParserToken(simBuilder, KeyWord.IDENTIFIER)) != null)
+		if ((token = PsiParse.acceptParserToken(psiBuilder, KeyWord.IDENTIFIER)) != null)
 			return ((Identifier)token).value;
 		return (null);
 	}
@@ -237,9 +237,9 @@ public interface PsiParse {
 	/// 
 	/// If failing to do so, an error is printed.
 	/// @return the identifier or null
-	public static String expectIdentifier(final PsiBuilder simBuilder) {
-        LexToken currentToken = getParserToken(simBuilder);
-		if (acceptIdentifier(simBuilder) != null)
+	public static String expectIdentifier(final PsiBuilder psiBuilder) {
+        LexToken currentToken = getParserToken(psiBuilder);
+		if (acceptIdentifier(psiBuilder) != null)
 			return ((Identifier)currentToken).value;
 		LOG.error("Got symbol " + currentToken + " while expecting an Identifier");
 		return (null);
@@ -247,18 +247,18 @@ public interface PsiParse {
 
 	/// Test to accept a Type.
 	/// @return the type or null
-	public static Type acceptType(final PsiBuilder simBuilder) {
+	public static Type acceptType(final PsiBuilder psiBuilder) {
 		Type type=null; //Type.Notype;
-		if(accept(simBuilder, KeyWord.BOOLEAN)) type=Type.Boolean;
-		else if(accept(simBuilder, KeyWord.CHARACTER)) type=Type.Character;
-		else if(accept(simBuilder, KeyWord.INTEGER)) type=Type.Integer;
-		else if(accept(simBuilder, KeyWord.SHORT)) { PsiParse.expect(simBuilder, KeyWord.INTEGER); type=Type.Integer; }
-		else if(accept(simBuilder, KeyWord.REAL)) type=Type.Real;
-		else if(accept(simBuilder, KeyWord.LONG)) { PsiParse.expect(simBuilder, KeyWord.REAL); type=Type.LongReal; }
-		else if(accept(simBuilder, KeyWord.TEXT)) type=Type.Text;
-		else if(accept(simBuilder, KeyWord.REF))	{
-			PsiParse.expect(simBuilder, KeyWord.BEGPAR); LexToken classIdentifier=PsiParse.getParserToken(simBuilder);
-			PsiParse.expect(simBuilder, KeyWord.IDENTIFIER); PsiParse.expect(simBuilder, KeyWord.ENDPAR); 
+		if(accept(psiBuilder, KeyWord.BOOLEAN)) type=Type.Boolean;
+		else if(accept(psiBuilder, KeyWord.CHARACTER)) type=Type.Character;
+		else if(accept(psiBuilder, KeyWord.INTEGER)) type=Type.Integer;
+		else if(accept(psiBuilder, KeyWord.SHORT)) { PsiParse.expect(psiBuilder, KeyWord.INTEGER); type=Type.Integer; }
+		else if(accept(psiBuilder, KeyWord.REAL)) type=Type.Real;
+		else if(accept(psiBuilder, KeyWord.LONG)) { PsiParse.expect(psiBuilder, KeyWord.REAL); type=Type.LongReal; }
+		else if(accept(psiBuilder, KeyWord.TEXT)) type=Type.Text;
+		else if(accept(psiBuilder, KeyWord.REF))	{
+			PsiParse.expect(psiBuilder, KeyWord.BEGPAR); LexToken classIdentifier=PsiParse.getParserToken(psiBuilder);
+			PsiParse.expect(psiBuilder, KeyWord.IDENTIFIER); PsiParse.expect(psiBuilder, KeyWord.ENDPAR); 
 			type=Type.Ref(classIdentifier.toString()); 
 		}
 		return(type);  
@@ -266,13 +266,13 @@ public interface PsiParse {
 	
 	/// Test to accept a postfix operator ( DOT, IS, IN, QUA).
 	/// @return true if the keyword is accepted, false otherwise.
-	public static LexToken acceptPostfixOprator(final PsiBuilder simBuilder) {
+	public static LexToken acceptPostfixOprator(final PsiBuilder psiBuilder) {
 		//   DOT | IS | IN | QUA
 		LexToken prevToken = null;
-		if((prevToken = acceptParserToken(simBuilder, KeyWord.DOT)) != null) return(prevToken);
-		if((prevToken = acceptParserToken(simBuilder, KeyWord.IS)) != null) return(prevToken);
-		if((prevToken = acceptParserToken(simBuilder, KeyWord.IN)) != null) return(prevToken);
-		if((prevToken = acceptParserToken(simBuilder, KeyWord.QUA)) != null) return(prevToken);
+		if((prevToken = acceptParserToken(psiBuilder, KeyWord.DOT)) != null) return(prevToken);
+		if((prevToken = acceptParserToken(psiBuilder, KeyWord.IS)) != null) return(prevToken);
+		if((prevToken = acceptParserToken(psiBuilder, KeyWord.IN)) != null) return(prevToken);
+		if((prevToken = acceptParserToken(psiBuilder, KeyWord.QUA)) != null) return(prevToken);
 		return(prevToken);
 	}
 	
@@ -282,16 +282,16 @@ public interface PsiParse {
 	///	     =  <  |  <=  |  =  |  >=  |  >  |  <> | == | =/=
 	/// </pre>
 	/// @return true if the keyword is accepted, false otherwise.
-	public static LexToken acceptRelationalOperator(final PsiBuilder simBuilder) {
+	public static LexToken acceptRelationalOperator(final PsiBuilder psiBuilder) {
 		LexToken prevToken = null;
-		if((prevToken = acceptParserToken(simBuilder, KeyWord.LT)) != null) return(prevToken);
-		if((prevToken = acceptParserToken(simBuilder, KeyWord.LE)) != null) return(prevToken);
-		if((prevToken = acceptParserToken(simBuilder, KeyWord.EQ)) != null) return(prevToken);
-		if((prevToken = acceptParserToken(simBuilder, KeyWord.GE)) != null) return(prevToken);
-		if((prevToken = acceptParserToken(simBuilder, KeyWord.GT)) != null) return(prevToken);
-		if((prevToken = acceptParserToken(simBuilder, KeyWord.NE)) != null) return(prevToken);
-		if((prevToken = acceptParserToken(simBuilder, KeyWord.NER)) != null) return(prevToken);
-		if((prevToken = acceptParserToken(simBuilder, KeyWord.EQR)) != null) return(prevToken);
+		if((prevToken = acceptParserToken(psiBuilder, KeyWord.LT)) != null) return(prevToken);
+		if((prevToken = acceptParserToken(psiBuilder, KeyWord.LE)) != null) return(prevToken);
+		if((prevToken = acceptParserToken(psiBuilder, KeyWord.EQ)) != null) return(prevToken);
+		if((prevToken = acceptParserToken(psiBuilder, KeyWord.GE)) != null) return(prevToken);
+		if((prevToken = acceptParserToken(psiBuilder, KeyWord.GT)) != null) return(prevToken);
+		if((prevToken = acceptParserToken(psiBuilder, KeyWord.NE)) != null) return(prevToken);
+		if((prevToken = acceptParserToken(psiBuilder, KeyWord.NER)) != null) return(prevToken);
+		if((prevToken = acceptParserToken(psiBuilder, KeyWord.EQR)) != null) return(prevToken);
 		return(prevToken);
 	}
 

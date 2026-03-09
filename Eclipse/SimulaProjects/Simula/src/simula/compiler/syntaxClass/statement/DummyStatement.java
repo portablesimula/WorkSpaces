@@ -41,18 +41,18 @@ public final class DummyStatement extends Statement {
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": DummyStatement: "+this);
 	}
 
-	public static DummyStatement ofExplicit(final PsiBuilder simBuilder, final int line) {
-		 int inrTree = simBuilder.startSubtree(InnerStatement.class, "DummyStatement");
-		 simBuilder.consume(KeyWord.SEMICOLON); //  (add it to 'current tree')
+	public static DummyStatement ofExplicit(final PsiBuilder psiBuilder, final int line) {
+		 int inrTree = psiBuilder.startSubtree(InnerStatement.class, "DummyStatement");
+		 psiBuilder.consume(KeyWord.SEMICOLON); //  (add it to 'current tree')
 		 DummyStatement dummyStatement = new DummyStatement(line);		
-		 simBuilder.doneSubtree(dummyStatement, inrTree, "DummyStatement");
+		 psiBuilder.doneSubtree(dummyStatement, inrTree, "DummyStatement");
 		 return dummyStatement;
 	}
 
-	public static DummyStatement ofImplicit(final PsiBuilder simBuilder, final int line) {
-		 int inrTree = simBuilder.startSubtree(InnerStatement.class, "DummyStatement");
+	public static DummyStatement ofImplicit(final PsiBuilder psiBuilder, final int line) {
+		 int inrTree = psiBuilder.startSubtree(InnerStatement.class, "DummyStatement");
 		 DummyStatement dummyStatement = new DummyStatement(line);		
-		 simBuilder.doneSubtree(dummyStatement, inrTree, "DummyStatement");
+		 psiBuilder.doneSubtree(dummyStatement, inrTree, "DummyStatement");
 		 return dummyStatement;
 	}
 
