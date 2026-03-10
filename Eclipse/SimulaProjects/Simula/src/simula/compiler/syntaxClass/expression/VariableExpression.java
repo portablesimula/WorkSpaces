@@ -16,7 +16,6 @@ import java.util.Vector;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.OverLoad;
 import simula.compiler.syntaxClass.ProcedureSpecification;
 import simula.compiler.syntaxClass.SyntaxClass;
@@ -177,28 +176,6 @@ public final class VariableExpression extends Expression {
 	/// Precondition: Identifier  is already read.
 	/// @param ident the variable identifier
 	/// @return the created Variable
-	public static VariableExpression expectVariable(final String ident) {
-		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse Variable, current=" + Parse.currentToken + ", prev=" + Parse.prevToken);
-		VariableExpression variable = new VariableExpression(ident);
-		if (Parse.accept(KeyWord.BEGPAR)) {
-			variable.params = new Vector<Expression>();
-			do {
-				Expression par = acceptExpression();
-				if (par == null)
-					Util.error("Missing procedure parameter");
-				else{
-					variable.params.add(par);
-					par.backLink = variable;
-				}
-			} while (Parse.accept(KeyWord.COMMA));
-			Parse.expect(KeyWord.ENDPAR);
-		}
-		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("NEW Variable: " + variable);
-		return (variable);
-	}
-
 	public static VariableExpression expectVariable(final PsiBuilder psiBuilder, final String ident) {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse Variable, current=" + PsiParse.currentLexToken(psiBuilder));

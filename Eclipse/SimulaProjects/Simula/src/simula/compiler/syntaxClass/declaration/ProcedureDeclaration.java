@@ -27,9 +27,7 @@ import java.util.Vector;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
-import simula.compiler.syntaxClass.Type;
+import simula.compiler.JavaSourceFileCoder;import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.statement.DummyStatement;
 import simula.compiler.syntaxClass.statement.Statement;
@@ -137,36 +135,13 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// 
 	/// @param type procedure's type
 	/// @return a newly created ProcedureDeclaration
-//	public static ProcedureDeclaration expectProcedureDeclaration(final Type type) {
-//		ProcedureDeclaration proc = new ProcedureDeclaration(null, ObjectKind.Procedure);
-//		proc.sourceFileName = Global.sourceFileName;
-//		proc.OLD_lineNumber=Parse.prevToken.lineNumber;
-//		proc.type = type;
-//		if (Option.internal.TRACE_PARSE)
-//			Parse.TRACE("Parse ProcedureDeclaration, type=" + type);
-//		proc.modifyIdentifier(Parse.expectIdentifier());
-//		if (Parse.accept(KeyWord.BEGPAR)) {
-//			expectFormalParameterPart(proc.parameterList);
-//			Parse.expect(KeyWord.SEMICOLON);
-//			while(acceptModePart(proc.parameterList));
-//			expectSpecificationPart(proc);
-//		} else Parse.expect(KeyWord.SEMICOLON);
-//		expectProcedureBody(proc);
-//
-//		proc.lastLineNumber = Global.sourceLineNumber;
-//		if (Option.internal.TRACE_PARSE)
-//			Util.TRACE("Line "+proc.lineNumber()+": ProcedureDeclaration: "+proc);
-//		Global.setScope(proc.declaredIn);
-//		return (proc);
-//	}
-
 	public static ProcedureDeclaration expectProcedureDeclaration(final PsiBuilder psiBuilder, final Type type) {
 		ProcedureDeclaration proc = new ProcedureDeclaration(null, ObjectKind.Procedure);
 		proc.sourceFileName = Global.sourceFileName;
 		proc.OLD_lineNumber = psiBuilder.getSourceLineNumber();
 		proc.type = type;
 		if (Option.internal.TRACE_PARSE)
-			Parse.TRACE("Parse ProcedureDeclaration, type=" + type);
+			PsiParse.TRACE("Parse ProcedureDeclaration, type=" + type);
 		proc.modifyIdentifier(PsiParse.expectIdentifier(psiBuilder));
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) {
 			expectFormalParameterPart(psiBuilder, proc.parameterList);
@@ -199,31 +174,6 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// </pre>
 	/// @param pList the parameter list
 	/// @return true: if mode-part was present.
-	private static boolean acceptModePart(Vector<Parameter> pList) {
-		if (Parse.accept(KeyWord.VALUE, KeyWord.NAME)) {
-			int mode = (Parse.prevToken.getKeyWord() == KeyWord.VALUE)
-					? Parameter.Mode.value
-					: Parameter.Mode.name;
-			do {
-				String identifier = Parse.expectIdentifier();
-				Parameter parameter = null;
-				for (Parameter par : pList)
-					if (Util.equals(identifier, par.identifier)) {
-						parameter = par;
-						break;
-					}
-				if (parameter == null) {
-					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(identifier);
-				}
-				parameter.setMode(mode);
-			} while (Parse.accept(KeyWord.COMMA));
-			Parse.expect(KeyWord.SEMICOLON);
-			return(true);
-		}
-		return(false);
-	}
-	
 	private static boolean acceptModePart(PsiBuilder psiBuilder, Vector<Parameter> pList) {
 		LexToken prevToken = PsiParse.getParserToken(psiBuilder);
 		if (PsiParse.accept(psiBuilder, KeyWord.VALUE, KeyWord.NAME)) {
@@ -260,59 +210,6 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	///        specifier = Type | [Type] ARRAY | [Type] PROCEDURE ] | LABEL | SWITCH
 	/// </pre>
 	/// @param proc the procedure declaration
-	private static void expectSpecificationPart(ProcedureDeclaration proc) {
-		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse ParameterSpecifications");
-		LOOP: while(true) {
-			Type type;
-			int kind = Parameter.Kind.Simple;
-			if (Parse.accept(KeyWord.SWITCH)) {
-				type = Type.Label;
-				kind = Parameter.Kind.Procedure;
-			} else if (Parse.accept(KeyWord.LABEL))
-				type = Type.Label;
-			else {
-				type = Parse.acceptType();
-				//if (type == null) return (false);
-				if (Parse.accept(KeyWord.ARRAY)) {
-					if (type == null) {
-						// See Simula Standard 5.2 -
-						// If no type is given the type real is understood.
-						type=Type.Real;
-					}
-					kind = Parameter.Kind.Array;
-				}
-				else if (Parse.accept(KeyWord.PROCEDURE)) kind = Parameter.Kind.Procedure;
-				else if(type == null) break LOOP;
-			}
-			do {
-				String identifier = Parse.expectIdentifier();
-				Parameter parameter = null;
-				for (Parameter par : proc.parameterList)
-					if (Util.equals(identifier,par.identifier)) { parameter = par; break; }
-				if (parameter == null) {
-					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(identifier);
-				}
-				parameter.setTypeAndKind(type, kind);
-			} while (Parse.accept(KeyWord.COMMA));
-			Parse.expect(KeyWord.SEMICOLON);
-			continue LOOP;
-		}
-		for (Parameter par : proc.parameterList) {
-			if (par.kind != 0)
-				switch (par.kind) {
-				case Parameter.Kind.Array:
-				case Parameter.Kind.Label:
-				case Parameter.Kind.Procedure:
-					break; // OK
-				case Parameter.Kind.Simple:
-				default:
-					if (par.type == null)
-						Util.error("Missing specification of parameter: " + par.identifier);
-				}
-		}
-	}
-
 	private static void expectSpecificationPart(PsiBuilder psiBuilder, ProcedureDeclaration proc) {
 		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse ParameterSpecifications");
 		LOOP: while(true) {

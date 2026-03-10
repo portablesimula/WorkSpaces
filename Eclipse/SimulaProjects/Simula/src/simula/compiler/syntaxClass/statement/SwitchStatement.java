@@ -15,7 +15,6 @@ import java.util.Vector;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.TypeConversion;
@@ -26,7 +25,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 
 /// Switch Statement.
 /// 
@@ -109,38 +107,6 @@ public final class SwitchStatement extends Statement {
 
 	/// Create a new SwitchStatement.
 	/// @param line the source line number
-//	SwitchStatement(int line) {
-//		super(line);
-//		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse SwitchStatement: line="+line);
-//		Parse.expect(KeyWord.BEGPAR);
-//		lowKey = Expression.expectExpression();
-//		Parse.expect(KeyWord.COLON);
-//		hiKey = Expression.expectExpression();
-//		Parse.expect(KeyWord.ENDPAR);
-//		switchKey = Expression.expectExpression();
-//		switchKey.backLink=this;
-//		Parse.expect(KeyWord.BEGIN);
-//		has_NONE_case=false;
-//		while (Parse.accept(KeyWord.WHEN)) {
-//			Vector<SwitchInterval> caseKeyList=new Vector<SwitchInterval>();
-//			if (Parse.accept(KeyWord.NONE)) {
-//				caseKeyList.add(null);
-//				if(has_NONE_case) Util.error("NONE Case is already used");
-//				has_NONE_case=true;
-//			}
-//			else {
-//				caseKeyList.add(expectCasePair());
-//				while(Parse.accept(KeyWord.COMMA)) caseKeyList.add(expectCasePair());
-//			}
-//			Parse.expect(KeyWord.DO);
-//			Statement statement = Statement.expectStatement();
-//			Parse.accept(KeyWord.SEMICOLON);
-//			switchCases.add(new SwitchWhenPart(caseKeyList, statement));
-//		}
-//		Parse.expect(KeyWord.END);
-//		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber()+": SwitchStatement: "+this);
-//	}
-
 	SwitchStatement(final PsiBuilder psiBuilder, final int line) {
 		super(line);
 
@@ -180,13 +146,6 @@ public final class SwitchStatement extends Statement {
 
 	/// Parse Utility: Expect case pair.
 	/// @return the resulting SwitchInterval
-	private SwitchInterval expectCasePair() {
-		Expression lowCase=Expression.expectExpression();
-		Expression hiCase=null;
-		if(Parse.accept(KeyWord.COLON)) hiCase=Expression.expectExpression();
-		return(new SwitchInterval(lowCase,hiCase));
-	}
-
 	private SwitchInterval expectCasePair(final PsiBuilder psiBuilder) {
 		Expression lowCase=Expression.expectExpression(psiBuilder);
 		Expression hiCase=null;

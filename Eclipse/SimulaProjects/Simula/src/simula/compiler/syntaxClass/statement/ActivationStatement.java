@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.expression.Expression;
@@ -20,12 +19,10 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
-import simula.compiler.utilities.Token;
 import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 
 /// Activation Statement.
 /// 
@@ -102,27 +99,6 @@ public final class ActivationStatement extends Statement {
 
 	/// Create a new ActivationStatement.
 	/// @param line the source line number
-//	ActivationStatement(final int line) {
-//		super(line);
-//		Token activator = Parse.prevToken;
-//		REAC = activator.getKeyWord() == KeyWord.REACTIVATE;
-//		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse ActivationStatement");
-//		object1 = Expression.expectExpression();
-//		object1.backLink = this;
-//		code = ActivationCode.direct;
-//		if (Parse.accept(KeyWord.AT) || Parse.accept(KeyWord.DELAY)) {
-//			code = (Parse.prevToken.getKeyWord() == KeyWord.AT) ? ActivationCode.at : ActivationCode.delay;
-//			time = Expression.expectExpression();
-//			time.backLink = this;
-//			if (Parse.accept(KeyWord.PRIOR)) prior = true;
-//		} else if (Parse.accept(KeyWord.BEFORE) || Parse.accept(KeyWord.AFTER)) {
-//			code = (Parse.prevToken.getKeyWord() == KeyWord.BEFORE) ? ActivationCode.before : ActivationCode.after;
-//			object2 = Expression.expectExpression();
-//			object2.backLink = this;
-//		}
-//		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": ActivationStatement: "+this);
-//	}
-
 	ActivationStatement(final PsiBuilder psiBuilder, final int line) {
 		super(line);
 		int actTree = psiBuilder.startSubtree(ActivationStatement.class, "ActivationStatement");

@@ -104,15 +104,6 @@ public final class ProcedureSpecification extends SyntaxClass {
 	/// Precondition:  [ type ] PROCEDURE  is already read.
 	/// @param type procedure's type
 	/// @return a newly created ProcedureSpecification
-//	public static ProcedureSpecification expectProcedureSpecification(final Type type) {
-//		ProcedureDeclaration block = ProcedureDeclaration.expectProcedureDeclaration(type);
-//		if (Option.internal.TRACE_PARSE)
-//			Util.TRACE("END ProcedureSpecification: " + block);
-//		Global.setScope(block.declaredIn);
-//		ProcedureSpecification procedureSpecification = new ProcedureSpecification(block.identifier, type, block.parameterList);
-//		return (procedureSpecification);
-//	}
-
 	public static ProcedureSpecification expectProcedureSpecification(final PsiBuilder psiBuilder, final Type type) {
 		ProcedureDeclaration block = ProcedureDeclaration.expectProcedureDeclaration(psiBuilder, type);
 		if (Option.internal.TRACE_PARSE)

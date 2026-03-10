@@ -12,7 +12,6 @@ import java.lang.classfile.Label;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.utilities.Global;
@@ -22,7 +21,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 
 /// Conditional Statement.
 /// 
@@ -55,24 +53,6 @@ public final class ConditionalStatement extends Statement {
 
 	/// Create a new ConditionalStatement.
 	/// @param line the source line number
-//	ConditionalStatement(final int line) {
-//		super(line);
-//		condition = Expression.expectExpression();
-//		Parse.expect(KeyWord.THEN);
-//		Statement elseStatement = null;
-//		if (Parse.accept(KeyWord.ELSE)) {
-//			thenStatement = DummyStatement(Parse.currentToken.lineNumber);
-//			elseStatement = Statement.expectStatement();
-//		} else {
-//		    thenStatement = Statement.expectStatement();
-//		    if (Parse.accept(KeyWord.ELSE)) {
-//			    elseStatement = Statement.expectStatement();
-//		    }
-//		}
-//		this.elseStatement=elseStatement;
-//		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": IfStatement: "+this);
-//	}
-
 	ConditionalStatement(PsiBuilder psiBuilder, final int line) {
 		super(line);
 

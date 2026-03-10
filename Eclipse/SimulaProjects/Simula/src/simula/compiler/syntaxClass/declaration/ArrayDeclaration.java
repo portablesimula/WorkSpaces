@@ -21,7 +21,6 @@ import java.util.Vector;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
@@ -144,37 +143,6 @@ public final class ArrayDeclaration extends Declaration {
 	/// 
 	/// @param type            the array's type
 	/// @param declarationList the given declaration list
-	static void expectArrayDeclaration(final Type type, final DeclarationList declarationList) {
-		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ArrayDeclaration, type=" + type + ", current=" + Parse.currentToken);
-		do {
-			if (Option.internal.TRACE_PARSE)
-				Parse.TRACE("Parse ArraySegment");
-			// IdentifierList = Identifier { , Identifier }
-			Vector<String> identList = new Vector<String>();
-			do {
-				identList.add(Parse.expectIdentifier());
-			} while (Parse.accept(KeyWord.COMMA));
-			Parse.expect(KeyWord.BEGPAR);
-			// BoundPairList = BoundPair { , BoundPair }
-			if (Option.internal.TRACE_PARSE)
-				Parse.TRACE("Parse BoundPairList");
-			Vector<BoundPair> boundPairList = new Vector<BoundPair>();
-			do {
-				Expression LB = Expression.expectExpression();
-				Parse.expect(KeyWord.COLON);
-				Expression UB = Expression.expectExpression();
-				boundPairList.add(new BoundPair(LB, UB));
-			} while (Parse.accept(KeyWord.COMMA));
-			Parse.expect(KeyWord.ENDPAR);
-			for (Enumeration<String> e = identList.elements(); e.hasMoreElements();) {
-				String identifier = e.nextElement();
-				declarationList.add(new ArrayDeclaration(identifier.toString(), type, boundPairList));
-			}
-			
-		} while (Parse.accept(KeyWord.COMMA));
-	}
-
 	static void expectArrayDeclaration(final PsiBuilder psiBuilder, final Type type, final DeclarationList declarationList) {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse ArrayDeclaration, type=" + type + ", current=" + PsiParse.getParserToken(psiBuilder));

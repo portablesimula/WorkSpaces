@@ -222,7 +222,11 @@ public final class SimulaCompiler {
 		// ***************************************************************
 		Global.javaSourceFileCoders = new Vector<JavaSourceFileCoder>();
 		Parse.initiateParser(reader);
-		programModule = new ProgramModule();
+		
+		Util.IERR("DETTE MÅ RETTES");
+		programModule = new ProgramModule(null);
+		Util.IERR("DETTE MÅ RETTES");
+		
 		Global.programModule = programModule;
 		if (Option.internal.TRACING) {
 			Util.println("END Parsing, resulting Program: \"" + programModule + "\"");

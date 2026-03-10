@@ -14,7 +14,6 @@ import java.util.Iterator;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -33,7 +32,6 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 
 /// For Statement.
 /// 
@@ -157,28 +155,6 @@ public final class ForStatement extends Statement {
 
 	/// Create a new ForStatement.
 	/// @param line the source line number
-//	ForStatement(final int line) {
-//		super(line);
-//		if (Option.internal.TRACE_PARSE)
-//			Parse.TRACE("Parse ForStatement");
-//		controlVariable = new VariableExpression(Parse.expectIdentifier());
-//		if (!Parse.accept(KeyWord.ASSIGNVALUE))
-//			Parse.expect(KeyWord.ASSIGNREF);
-//		assignmentOperator = Parse.prevToken.getKeyWord();
-//		do {
-//			forList.add(expectForListElement());
-//		} while (Parse.accept(KeyWord.COMMA));
-//		Parse.expect(KeyWord.DO);
-//		Statement doStatement = Statement.expectStatement();
-//		if (doStatement == null) {
-//			Util.error("No statement following DO in For statement");
-//			doStatement = new DummyStatement(line);
-//		}
-//		this.doStatement = doStatement;
-//		if (Option.internal.TRACE_PARSE)
-//			Util.TRACE("Line " + this.lineNumber() + ": ForStatement: " + this);
-//	}
-
 	ForStatement(final PsiBuilder psiBuilder, final int line) {
 		super(line);
 		int forTree = psiBuilder.startSubtree(ForStatement.class, "ForStatement");
@@ -208,20 +184,6 @@ public final class ForStatement extends Statement {
 
 	/// Parse a for-list element.
 	/// @return the resulting ForListElement
-	private ForListElement expectForListElement() {
-		if (Option.internal.TRACE_PARSE)
-			Parse.TRACE("Parse ForListElement");
-		Expression expr1 = Expression.expectExpression();
-		if (Parse.accept(KeyWord.WHILE))
-			return (new ForWhileElement(this, expr1, Expression.expectExpression()));
-		if (Parse.accept(KeyWord.STEP)) {
-			Expression expr2 = Expression.expectExpression();
-			Parse.expect(KeyWord.UNTIL);
-			return (new StepUntilElement(this, expr1, expr2, Expression.expectExpression()));
-		} else
-			return (new ForListElement(this, expr1));
-	}
-
 	private ForListElement expectForListElement(PsiBuilder psiBuilder) {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ForListElement");

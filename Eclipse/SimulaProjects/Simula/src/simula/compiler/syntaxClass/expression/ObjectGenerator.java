@@ -14,7 +14,6 @@ import java.util.Vector;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -85,24 +84,6 @@ public final class ObjectGenerator extends Expression {
 	///         =  "("  actual-parameter  {  ,  actual-parameter  }  ")"
 	/// </pre>
 	/// @return the newly created ObjectGenerator.
-	static Expression expectNew() {
-		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ObjectGenerator, current=" + Parse.currentToken);
-		String classIdentifier = Parse.expectIdentifier();
-		Vector<Expression> params = new Vector<Expression>();
-		if (Parse.accept(KeyWord.BEGPAR)) {
-			do {
-				Expression par=acceptExpression();
-				if(par==null) Util.error("Missing class parameter");
-				else params.add(par);
-			} while (Parse.accept(KeyWord.COMMA));
-			Parse.expect(KeyWord.ENDPAR);
-		}
-
-		Expression expr = new ObjectGenerator(classIdentifier, params);
-		return (expr);
-	}
-
 	static Expression expectNew(PsiBuilder psiBuilder) {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse ObjectGenerator, current=" + PsiParse.currentLexToken(psiBuilder));

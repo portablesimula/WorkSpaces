@@ -12,7 +12,6 @@ import java.lang.classfile.Label;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.expression.Expression;
@@ -23,7 +22,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 
 /// While Statement.
 /// 
@@ -49,16 +47,6 @@ public final class WhileStatement extends Statement {
 
 	/// Create a new WhileStatement.
 	/// @param line the source line number
-//	WhileStatement(int line) {
-//		super(line);
-//		if (Option.internal.TRACE_PARSE)
-//			Util.TRACE("Parse WhileStatement: line="+line+", current=" + Parse.currentToken);
-//		condition = Expression.expectExpression();
-//		Parse.expect(KeyWord.DO);
-//		doStatement = Statement.expectStatement();
-//		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber()+": WhileStatement: "+this);
-//	}
-
 	WhileStatement(final PsiBuilder psiBuilder, final int line) {
 		super(line);
 		int whileTree = psiBuilder.startSubtree(WhileStatement.class, "WhileStatement");

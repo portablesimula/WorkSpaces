@@ -23,7 +23,6 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 
 /// Goto Statement.
 /// 
@@ -55,12 +54,6 @@ public final class GotoStatement extends Statement {
 
 	/// Create a new GotoStatement.
 	/// @param line source line
-//	GotoStatement(final int line) {
-//		super(line);
-//		label = Expression.expectExpression();
-//		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+this.lineNumber()+": GotoStatement: "+this);
-//	}
-
 	GotoStatement(final PsiBuilder psiBuilder, final int keyWord, final int line) {
 		super(line);
 		int gotoTree = psiBuilder.startSubtree(GotoStatement.class, "GotoStatement");

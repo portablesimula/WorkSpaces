@@ -15,7 +15,6 @@ import java.lang.constant.MethodTypeDesc;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.HiddenSpecification;
 import simula.compiler.syntaxClass.ProtectedSpecification;
 import simula.compiler.syntaxClass.expression.Expression;
@@ -89,29 +88,6 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	/// @param blockPrefix the block prefix
 	/// @param isMainModule true if main module
 	/// @return the resulting PrefixedBlockDeclaration
-//	public static PrefixedBlockDeclaration expectPrefixedBlock(final VariableExpression blockPrefix,boolean isMainModule) {
-//		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(isMainModule);
-//		block.OLD_lineNumber=Parse.prevToken.lineNumber;
-//		block.declarationKind=ObjectKind.PrefixedBlock;
-//		Util.ASSERT(blockPrefix != null,"blockPrefix == null");
-//		block.blockPrefix = blockPrefix;
-//		block.prefix = blockPrefix.identifier;
-//		block.isMainModule=isMainModule;
-//		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse PrefixedBlock");
-//		while (Declaration.acceptDeclaration(block)) Parse.accept(KeyWord.SEMICOLON);
-//		while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
-//			Statement stm = Statement.expectStatement();
-//			if (stm != null) block.statements.add(stm);
-//		}
-//		if (Parse.prevToken.keyWord == KeyWord.EOF) {
-//			Util.error("Illegal termination of prefixed block. Missing END.");
-//		}
-//		block.lastLineNumber = Global.sourceLineNumber;
-//		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+block.lineNumber()+": PrefixedBlockDeclaration: "+block);
-//		Global.setScope(block.declaredIn);
-//		return block;
-//	}
-
 	public static PrefixedBlockDeclaration expectPrefixedBlock(final PsiBuilder psiBuilder, final VariableExpression blockPrefix,boolean isMainModule) {
 		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(isMainModule);
 		block.OLD_lineNumber=psiBuilder.getSourceLineNumber();

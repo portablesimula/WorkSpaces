@@ -22,7 +22,6 @@ import java.util.Vector;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.HiddenSpecification;
 import simula.compiler.syntaxClass.ProtectedSpecification;
 import simula.compiler.syntaxClass.Type;
@@ -168,36 +167,6 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// </pre>
 	/// @param prefix class identifier
 	/// @return the resulting ClassDeclaration
-//	public static ClassDeclaration expectClassDeclaration(final String prefix) {
-//		ClassDeclaration cls = new ClassDeclaration(null);
-//		cls.sourceFileName = Global.sourceFileName;
-//		cls.OLD_lineNumber = Parse.prevToken.lineNumber;
-//		cls.prefix = prefix;
-//		cls.declaredIn.hasLocalClasses = true;
-//		if (cls.prefix == null)
-//			cls.prefix = StandardClass.CLASS.identifier;
-//		cls.modifyIdentifier(Parse.expectIdentifier());
-//		if (Parse.accept(KeyWord.BEGPAR)) {
-//			expectFormalParameterPart(cls.parameterList);
-//			Parse.expect(KeyWord.SEMICOLON);
-//			acceptValuePart(cls.parameterList);
-//			acceptParameterSpecificationPart(cls.parameterList);
-//		} else
-//			Parse.expect(KeyWord.SEMICOLON);
-//
-//		acceptProtectionPart(cls);
-//		if (Parse.accept(KeyWord.VIRTUAL))
-//			VirtualSpecification.expectVirtualPart(cls);
-//		expectClassBody(cls);
-//		
-//		cls.lastLineNumber = Global.sourceLineNumber;
-//		cls.type = Type.Ref(cls.identifier);
-//		if (Option.internal.TRACE_PARSE)
-//			Parse.TRACE("Line " + cls.lineNumber() + ": ClassDeclaration: " + cls);
-//		Global.setScope(cls.declaredIn);
-//		return (cls);
-//	}
-
 	public static ClassDeclaration expectClassDeclaration(final PsiBuilder psiBuilder, final String ident) {
 		ClassDeclaration cls = new ClassDeclaration(null);
 		cls.sourceFileName = Global.sourceFileName;
@@ -239,26 +208,6 @@ public class ClassDeclaration extends BlockDeclaration {
 	///              VALUE identifier-list ;
 	/// </pre>
 	/// @param pList Parameter list
-	private static void acceptValuePart(final Vector<Parameter> pList) {
-		if (Parse.accept(KeyWord.VALUE)) {
-			do {
-				String identifier = Parse.expectIdentifier();
-				Parameter parameter = null;
-				for (Parameter par : pList)
-					if (Util.equals(identifier, par.identifier)) {
-						parameter = par;
-						break;
-					}
-				if (parameter == null) {
-					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(identifier);
-				}
-				parameter.setMode(Parameter.Mode.value);
-			} while (Parse.accept(KeyWord.COMMA));
-			Parse.expect(KeyWord.SEMICOLON);
-		}
-	}
-
 	private static void acceptValuePart(final PsiBuilder psiBuilder, final Vector<Parameter> pList) {
 		if (PsiParse.accept(psiBuilder, KeyWord.VALUE)) {
 			do {
@@ -292,42 +241,6 @@ public class ClassDeclaration extends BlockDeclaration {
 	///        class-parameter-specifier = Type | [Type] ARRAY
 	/// </pre>
 	/// @param pList the parameter list
-	private static void acceptParameterSpecificationPart(final Vector<Parameter> pList) {
-		if (Option.internal.TRACE_PARSE)
-			Parse.TRACE("Parse ParameterSpecifications");
-		while (true) {
-			Type type;
-			int kind = Parameter.Kind.Simple;
-			type = Parse.acceptType();
-			if (Parse.accept(KeyWord.ARRAY)) {
-				if (type == null) {
-					// See Simula Standard 5.2 -
-					// If no type is given the type real is understood.
-					type = Type.Real;
-				}
-				kind = Parameter.Kind.Array;
-			}
-			if (type == null)
-				return;
-			do {
-				String identifier = Parse.expectIdentifier();
-				Parameter parameter = null;
-				for (Parameter par : pList)
-					if (Util.equals(identifier, par.identifier)) {
-						parameter = par;
-						break;
-					}
-				if (parameter == null) {
-					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(identifier);
-				}
-				parameter.setTypeAndKind(type, kind);
-			} while (Parse.accept(KeyWord.COMMA));
-
-			Parse.expect(KeyWord.SEMICOLON);
-		}
-	}
-
 	private static void acceptParameterSpecificationPart(final PsiBuilder psiBuilder, final Vector<Parameter> pList) {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ParameterSpecifications");
@@ -380,23 +293,6 @@ public class ClassDeclaration extends BlockDeclaration {
 	///                | PROTECTED HIDDEN identifier-list
 	/// </pre>
 	/// @param cls the ClassDeclaration
-	private static void acceptProtectionPart(ClassDeclaration cls) {
-		while (true) {
-			if (Parse.accept(KeyWord.HIDDEN)) {
-				if (Parse.accept(KeyWord.PROTECTED))
-					expectHiddenProtectedList(cls, true, true);
-				else
-					expectHiddenProtectedList(cls, true, false);
-			} else if (Parse.accept(KeyWord.PROTECTED)) {
-				if (Parse.accept(KeyWord.HIDDEN))
-					expectHiddenProtectedList(cls, true, true);
-				else
-					expectHiddenProtectedList(cls, false, true);
-			} else
-				break;
-		}	
-	}
-	
 	private static void acceptProtectionPart(final PsiBuilder psiBuilder, ClassDeclaration cls) {
 		while (true) {
 			if (PsiParse.accept(psiBuilder, KeyWord.HIDDEN)) {
@@ -423,17 +319,6 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @param cls the ClassDeclaration
 	/// @param hidden if true, update the hidden list
 	/// @param prtected if true, update the protected list
-	private static void expectHiddenProtectedList(final ClassDeclaration cls, final boolean hidden, final boolean prtected) {
-		do {
-			String identifier = Parse.expectIdentifier();
-			if (hidden)
-				cls.hiddenList.add(new HiddenSpecification(cls, identifier));
-			if (prtected)
-				cls.protectedList.add(new ProtectedSpecification(cls, identifier));
-		} while (Parse.accept(KeyWord.COMMA));
-		Parse.expect(KeyWord.SEMICOLON);
-	}
-
 	private static void expectHiddenProtectedList(final PsiBuilder psiBuilder, final ClassDeclaration cls, final boolean hidden, final boolean prtected) {
 		do {
 			String identifier = PsiParse.expectIdentifier(psiBuilder);

@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Vector;
 
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.ProtectedSpecification;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
@@ -51,18 +50,6 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 
 	/// Create a new SwitchDeclaration.
 	/// @param ident switch identifier
-	public SwitchDeclaration(final String ident) {
-		super(ident,ObjectKind.Procedure);
-		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse SwitchDeclaration");
-		this.type = Type.Label;
-		Parse.expect(KeyWord.ASSIGNVALUE);
-		do { switchList.add(Expression.expectExpression());
-		} while (Parse.accept(KeyWord.COMMA));
-		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse SwitchDeclaration(3), switchList=" + switchList);
-		new Parameter("_SW", Type.Integer, Parameter.Kind.Simple).into(parameterList);
-		Global.setScope(declaredIn);
-	}
-
 	public SwitchDeclaration(PsiBuilder psiBuilder, final String ident) {
 		super(ident,ObjectKind.Procedure);
 		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchDeclaration");

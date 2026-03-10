@@ -22,7 +22,6 @@ import javax.swing.tree.DefaultTreeModel;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.statement.BlockStatement;
 import simula.compiler.syntaxClass.statement.DummyStatement;
 import simula.compiler.syntaxClass.statement.Statement;
@@ -39,7 +38,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 
 /// Maybe Block Declaration. I.e: CompoundStatement or SubBlock depends on
 /// whether it contains declarations.
@@ -110,34 +108,6 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	/// Pre-condition: BEGIN is already read.
 	/// @param line source line number
 	/// @return a BlockStatement
-//	public BlockStatement expectMaybeBlock(int line) {
-//		this.OLD_lineNumber=line;
-//		if (Option.internal.TRACE_PARSE)
-//			Parse.TRACE("Parse MayBeBlock");
-//		while (Declaration.acceptDeclaration(this))
-//			Parse.expect(KeyWord.SEMICOLON);
-//		while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
-//			Statement stm = Statement.expectStatement();
-//			if (stm != null) statements.add(stm);
-//		}
-//		if (Parse.prevToken.keyWord == KeyWord.EOF) {
-//			Util.error("Illegal termination of block. Missing END.");
-//		}		
-//		if (declarationKind != ObjectKind.SimulaProgram) {
-//			if (!declarationList.isEmpty()) {
-//				declarationKind = ObjectKind.SubBlock;
-//			} else {
-//				declarationKind = ObjectKind.CompoundStatement;
-//				if (labelList != null && labelList.declaredLabelSize() != 0)
-//					moveLabelsFrom(this); // Label is also declaration
-//			}
-//		}
-//		this.lastLineNumber = Global.sourceLineNumber;
-//		BlockStatement blk = new BlockStatement(this);
-//		Global.setScope(declaredIn);
-//		return (blk);
-//	}
-
 	private static int SEQU = 1;
 	public BlockStatement expectMaybeBlock(PsiBuilder psiBuilder, int line) {
 		this.OLD_lineNumber=line;

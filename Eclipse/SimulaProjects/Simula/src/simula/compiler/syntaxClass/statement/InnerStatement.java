@@ -17,7 +17,6 @@ import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
-import simula.psi.PsiTree;
 
 /// Inner Statement.
 /// 
@@ -40,11 +39,7 @@ public final class InnerStatement extends Statement {
 	public InnerStatement(final int line) {
 		super(line);
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": InnerStatement: "+this);
-//		ClassDeclaration cls=(ClassDeclaration)Global.getCurrentScope();
-//		cls.statements1 = cls.statements;
-//		cls.statements = new ObjectList<Statement>();
 		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
-//			ClassDeclaration cls=(ClassDeclaration)Global.getCurrentScope();
 			cls.statements1 = cls.statements;
 			cls.statements = new ObjectList<Statement>();
 		} else Util.error("Missplaced Inner");
@@ -67,16 +62,10 @@ public final class InnerStatement extends Statement {
 		
 	/// Create a new InnerStatement.
 	/// @param line the source line number
-//	public InnerStatement(final PsiBuilder psiBuilder, boolean implicit, final int line) {
 	private InnerStatement(final PsiBuilder psiBuilder) {
 		super(psiBuilder.getSourceLineNumber());
-//		if(! implicit) {
-//			psiBuilder.startSubtree("InnerStatement");
-//			psiBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
-//		}
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": InnerStatement: "+this);
 		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
-//			ClassDeclaration cls=(ClassDeclaration)Global.getCurrentScope();
 			cls.statements1 = cls.statements;
 			cls.statements = new ObjectList<Statement>();
 		} else Util.error("Missplaced Inner");

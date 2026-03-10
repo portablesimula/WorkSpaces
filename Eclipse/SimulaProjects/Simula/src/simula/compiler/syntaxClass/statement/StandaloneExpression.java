@@ -11,7 +11,6 @@ import java.lang.classfile.CodeBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.expression.AssignmentOperation;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.utilities.Global;
@@ -22,7 +21,6 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 
 /// Standalone Expression Statement.
 /// 
@@ -49,15 +47,6 @@ public final class StandaloneExpression extends Statement {
 	/// Create a new StandaloneExpression.
 	/// @param line the source line number
 	/// @param expression the expression
-	StandaloneExpression(final int line,final Expression expression) {
-		super(line);
-		this.expression = expression;
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": StandaloneExpression: "+this);
-		while (Parse.accept(KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) { 
-			this.expression = new AssignmentOperation(this.expression, Parse.prevToken.getKeyWord(),expectStandaloneExpression());
-		}		
-	}
-
 	StandaloneExpression(final PsiBuilder psiBuilder, final int line,final Expression expression) {
 		super(line);
 //		int stalonTree = psiBuilder.startSubtree(StandaloneExpression.class, "StandaloneExpression");
@@ -96,15 +85,6 @@ public final class StandaloneExpression extends Statement {
 	/// </pre>
 	/// Pre-Condition: First expression is already read.
 	/// @return the resulting StandaloneExpression
-	private static Expression expectStandaloneExpression() { 
-		Expression retExpr=Expression.expectExpression();
-		while (Parse.accept(KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) {
-			int opr=Parse.prevToken.getKeyWord();
-			retExpr=new AssignmentOperation(retExpr,opr,expectStandaloneExpression());
-		}
-		return retExpr;
-	}
-
 	private static Expression expectStandaloneExpression(PsiBuilder psiBuilder) { 
 		Expression retExpr=Expression.expectExpression(psiBuilder);
 		LexToken prevToken = null;

@@ -16,7 +16,6 @@ import java.lang.constant.ClassDesc;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.expression.Expression;
@@ -114,23 +113,10 @@ public class SimpleVariableDeclaration extends Declaration {
 	/// Precodition: Type  is already read.
 	/// @param type            the variable type
 	/// @param declarationList the declaration list to update
-	static void expectSimpleVariable(final Type type, final DeclarationList declarationList) {
-		// identifier-list = identifier { , identifier }
-		if (Option.internal.TRACE_PARSE)
-			Parse.TRACE("Parse IdentifierList");
-		do {
-			String ident = Parse.expectIdentifier();
-			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(type, ident);
-			if (Parse.accept(KeyWord.EQ))
-				typeDeclaration.constantElement = Expression.expectExpression();
-			declarationList.add(typeDeclaration);
-		} while (Parse.accept(KeyWord.COMMA));
-	}
-
 	static void expectSimpleVariable(final PsiBuilder psiBuilder, final Type type, final DeclarationList declarationList) {
 		// identifier-list = identifier { , identifier }
 		if (Option.internal.TRACE_PARSE)
-			Parse.TRACE("Parse IdentifierList");
+			PsiParse.TRACE("Parse IdentifierList");
 		do {
 			String ident = PsiParse.expectIdentifier(psiBuilder);
 			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(type, ident);

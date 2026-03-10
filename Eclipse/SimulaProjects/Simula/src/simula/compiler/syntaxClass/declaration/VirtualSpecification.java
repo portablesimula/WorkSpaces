@@ -15,7 +15,6 @@ import java.lang.constant.MethodTypeDesc;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.HiddenSpecification;
 import simula.compiler.syntaxClass.ProcedureSpecification;
 import simula.compiler.syntaxClass.ProtectedSpecification;
@@ -109,40 +108,6 @@ public final class VirtualSpecification extends Declaration {
 	/// </pre>
 	/// Precondition: VIRTUAL  is already read.
 	/// @param cls the ClassDeclaration
-//	static void expectVirtualPart(final ClassDeclaration cls) {
-//		Parse.expect(KeyWord.COLON);
-//		LOOP: while (true) {
-//			Type type;
-//			if (Parse.accept(KeyWord.SWITCH)) {
-//				expectIdentifierList(cls, Type.Label, Kind.Switch);
-//			} else if (Parse.accept(KeyWord.LABEL)) {
-//				expectIdentifierList(cls, Type.Label, Kind.Label);
-//			} else {
-//				type = Parse.acceptType();
-//				if (!Parse.accept(KeyWord.PROCEDURE))
-//					break LOOP;
-//
-//				String identifier = Parse.expectIdentifier();
-//				ProcedureSpecification procedureSpec = null;
-//				if (Parse.accept(KeyWord.IS)) {
-//					if(type != null) Util.error("An IS-specified virtual procedure can have its type only after IS.");
-//					type = Parse.acceptType();
-//					Parse.expect(KeyWord.PROCEDURE);
-//					procedureSpec = ProcedureSpecification.expectProcedureSpecification(type);						
-//					cls.virtualSpecList
-//							.add(new VirtualSpecification(identifier, type, Kind.Procedure, cls.prefixLevel(), procedureSpec));
-//				} else {
-//					cls.virtualSpecList.add(new VirtualSpecification(identifier, type, Kind.Procedure, cls.prefixLevel(), null));
-//					if (Parse.accept(KeyWord.COMMA))
-//						expectIdentifierList(cls, type, Kind.Procedure);
-//					else
-//						Parse.expect(KeyWord.SEMICOLON);
-//				}
-//			}
-//		}
-//		if(cls.virtualSpecList.size()==0) Util.error("Missing virtual specifier after VIRTUAL:");
-//	}
-
 	static void expectVirtualPart(final PsiBuilder psiBuilder, final ClassDeclaration cls) {
 		PsiParse.expect(psiBuilder, KeyWord.COLON);
 		LOOP: while (true) {
@@ -186,14 +151,6 @@ public final class VirtualSpecification extends Declaration {
 	/// @param cls the ClassDeclaration
 	/// @param type the specifiers type
 	/// @param kind the specifiers kind
-	private static void expectIdentifierList(final ClassDeclaration cls, final Type type, final int kind) {
-		do {
-			String identifier = Parse.expectIdentifier();
-			cls.virtualSpecList.add(new VirtualSpecification(identifier, type, kind, cls.prefixLevel(), null));
-		} while (Parse.accept(KeyWord.COMMA));
-		Parse.expect(KeyWord.SEMICOLON);
-	}
-
 	private static void expectIdentifierList(final PsiBuilder psiBuilder, final ClassDeclaration cls, final Type type, final int kind) {
 		do {
 			String identifier = PsiParse.expectIdentifier(psiBuilder);

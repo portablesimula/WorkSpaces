@@ -92,49 +92,6 @@ public final class ProgramModule extends Statement {
 		else return(false);
 	}
 
-//	/// Create a new ProgramModule.
-//	public ProgramModule() {
-//		super(0);
-//		sysin=new VariableExpression("sysin");
-//		sysout=new VariableExpression("sysout");
-//		try	{
-//			if(Option.internal.TRACE_PARSE) Parse.TRACE("Parse Program");
-//			Global.setScope(StandardClass.BASICIO);		    	// BASICIO Begin
-//			new ConnectionBlock(sysin, null)                     	//    Inspect sysin do
-//			     .setClassDeclaration(StandardClass.Infile);
-//			new ConnectionBlock(sysout, null)                    	//    Inspect sysout do
-//			     .setClassDeclaration(StandardClass.Printfile);
-//			Global.getCurrentScope().sourceBlockLevel=0;
-//			while(Parse.accept(KeyWord.EXTERNAL)) {
-//				externalHead = ExternalDeclaration.expectExternalHead(StandardClass.BASICIO);					
-//				Parse.expect(KeyWord.SEMICOLON);
-//			}
-//			// Now: Looking for ( program | procedure-declaration | class-declaration )
-//			String ident=Parse.acceptIdentifier();
-//			if(ident!=null) {
-//				if(Parse.accept(KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(ident);
-//			    else { Parse.saveCurrentToken(); mainModule = doParseProgram(); }
-//			}
-//			else if(Parse.accept(KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(null);
-//			else {
-//				Type type=Parse.acceptType();
-//			    if(Parse.accept(KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(type);
-//			    else mainModule = doParseProgram();
-//			}
-//			StandardClass.BASICIO.declarationList.add(mainModule);
-//			
-//			if(Parse.currentToken.keyWord != KeyWord.EOF) {
-//				Util.warning("Text after Program end - starting with " + Parse.currentToken);
-//			}
-//			
-//			if(Option.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
-//		} catch(Throwable e) {
-//			e.printStackTrace();
-//			Util.IERR();
-//		}
-//	}
-
-
 	/// Create a new ProgramModule.
 	public ProgramModule(PsiBuilder psiBuilder) {
 		super(0);

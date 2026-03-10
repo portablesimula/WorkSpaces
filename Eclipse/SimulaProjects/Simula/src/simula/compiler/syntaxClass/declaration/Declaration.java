@@ -9,7 +9,6 @@ import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.CodeBuilder;
 import java.util.Vector;
 
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.ProtectedSpecification;
 import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
@@ -130,56 +129,6 @@ public abstract class Declaration extends SyntaxClass {
 	/// Parse a declaration and add it to the given declaration list.
 	/// @param enclosure the owning block.
 	/// @return true if a declaration was found, false otherwise
-//	protected static boolean acceptDeclaration(final BlockDeclaration enclosure) {
-//		if (Option.internal.TRACE_PARSE)
-//			Parse.TRACE("Parse Declaration");
-//		DeclarationList declarationList=enclosure.declarationList;
-//		String prefix = Parse.acceptIdentifier();
-//		if (prefix != null) {
-//			if (Parse.accept(KeyWord.CLASS))
-//				declarationList.add(ClassDeclaration.expectClassDeclaration(prefix));
-//			else {
-//				Parse.saveCurrentToken(); // Identifier is NOT a class prefix.
-//				return (false);
-//			}
-//		} else if (Parse.accept(KeyWord.ARRAY))
-//			ArrayDeclaration.expectArrayDeclaration(Type.Real, declarationList); // Default type real for arrays
-//		else if (Parse.accept(KeyWord.PROCEDURE))
-//			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(null));
-//		else if (Parse.accept(KeyWord.PRIOR)) {
-//			Util.warning("Keyword 'prior' ignored - prior procedure is not implemented");
-//			Type type = Parse.acceptType();
-//			Parse.expect(KeyWord.PROCEDURE);
-//			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(type));
-//		} else if (Parse.accept(KeyWord.CLASS))
-//			declarationList.add(ClassDeclaration.expectClassDeclaration(null));
-//		else if (Parse.accept(KeyWord.SWITCH)) {
-//			String ident = Parse.acceptIdentifier();
-//			if (ident == null) {
-//				// Switch Statement
-//				Parse.saveCurrentToken();
-//				return (false);
-//			}
-//			declarationList.add(new SwitchDeclaration(ident));
-//		} else if (Parse.accept(KeyWord.EXTERNAL))
-//			ExternalDeclaration.expectExternalHead(enclosure);
-//		else {
-//			Type type = Parse.acceptType();
-//			if (type == null)
-//				return (false);
-//			if (Parse.accept(KeyWord.PROCEDURE))
-//				declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(type));
-//			else if (Parse.accept(KeyWord.ARRAY))
-//				ArrayDeclaration.expectArrayDeclaration(type, declarationList);
-//			else 
-//				SimpleVariableDeclaration.expectSimpleVariable(type, declarationList);
-//			
-//			if (Option.internal.TRACE_PARSE)
-//				Parse.TRACE("Parse Declaration(2)");
-//		}
-//		return (true);
-//	}
-	
 	private static boolean acceptDeclaration(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse Declaration");
