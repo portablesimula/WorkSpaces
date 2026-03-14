@@ -14,6 +14,10 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.OverLoad;
@@ -33,6 +37,7 @@ import simula.compiler.syntaxClass.declaration.SimpleVariableDeclaration;
 import simula.compiler.syntaxClass.declaration.StandardProcedure;
 import simula.compiler.syntaxClass.declaration.SwitchDeclaration;
 import simula.compiler.syntaxClass.declaration.VirtualSpecification;
+import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
@@ -42,6 +47,7 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.SyntaxTree;
 
 /// Variable.
 /// 
@@ -181,8 +187,10 @@ public final class VariableExpression extends Expression {
 			Util.TRACE("Parse Variable, current=" + PsiParse.currentLexToken(psiBuilder));
 		VariableExpression variable = new VariableExpression(ident);
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) {
+			IO.println("VariableExpression.expectVariable: GOT BEGPAR");
 			variable.params = new Vector<Expression>();
 			do {
+				IO.println("VariableExpression.expectVariable: GOT BEGPAR OR COMMA");
 				Expression par = acceptExpression(psiBuilder);
 				if (par == null)
 					Util.error("Missing procedure parameter");
@@ -192,6 +200,7 @@ public final class VariableExpression extends Expression {
 				}
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 			PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
+			IO.println("VariableExpression.expectVariable: GOT ENDPAR");
 		}
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW Variable: " + variable);
@@ -921,6 +930,22 @@ public final class VariableExpression extends Expression {
 		sb.append(")");
 		return sb.toString();
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+
+		SyntaxTree.addIdentifier(tree, model, newNode, identifier);
+		Vector<Expression> par = (checkedParams != null)? checkedParams : params;
+        if(par != null) {
+    		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.BEGPAR);
+			for(Expression expr:par) {
+				expr.addSyntaxNodes(tree, model, newNode);
+			}
+    		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.ENDPAR);
+        }
+    }
 
 	@Override
 	public String toString() {

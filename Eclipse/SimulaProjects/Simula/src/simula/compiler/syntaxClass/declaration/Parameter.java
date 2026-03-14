@@ -16,6 +16,10 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.SyntaxClass;
@@ -24,9 +28,12 @@ import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.RemoteVariable;
 import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.SyntaxTree;
 	
 /// Parameter Declaration.
 /// 
@@ -462,7 +469,27 @@ public final class Parameter extends Declaration {
 	public void printTree(final int indent, final Object head) {
 		IO.println(edTreeIndent(indent)+this);
 	}
-	
+
+    public static void addParameterList(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent, ObjectList<Parameter> parameterList) {
+    	if(parameterList != null  && parameterList.size() > 0) {
+	        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Parameters");
+	        model.insertNodeInto(newNode, parent, parent.getChildCount());
+			for(Parameter par:parameterList)
+				par.addSyntaxNodes(tree, model, newNode);
+    	}
+    }
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+        
+        if(kind != Parameter.Kind.Simple) SyntaxTree.addIdentifier(tree, model, newNode, edKind(kind));
+        if(mode != 0) SyntaxTree.addIdentifier(tree, model, newNode, edMode(mode));
+		if(type != null) type.addSyntaxNodes(tree, model, newNode);
+		SyntaxTree.addIdentifier(tree, model, newNode, identifier);
+    }
+
 	@Override
 	public String toString() {
 		String s = "";

@@ -8,6 +8,10 @@ package simula.compiler.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -80,6 +84,12 @@ public final class DummyStatement extends Statement {
 	@Override
 	public void printTree(final int indent, final Object head) {
 	}
+	
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+    }
 
 	@Override
 	public String toString() {

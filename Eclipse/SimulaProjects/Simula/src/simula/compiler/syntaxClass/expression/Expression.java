@@ -25,6 +25,7 @@ import simula.token.Identifier;
 import simula.token.IntegerConst;
 import simula.token.RealConst;
 import simula.token.SimpleString;
+import simula.token.StringToken;
 
 /// Expression.
 /// 
@@ -428,7 +429,7 @@ public abstract class Expression extends SyntaxClass {
 		else if(PsiParse.accept(psiBuilder, KeyWord.FALSE)) expr = new Constant(Type.Boolean,false);
 
 		else if(PsiParse.accept(psiBuilder, KeyWord.CHARACTERKONST)) expr = new Constant(Type.Character,((CharacterConst)prevToken).value);
-		else if(PsiParse.accept(psiBuilder, KeyWord.TEXTKONST)) expr = new Constant(Type.Text,((SimpleString)prevToken).value);
+		else if(PsiParse.accept(psiBuilder, KeyWord.TEXTKONST)) expr = new Constant(Type.Text,psiBuilder.getTextString(prevToken));
 		else if(PsiParse.accept(psiBuilder, KeyWord.NONE)) expr = new Constant(Type.Ref,null);
 		else if(PsiParse.accept(psiBuilder, KeyWord.NOTEXT)) expr = new Constant(Type.Text,null);
 		else if(PsiParse.accept(psiBuilder, KeyWord.NEW)) expr = ObjectGenerator.expectNew(psiBuilder);

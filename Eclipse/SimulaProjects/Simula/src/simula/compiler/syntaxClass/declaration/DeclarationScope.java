@@ -16,6 +16,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
@@ -350,18 +351,22 @@ public abstract class DeclarationScope extends Declaration  {
 		if(labelList != null) for(LabelDeclaration d:labelList.getDeclaredLabels()) d.printTree(indent,this);
 	}
 	
-	protected void addDeclarationNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        IO.println("BlockDeclaration.addDeclarationNodes: declarationList.size="+declarationList.size());
-		for(Declaration d:declarationList) {
-			DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(d);
-	        IO.println("BlockDeclaration.addSyntaxNodes: newNode="+newNode);
+    public void addDeclarationList(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+    	if(declarationList != null  && declarationList.size() > 0) {
+	        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Declarations");
 	        model.insertNodeInto(newNode, parent, parent.getChildCount());
-		}
-		if(labelList != null) {
-//			for(LabelDeclaration d:labelList.getDeclaredLabels()) d.printTree(indent,this);
-			Util.IERR("NOT IMPL");
-		}
-	}
+			for(Declaration elt:declarationList) elt.addSyntaxNodes(tree, model, newNode);
+    	}
+    }
+	
+    public void addLabelList(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+    	if(labelList != null) {
+	        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Labels");
+	        model.insertNodeInto(newNode, parent, parent.getChildCount());
+			if(labelList != null) for(LabelDeclaration d:labelList.getDeclaredLabels()) d.addSyntaxNodes(tree, model, newNode);
+    	}
+    }
+
 
 	/// Debug utility: edScope
 	/// @return edited scope String

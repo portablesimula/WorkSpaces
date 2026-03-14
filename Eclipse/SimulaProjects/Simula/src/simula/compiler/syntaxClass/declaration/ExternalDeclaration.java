@@ -12,12 +12,10 @@ import simula.compiler.AttributeFileIO;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JarFileBuilder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Token;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
@@ -126,53 +124,6 @@ public final class ExternalDeclaration extends Declaration {
 	/// Precondition: EXTERNAL  is already read.
 	/// @param enclosure the BlockDeclaration which is updated
 	/// @return a Vector of ExternalDeclaration
-	public static Vector<ExternalDeclaration> expectExternalHead(final BlockDeclaration enclosure) {
-		String kind = Parse.acceptIdentifier();
-		if (kind != null)
-			Util.error("*** NOT IMPLEMENTED: " + "External " + kind + " Procedure");
-		Type expectedType = Parse.acceptType();
-		if (!(Parse.accept(KeyWord.CLASS) || Parse.accept(KeyWord.PROCEDURE)))
-			Util.error("parseExternalDeclaration: Expecting CLASS or PROCEDURE");
-
-		Vector<ExternalDeclaration> externalDeclarations = new Vector<ExternalDeclaration>();
-		String identifier = Parse.expectIdentifier();
-		LOOP: while (true) {
-			Token externalIdentifier = null;
-			if (Parse.accept(KeyWord.EQ)) {
-				externalIdentifier = Parse.currentToken;
-				Parse.expect(KeyWord.TEXTKONST);
-			}
-			String extIdentitier = (externalIdentifier==null)?null:externalIdentifier.getIdentifier();
-			
-			ExternalDeclaration externalDeclaration = new ExternalDeclaration(identifier,extIdentitier);
-			externalDeclarations.add(externalDeclaration);
-			
-			File jarFile = JarFileBuilder.findJarFile(identifier, extIdentitier);
-			if (jarFile != null) {
-				if(checkJarFiles(jarFile)) {
-					Type moduleType = AttributeFileIO.readAttributeFile(identifier, jarFile, enclosure);
-					if(moduleType == null) {
-						if (expectedType != null) Util.error("Missing external type: "+expectedType);
-					} else if(expectedType == null) {
-						// NOTHING
-					} else if (!moduleType.equals(expectedType)) {
-						if (expectedType != null)
-							Util.error("Wrong external type: "+moduleType+". Expected type: "+expectedType);
-					}
-				}
-			}
-
-			if (Parse.accept(KeyWord.IS)) {
-				Util.error("*** NOT IMPLEMENTED: " + "External non-Simula Procedure");
-				break LOOP;
-			}
-			if (!Parse.accept(KeyWord.COMMA))
-				break LOOP;
-			identifier = Parse.expectIdentifier();
-		}
-		return externalDeclarations;
-	}
-	
 	public static Vector<ExternalDeclaration> expectExternalHead(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
 		String kind = PsiParse.acceptIdentifier(psiBuilder);
 		if (kind != null)

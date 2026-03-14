@@ -6,11 +6,19 @@
 package simula.compiler.syntaxClass;
 
 import java.io.IOException;
+
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
+import simula.compiler.syntaxClass.declaration.VirtualSpecification.Kind;
+import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.psi.SyntaxTree;
 
 /// Hidden Specification.
 /// <pre>
@@ -105,6 +113,13 @@ public final class HiddenSpecification extends SyntaxClass {
 				return (hdn);
 		return (null);
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+		SyntaxTree.addIdentifier(tree, model, newNode, identifier);
+    }
 
 	@Override
 	public void printTree(final int indent, final Object head) {

@@ -12,6 +12,10 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.SyntaxClass;
@@ -28,6 +32,7 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.SyntaxTree;
 
 /// ObjectGenerator i.e. new Object expression.
 /// 
@@ -246,6 +251,22 @@ public final class ObjectGenerator extends Expression {
 		else codeBuilder.checkcast(CD_cls);
 	}
 
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+
+		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.NEW);
+		SyntaxTree.addIdentifier(tree, model, newNode, classIdentifier);
+		Vector<Expression> par = (checkedParams.size() > 0)? checkedParams : params;
+        if(par != null) {
+    		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.BEGPAR);
+			for(Expression expr:par) {
+				expr.addSyntaxNodes(tree, model, newNode);
+			}
+    		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.ENDPAR);
+        }
+    }
 
 	@Override
 	public String toString() {

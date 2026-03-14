@@ -1,7 +1,6 @@
 package simula.psi;
 
 import simula.compiler.syntaxClass.SyntaxClass;
-import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
@@ -211,38 +210,14 @@ public class PsiBuilder {
 		return lexer.getCurrentLexerToken();
 	}
 
-	/// Return 'Parser' token. Skip Comment, Whitespace and Newline tokens.
+	/// Return current 'Parser' token.
+	/// Skip Comment, Whitespace and Newline tokens.
+	/// Concatenate successive Simple Strings into a single token.
     public LexToken getParserToken() {
-    	LexToken token = getParserToken1();
-//    	IO.println("SimulaLexer.getParserToken: RETURN TOKEN: "+token);
-    	if(token instanceof SimpleString) {
-        	IO.println("SimulaLexer.getParserToken: GOT SIMPLE STRING: "+token);
-        	int tokenStartLine = token.getLineNumber();
-        	int tokenStartOffset = token.startOffset;
-    		String result = "";
-        	while(token instanceof SimpleString str) {
-//        	if(token instanceof SimpleString str) {
-        		result += str.value;
-				PsiParse.nextToken(this);
-        		token = getParserToken1();
-            	IO.println("SimulaLexer.getParserToken: WHILE SIMPLE STRING: "+result);
-            	IO.println("SimulaLexer.getParserToken: WHILE NEXT TOKEN: "+token);
-        	}
-        	IO.println("SimulaLexer.getParserToken: RETURN TEXT: "+result);
-        	int currentPosition = token.endOffset;
-        	CharSequence sourceText = token.sourceText;
-            token = new SimpleString(tokenStartLine, sourceText, tokenStartOffset, currentPosition, result);
-//        	Util.STOP();
-        	return token;
-    	}	
-		return token;
-    }
-    
-    private LexToken getParserToken1() {
-    	// if(DEBUG > 1) IO.println("SimulaLexer.getParserToken: "+currentLexerToken);
+    	// if(DEBUG > 1) IO.println("PsiBuilder.getParserToken: "+currentLexerToken);
         while(true) {
     		LexToken token = lexer.getCurrentLexerToken();
-//        	IO.println("SimulaLexer.getParserToken: "+token);
+//        	IO.println("PsiBuilder.getParserToken: "+token);
     		if(token == null) {
 //    			public LexToken(int tokenStartLine, CharSequence sourceText, int startOffset, int endOffset, int keyWord) {
     			token = lexer.getEOFToken();
@@ -253,13 +228,59 @@ public class PsiBuilder {
         	else if(token.keyWord == KeyWord.WHITESPACES); // Skip
         	else if(token.keyWord == KeyWord.COMMENT);     // Skip
         	else {
-//            	IO.println("SimulaLexer.getParserToken: RETURN TOKEN: "+token);
+//            	IO.println("PsiBuilder.getParserToken: RETURN TOKEN: "+token);
         		return token;
         	}
-//        	IO.println("SimulaLexer.getParserToken: SKIP TOKEN: "+token);
+//        	IO.println("PsiBuilder.getParserToken: SKIP TOKEN: "+token);
         	advanceLexer();
 		}
     }
+    
+    /// Get text string, possibly concatenated.
+    /// 
+    /// string = simple-string { string-separator simple-string }
+    /// 
+    ///    string-separator = token-separator { token-separator }
+    /// 
+    /// @param prevToken first SimpleSring
+    /// @return resulting String
+    /// 
+    public String getTextString(LexToken prevToken) {
+		LexToken nextToken = prevToken;
+		IO.println("\n\nPsiBuilder.getTextString: nextToken: "+nextToken);
+		String result = ((SimpleString)prevToken).value;
+    	while((nextToken=getParserToken()) instanceof SimpleString str) {
+    		result += str.value;
+        	IO.println("PsiBuilder.getTextString: RESULT: "+result);
+        	IO.println("PsiBuilder.getTextString: NEXT TOKEN: "+nextToken);
+        	advanceLexer();
+    	}
+    	IO.println("PsiBuilder.getTextString: RETURN TEXT: ]"+result+"[\n\n");
+    	return result;
+    }
+//    private String OLD_getTextString(LexToken prevToken) {
+//		LexToken nextToken = prevToken;
+////		LexToken nextToken = getParserToken();
+//		IO.println("\n\nPsiBuilder.getTextString: nextToken: "+nextToken);
+//		String result = "";
+//    	while(nextToken instanceof SimpleString str) {
+//    		result += str.value;
+//    		nextToken = getParserToken();
+//        	advanceLexer();
+//        	IO.println("PsiBuilder.getTextString: RESULT: "+result);
+//        	IO.println("PsiBuilder.getTextString: NEXT TOKEN: "+nextToken);
+////			PsiParse.nextToken(this);
+//        	if(SEQU++ > 4) Util.STOP();
+//    	}
+////    	psiBuilder.pushBackLastParserToken();
+////    	psiBuilder.rollBackTo(mark);
+////    	psiBuilder.rollBackTo(nextToken);
+//    	IO.println("PsiBuilder.getTextString: RETURN TEXT: ]"+result+"[\n\n");
+////		Util.IERR("SJEKK DETTE");
+////		psiBuilder.printPSI("PsiBuilder.getTextString: ");
+////		Util.STOP();
+//    	return result;
+//    }
 	
 	public void printPSI(String title) {
 		IO.println("printPSI: BEGIN *** "+title+" ***");

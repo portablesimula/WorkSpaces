@@ -5,6 +5,10 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.utilities;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 /// The Simula Keywords and some additional symbols.
 /// 
 /// Link to GitHub: <a href=
@@ -252,6 +256,6 @@ public class KeyWord {
 		case DOT: return (".");
 		default: return (edit(key));
 		}
- }
+	}
 
 }

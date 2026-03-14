@@ -7,9 +7,15 @@ package simula.compiler.syntaxClass.statement;
 
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
+
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.LabelDeclaration;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.ObjectKind;
@@ -97,6 +103,15 @@ public final class LabeledStatement extends Statement {
 		IO.println("");
 		statement.printTree(indent+1,this);
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+		for (LabelDeclaration lab:labels) 
+			lab.addSyntaxNodes(tree, model, newNode);
+       statement.addSyntaxNodes(tree, model, newNode);
+    }
 
 	@Override
 	public String toString() {

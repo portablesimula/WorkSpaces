@@ -7,6 +7,11 @@ package simula.compiler.syntaxClass.statement;
 
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
+
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -17,6 +22,7 @@ import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
+import simula.psi.SyntaxTree;
 
 /// Inner Statement.
 /// 
@@ -99,6 +105,15 @@ public final class InnerStatement extends Statement {
 	public void printTree(final int indent, final Object head) {
 		IO.println(edTreeIndent(indent)+"INNER ");
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+//        model.insertNodeInto(newNode, parent, parent.getChildCount());
+//        
+//        SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.INNER);
+        SyntaxTree.addKeyWordNode(tree, model, parent, KeyWord.INNER);
+    }
 
 	@Override
 	public String toString() {

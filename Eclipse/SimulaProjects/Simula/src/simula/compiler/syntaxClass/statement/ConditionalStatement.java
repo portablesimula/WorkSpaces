@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -21,6 +25,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.SyntaxTree;
 
 /// Conditional Statement.
 /// 
@@ -144,6 +149,21 @@ public final class ConditionalStatement extends Statement {
 			elseStatement.printTree(indent+1,this);
 		}
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+        
+		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.IF);
+		condition.addSyntaxNodes(tree, model, newNode);
+		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.THEN);
+		thenStatement.addSyntaxNodes(tree, model, newNode);
+		if(elseStatement != null) {
+			SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.ELSE);
+			elseStatement.addSyntaxNodes(tree, model, newNode);
+		}
+    }
 
 	@Override
 	public String toString() {

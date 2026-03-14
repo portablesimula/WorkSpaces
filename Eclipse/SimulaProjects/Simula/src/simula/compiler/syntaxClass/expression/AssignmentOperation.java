@@ -9,6 +9,11 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
+
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.SyntaxClass;
@@ -18,6 +23,7 @@ import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.Parameter;
 import simula.compiler.syntaxClass.declaration.ProcedureDeclaration;
 import simula.compiler.syntaxClass.declaration.SimpleVariableDeclaration;
+import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
@@ -25,6 +31,7 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.SyntaxTree;
 
 /// Assignment Operation.
 /// 
@@ -436,6 +443,15 @@ public final class AssignmentOperation extends Expression {
 		if(this.backLink == null) codeBuilder.pop();
 	}
 
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+
+		lhs.addSyntaxNodes(tree, model, newNode);
+		SyntaxTree.addKeyWordNode(tree, model, newNode, opr);
+		rhs.addSyntaxNodes(tree, model, newNode);
+    }
 
 	@Override
 	public String toString() {

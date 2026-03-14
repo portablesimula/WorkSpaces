@@ -37,7 +37,12 @@ import javax.swing.text.DefaultEditorKit;
 import javax.swing.undo.UndoManager;
 
 import simula.compiler.SimulaCompiler;
+import simula.compiler.syntaxClass.declaration.BlockDeclaration;
+import simula.compiler.syntaxClass.declaration.Declaration;
+import simula.compiler.syntaxClass.declaration.DeclarationScope;
+import simula.compiler.syntaxClass.declaration.MaybeBlockDeclaration;
 import simula.compiler.syntaxClass.statement.ProgramModule;
+import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
@@ -607,10 +612,28 @@ public class EditorMenues extends JMenuBar {
 			
 			Global.programModule.printTree(1, this);
 			
-			SyntaxTree syntaxTree = new SyntaxTree(Global.programModule);
-			syntaxTree.popUp();
-			Thread.dumpStack();
-//			Util.STOP();
+			DeclarationScope mainModule = Global.programModule.mainModule;
+			IO.println("EditorMenues.doBuildSyntaxTreeAction: " + mainModule.getClass());
+			if(mainModule instanceof MaybeBlockDeclaration mainBlock) {
+				
+//				Declaration firstDcl = mainBlock.declarationList.getFirst();
+				Statement firstStm = mainBlock.statements.getFirst();
+				IO.println("EditorMenues.doBuildSyntaxTreeAction: firstStm: " + firstStm);
+				SyntaxTree syntaxTree = new SyntaxTree(firstStm);
+				syntaxTree.popUp();
+//				Util.STOP();
+			} else if(mainModule instanceof BlockDeclaration mainBlock) {
+				SyntaxTree syntaxTree = new SyntaxTree(mainBlock);
+				syntaxTree.popUp();
+//				Util.STOP();
+				
+			}
+			
+//			SyntaxTree syntaxTree = new SyntaxTree(Global.programModule.mainModule);
+////			SyntaxTree syntaxTree = new SyntaxTree(first);
+//			syntaxTree.popUp();
+//			Thread.dumpStack();
+////			Util.STOP();
 		});
 	}
     

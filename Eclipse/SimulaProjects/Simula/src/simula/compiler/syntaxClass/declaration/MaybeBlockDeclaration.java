@@ -524,23 +524,16 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
 //		verifyTree(head);
 		String block = ObjectKind.edit(declarationKind);
-		String tail = (IS_SEMANTICS_CHECKED()) ? "  BL=" + getRTBlockLevel() : "";
-		if(isPreCompiledFromFile != null) tail = tail + " From: " + isPreCompiledFromFile;
-		String ID = block + " " + identifier + tail + "  declaredIn="+this.declaredIn;
+//		String tail = (IS_SEMANTICS_CHECKED()) ? "  BL=" + getRTBlockLevel() : "";
+//		if(isPreCompiledFromFile != null) tail = tail + " From: " + isPreCompiledFromFile;
+		String ID = block + " " + identifier;// + tail + "  declaredIn="+this.declaredIn;
 
 		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(ID);
-        IO.println("MaybeBlockDeclaration.addSyntaxNodes: newNode="+newNode);
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         
-//		if(labelList != null) labelList.printTree(indent+1,this);
-//		printDeclarationList(indent+1);
-//		printStatementList(indent+1);
-		if(labelList != null) {
-//			labelList.addSybtaxNodes(tree, model, parent);
-			Util.IERR("NOT IMPL");
-		}
-        addDeclarationNodes(tree, model, parent);
-        addStatementNodes(tree, model, parent);
+        addDeclarationList(tree, model, newNode);
+        addLabelList(tree, model, newNode);
+		addStatementList(tree, model, newNode);			
     }
 
 	@Override

@@ -25,6 +25,10 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;import simula.compiler.syntaxClass.Type;
@@ -44,6 +48,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.SyntaxTree;
 
 /// Procedure Declaration.
 /// <pre>
@@ -1067,6 +1072,24 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		printDeclarationList(indent + 1);
 		printStatementList(indent + 1);
 	}
+
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+		String ID = "PROCEDURE " + identifier;
+		if(type != null) ID = ""+type + ' ' + ID;
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(ID);
+        IO.println("BlockStatement.addSyntaxNodes: newNode="+newNode);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+        
+//        if(type != null) type.addSyntaxNodes(tree, model, newNode);
+//		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.PROCEDURE);
+//		SyntaxTree.addIdentifier(tree, model, newNode, identifier);
+        Parameter.addParameterList(tree, model, newNode, parameterList);
+        addLabelList(tree, model, newNode);
+        addDeclarationList(tree, model, newNode);
+		addStatementList(tree, model, newNode);			
+    }
 
 	@Override
 	public String toString() {

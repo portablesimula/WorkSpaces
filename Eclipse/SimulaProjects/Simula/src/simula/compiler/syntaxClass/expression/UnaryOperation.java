@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.SyntaxClass;
@@ -18,6 +22,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.SyntaxTree;
 
 /// Unary Operation.
 /// 
@@ -146,6 +151,15 @@ public final class UnaryOperation extends Expression {
 		ASSERT_SEMANTICS_CHECKED();
 		return ("(" + KeyWord.toJavaCode(oprator) + "(" + operand.toJavaCode() + "))");
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+
+		SyntaxTree.addKeyWordNode(tree, model, newNode, oprator);
+		operand.addSyntaxNodes(tree, model, newNode);
+    }
 
 	@Override
 	public String toString() {

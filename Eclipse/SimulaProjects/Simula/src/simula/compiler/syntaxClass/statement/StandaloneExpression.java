@@ -8,9 +8,14 @@ package simula.compiler.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.expression.AssignmentOperation;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.utilities.Global;
@@ -69,7 +74,6 @@ public final class StandaloneExpression extends Statement {
 //			psiBuilder.doneSubtree(this);
 //			psiBuilder.startSubtree(AssignmentOperation.class, "Next'AssignmentOperation");
 		}		
-//		psiBuilder.dropSubtree();
 //		psiBuilder.doneSubtree(this, stalonTree, "StandaloneExpression");
 		
 		IO.println("\nEND NEW StandaloneExpression: expr="+expression);
@@ -134,6 +138,13 @@ public final class StandaloneExpression extends Statement {
 	public void printTree(final int indent, final Object head) {
 		expression.printTree(indent,this);
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+        expression.addSyntaxNodes(tree, model, newNode);
+   }
 
 	@Override
 	public String toString() {

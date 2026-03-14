@@ -6,14 +6,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.KeyWord;
 
 public class SyntaxTree {
-	SyntaxClass syntaxClass;
+	SyntaxClass rootClass;
 	
-	public SyntaxTree(SyntaxClass syntaxClass) {
-		this.syntaxClass = syntaxClass;
+	public SyntaxTree(SyntaxClass rootClass) {
+		this.rootClass = rootClass;
 	}
 
 	public void popUp() {
@@ -59,9 +61,20 @@ public class SyntaxTree {
 //        for(PsiElement elt:this.getChildren()) {
 //        	addNodes(1, tree, model, parent, elt);
 //        }
-        syntaxClass.addSyntaxNodes(tree, model, parent);
+        rootClass.addSyntaxNodes(tree, model, parent);
 	    
         return tree;
 	}
+
+
+    public static void addKeyWordNode(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent, int keyWord) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(KeyWord.edit(keyWord));
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+    }
+
+    public static void addIdentifier(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent, String identifier) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(identifier);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+    }
 
 }

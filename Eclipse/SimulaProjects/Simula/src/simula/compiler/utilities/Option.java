@@ -34,11 +34,13 @@ import javax.swing.JTextField;
 /// 
 /// @author Øystein Myhre Andersen
 public final class Option {
-	
-	public static int TRACE_PSITREE_START_DONE = 1;
-	public static int TRACE_NEW_LEXTOKEN = 0;
-	public static int TRACE_ACCEPT_EXPRESSION = 1;//0;
-	public static int TRACE_ACCEPT_STATEMENT = 1;//0;
+
+	public static int TEST_STRING_TOKEN = 2;
+
+	public static int TRACE_PSITREE_START_DONE = 0;
+	public static int TRACE_NEW_LEXTOKEN = 1;//0;
+	public static int TRACE_ACCEPT_EXPRESSION = 0;
+	public static int TRACE_ACCEPT_STATEMENT = 0;
 	
 	/// The UI-Scale factor
 	/// See: https://docs.oracle.com/en/java/javase/25/troubleshoot/java-2d-properties.html

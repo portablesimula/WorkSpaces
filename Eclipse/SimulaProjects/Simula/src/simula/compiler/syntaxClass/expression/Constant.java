@@ -10,6 +10,10 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.MethodTypeDesc;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.SyntaxClass;
@@ -294,11 +298,18 @@ public final class Constant extends Expression {
 			}
 		}
 	}
+	
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+    }
 
 	@Override
 	public String toString() {
 		if(type != null && type.keyWord == Type.T_TEXT) return("\""+value+'"');
-		return("Constant(" + type + ':' + value + ')');
+//		return("Constant(" + type + ':' + value + ')');
+		return ""+value;
 	}
 
 	

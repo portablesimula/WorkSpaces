@@ -8,12 +8,19 @@ package simula.compiler.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
+import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.PrefixedBlockDeclaration;
+import simula.compiler.syntaxClass.declaration.StandardClass;
+import simula.compiler.syntaxClass.declaration.StandardProcedure;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.Global;
@@ -124,6 +131,14 @@ public final class BlockStatement extends Statement {
 	public void printTree(final int indent, final Object head) {
 		blockDeclaration.printTree(indent,head);
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("BlockStatement");
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+        blockDeclaration.addDeclarationList(tree, model, newNode);
+		blockDeclaration.addStatementList(tree, model, newNode);			
+    }
 
 	@Override
 	public String toString() {

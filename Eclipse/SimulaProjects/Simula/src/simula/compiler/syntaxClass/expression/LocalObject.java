@@ -10,7 +10,6 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -78,14 +77,6 @@ public final class LocalObject extends Expression {
 
 	/// Expect Identifier following THIS.
 	/// @return the newly created LocalObject.
-	static Expression expectThisIdentifier() {
-		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ThisObjectExpression, current=" + Parse.currentToken);
-		String classIdentifier = Parse.expectIdentifier();
-		Expression expr = new LocalObject(classIdentifier);
-		return(expr);
-	}
-
 	static Expression expectThisIdentifier(PsiBuilder psiBuilder) {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse ThisObjectExpression, current=" + PsiParse.currentLexToken(psiBuilder));

@@ -13,7 +13,6 @@ import java.util.Vector;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.transform.ClassFileTransform;
 import simula.compiler.utilities.Global;
@@ -221,7 +220,7 @@ public final class SimulaCompiler {
 		// *** Scanning and Parsing
 		// ***************************************************************
 		Global.javaSourceFileCoders = new Vector<JavaSourceFileCoder>();
-		Parse.initiateParser(reader);
+//		Parse.initiateParser(reader);
 		
 		Util.IERR("DETTE MÅ RETTES");
 		programModule = new ProgramModule(null);
@@ -234,7 +233,7 @@ public final class SimulaCompiler {
 				programModule.print(0);
 		}
 		if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + Global.sourceName + ": Parsing completed");
-		Parse.close();
+//		Parse.close();
 		Global.duringParsing = false;
 		if(Option.internal.PRINT_SYNTAX_TREE > 1) {
 			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Parsing ================");

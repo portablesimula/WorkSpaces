@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.MethodTypeDesc;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -26,6 +30,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.SyntaxTree;
 
 // ************************************************************************************
 // *** ForListElement -- Single Value
@@ -146,6 +151,11 @@ public class ForListElement extends SyntaxClass {
 		MethodTypeDesc MTD=MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_NAME;Lsimula/runtime/RTS_NAME;)V");
 		codeBuilder.invokespecial(RTS.CD.FOR_SingleElt, "<init>", MTD); // Invoke Constructor
 	}
+	
+//	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+		expr1.addSyntaxNodes(tree, model, parent);
+    }
 
 	@Override
 	public String toString() {

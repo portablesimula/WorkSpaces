@@ -222,7 +222,6 @@ public final class ProgramModule extends Statement {
         model.insertNodeInto(n, parent, parent.getChildCount());
 
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
-        IO.println("ProgramModule.addSyntaxNodes: newNode="+newNode);
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         
 		for(Declaration decl:StandardClass.BASICIO.declarationList) {
@@ -233,21 +232,6 @@ public final class ProgramModule extends Statement {
 
         tree.doLayout();
     }
-
-//	private void addNodes(int indent, JTree tree,DefaultTreeModel model, DefaultMutableTreeNode parent, SyntaxClass elt) {
-////		char cc = (char)(0x00B6);
-//		char cc = (char)(0x204B);
-////		String xxx = "" + cc + elt.getLineNumber() + ": " + elt.debugName + " |" + elt.getText() +"|";
-////        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(xxx);
-//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(elt);
-//        model.insertNodeInto(newNode, parent, parent.getChildCount());
-//		if(elt instanceof PsiTree psiTree) {
-//	        for(PsiElement subelt:psiTree.getChildren()) {
-//	        	addNodes(indent++, tree, model, newNode, subelt);
-//	        }
-//		}
-//	}
-
 	
 	@Override
 	public String toString() {

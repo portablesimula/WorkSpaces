@@ -70,8 +70,8 @@ public abstract class Statement extends SyntaxClass {
 		int lineNumber=PsiParse.getParserToken(psiBuilder).lineNumber;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Statement.acceptStatement: LabeledStatement: lineNumber="+lineNumber+", current=" + PsiParse.getParserToken(psiBuilder));//	+ ", prev=" + PsiParse.prevToken);
-		String ident = PsiParse.acceptIdentifier(psiBuilder);
 		int labTree = psiBuilder.startSubtree(LabelDeclaration.class, "LabelDeclaration");
+		String ident = PsiParse.acceptIdentifier(psiBuilder);
 		while (PsiParse.accept(psiBuilder, KeyWord.COLON)) {
 			if (ident != null) {
 				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
@@ -92,8 +92,7 @@ public abstract class Statement extends SyntaxClass {
 		}
 		Statement statement = acceptUnlabeledStatement(psiBuilder);
 		if (labels != null && statement != null) {
-			Util.IERR("RETT OPP MHT PsiTree");
-			statement = new LabeledStatement(lineNumber,labels, statement);
+			statement = new LabeledStatement(lineNumber, labels, statement);
 		}
 		return (statement);
 	}

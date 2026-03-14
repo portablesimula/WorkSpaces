@@ -18,6 +18,10 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -37,6 +41,7 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.SyntaxTree;
 
 /// Array Declaration.
 /// 
@@ -534,11 +539,38 @@ public final class ArrayDeclaration extends Declaration {
 	}
 
 	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+        
+        if(type != null) type.addSyntaxNodes(tree, model, newNode);
+		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.ARRAY);
+		SyntaxTree.addIdentifier(tree, model, newNode, identifier);
+		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.BEGPAR);
+		boolean first = true;
+		for(BoundPair boundPair:boundPairList) {
+			if(!first) SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.COMMA);
+			first = false;
+			boundPair.LB.addSyntaxNodes(tree, model, newNode);
+			SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.COLON);
+			boundPair.UB.addSyntaxNodes(tree, model, newNode);
+		}		
+		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.ENDPAR);
+    }
+
+	@Override
 	public String toString() {
-		String s = "ARRAY " + identifier;
-		if (type != null)
-			s = type.toString() + " " + s;
-		return (s);
+		StringBuilder sb = new StringBuilder();
+		if(type != null) sb.append(type).append(' ');
+		sb.append("ARRAY ").append(identifier).append('(');
+		boolean first = true;
+		for(BoundPair boundPair:boundPairList) {
+			if(!first) sb.append(',');
+			first = false;
+			sb.append(boundPair.LB).append(':').append(boundPair.UB);
+		}		
+		sb.append(')');
+		return (sb.toString());
 	}
 
 	// ***********************************************************************************************

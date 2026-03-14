@@ -12,6 +12,11 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
+import java.util.Vector;
+
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
@@ -28,6 +33,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.SyntaxTree;
 
 /// Simple Variable Declaration.
 /// 
@@ -225,6 +231,19 @@ public class SimpleVariableDeclaration extends Declaration {
 		verifyTree(head);
 		IO.println(edTreeIndent(indent)+this);
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+        
+		type.addSyntaxNodes(tree, model, newNode);
+		SyntaxTree.addIdentifier(tree, model, newNode, identifier);
+		if (constantElement != null) {
+    		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.EQ);
+    		constantElement.addSyntaxNodes(tree, model, newNode);
+		}
+    }
 
 	@Override
 	public String toString() {

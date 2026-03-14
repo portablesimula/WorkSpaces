@@ -9,6 +9,11 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
+import java.util.Vector;
+
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
@@ -24,11 +29,13 @@ import simula.compiler.syntaxClass.declaration.StandardProcedure;
 import simula.compiler.syntaxClass.declaration.UndefinedDeclaration;
 import simula.compiler.syntaxClass.declaration.VirtualSpecification;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.SyntaxTree;
 
 /// Remote Variable.
 /// 
@@ -288,6 +295,16 @@ public final class RemoteVariable extends Expression {
 			codeBuilder.pop();
 		}
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+
+		obj.addSyntaxNodes(tree, model, newNode);
+		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.DOT);
+		var.addSyntaxNodes(tree, model, newNode);
+    }
 
 	@Override
 	public String toString() {

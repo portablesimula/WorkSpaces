@@ -239,9 +239,14 @@ public class PsiTree extends PsiElement {
 		PsiElement psiElement = (PsiElement) last.getUserObject();
    		IO.println("PsiTree.getJTree: gotSingleClick: GOT PSI ELEMENT:  " + psiElement);
 		if(psiElement instanceof PsiTree psiTree) {
-			IO.println("PsiTree.getJTree: gotSingleClick: GOT SYNTAX CLASS: " + psiTree.syntaxClass);
-			if(psiTree.syntaxClass != null) psiTree.syntaxClass.printTree(1, "GOT SYNTAX CLASS: ");
+			IO.println("PsiTree.getJTree: gotSingleClick: GOT SYNTAX CLASS: " + psiTree.syntaxClass.getClass().getSimpleName() + " " + psiTree.syntaxClass);
+			if(psiTree.syntaxClass != null) {
+				psiTree.syntaxClass.printTree(1, "GOT SYNTAX CLASS: ");
+				SyntaxTree syntaxTree = new SyntaxTree(psiTree.syntaxClass);
+				syntaxTree.popUp();
+			}
 		}
+		
 //		Util.IERR("");
 	}
 

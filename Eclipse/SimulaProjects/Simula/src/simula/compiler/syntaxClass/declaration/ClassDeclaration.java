@@ -19,6 +19,10 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -1428,6 +1432,47 @@ public class ClassDeclaration extends BlockDeclaration {
 			for(Statement s:statements1) s.printTree(indent+1,this);
 		printStatementList(indent+1);
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+		String ID = "CLASS " + identifier;
+		if(! prefix.equals("CLASS")) ID = prefix + ' ' + ID;
+		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(ID);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+        
+        Parameter.addParameterList(tree, model, newNode, parameterList);
+        if(virtualSpecList.size() > 0) addVirtualList(tree, model, newNode);
+        if(hiddenList.size() > 0) addHiddenList(tree, model, newNode);
+        if(protectedList.size() > 0) addProtectedList(tree, model, newNode);
+        addLabelList(tree, model, newNode);
+        addDeclarationList(tree, model, newNode);
+		addStatement1List(tree, model, newNode);
+		addStatementList(tree, model, newNode);			
+    }
+
+    public void addVirtualList(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Virtuals");
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+		for(VirtualSpecification virt:virtualSpecList) virt.addSyntaxNodes(tree, model, newNode);
+    }
+
+    public void addHiddenList(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Hidden");
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+		for(HiddenSpecification elt:hiddenList) elt.addSyntaxNodes(tree, model, newNode);
+    }
+
+    public void addProtectedList(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Protected");
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+		for(ProtectedSpecification elt:protectedList) elt.addSyntaxNodes(tree, model, newNode);
+    }
+
+    public void addStatement1List(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Statements1");
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+		for(Statement elt:statements1) elt.addSyntaxNodes(tree, model, newNode);
+    }
 
 	@Override
 	public String toString() {

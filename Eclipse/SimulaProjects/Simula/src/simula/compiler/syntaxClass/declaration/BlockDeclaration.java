@@ -19,7 +19,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.statement.Statement;
@@ -124,13 +123,6 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// 
 	/// Precondition: BEGPAR is already read.
 	/// @param pList the parameter list
-	protected static void expectFormalParameterPart(final Vector<Parameter> pList) {
-		do { // ParameterPart = Parameter ; { Parameter ; }
-			new Parameter(Parse.expectIdentifier()).into(pList);
-		} while (Parse.accept(KeyWord.COMMA));
-		Parse.expect(KeyWord.ENDPAR);
-	}
-
 	protected static void expectFormalParameterPart(final PsiBuilder psiBuilder, final Vector<Parameter> pList) {
 		do { // ParameterPart = Parameter ; { Parameter ; }
 			new Parameter(PsiParse.expectIdentifier(psiBuilder)).into(pList);
@@ -535,14 +527,13 @@ public abstract class BlockDeclaration extends DeclarationScope {
 		}
 	}
 	
-	protected void addStatementNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        IO.println("BlockDeclaration.addStatementNodes: statements.size="+statements.size());
-		for(Statement s:statements) {
-			DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(s);
-	        IO.println("BlockDeclaration.addSyntaxNodes: newNode="+newNode);
+    public void addStatementList(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+    	if(statements != null  && statements.size() > 0) {
+	        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Statements");
 	        model.insertNodeInto(newNode, parent, parent.getChildCount());
-		}
-	}
+			for(Statement elt:statements) elt.addSyntaxNodes(tree, model, newNode);
+    	}
+    }
 
 	@Override
 	public String toString() {
