@@ -385,7 +385,7 @@ public final class ForStatement extends Statement {
 
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         
 		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.FOR);
@@ -405,7 +405,7 @@ public final class ForStatement extends Statement {
 	public String toString() {
 		String fl = forList.toString().replace('[', ' ').replace(']', ' ');
 //		return ("FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + " DO " + doStatement);
-		return edStatement("FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + " DO " + doStatement);
+		return "FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + " DO " + doStatement;
 	}
 
 	// ***********************************************************************************************

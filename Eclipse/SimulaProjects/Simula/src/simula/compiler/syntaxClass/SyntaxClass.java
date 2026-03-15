@@ -115,6 +115,13 @@ public abstract class SyntaxClass {
 		Global.sourceLineNumber = OLD_lineNumber;
 	}
 
+	public int lastLineNumber() {
+		if(psiTree != null) return psiTree.lastLineNumber();
+		return OLD_lineNumber;
+	}
+
+	
+	
 	/// Create a new SyntaxClass.
 	protected SyntaxClass() {
 		OLD_lineNumber = Global.sourceLineNumber;
@@ -228,6 +235,15 @@ public abstract class SyntaxClass {
 		while ((i--) > 0)
 			s = s + "    ";
 		return (s);
+	}
+
+	public String edPsi(String phrase) {
+		int lno = lineNumber();
+		StringBuilder sb = new StringBuilder("Line ").append(lno);
+		int lastLine = this.lastLineNumber();
+		if(lastLine != lno) sb.append('-').append(lastLine);
+		sb.append(": ").append(getClass().getSimpleName()).append(": ").append(phrase);
+		return sb.toString();
 	}
 
 	// ***********************************************************************************************

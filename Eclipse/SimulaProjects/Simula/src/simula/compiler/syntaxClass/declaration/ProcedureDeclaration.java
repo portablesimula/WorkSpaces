@@ -1081,10 +1081,6 @@ public class ProcedureDeclaration extends BlockDeclaration {
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(ID);
         IO.println("BlockStatement.addSyntaxNodes: newNode="+newNode);
         model.insertNodeInto(newNode, parent, parent.getChildCount());
-        
-//        if(type != null) type.addSyntaxNodes(tree, model, newNode);
-//		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.PROCEDURE);
-//		SyntaxTree.addIdentifier(tree, model, newNode, identifier);
         Parameter.addParameterList(tree, model, newNode, parameterList);
         addLabelList(tree, model, newNode);
         addDeclarationList(tree, model, newNode);

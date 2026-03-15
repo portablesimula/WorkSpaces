@@ -141,7 +141,7 @@ public final class StandaloneExpression extends Statement {
 
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(expression.edPsi(expression.toString()));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         expression.addSyntaxNodes(tree, model, newNode);
    }

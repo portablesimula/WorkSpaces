@@ -37,6 +37,10 @@ public class LexToken extends PsiElement {
 		return lineNumber;
 	}
 
+	@Override public int lastLineNumber() {
+		return lineNumber;
+	}
+
 	public String getText() {
 		CharSequence txt = sourceText.subSequence(startOffset, endOffset);
 		String str = txt.toString();

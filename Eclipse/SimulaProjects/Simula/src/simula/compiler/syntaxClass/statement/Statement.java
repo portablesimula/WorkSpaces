@@ -201,7 +201,6 @@ public abstract class Statement extends SyntaxClass {
 		Util.IERR("Method buildByteCode need a redefinition in "+this.getClass().getSimpleName());
 	}
 
-
 	public String edStatement(String phrase) {
 //		return new StringBuilder("Line ")
 //				.append(lineNumber)

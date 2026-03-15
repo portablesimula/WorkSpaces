@@ -152,7 +152,7 @@ public final class ConditionalStatement extends Statement {
 
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         
 		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.IF);
@@ -167,8 +167,7 @@ public final class ConditionalStatement extends Statement {
 
 	@Override
 	public String toString() {
-//		return ("IF " + condition + " THEN " + thenStatement + " ELSE "	+ elseStatement + ';');
-		return edStatement("IF " + condition + " THEN " + thenStatement + " ELSE "	+ elseStatement + ';');
+		return "IF " + condition + " THEN " + thenStatement + " ELSE "	+ elseStatement + ';';
 	}
 	
 

@@ -255,7 +255,7 @@ public final class BooleanExpression extends Expression {
 
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
 
 		lhs.addSyntaxNodes(tree, model, newNode);

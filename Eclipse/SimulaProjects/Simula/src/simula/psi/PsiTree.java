@@ -149,6 +149,17 @@ public class PsiTree extends PsiElement {
 		} catch(Exception e) { }
 		return -1;
 	}
+	
+	@Override public int lastLineNumber() {
+		IO.println("PsiTree.lastLineNumber: ");
+//		Util.STOP();
+		try {
+//			PsiElement lastChild = getLastParserChild();
+			PsiElement lastChild = children.getLast();
+			if(lastChild != null) return lastChild.getLineNumber();
+		} catch(Exception e) { }
+		return getLineNumber();
+	}
 
 	@Override public String getText() {
 //		IO.println("PsiTree.getText: " + debugName);
