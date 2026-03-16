@@ -142,7 +142,7 @@ public final class BlockStatement extends Statement {
 
 	@Override
 	public String toString() {
-		return edStatement(""+blockDeclaration);
+		return ""+blockDeclaration;
 	}
 
 	// ***********************************************************************************************

@@ -26,6 +26,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.SyntaxTree;
 
 /// Utility class Type.
 /// <pre>
@@ -679,8 +680,10 @@ public class Type extends SyntaxClass {
 	
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
+//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
+//        model.insertNodeInto(newNode, parent, parent.getChildCount());
+        
+        SyntaxTree.addKeyWordIdentNode(tree, model, parent, toString());
     }
 
 	@Override

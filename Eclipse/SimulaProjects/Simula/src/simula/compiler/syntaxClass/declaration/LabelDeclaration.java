@@ -29,6 +29,7 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Label Declaration.
 /// 
@@ -223,7 +224,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
     }
 

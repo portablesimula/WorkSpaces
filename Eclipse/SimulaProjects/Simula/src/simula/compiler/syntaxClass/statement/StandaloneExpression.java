@@ -148,8 +148,7 @@ public final class StandaloneExpression extends Statement {
 
 	@Override
 	public String toString() {
-//		return ("Line " + this.lineNumber+ ": " + this.getClass().getSimpleName() + " { " + expression + " }");
-		return edStatement(expression.toString());
+		return expression.toString();
 	}
 
 	// ***********************************************************************************************

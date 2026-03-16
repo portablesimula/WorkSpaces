@@ -23,6 +23,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.token.Identifier;
 
 /// Statement.
 /// 
@@ -131,7 +132,7 @@ public abstract class Statement extends SyntaxClass {
 		    case KeyWord.EOF:		 statement = DummyStatement.ofImplicit(psiBuilder, lineNumber); break; // Dummy Statement, keep EOF
 
 //			case KeyWord.IDENTIFIER, KeyWord.NEW, KeyWord.THIS, KeyWord.BEGPAR:
-			case KeyWord.NEW, KeyWord.THIS, KeyWord.BEGPAR:
+		    case KeyWord.BEGPAR:
 				// new classIdentifier ...
 				// this classIdentifier ...
 				// BEGPAR ????
@@ -139,6 +140,8 @@ public abstract class Statement extends SyntaxClass {
 				Util.STOP();
 				break;
 			case KeyWord.IDENTIFIER:
+			case KeyWord.NEW:
+		    case KeyWord.THIS:
 				if(Option.TRACE_ACCEPT_STATEMENT > 2) {
 					IO.println("\nStatement.acceptUnlabeledStatement: IDENTIFIER");
 					psiBuilder.printPSI("Statement.acceptUnlabeledStatement: IDENTIFIER");
@@ -199,23 +202,6 @@ public abstract class Statement extends SyntaxClass {
 	@Override
 	public void buildByteCode(CodeBuilder codeBuilder) {
 		Util.IERR("Method buildByteCode need a redefinition in "+this.getClass().getSimpleName());
-	}
-
-	public String edStatement(String phrase) {
-//		return new StringBuilder("Line ")
-//				.append(lineNumber)
-//				.append(' ')
-//				.append(getClass().getSimpleName())
-//				.append(": ")
-//				.append(phrase)
-//				.toString();
-		return new StringBuilder(getClass().getSimpleName())
-				.append("[Line ")
-				.append(lineNumber())
-				.append(": ")
-				.append(phrase)
-				.append("]")
-				.toString();
 	}
 
 }

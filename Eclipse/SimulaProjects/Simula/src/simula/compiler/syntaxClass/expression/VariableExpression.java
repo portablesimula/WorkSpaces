@@ -48,6 +48,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 import simula.psi.SyntaxTree;
+import simula.token.Identifier;
 
 /// Variable.
 /// 
@@ -933,7 +934,7 @@ public final class VariableExpression extends Expression {
 
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
 
 		SyntaxTree.addIdentifier(tree, model, newNode, identifier);

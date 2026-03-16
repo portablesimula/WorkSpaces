@@ -7,6 +7,11 @@ package simula.compiler.syntaxClass.statement;
 
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
+
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.Type;
@@ -23,6 +28,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.SyntaxTree;
 
 /// Activation Statement.
 /// 
@@ -300,6 +306,34 @@ public final class ActivationStatement extends Statement {
 	}
 
 	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+        
+		SyntaxTree.addKeyWordNode(tree, model, newNode,	(REAC) ? KeyWord.REACTIVATE : KeyWord.ACTIVATE);
+        object1.addSyntaxNodes(tree, model, newNode);
+		switch (code) {
+		    case at:
+				SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.AT);
+		    	time.addSyntaxNodes(tree, model, newNode);
+		    	break;
+		    case delay:
+				SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.DELAY);
+		    	time.addSyntaxNodes(tree, model, newNode);
+		    	break;
+		    case before:
+				SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.BEFORE);
+		    	object2.addSyntaxNodes(tree, model, newNode);
+		    	break;
+		    case after:
+				SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.AFTER);
+		    	object2.addSyntaxNodes(tree, model, newNode);
+		    	break;
+		    default:
+		}
+    }
+
+	@Override
 	public String toString() {
 		String pri = "";
 		if (prior) pri = " PRIOR";
@@ -309,7 +343,7 @@ public final class ActivationStatement extends Statement {
 		    case before, after: activator += " " + code + ' ' + object2; break;
 		    default:
 		}
-		return edStatement(activator);
+		return activator;
 
 	}
 

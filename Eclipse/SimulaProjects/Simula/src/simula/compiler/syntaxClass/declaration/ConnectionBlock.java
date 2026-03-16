@@ -8,6 +8,11 @@ package simula.compiler.syntaxClass.declaration;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.ClassDesc;
+
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -24,6 +29,7 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Connection Block.
 /// 
@@ -234,6 +240,23 @@ public final class ConnectionBlock extends DeclarationScope {
 	public String toString() {
 		return ("ConnectionBlock: Inspect(" + inspectedVariable + ") do " + statement);
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+//		verifyTree(head);
+		String block = ObjectKind.edit(declarationKind);
+//		String tail = (IS_SEMANTICS_CHECKED()) ? "  BL=" + getRTBlockLevel() : "";
+//		if(isPreCompiledFromFile != null) tail = tail + " From: " + isPreCompiledFromFile;
+		String ID = block + " " + identifier;// + tail + "  declaredIn="+this.declaredIn;
+
+		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(ID);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+        
+        addDeclarationList(tree, model, newNode);
+        addLabelList(tree, model, newNode);
+//		addStatementList(tree, model, newNode);			
+		statement.addSyntaxNodes(tree, model, newNode);
+    }
 
 	@Override
 	public byte[] buildClassFile() {

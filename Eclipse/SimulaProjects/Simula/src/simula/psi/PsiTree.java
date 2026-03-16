@@ -151,8 +151,6 @@ public class PsiTree extends PsiElement {
 	}
 	
 	@Override public int lastLineNumber() {
-		IO.println("PsiTree.lastLineNumber: ");
-//		Util.STOP();
 		try {
 //			PsiElement lastChild = getLastParserChild();
 			PsiElement lastChild = children.getLast();

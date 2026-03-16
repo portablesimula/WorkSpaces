@@ -11,6 +11,8 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
+
 import java.lang.constant.ClassDesc;
 import simula.compiler.syntaxClass.OverLoad;
 import simula.compiler.syntaxClass.Type;

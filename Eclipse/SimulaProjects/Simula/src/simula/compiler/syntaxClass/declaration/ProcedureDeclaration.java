@@ -48,7 +48,6 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.SyntaxTree;
 
 /// Procedure Declaration.
 /// <pre>
@@ -1078,7 +1077,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
 		String ID = "PROCEDURE " + identifier;
 		if(type != null) ID = ""+type + ' ' + ID;
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(ID);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(ID));
         IO.println("BlockStatement.addSyntaxNodes: newNode="+newNode);
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         Parameter.addParameterList(tree, model, newNode, parameterList);

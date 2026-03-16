@@ -116,7 +116,7 @@ public final class HiddenSpecification extends SyntaxClass {
 
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
 		SyntaxTree.addIdentifier(tree, model, newNode, identifier);
     }

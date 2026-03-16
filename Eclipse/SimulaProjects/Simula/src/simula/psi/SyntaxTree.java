@@ -10,6 +10,7 @@ import javax.swing.tree.DefaultTreeModel;
 import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
+import simula.token.Identifier;
 
 public class SyntaxTree {
 	SyntaxClass rootClass;
@@ -41,6 +42,12 @@ public class SyntaxTree {
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
         DefaultTreeModel model = new DefaultTreeModel(root);
         JTree tree = new JTree(model);
+        
+//		JTree tree = new JTree(rootNode);
+//		tree.setRootVisible(false);      // Hides the root node
+		tree.setShowsRootHandles(true);   // Shows expansion icons for the new "top" level
+
+        
 //        tree.addMouseListener(new MouseAdapter() {
 //            public void mousePressed(MouseEvent e) {
 //        		IO.println("PsiTree'mousePressed: " + e);
@@ -67,8 +74,31 @@ public class SyntaxTree {
 	}
 
 
+    public static void addKeyWordIdentNode(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent, String keyWord) {
+    	
+//    	String html = "<html><b><u><p style=\"color: red;\">" + KeyWord.edit(keyWord).toLowerCase() + "</p></u></b></html>";
+//    	String html = "<html><b><u><p style=\"color: rgb(255, 0, 0);\">" + KeyWord.edit(keyWord).toLowerCase() + "</p></u></b></html>";
+    	String html = "<html><b><u><p style=\"color: rgb(153,0,51);\">" + keyWord.toLowerCase() + "</p></u></b></html>";
+//    	String redText = "<p style=\"color: red;\">Dette er rød tekst.</p>";
+
+//    	String html = "<html><b><u>" + KeyWord.edit(keyWord).toLowerCase() + "</u></b></html>";
+//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(KeyWord.edit(keyWord));
+    	
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(html);
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+    }
+
     public static void addKeyWordNode(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent, int keyWord) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(KeyWord.edit(keyWord));
+    	
+//    	String html = "<html><b><u><p style=\"color: red;\">" + KeyWord.edit(keyWord).toLowerCase() + "</p></u></b></html>";
+//    	String html = "<html><b><u><p style=\"color: rgb(255, 0, 0);\">" + KeyWord.edit(keyWord).toLowerCase() + "</p></u></b></html>";
+    	String html = "<html><b><u><p style=\"color: rgb(153,0,51);\">" + KeyWord.edit(keyWord).toLowerCase() + "</p></u></b></html>";
+//    	String redText = "<p style=\"color: red;\">Dette er rød tekst.</p>";
+
+//    	String html = "<html><b><u>" + KeyWord.edit(keyWord).toLowerCase() + "</u></b></html>";
+//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(KeyWord.edit(keyWord));
+    	
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(html);
         model.insertNodeInto(newNode, parent, parent.getChildCount());
     }
 

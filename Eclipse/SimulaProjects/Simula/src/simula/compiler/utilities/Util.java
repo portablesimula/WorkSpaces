@@ -15,6 +15,8 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import simula.token.Identifier;
+
 /// A set of all static Utility Methods
 /// 
 /// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/Util.java"><b>Source File</b></a>.
@@ -276,7 +278,12 @@ public final class Util {
 			 return(s1.equals(s2));			
 		else return(s1.equalsIgnoreCase(s2));
 	}
-	
+
+
+	public static boolean equals(Identifier id1, Identifier id2) {
+		return equals(id1.value, id2.value);
+	}
+
     //*******************************************************************************
     //*** IPOW - Integer Power: b ** x
     //*******************************************************************************
@@ -385,6 +392,7 @@ public final class Util {
 	public static void buildLineNumber(CodeBuilder codeBuilder, int lineNumber) {
 		codeBuilder.lineNumber(lineNumber);
 	}
+
 
   
 }

@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -16,9 +20,11 @@ import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.ConnectionBlock;
 import simula.compiler.syntaxClass.expression.AssignmentOperation;
+import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.SyntaxTree;
 
 /// Utility class to hold a when-part.
 ///
@@ -103,6 +109,15 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 				.labelBinding(elseLabel);
 		}
 	}
+	
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+		SyntaxTree.addKeyWordNode(tree, model, parent, KeyWord.WHEN);
+		SyntaxTree.addIdentifier(tree, model, parent, classIdentifier);
+		SyntaxTree.addKeyWordNode(tree, model, parent, KeyWord.DO);
+//		connectionStatement.addSyntaxNodes(tree, model, parent);
+		connectionBlock.addSyntaxNodes(tree, model, parent);
+    }
 
 	@Override
 	public String toString() {

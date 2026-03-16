@@ -42,6 +42,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 import simula.psi.SyntaxTree;
+import simula.token.Identifier;
 
 /// Array Declaration.
 /// 
@@ -175,7 +176,7 @@ public final class ArrayDeclaration extends Declaration {
 			psiBuilder.setParsingBoundPairList(false);
 			for (Enumeration<String> e = identList.elements(); e.hasMoreElements();) {
 				String identifier = e.nextElement();
-				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(identifier.toString(), type, boundPairList);
+				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(identifier, type, boundPairList);
 				declarationList.add(arrayDeclaration);
 				psiBuilder.doneSubtree(arrayDeclaration);
 				psiBuilder.startSubtree(Declaration.class, "NextDeclaration");
@@ -540,7 +541,7 @@ public final class ArrayDeclaration extends Declaration {
 
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         
         if(type != null) type.addSyntaxNodes(tree, model, newNode);

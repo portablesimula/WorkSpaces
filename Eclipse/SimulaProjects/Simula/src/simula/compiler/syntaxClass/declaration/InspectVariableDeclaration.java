@@ -13,6 +13,10 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.Type;
@@ -21,6 +25,7 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.SyntaxTree;
 
 /// InspectVariable Declaration.
 /// 
@@ -115,6 +120,15 @@ public class InspectVariableDeclaration extends Declaration {
 		verifyTree(head);
 		IO.println(edTreeIndent(indent)+this);
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+        
+		type.addSyntaxNodes(tree, model, newNode);
+		SyntaxTree.addIdentifier(tree, model, newNode, identifier);
+    }
 
 	@Override
 	public String toString() {

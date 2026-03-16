@@ -90,6 +90,7 @@ import simula.psi.PsiTree;
 /// @author Øystein Myhre Andersen
 public abstract class SyntaxClass {
 
+	/// The associated PSI Tree
 	public PsiTree psiTree;
 
 	/// Controls semantic checking.

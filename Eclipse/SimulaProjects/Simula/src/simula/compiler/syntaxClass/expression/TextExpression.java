@@ -7,15 +7,22 @@ package simula.compiler.syntaxClass.expression;
 
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
+
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.SyntaxTree;
 
 /// Text expression.
 /// 
@@ -146,6 +153,16 @@ public final class TextExpression extends Expression {
 		rhs.buildEvaluation(null,codeBuilder);
 		RTS.invokevirtual_RTS_CONC(codeBuilder);
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+
+		lhs.addSyntaxNodes(tree, model, newNode);
+		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.AMPERSAND);
+		rhs.addSyntaxNodes(tree, model, newNode);
+    }
 
 	@Override
 	public String toString() {

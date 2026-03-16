@@ -7,15 +7,22 @@ package simula.compiler.syntaxClass.statement;
 
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
+
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ConnectionBlock;
 import simula.compiler.syntaxClass.expression.AssignmentOperation;
+import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.SyntaxTree;
 
 /// Utility class to hold the single Connection do-part.
 ///
@@ -77,6 +84,13 @@ public class ConnectionDoPart extends SyntaxClass {
 		Util.println(spc + "DO " + connectionBlock.statement);
 		connectionBlock.printTree(indent, head);
 	}
+
+	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+		SyntaxTree.addKeyWordNode(tree, model, parent, KeyWord.DO);
+//		connectionStatement.addSyntaxNodes(tree, model, parent);
+		connectionBlock.addSyntaxNodes(tree, model, parent);
+    }
 
 	@Override
 	public String toString() {

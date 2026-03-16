@@ -10,5 +10,9 @@ public class Identifier extends LexToken {
 		super(tokenStartLine, sourceText, startOffset, endOffset, KeyWord.IDENTIFIER);
 		this.value = value;
 	}
+	
+	public Identifier(final String value) {
+		this(-1, value, -1, -1, value);
+	}
 
 }

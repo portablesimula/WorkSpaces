@@ -34,6 +34,7 @@ import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.SyntaxTree;
+import simula.token.Identifier;
 	
 /// Parameter Declaration.
 /// 
@@ -481,11 +482,11 @@ public final class Parameter extends Declaration {
 
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         
-        if(kind != Parameter.Kind.Simple) SyntaxTree.addIdentifier(tree, model, newNode, edKind(kind));
-        if(mode != 0) SyntaxTree.addIdentifier(tree, model, newNode, edMode(mode));
+        if(kind != Parameter.Kind.Simple) SyntaxTree.addKeyWordIdentNode(tree, model, newNode, edKind(kind));
+        if(mode != 0) SyntaxTree.addKeyWordIdentNode(tree, model, newNode, edMode(mode));
 		if(type != null) type.addSyntaxNodes(tree, model, newNode);
 		SyntaxTree.addIdentifier(tree, model, newNode, identifier);
     }

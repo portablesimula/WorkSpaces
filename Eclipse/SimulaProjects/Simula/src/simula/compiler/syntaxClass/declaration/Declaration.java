@@ -19,6 +19,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.token.Identifier;
 
 /// Declaration.
 ///  
@@ -70,7 +71,7 @@ public abstract class Declaration extends SyntaxClass {
 	/// @param identifier the given identifier
 	protected Declaration(final String identifier) {
 		this.identifier = identifier;
-		this.externalIdent = identifier; // May be overwritten
+		if(identifier != null) this.externalIdent = identifier; // May be overwritten
 		declaredIn = Global.getCurrentScope();
 		checkAlreadyDefined();
 	}

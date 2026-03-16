@@ -24,6 +24,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.SyntaxTree;
+import simula.token.Identifier;
 
 /// Arithmetic expressions
 /// 
@@ -327,7 +328,7 @@ public final class ArithmeticExpression extends Expression {
 
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
 
 		lhs.addSyntaxNodes(tree, model, newNode);

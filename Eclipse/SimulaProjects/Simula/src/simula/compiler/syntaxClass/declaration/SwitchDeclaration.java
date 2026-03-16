@@ -25,6 +25,7 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.token.Identifier;
 
 /// Switch Declaration.
 /// 

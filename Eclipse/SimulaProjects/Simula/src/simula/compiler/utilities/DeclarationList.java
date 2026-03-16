@@ -11,6 +11,7 @@ import java.util.Vector;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.declaration.Declaration;
+import simula.token.Identifier;
 
 /// Declaration List.
 /// 
@@ -33,11 +34,11 @@ public final class DeclarationList extends Vector<Declaration> {
 	}
 	
 	/// Find a declaration in this DeclarationList
-	/// @param identifier declaration identifier
+	/// @param identifier2 declaration identifier
 	/// @return the resulting Declaration
-	public Declaration find(String identifier) {
+	public Declaration find(String identifier2) {
 		for(Declaration d:this)
-			if(d.identifier.equals(identifier)) return(d);
+			if(d.identifier.equals(identifier2)) return(d);
 		return(null);
 	}
 	

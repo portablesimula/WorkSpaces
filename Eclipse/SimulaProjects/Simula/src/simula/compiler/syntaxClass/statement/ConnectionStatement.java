@@ -11,6 +11,11 @@ import java.lang.classfile.Label;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
+
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -31,6 +36,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.SyntaxTree;
 
 /// Connection Statement.
 /// 
@@ -282,10 +288,34 @@ public final class ConnectionStatement extends Statement {
 	}
 
 	@Override
+    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
+        model.insertNodeInto(newNode, parent, parent.getChildCount());
+        
+		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.INSPECT);
+		inspectedVariable.addSyntaxNodes(tree, model, newNode);
+		for (ConnectionDoPart doPart : connectionPart) {
+			//doPart.printTree(indent+1,this);
+			doPart.addSyntaxNodes(tree, model, newNode);
+		}
+		
+		if (otherwise != null) {
+			SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.OTHERWISE);
+			otherwise.addSyntaxNodes(tree, model, newNode);
+		}
+		
+//		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.THEN);
+//		thenStatement.addSyntaxNodes(tree, model, newNode);
+//		if(elseStatement != null) {
+//			SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.ELSE);
+//			elseStatement.addSyntaxNodes(tree, model, newNode);
+//		}
+    }
+
+	@Override
 	public String toString() {
 		String otherwisePart = (otherwise == null)?"":" OTHERWISE " + otherwise;
-//		return ("INSPECT " + inspectedVariable + " " + connectionPart + otherwisePart);
-		return edStatement("INSPECT " + inspectedVariable + " " + connectionPart + otherwisePart);
+		return "INSPECT " + inspectedVariable + " " + connectionPart + otherwisePart;
 	}
 
 	// ***********************************************************************************************

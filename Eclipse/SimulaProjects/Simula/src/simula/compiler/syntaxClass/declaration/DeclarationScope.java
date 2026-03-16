@@ -25,6 +25,7 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Declaration Scope.
 /// 
@@ -72,9 +73,9 @@ public abstract class DeclarationScope extends Declaration  {
 	}
 	
 	/// Modify the identifier of this class, procedure, ...
-	/// @param newIdentifier the new identifier
-	public void modifyIdentifier(final String newIdentifier) {
-		this.identifier = newIdentifier;
+	/// @param identifier the new identifier
+	public void modifyIdentifier(final String identifier) {
+		this.identifier = identifier;
 		checkAlreadyDefined();
 		if (declarationKind == ObjectKind.ContextFreeMethod) externalIdent = this.identifier;
 		else if (declarationKind == ObjectKind.MemberMethod) externalIdent = this.identifier;

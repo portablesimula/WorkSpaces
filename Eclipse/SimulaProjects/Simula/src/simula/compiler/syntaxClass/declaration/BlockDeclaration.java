@@ -31,6 +31,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.token.Identifier;
 
 /// Block Declaration.
 /// 

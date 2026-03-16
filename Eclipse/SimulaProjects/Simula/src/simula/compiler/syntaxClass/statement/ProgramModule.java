@@ -33,6 +33,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.token.Identifier;
 
 /// Simula Program Module.
 /// 
@@ -221,7 +222,7 @@ public final class ProgramModule extends Statement {
         DefaultMutableTreeNode n = new DefaultMutableTreeNode("BASICIO");
         model.insertNodeInto(n, parent, parent.getChildCount());
 
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         
 		for(Declaration decl:StandardClass.BASICIO.declarationList) {
@@ -235,8 +236,7 @@ public final class ProgramModule extends Statement {
 	
 	@Override
 	public String toString() {
-//		return((mainModule==null)?"":""+mainModule.identifier);
-		return edStatement((mainModule==null)?"MAIN":mainModule.identifier);
+		return (mainModule==null)?"MAIN":mainModule.identifier;
 	}
 	
 }

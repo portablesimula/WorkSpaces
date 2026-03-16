@@ -253,7 +253,7 @@ public final class ObjectGenerator extends Expression {
 
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(this);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
 
 		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.NEW);
