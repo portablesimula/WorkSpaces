@@ -15,7 +15,6 @@ import javax.swing.tree.DefaultTreeModel;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.LabelDeclaration;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.ObjectKind;
@@ -52,7 +51,6 @@ public final class LabeledStatement extends Statement {
 	/// @param labels the label identifiers
 	/// @param statement the labeled statement
 	LabeledStatement(final int line,final ObjectList<LabelDeclaration> labels,final Statement statement) {
-		super(line);
 		this.labels = labels;
 		this.statement = statement;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": LabeledStatement: "+this);
@@ -129,9 +127,7 @@ public final class LabeledStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private LabeledStatement() {
-		super(0);
-	}
+	private LabeledStatement() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -139,7 +135,7 @@ public final class LabeledStatement extends Statement {
 		oupt.writeKind(ObjectKind.LabeledStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** LabeledStatement
 		oupt.writeObj(statement);
 		oupt.writeObjectList(labels);
@@ -154,7 +150,7 @@ public final class LabeledStatement extends Statement {
 		LabeledStatement stm = new LabeledStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.OLD_lineNumber = inpt.readShort();
+//		stm.OLD_lineNumber = inpt.readShort();
 		// *** LabeledStatement
 		stm.statement = (Statement) inpt.readObj();
 		stm.labels = (ObjectList<LabelDeclaration>) inpt.readObjectList();

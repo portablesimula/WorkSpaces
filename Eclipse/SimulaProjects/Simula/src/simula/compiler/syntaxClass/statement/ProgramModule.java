@@ -33,7 +33,6 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.token.Identifier;
 
 /// Simula Program Module.
 /// 
@@ -95,7 +94,7 @@ public final class ProgramModule extends Statement {
 
 	/// Create a new ProgramModule.
 	public ProgramModule(PsiBuilder psiBuilder) {
-		super(0);
+//		super(0);
 		psiBuilder.startSubtree(DeclarationScope.class, "ProgramModule");
 
 		sysin=new VariableExpression("sysin");

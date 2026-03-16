@@ -90,7 +90,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	/// @return the resulting PrefixedBlockDeclaration
 	public static PrefixedBlockDeclaration expectPrefixedBlock(final PsiBuilder psiBuilder, final VariableExpression blockPrefix,boolean isMainModule) {
 		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(isMainModule);
-		block.OLD_lineNumber=psiBuilder.getSourceLineNumber();
+//		block.OLD_lineNumber=psiBuilder.getSourceLineNumber();
 		block.declarationKind=ObjectKind.PrefixedBlock;
 		Util.ASSERT(blockPrefix != null,"blockPrefix == null");
 		block.blockPrefix = blockPrefix;
@@ -366,7 +366,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		oupt.writeString(identifier);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		
 		// *** Declaration
 		//oupt.writeString(identifier);
@@ -408,7 +408,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		pbl.declarationKind = ObjectKind.Class;
 		pbl.OBJECT_SEQU = inpt.readSEQU(pbl);
 		// *** SyntaxClass
-		pbl.OLD_lineNumber = inpt.readShort();
+//		pbl.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		//pbl.identifier = inpt.readString();

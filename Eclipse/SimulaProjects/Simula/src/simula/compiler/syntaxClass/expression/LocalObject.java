@@ -155,7 +155,8 @@ public final class LocalObject extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+//		setLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		DeclarationScope.buildCTX2(ctxDiff,codeBuilder);
 		if (thisScope instanceof ConnectionBlock connectionBlock) {
@@ -199,7 +200,7 @@ public final class LocalObject extends Expression {
 		oupt.writeKind(ObjectKind.LocalObject);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -215,7 +216,7 @@ public final class LocalObject extends Expression {
 		LocalObject expr = new LocalObject();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-		expr.OLD_lineNumber = inpt.readShort();
+//		expr.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

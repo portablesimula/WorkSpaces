@@ -52,13 +52,12 @@ public final class WhileStatement extends Statement {
 
 	/// Create a new WhileStatement.
 	/// @param line the source line number
-	WhileStatement(final PsiBuilder psiBuilder, final int line) {
-		super(line);
+	WhileStatement(final PsiBuilder psiBuilder) {
 		int whileTree = psiBuilder.startSubtree(WhileStatement.class, "WhileStatement");
 		psiBuilder.consume(KeyWord.WHILE); //  (add it to 'current tree')
 
-		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse WhileStatement: line="+line+", current=" + PsiParse.currentLexToken(psiBuilder));
+//		if (Option.internal.TRACE_PARSE)
+//			Util.TRACE("Parse WhileStatement: line="+line+", current=" + PsiParse.currentLexToken(psiBuilder));
 		condition = Expression.expectExpression(psiBuilder);
 		PsiParse.expect(psiBuilder, KeyWord.DO);
 		doStatement = Statement.acceptStatement(psiBuilder);
@@ -134,9 +133,7 @@ public final class WhileStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private WhileStatement() {
-		super(0);
-	}
+	private WhileStatement() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -144,7 +141,7 @@ public final class WhileStatement extends Statement {
 		oupt.writeKind(ObjectKind.WhileStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** WhileStatement
 		oupt.writeObj(condition);
 		oupt.writeObj(doStatement);
@@ -158,7 +155,7 @@ public final class WhileStatement extends Statement {
 		WhileStatement stm = new WhileStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.OLD_lineNumber = inpt.readShort();
+//		stm.OLD_lineNumber = inpt.readShort();
 		// *** WhileStatement
 		stm.condition  = (Expression) inpt.readObj();
 		stm.doStatement = (Statement) inpt.readObj();

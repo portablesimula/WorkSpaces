@@ -42,7 +42,6 @@ import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 import simula.psi.SyntaxTree;
-import simula.token.Identifier;
 
 /// Array Declaration.
 /// 
@@ -590,7 +589,7 @@ public final class ArrayDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -614,7 +613,7 @@ public final class ArrayDeclaration extends Declaration {
 		arr.OBJECT_SEQU = inpt.readSEQU(arr);
 
 		// *** SyntaxClass
-		arr.OLD_lineNumber = inpt.readShort();
+//		arr.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		arr.identifier = inpt.readString();

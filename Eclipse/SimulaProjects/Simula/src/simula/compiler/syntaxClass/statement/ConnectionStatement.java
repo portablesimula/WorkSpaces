@@ -129,8 +129,7 @@ public final class ConnectionStatement extends Statement {
 	/// 
 	/// Pre-Condition: INSPECT  is already read.
 	/// @param line the source line number
-	ConnectionStatement(final PsiBuilder psiBuilder, final int line) {
-		super(line);
+	ConnectionStatement(final PsiBuilder psiBuilder) {
 		int inspectTree = psiBuilder.startSubtree(ConnectionStatement.class, "ConnectionStatement");
 		psiBuilder.consume(KeyWord.INSPECT); //  (add it to 'current tree')
 
@@ -322,9 +321,7 @@ public final class ConnectionStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ConnectionStatement() {
-		super(0);
-	}
+	private ConnectionStatement() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -332,7 +329,7 @@ public final class ConnectionStatement extends Statement {
 		oupt.writeKind(ObjectKind.ConnectionStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** ConnectionStatement
 		oupt.writeObj(objectExpression);
 		oupt.writeObj(inspectedVariable);
@@ -351,7 +348,7 @@ public final class ConnectionStatement extends Statement {
 		ConnectionStatement stm = new ConnectionStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.OLD_lineNumber = inpt.readShort();
+//		stm.OLD_lineNumber = inpt.readShort();
 		// *** ConnectionStatement
 		stm.objectExpression = (Expression) inpt.readObj();
 		stm.inspectedVariable = (VariableExpression) inpt.readObj();

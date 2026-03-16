@@ -195,7 +195,7 @@ public final class ObjectGenerator extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	
 		ASSERT_SEMANTICS_CHECKED();
 		//  new adHoc03_A((_CUR))._STM();
 		//
@@ -285,7 +285,7 @@ public final class ObjectGenerator extends Expression {
 		oupt.writeKind(ObjectKind.ObjectGenerator);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -307,7 +307,7 @@ public final class ObjectGenerator extends Expression {
 		ObjectGenerator gen = new ObjectGenerator();
 		gen.OBJECT_SEQU = inpt.readSEQU(gen);
 		// *** SyntaxClass
-		gen.OLD_lineNumber = inpt.readShort();
+//		gen.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		gen.type = inpt.readType();
 		gen.backLink = (SyntaxClass) inpt.readObj();

@@ -37,7 +37,6 @@ import simula.compiler.syntaxClass.declaration.SimpleVariableDeclaration;
 import simula.compiler.syntaxClass.declaration.StandardProcedure;
 import simula.compiler.syntaxClass.declaration.SwitchDeclaration;
 import simula.compiler.syntaxClass.declaration.VirtualSpecification;
-import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
@@ -48,7 +47,6 @@ import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 import simula.psi.SyntaxTree;
-import simula.token.Identifier;
 
 /// Variable.
 /// 
@@ -718,7 +716,7 @@ public final class VariableExpression extends Expression {
 	/// @param rightPart When destination, this is the right part of the assignment
 	/// @param codeBuilder the CodeBuilder
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		Declaration decl=meaning.declaredAs;
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
@@ -976,7 +974,7 @@ public final class VariableExpression extends Expression {
 		oupt.writeKind(ObjectKind.VariableExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -1000,7 +998,7 @@ public final class VariableExpression extends Expression {
 		VariableExpression var = new VariableExpression();
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 		// *** SyntaxClass
-		var.OLD_lineNumber = inpt.readShort();
+//		var.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		var.type = inpt.readType();
 		var.backLink = (SyntaxClass) inpt.readObj();

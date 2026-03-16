@@ -24,8 +24,6 @@ import simula.token.CharacterConst;
 import simula.token.Identifier;
 import simula.token.IntegerConst;
 import simula.token.RealConst;
-import simula.token.SimpleString;
-import simula.token.StringToken;
 
 /// Expression.
 /// 

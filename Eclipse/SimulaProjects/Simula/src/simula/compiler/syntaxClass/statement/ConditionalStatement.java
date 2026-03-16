@@ -58,8 +58,7 @@ public final class ConditionalStatement extends Statement {
 
 	/// Create a new ConditionalStatement.
 	/// @param line the source line number
-	ConditionalStatement(PsiBuilder psiBuilder, final int line) {
-		super(line);
+	ConditionalStatement(PsiBuilder psiBuilder) {
 
 		int ifTree = psiBuilder.startSubtree(ConditionalStatement.class, "ConditionalStatement");
 		psiBuilder.consume(KeyWord.IF); //  (add it to 'current tree')
@@ -68,7 +67,7 @@ public final class ConditionalStatement extends Statement {
 		PsiParse.expect(psiBuilder, KeyWord.THEN);
 		Statement elseStatement = null;
 		if (PsiParse.accept(psiBuilder, KeyWord.ELSE)) {
-			thenStatement = DummyStatement.ofImplicit(psiBuilder, PsiParse.getParserToken(psiBuilder).lineNumber);
+			thenStatement = DummyStatement.ofImplicit(psiBuilder);
 			elseStatement = Statement.acceptStatement(psiBuilder);
 		} else {
 		    thenStatement = Statement.acceptStatement(psiBuilder);
@@ -175,9 +174,7 @@ public final class ConditionalStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ConditionalStatement() {
-		super(0);
-	}
+	private ConditionalStatement() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -185,7 +182,7 @@ public final class ConditionalStatement extends Statement {
 		oupt.writeKind(ObjectKind.ConditionalStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** ConditionalStatement
 		oupt.writeObj(condition);
 		oupt.writeObj(thenStatement);
@@ -200,7 +197,7 @@ public final class ConditionalStatement extends Statement {
 		ConditionalStatement stm = new ConditionalStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.OLD_lineNumber = inpt.readShort();
+//		stm.OLD_lineNumber = inpt.readShort();
 		// *** ConditionalStatement
 		stm.condition = (Expression) inpt.readObj();
 		stm.thenStatement = (Statement) inpt.readObj();

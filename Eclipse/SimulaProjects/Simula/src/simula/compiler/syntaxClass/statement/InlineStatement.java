@@ -34,7 +34,7 @@ public final class InlineStatement extends Statement {
 	/// Create a new InlineStatement.
 	/// @param kind the kind code string.
 	public InlineStatement(String kind) {
-		super(1);
+//		super(1);
 		this.kind = kind;
 	}
 

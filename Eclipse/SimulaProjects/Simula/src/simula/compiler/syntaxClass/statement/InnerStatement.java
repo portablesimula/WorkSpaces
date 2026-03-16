@@ -42,14 +42,14 @@ public final class InnerStatement extends Statement {
 
 	/// Create a new InnerStatement.
 	/// @param line the source line number
-	public InnerStatement(final int line) {
-		super(line);
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": InnerStatement: "+this);
-		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
-			cls.statements1 = cls.statements;
-			cls.statements = new ObjectList<Statement>();
-		} else Util.error("Missplaced Inner");
-	}
+//	public InnerStatement(final int line) {
+////		super(line);
+//		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": InnerStatement: "+this);
+//		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
+//			cls.statements1 = cls.statements;
+//			cls.statements = new ObjectList<Statement>();
+//		} else Util.error("Missplaced Inner");
+//	}
 
 	public static InnerStatement ofExplicit(final PsiBuilder psiBuilder) {
 		 int inrTree = psiBuilder.startSubtree(InnerStatement.class, "InnerStatement");
@@ -69,7 +69,6 @@ public final class InnerStatement extends Statement {
 	/// Create a new InnerStatement.
 	/// @param line the source line number
 	private InnerStatement(final PsiBuilder psiBuilder) {
-		super(psiBuilder.getSourceLineNumber());
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": InnerStatement: "+this);
 		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
 			cls.statements1 = cls.statements;
@@ -124,9 +123,7 @@ public final class InnerStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public InnerStatement() {
-		super(0);
-	}
+	public InnerStatement() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -134,7 +131,7 @@ public final class InnerStatement extends Statement {
 		oupt.writeKind(ObjectKind.InnerStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 	}
 
 	/// Read and return an InnerStatement object.
@@ -145,7 +142,7 @@ public final class InnerStatement extends Statement {
 		InnerStatement stm = new InnerStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.OLD_lineNumber = inpt.readShort();
+//		stm.OLD_lineNumber = inpt.readShort();
 		Util.TRACE_INPUT("InnerStatement: " + stm);
 		return(stm);
 	}	

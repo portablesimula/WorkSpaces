@@ -24,7 +24,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.SyntaxTree;
-import simula.token.Identifier;
 
 /// Arithmetic expressions
 /// 
@@ -232,7 +231,7 @@ public final class ArithmeticExpression extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if(opr == KeyWord.EXP) {
 			// Real:     r2=((float)(Math.pow(((double)(r1)),((double)(e)))));
@@ -353,7 +352,7 @@ public final class ArithmeticExpression extends Expression {
 		oupt.writeKind(ObjectKind.ArithmeticExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -371,7 +370,7 @@ public final class ArithmeticExpression extends Expression {
 		ArithmeticExpression expr = new ArithmeticExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-		expr.OLD_lineNumber = inpt.readShort();
+//		expr.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

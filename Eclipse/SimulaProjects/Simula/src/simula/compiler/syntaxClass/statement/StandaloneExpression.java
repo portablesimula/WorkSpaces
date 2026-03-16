@@ -15,7 +15,6 @@ import javax.swing.tree.DefaultTreeModel;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.expression.AssignmentOperation;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.utilities.Global;
@@ -52,9 +51,9 @@ public final class StandaloneExpression extends Statement {
 	/// Create a new StandaloneExpression.
 	/// @param line the source line number
 	/// @param expression the expression
-	StandaloneExpression(final PsiBuilder psiBuilder, final int line,final Expression expression) {
-		super(line);
-//		int stalonTree = psiBuilder.startSubtree(StandaloneExpression.class, "StandaloneExpression");
+//	StandaloneExpression(final PsiBuilder psiBuilder, final int line,final Expression expression) {
+//		super(line);
+	StandaloneExpression(final PsiBuilder psiBuilder, final Expression expression) {
 		
 		IO.println("\nNEW StandaloneExpression: expr="+expression);
 		psiBuilder.printPSI("NEW StandaloneExpression: expr="+expression);
@@ -65,16 +64,12 @@ public final class StandaloneExpression extends Statement {
 			IO.println("Line "+lineNumber()+": StandaloneExpression: "+this+"   "+psiBuilder.getCurrentLexerToken());
 		}
 		LexToken prevToken = null;
-//		PsiTree asgTree = psiBuilder.startSubtree(AssignmentOperation.class, "First'AssignmentOperation");
 		while ((prevToken = PsiParse.acceptParserToken(psiBuilder, KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF)) != null) { 
 			IO.println("NEW StandaloneExpression: prevToken="+prevToken);
 			int asgTree = psiBuilder.startSubtree(AssignmentOperation.class, "AssignmentOperation");
 			this.expression = new AssignmentOperation(this.expression, prevToken.keyWord, expectStandaloneExpression(psiBuilder));
 			psiBuilder.doneSubtree(this, asgTree, "AssignmentOperation");
-//			psiBuilder.doneSubtree(this);
-//			psiBuilder.startSubtree(AssignmentOperation.class, "Next'AssignmentOperation");
 		}		
-//		psiBuilder.doneSubtree(this, stalonTree, "StandaloneExpression");
 		
 		IO.println("\nEND NEW StandaloneExpression: expr="+expression);
 		psiBuilder.printPSI("END NEW StandaloneExpression: expr="+expression);
@@ -156,7 +151,7 @@ public final class StandaloneExpression extends Statement {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private StandaloneExpression() {
-		super(0);
+//		super(0);
 	}
 
 	@Override
@@ -165,7 +160,7 @@ public final class StandaloneExpression extends Statement {
 		oupt.writeKind(ObjectKind.StandaloneExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** StandaloneExpression
 		oupt.writeObj(expression);
 	}
@@ -178,7 +173,7 @@ public final class StandaloneExpression extends Statement {
 		StandaloneExpression stm = new StandaloneExpression();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.OLD_lineNumber = inpt.readShort();
+//		stm.OLD_lineNumber = inpt.readShort();
 		// *** StandaloneExpression
 		stm.expression = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("StandaloneExpression: " + stm);

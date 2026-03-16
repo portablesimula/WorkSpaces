@@ -99,7 +99,7 @@ public final class ConditionalExpression extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		condition.buildEvaluation(null,codeBuilder);
 		Label elseLabel = codeBuilder.newLabel();
@@ -146,7 +146,7 @@ public final class ConditionalExpression extends Expression {
 		oupt.writeKind(ObjectKind.ConditionalExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -164,7 +164,7 @@ public final class ConditionalExpression extends Expression {
 		ConditionalExpression expr = new ConditionalExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-		expr.OLD_lineNumber = inpt.readShort();
+//		expr.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

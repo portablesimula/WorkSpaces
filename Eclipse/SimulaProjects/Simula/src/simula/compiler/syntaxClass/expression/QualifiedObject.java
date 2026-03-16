@@ -7,8 +7,6 @@ package simula.compiler.syntaxClass.expression;
 
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
-import java.util.Vector;
-
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -24,7 +22,6 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.SyntaxTree;
-import simula.token.Identifier;
 
 /// Qualified Object
 /// 
@@ -117,7 +114,7 @@ public final class QualifiedObject extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		lhs.buildEvaluation(null,codeBuilder);
 		codeBuilder.checkcast(classDeclaration.getClassDesc());
@@ -149,7 +146,7 @@ public final class QualifiedObject extends Expression {
 		oupt.writeKind(ObjectKind.QualifiedObject);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -166,7 +163,7 @@ public final class QualifiedObject extends Expression {
 		QualifiedObject expr = new QualifiedObject();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-		expr.OLD_lineNumber = inpt.readShort();
+//		expr.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

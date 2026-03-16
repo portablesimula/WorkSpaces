@@ -17,7 +17,6 @@ import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 
@@ -40,22 +39,23 @@ public final class DummyStatement extends Statement {
 	
 	/// Create a new DummyStatement.
 	/// @param line the source line number
-	private DummyStatement(final int line) {
-		super(line);
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": DummyStatement: "+this);
-	}
+//	private DummyStatement(final int line) {
+//		super(line);
+//		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": DummyStatement: "+this);
+//	}
+	private DummyStatement() {}
 
-	public static DummyStatement ofExplicit(final PsiBuilder psiBuilder, final int line) {
+	public static DummyStatement ofExplicit(final PsiBuilder psiBuilder) {
 		 int inrTree = psiBuilder.startSubtree(InnerStatement.class, "DummyStatement");
 		 psiBuilder.consume(KeyWord.SEMICOLON); //  (add it to 'current tree')
-		 DummyStatement dummyStatement = new DummyStatement(line);		
+		 DummyStatement dummyStatement = new DummyStatement();		
 		 psiBuilder.doneSubtree(dummyStatement, inrTree, "DummyStatement");
 		 return dummyStatement;
 	}
 
-	public static DummyStatement ofImplicit(final PsiBuilder psiBuilder, final int line) {
+	public static DummyStatement ofImplicit(final PsiBuilder psiBuilder) {
 		 int inrTree = psiBuilder.startSubtree(InnerStatement.class, "DummyStatement");
-		 DummyStatement dummyStatement = new DummyStatement(line);		
+		 DummyStatement dummyStatement = new DummyStatement();		
 		 psiBuilder.doneSubtree(dummyStatement, inrTree, "DummyStatement");
 		 return dummyStatement;
 	}
@@ -100,7 +100,7 @@ public final class DummyStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private DummyStatement() { super(0); }
+//	private DummyStatement() { super(0); }
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -108,7 +108,7 @@ public final class DummyStatement extends Statement {
 		oupt.writeKind(ObjectKind.DummyStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 	}
 
 	/// Read and return a DummyStatement object.
@@ -119,7 +119,7 @@ public final class DummyStatement extends Statement {
 		DummyStatement stm = new DummyStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.OLD_lineNumber = inpt.readShort();
+//		stm.OLD_lineNumber = inpt.readShort();
 		Util.TRACE_INPUT("DummyStatement: " + stm);
 		return(stm);
 	}

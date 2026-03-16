@@ -152,7 +152,7 @@ public class InspectVariableDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -174,7 +174,7 @@ public class InspectVariableDeclaration extends Declaration {
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
 		// *** SyntaxClass
-		var.OLD_lineNumber = inpt.readShort();
+//		var.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		var.identifier = inpt.readString();

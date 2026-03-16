@@ -142,7 +142,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public static ProcedureDeclaration expectProcedureDeclaration(final PsiBuilder psiBuilder, final Type type) {
 		ProcedureDeclaration proc = new ProcedureDeclaration(null, ObjectKind.Procedure);
 		proc.sourceFileName = Global.sourceFileName;
-		proc.OLD_lineNumber = psiBuilder.getSourceLineNumber();
+//		proc.OLD_lineNumber = psiBuilder.getSourceLineNumber();
 		proc.type = type;
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ProcedureDeclaration, type=" + type);
@@ -1113,7 +1113,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 		
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 
 		// *** Declaration
 		oupt.writeString(externalIdent);
@@ -1140,7 +1140,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		pro.OBJECT_SEQU = inpt.readSEQU(pro);
 
 		// *** SyntaxClass
-		pro.OLD_lineNumber = inpt.readShort();
+//		pro.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		pro.externalIdent = inpt.readString();

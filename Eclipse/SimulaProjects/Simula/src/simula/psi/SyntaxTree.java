@@ -10,7 +10,6 @@ import javax.swing.tree.DefaultTreeModel;
 import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
-import simula.token.Identifier;
 
 public class SyntaxTree {
 	SyntaxClass rootClass;

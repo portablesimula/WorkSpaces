@@ -24,7 +24,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.SyntaxTree;
-import simula.token.Identifier;
 
 /// Object relations IS and IN.
 /// 
@@ -150,7 +149,7 @@ public final class ObjectRelation extends Expression {
 
 	@Override
 	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
-		setLineNumber();
+//		setLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if(opr == KeyWord.IS) {
 			lhs.buildEvaluation(null,codeBuilder);
@@ -188,7 +187,7 @@ public final class ObjectRelation extends Expression {
 		oupt.writeKind(ObjectKind.ObjectRelation);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -205,7 +204,7 @@ public final class ObjectRelation extends Expression {
 	public static ObjectRelation readObject(AttributeInputStream inpt) throws IOException {
 		ObjectRelation expr = new ObjectRelation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		expr.OLD_lineNumber = inpt.readShort();
+//		expr.OLD_lineNumber = inpt.readShort();
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();
 		expr.lhs = (Expression) inpt.readObj();

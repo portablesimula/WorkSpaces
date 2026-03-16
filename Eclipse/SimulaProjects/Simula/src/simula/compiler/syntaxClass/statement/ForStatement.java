@@ -161,8 +161,7 @@ public final class ForStatement extends Statement {
 
 	/// Create a new ForStatement.
 	/// @param line the source line number
-	ForStatement(final PsiBuilder psiBuilder, final int line) {
-		super(line);
+	ForStatement(final PsiBuilder psiBuilder) {
 		int forTree = psiBuilder.startSubtree(ForStatement.class, "ForStatement");
 		psiBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
@@ -180,7 +179,7 @@ public final class ForStatement extends Statement {
 		Statement doStatement = Statement.acceptStatement(psiBuilder);
 		if (doStatement == null) {
 			Util.error("No statement following DO in For statement");
-			doStatement = DummyStatement.ofImplicit(psiBuilder, line);
+			doStatement = DummyStatement.ofImplicit(psiBuilder);
 		}
 		this.doStatement = doStatement;
 		if (Option.internal.TRACE_PARSE)
@@ -412,9 +411,7 @@ public final class ForStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ForStatement() {
-		super(0);
-	}
+	private ForStatement() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -422,7 +419,7 @@ public final class ForStatement extends Statement {
 		oupt.writeKind(ObjectKind.ForStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** ForStatement
 		oupt.writeObj(controlVariable);
 		oupt.writeShort(assignmentOperator);
@@ -439,7 +436,7 @@ public final class ForStatement extends Statement {
 		ForStatement stm = new ForStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.OLD_lineNumber = inpt.readShort();
+//		stm.OLD_lineNumber = inpt.readShort();
 		// *** ForStatement
 		stm.controlVariable = (VariableExpression) inpt.readObj();
 		stm.assignmentOperator = inpt.readShort();

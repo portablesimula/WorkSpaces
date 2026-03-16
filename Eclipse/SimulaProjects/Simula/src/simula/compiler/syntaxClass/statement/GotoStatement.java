@@ -60,8 +60,7 @@ public final class GotoStatement extends Statement {
 
 	/// Create a new GotoStatement.
 	/// @param line source line
-	GotoStatement(final PsiBuilder psiBuilder, final int keyWord, final int line) {
-		super(line);
+	GotoStatement(final PsiBuilder psiBuilder, final int keyWord) {
 		int gotoTree = psiBuilder.startSubtree(GotoStatement.class, "GotoStatement");
 		psiBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to 'current tree')
 		if(keyWord != KeyWord.GOTO) {
@@ -135,9 +134,7 @@ public final class GotoStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public GotoStatement() {
-		super(0);
-	}
+	public GotoStatement() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -145,7 +142,7 @@ public final class GotoStatement extends Statement {
 		oupt.writeKind(ObjectKind.GotoStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** GotoStatement
 		oupt.writeObj(label);
 	}
@@ -158,7 +155,7 @@ public final class GotoStatement extends Statement {
 		GotoStatement stm = new GotoStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.OLD_lineNumber = inpt.readShort();
+//		stm.OLD_lineNumber = inpt.readShort();
 		// *** GotoStatement
 		stm.label = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("GotoStatement: " + stm);

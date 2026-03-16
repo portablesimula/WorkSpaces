@@ -105,27 +105,29 @@ public abstract class SyntaxClass {
 	public int OBJECT_SEQU;
 	
 	/// The source line number
-	protected int OLD_lineNumber;
+//	protected int OLD_lineNumber;
 	public int lineNumber() {
 		if(psiTree != null) return psiTree.getLineNumber();
-		return OLD_lineNumber;
+//		return OLD_lineNumber;
+		return -1;
 	}
 	
-	/// Set source line number.
-	protected void setLineNumber() {
-		Global.sourceLineNumber = OLD_lineNumber;
-	}
+//	/// Set source line number.
+//	protected void setLineNumber() {
+//		Global.sourceLineNumber = OLD_lineNumber;
+//	}
 
 	public int lastLineNumber() {
 		if(psiTree != null) return psiTree.lastLineNumber();
-		return OLD_lineNumber;
+//		return OLD_lineNumber;
+		return lineNumber();
 	}
 
 	
 	
 	/// Create a new SyntaxClass.
 	protected SyntaxClass() {
-		OLD_lineNumber = Global.sourceLineNumber;
+//		OLD_lineNumber = Global.sourceLineNumber;
 	}
 	
 //	public SyntaxTree buildSyntaxTree() {

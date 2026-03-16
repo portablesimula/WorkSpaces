@@ -107,13 +107,12 @@ public final class SwitchStatement extends Statement {
 
 	/// Create a new SwitchStatement.
 	/// @param line the source line number
-	SwitchStatement(final PsiBuilder psiBuilder, final int line) {
-		super(line);
+	SwitchStatement(final PsiBuilder psiBuilder) {
 
 		int swtTree = psiBuilder.startSubtree(SwitchStatement.class, "SwitchStatement");
 		psiBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
-		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);
+//		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);
 		PsiParse.expect(psiBuilder, KeyWord.BEGPAR);
 		lowKey = Expression.expectExpression(psiBuilder);
 		PsiParse.expect(psiBuilder, KeyWord.COLON);
@@ -410,9 +409,7 @@ public final class SwitchStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private SwitchStatement() {
-		super(0);
-	}
+	private SwitchStatement() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -420,7 +417,7 @@ public final class SwitchStatement extends Statement {
 		oupt.writeKind(ObjectKind.SwitchStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** SwitchStatement
 		oupt.writeObj(lowKey);
 		oupt.writeObj(hiKey);
@@ -435,7 +432,7 @@ public final class SwitchStatement extends Statement {
 		SwitchStatement stm = new SwitchStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.OLD_lineNumber = inpt.readShort();
+//		stm.OLD_lineNumber = inpt.readShort();
 		stm.lowKey = (Expression) inpt.readObj();
 		stm.hiKey = (Expression) inpt.readObj();
 		stm.switchKey = (Expression) inpt.readObj();

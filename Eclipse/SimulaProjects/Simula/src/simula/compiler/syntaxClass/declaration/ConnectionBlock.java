@@ -281,7 +281,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		oupt.writeShort(OBJECT_SEQU);
 		
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		
 		// *** Declaration
 		//oupt.writeString(identifier);
@@ -314,7 +314,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
 		
 		// *** SyntaxClass
-		blk.OLD_lineNumber = inpt.readShort();
+//		blk.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		//blk.identifier = inpt.readString();

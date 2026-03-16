@@ -17,10 +17,7 @@ import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
-import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.PrefixedBlockDeclaration;
-import simula.compiler.syntaxClass.declaration.StandardClass;
-import simula.compiler.syntaxClass.declaration.StandardProcedure;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.Global;
@@ -63,7 +60,6 @@ public final class BlockStatement extends Statement {
 	/// Create a new BlockStatement.
 	/// @param blockDeclaration the BlockDeclaration
 	public BlockStatement(final BlockDeclaration blockDeclaration) {
-		super(blockDeclaration.lineNumber());
 		this.blockDeclaration = blockDeclaration;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": BlockStatement: "+this);
 	}
@@ -150,7 +146,7 @@ public final class BlockStatement extends Statement {
 	// ***********************************************************************************************
 
 	/// Default constructor used by Attribute File I/O
-	private BlockStatement() { super(0); }
+	private BlockStatement() { }
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -158,7 +154,7 @@ public final class BlockStatement extends Statement {
 		oupt.writeKind(ObjectKind.BlockStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** BlockStatement
 		oupt.writeObj(blockDeclaration);
 	}
@@ -171,7 +167,7 @@ public final class BlockStatement extends Statement {
 		BlockStatement stm = new BlockStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.OLD_lineNumber = inpt.readShort();
+//		stm.OLD_lineNumber = inpt.readShort();
 		// *** BlockStatement
 		stm.blockDeclaration = (BlockDeclaration) inpt.readObj();
 

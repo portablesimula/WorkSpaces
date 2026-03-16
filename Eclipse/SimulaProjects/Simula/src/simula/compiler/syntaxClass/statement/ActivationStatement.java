@@ -105,8 +105,7 @@ public final class ActivationStatement extends Statement {
 
 	/// Create a new ActivationStatement.
 	/// @param line the source line number
-	ActivationStatement(final PsiBuilder psiBuilder, final int line) {
-		super(line);
+	ActivationStatement(final PsiBuilder psiBuilder) {
 		int actTree = psiBuilder.startSubtree(ActivationStatement.class, "ActivationStatement");
 		LexToken activator = PsiParse.getParserToken(psiBuilder);
 		REAC = activator.keyWord == KeyWord.REACTIVATE;
@@ -351,7 +350,7 @@ public final class ActivationStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ActivationStatement() { super(0); }
+	private ActivationStatement() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -359,7 +358,7 @@ public final class ActivationStatement extends Statement {
 		oupt.writeKind(ObjectKind.ActivationStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		// *** ActivationStatement
 		oupt.writeBoolean(REAC);
 		oupt.writeObj(object1);
@@ -376,7 +375,7 @@ public final class ActivationStatement extends Statement {
 		ActivationStatement stm = new ActivationStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-		stm.OLD_lineNumber = inpt.readShort();
+//		stm.OLD_lineNumber = inpt.readShort();
 		// *** ActivationStatement
 		stm.REAC = inpt.readBoolean();
 		stm.object1 = (Expression) inpt.readObj();

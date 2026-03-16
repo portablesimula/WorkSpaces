@@ -12,8 +12,6 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
-import java.util.Vector;
-
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -34,7 +32,6 @@ import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 import simula.psi.SyntaxTree;
-import simula.token.Identifier;
 
 /// Simple Variable Declaration.
 /// 
@@ -273,7 +270,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -295,7 +292,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
 		// *** SyntaxClass
-		var.OLD_lineNumber = inpt.readShort();
+//		var.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		var.identifier = inpt.readString();

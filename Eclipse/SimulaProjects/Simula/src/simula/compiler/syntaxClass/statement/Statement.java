@@ -23,7 +23,6 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.token.Identifier;
 
 /// Statement.
 /// 
@@ -60,9 +59,10 @@ public abstract class Statement extends SyntaxClass {
 	
 	/// Create a new Statement.
 	/// @param line the source line number
-	protected Statement(int line) {
-		OLD_lineNumber=line;
-	}
+//	protected Statement(int line) {
+//		OLD_lineNumber=line;
+//	}
+	protected Statement() {}
 
 	/// Parse a statement.
 	/// @return the statement
@@ -102,7 +102,6 @@ public abstract class Statement extends SyntaxClass {
 	private static Statement acceptUnlabeledStatement(PsiBuilder psiBuilder) {
 		LexToken simToken = PsiParse.getParserToken(psiBuilder);
 		if(Option.TRACE_ACCEPT_STATEMENT > 1) IO.println("\nStatement.acceptUnlabeledStatement: "+simToken);
-		int lineNumber = simToken.lineNumber;
 		Statement statement = null;
 		int keyWord = simToken.keyWord;
 		
@@ -111,25 +110,25 @@ public abstract class Statement extends SyntaxClass {
 				// case KeyWord.BEGIN: PsiParse.nextToken(); return (new MaybeBlockDeclaration(null).expectMaybeBlock(lineNumber));
 				if(Option.TRACE_ACCEPT_STATEMENT > 1) IO.println("\nStatement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
 				MaybeBlockDeclaration block = new MaybeBlockDeclaration(null);
-				block.expectMaybeBlock(psiBuilder, lineNumber);
+				block.expectMaybeBlock(psiBuilder);
 				statement = new BlockStatement(block); break;
 				
-			case KeyWord.IF:		 statement = new ConditionalStatement(psiBuilder, lineNumber); break;
+			case KeyWord.IF:		 statement = new ConditionalStatement(psiBuilder); break;
 		    case KeyWord.GO,
-		         KeyWord.GOTO:		 statement = new GotoStatement(psiBuilder, keyWord, lineNumber); break;
-		    case KeyWord.FOR:		 statement = new ForStatement(psiBuilder, lineNumber); break;
-		    case KeyWord.WHILE:		 statement = new WhileStatement(psiBuilder, lineNumber); break;
-		    case KeyWord.INSPECT:	 statement = new ConnectionStatement(psiBuilder, lineNumber); break;
+		         KeyWord.GOTO:		 statement = new GotoStatement(psiBuilder, keyWord); break;
+		    case KeyWord.FOR:		 statement = new ForStatement(psiBuilder); break;
+		    case KeyWord.WHILE:		 statement = new WhileStatement(psiBuilder); break;
+		    case KeyWord.INSPECT:	 statement = new ConnectionStatement(psiBuilder); break;
 		    case KeyWord.SWITCH:	 if(Option.EXTENSIONS) {
-		    							 statement = new SwitchStatement(psiBuilder, lineNumber);
+		    							 statement = new SwitchStatement(psiBuilder);
 		    						 } break;
 		    case KeyWord.ACTIVATE,
-		         KeyWord.REACTIVATE: statement = new ActivationStatement(psiBuilder, lineNumber); break;
+		         KeyWord.REACTIVATE: statement = new ActivationStatement(psiBuilder); break;
 //		    case KeyWord.INNER:		 statement = new InnerStatement(psiBuilder, false, lineNumber);
 		    case KeyWord.INNER:		 statement = InnerStatement.ofExplicit(psiBuilder); break;
-		    case KeyWord.SEMICOLON:	 statement = DummyStatement.ofExplicit(psiBuilder, lineNumber); break;
-		    case KeyWord.END:	  // statement = DummyStatement.ofImplicit(psiBuilder, lineNumber); break; // Dummy Statement, keep END
-		    case KeyWord.EOF:		 statement = DummyStatement.ofImplicit(psiBuilder, lineNumber); break; // Dummy Statement, keep EOF
+		    case KeyWord.SEMICOLON:	 statement = DummyStatement.ofExplicit(psiBuilder); break;
+		    case KeyWord.END:	  // statement = DummyStatement.ofImplicit(psiBuilder); break; // Dummy Statement, keep END
+		    case KeyWord.EOF:		 statement = DummyStatement.ofImplicit(psiBuilder); break; // Dummy Statement, keep EOF
 
 //			case KeyWord.IDENTIFIER, KeyWord.NEW, KeyWord.THIS, KeyWord.BEGPAR:
 		    case KeyWord.BEGPAR:
@@ -167,7 +166,7 @@ public abstract class Statement extends SyntaxClass {
 	      					return prfblk;
 	      				}
 	      			}
-	      			statement = new StandaloneExpression(psiBuilder, Global.sourceLineNumber, expr);
+	      			statement = new StandaloneExpression(psiBuilder, expr);
 	      		}
 				break;
 				

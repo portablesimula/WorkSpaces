@@ -38,7 +38,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.token.Identifier;
 
 /// Maybe Block Declaration. I.e: CompoundStatement or SubBlock depends on
 /// whether it contains declarations.
@@ -110,8 +109,9 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	/// @param line source line number
 	/// @return a BlockStatement
 	private static int SEQU = 1;
-	public BlockStatement expectMaybeBlock(PsiBuilder psiBuilder, int line) {
-		this.OLD_lineNumber=line;
+//	public BlockStatement expectMaybeBlock(PsiBuilder psiBuilder, int line) {
+//		this.OLD_lineNumber=line;
+	public BlockStatement expectMaybeBlock(PsiBuilder psiBuilder) {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse MayBeBlock");
 		
@@ -556,7 +556,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(lineNumber());
 		
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -590,7 +590,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		blk.declarationKind = declarationKind;
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
 		// *** SyntaxClass
-		blk.OLD_lineNumber = inpt.readShort();
+//		blk.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		blk.identifier = inpt.readString();
