@@ -142,7 +142,7 @@ public final class BooleanExpression extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN BooleanOperation" + toString() + ".doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());
 		switch (opr) {
@@ -188,7 +188,7 @@ public final class BooleanExpression extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		switch(opr) {
 			case KeyWord.AND:
@@ -280,7 +280,7 @@ public final class BooleanExpression extends Expression {
 		oupt.writeKind(ObjectKind.BooleanExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -298,7 +298,7 @@ public final class BooleanExpression extends Expression {
 		BooleanExpression expr = new BooleanExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-		expr.OLD_lineNumber = inpt.readShort();
+//		expr.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

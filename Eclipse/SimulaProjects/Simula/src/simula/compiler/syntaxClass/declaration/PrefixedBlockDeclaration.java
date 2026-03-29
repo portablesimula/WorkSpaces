@@ -5,6 +5,8 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.declaration;
 
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.lang.classfile.ClassFile;
 import java.lang.classfile.CodeBuilder;
@@ -12,6 +14,10 @@ import java.lang.classfile.attribute.SourceFileAttribute;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -64,9 +70,7 @@ import simula.psi.PsiParse;
 /// @author Øystein Myhre Andersen
 public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	
-	/**
 	/// The block prefix.
-	 */
 	public VariableExpression blockPrefix;
 
 	// ***********************************************************************************************
@@ -76,9 +80,9 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	/// @param isMainModule true: this is the main module.
 	private PrefixedBlockDeclaration(boolean isMainModule) {
 		super(null);
-		if(isMainModule)
-			modifyIdentifier(Global.sourceName);
-		else modifyIdentifier("PBLK" + lineNumber());
+//		if(isMainModule)
+//			modifyIdentifier(Global.sourceName);
+//		else modifyIdentifier("PBLK" + firstLineNumber());
 	}
 
 	// ***********************************************************************************************
@@ -96,6 +100,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		block.blockPrefix = blockPrefix;
 		block.prefix = blockPrefix.identifier;
 		block.isMainModule=isMainModule;
+		String ID = (isMainModule)? Global.sourceName : block.prefix + "Begin";
+		block.modifyIdentifier(ID);
 		if (Option.internal.TRACE_PARSE) PsiParse.TRACE("Parse PrefixedBlock");
 //		while (Declaration.acceptDeclaration(psiBuilder, block)) Parse.accept(psiBuilder, KeyWord.SEMICOLON);
 		Declaration.acceptDeclarations(psiBuilder, block);
@@ -106,9 +112,11 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		if (PsiParse.prevToken(psiBuilder).keyWord == KeyWord.EOF) {
 			Util.error("Illegal termination of prefixed block. Missing END.");
 		}
-		block.lastLineNumber = Global.sourceLineNumber;
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+block.lineNumber()+": PrefixedBlockDeclaration: "+block);
+//		block.lastLineNumber = Global.sourceLineNumber;
+		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+block.firstLineNumber()+": PrefixedBlockDeclaration: "+block);
 		Global.setScope(block.declaredIn);
+		psiBuilder.doneSubtree(block);
+		psiBuilder.startSubtree("NextDeclaration");
 		return block;
 	}
 
@@ -118,7 +126,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		Global.enterScope(this.declaredIn);
 			blockPrefix.doChecking();
 			prefix = blockPrefix.identifier;
@@ -143,7 +151,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// ***********************************************************************************************
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(Option.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);	
@@ -161,7 +169,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 			else line = line + " extends RTS_BASICIO";
 			JavaSourceFileCoder.code(line + " {");
 			JavaSourceFileCoder.debug("// PrefixedBlockDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
-					+ ", firstLine=" + lineNumber() + ", lastLine=" + lastLineNumber + ", hasLocalClasses="
+					+ ", firstLine=" + firstLineNumber() + ", lastLine=" + lastLineNumber() + ", hasLocalClasses="
 					+ ((hasLocalClasses) ? "true" : "false") + ", System=" + ((isQPSystemBlock()) ? "true" : "false")
 					+ ", detachUsed=" + ((detachUsed) ? "true" : "false"));
 			if (isQPSystemBlock())
@@ -216,7 +224,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	
 	@Override
 	public void buildByteCode(CodeBuilder codeBuilder) {
-		Global.sourceLineNumber=lineNumber();
+		Global.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(Option.verbose)
@@ -348,6 +356,34 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	}
 
 	@Override
+	public JPanel getPanel() {
+		String[] table = {
+				"  declarationKind:",	""+declarationKind+":"+ObjectKind.edit(declarationKind),
+				"  ZZ_declarationClass:",	""+this.getClass().getSimpleName(),
+				"  blockPrefix:",		""+blockPrefix,
+				"  lines:",				""+this.firstLineNumber() + " ==> " + this.lastLineNumber(),
+				// *** Declaration
+				"  prefix:",			""+prefix,
+				"  identifier:",		""+identifier,
+				"  externalIdent:",	    ""+externalIdent,
+				"  type:",			    ""+type,
+				"  declaredIn:",		""+declaredIn.identifier,
+				// *** DeclarationScope
+				"  sourceFileName:",	""+sourceFileName,
+				"  hasLocalClasses:  ",	""+hasLocalClasses,
+				// *** BlockDeclaration
+				"  isMainModule:",		""+isMainModule
+		};
+		JPanel panel = new JPanel(new GridLayout(table.length/2, 2));
+		Font monoFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
+		for(String s:table) {
+			JLabel lab = new JLabel(s);
+			lab.setFont(monoFont); panel.add(lab);
+		}
+		return panel;
+	}
+
+	@Override
 	public String toString() {
 		return ("" + identifier + '[' + externalIdent + "] Kind=" + declarationKind + ", BlockPrefix=" + blockPrefix);
 	}
@@ -366,7 +402,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		oupt.writeString(identifier);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		
 		// *** Declaration
 		//oupt.writeString(identifier);

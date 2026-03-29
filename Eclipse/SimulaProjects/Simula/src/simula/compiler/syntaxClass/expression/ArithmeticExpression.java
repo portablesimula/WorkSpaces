@@ -164,7 +164,7 @@ public final class ArithmeticExpression extends Expression {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ArithmeticOperation" + toString() + ".doChecking - Current Scope Chain: "
 					+ Global.getCurrentScope().edScopeChain());
@@ -352,7 +352,7 @@ public final class ArithmeticExpression extends Expression {
 		oupt.writeKind(ObjectKind.ArithmeticExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);

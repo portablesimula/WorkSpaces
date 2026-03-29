@@ -162,7 +162,7 @@ public final class ForStatement extends Statement {
 	/// Create a new ForStatement.
 	/// @param line the source line number
 	ForStatement(final PsiBuilder psiBuilder) {
-		int forTree = psiBuilder.startSubtree(ForStatement.class, "ForStatement");
+		psiBuilder.startSubtree("ForStatement");
 		psiBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
@@ -183,8 +183,8 @@ public final class ForStatement extends Statement {
 		}
 		this.doStatement = doStatement;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line " + this.lineNumber() + ": ForStatement: " + this);
-		psiBuilder.doneSubtree(this, forTree, "ForStatement");
+			Util.TRACE("Line " + this.firstLineNumber() + ": ForStatement: " + this);
+		psiBuilder.doneSubtree(this);
 	}
 
 	/// Parse a for-list element.
@@ -207,7 +207,7 @@ public final class ForStatement extends Statement {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		controlVariable.doChecking();
 		Declaration decl = controlVariable.meaning.declaredAs;
 		if (decl instanceof Parameter par && par.mode == Parameter.Mode.name)
@@ -243,10 +243,10 @@ public final class ForStatement extends Statement {
 		//      // Statements ...
 		// }
 		// ------------------------------------------------------------
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		boolean refType = controlVariable.type.isReferenceType();
-		String CB = "CB_" + lineNumber();
+		String CB = "CB_" + firstLineNumber();
 		JavaSourceFileCoder.code("for(boolean " + CB + ":new FOR_List(");
 		char del = ' ';
 		for (ForListElement elt : forList) {
@@ -319,7 +319,7 @@ public final class ForStatement extends Statement {
 		//      // Statements ...
 		// }
 		// ------------------------------------------------------------
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		
 		codeBuilder
@@ -419,7 +419,7 @@ public final class ForStatement extends Statement {
 		oupt.writeKind(ObjectKind.ForStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** ForStatement
 		oupt.writeObj(controlVariable);
 		oupt.writeShort(assignmentOperator);

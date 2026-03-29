@@ -60,7 +60,7 @@ public final class ConditionalStatement extends Statement {
 	/// @param line the source line number
 	ConditionalStatement(PsiBuilder psiBuilder) {
 
-		int ifTree = psiBuilder.startSubtree(ConditionalStatement.class, "ConditionalStatement");
+		psiBuilder.startSubtree("ConditionalStatement");
 		psiBuilder.consume(KeyWord.IF); //  (add it to 'current tree')
 
 		condition = Expression.expectExpression(psiBuilder);
@@ -76,8 +76,8 @@ public final class ConditionalStatement extends Statement {
 		    }
 		}
 		this.elseStatement=elseStatement;
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": IfStatement: "+this);
-		psiBuilder.doneSubtree(this, ifTree, "ConditionalStatement");
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": IfStatement: "+this);
+		psiBuilder.doneSubtree(this);
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public final class ConditionalStatement extends Statement {
 	
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber=lineNumber();
+		Global.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code("if(_VALUE(" + condition.toJavaCode() + ")) {");
 		thenStatement.doJavaCoding();
@@ -182,7 +182,7 @@ public final class ConditionalStatement extends Statement {
 		oupt.writeKind(ObjectKind.ConditionalStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** ConditionalStatement
 		oupt.writeObj(condition);
 		oupt.writeObj(thenStatement);

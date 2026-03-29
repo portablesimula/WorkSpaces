@@ -152,7 +152,7 @@ public final class Constant extends Expression {
 	@Override
     public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber=lineNumber();
+		Global.sourceLineNumber=firstLineNumber();
 		this.type.doChecking(Global.getCurrentScope());
 		SET_SEMANTICS_CHECKED();
 	}
@@ -228,7 +228,7 @@ public final class Constant extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
 		//ASSERT_SEMANTICS_CHECKED(); // ØM: Ad'Hoc
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
 		if(this.value==null)
@@ -325,7 +325,7 @@ public final class Constant extends Expression {
 		oupt.writeKind(ObjectKind.Constant);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -341,7 +341,7 @@ public final class Constant extends Expression {
 		Constant cnst = new Constant();
 		cnst.OBJECT_SEQU = inpt.readSEQU(cnst);
 		// *** SyntaxClass
-		cnst.OLD_lineNumber = inpt.readShort();
+//		cnst.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		cnst.type = inpt.readType();
 		cnst.backLink = (SyntaxClass) inpt.readObj();

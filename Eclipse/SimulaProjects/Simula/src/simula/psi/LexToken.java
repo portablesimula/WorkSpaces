@@ -1,5 +1,6 @@
 package simula.psi;
 
+import simula.compiler.utilities.Html;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Option;
 
@@ -33,7 +34,7 @@ public class LexToken extends PsiElement {
 ////		this.endOffset = endOffset;
 //	}
 
-	@Override public int getLineNumber() {
+	@Override public int firstLineNumber() {
 		return lineNumber;
 	}
 
@@ -56,10 +57,22 @@ public class LexToken extends PsiElement {
 			return "EOF";
 		}
 	}
-	
+
+	public String edHtml() {
+//		return KeyWord.edit(keyWord) + '[' + startOffset + ':' + endOffset + "]=\"" + edText() + '"';
+//		String ID = KeyWord.edit(keyWord) + '[' + startOffset + ':' + endOffset + "]=\"" + edText() + '"';
+		int lno = this.firstLineNumber();
+		int lastLine = this.lastLineNumber();
+        return Html.edPsi(lno, lastLine, toString());
+	}
+
 	@Override
 	public String toString() {
-		return "Line-" + lineNumber + ':' + KeyWord.edit(keyWord) + '[' + startOffset + ':' + endOffset + "]=\"" + edText() + '"';
+		return KeyWord.edit(keyWord) + '[' + startOffset + ':' + endOffset + "]=\"" + edText() + '"';
+//		String ID = KeyWord.edit(keyWord) + '[' + startOffset + ':' + endOffset + "]=\"" + edText() + '"';
+//		int lno = this.firstLineNumber();
+//		int lastLine = this.lastLineNumber();
+//        return Html.edPsi(lno, lastLine, ID);
 	}
 
 	public boolean isParserToken() {

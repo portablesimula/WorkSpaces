@@ -5,6 +5,8 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.declaration;
 
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.ClassFile;
@@ -19,6 +21,8 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -36,6 +40,7 @@ import simula.compiler.utilities.ClassHierarchy;
 import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Html;
 import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
@@ -45,7 +50,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.token.Identifier;
+import simula.psi.TreeNodeIdent;
 
 /// Simula Class Declaration.
 /// 
@@ -194,13 +199,13 @@ public class ClassDeclaration extends BlockDeclaration {
 			VirtualSpecification.expectVirtualPart(psiBuilder, cls);
 		expectClassBody(psiBuilder, cls);
 		
-		cls.lastLineNumber = Global.sourceLineNumber;
+//		cls.lastLineNumber = Global.sourceLineNumber;
 		cls.type = Type.Ref(cls.identifier);
 		if (Option.internal.TRACE_PARSE)
-			PsiParse.TRACE("Line " + cls.lineNumber() + ": ClassDeclaration: " + cls);
+			PsiParse.TRACE("Line " + cls.firstLineNumber() + ": ClassDeclaration: " + cls);
 		Global.setScope(cls.declaredIn);
 		psiBuilder.doneSubtree(cls);
-		psiBuilder.startSubtree(Declaration.class, "NextDeclaration");
+		psiBuilder.startSubtree("NextDeclaration");
 		return (cls);
 	}
 
@@ -460,7 +465,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		Global.enterScope(this);
 		if(Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ClassDeclaration("+this.identifier+").doChecking");
@@ -751,7 +756,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			return (cls);
 		}
 		Util.error("Prefix " + prefix + " is not a Class but " + decl.getClass().getSimpleName()
-				+ " Declared in " + this.sourceFileName + " at line " + decl.lineNumber());
+				+ " Declared in " + this.sourceFileName + " at line " + decl.firstLineNumber());
 		printStaticChain("",0);
 		return (null);
 	}
@@ -854,7 +859,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			if(Option.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);	
 			return;
 		}
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
 		Global.enterScope(this);
 			labelList.setLabelIdexes();
@@ -863,7 +868,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			line = line + " extends " + getPrefixClass().getJavaIdentifier();
 			JavaSourceFileCoder.code(line + " {");
 			JavaSourceFileCoder.debug("// ClassDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
-					+ ", PrefixLevel=" + prefixLevel() + ", firstLine=" + lineNumber() + ", lastLine=" + lastLineNumber
+					+ ", PrefixLevel=" + prefixLevel() + ", firstLine=" + firstLineNumber() + ", lastLine=" + lastLineNumber()
 					+ ", hasLocalClasses=" + ((hasLocalClasses) ? "true" : "false") + ", System="
 					+ ((isQPSystemBlock()) ? "true" : "false") + ", detachUsed=" + ((detachUsed) ? "true" : "false"));
 			if (isQPSystemBlock())
@@ -1255,7 +1260,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	
 	@Override
 	public void buildDeclaration(ClassBuilder classBuilder, BlockDeclaration encloser) {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		try {
 			this.createJavaClassFile();
 		} catch (IOException e) {
@@ -1265,7 +1270,7 @@ public class ClassDeclaration extends BlockDeclaration {
 
 	@Override
 	public void buildInitAttribute(CodeBuilder codeBuilder) {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 	}
 
 	// ***********************************************************************************************
@@ -1357,7 +1362,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			if (prfx != null) prfx.buildStatementsBeforeInner(codeBuilder);
 		}
 		if(statements1 != null) for (Statement stm : statements1) {
-			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.lineNumber());
+			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.firstLineNumber());
 			stm.buildByteCode(codeBuilder);
 		}
 	}
@@ -1369,7 +1374,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @param codeBuilder the codeBuilder to use.
 	private void buildStatementsAfterInner(CodeBuilder codeBuilder) {
 		for (Statement stm : statements){
-			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.lineNumber());
+			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.firstLineNumber());
 			stm.buildByteCode(codeBuilder);
 		}
 		if (hasRealPrefix()) {
@@ -1438,7 +1443,7 @@ public class ClassDeclaration extends BlockDeclaration {
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
 		String ID = "CLASS " + identifier;
 		if(! prefix.equals("CLASS")) ID = prefix + ' ' + ID;
-		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(ID);
+		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new TreeNodeIdent(this, edPsi(edHtml())));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         
         Parameter.addParameterList(tree, model, newNode, parameterList);
@@ -1470,10 +1475,46 @@ public class ClassDeclaration extends BlockDeclaration {
     }
 
     public void addStatement1List(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Statements1");
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-		for(Statement elt:statements1) elt.addSyntaxNodes(tree, model, newNode);
+    	if(statements1 != null) {
+	        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Statements1");
+	        model.insertNodeInto(newNode, parent, parent.getChildCount());
+			for(Statement elt:statements1) elt.addSyntaxNodes(tree, model, newNode);
+    	}
     }
+
+	public String edHtml() {
+		StringBuilder sb = new StringBuilder();
+		if(! prefix.equals("CLASS")) sb.append(prefix).append(' ');
+		sb.append(Html.edKeyWord(KeyWord.CLASS)).append(' ').append(identifier);
+		return (sb.toString());
+	}
+
+	@Override
+	public JPanel getPanel() {
+		String[] table = {
+				"  declarationKind:",	""+declarationKind+":"+ObjectKind.edit(declarationKind),
+				"  declarationClass:",	""+this.getClass().getSimpleName(),
+				"  lines:",				""+this.firstLineNumber() + " ==> " + this.lastLineNumber(),
+				// *** Declaration
+				"  prefix:",			""+prefix,
+				"  identifier:",		""+identifier,
+				"  externalIdent:",	    ""+externalIdent,
+				"  type:",			    ""+type,
+				"  declaredIn:",		""+declaredIn.identifier,
+				// *** DeclarationScope
+				"  sourceFileName:",	""+sourceFileName,
+				"  hasLocalClasses:  ",	""+hasLocalClasses,
+				// *** BlockDeclaration
+				"  isMainModule:",		""+isMainModule
+		};
+		JPanel panel = new JPanel(new GridLayout(table.length/2, 2));
+		Font monoFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
+		for(String s:table) {
+			JLabel lab = new JLabel(s);
+			lab.setFont(monoFont); panel.add(lab);
+		}
+		return panel;
+	}
 
 	@Override
 	public String toString() {
@@ -1491,7 +1532,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 		
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		
 		// *** Declaration
 		//oupt.writeString(identifier);
@@ -1533,7 +1574,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		cls.OBJECT_SEQU = inpt.readSEQU(cls);
 		
 		// *** SyntaxClass
-		cls.OLD_lineNumber = inpt.readShort();
+//		cls.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		//identifier = inpt.readString();

@@ -25,6 +25,7 @@ import javax.swing.text.StyledDocument;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
+import simula.compiler.ModuleManager;
 import simula.compiler.parsing.DefaultScanner;
 import simula.compiler.parsing.SimulaScanner;
 import simula.compiler.utilities.Token;
@@ -49,6 +50,8 @@ import java.util.StringTokenizer;
 public class SourceTextPanel extends JPanel {
 	/// DEBUG on/off
 	private static final boolean DEBUG=false;//true;
+	
+	public ModuleManager moduleManager;
 
 	/// The line number side-panel.
 	private JTextPane lineNumbers;
@@ -75,8 +78,8 @@ public class SourceTextPanel extends JPanel {
     SimulaEditor.Language lang;
 
 	
-	/// The source file.
-	File sourceFile;
+//	/// The source file.
+//	File sourceFile;
 	
 	/// Signals auto refresh.
     boolean AUTO_REFRESH=true;//false;
@@ -158,8 +161,9 @@ public class SourceTextPanel extends JPanel {
 	/// @param sourceFile the source file
 	/// @param lang the language
 	/// @param popupMenu the popupMenu
-    SourceTextPanel(File sourceFile,SimulaEditor.Language lang,JPopupMenu popupMenu) {
-    	this.sourceFile=sourceFile;
+    SourceTextPanel(File sourceFile, SimulaEditor.Language lang, JPopupMenu popupMenu) {
+    	this.moduleManager = new ModuleManager(this, sourceFile);
+//    	this.sourceFile=sourceFile;
     	this.lang=lang;
     	this.popupMenu=popupMenu;
         editTextPane = new JTextPane(); editTextPane.setEditable(false);
@@ -187,7 +191,7 @@ public class SourceTextPanel extends JPanel {
     }
     
 
-	public CharSequence getText() {
+	public String getText() {
 		// TODO Auto-generated method stub
 //		String text = doc.getText(doc.getStartPosition(), doc.getLength());
 		try {
@@ -344,7 +348,7 @@ public class SourceTextPanel extends JPanel {
     @Override
     public String toString() {
     	String s="SourceTextPanel(";
-        s=s+((sourceFile==null)?"unnamed":sourceFile.getName());
+        s=s+moduleManager.getName();
     	if(this.AUTO_REFRESH) s=s+",AUTO_REFRESH";
     	s=s+')';
     	return(s);

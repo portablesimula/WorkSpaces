@@ -19,10 +19,10 @@ import java.util.jar.JarFile;
 import javax.swing.ImageIcon;
 
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.ModuleManager;
 import simula.compiler.JarFileBuilder;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.StandardClass;
-import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.editor.RTOption;
 
 /// Global Variables.
@@ -79,8 +79,11 @@ public final class Global {
 	/// The insert name.
 	public static String insertName;
 	
-	/// The programModule.
-	public static ProgramModule programModule;
+//	/// The programModule.
+//	public static ProgramModule programModule;
+	
+	/// The current ModuleManager.
+	public static ModuleManager moduleManager;
 	
 	/// Where to find the Simula Runtime System.
 	public static File simulaRtsLib; // The simula runtime system

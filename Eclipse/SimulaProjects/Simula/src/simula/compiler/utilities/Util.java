@@ -392,7 +392,5 @@ public final class Util {
 	public static void buildLineNumber(CodeBuilder codeBuilder, int lineNumber) {
 		codeBuilder.lineNumber(lineNumber);
 	}
-
-
   
 }

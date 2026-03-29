@@ -95,7 +95,8 @@ public final class ProgramModule extends Statement {
 	/// Create a new ProgramModule.
 	public ProgramModule(PsiBuilder psiBuilder) {
 //		super(0);
-		psiBuilder.startSubtree(DeclarationScope.class, "ProgramModule");
+		String debugName = "ProgramModule";
+		psiBuilder.startSubtree(debugName);
 
 		sysin=new VariableExpression("sysin");
 		sysout=new VariableExpression("sysout");
@@ -134,12 +135,12 @@ public final class ProgramModule extends Statement {
 			
 			LexToken token = PsiParse.getParserToken(psiBuilder);
 			if(token != null && token.keyWord != KeyWord.EOF) {
-				psiBuilder.startSubtree(Comment.class, "TextAfterProgramEnd");
+				psiBuilder.startSubtree("TextAfterProgramEnd");
 				Comment dum = new Comment();
 				while(!psiBuilder.eof()) psiBuilder.advanceLexer(); // consume tokens  (add it to 'current tree')
 				psiBuilder.doneSubtree(dum);
 //				IO.println("NEW ProgramModule: TextAfterEnd: \"" + dum.psiTree.getText().replace("\n", "\\n") + '"');
-				String textAfterEnd = dum.psiTree.getText().replaceAll("\\s+", ""); // Remove WhiteSpaces			
+				String textAfterEnd = dum.getPsiTree().getText().replaceAll("\\s+", ""); // Remove WhiteSpaces			
 //				IO.println("NEW ProgramModule: TextAfterEnd: \"" + textAfterEnd + '"');
 //				psiBuilder.psiRoot.printTree("");
 				if(! textAfterEnd.equals(";")) Util.warning("Text after Program end: \"" + textAfterEnd + '"');
@@ -157,7 +158,7 @@ public final class ProgramModule extends Statement {
 	/// @return the Program Statement.
 	private DeclarationScope doParseProgram(final PsiBuilder psiBuilder) {
 		BlockDeclaration mainBlock = new MaybeBlockDeclaration(Global.sourceName);
-		psiBuilder.startSubtree(Statement.class, "MainProgramBlock");
+		psiBuilder.startSubtree("MainProgramBlock");
 		
 		mainBlock.isMainModule = true;
 		mainBlock.declarationKind = ObjectKind.SimulaProgram;
@@ -185,6 +186,7 @@ public final class ProgramModule extends Statement {
 	@Override
 	public void doChecking() {
 		if(IS_SEMANTICS_CHECKED()) return;
+		Global.enterScope(mainModule);
 		sysin.doChecking();
 		sysout.doChecking();
 		mainModule.doChecking();
@@ -197,7 +199,7 @@ public final class ProgramModule extends Statement {
 	/// Create Java ClassFile.
 	/// @throws IOException if something went wrong
 	public void createJavaClassFile() throws IOException {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		mainModule.createJavaClassFile();
 	}
 

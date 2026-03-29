@@ -11,7 +11,6 @@ import java.util.Vector;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.declaration.Declaration;
-import simula.token.Identifier;
 
 /// Declaration List.
 /// 
@@ -31,6 +30,14 @@ public final class DeclarationList extends Vector<Declaration> {
 	/// @param identifier the given identifier
 	public DeclarationList(String identifier) {
 		this.identifier=identifier;
+	}
+	
+	public int getLineNumber() {
+		return firstElement().firstLineNumber();
+	}
+	
+	public int lastLineNumber() {
+		return lastElement().lastLineNumber();
 	}
 	
 	/// Find a declaration in this DeclarationList

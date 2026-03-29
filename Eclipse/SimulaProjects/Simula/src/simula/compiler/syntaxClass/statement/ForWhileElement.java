@@ -165,7 +165,7 @@ public class ForWhileElement extends ForListElement {
 		oupt.writeKind(ObjectKind.ForWhileElement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** ForListElement
 		oupt.writeObj(forStatement);
 		oupt.writeObj(expr1);

@@ -98,7 +98,7 @@ public final class Parameter extends Declaration {
 
 	/// Create a new Parameter.
 	/// @param identifier parameter identifier
-	Parameter(final String identifier) {
+	public Parameter(final String identifier) {
 		super(identifier);
 		this.declarationKind = ObjectKind.Parameter;
 	}
@@ -128,7 +128,7 @@ public final class Parameter extends Declaration {
 	// ***********************************************************************************************
 	/// Add this parameter to the given parameter list.
 	/// @param parameterList the given parameter list
-	void into(final Vector<Parameter> parameterList) {
+	public void into(final Vector<Parameter> parameterList) {
 		for (Parameter par : parameterList)
 			if (Util.equals(par.identifier, this.identifier)) {
 				Util.error("Parameter already defined: " + identifier);
@@ -179,7 +179,7 @@ public final class Parameter extends Declaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		if (kind == 0) {
 			Util.error("Parameter " + identifier + " is not specified -- assumed Simple Integer");
 			kind = Kind.Simple;

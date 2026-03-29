@@ -79,7 +79,7 @@ public class SimulaLexer {
         tokenStartOffset = currentPosition;
         currentLexerToken = scanBasic();
         tokenEndOffset = currentPosition;
-        Global.sourceLineNumber = this.nextLineNumber;
+//      Global.sourceLineNumber = this.nextLineNumber;
         tokens.add(currentLexerToken);
         
         if(DEBUG > 2) IO.println("SimulaLexer.advance: LINE "+currentLexerToken.lineNumber+"                       NEW CURRENT: "+currentLexerToken);
@@ -998,7 +998,8 @@ public class SimulaLexer {
         
         StringBuilder skipped = new StringBuilder();
         if (Global.TRACE_SCAN) Util.TRACE("scanEndComment, " + edcurrent());
-        int firstLine = Global.sourceLineNumber;
+//        int firstLine = Global.sourceLineNumber;
+        int firstLine = this.nextLineNumber;
         int lastLine = firstLine;
         LOOP:while (getNext() != EOF_MARK) {
             if (current == ';') {
@@ -1027,7 +1028,8 @@ public class SimulaLexer {
                 skipped.append(name); // lastLine=Global.sourceLineNumber;
             } else if (!Character.isWhitespace(current)) {
                 skipped.append((char) current);
-                lastLine = Global.sourceLineNumber;
+//                lastLine = Global.sourceLineNumber;
+                lastLine = this.nextLineNumber;
             }
         }
         if (Global.TRACE_COMMENTS)

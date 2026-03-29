@@ -87,7 +87,7 @@ public final class QualifiedObject extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN QualifiedObject" + toString() + ".doChecking - Current Scope Chain: "	+ Global.getCurrentScope().edScopeChain());
 		classDeclaration = getQualification(classIdentifier);
@@ -146,7 +146,7 @@ public final class QualifiedObject extends Expression {
 		oupt.writeKind(ObjectKind.QualifiedObject);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);

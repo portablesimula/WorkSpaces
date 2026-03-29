@@ -136,7 +136,7 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 		oupt.writeKind(ObjectKind.ConnectionWhenPart);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** ConnectionWhenPart
 		oupt.writeString(classIdentifier);
 		oupt.writeObj(connectionStatement);

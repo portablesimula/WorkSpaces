@@ -29,7 +29,6 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.token.Identifier;
 
 /// Connection Block.
 /// 
@@ -71,7 +70,8 @@ public final class ConnectionBlock extends DeclarationScope {
 	/// @param inspectedVariable   the inspected variable
 	/// @param whenClassIdentifier the when class identifier
 	public ConnectionBlock(final VariableExpression inspectedVariable, final String whenClassIdentifier) {
-		super("Connection block at line " + (Global.sourceLineNumber - 1));
+//		super("Connection block at line " + (Global.sourceLineNumber - 1));
+		super("Inspect " + inspectedVariable);
 		declarationKind = ObjectKind.ConnectionBlock;
 		this.inspectedVariable = inspectedVariable;
 		this.whenClassIdentifier = whenClassIdentifier;
@@ -154,7 +154,7 @@ public final class ConnectionBlock extends DeclarationScope {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		Global.enterScope(this);
 		if (whenClassIdentifier != null) {
 			Meaning meaning = findMeaning(whenClassIdentifier);
@@ -175,7 +175,7 @@ public final class ConnectionBlock extends DeclarationScope {
 
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		Global.enterScope(this);
 		JavaSourceFileCoder.code("{");
@@ -238,7 +238,8 @@ public final class ConnectionBlock extends DeclarationScope {
 
 	@Override
 	public String toString() {
-		return ("ConnectionBlock: Inspect(" + inspectedVariable + ") do " + statement);
+//		return ("ConnectionBlock: Inspect(" + inspectedVariable + ") do " + statement);
+		return ("ConnectionBlock: " + inspectedVariable);
 	}
 
 	@Override
@@ -281,7 +282,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		oupt.writeShort(OBJECT_SEQU);
 		
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		
 		// *** Declaration
 		//oupt.writeString(identifier);

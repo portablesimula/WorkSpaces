@@ -19,6 +19,7 @@ import javax.swing.tree.DefaultTreeModel;
 import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Html;
 import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
@@ -154,12 +155,15 @@ public abstract class DeclarationScope extends Declaration  {
 	/// @return the resulting Meaning
 	public Meaning findMeaning(final String identifier) {
 		Meaning meaning = findVisibleAttributeMeaning(identifier);
-		if (meaning == null && declaredIn != null)
+		if (meaning == null && declaredIn != null) {
+//			IO.println("DeclarationScope.findMeaning: Looking for "+identifier+" in "+declaredIn);
 			meaning = declaredIn.findMeaning(identifier);
+		}
 		
 		if (meaning == null) {
 			if (!Global.duringParsing) {
 				Util.error("Undefined variable: " + identifier);
+				Util.STOP();
 			}
 			UndefinedDeclaration undef = new UndefinedDeclaration(identifier);
 			meaning = new Meaning(undef, this); // Error Recovery
@@ -352,7 +356,12 @@ public abstract class DeclarationScope extends Declaration  {
 	
     public void addDeclarationList(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
     	if(declarationList != null  && declarationList.size() > 0) {
-	        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Declarations");
+    		int lno = declarationList.getLineNumber();
+    		int last = declarationList.lastLineNumber();
+	        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(Html.edPsi(lno, last, "Declarations"));
+//    		String ID = "Declarations";
+//        	String html = "<html><b><u><p style=\"color: rgb(153,0,51);\">" + ID + "</p></u></b></html>";
+//	        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(html);
 	        model.insertNodeInto(newNode, parent, parent.getChildCount());
 			for(Declaration elt:declarationList) elt.addSyntaxNodes(tree, model, newNode);
     	}

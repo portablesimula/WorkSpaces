@@ -16,6 +16,7 @@ import javax.tools.ToolProvider;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.transform.ClassFileTransform;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.SimulaClassLoader;
@@ -51,7 +52,7 @@ import simula.editor.RTOption;
 public final class SimulaCompiler {
 	
 	/// The Reader in case of SimulaEditor.
-	final private Reader reader;
+	private Reader reader;
 
 	/// The ProgramModule.
 	private ProgramModule programModule;
@@ -60,9 +61,9 @@ public final class SimulaCompiler {
 	private File outputJarFile;
 
 //	/// Create a new SimulaCompiler.
-//	/// @param inputFileName the source file name
-//	public SimulaCompiler(final String inputFileName) {
-//		this(inputFileName, null);
+//	/// @param sourceFileName the source file name
+//	public SimulaCompiler(final String sourceFileName) {
+//		this(sourceFileName, null);
 //	}
 
 	/// Create a new SimulaCompiler.
@@ -70,14 +71,6 @@ public final class SimulaCompiler {
 	/// @param reader        Reader in case of SimulaEditor
 	public SimulaCompiler(final String inputFileName, final Reader reader) {
 		Global.initiate();
-//		if (pReader == null) {
-//			try {
-//				File file = new File(inputFileName);
-//				pReader = new InputStreamReader(new FileInputStream(file), Global._CHARSET);
-//			} catch (IOException e) {
-//				Util.error("can't open " + inputFileName + ", reason: " + e);
-//			}
-//		}
 		this.reader = reader;
 		if(Option.verbose) Util.println("Input Source File: " + inputFileName);
 		if (!inputFileName.toLowerCase().endsWith(".sim"))
@@ -92,6 +85,73 @@ public final class SimulaCompiler {
 		
 		if (Option.internal.TRACING)
 			Util.println("Compiling: \"" + inputFileName + "\"");
+
+		if (Global.outputDir == null) {
+			Global.trySetOutputDir(new File(Global.sourceFileDir, "bin"));
+		}
+
+		// Get Temp Directory:
+		Global.simulaTempDir = Global.getTempFileDir("simula/");
+		deleteTempFiles(Global.simulaTempDir);
+
+		// Create Temp .java-Files Directory:
+		File javatmp = Option.internal.keepJava;
+		if (javatmp == null)
+			javatmp = Global.simulaTempDir;
+		File tmpJavaDir = new File(javatmp, "src/" + Global.packetName);
+		tmpJavaDir.mkdirs();
+		Global.tempJavaFileDir = tmpJavaDir;
+
+		// Create Temp .class-Files Directory:
+		File tmpClassDir = new File(Global.simulaTempDir, "classes");
+		tmpClassDir.mkdirs();
+		Global.tempClassFileDir = tmpClassDir;
+
+		File desktop = new File(System.getProperty("user.home"), "Desktop");
+		if (Option.verbose) {
+			// https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html
+			Util.println("------------  SIMULA ENVIRONMENT SUMMARY  ------------");
+			Util.println("Simula Properties    " + Global.simulaPropertiesFile);
+			Util.println("Simula Home          " + Global.simulaHome);
+			Util.println("Simula Home (prev)   " + Global.getSimulaProperty("simula.home", null));
+			Util.println("Java Home            " + System.getProperty("java.home"));
+			Util.println("User Home            " + System.getProperty("user.home"));
+			Util.println("Working Directory    " + System.getProperty("user.dir"));
+			String s = (desktop.exists()) ? "true " : "false";
+			Util.println("Desktop Exists=" + s + " " + desktop.toString());
+			Util.println("Java Class Path      " + System.getProperty("java.class.path"));
+			Util.println("Java Class Version   " + System.getProperty("java.class.version"));
+			Util.println("Java Version         " + System.getProperty("java.version"));
+			Util.println("Java VM Spec Version " + System.getProperty("java.vm.specification.version"));
+			Util.println("Java Vendor          " + System.getProperty("java.vendor"));
+			Util.println("OS name              " + System.getProperty("os.name"));
+			Util.println("OS architecture      " + System.getProperty("os.arch"));
+			Util.println("OS version           " + System.getProperty("os.version"));
+			Util.println("file.encoding        " + System.getProperty("file.encoding"));
+			Util.println("defaultCharset       " + Charset.defaultCharset());
+			Util.println("compilerMode         " + Option.compilerMode);
+
+			// This will list the current system properties
+			// System.getProperties().list(System.out);
+
+		}
+	}
+	public SimulaCompiler(final String sourceFileName) {
+		Global.initiate();
+//		this.reader = reader;
+		if(Option.verbose) Util.println("Input Source File: " + sourceFileName);
+		if (!sourceFileName.toLowerCase().endsWith(".sim"))
+			Util.warning("Simula source file should, by convention be extended by .sim: " + sourceFileName);
+
+		File inputFile = new File(sourceFileName);
+
+		Global.sourceFileName = inputFile.getName();
+		Global.sourceName = Util.getBaseName(inputFile.getName());
+		Global.sourceFileDir = inputFile.getParentFile();
+		if(Global.sourceFileDir == null) Global.sourceFileDir = new File(System.getProperty("user.dir"));
+		
+		if (Option.internal.TRACING)
+			Util.println("Compiling: \"" + sourceFileName + "\"");
 
 		if (Global.outputDir == null) {
 			Global.trySetOutputDir(new File(Global.sourceFileDir, "bin"));
@@ -202,7 +262,9 @@ public final class SimulaCompiler {
 
 	/// Do Compile
 	/// @throws IOException when it fails
-	public void doCompile() throws IOException {
+//	public void doCompile() throws IOException {
+	public void doCompile(ProgramModule programModule) throws IOException {
+		this.programModule = programModule;
 		if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + Global.sourceName + ": Start Simula Compiler");
 		Util.nError = 0;
 		if (!Util.isJavaIdentifier(Global.sourceName)) {
@@ -222,11 +284,23 @@ public final class SimulaCompiler {
 		Global.javaSourceFileCoders = new Vector<JavaSourceFileCoder>();
 //		Parse.initiateParser(reader);
 		
-		Util.IERR("DETTE MÅ RETTES");
-		programModule = new ProgramModule(null);
-		Util.IERR("DETTE MÅ RETTES");
+//		Util.IERR("DETTE MÅ RETTES");
+//		programModule = new ProgramModule(null);
+//		Util.IERR("DETTE MÅ RETTES");
+//		Global.programModule = programModule;
 		
-		Global.programModule = programModule;
+//		programModule = Global.moduleManager.programModule;
+		
+//		IO.println("SimulaCompiler.doCompile: mainModule"+programModule.mainModule);
+//		IO.println("SimulaCompiler.doCompile: mainModule"+programModule.mainModule.declaredIn);
+//		IO.println("SimulaCompiler.doCompile: mainModule"+programModule.mainModule.declaredIn.declaredIn);
+//		Option.internal.TRACE_FIND_MEANING = 1;
+//		Meaning meaning = programModule.mainModule.findMeaning("sysin");
+//		IO.println("SimulaCompiler.doCompile: meaning="+meaning);
+//		Option.internal.TRACE_FIND_MEANING = 0;
+//		Util.STOP();
+
+		
 		if (Option.internal.TRACING) {
 			Util.println("END Parsing, resulting Program: \"" + programModule + "\"");
 			if (Option.internal.TRACE_PARSE && programModule != null)

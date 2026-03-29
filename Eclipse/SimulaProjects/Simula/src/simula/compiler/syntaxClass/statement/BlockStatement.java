@@ -5,9 +5,13 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.statement;
 
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -21,9 +25,13 @@ import simula.compiler.syntaxClass.declaration.PrefixedBlockDeclaration;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Html;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
+import simula.psi.PsiTree;
+import simula.psi.TreeNodeIdent;
 
 /// BlockStatement.
 /// <pre>
@@ -53,17 +61,26 @@ import simula.compiler.utilities.Util;
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen
 public final class BlockStatement extends Statement {
+	public String debugName;
 	
 	/// The associated block declaration.
 	public BlockDeclaration blockDeclaration;
 
+	private static int SEQU = 1;
 	/// Create a new BlockStatement.
 	/// @param blockDeclaration the BlockDeclaration
-	public BlockStatement(final BlockDeclaration blockDeclaration) {
+	public BlockStatement(final PsiBuilder psiBuilder, final BlockDeclaration blockDeclaration) {
+		debugName = "BlockStatement"+SEQU++;
 		this.blockDeclaration = blockDeclaration;
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": BlockStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": BlockStatement: "+this);
 	}
 	
+	@Override
+	public PsiTree getPsiTree() {
+		if(psiTree == null) psiTree = blockDeclaration.getPsiTree();
+		return psiTree;
+	}
+
 	/// Check if this BlockStatement is a CompoundStatement.
 	/// @return true if this BlockStatement is a CompoundStatement
 	boolean isCompoundStatement() {
@@ -85,7 +102,7 @@ public final class BlockStatement extends Statement {
 	
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber=lineNumber();
+		Global.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if(blockDeclaration.declarationKind!=ObjectKind.CompoundStatement) {
 			String staticLink=blockDeclaration.declaredIn.edCTX();
@@ -113,7 +130,7 @@ public final class BlockStatement extends Statement {
 
 	@Override
 	public void buildByteCode(CodeBuilder codeBuilder) {
-		Global.sourceLineNumber=lineNumber();
+		Global.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		blockDeclaration.buildByteCode(codeBuilder);
 	}
@@ -127,18 +144,62 @@ public final class BlockStatement extends Statement {
 	public void printTree(final int indent, final Object head) {
 		blockDeclaration.printTree(indent,head);
 	}
+	
+	@Override
+	public int firstLineNumber() {
+//		IO.println("BlockStatement.firstLineNumber: psiTree: "+getPsiTree());
+		if(getPsiTree() != null) return getPsiTree().firstLineNumber();
+		return -15;
+	}
+	
+	@Override
+	public int lastLineNumber() {
+//		IO.println("BlockStatement.lastLineNumber: psiTree: "+getPsiTree());
+		if(getPsiTree() != null) return getPsiTree().lastLineNumber();
+		return -16;
+	}
 
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("BlockStatement");
+		int lno = firstLineNumber();
+		int last = lastLineNumber();
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new TreeNodeIdent(this, Html.edPsi(lno, last, debugName)));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         blockDeclaration.addDeclarationList(tree, model, newNode);
 		blockDeclaration.addStatementList(tree, model, newNode);			
     }
 
 	@Override
+	public JPanel getPanel() {
+		String[] table = {
+				"  BlockStatement:",	""+blockDeclaration.declaredIn.identifier,
+				"  declarationKind:",	""+blockDeclaration.declarationKind+":"+ObjectKind.edit(blockDeclaration.declarationKind),
+				"  declarationClass:",	""+this.getClass().getSimpleName(),
+				"  lines:",				""+this.firstLineNumber() + " ==> " + this.lastLineNumber(),
+				// *** Declaration
+				"  identifier:",		""+blockDeclaration.identifier,
+				"  externalIdent:",	    ""+blockDeclaration.externalIdent,
+				"  type:",			    ""+blockDeclaration.type,
+				"  declaredIn:",		""+blockDeclaration.declaredIn.identifier,
+				// *** DeclarationScope
+				"  sourceFileName:",	""+blockDeclaration.sourceFileName,
+				"  hasLocalClasses:  ",	""+blockDeclaration.hasLocalClasses,
+				// *** BlockDeclaration
+				"  isMainModule:",		""+blockDeclaration.isMainModule
+		};
+		JPanel panel = new JPanel(new GridLayout(table.length/2, 2));
+		Font monoFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
+		for(String s:table) {
+			JLabel lab = new JLabel(s);
+			lab.setFont(monoFont);
+			panel.add(lab);
+		}
+		return panel;
+	}
+
+	@Override
 	public String toString() {
-		return ""+blockDeclaration;
+		return blockDeclaration.identifier;
 	}
 
 	// ***********************************************************************************************
@@ -154,7 +215,7 @@ public final class BlockStatement extends Statement {
 		oupt.writeKind(ObjectKind.BlockStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** BlockStatement
 		oupt.writeObj(blockDeclaration);
 	}

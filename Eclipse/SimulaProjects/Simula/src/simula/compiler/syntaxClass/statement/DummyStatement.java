@@ -41,22 +41,22 @@ public final class DummyStatement extends Statement {
 	/// @param line the source line number
 //	private DummyStatement(final int line) {
 //		super(line);
-//		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": DummyStatement: "+this);
+//		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": DummyStatement: "+this);
 //	}
 	private DummyStatement() {}
 
 	public static DummyStatement ofExplicit(final PsiBuilder psiBuilder) {
-		 int inrTree = psiBuilder.startSubtree(InnerStatement.class, "DummyStatement");
+		 psiBuilder.startSubtree("DummyStatement");
 		 psiBuilder.consume(KeyWord.SEMICOLON); //  (add it to 'current tree')
 		 DummyStatement dummyStatement = new DummyStatement();		
-		 psiBuilder.doneSubtree(dummyStatement, inrTree, "DummyStatement");
+		 psiBuilder.doneSubtree(dummyStatement);
 		 return dummyStatement;
 	}
 
 	public static DummyStatement ofImplicit(final PsiBuilder psiBuilder) {
-		 int inrTree = psiBuilder.startSubtree(InnerStatement.class, "DummyStatement");
+		 psiBuilder.startSubtree("DummyStatement");
 		 DummyStatement dummyStatement = new DummyStatement();		
-		 psiBuilder.doneSubtree(dummyStatement, inrTree, "DummyStatement");
+		 psiBuilder.doneSubtree(dummyStatement);
 		 return dummyStatement;
 	}
 
@@ -108,7 +108,7 @@ public final class DummyStatement extends Statement {
 		oupt.writeKind(ObjectKind.DummyStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 	}
 
 	/// Read and return a DummyStatement object.

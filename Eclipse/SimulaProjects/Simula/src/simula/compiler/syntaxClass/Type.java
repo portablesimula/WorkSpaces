@@ -22,6 +22,7 @@ import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.Parameter;
 import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Html;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
@@ -119,6 +120,9 @@ public class Type extends SyntaxClass {
 		if(classIdent != null && !Option.CaseSensitive) classIdent = classIdent.toUpperCase();
 		this.keyWord = keyWord;
 		this.classIdent = classIdent;
+		
+		if(classIdent.startsWith("<HTML>")) Util.STOP();
+		if(classIdent.startsWith("IDENTIFIER[")) Util.STOP();
 	}
 
 	/// Create a new ref(classIdent) type.
@@ -133,7 +137,10 @@ public class Type extends SyntaxClass {
 	public Type(Type tp,ConnectionBlock declaredIn) {
 		this.keyWord = tp.keyWord;
 		this.classIdent = tp.classIdent;
-		
+
+		if(classIdent.startsWith("<HTML>")) Util.STOP();
+		if(classIdent.startsWith("IDENTIFIER[")) Util.STOP();
+
 		this.qual = tp.qual;
 		this.declaredIn = declaredIn;
 	}
@@ -685,6 +692,26 @@ public class Type extends SyntaxClass {
         
         SyntaxTree.addKeyWordIdentNode(tree, model, parent, toString());
     }
+
+	public String edHtml() {
+		String style = Html.styleKeyWord;
+		StringBuilder sb = new StringBuilder("<span " + style + ">");
+		if(keyWord == T_REF) {
+			return sb.append("ref").append("</span>").append('(').append(classIdent).append(')').toString();
+		}
+		switch(keyWord) {
+			case T_INTEGER:		sb.append("integer"); break;
+			case T_REAL:		sb.append("real"); break;
+			case T_LONG_REAL:	sb.append("long real"); break;
+			case T_BOOLEAN:		sb.append("boolean"); break;
+			case T_CHARACTER:	sb.append("character"); break;
+			case T_TEXT:		sb.append("text"); break;
+			case T_PROCEDURE:	sb.append("procedure"); break;
+			case T_LABEL:		sb.append("label"); break;
+			default:			sb.append("UNKNOWN"); break;
+		}
+		return sb.append("</span>").toString();
+	}
 
 	@Override
 	public String toString() {

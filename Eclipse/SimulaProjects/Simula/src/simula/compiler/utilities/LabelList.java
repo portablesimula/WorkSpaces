@@ -250,14 +250,14 @@ public class LabelList {
 		System.out.print("*** DeclaredLabels:");
 		if(declaredLabelSize() > 0) {
 			for(LabelDeclaration lab:getDeclaredLabels()) {
-				System.out.print(" " + lab.identifier + '[' + lab.declaredIn.externalIdent + ':' + lab.index + ']' + "atLine:" + lab.lineNumber());
+				System.out.print(" " + lab.identifier + '[' + lab.declaredIn.externalIdent + ':' + lab.index + ']' + "atLine:" + lab.firstLineNumber());
 			}
 			IO.println("");
 		} else IO.println(" NONE");
 		System.out.print("*** AccumLabels:   ");
 		if(accumLabelSize() > 0) {
 			for(LabelDeclaration lab:getAccumLabels()) {
-				System.out.print(" " + lab.identifier + '[' + lab.declaredIn.externalIdent + ':' + lab.index + ']' + "atLine:" + lab.lineNumber());
+				System.out.print(" " + lab.identifier + '[' + lab.declaredIn.externalIdent + ':' + lab.index + ']' + "atLine:" + lab.firstLineNumber());
 			}
 			IO.println("");
 		} else IO.println(" NONE");
@@ -276,7 +276,7 @@ public class LabelList {
 		if(declaredLabelSize() > 0) {
 			for(LabelDeclaration lab:declaredLabels) {
 				s = s + sep + lab.identifier + '[' + lab.declaredIn.externalIdent + ':' + lab.index + ']';				
-				s = s + "atLine:" + lab.lineNumber();
+				s = s + "atLine:" + lab.firstLineNumber();
 				sep = " ";
 			}
 		} else s = s + " With no labels";

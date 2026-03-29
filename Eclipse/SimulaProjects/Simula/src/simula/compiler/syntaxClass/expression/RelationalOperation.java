@@ -85,7 +85,7 @@ public final class RelationalOperation extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN RelationalOperation" + toString() + ".doChecking - Current Scope Chain: "	+ Global.getCurrentScope().edScopeChain());
 		lhs.doChecking();
@@ -185,7 +185,7 @@ public final class RelationalOperation extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if(lhs.type.keyWord == Type.T_TEXT) {
 			buildTextRelation(codeBuilder);
@@ -283,7 +283,7 @@ public final class RelationalOperation extends Expression {
 		oupt.writeKind(ObjectKind.RelationalOperation);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -301,7 +301,7 @@ public final class RelationalOperation extends Expression {
 		RelationalOperation expr = new RelationalOperation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-		expr.OLD_lineNumber = inpt.readShort();
+//		expr.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

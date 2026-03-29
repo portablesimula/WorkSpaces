@@ -196,7 +196,7 @@ public final class TypeConversion extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		expression.buildEvaluation(null,codeBuilder);
 		Type fromType = expression.type;
@@ -258,7 +258,7 @@ public final class TypeConversion extends Expression {
 		oupt.writeKind(ObjectKind.TypeConversion);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -274,7 +274,7 @@ public final class TypeConversion extends Expression {
 		TypeConversion expr = new TypeConversion();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-		expr.OLD_lineNumber = inpt.readShort();
+//		expr.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

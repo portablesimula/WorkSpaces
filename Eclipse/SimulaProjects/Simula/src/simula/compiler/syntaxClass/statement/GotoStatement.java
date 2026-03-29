@@ -61,14 +61,14 @@ public final class GotoStatement extends Statement {
 	/// Create a new GotoStatement.
 	/// @param line source line
 	GotoStatement(final PsiBuilder psiBuilder, final int keyWord) {
-		int gotoTree = psiBuilder.startSubtree(GotoStatement.class, "GotoStatement");
+		psiBuilder.startSubtree("GotoStatement");
 		psiBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to 'current tree')
 		if(keyWord != KeyWord.GOTO) {
 	        if (!PsiParse.accept(psiBuilder, KeyWord.TO))	Util.error("Missing 'TO' after 'GO'");
 		}
 		label = Expression.expectExpression(psiBuilder);
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+this.lineNumber()+": GotoStatement: "+this);
-		psiBuilder.doneSubtree(this, gotoTree, "GotoStatement");
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+this.firstLineNumber()+": GotoStatement: "+this);
+		psiBuilder.doneSubtree(this);
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public final class GotoStatement extends Statement {
 
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
   		Type type = label.type;
 		Util.ASSERT(type.keyWord == Type.T_LABEL, "Invariant");
@@ -142,7 +142,7 @@ public final class GotoStatement extends Statement {
 		oupt.writeKind(ObjectKind.GotoStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** GotoStatement
 		oupt.writeObj(label);
 	}

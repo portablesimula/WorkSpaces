@@ -25,6 +25,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Standalone Expression Statement.
 /// 
@@ -55,25 +56,31 @@ public final class StandaloneExpression extends Statement {
 //		super(line);
 	StandaloneExpression(final PsiBuilder psiBuilder, final Expression expression) {
 		
-		IO.println("\nNEW StandaloneExpression: expr="+expression);
-		psiBuilder.printPSI("NEW StandaloneExpression: expr="+expression);
+//		IO.println("\nNEW StandaloneExpression: expr="+expression);
+//		psiBuilder.printPSI("NEW StandaloneExpression: expr="+expression);
 
 		this.expression = expression;
 		if (Option.internal.TRACE_PARSE) {
-			Util.TRACE("Line "+lineNumber()+": StandaloneExpression: "+this);
-			IO.println("Line "+lineNumber()+": StandaloneExpression: "+this+"   "+psiBuilder.getCurrentLexerToken());
+			Util.TRACE("Line "+firstLineNumber()+": StandaloneExpression: "+this);
+			IO.println("Line "+firstLineNumber()+": StandaloneExpression: "+this+"   "+psiBuilder.getCurrentLexerToken());
 		}
 		LexToken prevToken = null;
 		while ((prevToken = PsiParse.acceptParserToken(psiBuilder, KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF)) != null) { 
-			IO.println("NEW StandaloneExpression: prevToken="+prevToken);
-			int asgTree = psiBuilder.startSubtree(AssignmentOperation.class, "AssignmentOperation");
+//			IO.println("NEW StandaloneExpression: prevToken="+prevToken);
+			psiBuilder.startSubtree("AssignmentOperation");
 			this.expression = new AssignmentOperation(this.expression, prevToken.keyWord, expectStandaloneExpression(psiBuilder));
-			psiBuilder.doneSubtree(this, asgTree, "AssignmentOperation");
+			psiBuilder.doneSubtree(this);
 		}		
 		
-		IO.println("\nEND NEW StandaloneExpression: expr="+expression);
-		psiBuilder.printPSI("END NEW StandaloneExpression: expr="+expression);
+//		IO.println("\nEND NEW StandaloneExpression: expr="+expression);
+//		psiBuilder.printPSI("END NEW StandaloneExpression: expr="+expression);
 
+	}
+
+	@Override
+	public PsiTree getPsiTree() {
+		if(psiTree == null) psiTree = expression.getPsiTree();
+		return psiTree;
 	}
 
 	/// Parse a standalone expression.
@@ -91,14 +98,14 @@ public final class StandaloneExpression extends Statement {
 			int opr=prevToken.keyWord;
 			retExpr=new AssignmentOperation(retExpr,opr,expectStandaloneExpression(psiBuilder));
 		}
-		IO.println("StandaloneExpression.expectStandaloneExpression: RETURN: "+retExpr+" ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+//		IO.println("StandaloneExpression.expectStandaloneExpression: RETURN: "+retExpr+" ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 		return retExpr;
 	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber=lineNumber();
+		Global.sourceLineNumber=firstLineNumber();
 		if (Option.internal.TRACE_CHECKER) Util.TRACE("StandaloneExpression("+expression+").doChecking - Current Scope Chain: "+Global.getCurrentScope().edScopeChain());
 		expression.doChecking();
 		if(!expression.maybeStatement()) Util.error("Illegal/Missplaced Expression: "+expression);
@@ -108,7 +115,7 @@ public final class StandaloneExpression extends Statement {
 	
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber=lineNumber();
+		Global.sourceLineNumber=firstLineNumber();
 		JavaSourceFileCoder.code(toJavaCode() + ';');
 	}
 
@@ -132,6 +139,20 @@ public final class StandaloneExpression extends Statement {
 	@Override
 	public void printTree(final int indent, final Object head) {
 		expression.printTree(indent,this);
+	}
+	
+	@Override
+	public int firstLineNumber() {
+//		IO.println("StandaloneExpression.firstLineNumber: psiTree: "+getPsiTree()+", expr="+expression.getClass().getSimpleName()+"  "+expression);
+		if(getPsiTree() != null) return getPsiTree().firstLineNumber();
+		return -105;
+	}
+	
+	@Override
+	public int lastLineNumber() {
+//		IO.println("StandaloneExpression.lastLineNumber: psiTree: "+getPsiTree());
+		if(getPsiTree() != null) return getPsiTree().lastLineNumber();
+		return -106;
 	}
 
 	@Override
@@ -160,7 +181,7 @@ public final class StandaloneExpression extends Statement {
 		oupt.writeKind(ObjectKind.StandaloneExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** StandaloneExpression
 		oupt.writeObj(expression);
 	}

@@ -9,7 +9,7 @@ public class SimpleString extends LexToken {
 	public SimpleString(int tokenStartLine, CharSequence sourceText, int startOffset, int endOffset, String value) {
 		super(tokenStartLine, sourceText, startOffset, endOffset, KeyWord.TEXTKONST);
 		this.value = value;
-		IO.println("NEW " + this);
+//		IO.println("NEW " + this);
 	}
 
 //	public String toString() {

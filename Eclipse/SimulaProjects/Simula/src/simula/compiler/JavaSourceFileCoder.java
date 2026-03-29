@@ -196,7 +196,7 @@ public final class JavaSourceFileCoder {
 
 	/// Output program info. I.e. identifier and lineMap.
 	public void codeProgramInfo() {
-		appendLine(currentJavaLineNumber, blockDeclaration.lastLineNumber);
+		appendLine(currentJavaLineNumber, blockDeclaration.lastLineNumber());
 		// public static RTS_PROGINFO _INFO=new
 		// RTS_PROGINFO("file.sim","MainProgram",1,4,12,5,14,12,32,14,37,16);
 		StringBuilder s = new StringBuilder();

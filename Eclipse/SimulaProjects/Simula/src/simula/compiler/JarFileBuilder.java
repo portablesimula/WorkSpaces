@@ -68,28 +68,28 @@ public class JarFileBuilder {
 	}
 	
 	/// Open the JarFileBuilder.
-	/// @param program the relevant ProgramModule
+	/// @param programModule the relevant ProgramModule
 	/// @throws IOException if something went wrong
-	public void open(final ProgramModule program) throws IOException {
-		if(TESTING) IO.println("JarFileBuilder.open: " + program);
+	public void open(final ProgramModule programModule) throws IOException {
+		if(TESTING) IO.println("JarFileBuilder.open: " + programModule);
 		if(jarOutputStream != null) Util.IERR();
-		this.programModule = program;
+		this.programModule = programModule;
 		if (Option.internal.TRACING)
 			Util.println("BEGIN Create .jar File");
-		outputJarFile = new File(Global.outputDir, program.getIdentifier() + ".jar");
+		outputJarFile = new File(Global.outputDir, programModule.getIdentifier() + ".jar");
 		outputJarFile.getParentFile().mkdirs();
 		Manifest manifest = new Manifest();
-		mainEntry = Global.packetName + '/' + program.getIdentifier();
+		mainEntry = Global.packetName + '/' + programModule.getIdentifier();
 		mainEntry = mainEntry.replace('/', '.');
 		if (Option.internal.TRACING)
 			Util.println("Output " + outputJarFile + " MANIFEST'mainEntry=\"" + mainEntry + "\"");
 		manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
 		manifest.getMainAttributes().putValue("Created-By", Global.simulaReleaseID + " (Portable Simula)");
-		if (program.isExecutable()) {
+		if (programModule.isExecutable()) {
 			manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, mainEntry);
 //			manifest.getMainAttributes().put(Attributes.Name.CLASS_PATH, ".");
 		} else {
-			String relativeAttributeFileName = program.getRelativeAttributeFileName();
+			String relativeAttributeFileName = programModule.getRelativeAttributeFileName();
 			if (relativeAttributeFileName != null)
 				manifest.getMainAttributes().putValue("SIMULA-INFO", relativeAttributeFileName);
 		}

@@ -259,7 +259,8 @@ public interface PsiParse {
 		else if(accept(psiBuilder, KeyWord.REF))	{
 			PsiParse.expect(psiBuilder, KeyWord.BEGPAR); LexToken classIdentifier=PsiParse.getParserToken(psiBuilder);
 			PsiParse.expect(psiBuilder, KeyWord.IDENTIFIER); PsiParse.expect(psiBuilder, KeyWord.ENDPAR); 
-			type=Type.Ref(classIdentifier.toString()); 
+//			type=Type.Ref(classIdentifier.toString()); 
+			type=Type.Ref(classIdentifier.getText()); 
 		}
 		return(type);  
 	}

@@ -8,6 +8,7 @@ package simula.compiler.syntaxClass;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
+import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -17,6 +18,7 @@ import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Html;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiTree;
 
@@ -93,6 +95,13 @@ public abstract class SyntaxClass {
 	/// The associated PSI Tree
 	public PsiTree psiTree;
 
+	/// Returns the associated PSI Tree
+	/// This method may be redefined.
+	/// @return the associated PSI Tree
+	public PsiTree getPsiTree() {
+		return psiTree;
+	}
+
 	/// Controls semantic checking.
 	/// 
 	/// Set true when the method doChecking() has been completed.
@@ -104,23 +113,17 @@ public abstract class SyntaxClass {
 	/// See: Global.Object_SEQU
 	public int OBJECT_SEQU;
 	
-	/// The source line number
-//	protected int OLD_lineNumber;
-	public int lineNumber() {
-		if(psiTree != null) return psiTree.getLineNumber();
-//		return OLD_lineNumber;
-		return -1;
+	/// The first source line number
+	public int firstLineNumber() {
+		if(psiTree != null) return psiTree.firstLineNumber();
+		throw new RuntimeException("Line number not yet available");
+//		return -22;
 	}
-	
-//	/// Set source line number.
-//	protected void setLineNumber() {
-//		Global.sourceLineNumber = OLD_lineNumber;
-//	}
 
+	/// The last source line number
 	public int lastLineNumber() {
 		if(psiTree != null) return psiTree.lastLineNumber();
-//		return OLD_lineNumber;
-		return lineNumber();
+		return firstLineNumber();
 	}
 
 	
@@ -139,14 +142,19 @@ public abstract class SyntaxClass {
 		Util.IERR("Method addSyntaxNodes need a redefinition in "+this.getClass().getSimpleName());
     }
 
-
+	public JPanel getPanel() {
+		IO.println("Method getPanel need a redefinition in "+this.getClass().getSimpleName());
+		Util.IERR("Method getPanel need a redefinition in "+this.getClass().getSimpleName());
+		return null;
+	}
+	
 	/// Perform semantic checking.
 	/// 
 	/// This must be redefined in every subclass.
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		Util.IERR("The method 'doChecking' needs a redefinition in "+this.getClass().getSimpleName());
 	}
 
@@ -183,7 +191,7 @@ public abstract class SyntaxClass {
 
 	/// Output Java code.
 	public void doJavaCoding() {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		JavaSourceFileCoder.code(toJavaCode());
 	}
 
@@ -225,7 +233,7 @@ public abstract class SyntaxClass {
 		String s = "";
 		while ((i--) > 0)
 			s = s + "    ";
-		return (s+"Line "+this.lineNumber()+": "+this.getClass().getSimpleName()+"    ");
+		return (s+"Line "+this.firstLineNumber()+": "+this.getClass().getSimpleName()+"    ");
 	}
 
 	/// Utility: Returns a number of blanks.
@@ -240,13 +248,18 @@ public abstract class SyntaxClass {
 		return (s);
 	}
 
+//	public String edPsi(String phrase) {
+//		int lno = firstLineNumber();
+//		StringBuilder sb = new StringBuilder("Line ").append(lno);
+//		int lastLine = this.lastLineNumber();
+//		if(lastLine != lno) sb.append('-').append(lastLine);
+//		sb.append(": ").append(getClass().getSimpleName()).append(": ").append(phrase);
+//		return sb.toString();
+//	}
 	public String edPsi(String phrase) {
-		int lno = lineNumber();
-		StringBuilder sb = new StringBuilder("Line ").append(lno);
+		int lno = firstLineNumber();
 		int lastLine = this.lastLineNumber();
-		if(lastLine != lno) sb.append('-').append(lastLine);
-		sb.append(": ").append(getClass().getSimpleName()).append(": ").append(phrase);
-		return sb.toString();
+		return Html.edPsi(lno, lastLine, getClass().getSimpleName() + ": " + phrase);
 	}
 
 	// ***********************************************************************************************

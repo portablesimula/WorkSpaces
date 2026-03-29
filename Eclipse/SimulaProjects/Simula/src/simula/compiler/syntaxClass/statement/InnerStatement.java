@@ -44,7 +44,7 @@ public final class InnerStatement extends Statement {
 	/// @param line the source line number
 //	public InnerStatement(final int line) {
 ////		super(line);
-//		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": InnerStatement: "+this);
+//		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": InnerStatement: "+this);
 //		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
 //			cls.statements1 = cls.statements;
 //			cls.statements = new ObjectList<Statement>();
@@ -52,24 +52,24 @@ public final class InnerStatement extends Statement {
 //	}
 
 	public static InnerStatement ofExplicit(final PsiBuilder psiBuilder) {
-		 int inrTree = psiBuilder.startSubtree(InnerStatement.class, "InnerStatement");
+		 psiBuilder.startSubtree("InnerStatement");
 		 psiBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
 		 InnerStatement innerStatement = new InnerStatement(psiBuilder);		
-		 psiBuilder.doneSubtree(innerStatement, inrTree, "InnerStatement");
+		 psiBuilder.doneSubtree(innerStatement);
 		 return innerStatement;
 	}
 
 	public static InnerStatement ofImplicit(final PsiBuilder psiBuilder) {
-		 int inrTree = psiBuilder.startSubtree(InnerStatement.class, "InnerStatement");
+		 psiBuilder.startSubtree("InnerStatement");
 		 InnerStatement innerStatement = new InnerStatement(psiBuilder);		
-		 psiBuilder.doneSubtree(innerStatement, inrTree, "InnerStatement");
+		 psiBuilder.doneSubtree(innerStatement);
 		 return innerStatement;
 	}
 		
 	/// Create a new InnerStatement.
 	/// @param line the source line number
 	private InnerStatement(final PsiBuilder psiBuilder) {
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": InnerStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": InnerStatement: "+this);
 		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
 			cls.statements1 = cls.statements;
 			cls.statements = new ObjectList<Statement>();
@@ -79,13 +79,13 @@ public final class InnerStatement extends Statement {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber=lineNumber();
+		Global.sourceLineNumber=firstLineNumber();
 		SET_SEMANTICS_CHECKED();
 	}
 	
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber=lineNumber();
+		Global.sourceLineNumber=firstLineNumber();
 		// No code !
 	}
 
@@ -131,7 +131,7 @@ public final class InnerStatement extends Statement {
 		oupt.writeKind(ObjectKind.InnerStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 	}
 
 	/// Read and return an InnerStatement object.

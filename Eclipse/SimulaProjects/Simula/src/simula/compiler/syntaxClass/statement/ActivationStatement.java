@@ -106,7 +106,7 @@ public final class ActivationStatement extends Statement {
 	/// Create a new ActivationStatement.
 	/// @param line the source line number
 	ActivationStatement(final PsiBuilder psiBuilder) {
-		int actTree = psiBuilder.startSubtree(ActivationStatement.class, "ActivationStatement");
+		psiBuilder.startSubtree("ActivationStatement");
 		LexToken activator = PsiParse.getParserToken(psiBuilder);
 		REAC = activator.keyWord == KeyWord.REACTIVATE;
 		psiBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to 'current tree')
@@ -128,8 +128,8 @@ public final class ActivationStatement extends Statement {
 			object2 = Expression.expectExpression(psiBuilder);
 			object2.backLink = this;
 		}
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": ActivationStatement: "+this);
-		psiBuilder.doneSubtree(this, actTree, "ActivationStatement");
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": ActivationStatement: "+this);
+		psiBuilder.doneSubtree(this);
 	}
 
 	@Override
@@ -358,7 +358,7 @@ public final class ActivationStatement extends Statement {
 		oupt.writeKind(ObjectKind.ActivationStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** ActivationStatement
 		oupt.writeBoolean(REAC);
 		oupt.writeObj(object1);

@@ -109,7 +109,7 @@ public final class SwitchStatement extends Statement {
 	/// @param line the source line number
 	SwitchStatement(final PsiBuilder psiBuilder) {
 
-		int swtTree = psiBuilder.startSubtree(SwitchStatement.class, "SwitchStatement");
+		psiBuilder.startSubtree("SwitchStatement");
 		psiBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
 //		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);
@@ -139,8 +139,8 @@ public final class SwitchStatement extends Statement {
 			switchCases.add(new SwitchWhenPart(caseKeyList, statement));
 		}
 		PsiParse.expect(psiBuilder, KeyWord.END);
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber()+": SwitchStatement: "+this);
-		psiBuilder.doneSubtree(this, swtTree, "SwitchStatement");
+		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+firstLineNumber()+": SwitchStatement: "+this);
+		psiBuilder.doneSubtree(this);
 	}
 
 	/// Parse Utility: Expect case pair.
@@ -306,7 +306,7 @@ public final class SwitchStatement extends Statement {
 	@Override
     public void doChecking() {
     	if(IS_SEMANTICS_CHECKED()) return;
-    	Global.sourceLineNumber=lineNumber();
+    	Global.sourceLineNumber=firstLineNumber();
     	if(Option.internal.TRACE_CHECKER) Util.TRACE("BEGIN SwitchStatement("+toString()+").doChecking - Current Scope Chain: "+Global.getCurrentScope().edScopeChain());    
     	lowKey.doChecking(); hiKey.doChecking();
     	switchKey.doChecking();
@@ -328,7 +328,7 @@ public final class SwitchStatement extends Statement {
 	
 	@Override
     public void doJavaCoding() {
-    	Global.sourceLineNumber=lineNumber();
+    	Global.sourceLineNumber=firstLineNumber();
 	    ASSERT_SEMANTICS_CHECKED();
 	    StringBuilder sb=new StringBuilder();
 	    sb.append("if(").append(switchKey.toJavaCode()).append("<").append(lowKey.toJavaCode());
@@ -417,7 +417,7 @@ public final class SwitchStatement extends Statement {
 		oupt.writeKind(ObjectKind.SwitchStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** SwitchStatement
 		oupt.writeObj(lowKey);
 		oupt.writeObj(hiKey);

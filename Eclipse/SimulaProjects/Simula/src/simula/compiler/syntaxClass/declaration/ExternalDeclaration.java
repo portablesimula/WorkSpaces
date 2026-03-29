@@ -211,7 +211,7 @@ public final class ExternalDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -228,7 +228,7 @@ public final class ExternalDeclaration extends Declaration {
 		ext.OBJECT_SEQU = inpt.readSEQU(ext);
 
 		// *** SyntaxClass
-		ext.OLD_lineNumber = inpt.readShort();
+//		ext.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		ext.identifier = inpt.readString();

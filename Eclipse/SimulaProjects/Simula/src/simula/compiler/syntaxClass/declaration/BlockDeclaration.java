@@ -24,6 +24,7 @@ import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Html;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
@@ -51,8 +52,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// The statements belonging to this block.
 	public ObjectList<Statement> statements = new ObjectList<Statement>();
 
-	/// Last source line number
-	public int lastLineNumber;
+//	/// Last source line number
+//	public int lastLineNumber;
 	
 	/// If true; all member methods are independent of context
 	public boolean isContextFree;
@@ -529,7 +530,9 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	
     public void addStatementList(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
     	if(statements != null  && statements.size() > 0) {
-	        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Statements");
+    		int lno = statements.firstElement().firstLineNumber();
+    		int last = statements.lastElement().lastLineNumber();
+	        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(Html.edPsi(lno, last, "Statements"));
 	        model.insertNodeInto(newNode, parent, parent.getChildCount());
 			for(Statement elt:statements) elt.addSyntaxNodes(tree, model, newNode);
     	}

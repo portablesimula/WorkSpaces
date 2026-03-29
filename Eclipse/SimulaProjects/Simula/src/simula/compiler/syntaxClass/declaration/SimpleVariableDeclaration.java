@@ -5,6 +5,8 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.declaration;
 
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.ClassFile;
@@ -12,6 +14,9 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -32,6 +37,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 import simula.psi.SyntaxTree;
+import simula.psi.TreeNodeIdent;
 
 /// Simple Variable Declaration.
 /// 
@@ -128,7 +134,7 @@ public class SimpleVariableDeclaration extends Declaration {
 				typeDeclaration.constantElement = Expression.expectExpression(psiBuilder);
 			declarationList.add(typeDeclaration);
 			psiBuilder.doneSubtree(typeDeclaration);
-			psiBuilder.startSubtree(Declaration.class, "NextDeclaration");
+			psiBuilder.startSubtree("NextDeclaration");
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 	}
 
@@ -136,7 +142,7 @@ public class SimpleVariableDeclaration extends Declaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		type.doChecking(Global.getCurrentScope());
 		if (constantElement != null) {
 			constantElement.doChecking();
@@ -232,7 +238,8 @@ public class SimpleVariableDeclaration extends Declaration {
 
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
+//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(edHtml()));
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new TreeNodeIdent(this, edPsi(edHtml())));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         
 		type.addSyntaxNodes(tree, model, newNode);
@@ -242,6 +249,38 @@ public class SimpleVariableDeclaration extends Declaration {
     		constantElement.addSyntaxNodes(tree, model, newNode);
 		}
     }
+
+	public String edHtml() {
+		String s = type.edHtml() + " " + identifier;
+		if (constantElement != null)
+			s = s + "=" + constantElement.toString();
+		return (s);
+	}
+
+	@Override
+	public JPanel getPanel() {
+		String[] table = {
+				"  declarationKind:",	""+declarationKind+":"+ObjectKind.edit(declarationKind),
+				"  declarationClass:",	""+this.getClass().getSimpleName(),
+				"  lines:",				""+this.firstLineNumber() + " ==> " + this.lastLineNumber(),
+				// *** Declaration
+				"  identifier:",		""+identifier,
+				"  externalIdent:",	    ""+externalIdent,
+				"  type:",			    ""+type,
+				"  declaredIn:",		""+declaredIn.identifier,
+				// *** SimpleVariableDeclaration
+				"  constant:",			""+constant,
+				"  constantElement: ",	""+constantElement
+		};
+		JPanel panel = new JPanel(new GridLayout(table.length/2, 2));
+		Font monoFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
+		for(String s:table) {
+			JLabel lab = new JLabel(s);
+			lab.setFont(monoFont);
+			panel.add(lab);
+		}
+		return panel;
+	}
 
 	@Override
 	public String toString() {
@@ -270,7 +309,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 
 		// *** Declaration
 		oupt.writeString(identifier);

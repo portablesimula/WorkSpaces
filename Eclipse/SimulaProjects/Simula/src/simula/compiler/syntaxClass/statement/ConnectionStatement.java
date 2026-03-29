@@ -130,14 +130,14 @@ public final class ConnectionStatement extends Statement {
 	/// Pre-Condition: INSPECT  is already read.
 	/// @param line the source line number
 	ConnectionStatement(final PsiBuilder psiBuilder) {
-		int inspectTree = psiBuilder.startSubtree(ConnectionStatement.class, "ConnectionStatement");
+		psiBuilder.startSubtree("ConnectionStatement");
 		psiBuilder.consume(KeyWord.INSPECT); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ConnectionStatement");
 		objectExpression = Expression.expectExpression(psiBuilder);
 		objectExpression.backLink = this;
-		String ident = "_inspect_" + lineNumber() + '_' + (SEQUX++);
+		String ident = "_inspect_" + firstLineNumber() + '_' + (SEQUX++);
 		inspectedVariable = new VariableExpression(ident);
 		DeclarationScope scope = Global.getCurrentScope();
 		inspectVariableDeclaration = new InspectVariableDeclaration(Type.Ref("RTObject"), ident, scope, this);
@@ -182,14 +182,14 @@ public final class ConnectionStatement extends Statement {
 		this.otherwise=otherwise;
 		this.hasWhenPart=hasWhenPart;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line "+this.lineNumber()+": ConnectionStatement: "+this);
-		psiBuilder.doneSubtree(this, inspectTree, "ConnectionStatement");
+			Util.TRACE("Line "+this.firstLineNumber()+": ConnectionStatement: "+this);
+		psiBuilder.doneSubtree(this);
 	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ConnectionStatement(" + toString() + ").doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());		
 		objectExpression.doChecking();
@@ -209,7 +209,7 @@ public final class ConnectionStatement extends Statement {
 
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code("{");
 		JavaSourceFileCoder.debug("// BEGIN INSPECTION ");
@@ -329,7 +329,7 @@ public final class ConnectionStatement extends Statement {
 		oupt.writeKind(ObjectKind.ConnectionStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** ConnectionStatement
 		oupt.writeObj(objectExpression);
 		oupt.writeObj(inspectedVariable);

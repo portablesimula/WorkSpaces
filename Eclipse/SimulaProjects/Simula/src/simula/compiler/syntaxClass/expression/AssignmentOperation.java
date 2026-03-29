@@ -23,7 +23,6 @@ import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.Parameter;
 import simula.compiler.syntaxClass.declaration.ProcedureDeclaration;
 import simula.compiler.syntaxClass.declaration.SimpleVariableDeclaration;
-import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
@@ -32,7 +31,6 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.SyntaxTree;
-import simula.token.Identifier;
 
 /// Assignment Operation.
 /// 
@@ -88,7 +86,7 @@ public final class AssignmentOperation extends Expression {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN Assignment" + toString() + ".doChecking - Current Scope Chain: "
 					+ Global.getCurrentScope().edScopeChain());
@@ -223,7 +221,6 @@ public final class AssignmentOperation extends Expression {
 	/// Build Java ByteCode.
 	@Override
 	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
-		setLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.textValueAssignment)
 			 buildTextValueAssignment(codeBuilder);
@@ -471,7 +468,7 @@ public final class AssignmentOperation extends Expression {
 		oupt.writeKind(ObjectKind.AssignmentOperation);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -489,7 +486,7 @@ public final class AssignmentOperation extends Expression {
 		AssignmentOperation expr = new AssignmentOperation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-		expr.OLD_lineNumber = inpt.readShort();
+//		expr.OLD_lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

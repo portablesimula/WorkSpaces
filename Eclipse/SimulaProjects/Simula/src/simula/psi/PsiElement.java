@@ -13,7 +13,7 @@ public abstract class PsiElement {// implements PsiElement {
 
 //	public PsiElement getParent() { return parent; }
 //	public void setParent(PsiTree parent) { this.parent = parent; }
-	public abstract int getLineNumber();
+	public abstract int firstLineNumber();
 	public abstract int lastLineNumber();
 	public abstract String getText();
 

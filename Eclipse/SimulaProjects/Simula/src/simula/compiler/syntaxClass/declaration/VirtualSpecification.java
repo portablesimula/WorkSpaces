@@ -169,7 +169,7 @@ public final class VirtualSpecification extends Declaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		if (procedureSpec != null)
 			procedureSpec.doChecking(this.declaredIn);
 		

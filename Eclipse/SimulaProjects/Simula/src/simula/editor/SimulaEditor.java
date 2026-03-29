@@ -67,7 +67,7 @@ public class SimulaEditor extends JFrame {
 	static EditorMenues menuBar;
 
 	/// The current SourceTextPanel
-	static SourceTextPanel current;
+	static SourceTextPanel currentTextPanel;
 
 	/// The autoRefresher
 	static AutoRefresher autoRefresher;
@@ -147,7 +147,8 @@ public class SimulaEditor extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				Component selected=tabbedPane.getSelectedComponent();
 				if(selected instanceof SourceTextPanel panel) {
-					current=panel;
+					currentTextPanel=panel;
+					Global.moduleManager = currentTextPanel.moduleManager;
 					menuBar.updateMenuItems();
 				}
 			}});
@@ -396,7 +397,7 @@ public class SimulaEditor extends JFrame {
     /// Remove selected tab.
     static void removeSelectedTab() {
     	tabbedPane.removeTabAt(tabbedPane.getSelectedIndex());
-        current=(SourceTextPanel)tabbedPane.getSelectedComponent();
+        currentTextPanel=(SourceTextPanel)tabbedPane.getSelectedComponent();
         menuBar.updateMenuItems();
     }
     
@@ -409,26 +410,26 @@ public class SimulaEditor extends JFrame {
     static void doNewTabbedPanel(File file,Language lang) {
     	new Thread(new Runnable() {
     		public void run() {
-     			current=new SourceTextPanel(file,lang,menuBar.popupMenu);
-    			tabbedPane.addTab((file==null)?"unnamed":file.getName(), null, current, "Tool tip ...");
+     			currentTextPanel=new SourceTextPanel(file,lang,menuBar.popupMenu);
+    			tabbedPane.addTab((file==null)?"unnamed":file.getName(), null, currentTextPanel, "Tool tip ...");
     			// select the last tab
     			tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
-    			current.fileChanged=false;
-    			if(file==null)current.fillTextPane(new StringReader("begin\n\nend;\n"),0);
+    			currentTextPanel.fileChanged=false;
+    			if(file==null)currentTextPanel.fillTextPane(new StringReader("begin\n\nend;\n"),0);
     			else if(lang==Language.Simula) {
     				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
-    					  current.fillTextPane(reader,0);
+    					  currentTextPanel.fillTextPane(reader,0);
     				} catch(IOException e) { Util.IERR("Impossible",e); }
     			}
     			else if(lang==Language.Jar) {
-    				current.fillTextPane(getJarFileReader(file),0);
+    				currentTextPanel.fillTextPane(getJarFileReader(file),0);
     			}
     			else if(lang==Language.Other) {
-    				current.fillTextPane(getHexFileReader(file),0);
+    				currentTextPanel.fillTextPane(getHexFileReader(file),0);
     			}
     			else if(lang==Language.Text)
     				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
-    				current.fillTextPane(reader,0);
+    				currentTextPanel.fillTextPane(reader,0);
     			} catch(IOException e) { Util.IERR("Impossible",e); }
     			menuBar.updateMenuItems();
     		}}).start();
@@ -549,8 +550,8 @@ public class SimulaEditor extends JFrame {
 			while (!stoped) {
 				try { sleep(100); } catch (InterruptedException e) {}
 				if ((counter--) <= 0) {
-					try { if (current.AUTO_REFRESH && current != null && current.refreshNeeded) {
-							  current.refreshNeeded = false;
+					try { if (currentTextPanel.AUTO_REFRESH && currentTextPanel != null && currentTextPanel.refreshNeeded) {
+							  currentTextPanel.refreshNeeded = false;
 							  menuBar.refresh.doClick();
 						  }
 					} catch (Throwable t) {}

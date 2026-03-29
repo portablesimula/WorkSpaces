@@ -16,7 +16,6 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.token.Identifier;
 
 /// Standard Procedure.
 /// 
@@ -70,7 +69,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 	public void doChecking() {
 		if(IS_SEMANTICS_CHECKED()) return;
 		Global.enterScope(this);
-		Global.sourceLineNumber=lineNumber();
+		Global.sourceLineNumber=firstLineNumber();
 		Global.exitScope();
 		if(Option.internal.TRACE_CHECKER) Util.TRACE("END StandardProcedure("+toString()+").doChecking - Result type="+this.type);
 		SET_SEMANTICS_CHECKED();

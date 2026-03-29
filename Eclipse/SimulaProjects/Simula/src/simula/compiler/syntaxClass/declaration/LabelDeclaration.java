@@ -29,7 +29,6 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
-import simula.token.Identifier;
 
 /// Label Declaration.
 /// 
@@ -63,7 +62,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		DeclarationScope declaredIn = Global.getCurrentScope();
 		this.externalIdent = "_LABEL_" + declaredIn.externalIdent + '_' + identifier + '_' + declaredIn.prefixLevel();
 		type.doChecking(declaredIn);
@@ -85,7 +84,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// Declare a local Label.
 	/// @param encloser the BlockDeclaration to update.
 	public void declareLocalLabel(BlockDeclaration encloser) {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		String ident = getJavaIdentifier();
 		int prefixLevel=0;
 		if(movedTo != null) {
@@ -247,7 +246,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -273,7 +272,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		lab.OBJECT_SEQU = inpt.readSEQU(lab);
 
 		// *** SyntaxClass
-		lab.OLD_lineNumber = inpt.readShort();
+//		lab.OLD_lineNumber = inpt.readShort();
 
 		// *** Declaration
 		lab.identifier = inpt.readString();

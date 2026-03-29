@@ -189,7 +189,7 @@ public abstract class Declaration extends SyntaxClass {
 	/// Continue until there are no more declarations.
 	/// @param enclosure the owning block.
 	protected static void acceptDeclarations(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
-		psiBuilder.startSubtree(Declaration.class, "Declaration");
+		psiBuilder.startSubtree("Declaration");
 		while (Declaration.acceptDeclaration(psiBuilder, enclosure))
 			PsiParse.accept(psiBuilder, KeyWord.SEMICOLON);
 		psiBuilder.dropSubtree();
@@ -229,14 +229,14 @@ public abstract class Declaration extends SyntaxClass {
 	/// Output Java ByteCode. Build init code for an Attribute.
 	/// @param codeBuilder the codeBuilder to use.
 	public void buildInitAttribute(CodeBuilder codeBuilder) {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		Util.IERR("Method buildInitAttribute need a redefinition in "+this.getClass().getSimpleName());
 	}
 
 	/// Output Java ByteCode. Build declaration code for an Attribute.
 	/// @param codeBuilder the codeBuilder to use.
 	public void buildDeclarationCode(CodeBuilder codeBuilder) {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		// Default: No code
 	}
 	

@@ -211,9 +211,15 @@ public final class Simula {
 	        for(String fileName:fileNames) {
 				if(sourceFileDir != null) fileName = sourceFileDir + '/' + fileName;
 				try {
-					File file = new File(fileName);
-					InputStreamReader reader = new InputStreamReader(new FileInputStream(file), Global._CHARSET);
-					new SimulaCompiler(fileName, reader).doCompile();
+//					File file = new File(fileName);
+//					InputStreamReader reader = new InputStreamReader(new FileInputStream(file), Global._CHARSET);
+//					new SimulaCompiler(fileName, reader).doCompile();
+					
+					Util.IERR("SJEKK DETTE NØYE !!!");
+					File sourceFile = new File(fileName);
+			    	Global.moduleManager = new ModuleManager(sourceFile);
+					new SimulaCompiler(fileName).doCompile(Global.moduleManager.getProgramModule());
+
 				} catch (IOException e) {
 					Util.error("can't open " + fileName + ", reason: " + e);
 				}

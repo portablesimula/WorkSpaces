@@ -14,8 +14,6 @@ import javax.swing.tree.DefaultTreeModel;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
-import simula.compiler.syntaxClass.declaration.VirtualSpecification.Kind;
-import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
 import simula.psi.SyntaxTree;
@@ -155,7 +153,7 @@ public final class HiddenSpecification extends SyntaxClass {
 		oupt.writeKind(ObjectKind.HiddenSpecification);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** HiddenSpecification
 		oupt.writeString(identifier);
 		oupt.writeObj(definedIn);
@@ -169,7 +167,7 @@ public final class HiddenSpecification extends SyntaxClass {
 		HiddenSpecification spec = new HiddenSpecification();
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
 		// *** SyntaxClass
-		spec.OLD_lineNumber = inpt.readShort();
+//		spec.OLD_lineNumber = inpt.readShort();
 		// *** HiddenSpecification
 		spec.identifier = inpt.readString();
 		spec.definedIn = (ClassDeclaration) inpt.readObj();

@@ -30,7 +30,7 @@ public final class Comment extends SyntaxClass {
 	/// @param line the source line number
 	public Comment() {
 //		super("Comment");
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber()+": DummyStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": DummyStatement: "+this);
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public final class Comment extends SyntaxClass {
 
 	@Override
 	public String toString() {
-		return ("DUMMY at Line "+lineNumber()+" in "+Global.getCurrentScope().identifier);
+		return ("DUMMY at Line "+firstLineNumber()+" in "+Global.getCurrentScope().identifier);
 	}
 
 //	// ***********************************************************************************************
@@ -75,7 +75,7 @@ public final class Comment extends SyntaxClass {
 //		oupt.writeKind(ObjectKind.DummyStatement);
 //		oupt.writeShort(OBJECT_SEQU);
 //		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 //	}
 //
 //	/// Read and return a DummyStatement object.

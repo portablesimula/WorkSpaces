@@ -66,7 +66,7 @@ public final class ConditionalExpression extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber=lineNumber();
+		Global.sourceLineNumber=firstLineNumber();
 		condition.doChecking();
 		condition.backLink=this; // To ensure _RESULT from functions
 		Type cType = condition.type;
@@ -146,7 +146,7 @@ public final class ConditionalExpression extends Expression {
 		oupt.writeKind(ObjectKind.ConditionalExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);

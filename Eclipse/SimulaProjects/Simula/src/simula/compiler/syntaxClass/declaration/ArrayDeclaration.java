@@ -5,6 +5,8 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.declaration;
 
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.ClassFile;
@@ -18,6 +20,8 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -33,6 +37,7 @@ import simula.compiler.syntaxClass.expression.TypeConversion;
 import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Html;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
@@ -42,6 +47,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 import simula.psi.SyntaxTree;
+import simula.psi.TreeNodeIdent;
 
 /// Array Declaration.
 /// 
@@ -178,7 +184,7 @@ public final class ArrayDeclaration extends Declaration {
 				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(identifier, type, boundPairList);
 				declarationList.add(arrayDeclaration);
 				psiBuilder.doneSubtree(arrayDeclaration);
-				psiBuilder.startSubtree(Declaration.class, "NextDeclaration");
+				psiBuilder.startSubtree("NextDeclaration");
 			}
 			
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
@@ -222,7 +228,7 @@ public final class ArrayDeclaration extends Declaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		if (type == null)
 			type = Type.Real;
 		type.doChecking(declaredIn);
@@ -234,7 +240,7 @@ public final class ArrayDeclaration extends Declaration {
 
 	@Override
 	public void doJavaCoding() {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		// --------------------------------------------------------------------
 		// public RTS_REAL_ARRAY rTab=null;
@@ -246,7 +252,7 @@ public final class ArrayDeclaration extends Declaration {
 
 	@Override
 	public void doDeclarationCoding() {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		// --------------------------------------------------------------------
 		// integer array A(1:4,4:6,6:12);
@@ -270,7 +276,7 @@ public final class ArrayDeclaration extends Declaration {
 	
 	@Override
 	public void buildDeclaration(ClassBuilder classBuilder, BlockDeclaration encloser) {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		classBuilder.withField(identifier, RTS.CD.RTS_ARRAY(type), fieldBuilder -> {
 			fieldBuilder
@@ -540,7 +546,8 @@ public final class ArrayDeclaration extends Declaration {
 
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
+//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(edHtml()));
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new TreeNodeIdent(this, edPsi(edHtml())));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         
         if(type != null) type.addSyntaxNodes(tree, model, newNode);
@@ -557,6 +564,44 @@ public final class ArrayDeclaration extends Declaration {
 		}		
 		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.ENDPAR);
     }
+
+	public String edHtml() {
+		StringBuilder sb = new StringBuilder();
+		if(type != null) sb.append(type.edHtml()).append(' ');
+		sb.append(Html.edKeyWord(KeyWord.ARRAY)).append(' ').append(identifier).append('(');
+		boolean first = true;
+		for(BoundPair boundPair:boundPairList) {
+			if(!first) sb.append(',');
+			first = false;
+			sb.append(boundPair.LB).append(':').append(boundPair.UB);
+		}		
+		sb.append(')');
+		return (sb.toString());
+	}
+
+	@Override
+	public JPanel getPanel() {
+		String[] table = {
+				"  declarationKind:",	""+declarationKind+":"+ObjectKind.edit(declarationKind),
+				"  declarationClass:",	""+this.getClass().getSimpleName(),
+				"  lines:",				""+this.firstLineNumber() + " ==> " + this.lastLineNumber(),
+				// *** Declaration
+				"  identifier:",		""+identifier,
+				"  externalIdent:",	    ""+externalIdent,
+				"  type:",			    ""+type,
+				"  declaredIn:",		""+declaredIn.identifier,
+				// *** ArrayDeclaration
+				"  nDim: ",				""+nDim
+		};
+		JPanel panel = new JPanel(new GridLayout(table.length/2, 2));
+		Font monoFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
+		for(String s:table) {
+			JLabel lab = new JLabel(s);
+			lab.setFont(monoFont);
+			panel.add(lab);
+		}
+		return panel;
+	}
 
 	@Override
 	public String toString() {
@@ -589,7 +634,7 @@ public final class ArrayDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 
 		// *** Declaration
 		oupt.writeString(identifier);

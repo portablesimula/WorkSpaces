@@ -109,7 +109,7 @@ public class ConnectionDoPart extends SyntaxClass {
 		oupt.writeKind(ObjectKind.ConnectionDoPart);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** ConnectionDoPart
 		oupt.writeObj(connectionStatement);
 		oupt.writeObj(connectionBlock);

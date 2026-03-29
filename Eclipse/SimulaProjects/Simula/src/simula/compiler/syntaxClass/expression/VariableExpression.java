@@ -186,10 +186,10 @@ public final class VariableExpression extends Expression {
 			Util.TRACE("Parse Variable, current=" + PsiParse.currentLexToken(psiBuilder));
 		VariableExpression variable = new VariableExpression(ident);
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) {
-			IO.println("VariableExpression.expectVariable: GOT BEGPAR");
+//			IO.println("VariableExpression.expectVariable: GOT BEGPAR");
 			variable.params = new Vector<Expression>();
 			do {
-				IO.println("VariableExpression.expectVariable: GOT BEGPAR OR COMMA");
+//				IO.println("VariableExpression.expectVariable: GOT BEGPAR OR COMMA");
 				Expression par = acceptExpression(psiBuilder);
 				if (par == null)
 					Util.error("Missing procedure parameter");
@@ -199,7 +199,7 @@ public final class VariableExpression extends Expression {
 				}
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 			PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
-			IO.println("VariableExpression.expectVariable: GOT ENDPAR");
+//			IO.println("VariableExpression.expectVariable: GOT ENDPAR");
 		}
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW Variable: " + variable);
@@ -218,7 +218,7 @@ public final class VariableExpression extends Expression {
 			return;
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN Variable(" + identifier + ").doChecking: type=" + type);
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		Declaration declaredAs = getMeaning().declaredAs;
 		if (declaredAs != null)
 			this.type = declaredAs.type;
@@ -756,7 +756,7 @@ public final class VariableExpression extends Expression {
 
 			case ObjectKind.ContextFreeMethod:
 				if (Util.equals(identifier, "sourceline"))
-					 Constant.buildIntConst(codeBuilder, this.lineNumber());
+					 Constant.buildIntConst(codeBuilder, this.firstLineNumber());
 				else BuildCP.staticStandardProcedure(this,codeBuilder);
 				break;
 
@@ -793,7 +793,8 @@ public final class VariableExpression extends Expression {
 						DeclarationScope declaredIn = cblk.declaredIn;
 						int bl = declaredIn.getRTBlockLevel();
 						if(bl == 0) { // Accessing _USR
-							ClassDesc main = Global.programModule.mainModule.getClassDesc();
+//							ClassDesc main = Global.programModule.mainModule.getClassDesc();
+							ClassDesc main = Global.moduleManager.getProgramModule().mainModule.getClassDesc();
 							codeBuilder.checkcast(main);
 						} else {
 							while(declaredIn.declaredIn.getRTBlockLevel() == bl) declaredIn = declaredIn.declaredIn;
@@ -974,7 +975,7 @@ public final class VariableExpression extends Expression {
 		oupt.writeKind(ObjectKind.VariableExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);

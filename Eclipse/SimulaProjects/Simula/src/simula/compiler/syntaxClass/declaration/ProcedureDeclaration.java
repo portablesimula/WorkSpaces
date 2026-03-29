@@ -5,6 +5,8 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.declaration;
 
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.ClassFile;
@@ -25,6 +27,8 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -38,6 +42,7 @@ import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.ClassHierarchy;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Html;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.Meaning;
@@ -48,6 +53,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.TreeNodeIdent;
 
 /// Procedure Declaration.
 /// <pre>
@@ -155,12 +161,12 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		} else PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 		expectProcedureBody(psiBuilder, proc);
 
-		proc.lastLineNumber = Global.sourceLineNumber;
+//		proc.lastLineNumber = Global.sourceLineNumber;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line "+proc.lineNumber()+": ProcedureDeclaration: "+proc);
+			Util.TRACE("Line "+proc.firstLineNumber()+": ProcedureDeclaration: "+proc);
 		Global.setScope(proc.declaredIn);
 		psiBuilder.doneSubtree(proc);
-		psiBuilder.startSubtree(Declaration.class, "NextDeclaration");
+		psiBuilder.startSubtree("NextDeclaration");
 		return (proc);
 	}
 
@@ -324,7 +330,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		Global.enterScope(this);
 			LabelList.accumLabelList(this);
 			if(type != null) {
@@ -436,7 +442,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Generate java source code for this Procedure.
 	private void doProcedureCoding() {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(Option.verbose) IO.println("Skip  doProcedureCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
@@ -448,7 +454,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			JavaSourceFileCoder.code("@SuppressWarnings(\"unchecked\")");
 			JavaSourceFileCoder.code("public final class " + getJavaIdentifier() + " extends RTS_PROCEDURE {");
 			JavaSourceFileCoder.debug("// ProcedureDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
-						+ ", firstLine=" + lineNumber() + ", lastLine=" + lastLineNumber + ", hasLocalClasses="
+						+ ", firstLine=" + firstLineNumber() + ", lastLine=" + lastLineNumber() + ", hasLocalClasses="
 						+ ((hasLocalClasses) ? "true" : "false") + ", System=" + ((isQPSystemBlock()) ? "true" : "false"));
 			if (isQPSystemBlock())
 				JavaSourceFileCoder.code("public boolean isQPSystemBlock() { return(true); }");
@@ -992,7 +998,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		
 	@Override
 	public void buildDeclaration(ClassBuilder classBuilder, BlockDeclaration encloser) {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		try {
 			this.createJavaClassFile();
 		} catch (IOException e) {
@@ -1002,7 +1008,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 
 	@Override
 	public void buildInitAttribute(CodeBuilder codeBuilder) {
-		Global.sourceLineNumber = lineNumber();
+		Global.sourceLineNumber = firstLineNumber();
 		// NOTHING
 	}
 
@@ -1016,7 +1022,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		labelContextStack.push(labelContext);
 		labelContext = this;
 		for (Statement stm : statements) {
-			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.lineNumber());
+			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.firstLineNumber());
 			stm.buildByteCode(codeBuilder);
 		}
 		labelContext = labelContextStack.pop();
@@ -1075,16 +1081,44 @@ public class ProcedureDeclaration extends BlockDeclaration {
 
 	@Override
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-		String ID = "PROCEDURE " + identifier;
-		if(type != null) ID = ""+type + ' ' + ID;
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(ID));
-        IO.println("BlockStatement.addSyntaxNodes: newNode="+newNode);
+		String ID = Html.edKeyWord(KeyWord.PROCEDURE) + " " + identifier;
+//		String ID = Html.styledText(Html.styleKeyWord, "PROCEDURE") + " " + identifier;
+//		if(type != null) ID = ""+type + ' ' + ID;
+		if(type != null) ID = type.edHtml() + ' ' + ID;
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new TreeNodeIdent(this, edPsi(ID)));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         Parameter.addParameterList(tree, model, newNode, parameterList);
         addLabelList(tree, model, newNode);
         addDeclarationList(tree, model, newNode);
 		addStatementList(tree, model, newNode);			
     }
+
+	@Override
+	public JPanel getPanel() {
+		String[] table = {
+				"  declarationKind:",	""+declarationKind+":"+ObjectKind.edit(declarationKind),
+				"  declarationClass:",	""+this.getClass().getSimpleName(),
+				"  lines:",				""+this.firstLineNumber() + " ==> " + this.lastLineNumber(),
+				// *** Declaration
+				"  identifier:",		""+identifier,
+				"  externalIdent:",	    ""+externalIdent,
+				"  type:",			    ""+type,
+				"  declaredIn:",		""+declaredIn.identifier,
+				// *** DeclarationScope
+				"  sourceFileName:",	""+sourceFileName,
+				"  hasLocalClasses:  ",	""+hasLocalClasses,
+				// *** BlockDeclaration
+				"  isMainModule:",		""+isMainModule
+		};
+		JPanel panel = new JPanel(new GridLayout(table.length/2, 2));
+		Font monoFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
+		for(String s:table) {
+			JLabel lab = new JLabel(s);
+			lab.setFont(monoFont);
+			panel.add(lab);
+		}
+		return panel;
+	}
 
 	@Override
 	public String toString() {
@@ -1113,7 +1147,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 		
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 
 		// *** Declaration
 		oupt.writeString(externalIdent);

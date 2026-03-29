@@ -95,7 +95,7 @@ public final class LocalObject extends Expression {
 	@Override
 	public void doChecking() { 
 		if (IS_SEMANTICS_CHECKED())	return;
-		Global.sourceLineNumber=lineNumber();
+		Global.sourceLineNumber=firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN LocalObject(" + toString()+").doChecking - Current Scope Chain: "+Global.getCurrentScope().edScopeChain());
 		Meaning meaning=Global.getCurrentScope().findMeaning(classIdentifier);
@@ -200,7 +200,7 @@ public final class LocalObject extends Expression {
 		oupt.writeKind(ObjectKind.LocalObject);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(lineNumber());
+//		oupt.writeShort(firstLineNumber());
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);

@@ -41,6 +41,7 @@ import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.MaybeBlockDeclaration;
+import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.Global;
@@ -91,8 +92,6 @@ public class EditorMenues extends JMenuBar {
     /** Menu */ private JMenu runMenu=new JMenu("Run");
     /** Menu item */ private JMenuItem run = new JMenuItem("Run");
     /** Menu item */ private JMenuItem debug = new JMenuItem("Debug");
-    /** Menu item */ private JMenuItem build = new JMenuItem("Build PSI Tree");
-    /** Menu item */ private JMenuItem syntax = new JMenuItem("Build Syntax Tree");
     
     /** Menu */ private JMenu settings=new JMenu("Settings");
 	/** CheckBox */ private JCheckBox autoRefresh=new JCheckBox("AutoRefresh");
@@ -108,6 +107,10 @@ public class EditorMenues extends JMenuBar {
     /** Menu item */ private JMenuItem compilerMode = new JMenuItem("Compiler Mode");
     /** Menu item */ private JMenuItem compilerOption = new JMenuItem("Compiler Options");
     /** Menu item */ private JMenuItem runtimeOption = new JMenuItem("Runtime Options");
+
+    /** Menu */ private JMenu toolsMenu=new JMenu("Tools");
+    /** Menu item */ private JMenuItem psiTree = new JMenuItem("Show PSI Tree");
+    /** Menu item */ private JMenuItem syntaxTree = new JMenuItem("Show Syntax Tree");
 
     /** Menu */ private JMenu helpMenu=new JMenu("Help");
     /** Menu item */ private JMenuItem about = new JMenuItem("About Simula");
@@ -130,8 +133,6 @@ public class EditorMenues extends JMenuBar {
 	///** Popup Menu item */ private JMenuItem redo2=new JMenuItem("Redo");
     /** Popup Menu item */ private JMenuItem run2 = new JMenuItem("Run");
     /** Popup Menu item */ private JMenuItem debug2 = new JMenuItem("Debug");
-    /** Popup Menu item */ private JMenuItem build2 = new JMenuItem("Build Psi Tree");
-    /** Popup Menu item */ private JMenuItem syntax2 = new JMenuItem("Build Syntax Tree");
 	/** Popup Menu item */ private JCheckBox autoRefresh2=new JCheckBox("AutoRefresh");
     /** Popup Menu item */ private JMenuItem setWorkSpace2 = new JMenuItem("Select WorkSpace");
     /** Popup Menu item */ private JMenuItem setJavaDir2 = new JMenuItem("Select Java Dir.");
@@ -174,8 +175,6 @@ public class EditorMenues extends JMenuBar {
 		this.add(editMenu);
 		runMenu.add(run); run.setEnabled(false); run.addActionListener(actionListener);
 		runMenu.add(debug); debug.setEnabled(false); debug.addActionListener(actionListener);
-		runMenu.add(build); build.setEnabled(false); build.addActionListener(actionListener);
-		runMenu.add(syntax); syntax.setEnabled(false); syntax.addActionListener(actionListener);
 		this.add(runMenu);
 		settings.add(autoRefresh); autoRefresh.setEnabled(false); autoRefresh.addActionListener(actionListener);
         settings.add(editorUIScale); editorUIScale.addActionListener(actionListener);
@@ -190,6 +189,9 @@ public class EditorMenues extends JMenuBar {
 		this.add(settings);
 		helpMenu.add(about); about.addActionListener(actionListener);
 		helpMenu.add(more); more.addActionListener(actionListener);
+		this.add(toolsMenu);
+		toolsMenu.add(psiTree); psiTree.setEnabled(false); psiTree.addActionListener(actionListener);
+		toolsMenu.add(syntaxTree); syntaxTree.setEnabled(false); syntaxTree.addActionListener(actionListener);
 		this.add(helpMenu);
 		
 	    addPopupMenuItems();
@@ -213,7 +215,7 @@ public class EditorMenues extends JMenuBar {
 		undo.setAccelerator(KeyStroke.getKeyStroke('Z', InputEvent.CTRL_DOWN_MASK));
 		//redo.setAccelerator(KeyStroke.getKeyStroke('Y', InputEvent.CTRL_DOWN_MASK));
 	    run.setAccelerator(KeyStroke.getKeyStroke('B', InputEvent.CTRL_DOWN_MASK));
-	    build.setAccelerator(KeyStroke.getKeyStroke('T', InputEvent.CTRL_DOWN_MASK));
+	    psiTree.setAccelerator(KeyStroke.getKeyStroke('T', InputEvent.CTRL_DOWN_MASK));
 	    about.setAccelerator(KeyStroke.getKeyStroke('H', InputEvent.CTRL_DOWN_MASK));
 		newFile2.setAccelerator(KeyStroke.getKeyStroke('N', InputEvent.CTRL_DOWN_MASK));
 	    openFile2.setAccelerator(KeyStroke.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK));
@@ -227,7 +229,6 @@ public class EditorMenues extends JMenuBar {
 		undo2.setAccelerator(KeyStroke.getKeyStroke('Z', InputEvent.CTRL_DOWN_MASK));
 		//redo2.setAccelerator(KeyStroke.getKeyStroke('Y', InputEvent.CTRL_DOWN_MASK));
 	    run2.setAccelerator(KeyStroke.getKeyStroke('B', InputEvent.CTRL_DOWN_MASK));
-	    build2.setAccelerator(KeyStroke.getKeyStroke('T', InputEvent.CTRL_DOWN_MASK));
 	    about2.setAccelerator(KeyStroke.getKeyStroke('H', InputEvent.CTRL_DOWN_MASK));
 	}
 	
@@ -242,8 +243,6 @@ public class EditorMenues extends JMenuBar {
         popupMenu.addSeparator();
         popupMenu.add(run2); run2.setEnabled(false); run2.addActionListener(actionListener);
         popupMenu.add(debug2); debug2.setEnabled(false); debug2.addActionListener(actionListener);
-        popupMenu.add(build2); build2.setEnabled(false); build2.addActionListener(actionListener);
-        popupMenu.add(syntax2); syntax2.setEnabled(false); syntax2.addActionListener(actionListener);
         popupMenu.addSeparator();
         popupMenu.add(saveFile2); saveFile2.setEnabled(false); saveFile2.addActionListener(actionListener);
         popupMenu.add(saveAs2); saveAs2.setEnabled(false); saveAs2.addActionListener(actionListener);
@@ -284,7 +283,7 @@ public class EditorMenues extends JMenuBar {
 	// ****************************************************************
 	/// Update menu items.
 	void updateMenuItems() {
-		SourceTextPanel current=SimulaEditor.current;
+		SourceTextPanel current=SimulaEditor.currentTextPanel;
 		boolean source=false;
 		boolean text=false;
 		boolean mayRun=false;
@@ -314,12 +313,12 @@ public class EditorMenues extends JMenuBar {
 		refresh.setEnabled(text);         refresh2.setEnabled(text);
 		run.setEnabled(mayRun);           run2.setEnabled(mayRun);
 		debug.setEnabled(mayRun);         debug2.setEnabled(mayRun);
-		build.setEnabled(mayBuild);       build2.setEnabled(mayBuild);
-		syntax.setEnabled(mayBuild);      syntax2.setEnabled(mayBuild);
 		autoRefresh.setSelected(auto);    autoRefresh2.setSelected(auto);
 		autoRefresh.setEnabled(source);   autoRefresh2.setEnabled(source);
 		undo.setEnabled(canUndo);         undo2.setEnabled(canUndo);
 //		redo.setEnabled(canRedo);         redo2.setEnabled(canRedo);
+		psiTree.setEnabled(mayBuild);
+		syntaxTree.setEnabled(mayBuild);
 		SimulaEditor.autoRefresher.reset();
 	}	
 	
@@ -330,7 +329,7 @@ public class EditorMenues extends JMenuBar {
 	ActionListener actionListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			Object item=e.getSource();
-			SourceTextPanel current=SimulaEditor.current;
+			SourceTextPanel current=SimulaEditor.currentTextPanel;
 			if(item==newFile || item==newFile2) SimulaEditor.doNewTabbedPanel(null,SimulaEditor.Language.Simula);
 			else if(item==openFile || item==openFile2) doOpenFileAction();
 			else if(item==saveFile || item==saveFile2) doSaveCurrentFile(false);
@@ -343,8 +342,6 @@ public class EditorMenues extends JMenuBar {
 			else if(item==refresh || item==refresh2) current.doRefresh();
 			else if(item==run   || item==run2) doRunAction();
 			else if(item==debug || item==debug2) doDebugAction();
-			else if(item==build   || item==build2) doBuildPsiTreeAction();
-			else if(item==syntax   || item==syntax2) doBuildSyntaxTreeAction();
 			else if(item==autoRefresh) current.AUTO_REFRESH=autoRefresh.isSelected();
 			else if(item==autoRefresh2) current.AUTO_REFRESH=autoRefresh2.isSelected();
 			else if(item==setWorkSpace || item==setWorkSpace2) selectWorkspaceAction();
@@ -356,6 +353,8 @@ public class EditorMenues extends JMenuBar {
 			else if(item==compilerMode || item==compilerMode2) Option.setCompilerMode();
 			else if(item==compilerOption || item==compilerOption2) Option.selectCompilerOptions();
 			else if(item==runtimeOption  || item==runtimeOption2) RTOption.selectRuntimeOptions();			
+			else if(item==psiTree) doShowPsiTreeAction();
+			else if(item==syntaxTree) doShowSyntaxTreeAction();
 			else if(item==about || item==about2) doAboutAction();
 			else if(item==more || item==more2) doMoreAction();
 		}
@@ -404,8 +403,8 @@ public class EditorMenues extends JMenuBar {
 	/// Do save current source file.
 	/// @param saveAs true if a file chooser is wanted
 	void doSaveCurrentFile(boolean saveAs) {
-		SourceTextPanel current=SimulaEditor.current;
-		if(saveAs || current.sourceFile==null) {
+		SourceTextPanel current=SimulaEditor.currentTextPanel;
+		if(saveAs || current.moduleManager.sourceFile==null) {
 	        JFileChooser fileChooser = new JFileChooser(Global.currentWorkspace);
 	        if (fileChooser.showSaveDialog(SimulaEditor.tabbedPane)!=JFileChooser.APPROVE_OPTION) return; // Do Nothing
 	        File file=fileChooser.getSelectedFile();
@@ -414,12 +413,12 @@ public class EditorMenues extends JMenuBar {
 	        if(!file.getName().toLowerCase().endsWith(".sim")) {
 	        	if(noSimTypeDialog(file)!=JOptionPane.OK_OPTION) return; // Do Nothing
 	        }
-	        current.sourceFile=file;
+	        current.moduleManager.sourceFile=file;
 	        SimulaEditor.setSelectedTabTitle(file.getName());
 	        current.fileChanged=true;
 		}
     	if(current.fileChanged)	try {
-    		Writer writer=new OutputStreamWriter(new FileOutputStream(current.sourceFile.getPath()),Global._CHARSET);
+    		Writer writer=new OutputStreamWriter(new FileOutputStream(current.moduleManager.sourceFile.getPath()),Global._CHARSET);
     		BufferedWriter out = new BufferedWriter(writer);
     		String text=current.editTextPane.getText();
     		out.write(text); out.close();
@@ -461,9 +460,9 @@ public class EditorMenues extends JMenuBar {
 	/// 
 	/// Also used by RunMeny.
 	void maybeSaveCurrentFile() {
-		SourceTextPanel current=SimulaEditor.current;
+		SourceTextPanel current=SimulaEditor.currentTextPanel;
 		if(current==null) return; if(!current.fileChanged) return;
-		if(saveDialog(current.sourceFile)==JOptionPane.YES_OPTION) doSaveCurrentFile(false);
+		if(saveDialog(current.moduleManager.sourceFile)==JOptionPane.YES_OPTION) doSaveCurrentFile(false);
 	}
 
 	/// Popup a warning: The file: 'name' Already exists - Do you want to overwrite it ?
@@ -496,7 +495,7 @@ public class EditorMenues extends JMenuBar {
 	// ****************************************************************
 	/// The undo action
 	private void undoAction() {
-		SourceTextPanel current=SimulaEditor.current;
+		SourceTextPanel current=SimulaEditor.currentTextPanel;
 		current.getUndoManager().undo();
 		current.fileChanged=true; current.refreshNeeded=true;
 		updateMenuItems();
@@ -536,16 +535,48 @@ public class EditorMenues extends JMenuBar {
 	// *** doStartRunning
 	// ****************************************************************
 	/// Utility: Start running current Simula program.
+//	private void OLD_doStartRunning() {
+//		maybeSaveCurrentFile();
+//       	File file=SimulaEditor.currentTextPanel.sourceFile;
+//		if(file==null) {
+//			file=new File(Global.getTempFileDir("simula/tmp/"),"unnamed.sim");
+//			file.getParentFile().mkdirs();
+//		} else if(file.getName().toLowerCase().endsWith(".jar")) {
+//			SimulaEditor.doRunJarFile(file);
+//			return;
+//		}
+//		try {
+//			Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+//				public void uncaughtException(Thread thread, Throwable e) {
+//					System.out.print("EditorMenues.UncaughtExceptionHandler: GOT Exception: " + e);
+//					e.printStackTrace();
+//			}});
+//			// Start compiler ....
+//			Util.ASSERT(SimulaEditor.currentTextPanel!=null,"EditorMenues.doRunAction: Invariant-1");
+//			String text=SimulaEditor.currentTextPanel.editTextPane.getText();
+//			StringReader reader=new StringReader(text);
+//			String name=(file!=null)?file.getPath():Global.tempJavaFileDir+"/unnamed.sim";
+//			if(file!=null) Option.internal.RUNTIME_USER_DIR=Global.currentWorkspace.toString();
+//			new Thread(new Runnable() {
+//				public void run() {
+//					try { new SimulaCompiler(name,reader).doCompile(); }
+//					catch (IOException e) { Util.IERR("Compiler Error: ", e); }
+//
+//				}}).start();
+//		} catch(Exception e) { Util.popUpError("Can't run: "+e);}
+//	}
 	private void doStartRunning() {
 		maybeSaveCurrentFile();
-       	File file=SimulaEditor.current.sourceFile;
-		if(file==null) {
-			file=new File(Global.getTempFileDir("simula/tmp/"),"unnamed.sim");
-			file.getParentFile().mkdirs();
-		} else if(file.getName().toLowerCase().endsWith(".jar")) {
-			SimulaEditor.doRunJarFile(file);
-			return;
-		}
+		SourceTextPanel current=SimulaEditor.currentTextPanel;			
+//		PsiTree psiTree = current.moduleManager.getPsiTree();
+		String sourceFileName = current.moduleManager.getName();
+		ProgramModule programModule = current.moduleManager.getProgramModule();
+		
+		IO.println("EditorMenues.doStartRunning: programModule: "+programModule);
+		IO.println("EditorMenues.doStartRunning: programModule'identifier: "+programModule.getIdentifier());
+		
+//		Util.STOP();
+		
 		try {
 			Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 				public void uncaughtException(Thread thread, Throwable e) {
@@ -553,85 +584,68 @@ public class EditorMenues extends JMenuBar {
 					e.printStackTrace();
 			}});
 			// Start compiler ....
-			Util.ASSERT(SimulaEditor.current!=null,"EditorMenues.doRunAction: Invariant-1");
-			String text=SimulaEditor.current.editTextPane.getText();
-			StringReader reader=new StringReader(text);
-			String name=(file!=null)?file.getPath():Global.tempJavaFileDir+"/unnamed.sim";
-			if(file!=null) Option.internal.RUNTIME_USER_DIR=Global.currentWorkspace.toString();
+			Util.ASSERT(SimulaEditor.currentTextPanel!=null,"EditorMenues.doRunAction: Invariant-1");
+//			String text=SimulaEditor.currentTextPanel.editTextPane.getText();
+//			StringReader reader=new StringReader(text);
+//			String name=(file!=null)?file.getPath():Global.tempJavaFileDir+"/unnamed.sim";
+//			if(file!=null) Option.internal.RUNTIME_USER_DIR=Global.currentWorkspace.toString();
 			new Thread(new Runnable() {
 				public void run() {
-					try { new SimulaCompiler(name,reader).doCompile(); }
+					try { new SimulaCompiler(sourceFileName).doCompile(programModule); }
 					catch (IOException e) { Util.IERR("Compiler Error: ", e); }
 
 				}}).start();
 		} catch(Exception e) { Util.popUpError("Can't run: "+e);}
-	}
-	
+	}	
 	// ****************************************************************
-	// *** doBuildPsiTreeAction
+	// *** doShowPsiTreeAction
 	// ****************************************************************
-	/// The build PSI Tree action
-	private void doBuildPsiTreeAction() {
+	/// The show PSI Tree action
+	private void doShowPsiTreeAction() {
 		SwingUtilities.invokeLater(() -> {
 			Option.internal.DEBUGGING=false;
-			SourceTextPanel current=SimulaEditor.current;
-			PsiBuilder psiBuilder = new PsiBuilder();
-			psiBuilder.start(current.getText());
-//			Global.programModule.doBuild(psiBuilder);
-			Global.programModule = new ProgramModule(psiBuilder);
-			PsiTree psiTree = psiBuilder.getRoot();
-			
-			if(! psiTree.getText().equals(current.getText())) {
-				String curTxt = (""+current.getText()).replace("\r", "\\r").replace("\n", "\\n");
-				String psiTxt = (psiTree.getText()).replace("\r", "\\r").replace("\n", "\\n");
-				IO.println("EditorMenues.doBuildPsiTreeAction: curTxt: "+curTxt);
-				IO.println("EditorMenues.doBuildPsiTreeAction: psiTxt: "+psiTxt);
-				Util.IERR("Resulting text differ from original text");
-				Util.STOP();
-			}
-			else IO.println("EditorMenues.doBuildPsiTreeAction: DONE - OK");
-			
+			SourceTextPanel current=SimulaEditor.currentTextPanel;			
+			PsiTree psiTree = current.moduleManager.getPsiTree();
 			psiTree.popUp();
 		});
 	}
 	
 	// ****************************************************************
-	// *** doBuildPsiTreeAction
+	// *** doShowSyntaxTreeAction
 	// ****************************************************************
-	/// The build PSI Tree action
-	private void doBuildSyntaxTreeAction() {
+	/// The show Syntax Tree action
+	private void doShowSyntaxTreeAction() {
 		SwingUtilities.invokeLater(() -> {
 			Option.internal.DEBUGGING=false;
-			SourceTextPanel current=SimulaEditor.current;
-			PsiBuilder psiBuilder = new PsiBuilder();
-			psiBuilder.start(current.getText());
-//			Global.programModule.doBuild(psiBuilder);
-			Global.programModule = new ProgramModule(psiBuilder);
-//			PsiTree psiTree = psiBuilder.getRoot();
-//			psiTree.popUp();
+			SourceTextPanel current=SimulaEditor.currentTextPanel;
+			ProgramModule programModule = current.moduleManager.getProgramModule();
 			
-			Global.programModule.printTree(1, this);
+			DeclarationScope mainModule = programModule.mainModule;
+			IO.println("EditorMenues.doShowSyntaxTreeAction: mainModule=" + mainModule.getClass());
+//			DeclarationScope
+//			IO.println("EditorMenues.doShowSyntaxTreeAction: mainModule.declaredIn=" + mainModule.declaredIn   .getClass());
 			
-			DeclarationScope mainModule = Global.programModule.mainModule;
-			IO.println("EditorMenues.doBuildSyntaxTreeAction: " + mainModule.getClass());
-			if(mainModule instanceof MaybeBlockDeclaration mainBlock) {
-				
-//				Declaration firstDcl = mainBlock.declarationList.getFirst();
-				Statement firstStm = mainBlock.statements.getFirst();
-				IO.println("EditorMenues.doBuildSyntaxTreeAction: firstStm: " + firstStm);
-				SyntaxTree syntaxTree = new SyntaxTree(firstStm);
-				syntaxTree.popUp();
-//				Util.STOP();
-			} else if(mainModule instanceof BlockDeclaration mainBlock) {
-				SyntaxTree syntaxTree = new SyntaxTree(mainBlock);
-				syntaxTree.popUp();
-//				Util.STOP();
-				
-			}
+			
+//			if(mainModule instanceof MaybeBlockDeclaration mainBlock) {
+////				Declaration firstDcl = mainBlock.declarationList.getFirst();
+//				Statement firstStm = mainBlock.statements.getFirst();
+//				IO.println("EditorMenues.doShowSyntaxTreeAction: firstStm: " + firstStm);
+//				SyntaxTree syntaxTree = new SyntaxTree(firstStm);
+//				syntaxTree.popUp("MainModule: " + firstStm);
+////				Util.STOP();
+//			} else if(mainModule instanceof BlockDeclaration mainBlock) {
+//				SyntaxTree syntaxTree = new SyntaxTree(mainBlock);
+//				syntaxTree.popUp("MainBlock: ");
+////				Util.STOP();
+//			}
 			
 //			SyntaxTree syntaxTree = new SyntaxTree(Global.programModule.mainModule);
-////			SyntaxTree syntaxTree = new SyntaxTree(first);
-//			syntaxTree.popUp();
+			
+			
+			
+//			SyntaxTree syntaxTree = new SyntaxTree(mainModule);
+			SyntaxTree syntaxTree = new SyntaxTree(StandardClass.BASICIO);
+			syntaxTree.popUp("MainModule");
 //			Thread.dumpStack();
 ////			Util.STOP();
 		});

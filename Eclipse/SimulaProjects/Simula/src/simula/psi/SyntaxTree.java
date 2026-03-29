@@ -1,11 +1,17 @@
 package simula.psi;
 
 import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.utilities.Global;
@@ -18,10 +24,10 @@ public class SyntaxTree {
 		this.rootClass = rootClass;
 	}
 
-	public void popUp() {
-		JTree tree = this.getJTree();
+	public void popUp(String title) {
+		JTree tree = this.doRenderSyntaxTreeAction();
 //		SwingUtilities.invokeLater(() -> {
-			JFrame frame = new JFrame("Program Syntax Tree");
+			JFrame frame = new JFrame("Syntax Tree: " + title);
 //			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	        try { frame.setIconImage(Global.favicon.getImage()); } 
@@ -36,39 +42,26 @@ public class SyntaxTree {
 //		});
 	}
 
-	public JTree getJTree() {
-		IO.println("SyntaxTree.getJTree: " + this);
+	private JTree doRenderSyntaxTreeAction() {
+		IO.println("SyntaxTree.doRenderSyntaxTreeAction: " + this);
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
         DefaultTreeModel model = new DefaultTreeModel(root);
         JTree tree = new JTree(model);
-        
-//		JTree tree = new JTree(rootNode);
-//		tree.setRootVisible(false);      // Hides the root node
 		tree.setShowsRootHandles(true);   // Shows expansion icons for the new "top" level
-
-        
-//        tree.addMouseListener(new MouseAdapter() {
-//            public void mousePressed(MouseEvent e) {
+        tree.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
 //        		IO.println("PsiTree'mousePressed: " + e);
-//                int selRow = tree.getRowForLocation(e.getX(), e.getY());
-//                TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-//                if(selRow != -1) {
-//                    if(e.getClickCount() == 1) {
-//                        gotSingleClick(selRow, selPath);
-//                    }
-//                    else if(e.getClickCount() == 2) {
-//                        gotDoubleClick(selRow, selPath);
-//                    }
-//                }
-//            }});
+                int selRow = tree.getRowForLocation(e.getX(), e.getY());
+                TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
+                if(selRow != -1) {
+                    if(e.getClickCount() > 0) gotClick(selRow, selPath);
+                }
+        }});
         
         DefaultMutableTreeNode parent = (DefaultMutableTreeNode) model.getRoot();
-        
-//        for(PsiElement elt:this.getChildren()) {
-//        	addNodes(1, tree, model, parent, elt);
-//        }
         rootClass.addSyntaxNodes(tree, model, parent);
-	    
+        model.reload(root); 
+//	    tree.repaint();
         return tree;
 	}
 
@@ -105,5 +98,61 @@ public class SyntaxTree {
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(identifier);
         model.insertNodeInto(newNode, parent, parent.getChildCount());
     }
+
+	private void gotClick(int selRow, TreePath selPath) {
+		DefaultMutableTreeNode last = (DefaultMutableTreeNode) selPath.getLastPathComponent();
+		IO.println("PsiTree.doRenderPsiTreeAction: gotSingleClick: userObject=" + last.getUserObject().getClass().getSimpleName());
+//		TreeNodeIdent treeNodeIdent = (TreeNodeIdent) last.getUserObject();
+		if(last.getUserObject() instanceof TreeNodeIdent treeNodeIdent) {
+	   		IO.println("PsiTree.doRenderPsiTreeAction: gotSingleClick: GOT TreeNodeIdent:  " + treeNodeIdent);
+			if(treeNodeIdent.object instanceof SyntaxClass syntaxClass) {
+				IO.println("PsiTree.doRenderPsiTreeAction: gotSingleClick: GOT SYNTAX CLASS: " + syntaxClass.getClass().getSimpleName() + " " + syntaxClass);
+				if(syntaxClass != null) {
+					popUpSyntaxPanel(syntaxClass);//(psiTree.toString());
+				}
+			}
+		}
+	}
+
+	public void popUpSyntaxPanel(SyntaxClass elt) {
+//		JTree tree = this.doRenderPsiTreeAction();
+		JPanel panel = getPanel(elt);
+//		JPanel panel = elt.getPanel();
+//		SwingUtilities.invokeLater(() -> {
+			JFrame frame = new JFrame("Syntax Info");
+			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	        try { frame.setIconImage(Global.favicon.getImage()); } 
+	        catch (Exception e) {}// Util.IERR("Impossible",e); }
+
+			JScrollPane scrollPane = new JScrollPane(panel);
+			frame.add(scrollPane, BorderLayout.CENTER);
+
+//			frame.setSize(500, 600);
+			frame.pack();
+			frame.setLocationRelativeTo(null);
+			frame.setVisible(true);
+//		});
+	}
+	
+	private JPanel getPanel(SyntaxClass elt) {
+		JPanel panel = new JPanel(new BorderLayout());
+//		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS)); // Vertical stacking
+		panel.add(elt.getPanel(), BorderLayout.CENTER);
+		PsiTree psiTree = elt.getPsiTree();
+		if(psiTree != null) {
+//			panel.add(new JLabel("SyntaxClass: " + psiTree.syntaxClass.getClass().getSimpleName() + " " + psiTree.syntaxClass));
+//			panel.add(new JLabel("SyntaxClass.psiTree: " + psiTree.syntaxClass.psiTree));
+			JButton button = new JButton("Open Psi Tree");
+	        panel.add(button, BorderLayout.SOUTH);
+	        
+	        button.addActionListener(e -> {
+	            System.out.println("Button was clicked!  elt: " + elt + e);
+    			IO.println("PsiTree.doRenderPsiTreeAction: gotSingleClick: GOT SYNTAX CLASS: " + psiTree.syntaxClass.getClass().getSimpleName() + " " + psiTree.syntaxClass);
+				psiTree.syntaxClass.printTree(1, "GOT SYNTAX CLASS: ");
+    			psiTree.popUp();
+	        });
+		}
+        return panel;
+	}
 
 }
