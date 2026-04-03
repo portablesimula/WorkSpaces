@@ -23,6 +23,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
 
 /// Arithmetic expressions
@@ -93,7 +94,7 @@ import simula.psi.SyntaxTree;
 ///   It is always evaluated in long real and the result is converted to the appropriate type. 
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/ArithmeticExpression.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/ArithmeticExpression.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Simula Standard
@@ -113,16 +114,17 @@ public final class ArithmeticExpression extends Expression {
 	/// @param lhs left hand side
 	/// @param opr arithmetic operation
 	/// @param rhs right hand side
-	private ArithmeticExpression(final Expression lhs, final int opr, final Expression rhs) {
+	private ArithmeticExpression(final PsiBuilder psiBuilder, final Expression lhs, final int opr, final Expression rhs) {
+		super(psiBuilder.psiTree);
 		this.opr = opr;
 		if (lhs == null) {
 			Util.error("Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new VariableExpression("UNKNOWN_");
+			this.lhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
 		} else
 			this.lhs = lhs;
 		if (rhs == null) {
 			Util.error("Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new VariableExpression("UNKNOWN_");
+			this.rhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
 		} else
 			this.rhs = rhs;
 		this.lhs.backLink = this.rhs.backLink = this;
@@ -133,19 +135,19 @@ public final class ArithmeticExpression extends Expression {
 	/// @param opr the arithmetic operation
 	/// @param rhs the right hand side
 	/// @return the newly created ArithmeticExpression
-	static Expression create(final Expression lhs, final int opr, final Expression rhs) {
+	static Expression create(final PsiBuilder psiBuilder, final Expression lhs, final int opr, final Expression rhs) {
 		try { // Try to Compile-time Evaluate this expression
 			Number lhn = lhs.getNumber();
 			if (lhn != null) {
 				Number rhn = rhs.getNumber();
 				if (rhn != null)
-					return (Constant.evaluate(lhn, opr, rhn));
+					return (Constant.evaluate(psiBuilder.psiTree, lhn, opr, rhn));
 			}
 		} catch (Exception e) {
 			Util.error("Arithmetic overflow: " + lhs + ' ' + KeyWord.edit(opr) + ' ' + rhs + "   " + e);
 			e.printStackTrace();
 		}
-		return (new ArithmeticExpression(lhs, opr, rhs));
+		return (new ArithmeticExpression(psiBuilder, lhs, opr, rhs));
 	}
 
 	@Override
@@ -155,7 +157,7 @@ public final class ArithmeticExpression extends Expression {
 		if (lhn != null) {
 			Number rhn = rhs.getNumber();
 			if (rhn != null)
-				return (Constant.evaluate(lhn, opr, rhn));
+				return (Constant.evaluate(lhs.psiTree, lhn, opr, rhn));
 		}
 		return (this);
 	}
@@ -344,7 +346,9 @@ public final class ArithmeticExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ArithmeticExpression() {}
+	private ArithmeticExpression() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -352,7 +356,7 @@ public final class ArithmeticExpression extends Expression {
 		oupt.writeKind(ObjectKind.ArithmeticExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -370,7 +374,7 @@ public final class ArithmeticExpression extends Expression {
 		ArithmeticExpression expr = new ArithmeticExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-//		expr.OLD_lineNumber = inpt.readShort();
+		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

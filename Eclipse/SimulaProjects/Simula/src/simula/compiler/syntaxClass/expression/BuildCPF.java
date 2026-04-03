@@ -20,7 +20,7 @@ import simula.compiler.utilities.Util;
 /// Coding Utilities: Build Call Procedure Formal (CPF).
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/BuildCPF.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/BuildCPF.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -86,7 +86,8 @@ public abstract class BuildCPF {
 					Declaration decl=var.meaning.declaredAs;
 					if(decl instanceof StandardProcedure) {
 						if(Util.equals(decl.identifier, "sourceline")) {
-							actualParameter=new Constant(Type.Integer,actualParameter.firstLineNumber());
+//							actualParameter=new Constant(Type.Integer,actualParameter.firstLineNumber());
+							actualParameter=new Constant(null, Type.Integer, decl.firstLineNumber());
 							actualParameter.doChecking();
 						}
 					}

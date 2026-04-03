@@ -22,7 +22,7 @@ import simula.compiler.utilities.Util;
 /// Runtime Options
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/editor/RTOption.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/editor/RTOption.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class RTOption {

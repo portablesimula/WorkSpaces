@@ -38,7 +38,7 @@ import simula.psi.SyntaxTree;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/WhileStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/WhileStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -53,6 +53,7 @@ public final class WhileStatement extends Statement {
 	/// Create a new WhileStatement.
 	/// @param line the source line number
 	WhileStatement(final PsiBuilder psiBuilder) {
+		super(psiBuilder.psiTree);
 		psiBuilder.startSubtree("WhileStatement");
 		psiBuilder.consume(KeyWord.WHILE); //  (add it to 'current tree')
 
@@ -133,7 +134,9 @@ public final class WhileStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private WhileStatement() {}
+	private WhileStatement() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -141,7 +144,7 @@ public final class WhileStatement extends Statement {
 		oupt.writeKind(ObjectKind.WhileStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** WhileStatement
 		oupt.writeObj(condition);
 		oupt.writeObj(doStatement);
@@ -155,7 +158,7 @@ public final class WhileStatement extends Statement {
 		WhileStatement stm = new WhileStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-//		stm.OLD_lineNumber = inpt.readShort();
+		stm.psiTree = readPsiTree(inpt);
 		// *** WhileStatement
 		stm.condition  = (Expression) inpt.readObj();
 		stm.doStatement = (Statement) inpt.readObj();

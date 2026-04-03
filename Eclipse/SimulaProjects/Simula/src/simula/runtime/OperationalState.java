@@ -8,7 +8,7 @@ package simula.runtime;
 /// Simula object Operational States
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/runtime/OperationalState.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/runtime/OperationalState.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public enum OperationalState {

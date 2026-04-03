@@ -11,7 +11,7 @@ package simula.runtime;
 /// This class is the common superclass for real type arrays. 
 /// It is introduced to implement overloading of real type parameter arrays.
 /// 
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/runtime/RTS_REALTYPE_ARRAY.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/runtime/RTS_REALTYPE_ARRAY.java"><b>Source File</b></a>.
 /// @author Øystein Myhre Andersen
 public abstract class RTS_REALTYPE_ARRAY extends RTS_ARRAY {
 

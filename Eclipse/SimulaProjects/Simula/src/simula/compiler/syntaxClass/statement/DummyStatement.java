@@ -19,6 +19,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
+import simula.psi.PsiTree;
 
 /// Dummy Statement.
 /// 
@@ -30,7 +31,7 @@ import simula.psi.PsiBuilder;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/DummyStatement.java"><b>Source File
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/DummyStatement.java"><b>Source File
 /// </b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -43,19 +44,21 @@ public final class DummyStatement extends Statement {
 //		super(line);
 //		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": DummyStatement: "+this);
 //	}
-	private DummyStatement() {}
+	private DummyStatement(final PsiTree psiTree) {
+		super(psiTree);
+	}
 
 	public static DummyStatement ofExplicit(final PsiBuilder psiBuilder) {
 		 psiBuilder.startSubtree("DummyStatement");
 		 psiBuilder.consume(KeyWord.SEMICOLON); //  (add it to 'current tree')
-		 DummyStatement dummyStatement = new DummyStatement();		
+		 DummyStatement dummyStatement = new DummyStatement(psiBuilder.psiTree);		
 		 psiBuilder.doneSubtree(dummyStatement);
 		 return dummyStatement;
 	}
 
 	public static DummyStatement ofImplicit(final PsiBuilder psiBuilder) {
 		 psiBuilder.startSubtree("DummyStatement");
-		 DummyStatement dummyStatement = new DummyStatement();		
+		 DummyStatement dummyStatement = new DummyStatement(psiBuilder.psiTree);		
 		 psiBuilder.doneSubtree(dummyStatement);
 		 return dummyStatement;
 	}
@@ -108,7 +111,7 @@ public final class DummyStatement extends Statement {
 		oupt.writeKind(ObjectKind.DummyStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 	}
 
 	/// Read and return a DummyStatement object.
@@ -116,10 +119,10 @@ public final class DummyStatement extends Statement {
 	/// @return the DummyStatement object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static DummyStatement readObject(AttributeInputStream inpt) throws IOException {
-		DummyStatement stm = new DummyStatement();
+		DummyStatement stm = new DummyStatement(null);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-//		stm.OLD_lineNumber = inpt.readShort();
+		stm.psiTree = readPsiTree(inpt);
 		Util.TRACE_INPUT("DummyStatement: " + stm);
 		return(stm);
 	}

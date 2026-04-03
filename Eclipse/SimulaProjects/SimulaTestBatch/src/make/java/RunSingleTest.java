@@ -8,17 +8,14 @@
 package make.java;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Vector;
 
-import simula.compiler.Simula;
+import simula.compiler.ModuleManager;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.RTOption;
 
 /**
  * Simula Test Batch donated by Simula as.
@@ -29,15 +26,15 @@ import simula.editor.RTOption;
  *
  */
 public final class RunSingleTest {
-	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/Simula");
-	private static final File userDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/SimulaTestBatch");
+	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula");
+	private static final File userDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/SimulaTestBatch");
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 
 	public static void main(String[] args) {
 		
 		// Set options.
 		Option.compilerMode = Option.CompilerMode.viaJavaSource;
-//		Option.verbose=true;
+		Option.verbose=true;
 //		Option.EXTENSIONS=false;
 //		Option.CaseSensitive=true;
 //		Option.noExecution=true;
@@ -84,7 +81,7 @@ public final class RunSingleTest {
 		Global.packetName="simulaTestBatch";
 		Option.internal.keepJava=userDir; // Generated .java Source is then found in Eclipse Package simulaTestBatch
 		Global.simulaRtsLib=new File(simulaDir,"bin"); // To use Eclipse Project's simula.runtime
-//		Global.extLib="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/Simula/src/simulaTestBatch/sim/bin";
+//		Global.extLib="C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin";
 		
 		// Set RunTime Options and tracing.
 //		RTOption.VERBOSE = true;
@@ -97,7 +94,7 @@ public final class RunSingleTest {
 		
 		Vector<String> names=new Vector<String>();
 //		names.add("AdHoc_SimulaTest.sim"); // Simula TestBatch Framework
-		names.add("adHoc00.sim"); // For ad'hoc testing
+//		names.add("adHoc00.sim"); // For ad'hoc testing
 //		names.add("adHoc01.sim"); // For ad'hoc testing
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
@@ -111,7 +108,7 @@ public final class RunSingleTest {
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
 //		names.add("simtst03.sim"); // OK:  Test Text Value Relations
 //		names.add("simtst04.sim"); // OK:  To test putint and putreal.
-//		names.add("simtst05.sim"); // OK:  Test Aritmetisk Relations
+		names.add("simtst05.sim"); // OK:  Test Aritmetisk Relations
 //		names.add("simtst06.sim"); // OK:  Test Mathematical Functions
 //		names.add("simtst07.sim"); // OK:  Test Mathematical Library
 //		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
@@ -327,9 +324,12 @@ public final class RunSingleTest {
 		for(String name:names) {
 			String fileName = sourceDir+name;
 			try {
-				File file = new File(fileName);
-				InputStreamReader reader = new InputStreamReader(new FileInputStream(file), Global._CHARSET);
-				new SimulaCompiler(fileName, reader).doCompile();
+//				File file = new File(fileName);
+//				InputStreamReader reader = new InputStreamReader(new FileInputStream(file), Global._CHARSET);
+//				new SimulaCompiler(fileName, reader).doCompile();
+				File sourceFile = new File(fileName);
+		    	Global.moduleManager = new ModuleManager(sourceFile);
+				new SimulaCompiler(fileName).doCompile(Global.moduleManager.getProgramModule());
 			} catch (IOException e) {
 				Util.error("can't open " + fileName + ", reason: " + e);
 			}

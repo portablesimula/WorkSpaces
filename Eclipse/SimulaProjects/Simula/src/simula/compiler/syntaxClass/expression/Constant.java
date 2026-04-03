@@ -23,6 +23,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiTree;
 
 /// Constant.
 /// 
@@ -35,7 +36,7 @@ import simula.compiler.utilities.Util;
 ///   Constant = unsigned-number | string | character-constant | NONE | NOTEXT
 ///   
 /// </pre>
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/Constant.java">
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/Constant.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -48,7 +49,8 @@ public final class Constant extends Expression {
 	/// Create a new Constant.
 	/// @param type the constant's type
 	/// @param value the constant's value
-	public Constant(final Type type,final Object value) {
+	public Constant(final PsiTree psiTree, final Type type,final Object value) {
+		super(psiTree);
 		this.type=type;
 		this.value = value;
 	}
@@ -56,10 +58,22 @@ public final class Constant extends Expression {
 	/// Create a real type Constant.
 	/// @param value a real type value
 	/// @return the resulting Constant
-    static Constant createRealType(final Object value)
-    { Type type=Type.Real;
-      if(value instanceof Double) type=Type.LongReal;
-      return(new Constant(type,value));
+//    static Constant createRealType(final PsiTree psiTree, final Object value)
+//    { Type type=Type.Real;
+//      if(value instanceof Double) type=Type.LongReal;
+//      return(new Constant(psiTree, type,value));
+//    }
+    static Constant createRealType(final PsiTree psiTree, final float value) {
+    	Type type=Type.Real;
+    	return(new Constant(psiTree, type,value));
+    }
+	
+	/// Create a long real type Constant.
+	/// @param value a long real type value
+	/// @return the resulting Constant
+    static Constant createLongRealType(final PsiTree psiTree, final double value) {
+    	Type type = Type.LongReal;
+    	return(new Constant(psiTree, type,value));
     }
     
     /// Returns the type of this number.
@@ -76,7 +90,7 @@ public final class Constant extends Expression {
     /// @param opr an unary operation
     /// @param rhn a right hand Number
     /// @return the resulting Constant
-    static Constant evaluate(final int opr,final Number rhn) { 
+    static Constant evaluate(final PsiTree psiTree, final int opr,final Number rhn) { 
     	Type type=getType(rhn);
 		Number result=null;
 		switch(type.keyWord) {
@@ -100,7 +114,7 @@ public final class Constant extends Expression {
 			} }
 		}
 		if(result==null) Util.IERR();
-		return(new Constant(type,result));
+		return(new Constant(psiTree, type,result));
     }
   
     /// Simplify this Constant.
@@ -108,7 +122,7 @@ public final class Constant extends Expression {
     /// @param opr an binary operation
     /// @param rhn a right hand Number
     /// @return the resulting Constant
-    static Constant evaluate(final Number lhn,final int opr,final Number rhn) { 
+    static Constant evaluate(final PsiTree psiTree, final Number lhn,final int opr,final Number rhn) { 
     	Type type=Type.arithmeticTypeConversion(getType(lhn),getType(rhn));
 		if(opr==KeyWord.DIV && type.keyWord == Type.T_INTEGER) type=Type.Real;
 		Number result=null;
@@ -146,7 +160,7 @@ public final class Constant extends Expression {
 			} }
 		}
 		if(result==null) Util.IERR();
-		return(new Constant(type,result));
+		return(new Constant(psiTree, type,result));
     }
     
 	@Override
@@ -175,6 +189,8 @@ public final class Constant extends Expression {
 				return "new RTS_TXT(\""+val+"\")";
 			}
 			case Type.T_CHARACTER -> {
+				IO.println("Constant.toJavaCode: "+value.getClass().getSimpleName()+"  "+value);
+//				char charValue=((Character)value).charValue();
 				char charValue=((Character)value).charValue();
 				if(charValue=='\\') return("'\\\\'");
 				int intValue=(int)charValue;
@@ -317,7 +333,9 @@ public final class Constant extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private Constant() {}
+	private Constant() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -325,7 +343,7 @@ public final class Constant extends Expression {
 		oupt.writeKind(ObjectKind.Constant);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -341,7 +359,7 @@ public final class Constant extends Expression {
 		Constant cnst = new Constant();
 		cnst.OBJECT_SEQU = inpt.readSEQU(cnst);
 		// *** SyntaxClass
-//		cnst.OLD_lineNumber = inpt.readShort();
+		cnst.psiTree = readPsiTree(inpt);
 		// *** Expression
 		cnst.type = inpt.readType();
 		cnst.backLink = (SyntaxClass) inpt.readObj();

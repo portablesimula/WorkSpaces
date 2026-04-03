@@ -16,7 +16,7 @@ import simula.compiler.syntaxClass.Type;
 /// Predefined values for common constants, including descriptors for class types etc. 
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/RTS.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/RTS.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class RTS {

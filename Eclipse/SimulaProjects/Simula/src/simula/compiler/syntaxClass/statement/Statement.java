@@ -23,6 +23,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Statement.
 /// 
@@ -50,7 +51,7 @@ import simula.psi.PsiParse;
 /// </pre>
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/Statement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/Statement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -58,7 +59,9 @@ import simula.psi.PsiParse;
 public abstract class Statement extends SyntaxClass {
 	
 	/// Create a new Statement.
-	protected Statement() {}
+	protected Statement(final PsiTree psiTree) {
+		super(psiTree);
+	}
 
 	/// Parse a statement.
 	/// @return the statement
@@ -72,7 +75,7 @@ public abstract class Statement extends SyntaxClass {
 		while (PsiParse.accept(psiBuilder, KeyWord.COLON)) {
 			if (ident != null) {
 				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
-				LabelDeclaration label = new LabelDeclaration(ident);
+				LabelDeclaration label = new LabelDeclaration(psiBuilder, ident);
 				psiBuilder.doneSubtree(label);
 				psiBuilder.startSubtree("LabelDeclaration");
 				labels.add(label);
@@ -89,7 +92,7 @@ public abstract class Statement extends SyntaxClass {
 		}
 		Statement statement = acceptUnlabeledStatement(psiBuilder);
 		if (labels != null && statement != null) {
-			statement = new LabeledStatement(lineNumber, labels, statement);
+			statement = new LabeledStatement(psiBuilder, labels, statement);
 		}
 		return (statement);
 	}
@@ -105,7 +108,7 @@ public abstract class Statement extends SyntaxClass {
 			case KeyWord.BEGIN:
 				// case KeyWord.BEGIN: PsiParse.nextToken(); return (new MaybeBlockDeclaration(null).expectMaybeBlock(lineNumber));
 				if(Option.TRACE_ACCEPT_STATEMENT > 1) IO.println("\nStatement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
-				MaybeBlockDeclaration block = new MaybeBlockDeclaration(null);
+				MaybeBlockDeclaration block = new MaybeBlockDeclaration(psiBuilder.psiTree, null);
 				block.expectMaybeBlock(psiBuilder);
 				statement = new BlockStatement(psiBuilder, block);
 				break;
@@ -153,22 +156,13 @@ public abstract class Statement extends SyntaxClass {
 				
 				if(expr!=null) {
 					if(expr instanceof VariableExpression var) {
-//						if(Option.TRACE_ACCEPT_STATEMENT > 1)
+						if(Option.TRACE_ACCEPT_STATEMENT > 1)
 							IO.println("Statement.acceptUnlabeledStatement: GOT VariableExpression: "+var);
 							
 						if (PsiParse.accept(psiBuilder, KeyWord.BEGIN)) {
 //							Util.IERR("Statement.acceptUnlabeledStatement: PREFIXED BLOCK: NOT IMPL");
 							//return new BlockStatement(PrefixedBlockDeclaration.expectPrefixedBlock(var,false));
 							BlockStatement prfblk = new BlockStatement(psiBuilder, PrefixedBlockDeclaration.expectPrefixedBlock(psiBuilder, var,false));
-							
-							// TESTING
-							IO.println("Statement.acceptUnlabeledStatement: GOT Block Statement: "+prfblk);
-							PrefixedBlockDeclaration pbl = (PrefixedBlockDeclaration) prfblk.blockDeclaration;
-							IO.println("Statement.acceptUnlabeledStatement: GOT Prefixed Block: "+pbl);
-							IO.println("Statement.acceptUnlabeledStatement: pbl.declaredIn: "+pbl.declaredIn);
-							IO.println("Statement.acceptUnlabeledStatement: pbl.blockPrefix: "+pbl.blockPrefix);
-							IO.println("Statement.acceptUnlabeledStatement: pbl.blockPrefix.identifier: "+pbl.blockPrefix.identifier);
-							
 							return prfblk;
 	      				}
 	      			}

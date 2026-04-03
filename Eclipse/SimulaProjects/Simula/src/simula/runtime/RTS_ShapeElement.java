@@ -40,7 +40,7 @@ import java.awt.geom.RoundRectangle2D;
 ///       into(RENDERING_SET);
 /// end;
 /// </pre>
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/runtime/RTS_ShapeElement.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/runtime/RTS_ShapeElement.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public class RTS_ShapeElement extends RTS_Link implements RTS_Drawing.Animable {

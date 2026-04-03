@@ -22,12 +22,13 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
 
 /// Utility class to hold the single Connection do-part.
 ///
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ConnectionDoPart.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ConnectionDoPart.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -43,7 +44,8 @@ public class ConnectionDoPart extends SyntaxClass {
 	/// @param connectionStatement The owner.
 	/// @param connectionBlock The associated connection block
 	/// @param statement the statement after DO
-	ConnectionDoPart(final ConnectionStatement connectionStatement, final ConnectionBlock connectionBlock,final Statement statement) {
+	ConnectionDoPart(final PsiBuilder psiBuilder, final ConnectionStatement connectionStatement, final ConnectionBlock connectionBlock,final Statement statement) {
+		super(psiBuilder.psiTree);
 		this.connectionStatement = connectionStatement;
 		this.connectionBlock = connectionBlock; // this.statement=statement;
 		connectionBlock.setStatement(statement);
@@ -101,7 +103,9 @@ public class ConnectionDoPart extends SyntaxClass {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	protected ConnectionDoPart() {}
+	protected ConnectionDoPart() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -109,7 +113,7 @@ public class ConnectionDoPart extends SyntaxClass {
 		oupt.writeKind(ObjectKind.ConnectionDoPart);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** ConnectionDoPart
 		oupt.writeObj(connectionStatement);
 		oupt.writeObj(connectionBlock);
@@ -123,7 +127,7 @@ public class ConnectionDoPart extends SyntaxClass {
 		ConnectionDoPart dop = new ConnectionDoPart();
 		dop.OBJECT_SEQU = inpt.readSEQU(dop);
 		// *** SyntaxClass
-//		dop.OLD_lineNumber = inpt.readShort();
+		dop.psiTree = readPsiTree(inpt);
 		// *** ConnectionDoPart
 		dop.connectionStatement = (ConnectionStatement) inpt.readObj();
 		dop.connectionBlock = (ConnectionBlock) inpt.readObj();

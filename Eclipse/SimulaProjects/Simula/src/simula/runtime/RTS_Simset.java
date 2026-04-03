@@ -32,7 +32,7 @@ package simula.runtime;
 /// "linkage". Objects which may be set members belong to subclasses of "link"
 /// which is itself another subclass of "linkage".
 /// 
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/runtime/RTS_Simset.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/runtime/RTS_Simset.java"><b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen

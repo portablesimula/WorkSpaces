@@ -20,7 +20,7 @@ import simula.compiler.utilities.Util;
 /// Standard Procedure.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/StandardProcedure.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/StandardProcedure.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -40,7 +40,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 	/// @param type the procedure's type
 	/// @param ident the procedure identifier
 	StandardProcedure(DeclarationScope declaredIn,int kind,Type type, String ident) {
-		super(ident,kind); this.declaredIn = declaredIn; this.type = type; }
+		super(null, ident,kind); this.declaredIn = declaredIn; this.type = type; }
 
 	/// Create a new StandardProcedure with parameters.
 	/// @param declaredIn the enclosing scope
@@ -138,7 +138,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 				}
 				default -> Util.IERR(""+c);
 			}
-			Parameter par = new Parameter("_p"+(pos-1), pType, Parameter.Kind.Simple);
+			Parameter par = new Parameter(null, "_p"+(pos-1), pType, Parameter.Kind.Simple);
 			pList.add(par);
 		}
 		char c = mtd.charAt(pos++);
@@ -158,7 +158,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 			default -> Util.IERR(""+c);
 		}
 		
-		return(new ProcedureSpecification(identifier, type, pList)); 
+		return(new ProcedureSpecification(null, identifier, type, pList)); 
 	}
 	
 	/// Get MethodTypeDesc
@@ -211,7 +211,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 		String id=identifier;
 		if(id.equalsIgnoreCase("detach") | id.equalsIgnoreCase("call") | id.equalsIgnoreCase("resume")) {
 			// Push extra parameter 'sourceLineNumber'
-			Parameter lno=new Parameter(id,Type.Integer,Parameter.Kind.Simple);
+			Parameter lno=new Parameter(null, id,Type.Integer,Parameter.Kind.Simple);
 			sb.append(lno.type.toJVMType());
 		}
 		sb.append(')');

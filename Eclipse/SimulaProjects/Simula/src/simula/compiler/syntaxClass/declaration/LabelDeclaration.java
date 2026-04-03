@@ -29,11 +29,12 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 
 /// Label Declaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/LabelDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/LabelDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -52,8 +53,8 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// Create a new Label Declaration.
 	/// 
 	/// @param identifier label identifier
-	public LabelDeclaration(final String identifier) {
-		super(Type.Label, identifier);
+	public LabelDeclaration(final PsiBuilder psiBuilder, final String identifier) {
+		super(psiBuilder.psiTree, Type.Label, identifier);
 		this.externalIdent = "_LABEL_" + identifier;
 		this.declarationKind = ObjectKind.LabelDeclaration;
 	}
@@ -71,7 +72,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 			// Label attributes are implicit specified 'protected'
 			if (declaredIn.declarationKind == ObjectKind.Class)
 				((ClassDeclaration) declaredIn).protectedList
-						.add(new ProtectedSpecification((ClassDeclaration) declaredIn, identifier));
+						.add(new ProtectedSpecification(null, (ClassDeclaration) declaredIn, identifier));
 		} else {
 			// This Label is a Virtual Match
 			ClassDeclaration decl = (ClassDeclaration) declaredIn;
@@ -246,7 +247,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -268,11 +269,11 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// @throws IOException if something went wrong.
 	public static LabelDeclaration readObject(AttributeInputStream inpt) throws IOException {
 		String identifier = inpt.readString();
-		LabelDeclaration lab = new LabelDeclaration(identifier);
+		LabelDeclaration lab = new LabelDeclaration(null, identifier);
 		lab.OBJECT_SEQU = inpt.readSEQU(lab);
 
 		// *** SyntaxClass
-//		lab.OLD_lineNumber = inpt.readShort();
+		lab.psiTree = readPsiTree(inpt);
 
 		// *** Declaration
 		lab.identifier = inpt.readString();

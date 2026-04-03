@@ -23,6 +23,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
 
 /// Object relations IS and IN.
@@ -72,7 +73,7 @@ import simula.psi.SyntaxTree;
 /// match exists, it is that of the virtual specification.
 /// </ul>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/ObjectRelation.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/ObjectRelation.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -96,7 +97,8 @@ public final class ObjectRelation extends Expression {
 	/// @param lhs left hand side
 	/// @param opr the operation: IN or IS
 	/// @param classIdentifier the right hand class identifier
-	ObjectRelation(final Expression lhs, final int opr, final String classIdentifier) {
+	ObjectRelation(final PsiBuilder psiBuilder, final Expression lhs, final int opr, final String classIdentifier) {
+		super(psiBuilder.psiTree);
 		this.lhs = lhs;
 		this.opr = opr;
 		this.classIdentifier = classIdentifier;
@@ -179,7 +181,9 @@ public final class ObjectRelation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ObjectRelation() {}
+	private ObjectRelation() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -187,7 +191,7 @@ public final class ObjectRelation extends Expression {
 		oupt.writeKind(ObjectKind.ObjectRelation);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -204,7 +208,7 @@ public final class ObjectRelation extends Expression {
 	public static ObjectRelation readObject(AttributeInputStream inpt) throws IOException {
 		ObjectRelation expr = new ObjectRelation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-//		expr.OLD_lineNumber = inpt.readShort();
+		expr.psiTree = readPsiTree(inpt);
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();
 		expr.lhs = (Expression) inpt.readObj();

@@ -5,7 +5,6 @@ import java.io.Reader;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.LOG;
-import simula.token.Identifier;
 
 
 /// The Simula Parser Utilities.
@@ -39,7 +38,7 @@ import simula.token.Identifier;
 /// 
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/parsing/Parse.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaProjects/Simula/src/simula/compiler/parsing/Parse.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public interface PsiParse {
@@ -140,7 +139,6 @@ public interface PsiParse {
 		for (int keyword : keywords)
 			if (currentKeyWord == keyword) {
 				nextToken(psiBuilder);
-//				IO.println("Line "+ Global.sourceLineNumber+": Parse.accept: " + KeyWord.edit(key) + " accepted, nextToken: " + Parse.currentToken);
 //				IO.println("PsiParse.accept: " + KeyWord.edit(keyword) + " accepted, nextToken: " + PsiParse.currentLexToken(psiBuilder));
 				return currentToken;
 			}
@@ -229,7 +227,8 @@ public interface PsiParse {
 	public static String acceptIdentifier(final PsiBuilder psiBuilder) {
 		LexToken token = null;
 		if ((token = PsiParse.acceptParserToken(psiBuilder, KeyWord.IDENTIFIER)) != null)
-			return ((Identifier)token).value;
+//			return ((Identifier)token).value;
+			return token.getText();
 		return (null);
 	}
 
@@ -239,10 +238,14 @@ public interface PsiParse {
 	/// @return the identifier or null
 	public static String expectIdentifier(final PsiBuilder psiBuilder) {
         LexToken currentToken = getParserToken(psiBuilder);
-		if (acceptIdentifier(psiBuilder) != null)
-			return ((Identifier)currentToken).value;
-		LOG.error("Got symbol " + currentToken + " while expecting an Identifier");
-		return (null);
+//		if (acceptIdentifier(psiBuilder) != null) {
+//			return ((Identifier)currentToken).value;
+//		}
+//		LOG.error("Got symbol " + currentToken + " while expecting an Identifier");
+//		return (null);
+		String ident = acceptIdentifier(psiBuilder);
+		if(ident == null) LOG.error("Got symbol " + currentToken + " while expecting an Identifier");
+		return (ident);
 	}  
 
 	/// Test to accept a Type.

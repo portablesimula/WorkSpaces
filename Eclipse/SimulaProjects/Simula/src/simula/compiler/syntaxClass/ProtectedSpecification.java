@@ -18,6 +18,7 @@ import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.VirtualSpecification;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
 
 /// Protected Specification.
@@ -30,7 +31,7 @@ import simula.psi.SyntaxTree;
 ///         | protected hidden identifier-list
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/ProtectedSpecification.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/ProtectedSpecification.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class ProtectedSpecification extends SyntaxClass {
@@ -47,7 +48,8 @@ public final class ProtectedSpecification extends SyntaxClass {
     /// Create a new ProtectedSpecification.
     /// @param definedIn the class it is defined in
     /// @param identifier the protected identifier
-	public ProtectedSpecification(final ClassDeclaration definedIn,final String identifier) {
+	public ProtectedSpecification(final PsiBuilder psiBuilder, final ClassDeclaration definedIn,final String identifier) {
+		super(psiBuilder.psiTree);
 		this.definedIn=definedIn;
 		this.identifier=identifier;
 	}
@@ -118,7 +120,9 @@ public final class ProtectedSpecification extends SyntaxClass {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ProtectedSpecification() {}
+	private ProtectedSpecification() {
+		super(null);
+	}
 	
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -126,7 +130,7 @@ public final class ProtectedSpecification extends SyntaxClass {
 		oupt.writeKind(ObjectKind.ProtectedSpecification);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** ProtectedSpecification
 		oupt.writeString(identifier);
 		oupt.writeObj(definedIn);
@@ -140,7 +144,7 @@ public final class ProtectedSpecification extends SyntaxClass {
 		ProtectedSpecification spec = new ProtectedSpecification();
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
 		// *** SyntaxClass
-//		spec.OLD_lineNumber = inpt.readShort();
+		spec.psiTree = readPsiTree(inpt);
 		// *** ProtectedSpecification
 		spec.identifier = inpt.readString();
 		spec.definedIn = (ClassDeclaration) inpt.readObj();

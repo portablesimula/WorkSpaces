@@ -20,9 +20,10 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.token.CharacterConst;
-import simula.token.Identifier;
 import simula.token.IntegerConst;
+import simula.token.LongRealConst;
 import simula.token.RealConst;
 
 /// Expression.
@@ -83,7 +84,7 @@ import simula.token.RealConst;
 ///   
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/Expression.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/Expression.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -104,7 +105,9 @@ public abstract class Expression extends SyntaxClass {
 	public SyntaxClass backLink;
 
 	/// Expression.
-	public Expression(){}
+	public Expression(final PsiTree psiTree){
+		super(psiTree);
+	}
 
   
 
@@ -122,7 +125,7 @@ public abstract class Expression extends SyntaxClass {
 				Expression thenExpression=acceptSimpleExpression(psiBuilder);
 			PsiParse.expect(psiBuilder, KeyWord.ELSE);
 				Expression elseExpression=acceptExpression(psiBuilder);
-			Expression expr=new ConditionalExpression(Type.Boolean,condition,thenExpression,elseExpression);
+			Expression expr=new ConditionalExpression(psiBuilder, Type.Boolean, condition, thenExpression, elseExpression);
 			if(Option.internal.TRACE_PARSE) Util.TRACE("Expression: ParseExpression, result="+expr);
 //			if(true) throw new RuntimeException("Expression.acceptExpression: NOT IMPL: "+expr);
 			psiBuilder.doneSubtree(expr);
@@ -174,7 +177,7 @@ public abstract class Expression extends SyntaxClass {
 		psiBuilder.startSubtree("SimpleExpression");
 		Expression expr = acceptANDTHEN(psiBuilder);
 		while(PsiParse.accept_OR_ELSE(psiBuilder)) {
-			expr=new BooleanExpression(expr,KeyWord.OR_ELSE,acceptANDTHEN(psiBuilder));
+			expr=new BooleanExpression(psiBuilder, expr, KeyWord.OR_ELSE, acceptANDTHEN(psiBuilder));
 			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptSimpleExpression");
 		}
 		psiBuilder.doneSubtree(expr);
@@ -189,7 +192,7 @@ public abstract class Expression extends SyntaxClass {
 	private static Expression acceptANDTHEN(PsiBuilder psiBuilder) {
 		Expression expr = acceptEQV(psiBuilder);
 		while(PsiParse.accept_AND_THEN(psiBuilder)) {
-			expr=new BooleanExpression(expr,KeyWord.AND_THEN,acceptEQV(psiBuilder));
+			expr=new BooleanExpression(psiBuilder, expr, KeyWord.AND_THEN, acceptEQV(psiBuilder));
 			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptANDTHEN");
 		}
 		return(expr);
@@ -203,7 +206,7 @@ public abstract class Expression extends SyntaxClass {
 	private static Expression acceptEQV(PsiBuilder psiBuilder) { 
 		Expression expr=acceptIMP(psiBuilder);
 		while(PsiParse.accept(psiBuilder, KeyWord.EQV)) {
-			expr=new BooleanExpression(expr,KeyWord.EQV,acceptIMP(psiBuilder));
+			expr=new BooleanExpression(psiBuilder, expr, KeyWord.EQV, acceptIMP(psiBuilder));
 			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptEQV");
 		}
 		return(expr);
@@ -217,7 +220,7 @@ public abstract class Expression extends SyntaxClass {
 	private static Expression acceptIMP(PsiBuilder psiBuilder) {
 		Expression expr=acceptOR(psiBuilder);
 		while(PsiParse.accept(psiBuilder, KeyWord.IMP)) {
-			expr=new BooleanExpression(expr,KeyWord.IMP,acceptOR(psiBuilder));
+			expr=new BooleanExpression(psiBuilder, expr, KeyWord.IMP, acceptOR(psiBuilder));
 			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptIMP");
 		}
 		return(expr);
@@ -231,7 +234,7 @@ public abstract class Expression extends SyntaxClass {
 	private static Expression acceptOR(PsiBuilder psiBuilder) {
 		Expression expr=acceptAND(psiBuilder);
 		while(PsiParse.accept_OR_ONLY(psiBuilder)) {
-			expr=new BooleanExpression(expr,KeyWord.OR,acceptAND(psiBuilder));
+			expr=new BooleanExpression(psiBuilder, expr, KeyWord.OR, acceptAND(psiBuilder));
 			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptOR");
 		}
 		return(expr);
@@ -246,7 +249,7 @@ public abstract class Expression extends SyntaxClass {
 		Expression expr=acceptNOT(psiBuilder);
 		while(PsiParse.accept_AND_ONLY(psiBuilder)) {
 			IO.println("Expression.acceptAND: ");
-			expr=new BooleanExpression(expr,KeyWord.AND,acceptNOT(psiBuilder));
+			expr=new BooleanExpression(psiBuilder, expr, KeyWord.AND, acceptNOT(psiBuilder));
 			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptAND");
 		}
 		return(expr);
@@ -260,7 +263,7 @@ public abstract class Expression extends SyntaxClass {
 	private static Expression acceptNOT(PsiBuilder psiBuilder) {
 		Expression expr;
 		if(PsiParse.accept(psiBuilder, KeyWord.NOT)) {
-			expr=UnaryOperation.create(KeyWord.NOT,acceptTEXTCONC(psiBuilder));
+			expr=UnaryOperation.create(psiBuilder, KeyWord.NOT, acceptTEXTCONC(psiBuilder));
 			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptNOT");
 		} else {
 			expr = acceptTEXTCONC(psiBuilder);
@@ -276,7 +279,7 @@ public abstract class Expression extends SyntaxClass {
 	private static Expression acceptTEXTCONC(PsiBuilder psiBuilder) {
 		Expression expr=acceptRelation(psiBuilder);
 		while(PsiParse.accept(psiBuilder, KeyWord.AMPERSAND)) {
-			expr=new TextExpression(expr,acceptRelation(psiBuilder));
+			expr=new TextExpression(psiBuilder, expr, acceptRelation(psiBuilder));
 			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptTEXTCONC");
 		}
 		return(expr);
@@ -293,7 +296,7 @@ public abstract class Expression extends SyntaxClass {
 		LexToken prevToken = null;
 		if((prevToken = PsiParse.acceptRelationalOperator(psiBuilder)) != null)   { 
 			int opr = prevToken.keyWord;
-			expr = new RelationalOperation(expr,opr,acceptAdditiveOperation(psiBuilder));
+			expr = new RelationalOperation(psiBuilder, expr, opr, acceptAdditiveOperation(psiBuilder));
 			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptRelation");
 		}
 		return(expr);
@@ -309,7 +312,7 @@ public abstract class Expression extends SyntaxClass {
 		LexToken accepted = null;
 		while( (accepted = PsiParse.acceptParserToken(psiBuilder, KeyWord.PLUS,KeyWord.MINUS)) != null) { 
 			int opr=accepted.keyWord;
-			expr=ArithmeticExpression.create(expr,opr,acceptMULDIV(psiBuilder));
+			expr=ArithmeticExpression.create(psiBuilder, expr, opr, acceptMULDIV(psiBuilder));
 			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptAdditiveOperation");
 		}
 		return(expr);
@@ -327,7 +330,7 @@ public abstract class Expression extends SyntaxClass {
 			int opr=prevToken.keyWord;
 			if(opr==KeyWord.PLUS) expr=acceptMULDIV(psiBuilder);
 			else {
-				expr=UnaryOperation.create(opr,acceptMULDIV(psiBuilder));
+				expr=UnaryOperation.create(psiBuilder, opr,acceptMULDIV(psiBuilder));
 				psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptUNIMULDIV");
 			}
 		} else {
@@ -346,7 +349,7 @@ public abstract class Expression extends SyntaxClass {
 		LexToken accepted = null;
 		while((accepted = PsiParse.acceptParserToken(psiBuilder, KeyWord.MUL,KeyWord.DIV,KeyWord.INTDIV)) != null) {
 			int opr = accepted.keyWord;
-			expr = ArithmeticExpression.create(expr,opr,acceptEXPON(psiBuilder));
+			expr = ArithmeticExpression.create(psiBuilder, expr, opr, acceptEXPON(psiBuilder));
 			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptMULDIV");
 		}
 		return(expr);
@@ -360,7 +363,7 @@ public abstract class Expression extends SyntaxClass {
 	private static Expression acceptEXPON(PsiBuilder psiBuilder) {
 		Expression expr=acceptBASICEXPR(psiBuilder);
 		while(PsiParse.accept(psiBuilder, KeyWord.EXP)) {
-			expr = ArithmeticExpression.create(expr,KeyWord.EXP,acceptBASICEXPR(psiBuilder));
+			expr = ArithmeticExpression.create(psiBuilder, expr, KeyWord.EXP, acceptBASICEXPR(psiBuilder));
 			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptEXPON");
 		}
 		return(expr);
@@ -394,34 +397,26 @@ public abstract class Expression extends SyntaxClass {
 		Expression expr=null;
 		LexToken prevToken = PsiParse.getParserToken(psiBuilder);
 		if(PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) { expr = acceptExpression(psiBuilder); PsiParse.expect(psiBuilder, KeyWord.ENDPAR); }
-		else if(PsiParse.accept(psiBuilder, KeyWord.INTEGERKONST)) expr = new Constant(Type.Integer,((IntegerConst)prevToken).value);
-		else if(PsiParse.accept(psiBuilder, KeyWord.REALKONST)) expr = Constant.createRealType(((RealConst)prevToken).value);
+		else if(PsiParse.accept(psiBuilder, KeyWord.INTEGERKONST)) expr = new Constant(psiBuilder.psiTree, Type.Integer,((IntegerConst)prevToken).value);
+		else if(PsiParse.accept(psiBuilder, KeyWord.REALKONST)) expr = Constant.createRealType(psiBuilder.psiTree, ((RealConst)prevToken).value);
+		else if(PsiParse.accept(psiBuilder, KeyWord.LONGREALKONST)) expr = Constant.createLongRealType(psiBuilder.psiTree, ((LongRealConst)prevToken).value);
 
 //		else if(PsiParse.accept(psiBuilder, KeyWord.BOOLEANKONST)) expr = new Constant(Type.Boolean,((IntegerConst)prevToken).value);
-		else if(PsiParse.accept(psiBuilder, KeyWord.TRUE)) expr = new Constant(Type.Boolean,true);
-		else if(PsiParse.accept(psiBuilder, KeyWord.FALSE)) expr = new Constant(Type.Boolean,false);
+		else if(PsiParse.accept(psiBuilder, KeyWord.TRUE)) expr = new Constant(psiBuilder.psiTree, Type.Boolean,true);
+		else if(PsiParse.accept(psiBuilder, KeyWord.FALSE)) expr = new Constant(psiBuilder.psiTree, Type.Boolean,false);
 
-		else if(PsiParse.accept(psiBuilder, KeyWord.CHARACTERKONST)) expr = new Constant(Type.Character,((CharacterConst)prevToken).value);
-		else if(PsiParse.accept(psiBuilder, KeyWord.TEXTKONST)) expr = new Constant(Type.Text,psiBuilder.getTextString(prevToken));
-		else if(PsiParse.accept(psiBuilder, KeyWord.NONE)) expr = new Constant(Type.Ref,null);
-		else if(PsiParse.accept(psiBuilder, KeyWord.NOTEXT)) expr = new Constant(Type.Text,null);
+		else if(PsiParse.accept(psiBuilder, KeyWord.CHARACTERKONST)) expr = new Constant(psiBuilder.psiTree, Type.Character,((CharacterConst)prevToken).value);
+		else if(PsiParse.accept(psiBuilder, KeyWord.TEXTKONST)) expr = new Constant(psiBuilder.psiTree, Type.Text,psiBuilder.getTextString(prevToken));
+		else if(PsiParse.accept(psiBuilder, KeyWord.NONE)) expr = new Constant(psiBuilder.psiTree, Type.Ref,null);
+		else if(PsiParse.accept(psiBuilder, KeyWord.NOTEXT)) expr = new Constant(psiBuilder.psiTree, Type.Text,null);
 		else if(PsiParse.accept(psiBuilder, KeyWord.NEW)) expr = ObjectGenerator.expectNew(psiBuilder);
 		else if(PsiParse.accept(psiBuilder, KeyWord.THIS)) expr = LocalObject.expectThisIdentifier(psiBuilder); 
 		else {
-//			String ident=PsiParse.acceptIdentifier(psiBuilder);
-			
-//			public static String acceptIdentifier(final PsiBuilder psiBuilder) {
 			LexToken prevToken2 = PsiParse.getParserToken(psiBuilder) ;
-			LexToken token = null;
-			if ((token = PsiParse.acceptParserToken(psiBuilder, KeyWord.IDENTIFIER)) != null) {
-				String ident = ((Identifier)token).value;
+			String ident = PsiParse.acceptIdentifier(psiBuilder);
+			if(ident != null) {
 				expr=VariableExpression.expectVariable(psiBuilder, ident);
-			}
-//				return (null);
-//			}
-
-//			if(ident!=null) expr=VariableExpression.expectVariable(ident);
-			else {
+			} else {
 //				if(Option.internal.TRACE_PARSE) PsiParse.TRACE("Expression: acceptBASICEXPR returns: NULL, prevKeyword="+PsiParse.prevToken.getKeyWord());
 				if(prevToken2.keyWord == KeyWord.SEMICOLON) PsiParse.skipMisplacedCurrentSymbol(psiBuilder); // Ad'Hoc
 				return(null);
@@ -432,12 +427,12 @@ public abstract class Expression extends SyntaxClass {
 		while ((prevToken = PsiParse.acceptPostfixOprator(psiBuilder)) != null) {
 			int opr = prevToken.keyWord; // opr == DOT || opr== IS || opr == IN || opr == QUA
 			if (opr == KeyWord.DOT ) 
-				expr=new RemoteVariable(expr,expectVariable(psiBuilder));
+				expr=new RemoteVariable(psiBuilder.psiTree, expr, expectVariable(psiBuilder));
 			else {  // opr == IS or opr == IN or opr == QUA.  Then a class identifier must follow.
 				String classIdentifier=PsiParse.expectIdentifier(psiBuilder);
 				if(opr==KeyWord.QUA)
-					expr=new QualifiedObject(expr,classIdentifier);
-				else expr=new ObjectRelation(expr,opr,classIdentifier);
+					expr=new QualifiedObject(psiBuilder, expr, classIdentifier);
+				else expr=new ObjectRelation(psiBuilder, expr, opr, classIdentifier);
 			}
 			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptPOSTFIX");
 		}

@@ -17,9 +17,9 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.token.Identifier;
 
 /// External Declaration.
 /// <pre>
@@ -89,7 +89,7 @@ import simula.token.Identifier;
 /// a formal procedure.
 ///  
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/ExternalDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/ExternalDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -99,15 +99,15 @@ public final class ExternalDeclaration extends Declaration {
 	/// Create a new ExternalDeclaration.
 	/// @param identifier the identifier.
 	/// @param extIdentitier the external identifier.
-	private ExternalDeclaration(String identifier,String extIdentitier) {
-		super(identifier);
+	private ExternalDeclaration(final PsiBuilder psiBuilder, String identifier,String extIdentitier) {
+		super(psiBuilder.psiTree, identifier);
 		this.declarationKind = ObjectKind.ExternalDeclaration;
 		this.externalIdent = extIdentitier;
 	}
 	
 	/// Private Constructor used by Attribute File I/O.
 	private ExternalDeclaration() {
-		super(null);
+		super(null, null);
 		this.declarationKind = ObjectKind.ExternalDeclaration;
 	}
 
@@ -135,16 +135,19 @@ public final class ExternalDeclaration extends Declaration {
 		Vector<ExternalDeclaration> externalDeclarations = new Vector<ExternalDeclaration>();
 		String identifier = PsiParse.expectIdentifier(psiBuilder);
 		LOOP: while (true) {
-			Identifier externalIdentifier = null;
+			LexToken externalIdentifier = null;
 			if (PsiParse.accept(psiBuilder, KeyWord.EQ)) {
-				externalIdentifier = (Identifier) PsiParse.currentLexToken(psiBuilder);
+				externalIdentifier = PsiParse.currentLexToken(psiBuilder);
 				PsiParse.expect(psiBuilder, KeyWord.TEXTKONST);
 			}
-			String extIdentitier = (externalIdentifier==null)?null:externalIdentifier.value;
+			String extIdentitier = (externalIdentifier==null)?null:externalIdentifier.getText();
 			
-			ExternalDeclaration externalDeclaration = new ExternalDeclaration(identifier,extIdentitier);
+			ExternalDeclaration externalDeclaration = new ExternalDeclaration(psiBuilder, identifier, extIdentitier);
 			externalDeclarations.add(externalDeclaration);
 			
+			psiBuilder.doneSubtree(externalDeclaration);
+			psiBuilder.startSubtree("NextDeclaration");
+
 			File jarFile = JarFileBuilder.findJarFile(identifier, extIdentitier);
 			if (jarFile != null) {
 				if(checkJarFiles(jarFile)) {
@@ -211,7 +214,7 @@ public final class ExternalDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -228,7 +231,7 @@ public final class ExternalDeclaration extends Declaration {
 		ext.OBJECT_SEQU = inpt.readSEQU(ext);
 
 		// *** SyntaxClass
-//		ext.OLD_lineNumber = inpt.readShort();
+		ext.psiTree = readPsiTree(inpt);
 
 		// *** Declaration
 		ext.identifier = inpt.readString();

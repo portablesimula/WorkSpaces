@@ -88,7 +88,7 @@ import simula.psi.SyntaxTree;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ConnectionStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ConnectionStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -130,6 +130,7 @@ public final class ConnectionStatement extends Statement {
 	/// Pre-Condition: INSPECT  is already read.
 	/// @param line the source line number
 	ConnectionStatement(final PsiBuilder psiBuilder) {
+		super(psiBuilder.psiTree);
 		psiBuilder.startSubtree("ConnectionStatement");
 		psiBuilder.consume(KeyWord.INSPECT); //  (add it to 'current tree')
 
@@ -138,9 +139,9 @@ public final class ConnectionStatement extends Statement {
 		objectExpression = Expression.expectExpression(psiBuilder);
 		objectExpression.backLink = this;
 		String ident = "_inspect_" + firstLineNumber() + '_' + (SEQUX++);
-		inspectedVariable = new VariableExpression(ident);
+		inspectedVariable = new VariableExpression(psiBuilder.psiTree, ident);
 		DeclarationScope scope = Global.getCurrentScope();
-		inspectVariableDeclaration = new InspectVariableDeclaration(Type.Ref("RTObject"), ident, scope, this);
+		inspectVariableDeclaration = new InspectVariableDeclaration(psiBuilder, Type.Ref("RTObject"), ident, scope, this);
 		
 		LOOP: while (scope instanceof ConnectionBlock
 				|| (scope instanceof MaybeBlockDeclaration && scope.declarationList.size() == 0 )) {
@@ -157,22 +158,22 @@ public final class ConnectionStatement extends Statement {
 		boolean hasWhenPart=false;
 		if (PsiParse.accept(psiBuilder, KeyWord.DO)) {
 			hasDoPart = true;
-			ConnectionBlock connectionBlock = new ConnectionBlock(inspectedVariable, null);
+			ConnectionBlock connectionBlock = new ConnectionBlock(psiBuilder.psiTree, inspectedVariable, null);
 			DeclarationScope prevScope = Global.getCurrentScope();
 			Global.setScope(connectionBlock);
 			Statement statement = Statement.acceptStatement(psiBuilder);
 			Global.setScope(prevScope);
 			
-			connectionPart.add(new ConnectionDoPart(this,connectionBlock, statement));
+			connectionPart.add(new ConnectionDoPart(psiBuilder, this,connectionBlock, statement));
 			connectionBlock.end();
 		} else {
 			while (PsiParse.accept(psiBuilder, KeyWord.WHEN)) {
 				String classIdentifier = PsiParse.expectIdentifier(psiBuilder);
 				PsiParse.expect(psiBuilder, KeyWord.DO);
-				ConnectionBlock connectionBlock = new ConnectionBlock(inspectedVariable, classIdentifier);
+				ConnectionBlock connectionBlock = new ConnectionBlock(psiBuilder.psiTree, inspectedVariable, classIdentifier);
 				hasWhenPart = true;
 				Statement statement = Statement.acceptStatement(psiBuilder);
-				connectionPart.add(new ConnectionWhenPart(this,classIdentifier, connectionBlock, statement));
+				connectionPart.add(new ConnectionWhenPart(psiBuilder, this,classIdentifier, connectionBlock, statement));
 				connectionBlock.end();
 			}
 		}
@@ -213,7 +214,7 @@ public final class ConnectionStatement extends Statement {
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code("{");
 		JavaSourceFileCoder.debug("// BEGIN INSPECTION ");
-		Expression assignment = new AssignmentOperation(inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
+		Expression assignment = new AssignmentOperation(null, inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
 		assignment.doChecking();
 		JavaSourceFileCoder.code(assignment.toJavaCode() + ';');
 		if (!hasWhenPart) JavaSourceFileCoder.code("if(" + inspectedVariable.toJavaCode() + "!=null) {","INSPECT " + inspectedVariable);
@@ -321,7 +322,9 @@ public final class ConnectionStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ConnectionStatement() {}
+	private ConnectionStatement() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -329,7 +332,7 @@ public final class ConnectionStatement extends Statement {
 		oupt.writeKind(ObjectKind.ConnectionStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** ConnectionStatement
 		oupt.writeObj(objectExpression);
 		oupt.writeObj(inspectedVariable);
@@ -348,7 +351,7 @@ public final class ConnectionStatement extends Statement {
 		ConnectionStatement stm = new ConnectionStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-//		stm.OLD_lineNumber = inpt.readShort();
+		stm.psiTree = readPsiTree(inpt);
 		// *** ConnectionStatement
 		stm.objectExpression = (Expression) inpt.readObj();
 		stm.inspectedVariable = (VariableExpression) inpt.readObj();

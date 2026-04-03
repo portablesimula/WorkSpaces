@@ -21,6 +21,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 
 /// Labeled Statement.
 /// 
@@ -34,7 +35,7 @@ import simula.compiler.utilities.Util;
 ///  
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/LabeledStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/LabeledStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -50,7 +51,9 @@ public final class LabeledStatement extends Statement {
 	/// @param line the source line number
 	/// @param labels the label identifiers
 	/// @param statement the labeled statement
-	LabeledStatement(final int line,final ObjectList<LabelDeclaration> labels,final Statement statement) {
+//	LabeledStatement(final int line,final ObjectList<LabelDeclaration> labels,final Statement statement) {
+	LabeledStatement(final PsiBuilder psiBuilder, final ObjectList<LabelDeclaration> labels, final Statement statement) {
+		super(psiBuilder.psiTree);
 		this.labels = labels;
 		this.statement = statement;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": LabeledStatement: "+this);
@@ -127,7 +130,9 @@ public final class LabeledStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private LabeledStatement() {}
+	private LabeledStatement() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -135,7 +140,7 @@ public final class LabeledStatement extends Statement {
 		oupt.writeKind(ObjectKind.LabeledStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** LabeledStatement
 		oupt.writeObj(statement);
 		oupt.writeObjectList(labels);
@@ -150,7 +155,7 @@ public final class LabeledStatement extends Statement {
 		LabeledStatement stm = new LabeledStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-//		stm.OLD_lineNumber = inpt.readShort();
+		stm.psiTree = readPsiTree(inpt);
 		// *** LabeledStatement
 		stm.statement = (Statement) inpt.readObj();
 		stm.labels = (ObjectList<LabelDeclaration>) inpt.readObjectList();

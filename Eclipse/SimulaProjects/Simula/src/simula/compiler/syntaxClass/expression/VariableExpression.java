@@ -46,6 +46,7 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Variable.
@@ -109,7 +110,7 @@ import simula.psi.SyntaxTree;
 /// outside its associated bounds causes a run time error.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/VariableExpression.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/VariableExpression.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -133,7 +134,8 @@ public final class VariableExpression extends Expression {
 
 	/// Create a new Variable.
 	/// @param identifier the variable's identifier
-	public VariableExpression(final String identifier) {
+	public VariableExpression(final PsiTree psiTree, final String identifier) {
+		super(psiTree);
 		this.identifier = identifier;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW Variable: " + identifier);
@@ -184,7 +186,8 @@ public final class VariableExpression extends Expression {
 	public static VariableExpression expectVariable(final PsiBuilder psiBuilder, final String ident) {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse Variable, current=" + PsiParse.currentLexToken(psiBuilder));
-		VariableExpression variable = new VariableExpression(ident);
+		VariableExpression variable = new VariableExpression(psiBuilder.psiTree, ident);
+		variable.psiTree = psiBuilder.psiTree;
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) {
 //			IO.println("VariableExpression.expectVariable: GOT BEGPAR");
 			variable.params = new Vector<Expression>();
@@ -211,6 +214,14 @@ public final class VariableExpression extends Expression {
 	public VariableExpression getWriteableVariable() {
 		return (this);
 	}
+
+//	@Override
+//	public PsiTree getPsiTree() {
+//		PsiTree sup = super.getPsiTree();
+//		if(sup != null) return sup;
+//		if(backLink != null) return backLink.getPsiTree();
+//		throw new RuntimeException("Line number not available: psiTree == null in " + this.getClass().getSimpleName() + ": " + this);
+//	}
 
 	@Override
 	public void doChecking() {
@@ -967,6 +978,7 @@ public final class VariableExpression extends Expression {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O.
 	public VariableExpression() {
+		super(null);
 	}
 
 	@Override
@@ -975,7 +987,7 @@ public final class VariableExpression extends Expression {
 		oupt.writeKind(ObjectKind.VariableExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -999,7 +1011,7 @@ public final class VariableExpression extends Expression {
 		VariableExpression var = new VariableExpression();
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 		// *** SyntaxClass
-//		var.OLD_lineNumber = inpt.readShort();
+		var.psiTree = readPsiTree(inpt);
 		// *** Expression
 		var.type = inpt.readType();
 		var.backLink = (SyntaxClass) inpt.readObj();

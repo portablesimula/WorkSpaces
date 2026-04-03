@@ -54,7 +54,7 @@ import simula.psi.SyntaxTree;
 ///                    qualification = class-identifier
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/Type.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/Type.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public class Type extends SyntaxClass {
@@ -110,6 +110,7 @@ public class Type extends SyntaxClass {
 	/// Create a new simple Type with the given keyWord
 	/// @param keyWord the given keyWord
 	private Type(int keyWord) {
+		super(null);
 		this.keyWord = keyWord;
 	}
 	
@@ -117,12 +118,14 @@ public class Type extends SyntaxClass {
 	/// @param keyWord the given keyWord
 	/// @param classIdent the given class identifier
 	public Type(int keyWord, String classIdent) {
+		super(null);
 		if(classIdent != null && !Option.CaseSensitive) classIdent = classIdent.toUpperCase();
 		this.keyWord = keyWord;
 		this.classIdent = classIdent;
-		
-		if(classIdent.startsWith("<HTML>")) Util.STOP();
-		if(classIdent.startsWith("IDENTIFIER[")) Util.STOP();
+		if(classIdent != null) {
+			if(classIdent.startsWith("<HTML>")) Util.STOP();
+			if(classIdent.startsWith("IDENTIFIER[")) Util.STOP();
+		}
 	}
 
 	/// Create a new ref(classIdent) type.
@@ -135,12 +138,13 @@ public class Type extends SyntaxClass {
 	/// @param tp the given Type
 	/// @param declaredIn the ConnectionBlock
 	public Type(Type tp,ConnectionBlock declaredIn) {
+		super(null);
 		this.keyWord = tp.keyWord;
 		this.classIdent = tp.classIdent;
-
-		if(classIdent.startsWith("<HTML>")) Util.STOP();
-		if(classIdent.startsWith("IDENTIFIER[")) Util.STOP();
-
+		if(classIdent != null) {
+			if(classIdent.startsWith("<HTML>")) Util.STOP();
+			if(classIdent.startsWith("IDENTIFIER[")) Util.STOP();
+		}
 		this.qual = tp.qual;
 		this.declaredIn = declaredIn;
 	}

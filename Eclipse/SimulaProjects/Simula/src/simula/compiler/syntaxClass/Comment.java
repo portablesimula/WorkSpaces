@@ -8,6 +8,7 @@ package simula.compiler.syntaxClass;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiTree;
 
 /// Comment or White Spaces.
 /// 
@@ -19,7 +20,7 @@ import simula.compiler.utilities.Util;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/DummyStatement.java"><b>Source File
+/// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/DummyStatement.java"><b>Source File
 /// </b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -28,8 +29,8 @@ public final class Comment extends SyntaxClass {
 	
 	/// Create a new DummyStatement.
 	/// @param line the source line number
-	public Comment() {
-//		super("Comment");
+	public Comment(PsiTree psiTree) {
+		super(psiTree);
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": DummyStatement: "+this);
 	}
 
@@ -75,7 +76,7 @@ public final class Comment extends SyntaxClass {
 //		oupt.writeKind(ObjectKind.DummyStatement);
 //		oupt.writeShort(OBJECT_SEQU);
 //		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+//		writePsiTree(oupt);
 //	}
 //
 //	/// Read and return a DummyStatement object.
@@ -86,7 +87,7 @@ public final class Comment extends SyntaxClass {
 //		Comment stm = new Comment();
 //		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 //		// *** SyntaxClass
-//		stm.OLD_lineNumber = inpt.readShort();
+//		stm.psiTree = readPsiTree(inpt);
 //		Util.TRACE_INPUT("DummyStatement: " + stm);
 //		return(stm);
 //	}

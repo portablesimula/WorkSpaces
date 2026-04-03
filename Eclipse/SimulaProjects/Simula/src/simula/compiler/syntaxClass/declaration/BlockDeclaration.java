@@ -32,6 +32,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Block Declaration.
 /// 
@@ -40,7 +41,7 @@ import simula.psi.PsiParse;
 /// It contains a number of useful fields and methods common to its subclasses.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/BlockDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/BlockDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -101,8 +102,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// 
 	/// Used by expectMaybeBlock, i.e. CompoundStatement, SubBlock or PrefixedBlock.
 	/// @param identifier the given identifier
-	protected BlockDeclaration(String identifier) {
-		super(identifier);
+	protected BlockDeclaration(final PsiTree psiTree, String identifier) {
+		super(psiTree, identifier);
 	}
 
 	/// Create a new BlockDeclaration.
@@ -110,8 +111,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// This constructor is only used by ClassDeclaration. ProcedureDeclaration and MaybeBlockDeclaration.
 	/// @param identifier the block identifier
 	/// @param declarationKind the declaration kind
-	private BlockDeclaration(final String identifier,final int declarationKind) {
-		super(identifier);
+	private BlockDeclaration(final PsiTree psiTree, final String identifier,final int declarationKind) {
+		super(psiTree, identifier);
 		this.declarationKind = declarationKind;
 	}
 	
@@ -126,7 +127,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// @param pList the parameter list
 	protected static void expectFormalParameterPart(final PsiBuilder psiBuilder, final Vector<Parameter> pList) {
 		do { // ParameterPart = Parameter ; { Parameter ; }
-			new Parameter(PsiParse.expectIdentifier(psiBuilder)).into(pList);
+			new Parameter(psiBuilder.psiTree, PsiParse.expectIdentifier(psiBuilder)).into(pList);
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 		PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
 	}

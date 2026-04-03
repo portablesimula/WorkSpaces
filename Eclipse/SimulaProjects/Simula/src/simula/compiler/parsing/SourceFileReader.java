@@ -20,7 +20,7 @@ import simula.compiler.utilities.Util;
 /// Input Utilities for the Simula Scanner.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/parsing/SourceFileReader.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/parsing/SourceFileReader.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class SourceFileReader {

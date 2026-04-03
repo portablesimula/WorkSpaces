@@ -36,6 +36,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 import simula.psi.TreeNodeIdent;
 
@@ -61,7 +62,7 @@ import simula.psi.TreeNodeIdent;
 ///   
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/SimpleVariableDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/SimpleVariableDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -77,8 +78,8 @@ public class SimpleVariableDeclaration extends Declaration {
 	/// 
 	/// @param type       the variable type
 	/// @param identifier the variable identifier
-	public SimpleVariableDeclaration(final Type type, final String identifier) {
-		super(identifier);
+	public SimpleVariableDeclaration(final PsiTree psiTree, final Type type, final String identifier) {
+		super(psiTree, identifier);
 		this.declarationKind = ObjectKind.SimpleVariableDeclaration;
 		this.type = type;
 	}
@@ -88,8 +89,8 @@ public class SimpleVariableDeclaration extends Declaration {
 	/// @param identifier      the variable identifier
 	/// @param constant        the constant indicator
 	/// @param constantElement a constant initial value
-	SimpleVariableDeclaration(final Type type, final String identifier, final boolean constant, final Constant constantElement) {
-		this(type, identifier);
+	SimpleVariableDeclaration(final PsiTree psiTree, final Type type, final String identifier, final boolean constant, final Constant constantElement) {
+		this(psiTree, type, identifier);
 		this.constant = constant;
 		this.constantElement = constantElement;
 	}
@@ -129,7 +130,7 @@ public class SimpleVariableDeclaration extends Declaration {
 			PsiParse.TRACE("Parse IdentifierList");
 		do {
 			String ident = PsiParse.expectIdentifier(psiBuilder);
-			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(type, ident);
+			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(psiBuilder.psiTree, type, ident);
 			if (PsiParse.accept(psiBuilder, KeyWord.EQ))
 				typeDeclaration.constantElement = Expression.expectExpression(psiBuilder);
 			declarationList.add(typeDeclaration);
@@ -298,7 +299,7 @@ public class SimpleVariableDeclaration extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public SimpleVariableDeclaration() {
-		super(null);
+		super(null, null);
 		this.declarationKind = ObjectKind.SimpleVariableDeclaration;
 	}
 
@@ -309,7 +310,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -331,7 +332,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
 		// *** SyntaxClass
-//		var.OLD_lineNumber = inpt.readShort();
+		var.psiTree = readPsiTree(inpt);
 
 		// *** Declaration
 		var.identifier = inpt.readString();

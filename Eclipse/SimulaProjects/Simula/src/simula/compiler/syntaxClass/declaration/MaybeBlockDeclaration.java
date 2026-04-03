@@ -42,6 +42,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.psi.TreeNodeIdent;
 
 /// Maybe Block Declaration. I.e: CompoundStatement or SubBlock depends on
@@ -60,7 +61,7 @@ import simula.psi.TreeNodeIdent;
 /// </pre>
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/MaybeBlockDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/MaybeBlockDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -72,12 +73,11 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Create a new MaybeBlockDeclaration, i.e. CompoundStatement or SubBlock.
 	/// @param identifier block identifier
-	public MaybeBlockDeclaration(final String identifier) {
-		super(identifier);
+	public MaybeBlockDeclaration(final PsiTree psiTree, final String identifier) {
+		super(psiTree, identifier);
 		if(identifier != null)
 			modifyIdentifier(identifier);
-//		else modifyIdentifier("Block" + firstLineNumber());
-//		else modifyIdentifier("Block");
+		else modifyIdentifier("Block" + firstLineNumber());
 	}
 
 //	// ***********************************************************************************************
@@ -591,7 +591,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 
 	/// Default constructor used by Attribute File I/O
-	public MaybeBlockDeclaration() { super(null); }
+	public MaybeBlockDeclaration() { super(null, null); }
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -600,7 +600,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -634,7 +634,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		blk.declarationKind = declarationKind;
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
 		// *** SyntaxClass
-//		blk.OLD_lineNumber = inpt.readShort();
+		blk.psiTree = readPsiTree(inpt);
 
 		// *** Declaration
 		blk.identifier = inpt.readString();

@@ -11,8 +11,6 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.token.Identifier;
-
 import java.lang.constant.ClassDesc;
 import simula.compiler.syntaxClass.OverLoad;
 import simula.compiler.syntaxClass.Type;
@@ -23,7 +21,7 @@ import simula.compiler.syntaxClass.statement.Statement;
 /// Standard Class.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/StandardClass.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/StandardClass.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -904,8 +902,8 @@ public final class StandardClass extends ClassDeclaration {
 		Simulation.addStandardClass(Process);  // Declared in Simulation
 		Process.detachUsed=true;
 		Process.statements1=new ObjectList<Statement>();
-		Process.statements1.add(new InlineStatement("detach")); // Statements before inner 
-		Process.statements.add(new InlineStatement("terminate")); // Statements after inner 				
+		Process.statements1.add(new InlineStatement(null, "detach")); // Statements before inner 
+		Process.statements.add(new InlineStatement(null, "terminate")); // Statements after inner 				
 		//	    ref(EVENT_NOTICE) EVENT;
 		//	    Boolean TERMINATED_;
 		//	    Boolean procedure idle;
@@ -942,10 +940,10 @@ public final class StandardClass extends ClassDeclaration {
 	private static void initCatchingErrors() { 
 		CatchingErrors=new StandardClass("CLASS","CatchingErrors");
 		ENVIRONMENT.addStandardClass(CatchingErrors);  // Declared in ENVIRONMENT
-		CatchingErrors.virtualSpecList.add(new VirtualSpecification("onError",null,VirtualSpecification.Kind.Procedure,CatchingErrors.prefixLevel(),null));
+		CatchingErrors.virtualSpecList.add(new VirtualSpecification(null, "onError",null,VirtualSpecification.Kind.Procedure,CatchingErrors.prefixLevel(),null));
 		CatchingErrors.statements1=new ObjectList<Statement>();
-		CatchingErrors.statements1.add(new InlineStatement("try")); // Statements before inner 
-		CatchingErrors.statements.add(new InlineStatement("catch")); // Statements after inner 				
+		CatchingErrors.statements1.add(new InlineStatement(null, "try")); // Statements before inner 
+		CatchingErrors.statements.add(new InlineStatement(null, "catch")); // Statements after inner 				
 	}  
 
 	
@@ -1107,10 +1105,11 @@ public final class StandardClass extends ClassDeclaration {
 	/// Create a new StandardClass.
 	/// @param className the class's name
 	private StandardClass(String className) {
-		super(className);
+		super(null, className);
 		this.externalIdent = "RTS_"+className;
 		this.declarationKind=ObjectKind.StandardClass;
 		this.type=Type.Ref(className);
+		SET_SEMANTICS_CHECKED();
 	}
 
 	/// Create a new StandardClass.
@@ -1124,6 +1123,7 @@ public final class StandardClass extends ClassDeclaration {
 			ClassDesc CD_SuperClass = ClassDesc.of("simula.runtime.RTS_" + prefix); 
 			ClassHierarchy.addClassToSuperClass(CD_ThisClass, CD_SuperClass);
 		}
+		SET_SEMANTICS_CHECKED();
 	}
 
 	/// Create a new StandardClass.
@@ -1133,6 +1133,7 @@ public final class StandardClass extends ClassDeclaration {
 	private StandardClass(String prefix,String className,Parameter... param) {
 		this(prefix,className);
 		for(int i=0;i<param.length;i++) param[i].into(parameterList);
+		SET_SEMANTICS_CHECKED();
 	}
 	
 	@Override
@@ -1180,7 +1181,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param type  the type
 	/// @return the newly created Parameter
 	private static Parameter parameter(String ident,Type type)	{
-		return(new Parameter(ident,type,Parameter.Kind.Simple)); }
+		return(new Parameter(null, ident,type,Parameter.Kind.Simple)); }
 
 	/// Create a new Parameter.
 	/// @param ident the identifier
@@ -1188,7 +1189,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param kind  the parameter kind
 	/// @return the newly created Parameter
 	private static Parameter parameter(String ident,Type type,int kind)	{
-		return(new Parameter(ident,type,kind)); }
+		return(new Parameter(null, ident,type,kind)); }
 
 	/// Create a new Parameter.
 	/// @param ident the identifier
@@ -1197,7 +1198,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param nDim  number of dimensions for arrays
 	/// @return the newly created Parameter
 	private static Parameter parameter(String ident,Type type,int kind,int nDim)	{
-		return(new Parameter(ident,type,kind,nDim)); }
+		return(new Parameter(null, ident,type,kind,nDim)); }
 
 	/// Create a new Parameter.
 	/// @param ident the identifier
@@ -1205,7 +1206,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param type  the type
 	/// @return the newly created Parameter
 	private static Parameter parameter(String ident,int mode,Type type) {
-		Parameter spec=new Parameter(ident,type,Parameter.Kind.Simple);
+		Parameter spec=new Parameter(null, ident,type,Parameter.Kind.Simple);
 		spec.setMode(mode); return(spec);
 	}
 
@@ -1216,7 +1217,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param type  the type
 	/// @return the newly created Parameter
 	private static Parameter parameter(String ident,int kind, int mode,Type type) {
-		Parameter spec=new Parameter(ident,type,kind);
+		Parameter spec=new Parameter(null, ident,type,kind);
 		spec.setMode(mode); return(spec);
 	}
 
@@ -1237,14 +1238,14 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param type the attribute type
 	/// @param ident the attribute identifier
 	private void addStandardAttribute(Type type,String ident) {
-		declarationList.add(new SimpleVariableDeclaration(type,ident)); }
+		declarationList.add(new SimpleVariableDeclaration(null, type,ident)); }
 
 	/// Create and add a new constant standard attribute.
 	/// @param type the attribute type
 	/// @param ident the attribute identifier
 	/// @param value the constant integer value
 	private void addStandardAttribute(Type type,String ident,Number value) {
-		declarationList.add(new SimpleVariableDeclaration(type,ident,true,new Constant(type,value))); }
+		declarationList.add(new SimpleVariableDeclaration(null, type,ident,true,new Constant(null, type,value))); }
 
 	/// Create and add a new StandardProcedure.
 	/// @param kind the declaration kind
@@ -1283,7 +1284,7 @@ public final class StandardClass extends ClassDeclaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public StandardClass() {
-		super(null);
+		super(null, null);
 	}
 
 

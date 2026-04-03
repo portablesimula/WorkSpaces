@@ -53,6 +53,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.psi.TreeNodeIdent;
 
 /// Procedure Declaration.
@@ -93,7 +94,7 @@ import simula.psi.TreeNodeIdent;
 /// This class is prefix to StandardProcedure and SwitchDeclaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/ProcedureDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/ProcedureDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -119,8 +120,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// Create a new ProcedureDeclaration.
 	/// @param identifier procedure identifier
 	/// @param declarationKind procedure or switch
-	protected ProcedureDeclaration(final String identifier,final int declarationKind) {
-		super(identifier);
+	protected ProcedureDeclaration(final PsiTree psiTree, final String identifier,final int declarationKind) {
+		super(psiTree, identifier);
 		this.declarationKind = declarationKind;
 	}
 
@@ -146,7 +147,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @param type procedure's type
 	/// @return a newly created ProcedureDeclaration
 	public static ProcedureDeclaration expectProcedureDeclaration(final PsiBuilder psiBuilder, final Type type) {
-		ProcedureDeclaration proc = new ProcedureDeclaration(null, ObjectKind.Procedure);
+		ProcedureDeclaration proc = new ProcedureDeclaration(psiBuilder.psiTree, null, ObjectKind.Procedure);
 		proc.sourceFileName = Global.sourceFileName;
 //		proc.OLD_lineNumber = psiBuilder.getSourceLineNumber();
 		proc.type = type;
@@ -200,7 +201,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					}
 				if (parameter == null) {
 					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(identifier);
+					parameter = new Parameter(psiBuilder.psiTree, identifier);
 				}
 				parameter.setMode(mode);
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
@@ -251,7 +252,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					if (Util.equals(identifier,par.identifier)) { parameter = par; break; }
 				if (parameter == null) {
 					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(identifier);
+					parameter = new Parameter(psiBuilder.psiTree, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
@@ -334,7 +335,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		Global.enterScope(this);
 			LabelList.accumLabelList(this);
 			if(type != null) {
-				this.result = new SimpleVariableDeclaration(type, "_RESULT");
+				this.result = new SimpleVariableDeclaration(null, type, "_RESULT");
 				declarationList.add(result);
 			}
 			int prfx = 0;// prefixLevel();
@@ -359,7 +360,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 								Util.error("Virtual match has wrong heading. Parameter " + (i+1) + " does not match the specification");	
 					}
 				} 
-				myVirtual = new VirtualMatch(virtualSpec, this);
+				myVirtual = new VirtualMatch(psiTree, virtualSpec, this);
 				ClassDeclaration decl = (ClassDeclaration) declaredIn;
 				decl.virtualMatchList.add(myVirtual);
 				if (decl == virtualSpec.declaredIn) virtualSpec.hasDefaultMatch = true;
@@ -1137,7 +1138,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public ProcedureDeclaration() {	super(null); }
+	public ProcedureDeclaration() {	super(null, null); }
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -1147,7 +1148,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 		
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 
 		// *** Declaration
 		oupt.writeString(externalIdent);
@@ -1170,11 +1171,11 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	@SuppressWarnings("unchecked")
 	public static ProcedureDeclaration readObject(AttributeInputStream inpt) throws IOException {
 		String identifier = inpt.readString();
-		ProcedureDeclaration pro = new ProcedureDeclaration(identifier, ObjectKind.Procedure);
+		ProcedureDeclaration pro = new ProcedureDeclaration(null, identifier, ObjectKind.Procedure);
 		pro.OBJECT_SEQU = inpt.readSEQU(pro);
 
 		// *** SyntaxClass
-//		pro.OLD_lineNumber = inpt.readShort();
+		pro.psiTree = readPsiTree(inpt);
 
 		// *** Declaration
 		pro.externalIdent = inpt.readString();

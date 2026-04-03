@@ -38,7 +38,7 @@ import simula.compiler.utilities.Util;
 /// Utilities to build and manipulate jarFiles.
 ///
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/JarFileBuilder.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/JarFileBuilder.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public class JarFileBuilder {
@@ -59,7 +59,7 @@ public class JarFileBuilder {
 	private JarOutputStream jarOutputStream;
 
 	/// Debug utility.
-	private final static boolean TESTING = false;
+	private final static boolean TESTING = true;//false;
 	
 	/// Construct a new JarFileBuilder.
 	public JarFileBuilder() {

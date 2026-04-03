@@ -15,11 +15,11 @@ public class PsiBuilder {
     public PsiTree psiTree;
 
 //	public PsiBuilder() {
-//		psiTree = psiRoot = new PsiTree("ROOT", null);
+//		psiTree = psiRoot = new LocalPsiTree("ROOT", null);
 //	}
 
 	public void start(CharSequence txt) {
-		psiTree = psiRoot = new PsiTree("ROOT", null);
+		psiTree = psiRoot = new PsiTree("ROOT", 1, null);
         lexer = new SimulaLexer();
 		CharSequence buffer = txt;
 		int startOffset = 0;
@@ -37,7 +37,7 @@ public class PsiBuilder {
 
 	public void startSubtree(String debugName) {
 		getParserToken(); // Get next Parser Token while skipped LexTokens are added to current psiTree.
-		psiTree = new PsiTree(debugName, psiTree);
+		psiTree = new PsiTree(debugName, getSourceLineNumber(), psiTree);
 		psiTree.parent.addChild(psiTree);
 		if(Option.TRACE_PSITREE_START_DONE > 0) {
 			IO.println("PsiBuilder.startSubtree: "+debugName+" CALLED FROM: "+Util.calledFrom(3,6));

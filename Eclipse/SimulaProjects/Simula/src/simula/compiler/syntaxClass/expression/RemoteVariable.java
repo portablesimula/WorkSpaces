@@ -33,6 +33,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Remote Variable.
@@ -45,7 +46,7 @@ import simula.psi.SyntaxTree;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/RemoteVariable.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/RemoteVariable.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -75,7 +76,8 @@ public final class RemoteVariable extends Expression {
 	/// Create a new RemoteVariable
 	/// @param obj object expression
 	/// @param var the variable
-	RemoteVariable(final Expression obj, final VariableExpression var) {
+	RemoteVariable(final PsiTree psiTree, final Expression obj, final VariableExpression var) {
+		super(psiTree);
 		this.obj = obj;
 		this.var = var;
 		obj.backLink = var.backLink = this;
@@ -131,7 +133,7 @@ public final class RemoteVariable extends Expression {
 			if (remoteAttribute == null) {
 				if(objType.keyWord != Type.T_UNDEF)
 					Util.error("RemoteVariable.doRemoteChecking: " + ident + " is not an attribute of "	+ objType.getRefIdent());
-				UndefinedDeclaration undef = new UndefinedDeclaration(ident);
+				UndefinedDeclaration undef = new UndefinedDeclaration(null, ident);
 				remoteAttribute = new Meaning(undef, Global.getCurrentScope()); // Error Recovery
 			}
 			var.setRemotelyAccessed(remoteAttribute);
@@ -313,7 +315,9 @@ public final class RemoteVariable extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private RemoteVariable() {}
+	private RemoteVariable() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -321,7 +325,7 @@ public final class RemoteVariable extends Expression {
 		oupt.writeKind(ObjectKind.RemoteVariable);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -338,7 +342,7 @@ public final class RemoteVariable extends Expression {
 		RemoteVariable rem = new RemoteVariable();
 		rem.OBJECT_SEQU = inpt.readSEQU(rem);
 		// *** SyntaxClass
-//		rem.OLD_lineNumber = inpt.readShort();
+		rem.psiTree = readPsiTree(inpt);
 		// *** SyntaxClass
 		rem.type = inpt.readType();
 		rem.backLink = (SyntaxClass) inpt.readObj();

@@ -1,10 +1,10 @@
 // JavaLine 1 <== SourceLine 10
 package simulaTestBatch;
-// Simula-2.0 Compiled at Mon Feb 24 10:08:05 CET 2025
+// Simula-2.0 Compiled at Thu Apr 02 08:32:15 CEST 2026
 import simula.runtime.*;
 @SuppressWarnings("unchecked")
 public final class SimulaTest_err extends RTS_PROCEDURE {
-    // ProcedureDeclaration: Kind=5, BlockLevel=2, firstLine=10, lastLine=14, hasLocalClasses=false, System=false
+    // ProcedureDeclaration: Kind=6, BlockLevel=2, firstLine=10, lastLine=14, hasLocalClasses=false, System=false
     // Declare parameters as attributes
     public RTS_TXT p_t;
     // Declare locals as attributes
@@ -54,5 +54,5 @@ public final class SimulaTest_err extends RTS_PROCEDURE {
         EBLK();
         return(this);
     } // End of Procedure BODY
-    public static RTS_PROGINFO _INFO=new RTS_PROGINFO("SimulaTest.sim","5 err",1,10,39,11,42,12,49,13,56,14);
+    public static RTS_PROGINFO _INFO=new RTS_PROGINFO("SimulaTest.sim","Procedure err",1,10,39,11,42,12,49,13,56,14);
 } // End of Procedure

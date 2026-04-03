@@ -1,11 +1,30 @@
+ begin
+
+text               txt;             ! text to use the editing and;
+integer            realprecision;   ! To contain the precision for;
+integer            longprecision;   ! reals and long reals       ;
+                                    ! respectively.              ;
+
+procedure test(msg,result,expected); text msg,result,expected;
 begin
-Simset begin
-% inspect new Simset do begin
-	ref(Head) liste;
-	ref(Link) elt;
-	
-	elt :- liste.first;
-	
+if result <> expected then  !*** NOTE 5 ***;
+   begin
+      outtext (" - the following result is wrong: ");
+      outchar('"'); outtext (txt); outchar('"'); outimage;
+      outtext (" -               expected result: ");
+      outchar('"'); outtext (expected); outchar('"'); outimage;
+--   found_error := true;
+   end;
 end;
-end;	
-	
+
+
+txt :- blanks (30);
+
+realprecision := 7;
+longprecision := 16;
+
+
+txt.putreal (&+20, realprecision);
+test("real operation (11).",txt,"                  1.000000&+20");
+
+end	

@@ -23,8 +23,8 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
-import simula.token.Identifier;
 
 /// Relational Operation.
 /// 
@@ -47,7 +47,7 @@ import simula.token.Identifier;
 ///         reference-comparator =  == | =/= 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/RelationalOperation.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/RelationalOperation.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -66,18 +66,19 @@ public final class RelationalOperation extends Expression {
 	/// @param lhs the left hand side
 	/// @param opr the relation
 	/// @param rhs the right hand side
-	RelationalOperation(final Expression lhs,final int opr,final Expression rhs) {
+	RelationalOperation(final PsiBuilder psiBuilder, final Expression lhs,final int opr,final Expression rhs) {
+		super(psiBuilder.psiTree);
 		this.type = Type.Boolean;
 		this.lhs = lhs;
 		this.opr = opr;
 		this.rhs = rhs;
 		if (this.lhs == null) {
 			Util.error("Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new VariableExpression("UNKNOWN_");
+			this.lhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
 		}
 		if (this.rhs == null) {
 			Util.error("Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new VariableExpression("UNKNOWN_");
+			this.rhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
@@ -275,7 +276,9 @@ public final class RelationalOperation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private RelationalOperation() {}
+	private RelationalOperation() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -283,7 +286,7 @@ public final class RelationalOperation extends Expression {
 		oupt.writeKind(ObjectKind.RelationalOperation);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -301,7 +304,7 @@ public final class RelationalOperation extends Expression {
 		RelationalOperation expr = new RelationalOperation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-//		expr.OLD_lineNumber = inpt.readShort();
+		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

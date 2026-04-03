@@ -5,14 +5,10 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.utilities;
 
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 /// The Simula Keywords and some additional symbols.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/KeyWord.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/KeyWord.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public class KeyWord {
@@ -114,8 +110,9 @@ public class KeyWord {
 	/** Other Symbol */ public final static int INTEGERKONST   = 92;
 	/** Other Symbol */ public final static int CHARACTERKONST = 93;
 	/** Other Symbol */ public final static int REALKONST      = 94;
-	/** Other Symbol */ public final static int TEXTKONST      = 95;
-	/** Other Symbol */ public final static int BAD_CHARACTERS = 96;
+	/** Other Symbol */ public final static int LONGREALKONST  = 95;
+	/** Other Symbol */ public final static int TEXTKONST      = 96;
+	/** Other Symbol */ public final static int BAD_CHARACTERS = 97;
 
 	/// Returns the corresponding String.
 	/// @param key the argument key.
@@ -210,6 +207,7 @@ public class KeyWord {
 			case INTEGERKONST:   return("INTEGERKONST");
 			case CHARACTERKONST: return("CHARACTERKONST");
 			case REALKONST:      return("REALKONST");
+			case LONGREALKONST:  return("LONGREALKONST");
 			case TEXTKONST:      return("TEXTKONST");
 			case OR_ELSE:        return("OR_ELSE");
 			case AND_THEN:       return("AND_THEN");

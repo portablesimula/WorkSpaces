@@ -30,6 +30,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
 
 // ************************************************************************************
@@ -38,7 +39,7 @@ import simula.psi.SyntaxTree;
 /// Utility class: For-list While element.
 ///
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ForWhileElement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ForWhileElement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -51,8 +52,8 @@ public class ForWhileElement extends ForListElement {
 	/// @param forStatement the ForStatement
 	/// @param expr1 first expression 
 	/// @param expr2 second expression
-	public ForWhileElement(final ForStatement forStatement, final Expression expr1, final Expression expr2) {
-		super(forStatement, expr1);
+	public ForWhileElement(final PsiBuilder psiBuilder, final ForStatement forStatement, final Expression expr1, final Expression expr2) {
+		super(psiBuilder, forStatement, expr1);
 		this.expr2 = expr2;
 	}
 
@@ -165,7 +166,7 @@ public class ForWhileElement extends ForListElement {
 		oupt.writeKind(ObjectKind.ForWhileElement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** ForListElement
 		oupt.writeObj(forStatement);
 		oupt.writeObj(expr1);
@@ -180,7 +181,7 @@ public class ForWhileElement extends ForListElement {
 		ForWhileElement elt = new ForWhileElement();
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
 		// *** SyntaxClass
-//		elt.OLD_lineNumber = inpt.readShort();
+		elt.psiTree = readPsiTree(inpt);
 		// *** ForListElement
 		elt.forStatement = (ForStatement) inpt.readObj();
 		elt.expr1 = (Expression) inpt.readObj();

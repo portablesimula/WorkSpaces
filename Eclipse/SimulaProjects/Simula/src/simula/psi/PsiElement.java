@@ -5,6 +5,7 @@ package simula.psi;
 public abstract class PsiElement {// implements PsiElement {
 //	private final String text;
 	public String debugName;
+    public int lineNumber;
 	public PsiTree parent;
 	
 	public PsiElement(String debugName) {

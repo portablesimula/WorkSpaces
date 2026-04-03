@@ -11,7 +11,7 @@ public class LexToken extends PsiElement {
     int startOffset;
     int endOffset;
     
-    public int lineNumber;
+//    public int lineNumber;
 
 	public LexToken(int tokenStartLine, CharSequence sourceText, int startOffset, int endOffset, int keyWord) {
 		super(KeyWord.edit(keyWord));

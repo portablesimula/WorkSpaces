@@ -40,7 +40,7 @@ import simula.psi.PsiTree;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/StandaloneExpression.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/StandaloneExpression.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -55,7 +55,7 @@ public final class StandaloneExpression extends Statement {
 //	StandaloneExpression(final PsiBuilder psiBuilder, final int line,final Expression expression) {
 //		super(line);
 	StandaloneExpression(final PsiBuilder psiBuilder, final Expression expression) {
-		
+		super(psiBuilder.psiTree);
 //		IO.println("\nNEW StandaloneExpression: expr="+expression);
 //		psiBuilder.printPSI("NEW StandaloneExpression: expr="+expression);
 
@@ -68,7 +68,7 @@ public final class StandaloneExpression extends Statement {
 		while ((prevToken = PsiParse.acceptParserToken(psiBuilder, KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF)) != null) { 
 //			IO.println("NEW StandaloneExpression: prevToken="+prevToken);
 			psiBuilder.startSubtree("AssignmentOperation");
-			this.expression = new AssignmentOperation(this.expression, prevToken.keyWord, expectStandaloneExpression(psiBuilder));
+			this.expression = new AssignmentOperation(psiBuilder.psiTree, this.expression, prevToken.keyWord, expectStandaloneExpression(psiBuilder));
 			psiBuilder.doneSubtree(this);
 		}		
 		
@@ -96,7 +96,7 @@ public final class StandaloneExpression extends Statement {
 		LexToken prevToken = null;
 		while ((prevToken = PsiParse.acceptParserToken(psiBuilder, KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) != null) {
 			int opr=prevToken.keyWord;
-			retExpr=new AssignmentOperation(retExpr,opr,expectStandaloneExpression(psiBuilder));
+			retExpr=new AssignmentOperation(psiBuilder.psiTree, retExpr, opr, expectStandaloneExpression(psiBuilder));
 		}
 //		IO.println("StandaloneExpression.expectStandaloneExpression: RETURN: "+retExpr+" ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 		return retExpr;
@@ -172,7 +172,7 @@ public final class StandaloneExpression extends Statement {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private StandaloneExpression() {
-//		super(0);
+		super(null);
 	}
 
 	@Override
@@ -181,7 +181,7 @@ public final class StandaloneExpression extends Statement {
 		oupt.writeKind(ObjectKind.StandaloneExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** StandaloneExpression
 		oupt.writeObj(expression);
 	}
@@ -194,7 +194,7 @@ public final class StandaloneExpression extends Statement {
 		StandaloneExpression stm = new StandaloneExpression();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-//		stm.OLD_lineNumber = inpt.readShort();
+		stm.psiTree = readPsiTree(inpt);
 		// *** StandaloneExpression
 		stm.expression = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("StandaloneExpression: " + stm);

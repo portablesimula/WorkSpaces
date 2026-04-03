@@ -19,7 +19,7 @@ import simula.compiler.utilities.Util;
 /// The Simula Scanner.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/parsing/SimulaScanner.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/parsing/SimulaScanner.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class SimulaScanner extends DefaultScanner { 

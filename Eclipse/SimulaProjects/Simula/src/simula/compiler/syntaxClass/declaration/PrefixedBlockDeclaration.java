@@ -38,6 +38,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Prefixed Block Declaration.
 /// <pre>
@@ -63,7 +64,7 @@ import simula.psi.PsiParse;
 /// </pre>
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/PrefixedBlockDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/PrefixedBlockDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -78,8 +79,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// ***********************************************************************************************
 	/// PrefixedBlock.
 	/// @param isMainModule true: this is the main module.
-	private PrefixedBlockDeclaration(boolean isMainModule) {
-		super(null);
+	private PrefixedBlockDeclaration(final PsiTree psiTree, final boolean isMainModule) {
+		super(psiTree, null);
 //		if(isMainModule)
 //			modifyIdentifier(Global.sourceName);
 //		else modifyIdentifier("PBLK" + firstLineNumber());
@@ -93,7 +94,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	/// @param isMainModule true if main module
 	/// @return the resulting PrefixedBlockDeclaration
 	public static PrefixedBlockDeclaration expectPrefixedBlock(final PsiBuilder psiBuilder, final VariableExpression blockPrefix,boolean isMainModule) {
-		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(isMainModule);
+		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(psiBuilder.psiTree, isMainModule);
 //		block.OLD_lineNumber=psiBuilder.getSourceLineNumber();
 		block.declarationKind=ObjectKind.PrefixedBlock;
 		Util.ASSERT(blockPrefix != null,"blockPrefix == null");
@@ -393,7 +394,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// ***********************************************************************************************
 	/// Private Constructor used by Attribute File I/O.
 	private PrefixedBlockDeclaration() {
-		super(null);
+		super(null, null);
 	}
 
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -402,7 +403,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		oupt.writeString(identifier);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		
 		// *** Declaration
 		//oupt.writeString(identifier);
@@ -444,7 +445,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		pbl.declarationKind = ObjectKind.Class;
 		pbl.OBJECT_SEQU = inpt.readSEQU(pbl);
 		// *** SyntaxClass
-//		pbl.OLD_lineNumber = inpt.readShort();
+		pbl.psiTree = readPsiTree(inpt);
 
 		// *** Declaration
 		//pbl.identifier = inpt.readString();

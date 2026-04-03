@@ -25,12 +25,13 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
 
 /// InspectVariable Declaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/InspectVariableDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/InspectVariableDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -51,8 +52,8 @@ public class InspectVariableDeclaration extends Declaration {
 	/// @param identifier the variable identifier
 	/// @param connectionScope the connectionScope
 	/// @param connectionStatement the connectionStatement
-	public InspectVariableDeclaration(final Type type, final String identifier,final DeclarationScope connectionScope, final ConnectionStatement connectionStatement) {
-		super(identifier);
+	public InspectVariableDeclaration(final PsiBuilder psiBuilder, final Type type, final String identifier,final DeclarationScope connectionScope, final ConnectionStatement connectionStatement) {
+		super(psiBuilder.psiTree, identifier);
 		this.declarationKind = ObjectKind.InspectVariableDeclaration;
 		this.type = type;
 		this.connectionScope = connectionScope;
@@ -141,7 +142,7 @@ public class InspectVariableDeclaration extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public InspectVariableDeclaration() {
-		super(null);
+		super(null, null);
 		this.declarationKind = ObjectKind.InspectVariableDeclaration;
 	}
 
@@ -152,7 +153,7 @@ public class InspectVariableDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -174,7 +175,7 @@ public class InspectVariableDeclaration extends Declaration {
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
 		// *** SyntaxClass
-//		var.OLD_lineNumber = inpt.readShort();
+		var.psiTree = readPsiTree(inpt);
 
 		// *** Declaration
 		var.identifier = inpt.readString();

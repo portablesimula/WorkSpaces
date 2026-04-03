@@ -90,7 +90,7 @@ import javax.swing.JFrame;
 /// The members of the rendering set are ShapeElements and TextElements.
 /// The elements are rendered in the order defined by the RENDERING_SET, starting with RENDERING_SET.first.
 /// 
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/runtime/RTS_Drawing.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/runtime/RTS_Drawing.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public class RTS_Drawing extends RTS_Simset {

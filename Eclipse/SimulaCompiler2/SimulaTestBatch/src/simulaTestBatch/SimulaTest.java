@@ -1,6 +1,6 @@
 // JavaLine 1 <== SourceLine 2
 package simulaTestBatch;
-// Simula-2.0 Compiled at Mon Feb 24 10:08:05 CET 2025
+// Simula-2.0 Compiled at Thu Apr 02 08:32:15 CEST 2026
 import simula.runtime.*;
 @SuppressWarnings("unchecked")
 public class SimulaTest extends RTS_CLASS {
@@ -109,5 +109,5 @@ public class SimulaTest extends RTS_CLASS {
         EBLK();
         return(this);
     } // End of Class Statements
-    public static RTS_PROGINFO _INFO=new RTS_PROGINFO("SimulaTest.sim","9 SimulaTest",1,2,12,5,14,6,16,7,18,8,32,16,35,17,42,18,45,19,53,22,57,24,62,25,65,26,74,27,79,28,81,29,93,32,96,33,111,37);
+    public static RTS_PROGINFO _INFO=new RTS_PROGINFO("SimulaTest.sim","Class SimulaTest",1,2,12,5,14,6,16,7,18,8,32,16,35,17,42,18,45,19,53,22,57,24,62,25,65,26,74,27,79,28,81,29,93,32,96,33,111,37);
 } // End of Class

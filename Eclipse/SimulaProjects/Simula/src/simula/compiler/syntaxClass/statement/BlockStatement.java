@@ -55,7 +55,7 @@ import simula.psi.TreeNodeIdent;
 ///               | BEGIN statement { ; statement } END
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/BlockStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/BlockStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -70,6 +70,7 @@ public final class BlockStatement extends Statement {
 	/// Create a new BlockStatement.
 	/// @param blockDeclaration the BlockDeclaration
 	public BlockStatement(final PsiBuilder psiBuilder, final BlockDeclaration blockDeclaration) {
+		super(psiBuilder.psiTree);
 		debugName = "BlockStatement"+SEQU++;
 		this.blockDeclaration = blockDeclaration;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": BlockStatement: "+this);
@@ -207,7 +208,9 @@ public final class BlockStatement extends Statement {
 	// ***********************************************************************************************
 
 	/// Default constructor used by Attribute File I/O
-	private BlockStatement() { }
+	private BlockStatement() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -215,7 +218,7 @@ public final class BlockStatement extends Statement {
 		oupt.writeKind(ObjectKind.BlockStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** BlockStatement
 		oupt.writeObj(blockDeclaration);
 	}
@@ -228,7 +231,7 @@ public final class BlockStatement extends Statement {
 		BlockStatement stm = new BlockStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-//		stm.OLD_lineNumber = inpt.readShort();
+		stm.psiTree = readPsiTree(inpt);
 		// *** BlockStatement
 		stm.blockDeclaration = (BlockDeclaration) inpt.readObj();
 

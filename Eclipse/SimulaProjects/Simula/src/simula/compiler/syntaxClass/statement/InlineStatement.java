@@ -10,6 +10,7 @@ import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiTree;
 
 /// Inline Statement.
 /// 
@@ -21,7 +22,7 @@ import simula.compiler.utilities.Util;
 /// </pre>
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/InlineStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/InlineStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -33,8 +34,8 @@ public final class InlineStatement extends Statement {
 	
 	/// Create a new InlineStatement.
 	/// @param kind the kind code string.
-	public InlineStatement(String kind) {
-//		super(1);
+	public InlineStatement(final PsiTree psiTree, String kind) {
+		super(psiTree);
 		this.kind = kind;
 	}
 

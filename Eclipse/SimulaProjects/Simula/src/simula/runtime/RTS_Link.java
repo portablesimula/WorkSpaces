@@ -43,7 +43,7 @@ package simula.runtime;
 /// In addition to the procedures "suc" and "pred", there are four procedures
 /// associated with each "link" object: "out", "follow", "precede" and "into".
 /// 
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/runtime/RTS_Link.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/runtime/RTS_Link.java"><b>Source File</b></a>.
 /// 
 /// 
 /// 

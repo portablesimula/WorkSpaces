@@ -22,6 +22,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
 
 /// Unary Operation.
@@ -34,7 +35,7 @@ import simula.psi.SyntaxTree;
 ///   
 ///      unary-operator = NOT | + | -
 /// </pre>
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/UnaryOperation.java">
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/UnaryOperation.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -49,12 +50,13 @@ public final class UnaryOperation extends Expression {
 	/// Create a new UnaryOperation.
 	/// @param oprator the unary operator.
 	/// @param operand the operand Expression
-	private UnaryOperation(final int oprator,final Expression operand) {
+	private UnaryOperation(final PsiBuilder psiBuilder, final int oprator,final Expression operand) {
+		super(psiBuilder.psiTree);
 		this.oprator = oprator;
 		this.operand = operand;
 		if(this.operand==null)
 		{ Util.error("Missing operand after unary "+KeyWord.edit(oprator));
-		  this.operand=new VariableExpression("UNKNOWN_");
+		  this.operand=new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
 		}
 		this.operand.backLink=this;
 	}
@@ -63,16 +65,16 @@ public final class UnaryOperation extends Expression {
 	/// @param oprator the unary operator.
 	/// @param operand the operand Expression
 	/// @return the newly created UnaryOperation
-	static Expression create(final int oprator,final Expression operand) {
+	static Expression create(final PsiBuilder psiBuilder, final int oprator,final Expression operand) {
 		if (oprator == KeyWord.PLUS || oprator == KeyWord.MINUS) {
 			try { // Try to Compile-time Evaluate this expression
 				Number rhn=operand.getNumber();
 				if(rhn!=null) {
-					return(Constant.evaluate(oprator,rhn));
+					return(Constant.evaluate(psiBuilder.psiTree, oprator, rhn));
 				}  
 			} catch(Exception e) {}
 		}
-		return(new UnaryOperation(oprator,operand));
+		return(new UnaryOperation(psiBuilder, oprator, operand));
 	}
 	
 	@Override
@@ -81,7 +83,7 @@ public final class UnaryOperation extends Expression {
 		if (oprator == KeyWord.PLUS || oprator == KeyWord.MINUS) {
 			Number rhn=operand.getNumber();
 			if(rhn!=null) {
-				return(Constant.evaluate(oprator,rhn));
+				return(Constant.evaluate(null, oprator,rhn));
 			}  
 		}
 		return(this);
@@ -170,7 +172,9 @@ public final class UnaryOperation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private UnaryOperation() {}
+	private UnaryOperation() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -178,7 +182,7 @@ public final class UnaryOperation extends Expression {
 		oupt.writeKind(ObjectKind.UnaryOperation);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -195,7 +199,7 @@ public final class UnaryOperation extends Expression {
 		UnaryOperation expr = new UnaryOperation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-//		expr.OLD_lineNumber = inpt.readShort();
+		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

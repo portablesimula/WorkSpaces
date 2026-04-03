@@ -61,7 +61,7 @@ import java.util.Vector;
 ///
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/ClassHierarchy.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/ClassHierarchy.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public abstract class ClassHierarchy {

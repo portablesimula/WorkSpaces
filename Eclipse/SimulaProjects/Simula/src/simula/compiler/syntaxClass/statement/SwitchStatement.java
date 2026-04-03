@@ -75,7 +75,7 @@ import simula.psi.PsiParse;
 ///   
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/SwitchStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/SwitchStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -108,6 +108,7 @@ public final class SwitchStatement extends Statement {
 	/// Create a new SwitchStatement.
 	/// @param line the source line number
 	SwitchStatement(final PsiBuilder psiBuilder) {
+		super(psiBuilder.psiTree);
 
 		psiBuilder.startSubtree("SwitchStatement");
 		psiBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
@@ -409,7 +410,9 @@ public final class SwitchStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private SwitchStatement() {}
+	private SwitchStatement() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -417,7 +420,7 @@ public final class SwitchStatement extends Statement {
 		oupt.writeKind(ObjectKind.SwitchStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** SwitchStatement
 		oupt.writeObj(lowKey);
 		oupt.writeObj(hiKey);
@@ -432,7 +435,7 @@ public final class SwitchStatement extends Statement {
 		SwitchStatement stm = new SwitchStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-//		stm.OLD_lineNumber = inpt.readShort();
+		stm.psiTree = readPsiTree(inpt);
 		stm.lowKey = (Expression) inpt.readObj();
 		stm.hiKey = (Expression) inpt.readObj();
 		stm.switchKey = (Expression) inpt.readObj();

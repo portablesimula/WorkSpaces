@@ -16,6 +16,7 @@ import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
+import simula.psi.PsiTree;
 
 /// Procedure Specification.
 /// <pre>
@@ -53,7 +54,7 @@ import simula.psi.PsiBuilder;
 ///             identifier-list = identifier { , identifier }
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/ProcedureSpecification.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/ProcedureSpecification.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -76,7 +77,8 @@ public final class ProcedureSpecification extends SyntaxClass {
 	/// @param identifier procedure-identifier
 	/// @param type procedure's type or null
 	/// @param pList the parameter lList
-	public ProcedureSpecification(final String identifier, final Type type, final ObjectList<Parameter> pList) {
+	public ProcedureSpecification(final PsiTree psiTree, final String identifier, final Type type, final ObjectList<Parameter> pList) {
+		super(psiTree);
 		this.identifier = identifier;
 		this.type = type;
 		this.parameterList = pList;
@@ -109,7 +111,7 @@ public final class ProcedureSpecification extends SyntaxClass {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("END ProcedureSpecification: " + block);
 		Global.setScope(block.declaredIn);
-		ProcedureSpecification procedureSpecification = new ProcedureSpecification(block.identifier, type, block.parameterList);
+		ProcedureSpecification procedureSpecification = new ProcedureSpecification(psiBuilder.psiTree, block.identifier, type, block.parameterList);
 		return (procedureSpecification);
 	}
 
@@ -143,6 +145,7 @@ public final class ProcedureSpecification extends SyntaxClass {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public ProcedureSpecification() {
+		super(null);
 	}
 
 	/// Write a ProcedureSpecification.

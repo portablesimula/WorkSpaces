@@ -20,6 +20,7 @@ import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Html;
 import simula.compiler.utilities.Util;
+import simula.psi.ExternalPsiTree;
 import simula.psi.PsiTree;
 
 /// The class SyntaxClass.
@@ -87,7 +88,7 @@ import simula.psi.PsiTree;
 /// </pre>
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/SyntaxClass.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/SyntaxClass.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public abstract class SyntaxClass {
@@ -115,22 +116,20 @@ public abstract class SyntaxClass {
 	
 	/// The first source line number
 	public int firstLineNumber() {
-		if(psiTree != null) return psiTree.firstLineNumber();
-		throw new RuntimeException("Line number not yet available");
-//		return -22;
+		return psiTree.firstLineNumber();
 	}
 
 	/// The last source line number
 	public int lastLineNumber() {
-		if(psiTree != null) return psiTree.lastLineNumber();
-		return firstLineNumber();
+		return psiTree.lastLineNumber();
 	}
 
 	
 	
 	/// Create a new SyntaxClass.
-	protected SyntaxClass() {
+	protected SyntaxClass(PsiTree psiTree) {
 //		OLD_lineNumber = Global.sourceLineNumber;
+		this.psiTree = (psiTree != null)? psiTree : PsiTree.dummyTree;
 	}
 	
 //	public SyntaxTree buildSyntaxTree() {
@@ -161,7 +160,7 @@ public abstract class SyntaxClass {
 	/// Set semantic checked.
 	/// 
 	/// Should be called from all doChecking methods to signal that semantic checking is done.
-	protected void SET_SEMANTICS_CHECKED() {
+	public void SET_SEMANTICS_CHECKED() {
 		CHECKED = true;
 	}
 
@@ -181,7 +180,7 @@ public abstract class SyntaxClass {
 		if (this instanceof Declaration decl) {
 			if (decl.externalIdent == null) {
 				Thread.dumpStack();
-				Util.error("External Identifier is not set -- "+this);
+				Util.error("External Identifier is not set -- "+this.getClass().getSimpleName()+"  "+this);
 			}
 		}
 	}
@@ -265,6 +264,17 @@ public abstract class SyntaxClass {
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
+
+	public void writePsiTree(AttributeOutputStream oupt) throws IOException {
+		oupt.writeShort(firstLineNumber());
+		oupt.writeShort(lastLineNumber());
+	}
+
+	public static PsiTree readPsiTree(AttributeInputStream inpt) throws IOException {
+		int firstLineNumber = inpt.readShort();
+		int lastLineNumber = inpt.readShort();
+		return new ExternalPsiTree("ExternalClass", firstLineNumber, lastLineNumber);
+	}
 
 	/// Write a SyntaxClass object to a AttributeOutputStream.
 	/// @param oupt the AttributeOutputStream to write to.

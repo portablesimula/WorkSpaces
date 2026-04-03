@@ -24,12 +24,13 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
 
 /// Utility class to hold a when-part.
 ///
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ConnectionWhenPart.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ConnectionWhenPart.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -50,8 +51,8 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 	/// @param classIdentifier the WHEN class-identifier
 	/// @param connectionBlock The associated connection block
 	/// @param statement the statement after DO
-	public ConnectionWhenPart(final ConnectionStatement connectionStatement, final String classIdentifier,final ConnectionBlock connectionBlock,final Statement statement) {
-		super(connectionStatement, connectionBlock, statement);
+	public ConnectionWhenPart(final PsiBuilder psiBuilder, final ConnectionStatement connectionStatement, final String classIdentifier,final ConnectionBlock connectionBlock,final Statement statement) {
+		super(psiBuilder, connectionStatement, connectionBlock, statement);
 		this.classIdentifier = classIdentifier;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW ConnectionDoPart: " + toString());
@@ -136,7 +137,7 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 		oupt.writeKind(ObjectKind.ConnectionWhenPart);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** ConnectionWhenPart
 		oupt.writeString(classIdentifier);
 		oupt.writeObj(connectionStatement);
@@ -151,7 +152,7 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 		ConnectionWhenPart whn = new ConnectionWhenPart();
 		whn.OBJECT_SEQU = inpt.readSEQU(whn);
 		// *** SyntaxClass
-//		whn.OLD_lineNumber = inpt.readShort();
+		whn.psiTree = readPsiTree(inpt);
 		// *** ConnectionDoPart
 		whn.classIdentifier = inpt.readString();
 		whn.connectionStatement = (ConnectionStatement) inpt.readObj();

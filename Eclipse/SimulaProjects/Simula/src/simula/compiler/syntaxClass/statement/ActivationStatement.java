@@ -69,7 +69,7 @@ import simula.psi.SyntaxTree;
 /// See runtime module RTS_Simulation for details.  
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ActivationStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ActivationStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -106,6 +106,7 @@ public final class ActivationStatement extends Statement {
 	/// Create a new ActivationStatement.
 	/// @param line the source line number
 	ActivationStatement(final PsiBuilder psiBuilder) {
+		super(psiBuilder.psiTree);
 		psiBuilder.startSubtree("ActivationStatement");
 		LexToken activator = PsiParse.getParserToken(psiBuilder);
 		REAC = activator.keyWord == KeyWord.REACTIVATE;
@@ -350,7 +351,9 @@ public final class ActivationStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ActivationStatement() {}
+	private ActivationStatement() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -358,7 +361,7 @@ public final class ActivationStatement extends Statement {
 		oupt.writeKind(ObjectKind.ActivationStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** ActivationStatement
 		oupt.writeBoolean(REAC);
 		oupt.writeObj(object1);
@@ -375,7 +378,7 @@ public final class ActivationStatement extends Statement {
 		ActivationStatement stm = new ActivationStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-//		stm.OLD_lineNumber = inpt.readShort();
+		stm.psiTree = readPsiTree(inpt);
 		// *** ActivationStatement
 		stm.REAC = inpt.readBoolean();
 		stm.object1 = (Expression) inpt.readObj();

@@ -30,6 +30,7 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Assignment Operation.
@@ -44,7 +45,7 @@ import simula.psi.SyntaxTree;
 /// 	assignment-operator =  :=  |  :-
 ///   
 /// </pre>
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/AssignmentOperation.java">
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/AssignmentOperation.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -67,19 +68,32 @@ public final class AssignmentOperation extends Expression {
 	/// @param lhs the left hand side
 	/// @param opr the operation
 	/// @param rhs the right hand side
-	public AssignmentOperation(final Expression lhs, final int opr, final Expression rhs) {
+	public AssignmentOperation(final PsiTree psiTree, final Expression lhs, final int opr, final Expression rhs) {
+		super(psiTree);
 		this.lhs = lhs;
 		this.opr = opr;
 		this.rhs = rhs;
 		if (this.lhs == null) {
 			Util.error("Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new VariableExpression("UNKNOWN_");
+			this.lhs = new VariableExpression(psiTree, "UNKNOWN_");
 		}
 		if (this.rhs == null) {
 			Util.error("Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new VariableExpression("UNKNOWN_");
+			this.rhs = new VariableExpression(psiTree, "UNKNOWN_");
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
+	}
+
+	@Override
+	public int firstLineNumber() {
+		if(psiTree != null) return psiTree.firstLineNumber();
+		return lhs.firstLineNumber();
+	}
+
+	@Override
+	public int lastLineNumber() {
+		if(psiTree != null) return psiTree.lastLineNumber();
+		return rhs.lastLineNumber();
 	}
 
 	@Override
@@ -460,7 +474,9 @@ public final class AssignmentOperation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private AssignmentOperation() {}
+	private AssignmentOperation() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -468,7 +484,7 @@ public final class AssignmentOperation extends Expression {
 		oupt.writeKind(ObjectKind.AssignmentOperation);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -486,7 +502,7 @@ public final class AssignmentOperation extends Expression {
 		AssignmentOperation expr = new AssignmentOperation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-//		expr.OLD_lineNumber = inpt.readShort();
+		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

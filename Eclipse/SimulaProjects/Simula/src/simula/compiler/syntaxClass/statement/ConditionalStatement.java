@@ -40,7 +40,7 @@ import simula.psi.SyntaxTree;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ConditionalStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ConditionalStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -59,6 +59,7 @@ public final class ConditionalStatement extends Statement {
 	/// Create a new ConditionalStatement.
 	/// @param line the source line number
 	ConditionalStatement(PsiBuilder psiBuilder) {
+		super(psiBuilder.psiTree);
 
 		psiBuilder.startSubtree("ConditionalStatement");
 		psiBuilder.consume(KeyWord.IF); //  (add it to 'current tree')
@@ -174,7 +175,9 @@ public final class ConditionalStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ConditionalStatement() {}
+	private ConditionalStatement() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -182,7 +185,7 @@ public final class ConditionalStatement extends Statement {
 		oupt.writeKind(ObjectKind.ConditionalStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** ConditionalStatement
 		oupt.writeObj(condition);
 		oupt.writeObj(thenStatement);
@@ -197,7 +200,7 @@ public final class ConditionalStatement extends Statement {
 		ConditionalStatement stm = new ConditionalStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-//		stm.OLD_lineNumber = inpt.readShort();
+		stm.psiTree = readPsiTree(inpt);
 		// *** ConditionalStatement
 		stm.condition = (Expression) inpt.readObj();
 		stm.thenStatement = (Statement) inpt.readObj();

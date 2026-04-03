@@ -19,7 +19,7 @@ import simula.compiler.utilities.Util;
 /// Coding Utilities: Build Call Procedure (CP)
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/BuildCP.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/BuildCP.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -241,13 +241,13 @@ public class BuildCP {
 		if (id.equalsIgnoreCase("detach")) {
 			variable.checkedParams = new Vector<Expression>();
 			// Push extra parameter 'sourceLineNumber'
-			Constant c = new Constant(Type.Integer, variable.firstLineNumber());
+			Constant c = new Constant(null, Type.Integer, variable.firstLineNumber());
 			variable.checkedParams.add(c);
 			return true;
 		} else if( id.equalsIgnoreCase("call") | id.equalsIgnoreCase("resume")) {
 			if(variable.checkedParams.size() == 1) {
 				// Push extra parameter 'sourceLineNumber'
-				Constant c = new Constant(Type.Integer, variable.firstLineNumber());
+				Constant c = new Constant(null, Type.Integer, variable.firstLineNumber());
 				variable.checkedParams.add(c);
 				return true;
 			}

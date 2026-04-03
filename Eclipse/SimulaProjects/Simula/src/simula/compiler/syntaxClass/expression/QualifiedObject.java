@@ -21,6 +21,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
 
 /// Qualified Object
@@ -59,7 +60,7 @@ import simula.psi.SyntaxTree;
 /// match exists, it is that of the virtual specification.
 /// </ul>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/QualifiedObject.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/QualifiedObject.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -78,7 +79,8 @@ public final class QualifiedObject extends Expression {
 	/// Create a new QualifiedObject
 	/// @param lhs left hand side
 	/// @param classIdentifier class identifier
-	QualifiedObject(final Expression lhs, final String classIdentifier) {
+	QualifiedObject(final PsiBuilder psiBuilder, final Expression lhs, final String classIdentifier) {
+		super(psiBuilder.psiTree);
 		this.lhs = lhs;
 		this.classIdentifier = classIdentifier;
 		lhs.backLink = this;
@@ -138,7 +140,9 @@ public final class QualifiedObject extends Expression {
 	// *** Externalization
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private QualifiedObject() {}
+	private QualifiedObject() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -146,7 +150,7 @@ public final class QualifiedObject extends Expression {
 		oupt.writeKind(ObjectKind.QualifiedObject);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -163,7 +167,7 @@ public final class QualifiedObject extends Expression {
 		QualifiedObject expr = new QualifiedObject();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-//		expr.OLD_lineNumber = inpt.readShort();
+		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

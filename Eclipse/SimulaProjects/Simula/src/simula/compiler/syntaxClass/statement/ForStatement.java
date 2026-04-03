@@ -140,7 +140,7 @@ import simula.psi.SyntaxTree;
 ///           }
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ForStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ForStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -162,12 +162,13 @@ public final class ForStatement extends Statement {
 	/// Create a new ForStatement.
 	/// @param line the source line number
 	ForStatement(final PsiBuilder psiBuilder) {
+		super(psiBuilder.psiTree);
 		psiBuilder.startSubtree("ForStatement");
 		psiBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ForStatement");
-		controlVariable = new VariableExpression(PsiParse.expectIdentifier(psiBuilder));
+		controlVariable = new VariableExpression(psiBuilder.psiTree, PsiParse.expectIdentifier(psiBuilder));
 		LexToken prevToken = PsiParse.getParserToken(psiBuilder);
 		if (!PsiParse.accept(psiBuilder, KeyWord.ASSIGNVALUE))
 			PsiParse.expect(psiBuilder, KeyWord.ASSIGNREF);
@@ -194,13 +195,13 @@ public final class ForStatement extends Statement {
 			PsiParse.TRACE("Parse ForListElement");
 		Expression expr1 = Expression.expectExpression(psiBuilder);
 		if (PsiParse.accept(psiBuilder, KeyWord.WHILE))
-			return (new ForWhileElement(this, expr1, Expression.expectExpression(psiBuilder)));
+			return (new ForWhileElement(psiBuilder, this, expr1, Expression.expectExpression(psiBuilder)));
 		if (PsiParse.accept(psiBuilder, KeyWord.STEP)) {
 			Expression expr2 = Expression.expectExpression(psiBuilder);
 			PsiParse.expect(psiBuilder, KeyWord.UNTIL);
-			return (new StepUntilElement(this, expr1, expr2, Expression.expectExpression(psiBuilder)));
+			return (new StepUntilElement(psiBuilder, this, expr1, expr2, Expression.expectExpression(psiBuilder)));
 		} else
-			return (new ForListElement(this, expr1));
+			return (new ForListElement(psiBuilder, this, expr1));
 	}
 
 	@Override
@@ -411,7 +412,9 @@ public final class ForStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ForStatement() {}
+	private ForStatement() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -419,7 +422,7 @@ public final class ForStatement extends Statement {
 		oupt.writeKind(ObjectKind.ForStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** ForStatement
 		oupt.writeObj(controlVariable);
 		oupt.writeShort(assignmentOperator);
@@ -436,7 +439,7 @@ public final class ForStatement extends Statement {
 		ForStatement stm = new ForStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-//		stm.OLD_lineNumber = inpt.readShort();
+		stm.psiTree = readPsiTree(inpt);
 		// *** ForStatement
 		stm.controlVariable = (VariableExpression) inpt.readObj();
 		stm.assignmentOperator = inpt.readShort();

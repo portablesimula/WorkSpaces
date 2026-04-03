@@ -22,6 +22,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
 
 /// Boolean expressions.
@@ -103,7 +104,7 @@ import simula.psi.SyntaxTree;
 /// operand alone.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/BooleanExpression.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/BooleanExpression.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Simula Standard
@@ -123,18 +124,19 @@ public final class BooleanExpression extends Expression {
 	/// @param lhs left hand side
 	/// @param opr Boolean operation
 	/// @param rhs right hand side
-	BooleanExpression(Expression lhs, int opr, Expression rhs) {
+	BooleanExpression(final PsiBuilder psiBuilder, Expression lhs, int opr, Expression rhs) {
+		super(psiBuilder.psiTree);
 		this.lhs = lhs;
 		this.opr = opr;
 		this.rhs = rhs;
 		IO.println("NEW BooleanExpression: "+this);
 		if (this.lhs == null) {
 			Util.error("Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new VariableExpression("UNKNOWN_");
+			this.lhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
 		}
 		if (this.rhs == null) {
 			Util.error("Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new VariableExpression("UNKNOWN_");
+			this.rhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
@@ -272,7 +274,9 @@ public final class BooleanExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private BooleanExpression() {}
+	private BooleanExpression() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -280,7 +284,7 @@ public final class BooleanExpression extends Expression {
 		oupt.writeKind(ObjectKind.BooleanExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -298,7 +302,7 @@ public final class BooleanExpression extends Expression {
 		BooleanExpression expr = new BooleanExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-//		expr.OLD_lineNumber = inpt.readShort();
+		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

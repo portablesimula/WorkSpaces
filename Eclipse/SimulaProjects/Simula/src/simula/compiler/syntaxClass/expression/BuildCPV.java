@@ -28,7 +28,7 @@ import simula.compiler.utilities.Meaning;
 /// Coding Utilities: Build Call Procedure Virtual (CPV).
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/BuildCPV.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/BuildCPV.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen

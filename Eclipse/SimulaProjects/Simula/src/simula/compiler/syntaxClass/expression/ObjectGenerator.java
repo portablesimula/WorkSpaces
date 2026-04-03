@@ -53,7 +53,7 @@ import simula.psi.SyntaxTree;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/ObjectGenerator.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/ObjectGenerator.java"><b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen
@@ -74,7 +74,8 @@ public final class ObjectGenerator extends Expression {
 	/// Create a new ObjectGenerator.
 	/// @param ident class-identifier
 	/// @param params the actual parameters
-	private ObjectGenerator(final String ident,final Vector<Expression> params) {
+	private ObjectGenerator(final PsiBuilder psiBuilder, final String ident,final Vector<Expression> params) {
+		super(psiBuilder.psiTree);
 		this.classIdentifier = ident;
 		this.type = Type.Ref(classIdentifier);
 		this.params = params;
@@ -103,7 +104,7 @@ public final class ObjectGenerator extends Expression {
 			PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
 		}
 
-		Expression expr = new ObjectGenerator(classIdentifier, params);
+		Expression expr = new ObjectGenerator(psiBuilder, classIdentifier, params);
 		return (expr);
 	}
 
@@ -277,7 +278,9 @@ public final class ObjectGenerator extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ObjectGenerator() {	}
+	private ObjectGenerator() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -285,7 +288,7 @@ public final class ObjectGenerator extends Expression {
 		oupt.writeKind(ObjectKind.ObjectGenerator);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -307,7 +310,7 @@ public final class ObjectGenerator extends Expression {
 		ObjectGenerator gen = new ObjectGenerator();
 		gen.OBJECT_SEQU = inpt.readSEQU(gen);
 		// *** SyntaxClass
-//		gen.OLD_lineNumber = inpt.readShort();
+		gen.psiTree = readPsiTree(inpt);
 		// *** Expression
 		gen.type = inpt.readType();
 		gen.backLink = (SyntaxClass) inpt.readObj();

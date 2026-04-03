@@ -46,7 +46,7 @@ import simula.editor.RTOption;
 /// 			- Run the loaded program
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/SimulaCompiler.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/SimulaCompiler.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class SimulaCompiler {
@@ -274,8 +274,10 @@ public final class SimulaCompiler {
 					+ Global.sourceName);
 		}
 		
-   		if(Option.compilerMode != Option.CompilerMode.simulaClassLoader) {
-			Global.jarFileBuilder = new JarFileBuilder();
+		if(Global.jarFileBuilder == null) {
+	   		if(Option.compilerMode != Option.CompilerMode.simulaClassLoader) {
+				Global.jarFileBuilder = new JarFileBuilder();
+			}
 		}
 		
 		// ***************************************************************
@@ -325,7 +327,8 @@ public final class SimulaCompiler {
    		if(Option.compilerMode == Option.CompilerMode.simulaClassLoader) {
 			if (!programModule.isExecutable()) {
 				// Separate Compilation
-				Global.jarFileBuilder = new JarFileBuilder();
+				if(Global.jarFileBuilder == null)
+					Global.jarFileBuilder = new JarFileBuilder();
 				Global.jarFileBuilder.open(programModule);
 			} else {
 				Global.simulaClassLoader = new SimulaClassLoader();

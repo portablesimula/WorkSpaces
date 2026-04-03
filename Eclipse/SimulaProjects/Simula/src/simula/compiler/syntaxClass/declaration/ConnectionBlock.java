@@ -29,6 +29,7 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiTree;
 
 /// Connection Block.
 /// 
@@ -41,7 +42,7 @@ import simula.compiler.utilities.Util;
 /// See Simula Standard 4.8 Connection statement.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/ConnectionBlock.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/ConnectionBlock.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -69,9 +70,9 @@ public final class ConnectionBlock extends DeclarationScope {
 	/// Create a new ConnectionBlock.
 	/// @param inspectedVariable   the inspected variable
 	/// @param whenClassIdentifier the when class identifier
-	public ConnectionBlock(final VariableExpression inspectedVariable, final String whenClassIdentifier) {
+	public ConnectionBlock(final PsiTree psiTree, final VariableExpression inspectedVariable, final String whenClassIdentifier) {
 //		super("Connection block at line " + (Global.sourceLineNumber - 1));
-		super("Inspect " + inspectedVariable);
+		super(psiTree, "Inspect " + inspectedVariable);
 		declarationKind = ObjectKind.ConnectionBlock;
 		this.inspectedVariable = inspectedVariable;
 		this.whenClassIdentifier = whenClassIdentifier;
@@ -121,7 +122,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		}
 		if (result == null) {
 			Util.error("Undefined variable: " + identifier);
-			UndefinedDeclaration undef = new UndefinedDeclaration(identifier);
+			UndefinedDeclaration undef = new UndefinedDeclaration(null, identifier);
 			result = new Meaning(undef, this); // Error Recovery
 		}
 		return (result);
@@ -270,7 +271,7 @@ public final class ConnectionBlock extends DeclarationScope {
 	/// Default constructor used by Attribute File I/O
 	/// @param identifier the block identifier.
 	public ConnectionBlock(String identifier) {
-		super(identifier);
+		super(null, identifier);
 		declarationKind = ObjectKind.ConnectionBlock;
 	}
 
@@ -282,7 +283,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		oupt.writeShort(OBJECT_SEQU);
 		
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		
 		// *** Declaration
 		//oupt.writeString(identifier);
@@ -315,7 +316,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
 		
 		// *** SyntaxClass
-//		blk.OLD_lineNumber = inpt.readShort();
+		blk.psiTree = readPsiTree(inpt);
 
 		// *** Declaration
 		//blk.identifier = inpt.readString();

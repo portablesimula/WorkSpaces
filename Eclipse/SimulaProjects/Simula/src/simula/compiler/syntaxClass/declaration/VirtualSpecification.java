@@ -30,8 +30,8 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
-import simula.token.Identifier;
 
 /// Virtual Quantities.
 /// <pre>
@@ -49,7 +49,7 @@ import simula.token.Identifier;
 ///    	identifier-list  =  identifier  { , identifier }
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/VirtualSpecification.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/VirtualSpecification.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -87,8 +87,8 @@ public final class VirtualSpecification extends Declaration {
 	/// @param kind the vitual Kind
 	/// @param prefixLevel the prefix level of the class with this virtual specification
 	/// @param procedureSpec the ProcedureSpecification or null if not present
-	VirtualSpecification(final String identifier, final Type type, final int kind, final int prefixLevel, final ProcedureSpecification procedureSpec) {
-		super(identifier);
+	VirtualSpecification(final PsiTree psiTree, final String identifier, final Type type, final int kind, final int prefixLevel, final ProcedureSpecification procedureSpec) {
+		super(psiTree, identifier);
 		this.declarationKind = ObjectKind.VirtualSpecification;
 		this.externalIdent = identifier;
 		this.type = type;
@@ -135,9 +135,9 @@ public final class VirtualSpecification extends Declaration {
 					PsiParse.expect(psiBuilder, KeyWord.PROCEDURE);
 					procedureSpec = ProcedureSpecification.expectProcedureSpecification(psiBuilder, type);						
 					cls.virtualSpecList
-							.add(new VirtualSpecification(identifier, type, Kind.Procedure, cls.prefixLevel(), procedureSpec));
+							.add(new VirtualSpecification(psiBuilder.psiTree, identifier, type, Kind.Procedure, cls.prefixLevel(), procedureSpec));
 				} else {
-					cls.virtualSpecList.add(new VirtualSpecification(identifier, type, Kind.Procedure, cls.prefixLevel(), null));
+					cls.virtualSpecList.add(new VirtualSpecification(psiBuilder.psiTree, identifier, type, Kind.Procedure, cls.prefixLevel(), null));
 					if (PsiParse.accept(psiBuilder, KeyWord.COMMA))
 						expectIdentifierList(psiBuilder, cls, type, Kind.Procedure);
 					else
@@ -160,7 +160,7 @@ public final class VirtualSpecification extends Declaration {
 	private static void expectIdentifierList(final PsiBuilder psiBuilder, final ClassDeclaration cls, final Type type, final int kind) {
 		do {
 			String identifier = PsiParse.expectIdentifier(psiBuilder);
-			cls.virtualSpecList.add(new VirtualSpecification(identifier, type, kind, cls.prefixLevel(), null));
+			cls.virtualSpecList.add(new VirtualSpecification(psiBuilder.psiTree, identifier, type, kind, cls.prefixLevel(), null));
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 	}
@@ -176,7 +176,7 @@ public final class VirtualSpecification extends Declaration {
 		// Label and switch attributes are implicit specified 'protected'
 		if (kind == Kind.Label || kind == Kind.Switch)
 			((ClassDeclaration) declaredIn).protectedList
-					.add(new ProtectedSpecification((ClassDeclaration) declaredIn, identifier));
+					.add(new ProtectedSpecification(null, (ClassDeclaration) declaredIn, identifier));
 		SET_SEMANTICS_CHECKED();
 	}
 
@@ -297,7 +297,7 @@ public final class VirtualSpecification extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private VirtualSpecification() {
-		super(null);
+		super(null, null);
 		this.declarationKind = ObjectKind.VirtualSpecification;
 	}
 	

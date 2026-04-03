@@ -50,6 +50,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.psi.TreeNodeIdent;
 
 /// Simula Class Declaration.
@@ -110,7 +111,7 @@ import simula.psi.TreeNodeIdent;
 /// This class is prefix to StandardClass and PrefixedBlockDeclaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/ClassDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/ClassDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -151,8 +152,8 @@ public class ClassDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Create a new ClassDeclaration.
 	/// @param identifier the given identifier
-	protected ClassDeclaration(String identifier) {
-		super(identifier);
+	protected ClassDeclaration(final PsiTree psiTree, String identifier) {
+		super(psiTree, identifier);
 		this.declarationKind = ObjectKind.Class;
 	}
 
@@ -178,7 +179,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @param prefix class identifier
 	/// @return the resulting ClassDeclaration
 	public static ClassDeclaration expectClassDeclaration(final PsiBuilder psiBuilder, final String ident) {
-		ClassDeclaration cls = new ClassDeclaration(null);
+		ClassDeclaration cls = new ClassDeclaration(psiBuilder.psiTree, null);
 		cls.sourceFileName = Global.sourceFileName;
 //		cls.OLD_lineNumber = PsiParse.prevToken.lineNumber;
 		cls.prefix = ident;
@@ -230,7 +231,7 @@ public class ClassDeclaration extends BlockDeclaration {
 					}
 				if (parameter == null) {
 					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(identifier);
+					parameter = new Parameter(psiBuilder.psiTree, identifier);
 				}
 				parameter.setMode(Parameter.Mode.value);
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
@@ -278,7 +279,7 @@ public class ClassDeclaration extends BlockDeclaration {
 					}
 				if (parameter == null) {
 					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(identifier);
+					parameter = new Parameter(psiBuilder.psiTree, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
@@ -333,9 +334,9 @@ public class ClassDeclaration extends BlockDeclaration {
 		do {
 			String identifier = PsiParse.expectIdentifier(psiBuilder);
 			if (hidden)
-				cls.hiddenList.add(new HiddenSpecification(cls, identifier));
+				cls.hiddenList.add(new HiddenSpecification(psiBuilder, cls, identifier));
 			if (prtected)
-				cls.protectedList.add(new ProtectedSpecification(cls, identifier));
+				cls.protectedList.add(new ProtectedSpecification(psiBuilder, cls, identifier));
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 	}
@@ -1362,7 +1363,13 @@ public class ClassDeclaration extends BlockDeclaration {
 			if (prfx != null) prfx.buildStatementsBeforeInner(codeBuilder);
 		}
 		if(statements1 != null) for (Statement stm : statements1) {
-			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.firstLineNumber());
+			if(!(stm instanceof DummyStatement)) {
+				int lno = stm.firstLineNumber();
+				if(lno < 0) {
+					Util.IERR("ClassDeclaration.buildStatementsBeforeInner: Illegal LNO: "+lno+" "+stm.getClass().getSimpleName()+" "+stm);
+				}
+				Util.buildLineNumber(codeBuilder,lno);
+			}
 			stm.buildByteCode(codeBuilder);
 		}
 	}
@@ -1532,7 +1539,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 		
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		
 		// *** Declaration
 		//oupt.writeString(identifier);
@@ -1568,14 +1575,14 @@ public class ClassDeclaration extends BlockDeclaration {
 	@SuppressWarnings("unchecked")
 	public static ClassDeclaration readObject(AttributeInputStream inpt) throws IOException {
 		String identifier = (String) inpt.readString();
-		ClassDeclaration cls = new ClassDeclaration(identifier);
+		ClassDeclaration cls = new ClassDeclaration(null, identifier);
 		Util.TRACE_INPUT("BEGIN Read ClassDeclaration: " + identifier + ", Declared in: " + cls.declaredIn);
 		cls.declarationKind = ObjectKind.Class;
 		cls.OBJECT_SEQU = inpt.readSEQU(cls);
 		
 		// *** SyntaxClass
-//		cls.OLD_lineNumber = inpt.readShort();
-
+		cls.psiTree = readPsiTree(inpt);
+		
 		// *** Declaration
 		//identifier = inpt.readString();
 		cls.externalIdent = inpt.readString();

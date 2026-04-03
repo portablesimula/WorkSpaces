@@ -54,7 +54,7 @@ import simula.psi.SyntaxTree;
 /// containing its declaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/LocalObject.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/LocalObject.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Simula Standard
@@ -75,7 +75,8 @@ public final class LocalObject extends Expression {
 
 	/// Create a new LocalObject
 	/// @param ident class-identifier
-	private LocalObject(final String ident) {
+	private LocalObject(final PsiBuilder psiBuilder, final String ident) {
+		super(psiBuilder.psiTree);
 		this.classIdentifier = ident;
 		this.type=Type.Ref(classIdentifier);
 		if (Option.internal.TRACE_PARSE)
@@ -88,7 +89,7 @@ public final class LocalObject extends Expression {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse ThisObjectExpression, current=" + PsiParse.currentLexToken(psiBuilder));
 		String classIdentifier = PsiParse.expectIdentifier(psiBuilder);
-		Expression expr = new LocalObject(classIdentifier);
+		Expression expr = new LocalObject(psiBuilder, classIdentifier);
 		return(expr);
 	}
 
@@ -192,6 +193,7 @@ public final class LocalObject extends Expression {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public LocalObject() {
+		super(null);
 	}
 
 	@Override
@@ -200,7 +202,7 @@ public final class LocalObject extends Expression {
 		oupt.writeKind(ObjectKind.LocalObject);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -216,7 +218,7 @@ public final class LocalObject extends Expression {
 		LocalObject expr = new LocalObject();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-//		expr.OLD_lineNumber = inpt.readShort();
+		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

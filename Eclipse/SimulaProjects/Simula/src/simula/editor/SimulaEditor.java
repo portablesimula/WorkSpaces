@@ -54,7 +54,7 @@ import simula.compiler.utilities.Util;
 /// The SimulaEditor.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/editor/SimulaEditor.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/editor/SimulaEditor.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 @SuppressWarnings("serial")
@@ -83,7 +83,7 @@ public class SimulaEditor extends JFrame {
 	/// @param args the arguments
 	public static void main(String[] args) {
 		Global.packetName="simprog";
-		String userDir="C:/GitHub/WorkSpaces/Eclipse/SimulaCompiler2/Simula";
+		String userDir="C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula";
 		Global.simulaRtsLib=new File(userDir,"bin"); // To use Eclipse Project's simula.runtime  Download
 		RTOption.InitRuntimeOptions();
 		Option.InitCompilerOptions();

@@ -22,6 +22,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
 
 /// Conditional Expression.
@@ -35,7 +36,7 @@ import simula.psi.SyntaxTree;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/ConditionalExpression.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/ConditionalExpression.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -55,7 +56,8 @@ public final class ConditionalExpression extends Expression {
 	/// @param condition the condition
 	/// @param thenExpression then branch expression
 	/// @param elseExpression else branch expression
-	ConditionalExpression(final Type type, final Expression condition, final Expression thenExpression, final Expression elseExpression) {
+	ConditionalExpression(final PsiBuilder psiBuilder, final Type type, final Expression condition, final Expression thenExpression, final Expression elseExpression) {
+		super(psiBuilder.psiTree);
 		this.condition = condition;
 		this.thenExpression = thenExpression; thenExpression.backLink=this;
 		this.elseExpression = elseExpression; elseExpression.backLink=this;
@@ -138,7 +140,9 @@ public final class ConditionalExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ConditionalExpression() {}
+	private ConditionalExpression() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -146,7 +150,7 @@ public final class ConditionalExpression extends Expression {
 		oupt.writeKind(ObjectKind.ConditionalExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -164,7 +168,7 @@ public final class ConditionalExpression extends Expression {
 		ConditionalExpression expr = new ConditionalExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-//		expr.OLD_lineNumber = inpt.readShort();
+		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

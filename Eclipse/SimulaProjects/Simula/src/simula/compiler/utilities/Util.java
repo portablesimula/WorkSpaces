@@ -15,11 +15,9 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
-import simula.token.Identifier;
-
 /// A set of all static Utility Methods
 /// 
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/Util.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/Util.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class Util { 
@@ -277,11 +275,6 @@ public final class Util {
 		if(Option.CaseSensitive)
 			 return(s1.equals(s2));			
 		else return(s1.equalsIgnoreCase(s2));
-	}
-
-
-	public static boolean equals(Identifier id1, Identifier id2) {
-		return equals(id1.value, id2.value);
 	}
 
     //*******************************************************************************

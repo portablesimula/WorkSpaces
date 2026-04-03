@@ -49,7 +49,7 @@ import simula.psi.SyntaxTree;
 /// Sect. 6.1 Goto Statement
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/GotoStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/GotoStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -61,6 +61,7 @@ public final class GotoStatement extends Statement {
 	/// Create a new GotoStatement.
 	/// @param line source line
 	GotoStatement(final PsiBuilder psiBuilder, final int keyWord) {
+		super(psiBuilder.psiTree);
 		psiBuilder.startSubtree("GotoStatement");
 		psiBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to 'current tree')
 		if(keyWord != KeyWord.GOTO) {
@@ -134,7 +135,9 @@ public final class GotoStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public GotoStatement() {}
+	public GotoStatement() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -142,7 +145,7 @@ public final class GotoStatement extends Statement {
 		oupt.writeKind(ObjectKind.GotoStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** GotoStatement
 		oupt.writeObj(label);
 	}
@@ -155,7 +158,7 @@ public final class GotoStatement extends Statement {
 		GotoStatement stm = new GotoStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxClass
-//		stm.OLD_lineNumber = inpt.readShort();
+		stm.psiTree = readPsiTree(inpt);
 		// *** GotoStatement
 		stm.label = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("GotoStatement: " + stm);

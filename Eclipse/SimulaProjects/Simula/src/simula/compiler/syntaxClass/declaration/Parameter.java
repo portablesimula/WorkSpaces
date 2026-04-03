@@ -32,6 +32,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 	
 /// Parameter Declaration.
@@ -39,7 +40,7 @@ import simula.psi.SyntaxTree;
 /// A parameter models class and procedure parameters.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/Parameter.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/Parameter.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -98,8 +99,8 @@ public final class Parameter extends Declaration {
 
 	/// Create a new Parameter.
 	/// @param identifier parameter identifier
-	public Parameter(final String identifier) {
-		super(identifier);
+	public Parameter(final PsiTree psiTree, final String identifier) {
+		super(psiTree, identifier);
 		this.declarationKind = ObjectKind.Parameter;
 	}
 
@@ -107,8 +108,8 @@ public final class Parameter extends Declaration {
 	/// @param identifier parameter identifier
 	/// @param type parameter type
 	/// @param kind parameter kind
-	Parameter(final String identifier, final Type type, final int kind) {
-		this(identifier);
+	Parameter(final PsiTree psiTree, final String identifier, final Type type, final int kind) {
+		this(psiTree, identifier);
 		this.type = type;
 		this.kind = kind;
 	}
@@ -118,8 +119,8 @@ public final class Parameter extends Declaration {
 	/// @param type parameter type
 	/// @param kind parameter kind
 	/// @param nDim parameter's number of dimension in case of array kind.
-	public Parameter(final String identifier, final Type type, final int kind, final int nDim) {
-		this(identifier, type, kind);
+	public Parameter(final PsiTree psiTree, final String identifier, final Type type, final int kind, final int nDim) {
+		this(psiTree, identifier, type, kind);
 		this.nDim = nDim;
 	}
 
@@ -512,7 +513,7 @@ public final class Parameter extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private Parameter() {
-		super(null);
+		super(null, null);
 		this.declarationKind = ObjectKind.Parameter;
 	}
 	

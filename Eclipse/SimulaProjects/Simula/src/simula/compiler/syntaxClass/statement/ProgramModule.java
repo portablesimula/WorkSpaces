@@ -37,7 +37,7 @@ import simula.psi.PsiParse;
 /// Simula Program Module.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ProgramModule.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ProgramModule.java">
 /// <b>Source File</b></a>.
 /// 
 /// <pre>
@@ -94,29 +94,28 @@ public final class ProgramModule extends Statement {
 
 	/// Create a new ProgramModule.
 	public ProgramModule(PsiBuilder psiBuilder) {
-//		super(0);
+		super(psiBuilder.psiTree);
 		String debugName = "ProgramModule";
 		psiBuilder.startSubtree(debugName);
 
-		sysin=new VariableExpression("sysin");
-		sysout=new VariableExpression("sysout");
+		sysin=new VariableExpression(null, "sysin");
+		sysout=new VariableExpression(null, "sysout");
 		try	{
 			if(Option.internal.TRACE_PARSE) PsiParse.TRACE("Parse Program");
 			Global.setScope(StandardClass.BASICIO);		    	// BASICIO Begin
-			new ConnectionBlock(sysin, null)                     	//    Inspect sysin do
+			new ConnectionBlock(null, sysin, null)                     	//    Inspect sysin do
 			     .setClassDeclaration(StandardClass.Infile);
-			new ConnectionBlock(sysout, null)                    	//    Inspect sysout do
+			new ConnectionBlock(null, sysout, null)                    	//    Inspect sysout do
 			     .setClassDeclaration(StandardClass.Printfile);
 			Global.getCurrentScope().sourceBlockLevel=0;
 			while(PsiParse.accept(psiBuilder, KeyWord.EXTERNAL)) {
 				externalHead = ExternalDeclaration.expectExternalHead(psiBuilder, StandardClass.BASICIO);		
-				Util.IERR("ADD ExternalDeclaration TO PsiTree");
 				PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 			}
 			
 //			// FOR TEST:
-//			psiBuilder.psiTree.addChild(new PsiTree("BASICIO", psiTree));
-//			psiBuilder.psiTree.addChild(new PsiTree("Drawing", psiTree));
+//			psiBuilder.psiTree.addChild(new LocalPsiTree("BASICIO", psiTree));
+//			psiBuilder.psiTree.addChild(new LocalPsiTree("Drawing", psiTree));
 			
 			// Now: Looking for ( program | procedure-declaration | class-declaration )
 			String ident=PsiParse.acceptIdentifier(psiBuilder);
@@ -136,7 +135,7 @@ public final class ProgramModule extends Statement {
 			LexToken token = PsiParse.getParserToken(psiBuilder);
 			if(token != null && token.keyWord != KeyWord.EOF) {
 				psiBuilder.startSubtree("TextAfterProgramEnd");
-				Comment dum = new Comment();
+				Comment dum = new Comment(psiBuilder.psiTree);
 				while(!psiBuilder.eof()) psiBuilder.advanceLexer(); // consume tokens  (add it to 'current tree')
 				psiBuilder.doneSubtree(dum);
 //				IO.println("NEW ProgramModule: TextAfterEnd: \"" + dum.psiTree.getText().replace("\n", "\\n") + '"');
@@ -157,7 +156,7 @@ public final class ProgramModule extends Statement {
 	/// Parse Simula Program by expecting a Statement.
 	/// @return the Program Statement.
 	private DeclarationScope doParseProgram(final PsiBuilder psiBuilder) {
-		BlockDeclaration mainBlock = new MaybeBlockDeclaration(Global.sourceName);
+		BlockDeclaration mainBlock = new MaybeBlockDeclaration(psiBuilder.psiTree, Global.sourceName);
 		psiBuilder.startSubtree("MainProgramBlock");
 		
 		mainBlock.isMainModule = true;

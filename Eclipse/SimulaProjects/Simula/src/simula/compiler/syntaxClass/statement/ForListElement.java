@@ -30,6 +30,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 
 // ************************************************************************************
 // *** ForListElement -- Single Value
@@ -37,7 +38,7 @@ import simula.compiler.utilities.Util;
 /// Utility class ForListElement implementing a single value element.
 ///
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ForListElement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ForListElement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -51,7 +52,8 @@ public class ForListElement extends SyntaxClass {
 	/// Create a new ForListElement.
 	/// @param forStatement the ForStatement
 	/// @param expr1 The first expression
-	public ForListElement(final ForStatement forStatement, final Expression expr1) {
+	public ForListElement(final PsiBuilder psiBuilder, final ForStatement forStatement, final Expression expr1) {
+		super(psiBuilder.psiTree);
 		this.forStatement = forStatement;
 		this.expr1 = expr1;
 		if (Option.internal.TRACE_PARSE)
@@ -165,7 +167,9 @@ public class ForListElement extends SyntaxClass {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	protected ForListElement() {}
+	protected ForListElement() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -173,7 +177,7 @@ public class ForListElement extends SyntaxClass {
 		oupt.writeKind(ObjectKind.ForListElement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** ForListElement
 		oupt.writeObj(forStatement);
 		oupt.writeObj(expr1);
@@ -187,7 +191,7 @@ public class ForListElement extends SyntaxClass {
 		ForListElement elt = new ForListElement();
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
 		// *** SyntaxClass
-//		elt.OLD_lineNumber = inpt.readShort();
+		elt.psiTree = readPsiTree(inpt);
 		// *** ForListElement
 		elt.forStatement = (ForStatement) inpt.readObj();
 		elt.expr1 = (Expression) inpt.readObj();

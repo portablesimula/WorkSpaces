@@ -16,6 +16,7 @@ import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
 
 /// Hidden Specification.
@@ -28,7 +29,7 @@ import simula.psi.SyntaxTree;
 ///         | protected hidden identifier-list
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/HiddenSpecification.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/HiddenSpecification.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class HiddenSpecification extends SyntaxClass {
@@ -53,7 +54,8 @@ public final class HiddenSpecification extends SyntaxClass {
 	/// Create a new HiddenSpecification.
 	/// @param definedIn  the class where Hidden is specified
 	/// @param identifier the hidden identifier
-	public HiddenSpecification(final ClassDeclaration definedIn, final String identifier) {
+	public HiddenSpecification(final PsiBuilder psiBuilder, final ClassDeclaration definedIn, final String identifier) {
+		super(psiBuilder.psiTree);
 		this.definedIn = definedIn;
 		this.identifier = identifier;
 	}
@@ -145,7 +147,9 @@ public final class HiddenSpecification extends SyntaxClass {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private HiddenSpecification() {}
+	private HiddenSpecification() {
+		super(null);
+	}
 	
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -153,7 +157,7 @@ public final class HiddenSpecification extends SyntaxClass {
 		oupt.writeKind(ObjectKind.HiddenSpecification);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** HiddenSpecification
 		oupt.writeString(identifier);
 		oupt.writeObj(definedIn);
@@ -167,7 +171,7 @@ public final class HiddenSpecification extends SyntaxClass {
 		HiddenSpecification spec = new HiddenSpecification();
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
 		// *** SyntaxClass
-//		spec.OLD_lineNumber = inpt.readShort();
+		spec.psiTree = readPsiTree(inpt);
 		// *** HiddenSpecification
 		spec.identifier = inpt.readString();
 		spec.definedIn = (ClassDeclaration) inpt.readObj();

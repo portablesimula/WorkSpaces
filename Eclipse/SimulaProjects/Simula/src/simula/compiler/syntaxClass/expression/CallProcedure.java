@@ -26,7 +26,7 @@ import simula.compiler.utilities.Util;
 /// Java Coding Utilities: Call Procedure
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/CallProcedure.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/CallProcedure.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -259,7 +259,8 @@ public final class CallProcedure {
 						Declaration decl=var.meaning.declaredAs;
 						if(decl instanceof StandardProcedure) {
 							if(Util.equals(decl.identifier, "sourceline")) {
-								actualParameter=new Constant(Type.Integer,Global.sourceLineNumber);
+//								actualParameter=new Constant(Type.Integer,Global.sourceLineNumber);
+								actualParameter=new Constant(null, Type.Integer, decl.firstLineNumber());
 								actualParameter.doChecking();
 							}
 						}

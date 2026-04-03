@@ -31,7 +31,7 @@ import simula.compiler.utilities.Util;
 
 /// Simula attribute file input/output.
 /// 
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/AttributeFileIO.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/AttributeFileIO.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class AttributeFileIO {
@@ -128,6 +128,11 @@ public final class AttributeFileIO {
 	   		if(Option.compilerMode == Option.CompilerMode.simulaClassLoader) {
 				JarFileBuilder.addToIncludeQueue(jarFile);
 			} else {
+				if(Global.jarFileBuilder == null) {
+			   		if(Option.compilerMode != Option.CompilerMode.simulaClassLoader) {
+						Global.jarFileBuilder = new JarFileBuilder();
+					}
+				}
 				Global.jarFileBuilder.expandJarFile(jarFile);
 			}
 

@@ -22,6 +22,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
 
 /// Text expression.
@@ -84,7 +85,7 @@ import simula.psi.SyntaxTree;
 /// "T1 & (T2.sub(1,2)) & (T3.main)" are equivalent.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/TextExpression.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/TextExpression.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Simula Standard
@@ -100,16 +101,17 @@ public final class TextExpression extends Expression {
 	/// Create a new TextExpression
 	/// @param lhs left hand side
 	/// @param rhs rigth hand side
-	TextExpression(final Expression lhs, final Expression rhs) {
+	TextExpression(final PsiBuilder psiBuilder, final Expression lhs, final Expression rhs) {
+		super(psiBuilder.psiTree);
 		this.lhs = lhs;
 		this.rhs = rhs;
 		if (this.lhs == null) {
 			Util.error("Missing operand before &");
-			this.lhs = new VariableExpression("UNKNOWN_");
+			this.lhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
 		}
 		if (this.rhs == null) {
 			Util.error("Missing operand after &");
-			this.rhs = new VariableExpression("UNKNOWN_");
+			this.rhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
@@ -173,7 +175,9 @@ public final class TextExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private TextExpression() {}
+	private TextExpression() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -181,7 +185,7 @@ public final class TextExpression extends Expression {
 		oupt.writeKind(ObjectKind.TextExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -198,7 +202,7 @@ public final class TextExpression extends Expression {
 		TextExpression expr = new TextExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxClass
-//		expr.OLD_lineNumber = inpt.readShort();
+		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxClass) inpt.readObj();

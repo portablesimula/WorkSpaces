@@ -19,6 +19,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Declaration.
 ///  
@@ -38,7 +39,7 @@ import simula.psi.PsiParse;
 /// SimpleVariableDeclaration, VirtualSpecification, VirtualMatch, ArrayDeclaration
 ///  
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/Declaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/Declaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -68,7 +69,8 @@ public abstract class Declaration extends SyntaxClass {
 	// ***********************************************************************************************
 	/// Create a new Declaration.
 	/// @param identifier the given identifier
-	protected Declaration(final String identifier) {
+	protected Declaration(final PsiTree psiTree, final String identifier) {
+		super(psiTree);
 		this.identifier = identifier;
 		if(identifier != null) this.externalIdent = identifier; // May be overwritten
 		declaredIn = Global.getCurrentScope();

@@ -29,6 +29,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.SyntaxTree;
 
 // ************************************************************************************
@@ -37,7 +38,7 @@ import simula.psi.SyntaxTree;
 /// Utility class: For-list Step until element.
 ///
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/StepUntilElement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/StepUntilElement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -53,8 +54,8 @@ public class StepUntilElement extends ForListElement {
 	/// @param expr1 The first expression
 	/// @param expr2 The second expression
 	/// @param expr3 The third expression
-	public StepUntilElement(final ForStatement forStatement, final Expression expr1, final Expression expr2, final Expression expr3) {
-		super(forStatement, expr1);
+	public StepUntilElement(final PsiBuilder psiBuilder, final ForStatement forStatement, final Expression expr1, final Expression expr2, final Expression expr3) {
+		super(psiBuilder, forStatement, expr1);
 		this.expr2 = expr2;
 		this.expr3 = expr3;
 		if (expr1 == null)
@@ -384,7 +385,7 @@ public class StepUntilElement extends ForListElement {
 		oupt.writeKind(ObjectKind.StepUntilElement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 		// *** ForListElement
 		oupt.writeObj(forStatement);
 		oupt.writeObj(expr1);
@@ -400,7 +401,7 @@ public class StepUntilElement extends ForListElement {
 		StepUntilElement elt = new StepUntilElement();
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
 		// *** SyntaxClass
-//		elt.OLD_lineNumber = inpt.readShort();
+		elt.psiTree = readPsiTree(inpt);
 		// *** ForListElement
 		elt.forStatement = (ForStatement) inpt.readObj();
 		elt.expr1 = (Expression) inpt.readObj();

@@ -25,6 +25,7 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiTree;
 
 /// Declaration Scope.
 /// 
@@ -32,7 +33,7 @@ import simula.compiler.utilities.Util;
 /// of ClassDeclaration, ProcedureDeclaration and MaybeBlockDeclaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/DeclarationScope.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/DeclarationScope.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -62,8 +63,8 @@ public abstract class DeclarationScope extends Declaration  {
 	/// Create a new DeclarationScope.
 	/// 
 	/// @param ident scope identifier
-	protected DeclarationScope(final String ident) {
-		super(ident);
+	protected DeclarationScope(final PsiTree psiTree, final String ident) {
+		super(psiTree, ident);
 		declarationList = new DeclarationList(getClass().getSimpleName() + ':' + ident + ":Line=" + Global.sourceLineNumber);
 		declaredIn = Global.getCurrentScope();
 		Global.setScope(this);
@@ -165,7 +166,7 @@ public abstract class DeclarationScope extends Declaration  {
 				Util.error("Undefined variable: " + identifier);
 				Util.STOP();
 			}
-			UndefinedDeclaration undef = new UndefinedDeclaration(identifier);
+			UndefinedDeclaration undef = new UndefinedDeclaration(null, identifier);
 			meaning = new Meaning(undef, this); // Error Recovery
 		}
 		return (meaning);

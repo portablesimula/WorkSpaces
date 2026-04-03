@@ -25,7 +25,6 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.token.Identifier;
 
 /// Switch Declaration.
 /// 
@@ -39,7 +38,7 @@ import simula.token.Identifier;
 ///     switch-list = designational-expression { , designational-expression }
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/SwitchDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/SwitchDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -52,14 +51,14 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 	/// Create a new SwitchDeclaration.
 	/// @param ident switch identifier
 	public SwitchDeclaration(PsiBuilder psiBuilder, final String ident) {
-		super(ident,ObjectKind.Procedure);
+		super(psiBuilder.psiTree, ident, ObjectKind.Procedure);
 		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchDeclaration");
 		this.type = Type.Label;
 		PsiParse.expect(psiBuilder, KeyWord.ASSIGNVALUE);
 		do { switchList.add(Expression.expectExpression(psiBuilder));
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchDeclaration(3), switchList=" + switchList);
-		new Parameter("_SW", Type.Integer, Parameter.Kind.Simple).into(parameterList);
+		new Parameter(psiBuilder.psiTree, "_SW", Type.Integer, Parameter.Kind.Simple).into(parameterList);
 		Global.setScope(declaredIn);
 	}
 
@@ -75,7 +74,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		if(virtSpec==null) {
 			// Switch attributes are implicit specified 'protected'
 			if(declaredIn.declarationKind==ObjectKind.Class)
-				((ClassDeclaration)declaredIn).protectedList.add(new ProtectedSpecification((ClassDeclaration)Global.getCurrentScope(),identifier));
+				((ClassDeclaration)declaredIn).protectedList.add(new ProtectedSpecification(null, (ClassDeclaration)Global.getCurrentScope(),identifier));
 		}
 	}
 

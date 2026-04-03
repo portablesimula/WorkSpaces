@@ -8,9 +8,9 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.token.CharacterConst;
-import simula.token.Identifier;
 import simula.token.IntegerConst;
 import simula.token.KeyWordToken;
+import simula.token.LongRealConst;
 import simula.token.RealConst;
 import simula.token.SimpleString;
 
@@ -79,7 +79,6 @@ public class SimulaLexer {
         tokenStartOffset = currentPosition;
         currentLexerToken = scanBasic();
         tokenEndOffset = currentPosition;
-//      Global.sourceLineNumber = this.nextLineNumber;
         tokens.add(currentLexerToken);
         
         if(DEBUG > 2) IO.println("SimulaLexer.advance: LINE "+currentLexerToken.lineNumber+"                       NEW CURRENT: "+currentLexerToken);
@@ -124,14 +123,7 @@ public class SimulaLexer {
     }
 
     private boolean isWhitespace(int c) {
-    	if(Character.isWhitespace(c)) {
-    		if(c == '\n') {
-//    			this.nextLineNumber++;
-//    			IO.println("SimulaLexer.isWhitespace: NEW LINE "+Global.sourceLineNumber+" ......................................................");
-    		}
-    		return true;
-    	}
-    	return false;
+    	return Character.isWhitespace(c);
     }
     
     
@@ -235,7 +227,7 @@ public class SimulaLexer {
                 case ']': return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.ENDBRACKET);
 
 //	            case '\n':			/* NL (LF) */
-//	    	      if (editorMode) return SyntaxClass.NEWLINE,Global.sourceLineNumber+1));
+//	    	      if (editorMode) return SyntaxClass.NEWLINE));
 //	            case ' ':
 //	            case '\b':			/* BS */
 //	            case '\t':			/* HT */
@@ -375,7 +367,9 @@ public class SimulaLexer {
                 if(ident.equals("while"))        return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.WHILE);
                 break;
         }
-        return(new Identifier(tokenStartLine, sourceText, tokenStartOffset, currentPosition, ident));
+//        return(new Identifier(tokenStartLine, sourceText, tokenStartOffset, currentPosition, ident));
+//        return new Identifier(tokenStartLine, sourceText, tokenStartOffset, currentPosition);
+		return new LexToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.IDENTIFIER);
     }
 
     //********************************************************************************
@@ -520,7 +514,7 @@ public class SimulaLexer {
         if(Global.TRACE_SCAN) Util.TRACE("scanDigitsExp, result='"+result);
         pushBack(current);
         try {
-            if(doubleAmpersand) return new RealConst(tokenStartLine, sourceText, tokenStartOffset, currentPosition, Double.parseDouble(result));
+            if(doubleAmpersand) return new LongRealConst(tokenStartLine, sourceText, tokenStartOffset, currentPosition, Double.parseDouble(result));
             return new RealConst(tokenStartLine, sourceText, tokenStartOffset, currentPosition, Float.parseFloat(result));
         } catch(NumberFormatException e) {
             Util.error("Illegal number: "+result);
@@ -998,7 +992,6 @@ public class SimulaLexer {
         
         StringBuilder skipped = new StringBuilder();
         if (Global.TRACE_SCAN) Util.TRACE("scanEndComment, " + edcurrent());
-//        int firstLine = Global.sourceLineNumber;
         int firstLine = this.nextLineNumber;
         int lastLine = firstLine;
         LOOP:while (getNext() != EOF_MARK) {
@@ -1025,10 +1018,9 @@ public class SimulaLexer {
                     tokenQueueAdd("scanEndComment", new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.COMMENT));
                     break LOOP;
                 }
-                skipped.append(name); // lastLine=Global.sourceLineNumber;
+                skipped.append(name);
             } else if (!Character.isWhitespace(current)) {
                 skipped.append((char) current);
-//                lastLine = Global.sourceLineNumber;
                 lastLine = this.nextLineNumber;
             }
         }

@@ -14,11 +14,12 @@ import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
+import simula.psi.PsiTree;
 
 /// Virtual match.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/VirtualMatch.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/VirtualMatch.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -33,8 +34,8 @@ public final class VirtualMatch extends Declaration {
 	/// Create a new VirtualMatch.
 	/// @param virtualSpec the virtual specification
 	/// @param match a matching ProcedureDeclaration
-	VirtualMatch(final VirtualSpecification virtualSpec, final ProcedureDeclaration match) {
-		super(virtualSpec.identifier);
+	VirtualMatch(final PsiTree psiTree, final VirtualSpecification virtualSpec, final ProcedureDeclaration match) {
+		super(psiTree, virtualSpec.identifier);
 		this.declarationKind = ObjectKind.VirtualMatch;
 		// NOTE: Called during Checking
 		this.virtualSpec = virtualSpec;

@@ -108,7 +108,7 @@ import simula.psi.TreeNodeIdent;
 ///           array  a,b,c(7:n,2:m), s(-2:10)            ! any value of n or m legal;
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/ArrayDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/ArrayDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -126,8 +126,8 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param identifier the array identifier
 	/// @param type the array type
 	/// @param boundPairList The list of BoundPair
-	private ArrayDeclaration(final String identifier, final Type type, final Vector<BoundPair> boundPairList) {
-		super(identifier);
+	private ArrayDeclaration(final PsiBuilder psiBuilder, final String identifier, final Type type, final Vector<BoundPair> boundPairList) {
+		super(psiBuilder.psiTree, identifier);
 		this.declarationKind = ObjectKind.ArrayDeclaration;
 		this.type = type;
 		this.boundPairList = boundPairList;
@@ -181,7 +181,7 @@ public final class ArrayDeclaration extends Declaration {
 			psiBuilder.setParsingBoundPairList(false);
 			for (Enumeration<String> e = identList.elements(); e.hasMoreElements();) {
 				String identifier = e.nextElement();
-				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(identifier, type, boundPairList);
+				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(psiBuilder, identifier, type, boundPairList);
 				declarationList.add(arrayDeclaration);
 				psiBuilder.doneSubtree(arrayDeclaration);
 				psiBuilder.startSubtree("NextDeclaration");
@@ -623,7 +623,7 @@ public final class ArrayDeclaration extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public ArrayDeclaration() {
-		super(null);
+		super(null, null);
 		this.declarationKind = ObjectKind.ArrayDeclaration;
 	}
 
@@ -634,7 +634,7 @@ public final class ArrayDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxClass
-//		oupt.writeShort(firstLineNumber());
+		writePsiTree(oupt);
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -658,7 +658,7 @@ public final class ArrayDeclaration extends Declaration {
 		arr.OBJECT_SEQU = inpt.readSEQU(arr);
 
 		// *** SyntaxClass
-//		arr.OLD_lineNumber = inpt.readShort();
+		arr.psiTree = readPsiTree(inpt);
 
 		// *** Declaration
 		arr.identifier = inpt.readString();

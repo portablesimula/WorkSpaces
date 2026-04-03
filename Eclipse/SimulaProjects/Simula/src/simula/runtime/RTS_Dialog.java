@@ -11,7 +11,7 @@ import javax.swing.UIManager;
 
 /// RTS Dialog utilities
 /// 
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/runtime/RTS_Dialog.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/runtime/RTS_Dialog.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public interface RTS_Dialog {

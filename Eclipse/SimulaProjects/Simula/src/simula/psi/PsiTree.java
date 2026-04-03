@@ -1,8 +1,5 @@
 package simula.psi;
 
-import simula.compiler.syntaxClass.SyntaxClass;
-import simula.compiler.utilities.Global;
-import simula.compiler.utilities.Html;
 import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -20,14 +17,24 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-//Base class for composite nodes (branching nodes)
+import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Html;
+
 public class PsiTree extends PsiElement {
 	public SyntaxClass syntaxClass;
 	protected final List<PsiElement> children = new ArrayList<>();
 //	private String error;
 	
-	public PsiTree(String debugName, PsiTree parent) {
+//	public static PsiTree dummyTree = new LocalPsiTree("dymmyTree", null) {
+//		@Override public int firstLineNumber() { return -24; }
+//		@Override public int lastLineNumber()  { return -25; }
+//	};
+	public static PsiTree dummyTree = new PsiTree("dymmyTree", -25, null);
+	
+	public PsiTree(String debugName, int lineNumber, PsiTree parent) {
 		super(debugName);
+		this.lineNumber = lineNumber;
 		this.parent = parent;
 	}
 	
@@ -89,14 +96,13 @@ public class PsiTree extends PsiElement {
 			PsiElement firstChild = children.getFirst();
 			if(firstChild != null) return firstChild.firstLineNumber();
 		} catch(Exception e) { }
-		return -1;
+//		IO.println("PsiTree.firstLineNumber: No child: return "+this.debugName+"  "+this.lineNumber);
+		return this.lineNumber;
 	}
 	
 	@Override public int lastLineNumber() {
 		try {
-//			PsiElement lastChild = getLastParserChild();
 			PsiElement lastChild = children.getLast();
-//			if(lastChild != null) return lastChild.getLineNumber();
 			if(lastChild != null) return lastChild.lastLineNumber();
 		} catch(Exception e) { }
 		return firstLineNumber();
