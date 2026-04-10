@@ -49,17 +49,17 @@ public final class DummyStatement extends Statement {
 	}
 
 	public static DummyStatement ofExplicit(final PsiBuilder psiBuilder) {
-		 psiBuilder.startSubtree("DummyStatement");
+		 psiBuilder.startSubtree(PsiTree.Kind.statement, "DummyStatement");
 		 psiBuilder.consume(KeyWord.SEMICOLON); //  (add it to 'current tree')
 		 DummyStatement dummyStatement = new DummyStatement(psiBuilder.psiTree);		
-		 psiBuilder.doneSubtree(dummyStatement);
+		 psiBuilder.doneSubtree(PsiTree.Kind.statement, dummyStatement);
 		 return dummyStatement;
 	}
 
 	public static DummyStatement ofImplicit(final PsiBuilder psiBuilder) {
-		 psiBuilder.startSubtree("DummyStatement");
+		 psiBuilder.startSubtree(PsiTree.Kind.statement, "DummyStatement");
 		 DummyStatement dummyStatement = new DummyStatement(psiBuilder.psiTree);		
-		 psiBuilder.doneSubtree(dummyStatement);
+		 psiBuilder.doneSubtree(PsiTree.Kind.statement, dummyStatement);
 		 return dummyStatement;
 	}
 

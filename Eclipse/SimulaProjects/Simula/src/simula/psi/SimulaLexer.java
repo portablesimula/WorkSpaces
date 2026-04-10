@@ -15,8 +15,6 @@ import simula.token.RealConst;
 import simula.token.SimpleString;
 
 public class SimulaLexer {
-
-    private static int DEBUG = 1;// 2;
     
     private Vector<LexToken> tokens;
     public Vector<LexToken> getTokens() { return tokens; }
@@ -46,7 +44,7 @@ public class SimulaLexer {
     }
 
     public void start(CharSequence buffer, int startOffset, int endOffset) {
-    	if(DEBUG > 0) IO.println(("SimulaLexer.start: " + buffer).replace("\r", "\\r").replace("\n", "\\n"));
+    	if(Option.internal.TRACE_LEXER > 0) IO.println(("SimulaLexer.start: " + buffer).replace("\r", "\\r").replace("\n", "\\n"));
         sourceText = buffer;
         nextLineNumber = 1;
         textEndOffset = endOffset;
@@ -64,7 +62,7 @@ public class SimulaLexer {
         	tokenEndOffset = qtoken.endOffset;
         	currentLexerToken = qtoken;
         	
-            if(DEBUG > 2) IO.println("SimulaLexer.advance: QLINE "+currentLexerToken.lineNumber+"                      NEW CURRENT: "+currentLexerToken);
+            if(Option.internal.TRACE_LEXER > 2) IO.println("SimulaLexer.advance: QLINE "+currentLexerToken.lineNumber+"                      NEW CURRENT: "+currentLexerToken);
             tokens.add(currentLexerToken);
             return;
         }
@@ -75,13 +73,13 @@ public class SimulaLexer {
             return;
         }
         tokenStartLine = this.nextLineNumber;
-        if(DEBUG > 2) IO.println("SimulaLexer.advance: ============================================================================= tokenStartLine="+tokenStartLine);
+        if(Option.internal.TRACE_LEXER > 2) IO.println("SimulaLexer.advance: ============================================================================= tokenStartLine="+tokenStartLine);
         tokenStartOffset = currentPosition;
         currentLexerToken = scanBasic();
         tokenEndOffset = currentPosition;
         tokens.add(currentLexerToken);
         
-        if(DEBUG > 2) IO.println("SimulaLexer.advance: LINE "+currentLexerToken.lineNumber+"                       NEW CURRENT: "+currentLexerToken);
+        if(Option.internal.TRACE_LEXER > 2) IO.println("SimulaLexer.advance: LINE "+currentLexerToken.lineNumber+"                       NEW CURRENT: "+currentLexerToken);
        
         if(tokenStartOffset == tokenEndOffset) {
             CharSequence xxx = sourceText.subSequence(tokenStartOffset-10, tokenStartOffset);
@@ -94,8 +92,9 @@ public class SimulaLexer {
 		this.parsingBoundPairList = parsingBoundPairList;
 	}
 
-	public void rollBackToBefore(LexToken prev) {
-		if(Option.TRACE_NEW_LEXTOKEN > 0) IO.println("SimulaLexer.rollBackToBefore: "+prev+", currentPosition="+currentPosition);
+	public void rollBackToBefore(LexToken prev, String debugInfo) {
+		if(Option.internal.TRACE_NEW_LEXTOKEN > 0)
+			IO.println("\nSimulaLexer.rollBackToBefore: "+prev+debugInfo+", currentPosition="+currentPosition+" CALLED FROM: "+Util.calledFrom(6,7)+"\n");
 //		Thread.dumpStack();
 		currentPosition = prev.startOffset;
 		nextLineNumber = prev.lineNumber;
@@ -103,14 +102,14 @@ public class SimulaLexer {
 	}
 
 	public LexToken getCurrentLexerToken() {
-        if(DEBUG > 1) IO.println("SimulaLexer.getCurrentLexerToken: "+currentLexerToken);
+        if(Option.internal.TRACE_LEXER > 1) IO.println("SimulaLexer.getCurrentLexerToken: "+currentLexerToken);
         return currentLexerToken;
     }
 
 	public LexToken getEOFToken() {
 		int ofst = textEndOffset - 1;
 		LexToken token = new LexToken(tokenStartLine,"ILLEGAL TERMINATION", ofst, ofst, KeyWord.EOF);
-        if(DEBUG > 1) IO.println("SimulaLexer.getEOFToken: "+token);
+        if(Option.internal.TRACE_LEXER > 1) IO.println("SimulaLexer.getEOFToken: "+token);
         return token;
     }
 
@@ -118,7 +117,7 @@ public class SimulaLexer {
     	Util.IERR("GAMMEL: BLE BRUKT AV DefaultScanner OG SimulaScanner");
         LexToken next = currentLexerToken;
         advance();
-        if(DEBUG > 1) IO.println("SimulaLexer.nextToken: "+next);
+        if(Option.internal.TRACE_LEXER > 1) IO.println("SimulaLexer.nextToken: "+next);
         return next;
     }
 
@@ -136,7 +135,7 @@ public class SimulaLexer {
     /// Scan basic Token
     /// @return next Token
     private LexToken scanBasic() {
-        if(Global.TRACE_SCAN) Util.TRACE("SimulaLexer.scanBasic: "+edcurrent());
+        if(Global.TRACE_LEXER) Util.TRACE("SimulaLexer.scanBasic: "+edcurrent());
 //        IO.println("SimulaLexer.scanBasic: "+edcurrent());
         while(true)	{
             getNext(); if(current == EOF_MARK) return(null);
@@ -191,6 +190,10 @@ public class SimulaLexer {
                     if(current   == '>')   return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.NE);
                     pushBack(current);     return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.LT);
 
+	            case '*':
+		            if(getNext() == '*')   return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.EXP);
+		            pushBack(current); 	   return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.MUL);
+
                 case '/':
                     if(getNext() == '/')   return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.INTDIV);
                     pushBack(current);     return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.DIV);
@@ -212,7 +215,6 @@ public class SimulaLexer {
                 case '"':  return(scanSimpleString());
 
                 case '+': return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.PLUS);
-                case '*': return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.MUL);
                 case ',': return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.COMMA);
                 
 //                case ';': pardepth=0; return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.SEMICOLON);
@@ -254,7 +256,7 @@ public class SimulaLexer {
     /// @return next Token
     private LexToken scanIdentifier() {
         String name=scanName();
-        if(Global.TRACE_SCAN) Util.TRACE("scanIdentifier: name=\""+name+"\"");
+        if(Global.TRACE_LEXER) Util.TRACE("scanIdentifier: name=\""+name+"\"");
         String ident=(Global.CaseSensitive)?name:name.toLowerCase();
         switch(Character.toLowerCase(ident.charAt(0))) {
             case 'a':
@@ -405,20 +407,20 @@ public class SimulaLexer {
     private LexToken scanNumber() {
         int radix=10;
         char firstChar=(char)current;
-        if(Global.TRACE_SCAN) Util.TRACE("scanNumber, "+edcurrent());
+        if(Global.TRACE_LEXER) Util.TRACE("scanNumber, "+edcurrent());
         Util.ASSERT(Character.isDigit((char)(current)),"scanNumber:Expecting a Digit");
         StringBuilder number=new StringBuilder();
 
         number.append((char)current);
         if(getNext() == 'R' && (firstChar == '2' | firstChar == '4' | firstChar == '8')) {
             radix=firstChar - '0';
-            if(Global.TRACE_SCAN) Util.TRACE("scanNumber, radix="+radix);
+            if(Global.TRACE_LEXER) Util.TRACE("scanNumber, radix="+radix);
             number.setLength(0);
         } else if(firstChar == '1' && current == '6') {
             number.append((char)current);
             if(getNext() == 'R') {
                 radix=16;
-                if(Global.TRACE_SCAN) Util.TRACE("scanNumber, radix="+radix);
+                if(Global.TRACE_LEXER) Util.TRACE("scanNumber, radix="+radix);
                 number.setLength(0);
             } else pushBack(current);
         } else pushBack (current);
@@ -431,7 +433,7 @@ public class SimulaLexer {
         if(current == '&' && radix == 10) { getNext(); return(scanDigitsExp(number)); }
 
         String result=number.toString(); number=null;
-        if(Global.TRACE_SCAN) Util.TRACE("scanNumber, result='"+result+"' radix="+radix);
+        if(Global.TRACE_LEXER) Util.TRACE("scanNumber, result='"+result+"' radix="+radix);
 
         pushBack(current);
         @SuppressWarnings("unused")
@@ -462,7 +464,7 @@ public class SimulaLexer {
     /// @param number The edited number so far
     /// @return next Token
     private LexToken scanDotDigit(StringBuilder number) {
-        if(Global.TRACE_SCAN) Util.TRACE("scanDotDigit, "+edcurrent());
+        if(Global.TRACE_LEXER) Util.TRACE("scanDotDigit, "+edcurrent());
         number.append('.');
         if(Character.isDigit(current)) number.append((char)current);
         while(Character.isDigit(getNext()) || current == '_')
@@ -471,7 +473,7 @@ public class SimulaLexer {
         if(current == '&') { getNext(); return(scanDigitsExp(number)); }
 
         String result=number.toString(); number=null;
-        if(Global.TRACE_SCAN) Util.TRACE("scanDotDigit, result='"+result);
+        if(Global.TRACE_LEXER) Util.TRACE("scanDotDigit, result='"+result);
         pushBack(current);
         try {
             return new RealConst(tokenStartLine, sourceText, tokenStartOffset, currentPosition, Float.parseFloat(result));
@@ -501,7 +503,7 @@ public class SimulaLexer {
         String result;
         @SuppressWarnings("unused")
         boolean doubleAmpersand=false;
-        if(Global.TRACE_SCAN) Util.TRACE("scanDigitsExp, "+edcurrent());
+        if(Global.TRACE_LEXER) Util.TRACE("scanDigitsExp, "+edcurrent());
         if(number==null) { number=new StringBuilder(); number.append('1'); }
         if(current == '&') { getNext(); doubleAmpersand=true; }
         number.append('e');
@@ -511,7 +513,7 @@ public class SimulaLexer {
         while(Character.isDigit(getNext()) || current == '_') number.append((char)current);
 
         result=number.toString(); number=null;
-        if(Global.TRACE_SCAN) Util.TRACE("scanDigitsExp, result='"+result);
+        if(Global.TRACE_LEXER) Util.TRACE("scanDigitsExp, result='"+result);
         pushBack(current);
         try {
             if(doubleAmpersand) return new LongRealConst(tokenStartLine, sourceText, tokenStartOffset, currentPosition, Double.parseDouble(result));
@@ -539,13 +541,13 @@ public class SimulaLexer {
     /// @return the resulting identifier
     private String scanName() {
         StringBuilder name=new StringBuilder();
-        if(Global.TRACE_SCAN) Util.TRACE("scanName, "+edcurrent());
+        if(Global.TRACE_LEXER) Util.TRACE("scanName, "+edcurrent());
         Util.ASSERT(Character.isLetter((char)(current)),"Expecting a Letter");
         name.append((char)current);
         while ((Character.isLetter(getNext()) || Character.isDigit(current) || current == '_'))
             name.append((char)current);
         pushBack(current);
-        if(Global.TRACE_SCAN) Util.TRACE("scanName, name="+name+",current="+edcurrent());
+        if(Global.TRACE_LEXER) Util.TRACE("scanName, name="+name+",current="+edcurrent());
         return(name.toString());
     }
 
@@ -573,7 +575,7 @@ public class SimulaLexer {
     /// @return next Token
     private LexToken scanCharacterConstant() {
         char result=0;
-        if(Global.TRACE_SCAN) Util.TRACE("scanCharacterConstant, "+edcurrent());
+        if(Global.TRACE_LEXER) Util.TRACE("scanCharacterConstant, "+edcurrent());
         Util.ASSERT((char)(current)=='\'',"Expecting a character quote '");
         if((isPrintable(getNext())) && current != '!') {
             result=(char)current; getNext();
@@ -585,7 +587,7 @@ public class SimulaLexer {
             Util.error("Character constant is not terminated. "+edcurrent());
             pushBack(current);
         }
-        if(Global.TRACE_SCAN) Util.TRACE("END scanCharacterConstant, result='"+result+"', "+edcurrent());
+        if(Global.TRACE_LEXER) Util.TRACE("END scanCharacterConstant, result='"+result+"', "+edcurrent());
         return new CharacterConst(tokenStartLine, sourceText, tokenStartOffset, currentPosition, result);
     }
 
@@ -617,13 +619,13 @@ public class SimulaLexer {
     /// </pre>
     /// @return next Token
     private LexToken OLD_scanTextConstant() {
-        if(Global.TRACE_SCAN) Util.TRACE("scanTextConstant, "+edcurrent());
+        if(Global.TRACE_LEXER) Util.TRACE("scanTextConstant, "+edcurrent());
         IO.println("SimulaLexer.scanTextConstant: BEGIN -----------------------------------------------------------------------");
         LOOP:while(true) {
             OLD_scanSimpleString();
             // Skip string-separators
             while(scanStringSeparator());
-            if(Global.TRACE_SCAN) Util.TRACE("scanTextConstant(2): "+edcurrent());
+            if(Global.TRACE_LEXER) Util.TRACE("scanTextConstant(2): "+edcurrent());
             IO.println("scanTextConstant(2): "+edcurrent());
             if(current!='"') {
                 pushBack(current);
@@ -636,7 +638,7 @@ public class SimulaLexer {
         return popToken();
     }
     private LexToken NEW_scanTextConstant() {
-        if(Global.TRACE_SCAN) Util.TRACE("scanTextConstant, "+edcurrent());
+        if(Global.TRACE_LEXER) Util.TRACE("scanTextConstant, "+edcurrent());
         IO.println("SimulaLexer.scanTextConstant: BEGIN -----------------------------------------------------------------------");
         SimpleString first = NEW_scanSimpleString();
         String result = first.value;
@@ -645,7 +647,7 @@ public class SimulaLexer {
         int textStartLine = tokenStartLine;
         LOOP:while(true) {
         	while(scanStringSeparator());
-        	if(Global.TRACE_SCAN) Util.TRACE("scanTextConstant(2): "+edcurrent());
+        	if(Global.TRACE_LEXER) Util.TRACE("scanTextConstant(2): "+edcurrent());
         	IO.println("scanTextConstant(2): "+edcurrent());
         	if(current!='"') {
         		pushBack(current);
@@ -664,7 +666,7 @@ public class SimulaLexer {
 //            NEW_scanSimpleString();
 //            // Skip string-separators
 //            while(scanStringSeparator());
-//            if(Global.TRACE_SCAN) Util.TRACE("scanTextConstant(2): "+edcurrent());
+//            if(Global.TRACE_LEXER) Util.TRACE("scanTextConstant(2): "+edcurrent());
 //            IO.println("scanTextConstant(2): "+edcurrent());
 //            if(current!='"') {
 //                pushBack(current);
@@ -724,7 +726,7 @@ public class SimulaLexer {
         	}
         }
         String result=sb.toString();
-        if(Global.TRACE_SCAN) Util.TRACE("scanSimpleString: Result=\""+result+"\", "+edcurrent());
+        if(Global.TRACE_LEXER) Util.TRACE("scanSimpleString: Result=\""+result+"\", "+edcurrent());
         return new SimpleString(tokenStartLine, sourceText, tokenStartOffset, currentPosition, result);
     }
     private void OLD_scanSimpleString() {
@@ -759,7 +761,7 @@ public class SimulaLexer {
         	}
         }
         String result=sb.toString();
-        if(Global.TRACE_SCAN) Util.TRACE("scanSimpleString: Result=\""+result+"\", "+edcurrent());
+        if(Global.TRACE_LEXER) Util.TRACE("scanSimpleString: Result=\""+result+"\", "+edcurrent());
         tokenQueueAdd("scanTextConstant", new SimpleString(tokenStartLine, sourceText, tokenStartOffset, currentPosition, result));
     }
     private LexToken scanSimpleString() {
@@ -794,7 +796,7 @@ public class SimulaLexer {
       	}
       }
       String result=sb.toString();
-      if(Global.TRACE_SCAN) Util.TRACE("scanSimpleString: Result=\""+result+"\", "+edcurrent());
+      if(Global.TRACE_LEXER) Util.TRACE("scanSimpleString: Result=\""+result+"\", "+edcurrent());
       return new SimpleString(tokenStartLine, sourceText, tokenStartOffset, currentPosition, result);
     }
     
@@ -860,7 +862,7 @@ public class SimulaLexer {
     /// @return the resulting iso-code
     private int scanPossibleIsoCode() {
         char firstchar, secondchar, thirdchar;
-        if (Global.TRACE_SCAN) Util.TRACE("scanPossibleIsoCode, " + edcurrent());
+        if (Global.TRACE_LEXER) Util.TRACE("scanPossibleIsoCode, " + edcurrent());
         Util.ASSERT((char) (current) == '!', "Expecting a character !");
         if (Character.isDigit(getNext())) {
             firstchar = (char) current;
@@ -870,7 +872,7 @@ public class SimulaLexer {
                     thirdchar = (char) current;
                     if (getNext() == '!') { // ! digit digit digit ! Found
                         int value = (((firstchar - '0') * 10 + secondchar - '0') * 10 + thirdchar - '0');
-                        if (Global.TRACE_SCAN)
+                        if (Global.TRACE_LEXER)
                             Util.TRACE("scanPossibleIsoCode:Got three digits: "+(char)firstchar+(char)secondchar+(char)thirdchar+"value="+value);
                         if (value < 256)
                             return (value);
@@ -925,7 +927,7 @@ public class SimulaLexer {
     /// @return a Comment Token
     private LexToken scanComment() {
         StringBuilder skipped = new StringBuilder();
-        if (Global.TRACE_SCAN) Util.TRACE("BEGIN scanComment, " + edcurrent());
+        if (Global.TRACE_LEXER) Util.TRACE("BEGIN scanComment, " + edcurrent());
         while ((getNext() != ';') && current != EOF_MARK)
             skipped.append((char) current);
         skipped.append((char) current);
@@ -935,7 +937,7 @@ public class SimulaLexer {
             Util.error("Comment is not terminated with ';'.");
             pushBack(current);
         }
-        if (Global.TRACE_SCAN) Util.TRACE("END scanComment: " + edcurrent() + "  skipped=\"" + skipped + '"');
+        if (Global.TRACE_LEXER) Util.TRACE("END scanComment: " + edcurrent() + "  skipped=\"" + skipped + '"');
         if (Global.TRACE_COMMENTS) Util.TRACE("COMMENT:\"" + skipped + "\" Skipped and replaced with a SPACE");
         return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.COMMENT);
     }
@@ -956,12 +958,12 @@ public class SimulaLexer {
     /// @return a Comment Token
     private LexToken scanCommentToEndOfLine() {
         StringBuilder skipped = new StringBuilder();
-        if (Global.TRACE_SCAN) Util.TRACE("BEGIN scanCommentToEndOfLine, " + edcurrent());
+        if (Global.TRACE_LEXER) Util.TRACE("BEGIN scanCommentToEndOfLine, " + edcurrent());
         while ((getNext() != '\n') && current != EOF_MARK)
             skipped.append((char) current);
         nextLineNumber++;
         skipped.append((char) current);
-        if (Global.TRACE_SCAN) Util.TRACE("END scanCommentToEndOfLine: " + edcurrent() + "  skipped=\"" + skipped + '"');
+        if (Global.TRACE_LEXER) Util.TRACE("END scanCommentToEndOfLine: " + edcurrent() + "  skipped=\"" + skipped + '"');
         if (Global.TRACE_COMMENTS) Util.TRACE("COMMENT:\"" + skipped + "\" Skipped and replaced with a SPACE");
         return new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.COMMENT);
     }
@@ -991,7 +993,7 @@ public class SimulaLexer {
         tokenQueueAdd("scanEndComment", new KeyWordToken(tokenStartLine, sourceText, tokenStartOffset, currentPosition, KeyWord.END));
         
         StringBuilder skipped = new StringBuilder();
-        if (Global.TRACE_SCAN) Util.TRACE("scanEndComment, " + edcurrent());
+        if (Global.TRACE_LEXER) Util.TRACE("scanEndComment, " + edcurrent());
         int firstLine = this.nextLineNumber;
         int lastLine = firstLine;
         LOOP:while (getNext() != EOF_MARK) {

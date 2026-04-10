@@ -19,7 +19,7 @@ import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
-import simula.psi.PsiBuilder;
+import simula.psi.PsiTree;
 
 /// Undefined Declaration.
 /// 
@@ -34,8 +34,8 @@ public class UndefinedDeclaration extends Declaration {
 	/// Create a new UndefinedDeclaration.
 	/// 
 	/// @param identifier the variable identifier
-	public UndefinedDeclaration(final PsiBuilder psiBuilder, final String identifier) {
-		super(psiBuilder.psiTree, identifier);
+	public UndefinedDeclaration(final PsiTree psiTree, final String identifier) {
+		super(psiTree, identifier);
 		this.declarationKind = ObjectKind.UndefinedDeclaration;
 		this.type = Type.Undef;
 	}

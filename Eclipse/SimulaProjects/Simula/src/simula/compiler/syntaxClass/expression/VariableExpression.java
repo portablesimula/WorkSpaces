@@ -653,7 +653,10 @@ public final class VariableExpression extends Expression {
 				return CallProcedure.virtual(this, virtual, remotelyAccessed);
 
 			case ObjectKind.UndefinedDeclaration:
-				Util.IERR("");
+				if (rightPart != null)
+					return decl.toString() + '=' + rightPart;
+				else
+					return decl.toString();
 	
 			default:
 				Util.IERR(""+ObjectKind.edit(decl.declarationKind));

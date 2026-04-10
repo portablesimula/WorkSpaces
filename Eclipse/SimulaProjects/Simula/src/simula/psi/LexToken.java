@@ -20,9 +20,17 @@ public class LexToken extends PsiElement {
 		this.sourceText = sourceText;
 		this.startOffset = startOffset;
 		this.endOffset = endOffset;
-		if(Option.TRACE_NEW_LEXTOKEN >0) IO.println("NEW LexToken: "+this);
-//		IO.println("NEW LexToken: "+this+"  CALLED FROM: " + Util.calledFrom(3, 25));
-//		Thread.dumpStack();
+		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) {
+			if(Option.internal.TRACE_NEW_LEXTOKEN > 1) {
+				IO.println("NEW LexToken: Line: "+lineNumber+": "+this);
+			} else {
+				if(keyWord == KeyWord.WHITESPACES) ; // Nothing
+				else if(keyWord == KeyWord.NEWLINE) ; // Nothing
+				else IO.println("NEW LexToken: Line: "+lineNumber+": "+this);
+			}
+//			IO.println("NEW LexToken: "+this+"  CALLED FROM: " + Util.calledFrom(3, 25));
+//			Thread.dumpStack();
+		}
 	}
 
 //	public LexToken(int tokenStartLine, int keyWord) {

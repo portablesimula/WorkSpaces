@@ -16,6 +16,7 @@ import simula.compiler.SimulaCompiler;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.editor.RTOption;
 
 /**
  * Simula Test Batch donated by Simula as.
@@ -53,7 +54,7 @@ public final class RunSingleTest {
 //		Option.internal.TRACING=true;
 
 		// Scanner Trace Options
-//		Option.TRACE_SCAN=true;
+//		Option.TRACE_LEXER=true;
 //		Option.TRACE_COMMENTS=true;
 
 		// Parser Trace Options
@@ -94,7 +95,7 @@ public final class RunSingleTest {
 		
 		Vector<String> names=new Vector<String>();
 //		names.add("AdHoc_SimulaTest.sim"); // Simula TestBatch Framework
-//		names.add("adHoc00.sim"); // For ad'hoc testing
+		names.add("adHoc00.sim"); // For ad'hoc testing
 //		names.add("adHoc01.sim"); // For ad'hoc testing
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
@@ -108,10 +109,10 @@ public final class RunSingleTest {
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
 //		names.add("simtst03.sim"); // OK:  Test Text Value Relations
 //		names.add("simtst04.sim"); // OK:  To test putint and putreal.
-		names.add("simtst05.sim"); // OK:  Test Aritmetisk Relations
+//		names.add("simtst05.sim"); // OK:  Test Aritmetisk Relations
 //		names.add("simtst06.sim"); // OK:  Test Mathematical Functions
 //		names.add("simtst07.sim"); // OK:  Test Mathematical Library
-//		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
+//			names.add("simtst08.sim"); // OK:  Test Scope of Variables.
 //		names.add("simtst09.sim"); // OK:  Test relation operator and some Funtions
 //		names.add("simtst10.sim"); // OK:  Test Evaluation of Text-Constants
 //

@@ -58,7 +58,7 @@ public final class RunSingleClassTest {
 //		Option.internal.TRACING=true;
 
 		// Scanner Trace Options
-//		Option.internal.TRACE_SCAN=true;
+//		Option.internal.TRACE_LEXER=true;
 //		Option.internal.TRACE_COMMENTS=true;
 
 		// Parser Trace Options
@@ -99,8 +99,8 @@ public final class RunSingleClassTest {
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
 		
-//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
-		names.add("simtst00.sim"); // OK:  Empty test
+		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+//		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
 //		names.add("simtst03.sim"); // OK:  Test Text Value Relations
@@ -109,7 +109,7 @@ public final class RunSingleClassTest {
 //		names.add("simtst06.sim"); // OK:  Test Mathematical Functions
 //		names.add("simtst07.sim"); // OK:  Test Mathematical Library
 //		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
-//		names.add("simtst09.sim"); // OK:  Test relation operator and some Funtions
+		names.add("simtst09.sim"); // OK:  Test relation operator and some Funtions
 //		names.add("simtst10.sim"); // OK:  Test Evaluation of Text-Constants
 //
 //		names.add("simtst11.sim"); // OK:  Text Attributes constant, start, length, pos and main

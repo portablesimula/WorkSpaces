@@ -70,13 +70,13 @@ public abstract class Statement extends SyntaxClass {
 		int lineNumber=PsiParse.getParserToken(psiBuilder).lineNumber;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Statement.acceptStatement: LabeledStatement: lineNumber="+lineNumber+", current=" + PsiParse.getParserToken(psiBuilder));//	+ ", prev=" + PsiParse.prevToken);
-		psiBuilder.startSubtree("LabelDeclaration");
+		psiBuilder.startSubtree(PsiTree.Kind.label, "LabelDeclaration");
 		String ident = PsiParse.acceptIdentifier(psiBuilder);
 		while (PsiParse.accept(psiBuilder, KeyWord.COLON)) {
 			if (ident != null) {
 				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
 				LabelDeclaration label = new LabelDeclaration(psiBuilder, ident);
-				psiBuilder.doneSubtree(label);
+				psiBuilder.doneSubtree(PsiTree.Kind.label, label);
 				psiBuilder.startSubtree("LabelDeclaration");
 				labels.add(label);
 				DeclarationScope scope = Global.getCurrentScope();
@@ -85,10 +85,11 @@ public abstract class Statement extends SyntaxClass {
 			} else Util.error("Missplaced ':'");
 			ident = PsiParse.acceptIdentifier(psiBuilder);
 		}
-		psiBuilder.dropSubtree();
+		psiBuilder.dropSubtree(PsiTree.Kind.label);
+		
 		if(ident!=null) {
 			if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("\n\nStatement.acceptStatement: NOT LABEL ==> ROLL BACK: "+ident);
-			PsiParse.rollBack(psiBuilder); // Not Label: rollBack
+			PsiParse.rollBack(psiBuilder, " is not a label"); // Not Label: rollBack
 		}
 		Statement statement = acceptUnlabeledStatement(psiBuilder);
 		if (labels != null && statement != null) {
@@ -110,7 +111,7 @@ public abstract class Statement extends SyntaxClass {
 				if(Option.TRACE_ACCEPT_STATEMENT > 1) IO.println("\nStatement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
 				MaybeBlockDeclaration block = new MaybeBlockDeclaration(psiBuilder.psiTree, null);
 				block.expectMaybeBlock(psiBuilder);
-				statement = new BlockStatement(psiBuilder, block);
+				statement = new BlockStatement(psiBuilder, block, "Statement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
 				break;
 				
 			case KeyWord.IF:		 statement = new ConditionalStatement(psiBuilder); break;
@@ -134,9 +135,9 @@ public abstract class Statement extends SyntaxClass {
 				// new classIdentifier ...
 				// this classIdentifier ...
 				// BEGPAR ????
-				Util.IERR("DETTE MÅ SKRIVES");
-				Util.STOP();
-				break;
+//				Util.IERR("DETTE MÅ SKRIVES");
+//				Util.STOP();
+//				break;
 			case KeyWord.IDENTIFIER:
 			case KeyWord.NEW:
 		    case KeyWord.THIS:
@@ -162,12 +163,14 @@ public abstract class Statement extends SyntaxClass {
 						if (PsiParse.accept(psiBuilder, KeyWord.BEGIN)) {
 //							Util.IERR("Statement.acceptUnlabeledStatement: PREFIXED BLOCK: NOT IMPL");
 							//return new BlockStatement(PrefixedBlockDeclaration.expectPrefixedBlock(var,false));
-							BlockStatement prfblk = new BlockStatement(psiBuilder, PrefixedBlockDeclaration.expectPrefixedBlock(psiBuilder, var,false));
+							BlockStatement prfblk = new BlockStatement(psiBuilder, PrefixedBlockDeclaration.expectPrefixedBlock(psiBuilder, var,false)
+									, "Statement.acceptIdentifierStatement: GOT VariableExpression: "+var);
 							return prfblk;
 	      				}
 	      			}
 	      			statement = new StandaloneExpression(psiBuilder, expr);
 	      		}
+		    	
 				break;
 				
 			default:
@@ -187,8 +190,6 @@ public abstract class Statement extends SyntaxClass {
 //		else psiBuilder.dropSubtree();
 		return statement;
   }
-
-
 
 	@Override
 	public void doJavaCoding() {

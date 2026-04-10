@@ -33,7 +33,7 @@ import simula.editor.RTOption;
 /// @author Øystein Myhre Andersen
 public final class Global {
     
-	public static boolean TRACE_SCAN = false;
+	public static boolean TRACE_LEXER = false;
 	public static final boolean CaseSensitive = false;
 	public static boolean TRACE_COMMENTS = false;
 

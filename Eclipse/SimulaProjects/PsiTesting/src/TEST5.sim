@@ -1,0 +1,29 @@
+begin
+
+   integer            isum;               ! To contain control sum.     ;
+   real               rsum;               ! To contain control sum.     ;
+   text               txt;                ! Used in controlling real    ;
+                                       ! controll sum.               ;
+   begin
+      integer            intr;
+      real               rea;
+
+      intr := 1;
+      rea := 1;
+
+
+
+      isum := isum + intr;
+      rsum := rsum + rea
+   end;
+
+   txt :- blanks (6);
+   txt.putfix (rsum, 0);
+
+   if isum <> 34911 or txt <> " 34911" then begin
+      outtext("ERROR : In variable scope"); outimage;
+      outtext ("    Result sums was : ");
+      outtext (txt); outint (isum, 8); outimage;
+   end;
+
+end of program

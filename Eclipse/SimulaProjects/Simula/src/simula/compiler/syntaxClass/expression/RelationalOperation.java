@@ -101,8 +101,10 @@ public final class RelationalOperation extends Expression {
 			if (type1.keyWord == Type.T_BOOLEAN   && type2.keyWord == Type.T_BOOLEAN) break;
 			// Arithmetic Relation
 			Type atype = Type.arithmeticTypeConversion(type1, type2);
-			if (atype == null)
+			if (atype == null) {
 				Util.error("Incompatible types in binary operation: " + toString());
+				Util.error("RelationalOperation: Illegal types: " + type1 + " " + opr + " " + type2);
+			}
 			lhs = (Expression) TypeConversion.testAndCreate(atype, lhs);
 			rhs = (Expression) TypeConversion.testAndCreate(atype, rhs);
 			break;

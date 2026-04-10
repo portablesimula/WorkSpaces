@@ -67,9 +67,9 @@ public final class StandaloneExpression extends Statement {
 		LexToken prevToken = null;
 		while ((prevToken = PsiParse.acceptParserToken(psiBuilder, KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF)) != null) { 
 //			IO.println("NEW StandaloneExpression: prevToken="+prevToken);
-			psiBuilder.startSubtree("AssignmentOperation");
+			psiBuilder.startSubtree(PsiTree.Kind.expression, "AssignmentOperation");
 			this.expression = new AssignmentOperation(psiBuilder.psiTree, this.expression, prevToken.keyWord, expectStandaloneExpression(psiBuilder));
-			psiBuilder.doneSubtree(this);
+			psiBuilder.doneSubtree(PsiTree.Kind.expression, this);
 		}		
 		
 //		IO.println("\nEND NEW StandaloneExpression: expr="+expression);

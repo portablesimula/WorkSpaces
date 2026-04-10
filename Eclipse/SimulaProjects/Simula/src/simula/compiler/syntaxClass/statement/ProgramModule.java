@@ -33,6 +33,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Simula Program Module.
 /// 
@@ -96,7 +97,7 @@ public final class ProgramModule extends Statement {
 	public ProgramModule(PsiBuilder psiBuilder) {
 		super(psiBuilder.psiTree);
 		String debugName = "ProgramModule";
-		psiBuilder.startSubtree(debugName);
+		psiBuilder.startSubtree(PsiTree.Kind.programModule, debugName);
 
 		sysin=new VariableExpression(null, "sysin");
 		sysout=new VariableExpression(null, "sysout");
@@ -121,7 +122,7 @@ public final class ProgramModule extends Statement {
 			String ident=PsiParse.acceptIdentifier(psiBuilder);
 			if(ident!=null) {
 				if(PsiParse.accept(psiBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(psiBuilder, ident);
-			    else { PsiParse.rollBack(psiBuilder); mainModule = doParseProgram(psiBuilder); }
+			    else { PsiParse.rollBack(psiBuilder, " is not a class identifier"); mainModule = doParseProgram(psiBuilder); }
 			}
 			else if(PsiParse.accept(psiBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(psiBuilder, ident);
 			else {
@@ -129,7 +130,7 @@ public final class ProgramModule extends Statement {
 			    if(PsiParse.accept(psiBuilder, KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(psiBuilder, type);
 			    else mainModule = doParseProgram(psiBuilder);
 			}
-			psiBuilder.doneSubtree(mainModule);
+			psiBuilder.doneSubtree(PsiTree.Kind.programModule, mainModule);
 			StandardClass.BASICIO.declarationList.add(mainModule);
 			
 			LexToken token = PsiParse.getParserToken(psiBuilder);
@@ -157,7 +158,7 @@ public final class ProgramModule extends Statement {
 	/// @return the Program Statement.
 	private DeclarationScope doParseProgram(final PsiBuilder psiBuilder) {
 		BlockDeclaration mainBlock = new MaybeBlockDeclaration(psiBuilder.psiTree, Global.sourceName);
-		psiBuilder.startSubtree("MainProgramBlock");
+		psiBuilder.startSubtree(PsiTree.Kind.mainModule, "MainProgramBlock");
 		
 		mainBlock.isMainModule = true;
 		mainBlock.declarationKind = ObjectKind.SimulaProgram;
@@ -166,7 +167,7 @@ public final class ProgramModule extends Statement {
 		Statement program = Statement.acceptStatement(psiBuilder);
 		mainBlock.statements.add(program);
 //		mainBlock.psiTree.addChild(program.psiTree);
-		psiBuilder.doneSubtree(this);
+		psiBuilder.doneSubtree(PsiTree.Kind.mainModule, this);
 		return mainBlock;
 	}
 

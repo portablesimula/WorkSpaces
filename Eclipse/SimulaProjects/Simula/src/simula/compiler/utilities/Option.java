@@ -35,9 +35,9 @@ import javax.swing.JTextField;
 /// @author Øystein Myhre Andersen
 public final class Option {
 
-	public static int TRACE_PSITREE_START_DONE = 0;
-	public static int TRACE_NEW_LEXTOKEN = 0;
-	public static int TRACE_ACCEPT_EXPRESSION = 0;
+
+	public static int TRACE_PSITREE_START_DONE = 1;//0;
+	public static int TRACE_ACCEPT_EXPRESSION = 1;//0;
 	public static int TRACE_ACCEPT_STATEMENT = 0;
 	
 	/// The UI-Scale factor
@@ -92,58 +92,59 @@ public final class Option {
 
 
 		// Overall TRACING Options
-		/** Debug option */	public static boolean TRACING=false;
-		/** Debug option */	public static boolean DEBUGGING=false;		// Set by EditorMenues - doDebugAction
+		/** Debug option */	public static boolean TRACING = false;
+		/** Debug option */	public static boolean DEBUGGING = false;		// Set by EditorMenues - doDebugAction
 
-		// Scanner Trace Options
-		/** Debug option */	public static boolean TRACE_SCAN=false;
-		/** Debug option */	public static boolean TRACE_COMMENTS=false;
+		// Lexer Trace Options
+		/** Debug option */	public static int TRACE_LEXER = 0;
+		/** Debug option */	public static int TRACE_NEW_LEXTOKEN = 1;//0;
+		/** Debug option */	public static boolean TRACE_COMMENTS = false;
 
 		// Parser Trace Options
-		/** Debug option */	public static boolean TRACE_PARSE=false;
-		/** Debug option */	public static int     PRINT_SYNTAX_TREE=0;
-		/** Debug option */	public static boolean TRACE_ATTRIBUTE_OUTPUT=false;
-		/** Debug option */	public static boolean TRACE_ATTRIBUTE_INPUT=false;
+		/** Debug option */	public static boolean TRACE_PARSE = false;
+		/** Debug option */	public static int     PRINT_SYNTAX_TREE = 0;
+		/** Debug option */	public static boolean TRACE_ATTRIBUTE_OUTPUT = false;
+		/** Debug option */	public static boolean TRACE_ATTRIBUTE_INPUT = false;
 
 		// Checker Trace Options
-		/** Debug option */	public static boolean TRACE_CHECKER=false;
-		/** Debug option */	public static boolean TRACE_CHECKER_OUTPUT=false;
-		/** Debug option */	public static int     TRACE_FIND_MEANING=0;
+		/** Debug option */	public static boolean TRACE_CHECKER = false;
+		/** Debug option */	public static boolean TRACE_CHECKER_OUTPUT = false;
+		/** Debug option */	public static int     TRACE_FIND_MEANING = 0;
 
 		// Java Coder Options
-		/** Debug option */	public static boolean TRACE_CODING=false;         // Only when .java output
-		/** Debug option */	public static boolean GNERATE_LINE_CALLS=false;   // Only when .java output
+		/** Debug option */	public static boolean TRACE_CODING = false;         // Only when .java output
+		/** Debug option */	public static boolean GNERATE_LINE_CALLS = false;   // Only when .java output
 
 		// Byte code engineering Options
-		/** Debug option */	public static boolean TRACE_BYTECODE_OUTPUT=false;
-		/** Debug option */	public static boolean LIST_REPAIRED_INSTRUCTION_LIST=false;
-		/** Debug option */	public static boolean TRACE_REPAIRING=false;
-		/** Debug option */	public static boolean LIST_INPUT_INSTRUCTION_LIST=false;
-		/** Debug option */	public static boolean TRACE_REPAIRING_INPUT=false;
-		/** Debug option */	public static boolean TRACE_REPAIRING_OUTPUT=false;
+		/** Debug option */	public static boolean TRACE_BYTECODE_OUTPUT = false;
+		/** Debug option */	public static boolean LIST_REPAIRED_INSTRUCTION_LIST = false;
+		/** Debug option */	public static boolean TRACE_REPAIRING = false;
+		/** Debug option */	public static boolean LIST_INPUT_INSTRUCTION_LIST = false;
+		/** Debug option */	public static boolean TRACE_REPAIRING_INPUT = false;
+		/** Debug option */	public static boolean TRACE_REPAIRING_OUTPUT = false;
 
-		/** Runtime Options */ public static String SOURCE_FILE="";
-		/** Runtime Options */ public static String RUNTIME_USER_DIR="";
+		/** Runtime Options */ public static String SOURCE_FILE = "";
+		/** Runtime Options */ public static String RUNTIME_USER_DIR = "";
 		
 		/// Initiate Compiler options
 		public static void InitCompilerOptions() {
 
-			Option.internal.TRACING=false;
-			Option.internal.DEBUGGING=false;
+			Option.internal.TRACING = false;
+			Option.internal.DEBUGGING = false;
 
 			// Scanner Trace Options
-			Option.internal.TRACE_SCAN=false;
-			Option.internal.TRACE_COMMENTS=false;
+			Option.internal.TRACE_LEXER = 0;
+			Option.internal.TRACE_COMMENTS = false;
 
 			// Parser Trace Options
-			Option.internal.TRACE_PARSE=false;
+			Option.internal.TRACE_PARSE = false;
 
 			// Checker Trace Options
-			Option.internal.TRACE_CHECKER=false;
-			Option.internal.TRACE_CHECKER_OUTPUT=false;
+			Option.internal.TRACE_CHECKER = false;
+			Option.internal.TRACE_CHECKER_OUTPUT = false;
 
 			// Coder Trace Options
-			Option.internal.TRACE_CODING=false;
+			Option.internal.TRACE_CODING = false;
 		}
 
 	}
@@ -155,13 +156,13 @@ public final class Option {
 	public static void InitCompilerOptions() {
 		Option.editorUIScale = "1.0";
 //		CompilerMode compilerMode=CompilerMode.viaJavaSource;
-		compilerMode=CompilerMode.directClassFiles;
-//		compilerMode=CompilerMode.simulaClassLoader;
-		Option.CaseSensitive=false;
+		compilerMode = CompilerMode.directClassFiles;
+//		compilerMode = CompilerMode.simulaClassLoader;
+		Option.CaseSensitive = false;
 		Option.verbose = false;
 		Option.noExecution = false;
-		Option.WARNINGS=true;
-		Option.EXTENSIONS=true;
+		Option.WARNINGS = true;
+		Option.EXTENSIONS = true;
 		
 		Option.internal.InitCompilerOptions();
 	}
@@ -333,7 +334,7 @@ public final class Option {
 		if(id.equalsIgnoreCase("WARNINGS")) return(WARNINGS); 
 		if(id.equalsIgnoreCase("EXTENSIONS")) return(EXTENSIONS); 
 		if(id.equalsIgnoreCase("TRACING")) return(internal.TRACING); 
-		if(id.equalsIgnoreCase("TRACE_SCAN")) return(internal.TRACE_SCAN); 
+		if(id.equalsIgnoreCase("TRACE_LEXER")) return(internal.TRACE_LEXER > 0); 
 		if(id.equalsIgnoreCase("TRACE_COMMENTS")) return(internal.TRACE_COMMENTS); 
 		if(id.equalsIgnoreCase("TRACE_PARSE")) return(internal.TRACE_PARSE); 
 		if(id.equalsIgnoreCase("TRACE_ATTRIBUTE_OUTPUT")) return(internal.TRACE_ATTRIBUTE_OUTPUT); 
@@ -355,7 +356,7 @@ public final class Option {
 		if(id.equalsIgnoreCase("WARNINGS")) WARNINGS=val; 
 		if(id.equalsIgnoreCase("EXTENSIONS")) EXTENSIONS=val; 
 		if(id.equalsIgnoreCase("TRACING")) internal.TRACING=val; 
-		if(id.equalsIgnoreCase("TRACE_SCAN")) internal.TRACE_SCAN=val; 
+		if(id.equalsIgnoreCase("TRACE_LEXER")) internal.TRACE_LEXER=(val)?1:0; 
 		if(id.equalsIgnoreCase("TRACE_COMMENTS")) internal.TRACE_COMMENTS=val; 
 		if(id.equalsIgnoreCase("TRACE_PARSE")) internal.TRACE_PARSE=val; 
 		if(id.equalsIgnoreCase("TRACE_ATTRIBUTE_OUTPUT")) internal.TRACE_ATTRIBUTE_OUTPUT=val; 
@@ -377,7 +378,7 @@ public final class Option {
 		panel.add(checkBox("noExecution","Don't execute generated .jar file"));
 		if(Option.internal.DEBUGGING) {
 			panel.add(checkBox("TRACING","Debug option"));
-			panel.add(checkBox("TRACE_SCAN","Debug option"));
+			panel.add(checkBox("TRACE_LEXER","Debug option"));
 			panel.add(checkBox("TRACE_COMMENTS","Debug option"));
 			panel.add(checkBox("TRACE_PARSE","Debug option"));
 			panel.add(checkBox("TRACE_ATTRIBUTE_OUTPUT","Debug option"));

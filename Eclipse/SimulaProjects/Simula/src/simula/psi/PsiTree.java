@@ -26,6 +26,11 @@ public class PsiTree extends PsiElement {
 	protected final List<PsiElement> children = new ArrayList<>();
 //	private String error;
 	
+    public enum Kind { any, programModule, mainModule, label, declaration, block, statement,
+    	// Expressions
+    	expression, additiveOperation, postfixExpression }
+	public Kind kind;
+	
 //	public static PsiTree dummyTree = new LocalPsiTree("dymmyTree", null) {
 //		@Override public int firstLineNumber() { return -24; }
 //		@Override public int lastLineNumber()  { return -25; }
@@ -253,6 +258,26 @@ public class PsiTree extends PsiElement {
 		return sb.toString();
 	}
 
+	public void printAncesterChain(String title) {
+    	IO.println("====== BEGIN - printAncesterChain: " + title + " ======");
+    	PsiTree x = this;
+    	while(x != null) {
+    		IO.println("PsiTree: Line:"+x.lineNumber+ " Level: "+ x.level() + " " +x.kind+" "+x.debugName);
+    		x = x.parent;
+    	}
+    	IO.println("====== ENDOF - printAncesterChain: " + title + " ======");
+		
+	}
+
+	public int level() {
+		int res = -1;
+    	PsiTree x = this;
+    	while(x != null) {
+    		res++; x = x.parent;
+    	}
+    	return res;
+	}
+	
     public void printPsiTree(String title) {
     	IO.println("====== BEGIN - PrintTree: " + title + " ======");
     	printPsiTree(this, 1);

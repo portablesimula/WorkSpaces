@@ -59,7 +59,7 @@ public class JarFileBuilder {
 	private JarOutputStream jarOutputStream;
 
 	/// Debug utility.
-	private final static boolean TESTING = true;//false;
+	private final static boolean TESTING = false;
 	
 	/// Construct a new JarFileBuilder.
 	public JarFileBuilder() {

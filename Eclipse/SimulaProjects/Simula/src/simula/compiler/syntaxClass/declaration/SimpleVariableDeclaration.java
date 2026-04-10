@@ -134,8 +134,8 @@ public class SimpleVariableDeclaration extends Declaration {
 			if (PsiParse.accept(psiBuilder, KeyWord.EQ))
 				typeDeclaration.constantElement = Expression.expectExpression(psiBuilder);
 			declarationList.add(typeDeclaration);
-			psiBuilder.doneSubtree(typeDeclaration);
-			psiBuilder.startSubtree("NextDeclaration");
+			psiBuilder.doneSubtree(PsiTree.Kind.declaration, typeDeclaration);
+			psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 	}
 

@@ -135,12 +135,12 @@ public abstract class Declaration extends SyntaxClass {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse Declaration");
 		DeclarationList declarationList=enclosure.declarationList;
-		String prefix = PsiParse.acceptIdentifier(psiBuilder);
-		if (prefix != null) {
+		String maybePrefix = PsiParse.acceptIdentifier(psiBuilder);
+		if (maybePrefix != null) {
 			if (PsiParse.accept(psiBuilder, KeyWord.CLASS))
-				declarationList.add(ClassDeclaration.expectClassDeclaration(psiBuilder, prefix));
+				declarationList.add(ClassDeclaration.expectClassDeclaration(psiBuilder, maybePrefix));
 			else {
-				PsiParse.rollBack(psiBuilder); // Identifier is NOT a class prefix.
+				PsiParse.rollBack(psiBuilder, " is NOT a class prefix"); // Identifier is NOT a class prefix.
 				return (false);
 			}
 		} else if (PsiParse.accept(psiBuilder, KeyWord.ARRAY))
@@ -153,12 +153,12 @@ public abstract class Declaration extends SyntaxClass {
 			PsiParse.expect(psiBuilder, KeyWord.PROCEDURE);
 			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(psiBuilder, type));
 		} else if (PsiParse.accept(psiBuilder, KeyWord.CLASS))
-			declarationList.add(ClassDeclaration.expectClassDeclaration(psiBuilder, prefix));
+			declarationList.add(ClassDeclaration.expectClassDeclaration(psiBuilder, null));
 		else if (PsiParse.accept(psiBuilder, KeyWord.SWITCH)) {
 			String ident = PsiParse.acceptIdentifier(psiBuilder);
 			if (ident == null) {
 				// Switch Statement
-				PsiParse.rollBack(psiBuilder);
+				PsiParse.rollBack(psiBuilder, " HVA GJØR VI HER");
 				return (false);
 			}
 			declarationList.add(new SwitchDeclaration(psiBuilder, ident));
@@ -191,10 +191,10 @@ public abstract class Declaration extends SyntaxClass {
 	/// Continue until there are no more declarations.
 	/// @param enclosure the owning block.
 	protected static void acceptDeclarations(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
-		psiBuilder.startSubtree("Declaration");
+		psiBuilder.startSubtree(PsiTree.Kind.declaration, "Declaration");
 		while (Declaration.acceptDeclaration(psiBuilder, enclosure))
 			PsiParse.accept(psiBuilder, KeyWord.SEMICOLON);
-		psiBuilder.dropSubtree();
+		psiBuilder.dropSubtree(PsiTree.Kind.declaration);
 	}
 
 	// ***********************************************************************************************

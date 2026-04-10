@@ -75,8 +75,8 @@ public interface PsiParse {
 //		nextToken();
 	}
 
-	public static void rollBack(final PsiBuilder psiBuilder) {
-		psiBuilder.rollBack();
+	public static void rollBack(final PsiBuilder psiBuilder, String debugInfo) {
+		psiBuilder.rollBack(debugInfo);
 //		Util.IERR("Parse.rollBack: KAN IKKE BRUKES: FORSØK  drop()  eller rollbackTo()");
 	}
 
@@ -148,18 +148,18 @@ public interface PsiParse {
 	public static boolean accept_AND_THEN(final PsiBuilder psiBuilder) {
 //		IO.println("\nPsiParse.accept_AND_THEN: BEGIN ======================================================================");
 		if(accept(psiBuilder, KeyWord.AND_THEN)) {
-			IO.println("PsiParse.accept_AND_THEN: GOT: AND_THEN");
+//			IO.println("PsiParse.accept_AND_THEN: GOT: AND_THEN");
 			return true;
 		}
 		if(accept(psiBuilder, KeyWord.AND)) {
 			LexToken prv = psiBuilder.getCurrentLexerToken();
-			IO.println("PsiParse.accept_AND_THEN: MAYBE AND THEN prv="+prv);
+//			IO.println("PsiParse.accept_AND_THEN: MAYBE AND THEN prv="+prv);
 			if(accept(psiBuilder, KeyWord.THEN)) {
-				IO.println("PsiParse.accept_AND_THEN: GOT: AND THEN prv="+prv);
+//				IO.println("PsiParse.accept_AND_THEN: GOT: AND THEN prv="+prv);
 				return true;
 			}
-			IO.println("PsiParse.accept_AND_THEN: FAILED --> ROLLBACK prv="+prv);
-			psiBuilder.rollBackTo(prv);
+//			IO.println("PsiParse.accept_AND_THEN: FAILED --> ROLLBACK prv="+prv);
+			psiBuilder.rollBackTo(prv, " is not part of AND THEN");
 		}
 		return false;
 	}
@@ -168,13 +168,13 @@ public interface PsiParse {
 //		IO.println("\nPsiParse.accept_AND_THEN: BEGIN ======================================================================");
 		LexToken prv = psiBuilder.getCurrentLexerToken();
 		if(accept(psiBuilder, KeyWord.AND)) {
-			IO.println("PsiParse.accept_AND_ONLY: MAYBE AND THEN prv="+prv);
+//			IO.println("PsiParse.accept_AND_ONLY: MAYBE AND THEN prv="+prv);
 			if(accept(psiBuilder, KeyWord.THEN)) {
-				IO.println("PsiParse.accept_AND_ONLY: GOT: AND THEN prv="+prv);
-				psiBuilder.rollBackTo(prv);
+//			IO.println("PsiParse.accept_AND_ONLY: GOT: AND THEN prv="+prv);
+				psiBuilder.rollBackTo(prv, " is not a single AND without THEN");
 				return false;
 			}
-			IO.println("PsiParse.accept_AND_ONLY: prv="+prv);
+//			IO.println("PsiParse.accept_AND_ONLY: prv="+prv);
 			return true;
 		}
 		return false;
@@ -183,18 +183,18 @@ public interface PsiParse {
 	public static boolean accept_OR_ELSE(final PsiBuilder psiBuilder) {
 //		IO.println("\nPsiParse.accept_OR_ELSE: BEGIN ======================================================================");
 		if(accept(psiBuilder, KeyWord.OR_ELSE)) {
-			IO.println("PsiParse.accept_OR_ELSE: GOT: OR_ELSE");
+//			IO.println("PsiParse.accept_OR_ELSE: GOT: OR_ELSE");
 			return true;
 		}
 		if(accept(psiBuilder, KeyWord.OR)) {
 			LexToken prv = psiBuilder.getCurrentLexerToken();
-			IO.println("PsiParse.accept_OR_ELSE: MAYBE OR ELSE prv="+prv);
+//			IO.println("PsiParse.accept_OR_ELSE: MAYBE OR ELSE prv="+prv);
 			if(accept(psiBuilder, KeyWord.ELSE)) {
-				IO.println("PsiParse.accept_OR_ELSE: GOT: OR ELSE prv="+prv);
+//				IO.println("PsiParse.accept_OR_ELSE: GOT: OR ELSE prv="+prv);
 				return true;
 			}
-			IO.println("PsiParse.accept_OR_ELSE: FAILED --> ROLLBACK prv="+prv);
-			psiBuilder.rollBackTo(prv);
+//			IO.println("PsiParse.accept_OR_ELSE: FAILED --> ROLLBACK prv="+prv);
+			psiBuilder.rollBackTo(prv, " is not part of OR ELSE");
 		}
 		return false;
 	}
@@ -203,13 +203,13 @@ public interface PsiParse {
 //		IO.println("\nPsiParse.accept_OR_THEN: BEGIN ======================================================================");
 		LexToken prv = psiBuilder.getCurrentLexerToken();
 		if(accept(psiBuilder, KeyWord.OR)) {
-			IO.println("PsiParse.accept_OR_ONLY: MAYBE OR ELSE prv="+prv);
+//			IO.println("PsiParse.accept_OR_ONLY: MAYBE OR ELSE prv="+prv);
 			if(accept(psiBuilder, KeyWord.ELSE)) {
-				IO.println("PsiParse.accept_OR_ONLY: GOT: OR ELSE prv="+prv);
-				psiBuilder.rollBackTo(prv);
+//				IO.println("PsiParse.accept_OR_ONLY: GOT: OR ELSE prv="+prv);
+				psiBuilder.rollBackTo(prv, " is not a single OR without ELSE");
 				return false;
 			}
-			IO.println("PsiParse.accept_OR_ONLY: prv="+prv);
+//			IO.println("PsiParse.accept_OR_ONLY: prv="+prv);
 			return true;
 		}
 		return false;

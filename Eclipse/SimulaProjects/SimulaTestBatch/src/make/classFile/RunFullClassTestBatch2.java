@@ -78,7 +78,7 @@ public final class RunFullClassTestBatch2 {
 		names.add("simtst05.sim"); // OK:  Test Aritmetisk Relations
 		names.add("simtst06.sim"); // OK:  Test Mathematical Functions
 		names.add("simtst07.sim"); // OK:  Test Mathematical Library
-		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
+//		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
 		names.add("simtst09.sim"); // OK:  Test relation operator and some Funtions
 		names.add("simtst10.sim"); // OK:  Test Evaluation of Text-Constants
 

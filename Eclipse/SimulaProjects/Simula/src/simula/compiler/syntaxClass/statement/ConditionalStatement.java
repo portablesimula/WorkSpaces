@@ -62,6 +62,9 @@ public final class ConditionalStatement extends Statement {
 		super(psiBuilder.psiTree);
 
 		psiBuilder.startSubtree("ConditionalStatement");
+		int lno = psiBuilder.getSourceLineNumber();
+//		IO.println("NEW ConditionalStatement: "+psiBuilder.getSourceLineNumber());
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN IfStatement: ");
 		psiBuilder.consume(KeyWord.IF); //  (add it to 'current tree')
 
 		condition = Expression.expectExpression(psiBuilder);
@@ -77,8 +80,14 @@ public final class ConditionalStatement extends Statement {
 		    }
 		}
 		this.elseStatement=elseStatement;
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": IfStatement: "+this);
 		psiBuilder.doneSubtree(this);
+//		IO.println("NEW ConditionalStatement: firstLineNumber: "+psiTree.firstLineNumber());
+//		IO.println("NEW ConditionalStatement: lastLineNumber: "+psiTree.lastLineNumber());
+//		psiTree.printPsiTree("NEW ConditionalStatement: ZZZZZ");
+		
+//		Util.ASSERT(psiTree.firstLineNumber() == lno, "NEW ConditionalStatement: firstLineNumber="+psiTree.firstLineNumber()+" equals lno="+lno);
+		if (Option.internal.TRACE_PARSE)
+			Util.TRACE("Line " + psiBuilder.getSourceLineNumber() + ": DONE IfStatement started at line: " + lno + ": " + this);
 	}
 
 	@Override

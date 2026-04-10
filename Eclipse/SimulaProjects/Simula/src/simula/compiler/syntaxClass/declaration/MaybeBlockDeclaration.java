@@ -121,15 +121,15 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse MayBeBlock");
 		
-		String debugName = "MaybeBlockDeclaration-"+(SEQU++);
-		psiBuilder.startSubtree(debugName);
+		String debugName = "MaybeBlockDeclaration: "+(SEQU++);
+		psiBuilder.startSubtree(PsiTree.Kind.block, debugName);
+		int lno = psiBuilder.getSourceLineNumber();
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN "+debugName);
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("BlockStatement expectMaybeBlock: BEGIN " + debugName);
+		IO.println("BlockStatement.expectMaybeBlock: BEGIN "+debugName);
 
-		//		psiBuilder.advanceLexer(); // consume BEGIN (add it to 'current tree')
-		psiBuilder.consume(KeyWord.BEGIN); // (add it to 'current tree')
+		psiBuilder.consume(KeyWord.BEGIN); // consume BEGIN (add it to 'current tree')
 
-//		while (Declaration.acceptDeclaration(psiBuilder, this))
-//			Parse.expect(psiBuilder, KeyWord.SEMICOLON);
 		Declaration.acceptDeclarations(psiBuilder, this);
 		while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
 			Statement stm = Statement.acceptStatement(psiBuilder);
@@ -148,13 +148,18 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 			}
 		}
 //		this.lastLineNumber = Global.sourceLineNumber;
-		BlockStatement block = new BlockStatement(psiBuilder, this);
+		IO.println("BlockStatement.expectMaybeBlock: BEFORE BLKSTM "+debugName);
+		BlockStatement block = new BlockStatement(psiBuilder, this, debugName);
+		IO.println("BlockStatement.expectMaybeBlock: AFTER BLKSTM "+debugName);
 		
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("BlockStatement expectMaybeBlock: ENDOF " + debugName + "  " + block);
 //		psiBuilder.doneSubtree(block);
-		psiBuilder.doneSubtree(this);
+		psiBuilder.doneSubtree(PsiTree.Kind.block, this);
 		
 		Global.setScope(declaredIn);
+//		Util.ASSERT(psiTree.firstLineNumber() == lno, "NEW BlockStatement.expectMaybeBlock: firstLineNumber="+psiTree.firstLineNumber()+" equals lno="+lno);
+		if (Option.internal.TRACE_PARSE)
+			Util.TRACE("Line " + psiBuilder.getSourceLineNumber() + ": DONE "+debugName+" started at line: " + lno + ": " + this);
 		return (block);
 	}
 

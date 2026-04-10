@@ -1,0 +1,4 @@
+begin
+%    isum :=
+             isum + intr;
+end;

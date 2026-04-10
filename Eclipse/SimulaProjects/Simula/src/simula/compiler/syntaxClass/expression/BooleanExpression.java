@@ -129,7 +129,7 @@ public final class BooleanExpression extends Expression {
 		this.lhs = lhs;
 		this.opr = opr;
 		this.rhs = rhs;
-		IO.println("NEW BooleanExpression: "+this);
+//		IO.println("NEW BooleanExpression: "+this);
 		if (this.lhs == null) {
 			Util.error("Missing operand before " + KeyWord.edit(opr));
 			this.lhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");

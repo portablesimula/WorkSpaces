@@ -96,7 +96,8 @@ public abstract class Expression extends SyntaxClass {
 //	private static final boolean TEST2 = false;
 //	private static final boolean TEST3 = false;//true;
 //	private static final boolean TEST4 = false;
-	private static final boolean TEST5 = true;
+//	private static final boolean TEST5 = true;
+	private static final boolean TEST6 = true;
 
 	/// The type
 	public Type type = null;
@@ -109,33 +110,38 @@ public abstract class Expression extends SyntaxClass {
 		super(psiTree);
 	}
 
-  
-
 	/// Accept expression.
 	/// <pre>
 	/// Expression  =  SimpleExpression
 	/// 	        |  IF  BooleanExpression  THEN  SimpleExpression  ELSE  Expression
 	/// </pre>
+	/// 
+	/// NOTE: Possible start of an expression. MUST start a PsiTree !
+	/// 
 	/// @return Expression or null if no expression is found.
 	public static Expression acceptExpression(PsiBuilder psiBuilder) {
 		if(PsiParse.accept(psiBuilder, KeyWord.IF)) {
 			Expression condition=acceptExpression(psiBuilder);
 			PsiParse.expect(psiBuilder, KeyWord.THEN);
-				psiBuilder.startSubtree("Expression");
+				psiBuilder.startSubtree(PsiTree.Kind.expression, "Expression");
 				Expression thenExpression=acceptSimpleExpression(psiBuilder);
 			PsiParse.expect(psiBuilder, KeyWord.ELSE);
 				Expression elseExpression=acceptExpression(psiBuilder);
 			Expression expr=new ConditionalExpression(psiBuilder, Type.Boolean, condition, thenExpression, elseExpression);
 			if(Option.internal.TRACE_PARSE) Util.TRACE("Expression: ParseExpression, result="+expr);
 //			if(true) throw new RuntimeException("Expression.acceptExpression: NOT IMPL: "+expr);
-			psiBuilder.doneSubtree(expr);
+			psiBuilder.doneSubtree(PsiTree.Kind.expression, expr);
 			return expr;
 		} else {
-			psiBuilder.startSubtree("Expression");
-			if(Option.TRACE_ACCEPT_EXPRESSION > 0) IO.println("Expression.acceptExpression: ZZZZZZZZZZZZZZZZZZZZZZZZZZ   BEGIN: ");
+			psiBuilder.startSubtree(PsiTree.Kind.expression, "MAIN: acceptExpression");
+			if(Option.TRACE_ACCEPT_EXPRESSION > 0) IO.println("Expression.acceptExpression: Level "+psiBuilder.psiLevel()+" ZZZZZZZZZZZZZZZZZZZZZZZZZZ   BEGIN: ");
 			Expression expr= acceptSimpleExpression(psiBuilder);
-			if(Option.TRACE_ACCEPT_EXPRESSION > 0) IO.println("Expression.acceptExpression: ZZZZZZZZZZZZZZZZZZZZZZZZZZ   RESULT: "+expr);
-			psiBuilder.doneSubtree(expr);
+			if(Option.TRACE_ACCEPT_EXPRESSION > 0) IO.println("Expression.acceptExpression: Level "+psiBuilder.psiLevel()+" ZZZZZZZZZZZZZZZZZZZZZZZZZZ   RESULT: "+expr);
+			if(expr != null) {
+				psiBuilder.doneSubtree(PsiTree.Kind.expression, expr);
+			} else {
+				psiBuilder.dropSubtree(PsiTree.Kind.expression);				
+			}
 			return expr;
 		}
 	} 
@@ -154,6 +160,8 @@ public abstract class Expression extends SyntaxClass {
 //		IO.println("Expression.expectExpression: END: expr="+expr);
 		return(expr);
 	}
+	
+	
 
 	/// Parse simple expression.
 	/// <pre>
@@ -174,13 +182,20 @@ public abstract class Expression extends SyntaxClass {
 	///        
 	/// @return Expression or null if no expression is found.
 	private static Expression acceptSimpleExpression(PsiBuilder psiBuilder)  {   
-		psiBuilder.startSubtree("SimpleExpression");
+		psiBuilder.startSubtree(PsiTree.Kind.expression, "SimpleExpression");
+		int level = psiBuilder.psiLevel();
 		Expression expr = acceptANDTHEN(psiBuilder);
 		while(PsiParse.accept_OR_ELSE(psiBuilder)) {
 			expr=new BooleanExpression(psiBuilder, expr, KeyWord.OR_ELSE, acceptANDTHEN(psiBuilder));
-			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptSimpleExpression");
+			psiBuilder.doneSubtree(PsiTree.Kind.expression, expr); psiBuilder.startSubtree(PsiTree.Kind.expression, "acceptSimpleExpression");
 		}
-		psiBuilder.doneSubtree(expr);
+		if(TEST6) {
+			psiBuilder.checkLevel(level);
+			psiBuilder.doneSubtree(PsiTree.Kind.expression, expr);
+		} else {
+			psiBuilder.checkLevel(level-1);			
+		}
+//		psiBuilder.doneSubtree(PsiTree.Kind.expression, expr);
 		return(expr);
 	}
 
@@ -193,7 +208,7 @@ public abstract class Expression extends SyntaxClass {
 		Expression expr = acceptEQV(psiBuilder);
 		while(PsiParse.accept_AND_THEN(psiBuilder)) {
 			expr=new BooleanExpression(psiBuilder, expr, KeyWord.AND_THEN, acceptEQV(psiBuilder));
-			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptANDTHEN");
+			psiBuilder.doneSubtree(PsiTree.Kind.expression, expr); psiBuilder.startSubtree(PsiTree.Kind.expression, "acceptANDTHEN");
 		}
 		return(expr);
 	}
@@ -207,7 +222,7 @@ public abstract class Expression extends SyntaxClass {
 		Expression expr=acceptIMP(psiBuilder);
 		while(PsiParse.accept(psiBuilder, KeyWord.EQV)) {
 			expr=new BooleanExpression(psiBuilder, expr, KeyWord.EQV, acceptIMP(psiBuilder));
-			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptEQV");
+			psiBuilder.doneSubtree(PsiTree.Kind.expression, expr); psiBuilder.startSubtree(PsiTree.Kind.expression, "acceptEQV");
 		}
 		return(expr);
 	}
@@ -221,7 +236,7 @@ public abstract class Expression extends SyntaxClass {
 		Expression expr=acceptOR(psiBuilder);
 		while(PsiParse.accept(psiBuilder, KeyWord.IMP)) {
 			expr=new BooleanExpression(psiBuilder, expr, KeyWord.IMP, acceptOR(psiBuilder));
-			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptIMP");
+			psiBuilder.doneSubtree(PsiTree.Kind.expression, expr); psiBuilder.startSubtree(PsiTree.Kind.expression, "acceptIMP");
 		}
 		return(expr);
 	}
@@ -235,7 +250,7 @@ public abstract class Expression extends SyntaxClass {
 		Expression expr=acceptAND(psiBuilder);
 		while(PsiParse.accept_OR_ONLY(psiBuilder)) {
 			expr=new BooleanExpression(psiBuilder, expr, KeyWord.OR, acceptAND(psiBuilder));
-			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptOR");
+			psiBuilder.doneSubtree(PsiTree.Kind.expression, expr); psiBuilder.startSubtree(PsiTree.Kind.expression, "acceptOR");
 		}
 		return(expr);
 	}
@@ -248,9 +263,9 @@ public abstract class Expression extends SyntaxClass {
 	private static Expression acceptAND(PsiBuilder psiBuilder) {
 		Expression expr=acceptNOT(psiBuilder);
 		while(PsiParse.accept_AND_ONLY(psiBuilder)) {
-			IO.println("Expression.acceptAND: ");
+//			IO.println("Expression.acceptAND: ");
 			expr=new BooleanExpression(psiBuilder, expr, KeyWord.AND, acceptNOT(psiBuilder));
-			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptAND");
+			psiBuilder.doneSubtree(PsiTree.Kind.expression, expr); psiBuilder.startSubtree(PsiTree.Kind.expression, "acceptAND");
 		}
 		return(expr);
 	}
@@ -264,7 +279,7 @@ public abstract class Expression extends SyntaxClass {
 		Expression expr;
 		if(PsiParse.accept(psiBuilder, KeyWord.NOT)) {
 			expr=UnaryOperation.create(psiBuilder, KeyWord.NOT, acceptTEXTCONC(psiBuilder));
-			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptNOT");
+			psiBuilder.doneSubtree(PsiTree.Kind.expression, expr); psiBuilder.startSubtree(PsiTree.Kind.expression, "acceptNOT");
 		} else {
 			expr = acceptTEXTCONC(psiBuilder);
 		}
@@ -280,7 +295,7 @@ public abstract class Expression extends SyntaxClass {
 		Expression expr=acceptRelation(psiBuilder);
 		while(PsiParse.accept(psiBuilder, KeyWord.AMPERSAND)) {
 			expr=new TextExpression(psiBuilder, expr, acceptRelation(psiBuilder));
-			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptTEXTCONC");
+			psiBuilder.doneSubtree(PsiTree.Kind.expression, expr); psiBuilder.startSubtree(PsiTree.Kind.expression, "acceptTEXTCONC");
 		}
 		return(expr);
 	}
@@ -297,7 +312,7 @@ public abstract class Expression extends SyntaxClass {
 		if((prevToken = PsiParse.acceptRelationalOperator(psiBuilder)) != null)   { 
 			int opr = prevToken.keyWord;
 			expr = new RelationalOperation(psiBuilder, expr, opr, acceptAdditiveOperation(psiBuilder));
-			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptRelation");
+			psiBuilder.doneSubtree(PsiTree.Kind.expression, expr); psiBuilder.startSubtree(PsiTree.Kind.expression, "acceptRelation");
 		}
 		return(expr);
 	}
@@ -311,9 +326,16 @@ public abstract class Expression extends SyntaxClass {
 		Expression expr=acceptUNIMULDIV(psiBuilder);
 		LexToken accepted = null;
 		while( (accepted = PsiParse.acceptParserToken(psiBuilder, KeyWord.PLUS,KeyWord.MINUS)) != null) { 
+			if(TEST6)
+				psiBuilder.startSubtree(PsiTree.Kind.additiveOperation, "acceptAdditiveOperation");
 			int opr=accepted.keyWord;
 			expr=ArithmeticExpression.create(psiBuilder, expr, opr, acceptMULDIV(psiBuilder));
-			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptAdditiveOperation");
+			if(TEST6) {
+				psiBuilder.doneSubtree(PsiTree.Kind.additiveOperation, expr);
+			} else {
+				psiBuilder.doneSubtree(PsiTree.Kind.expression, expr);
+				psiBuilder.startSubtree(PsiTree.Kind.expression, "acceptAdditiveOperation");
+			}
 		}
 		return(expr);
 	}
@@ -331,7 +353,7 @@ public abstract class Expression extends SyntaxClass {
 			if(opr==KeyWord.PLUS) expr=acceptMULDIV(psiBuilder);
 			else {
 				expr=UnaryOperation.create(psiBuilder, opr,acceptMULDIV(psiBuilder));
-				psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptUNIMULDIV");
+				psiBuilder.doneSubtree(PsiTree.Kind.expression, expr); psiBuilder.startSubtree(PsiTree.Kind.expression, "acceptUNIMULDIV");
 			}
 		} else {
 			expr = acceptMULDIV(psiBuilder);
@@ -350,7 +372,7 @@ public abstract class Expression extends SyntaxClass {
 		while((accepted = PsiParse.acceptParserToken(psiBuilder, KeyWord.MUL,KeyWord.DIV,KeyWord.INTDIV)) != null) {
 			int opr = accepted.keyWord;
 			expr = ArithmeticExpression.create(psiBuilder, expr, opr, acceptEXPON(psiBuilder));
-			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptMULDIV");
+			psiBuilder.doneSubtree(PsiTree.Kind.expression, expr); psiBuilder.startSubtree(PsiTree.Kind.expression, "acceptMULDIV");
 		}
 		return(expr);
 	}
@@ -364,7 +386,7 @@ public abstract class Expression extends SyntaxClass {
 		Expression expr=acceptBASICEXPR(psiBuilder);
 		while(PsiParse.accept(psiBuilder, KeyWord.EXP)) {
 			expr = ArithmeticExpression.create(psiBuilder, expr, KeyWord.EXP, acceptBASICEXPR(psiBuilder));
-			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptEXPON");
+			psiBuilder.doneSubtree(PsiTree.Kind.expression, expr); psiBuilder.startSubtree(PsiTree.Kind.expression, "acceptEXPON");
 		}
 		return(expr);
 	}
@@ -392,8 +414,8 @@ public abstract class Expression extends SyntaxClass {
 		// Dette er vel kanskje det samme som “primary”?
 		// Merk: Alt som kan stå foran et postfix (DOT, IS, IN og QUA) må være et BASICEXPR
 		if(Option.internal.TRACE_PARSE) PsiParse.TRACE("Expression: acceptExpression");
-//		if(TEST1) psiBuilder.startSubtree(Expression.class, "acceptBASICEXPR");
-//		if(TEST2) psiBuilder.startSubtree(Expression.class, "acceptBASICEXPR");
+//		if(TEST1) psiBuilder.startSubtree(PsiTree.Kind.expression, Expression.class, "acceptBASICEXPR");
+//		if(TEST2) psiBuilder.startSubtree(PsiTree.Kind.expression, Expression.class, "acceptBASICEXPR");
 		Expression expr=null;
 		LexToken prevToken = PsiParse.getParserToken(psiBuilder);
 		if(PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) { expr = acceptExpression(psiBuilder); PsiParse.expect(psiBuilder, KeyWord.ENDPAR); }
@@ -422,7 +444,8 @@ public abstract class Expression extends SyntaxClass {
 				return(null);
 			}
 		}
-		psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptBASICEXPR");
+//		psiBuilder.doneSubtree(PsiTree.Kind.expression, expr);
+		psiBuilder.startSubtree(PsiTree.Kind.postfixExpression, "acceptPOSTFIX");
 		// Then there can be a sequence of postfixes, which builds a tree “upwards to the right”
 		while ((prevToken = PsiParse.acceptPostfixOprator(psiBuilder)) != null) {
 			int opr = prevToken.keyWord; // opr == DOT || opr== IS || opr == IN || opr == QUA
@@ -434,8 +457,10 @@ public abstract class Expression extends SyntaxClass {
 					expr=new QualifiedObject(psiBuilder, expr, classIdentifier);
 				else expr=new ObjectRelation(psiBuilder, expr, opr, classIdentifier);
 			}
-			psiBuilder.doneSubtree(expr); psiBuilder.startSubtree("acceptPOSTFIX");
+			psiBuilder.doneSubtree(PsiTree.Kind.postfixExpression, expr); psiBuilder.startSubtree(PsiTree.Kind.expression, "acceptPOSTFIX");
+			psiBuilder.startSubtree(PsiTree.Kind.postfixExpression, "acceptPOSTFIX");
 		}
+		psiBuilder.dropSubtree(PsiTree.Kind.postfixExpression);
 //		if(Option.internal.TRACE_PARSE) PsiParse.TRACE("Expression: acceptBasicExpression returns: "+expr);
 		return(expr);
 	}

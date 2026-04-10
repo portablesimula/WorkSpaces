@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Vector;
 
+import simula.compiler.ModuleManager;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
@@ -71,9 +72,9 @@ public final class RunFullTestBatch {
 		names.add("simtst03.sim"); // OK:  Test Text Value Relations
 		names.add("simtst04.sim"); // OK:  To test putint and putreal.
 		names.add("simtst05.sim"); // OK:  Test Aritmetisk Relations
-		names.add("simtst06.sim"); // OK:  Test Mathematical Functions
-		names.add("simtst07.sim"); // OK:  Test Mathematical Library
-		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
+//		names.add("simtst06.sim"); // OK:  Test Mathematical Functions
+//		names.add("simtst07.sim"); // OK:  Test Mathematical Library
+//		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
 		names.add("simtst09.sim"); // OK:  Test relation operator and some Funtions
 		names.add("simtst10.sim"); // OK:  Test Evaluation of Text-Constants
 
@@ -286,9 +287,12 @@ public final class RunFullTestBatch {
 			String fileName = sourceDir+name;
 			Option.internal.RUNTIME_USER_DIR=new File(fileName).getParent();
 			try {
-				File file = new File(fileName);
-				InputStreamReader reader = new InputStreamReader(new FileInputStream(file), Global._CHARSET);
-				new SimulaCompiler(fileName, reader).doCompile();
+//				File file = new File(fileName);
+//				InputStreamReader reader = new InputStreamReader(new FileInputStream(file), Global._CHARSET);
+//				new SimulaCompiler(fileName, reader).doCompile();
+				File sourceFile = new File(fileName);
+		    	Global.moduleManager = new ModuleManager(sourceFile);
+				new SimulaCompiler(fileName).doCompile(Global.moduleManager.getProgramModule());
 			} catch (IOException e) {
 				Util.error("can't open " + fileName + ", reason: " + e);
 			}

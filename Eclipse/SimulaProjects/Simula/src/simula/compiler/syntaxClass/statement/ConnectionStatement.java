@@ -211,10 +211,12 @@ public final class ConnectionStatement extends Statement {
 	@Override
 	public void doJavaCoding() {
 		Global.sourceLineNumber = firstLineNumber();
+		IO.println("ConnectionStatement.doJavaCoding: "+Global.sourceLineNumber);
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code("{");
 		JavaSourceFileCoder.debug("// BEGIN INSPECTION ");
-		Expression assignment = new AssignmentOperation(null, inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
+//		Expression assignment = new AssignmentOperation(null, inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
+		Expression assignment = new AssignmentOperation(this.psiTree, inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
 		assignment.doChecking();
 		JavaSourceFileCoder.code(assignment.toJavaCode() + ';');
 		if (!hasWhenPart) JavaSourceFileCoder.code("if(" + inspectedVariable.toJavaCode() + "!=null) {","INSPECT " + inspectedVariable);

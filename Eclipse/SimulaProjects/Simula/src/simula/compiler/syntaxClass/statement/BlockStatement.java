@@ -69,11 +69,12 @@ public final class BlockStatement extends Statement {
 	private static int SEQU = 1;
 	/// Create a new BlockStatement.
 	/// @param blockDeclaration the BlockDeclaration
-	public BlockStatement(final PsiBuilder psiBuilder, final BlockDeclaration blockDeclaration) {
+	public BlockStatement(final PsiBuilder psiBuilder, final BlockDeclaration blockDeclaration, String debugName1) {
 		super(psiBuilder.psiTree);
-		debugName = "BlockStatement"+SEQU++;
+		debugName = "BlockStatement: "+SEQU++;
 		this.blockDeclaration = blockDeclaration;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": BlockStatement: "+this);
+		IO.println("NEW BlockStatement: " + debugName + '[' + debugName1 + ']');
 	}
 	
 	@Override

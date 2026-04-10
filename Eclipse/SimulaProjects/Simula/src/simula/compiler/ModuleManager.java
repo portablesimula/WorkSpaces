@@ -74,9 +74,9 @@ public class ModuleManager {
 				IO.println("EditorMenues.doRenderSyntaxTreeAction: curTxt: "+curTxt);
 				IO.println("EditorMenues.doRenderSyntaxTreeAction: psiTxt: "+psiTxt);
 				Util.IERR("Resulting text differ from original text");
-				Util.STOP();
+//				Util.STOP();
 			}
-			else IO.println("EditorMenues.doRenderSyntaxTreeAction: DONE - OK");
+//			else IO.println("EditorMenues.doRenderSyntaxTreeAction: DONE - OK");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

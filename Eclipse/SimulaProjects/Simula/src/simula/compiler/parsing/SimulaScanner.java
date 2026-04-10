@@ -115,7 +115,7 @@ public final class SimulaScanner extends DefaultScanner {
 				tokenQueue.add(maybeElse);
 			}
 		}
-		if (Option.internal.TRACE_SCAN) Util.TRACE("Item.nextToken, " + edcurrent());
+		if (Option.internal.TRACE_LEXER > 0) Util.TRACE("Item.nextToken, " + edcurrent());
 		return (token);
 	}
 	
@@ -145,7 +145,7 @@ public final class SimulaScanner extends DefaultScanner {
     /// Scan basic Token
     /// @return next Token
     private Token scanBasic() {
-    	if(Option.internal.TRACE_SCAN) Util.TRACE("SimulaScanner.scanBasic, "+edcurrent());
+    	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("SimulaScanner.scanBasic, "+edcurrent());
     	while(true)	{
     		Token.lineNumberBeforeScanBasic = Global.sourceLineNumber;
 
@@ -250,7 +250,7 @@ public final class SimulaScanner extends DefaultScanner {
     /// @return next Token
 	private Token scanIdentifier() {
 		String name=scanName();
-	    if(Option.internal.TRACE_SCAN) Util.TRACE("scanIdentifier: name=\""+name+"\"");
+	    if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanIdentifier: name=\""+name+"\"");
 	    String ident=(Option.CaseSensitive)?name:name.toLowerCase();
 	    switch(Character.toLowerCase(ident.charAt(0))) {
 	        case 'a':
@@ -433,20 +433,20 @@ public final class SimulaScanner extends DefaultScanner {
     private Token scanNumber() {
     	int radix=10;
     	char firstChar=(char)current;
-    	if(Option.internal.TRACE_SCAN) Util.TRACE("scanNumber, "+edcurrent());
+    	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanNumber, "+edcurrent());
     	Util.ASSERT(Character.isDigit((char)(current)),"scanNumber:Expecting a Digit");
     	StringBuilder number=new StringBuilder();
 	
     	number.append((char)current);
     	if(getNext() == 'R' && (firstChar == '2' | firstChar == '4' | firstChar == '8')) {
     		radix=firstChar - '0';
-    		if(Option.internal.TRACE_SCAN) Util.TRACE("scanNumber, radix="+radix);
+    		if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanNumber, radix="+radix);
     		number.setLength(0);
     	} else if(firstChar == '1' && current == '6') { 
     		number.append((char)current);
     		if(getNext() == 'R') {
     			radix=16;
-    			if(Option.internal.TRACE_SCAN) Util.TRACE("scanNumber, radix="+radix);
+    			if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanNumber, radix="+radix);
     			number.setLength(0);
     		} else pushBack(current);
     	} else pushBack (current);
@@ -459,7 +459,7 @@ public final class SimulaScanner extends DefaultScanner {
     	if(current == '&' && radix == 10) { getNext(); return(scanDigitsExp(number)); }
       
     	String result=number.toString(); number=null;
-    	if(Option.internal.TRACE_SCAN) Util.TRACE("scanNumber, result='"+result+"' radix="+radix);
+    	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanNumber, result='"+result+"' radix="+radix);
 
     	pushBack(current);
     	long res = 0;
@@ -489,7 +489,7 @@ public final class SimulaScanner extends DefaultScanner {
     /// @param number The edited number so far
     /// @return next Token
     private Token scanDotDigit(StringBuilder number) {
-    	if(Option.internal.TRACE_SCAN) Util.TRACE("scanDotDigit, "+edcurrent());
+    	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanDotDigit, "+edcurrent());
     	number.append('.');
     	if(Character.isDigit(current)) number.append((char)current);
     	while(Character.isDigit(getNext()) || current == '_')
@@ -498,7 +498,7 @@ public final class SimulaScanner extends DefaultScanner {
     	if(current == '&') { getNext(); return(scanDigitsExp(number)); }
     
     	String result=number.toString(); number=null;
-    	if(Option.internal.TRACE_SCAN) Util.TRACE("scanDotDigit, result='"+result);
+    	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanDotDigit, result='"+result);
     	pushBack(current);
     	try {
     		return(newToken(KeyWord.REALKONST,Float.parseFloat(result)));
@@ -527,7 +527,7 @@ public final class SimulaScanner extends DefaultScanner {
     private Token scanDigitsExp(StringBuilder number) {
     	String result;
     	boolean doubleAmpersand=false;
-    	if(Option.internal.TRACE_SCAN) Util.TRACE("scanDigitsExp, "+edcurrent());
+    	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanDigitsExp, "+edcurrent());
     	if(number==null) { number=new StringBuilder(); number.append('1'); }
     	if(current == '&') { getNext(); doubleAmpersand=true; }
     	number.append('e');
@@ -537,7 +537,7 @@ public final class SimulaScanner extends DefaultScanner {
     	while(Character.isDigit(getNext()) || current == '_') number.append((char)current);
 	      
     	result=number.toString(); number=null;
-    	if(Option.internal.TRACE_SCAN) Util.TRACE("scanDigitsExp, result='"+result);
+    	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanDigitsExp, result='"+result);
     	pushBack(current);
     	try {
     		if(doubleAmpersand) return(newToken(KeyWord.REALKONST,Double.parseDouble(result)));
@@ -565,13 +565,13 @@ public final class SimulaScanner extends DefaultScanner {
     /// @return the resulting identifier
     private String scanName() {
     	StringBuilder name=new StringBuilder();
-    	if(Option.internal.TRACE_SCAN) Util.TRACE("scanName, "+edcurrent());
+    	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanName, "+edcurrent());
     	Util.ASSERT(Character.isLetter((char)(current)),"Expecting a Letter");
     	name.append((char)current);
     	while ((Character.isLetter(getNext()) || Character.isDigit(current) || current == '_'))
     		name.append((char)current);
     	pushBack(current);
-    	if(Option.internal.TRACE_SCAN) Util.TRACE("scanName, name="+name+",current="+edcurrent());
+    	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanName, name="+name+",current="+edcurrent());
     	return(name.toString());
     }
 	
@@ -599,7 +599,7 @@ public final class SimulaScanner extends DefaultScanner {
     /// @return next Token
     private Token scanCharacterConstant() {
     	char result=0;
-    	if(Option.internal.TRACE_SCAN) Util.TRACE("scanCharacterConstant, "+edcurrent());
+    	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanCharacterConstant, "+edcurrent());
     	Util.ASSERT((char)(current)=='\'',"Expecting a character quote '");
     	if((isPrintable(getNext())) && current != '!') {
     		result=(char)current; getNext();
@@ -611,7 +611,7 @@ public final class SimulaScanner extends DefaultScanner {
     		Util.error("Character constant is not terminated. "+edcurrent());
     		pushBack(current);
     	}
-    	if(Option.internal.TRACE_SCAN) Util.TRACE("END scanCharacterConstant, result='"+result+"', "+edcurrent());
+    	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("END scanCharacterConstant, result='"+result+"', "+edcurrent());
     	return(newToken(KeyWord.CHARACTERKONST,Character.valueOf(result)));
     }  
     
@@ -643,7 +643,7 @@ public final class SimulaScanner extends DefaultScanner {
     /// </pre>
     /// @return next Token
     private Token scanTextConstant() {
-    	if(Option.internal.TRACE_SCAN) Util.TRACE("scanTextConstant, "+edcurrent());
+    	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanTextConstant, "+edcurrent());
     	StringBuilder accumulatedTextConstant=new StringBuilder();
     	LOOP:while(true) {
     		int firstLine=Global.sourceLineNumber;
@@ -657,7 +657,7 @@ public final class SimulaScanner extends DefaultScanner {
     			else if(current == EOF_MARK) {
     				Util.error("Text constant is not terminated.");
     				String result=accumulatedTextConstant.toString(); accumulatedTextConstant=null;
-    				if(Option.internal.TRACE_SCAN) Util.TRACE("scanTextConstant(1): Result=\""+result+"\", "+edcurrent());
+    				if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanTextConstant(1): Result=\""+result+"\", "+edcurrent());
     				tokenQueue.add(newToken(KeyWord.TEXTKONST,result));
     				break LOOP;
     			} else accumulatedTextConstant.append((char)current);
@@ -670,11 +670,11 @@ public final class SimulaScanner extends DefaultScanner {
     		} else {
     			// Skip string-separator
     			while(currentIsStringSeparator()) getNext();
-    			if(Option.internal.TRACE_SCAN) Util.TRACE("scanTextConstant(2): "+edcurrent());
+    			if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanTextConstant(2): "+edcurrent());
     			if(current!='"') {
     				pushBack(current);
     				String result=accumulatedTextConstant.toString(); accumulatedTextConstant=null;
-    				if(Option.internal.TRACE_SCAN) Util.TRACE("scanTextConstant(2): Result=\""+result+"\", "+edcurrent());
+    				if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanTextConstant(2): Result=\""+result+"\", "+edcurrent());
     				if(firstLine<lastLine)
     					Util.warning("Illegal Text constant. Simple string span mutiple source lines ("+firstLine+':'+lastLine+"). See Simula Standard 1.6");
     				tokenQueue.add(newToken(KeyWord.TEXTKONST,result));
@@ -748,7 +748,7 @@ public final class SimulaScanner extends DefaultScanner {
     /// @return the resulting iso-code
     private int scanPossibleIsoCode() {
 		char firstchar, secondchar, thirdchar;
-		if (Option.internal.TRACE_SCAN) Util.TRACE("scanPossibleIsoCode, " + edcurrent());
+		if (Option.internal.TRACE_LEXER > 0) Util.TRACE("scanPossibleIsoCode, " + edcurrent());
 		Util.ASSERT((char) (current) == '!', "Expecting a character !");
 		if (Character.isDigit(getNext())) {
 			firstchar = (char) current;
@@ -758,7 +758,7 @@ public final class SimulaScanner extends DefaultScanner {
 					thirdchar = (char) current;
 					if (getNext() == '!') { // ! digit digit digit ! Found
 						int value = (((firstchar - '0') * 10 + secondchar - '0') * 10 + thirdchar - '0');
-						if (Option.internal.TRACE_SCAN)
+						if (Option.internal.TRACE_LEXER > 0)
 							Util.TRACE("scanPossibleIsoCode:Got three digits: "+(char)firstchar+(char)secondchar+(char)thirdchar+"value="+value);
 						if (value < 256)
 							return (value);
@@ -915,7 +915,7 @@ public final class SimulaScanner extends DefaultScanner {
 	/// @return a Comment Token
 	private Token scanComment() {
 		StringBuilder skipped = new StringBuilder();
-		if (Option.internal.TRACE_SCAN) Util.TRACE("BEGIN scanComment, " + edcurrent());
+		if (Option.internal.TRACE_LEXER > 0) Util.TRACE("BEGIN scanComment, " + edcurrent());
 		while ((getNext() != ';') && current != EOF_MARK)
 			skipped.append((char) current);
 		skipped.append((char) current);
@@ -925,7 +925,7 @@ public final class SimulaScanner extends DefaultScanner {
 			Util.error("Comment is not terminated with ';'.");
 			pushBack(current);
 		}
-		if (Option.internal.TRACE_SCAN) Util.TRACE("END scanComment: " + edcurrent() + "  skipped=\"" + skipped + '"');
+		if (Option.internal.TRACE_LEXER > 0) Util.TRACE("END scanComment: " + edcurrent() + "  skipped=\"" + skipped + '"');
 		if (Option.internal.TRACE_COMMENTS) Util.TRACE("COMMENT:\"" + skipped + "\" Skipped and replaced with a SPACE");
 		return (newToken(KeyWord.COMMENT));
 	}
@@ -946,11 +946,11 @@ public final class SimulaScanner extends DefaultScanner {
 	/// @return a Comment Token
 	private Token scanCommentToEndOfLine() {
 		StringBuilder skipped = new StringBuilder();
-		if (Option.internal.TRACE_SCAN) Util.TRACE("BEGIN scanCommentToEndOfLine, " + edcurrent());
+		if (Option.internal.TRACE_LEXER > 0) Util.TRACE("BEGIN scanCommentToEndOfLine, " + edcurrent());
 		while ((getNext() != '\n') && current != EOF_MARK)
 			skipped.append((char) current);
 		skipped.append((char) current);
-		if (Option.internal.TRACE_SCAN) Util.TRACE("END scanCommentToEndOfLine: " + edcurrent() + "  skipped=\"" + skipped + '"');
+		if (Option.internal.TRACE_LEXER > 0) Util.TRACE("END scanCommentToEndOfLine: " + edcurrent() + "  skipped=\"" + skipped + '"');
 		if (Option.internal.TRACE_COMMENTS) Util.TRACE("COMMENT:\"" + skipped + "\" Skipped and replaced with a SPACE");
 		return (newToken(KeyWord.COMMENT));
 	}
@@ -979,7 +979,7 @@ public final class SimulaScanner extends DefaultScanner {
 		//Util.println("SimulaScanner.scanEndComment");
 		tokenQueue.add(newToken(KeyWord.END));				   
 		StringBuilder skipped = new StringBuilder();
-		if (Option.internal.TRACE_SCAN) Util.TRACE("scanEndComment, " + edcurrent());
+		if (Option.internal.TRACE_LEXER > 0) Util.TRACE("scanEndComment, " + edcurrent());
 		int firstLine = Global.sourceLineNumber;
 		int lastLine = firstLine;
    LOOP:while (getNext() != EOF_MARK) {

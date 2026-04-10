@@ -130,6 +130,7 @@ public abstract class SyntaxClass {
 	protected SyntaxClass(PsiTree psiTree) {
 //		OLD_lineNumber = Global.sourceLineNumber;
 		this.psiTree = (psiTree != null)? psiTree : PsiTree.dummyTree;
+//		IO.println("NEW SyntaxClass: "+this.getClass().getSimpleName());
 	}
 	
 //	public SyntaxTree buildSyntaxTree() {

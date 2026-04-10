@@ -1,0 +1,24 @@
+begin
+
+   integer            isum;               ! To contain control sum.     ;
+   real               rsum;               ! To contain control sum.     ;
+   text               txt;                ! Used in controlling real    ;
+                                       ! controll sum.               ;
+   begin
+      integer            intr;
+      real               rea;
+
+      intr := 1;
+      rea := 1;
+
+
+
+      isum := isum + intr;
+      rsum := rsum + rea
+   end;
+
+   txt :- blanks (6);
+   txt.putfix (rsum, 0);
+
+
+end of program
