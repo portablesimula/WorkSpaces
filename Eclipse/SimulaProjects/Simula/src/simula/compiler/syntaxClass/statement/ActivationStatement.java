@@ -28,6 +28,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Activation Statement.
@@ -107,7 +108,9 @@ public final class ActivationStatement extends Statement {
 	/// @param line the source line number
 	ActivationStatement(final PsiBuilder psiBuilder) {
 		super(psiBuilder.psiTree);
-		psiBuilder.startSubtree("ActivationStatement");
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.startSubtree(PsiTree.Kind.activationStatement, "ActivationStatement");
+		}
 		LexToken activator = PsiParse.getParserToken(psiBuilder);
 		REAC = activator.keyWord == KeyWord.REACTIVATE;
 		psiBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to 'current tree')
@@ -130,7 +133,9 @@ public final class ActivationStatement extends Statement {
 			object2.backLink = this;
 		}
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": ActivationStatement: "+this);
-		psiBuilder.doneSubtree(this);
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.doneSubtree(PsiTree.Kind.activationStatement, this);
+		}
 	}
 
 	@Override

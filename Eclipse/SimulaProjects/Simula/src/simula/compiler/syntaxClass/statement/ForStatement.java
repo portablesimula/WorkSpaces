@@ -37,6 +37,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// For Statement.
@@ -163,12 +164,14 @@ public final class ForStatement extends Statement {
 	/// @param line the source line number
 	ForStatement(final PsiBuilder psiBuilder) {
 		super(psiBuilder.psiTree);
-		psiBuilder.startSubtree("ForStatement");
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.startSubtree(PsiTree.Kind.forStatement, "ForStatement");
+		}
 		psiBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ForStatement");
-		controlVariable = new VariableExpression(psiBuilder.psiTree, PsiParse.expectIdentifier(psiBuilder));
+		controlVariable = new VariableExpression(psiBuilder.psiTree, PsiParse.expectIdentifier(psiBuilder).edText());
 		LexToken prevToken = PsiParse.getParserToken(psiBuilder);
 		if (!PsiParse.accept(psiBuilder, KeyWord.ASSIGNVALUE))
 			PsiParse.expect(psiBuilder, KeyWord.ASSIGNREF);
@@ -185,7 +188,9 @@ public final class ForStatement extends Statement {
 		this.doStatement = doStatement;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Line " + this.firstLineNumber() + ": ForStatement: " + this);
-		psiBuilder.doneSubtree(this);
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.doneSubtree(PsiTree.Kind.forStatement, this);
+		}
 	}
 
 	/// Parse a for-list element.

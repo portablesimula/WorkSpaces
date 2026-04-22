@@ -23,6 +23,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Boolean expressions.
@@ -126,9 +127,8 @@ public final class BooleanExpression extends Expression {
 	/// @param rhs right hand side
 	BooleanExpression(final PsiBuilder psiBuilder, Expression lhs, int opr, Expression rhs) {
 		super(psiBuilder.psiTree);
-		this.lhs = lhs;
-		this.opr = opr;
-		this.rhs = rhs;
+		this.lhs = lhs; this.opr = opr; this.rhs = rhs;
+//		psiBuilder.startSubtree(PsiTree.Kind.booleanExpression, "BooleanExpression");
 //		IO.println("NEW BooleanExpression: "+this);
 		if (this.lhs == null) {
 			Util.error("Missing operand before " + KeyWord.edit(opr));
@@ -139,6 +139,7 @@ public final class BooleanExpression extends Expression {
 			this.rhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
+//		psiBuilder.doneSubtree(PsiTree.Kind.booleanExpression, this);
 	}
 
 	@Override

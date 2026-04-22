@@ -383,7 +383,7 @@ public final class Util {
 	/// @param codeBuilder the codeBuilder to use.
 	/// @param lineNumber the line number
 	public static void buildLineNumber(CodeBuilder codeBuilder, int lineNumber) {
-		codeBuilder.lineNumber(lineNumber);
+		if(lineNumber > 0) codeBuilder.lineNumber(lineNumber);
 	}
   
 }

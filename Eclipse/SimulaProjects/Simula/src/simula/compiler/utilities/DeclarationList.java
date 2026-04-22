@@ -64,8 +64,9 @@ public final class DeclarationList extends Vector<Declaration> {
 	/// Utility print method.
 	/// @param title the title
 	public void print(String title) {
-		Util.println("DeclarationList: "+identifier+" -- "+title);
+		Util.println("BEGIN DeclarationList: "+identifier+" -- "+title);
 		for(Declaration decl:this) Util.println(decl.toString());
+		Util.println("ENDOF: DeclarationList: "+identifier+" -- "+title);
 	}
 	
 	// ***********************************************************************************************

@@ -22,6 +22,7 @@ import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Inner Statement.
@@ -52,17 +53,25 @@ public final class InnerStatement extends Statement {
 //	}
 
 	public static InnerStatement ofExplicit(final PsiBuilder psiBuilder) {
-		 psiBuilder.startSubtree("InnerStatement");
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.startSubtree(PsiTree.Kind.innerStatement, "InnerStatement");
+		}
 //		 psiBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
 		 InnerStatement innerStatement = new InnerStatement(psiBuilder);		
-		 psiBuilder.doneSubtree(innerStatement);
+		 if(! Option.TESTING_STATEMENT) {
+			 psiBuilder.doneSubtree(PsiTree.Kind.innerStatement, innerStatement);
+		 }
 		 return innerStatement;
 	}
 
 	public static InnerStatement ofImplicit(final PsiBuilder psiBuilder) {
-		 psiBuilder.startSubtree("InnerStatement");
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.startSubtree(PsiTree.Kind.innerStatement, "InnerStatement");
+		}
 		 InnerStatement innerStatement = new InnerStatement(psiBuilder);		
-		 psiBuilder.doneSubtree(innerStatement);
+		 if(! Option.TESTING_STATEMENT) {
+			 psiBuilder.doneSubtree(PsiTree.Kind.innerStatement, innerStatement);
+		 }
 		 return innerStatement;
 	}
 		

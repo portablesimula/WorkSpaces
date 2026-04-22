@@ -1,0 +1,28 @@
+begin
+    procedure testrpower (b, e); long real b, e;
+    begin
+       long real x, y;
+
+       if b>0.0 then
+       begin
+          x:= rpower (b, e); y:= b**e;
+
+          if realdiff (x, y) then
+          begin
+             error ("rpower");
+             outtext ("  base=");
+             outreal (b, 16, 23);
+             outtext ("          exp=");
+             outreal (e, 16, 23);
+             outimage;
+             outtext ("  exp(y*ln(x))= ");
+             outreal (x, 16, 23);
+             outimage;
+             outtext ("  base**exp=    ");
+             outreal (y, 16, 23);
+             outimage; outimage
+          end if
+       end
+    end of procedure testrpower;
+
+end;

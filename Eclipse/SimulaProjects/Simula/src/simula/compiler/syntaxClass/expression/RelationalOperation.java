@@ -24,6 +24,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Relational Operation.
@@ -69,9 +70,8 @@ public final class RelationalOperation extends Expression {
 	RelationalOperation(final PsiBuilder psiBuilder, final Expression lhs,final int opr,final Expression rhs) {
 		super(psiBuilder.psiTree);
 		this.type = Type.Boolean;
-		this.lhs = lhs;
-		this.opr = opr;
-		this.rhs = rhs;
+		this.lhs = lhs; this.opr = opr; this.rhs = rhs;
+//		psiBuilder.startSubtree(PsiTree.Kind.relationalOperation, "RelationalOperation");
 		if (this.lhs == null) {
 			Util.error("Missing operand before " + KeyWord.edit(opr));
 			this.lhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
@@ -81,6 +81,7 @@ public final class RelationalOperation extends Expression {
 			this.rhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
+//		psiBuilder.doneSubtree(PsiTree.Kind.relationalOperation, this);
 	}
 
 	@Override

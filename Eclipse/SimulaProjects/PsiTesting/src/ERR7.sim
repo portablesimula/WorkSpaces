@@ -1,0 +1,16 @@
+begin
+
+   ref(A) x;
+
+   class A; virtual: procedure P;
+   begin
+      procedure P(line); integer line;
+      begin
+   outtext("LINE: "); outint(line, 0); outimage;
+      end;
+   end;
+   
+   x:-new A;
+   x.P(sourceline);
+
+end

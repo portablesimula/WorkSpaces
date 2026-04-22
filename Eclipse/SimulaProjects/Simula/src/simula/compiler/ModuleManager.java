@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.Util;
 import simula.editor.SourceTextPanel;
@@ -50,7 +51,8 @@ public class ModuleManager {
 				e.printStackTrace();
 			}
 			programModule = new ProgramModule(psiBuilder);
-			programModule.doChecking();
+			StandardClass.ENVIRONMENT.doChecking();
+//			programModule.doChecking();
 			psiTree = psiBuilder.getRoot();
 			checkPsiText();
 		}
@@ -69,10 +71,17 @@ public class ModuleManager {
 //		if(! psiTree.getText().equals(textPanel.getText())) {
 		try {
 			if(! psiTree.getText().equals(getSourceText())) {
-				String curTxt = (""+textPanel.getText()).replace("\r", "\\r").replace("\n", "\\n");
-				String psiTxt = (psiTree.getText()).replace("\r", "\\r").replace("\n", "\\n");
-				IO.println("EditorMenues.doRenderSyntaxTreeAction: curTxt: "+curTxt);
-				IO.println("EditorMenues.doRenderSyntaxTreeAction: psiTxt: "+psiTxt);
+				if(textPanel != null) {
+					String curTxt = (""+textPanel.getText()).replace("\r", "\\r").replace("\n", "\\n");
+					String psiTxt = (psiTree.getText()).replace("\r", "\\r").replace("\n", "\\n");
+					IO.println("EditorMenues.doRenderSyntaxTreeAction: curTxt: "+curTxt);
+					IO.println("EditorMenues.doRenderSyntaxTreeAction: psiTxt: "+psiTxt);
+				} else {
+					String curTxt = (getSourceText()).replace("\r", "\\r").replace("\n", "\\n");
+					String psiTxt = (psiTree.getText()).replace("\r", "\\r").replace("\n", "\\n");
+					IO.println("EditorMenues.doRenderSyntaxTreeAction: curTxt: "+curTxt);
+					IO.println("EditorMenues.doRenderSyntaxTreeAction: psiTxt: "+psiTxt);					
+				}
 				Util.IERR("Resulting text differ from original text");
 //				Util.STOP();
 			}

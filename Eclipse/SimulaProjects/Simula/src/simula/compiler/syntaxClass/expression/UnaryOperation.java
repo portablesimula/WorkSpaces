@@ -23,6 +23,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Unary Operation.
@@ -52,13 +53,14 @@ public final class UnaryOperation extends Expression {
 	/// @param operand the operand Expression
 	private UnaryOperation(final PsiBuilder psiBuilder, final int oprator,final Expression operand) {
 		super(psiBuilder.psiTree);
-		this.oprator = oprator;
-		this.operand = operand;
+		this.oprator = oprator; this.operand = operand;
+//		psiBuilder.startSubtree(PsiTree.Kind.unaryOperation, "UnaryOperation");
 		if(this.operand==null)
 		{ Util.error("Missing operand after unary "+KeyWord.edit(oprator));
 		  this.operand=new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
 		}
 		this.operand.backLink=this;
+//		psiBuilder.doneSubtree(PsiTree.Kind.unaryOperation, this);
 	}
 
 	/// Create a new UnaryOperation.

@@ -1,0 +1,8 @@
+begin
+   class private; begin
+      procedure char(int); integer int; begin
+         integer case;
+      end;
+   end;
+
+end;

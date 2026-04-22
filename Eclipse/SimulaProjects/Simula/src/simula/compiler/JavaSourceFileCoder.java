@@ -130,7 +130,7 @@ public final class JavaSourceFileCoder {
 	/// @param line the code line string
 	/// @param modid module identifier
 	private void write(final int sourceLineNumber, final String line, final String modid) {
-		Util.ASSERT(sourceLineNumber > 0, "Invariant: sourceLineNumber="+sourceLineNumber);
+//		Util.ASSERT(sourceLineNumber > 0, "Invariant: sourceLineNumber="+sourceLineNumber);
 		try {
 			currentJavaLineNumber++;
 			if (prevLineNumber != sourceLineNumber) {

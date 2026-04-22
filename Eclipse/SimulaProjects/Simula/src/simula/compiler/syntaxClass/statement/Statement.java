@@ -63,43 +63,52 @@ public abstract class Statement extends SyntaxClass {
 		super(psiTree);
 	}
 
+	private static int SEQU = 0;
 	/// Parse a statement.
 	/// @return the statement
 	public static Statement acceptStatement(PsiBuilder psiBuilder) {
+		if(SEQU++ > 10) Util.STOP();
 		ObjectList<LabelDeclaration> labels = null;
 		int lineNumber=PsiParse.getParserToken(psiBuilder).lineNumber;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Statement.acceptStatement: LabeledStatement: lineNumber="+lineNumber+", current=" + PsiParse.getParserToken(psiBuilder));//	+ ", prev=" + PsiParse.prevToken);
-		psiBuilder.startSubtree(PsiTree.Kind.label, "LabelDeclaration");
-		String ident = PsiParse.acceptIdentifier(psiBuilder);
+		psiBuilder.startSubtree(PsiTree.Kind.label, "May be LabelDeclaration");
+		LexToken mayBeLabel = PsiParse.acceptIdentifier(psiBuilder);
+		IO.println("Statement.acceptStatement: IDENTIFIER: " + mayBeLabel);
 		while (PsiParse.accept(psiBuilder, KeyWord.COLON)) {
-			if (ident != null) {
+			if (mayBeLabel != null) {
 				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
-				LabelDeclaration label = new LabelDeclaration(psiBuilder, ident);
+				LabelDeclaration label = new LabelDeclaration(psiBuilder, mayBeLabel.getText());
 				psiBuilder.doneSubtree(PsiTree.Kind.label, label);
-				psiBuilder.startSubtree("LabelDeclaration");
+				psiBuilder.startSubtree(PsiTree.Kind.label, "May be LabelDeclaration2");
 				labels.add(label);
 				DeclarationScope scope = Global.getCurrentScope();
 				if(scope.labelList == null) scope.labelList = new LabelList(scope); 
 				scope.labelList.add(label);
 			} else Util.error("Missplaced ':'");
-			ident = PsiParse.acceptIdentifier(psiBuilder);
+			mayBeLabel = PsiParse.acceptIdentifier(psiBuilder);
 		}
-		psiBuilder.dropSubtree(PsiTree.Kind.label);
+		psiBuilder.dropSubtree(PsiTree.Kind.label, " is not a label");
 		
-		if(ident!=null) {
-			if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("\n\nStatement.acceptStatement: NOT LABEL ==> ROLL BACK: "+ident);
-			PsiParse.rollBack(psiBuilder, " is not a label"); // Not Label: rollBack
-		}
+//		if(! Option.TESTING_DROP_TREE) {
+//			if(mayBeLabel!=null) {
+//				if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("\n\nStatement.acceptStatement: NOT LABEL ==> ROLL BACK: "+mayBeLabel);
+//				PsiParse.rollBackIdentifier(psiBuilder, mayBeLabel, " is not a label"); // Not Label: rollBack
+//			}
+//		}
 		Statement statement = acceptUnlabeledStatement(psiBuilder);
 		if (labels != null && statement != null) {
 			statement = new LabeledStatement(psiBuilder, labels, statement);
 		}
+//		IO.println("Statement.acceptStatement: DONE: " + statement);
 		return (statement);
 	}
 
 	/// Invariant: All Statement handlers starts with 'startSubtree' and ends with 'doneSubtree'.
 	private static Statement acceptUnlabeledStatement(PsiBuilder psiBuilder) {
+		if(Option.TESTING_STATEMENT) {
+			psiBuilder.startSubtree(PsiTree.Kind.statement, "UnlabeledStatement");
+		}
 		LexToken simToken = PsiParse.getParserToken(psiBuilder);
 		if(Option.TRACE_ACCEPT_STATEMENT > 1) IO.println("\nStatement.acceptUnlabeledStatement: "+simToken);
 		Statement statement = null;
@@ -108,8 +117,9 @@ public abstract class Statement extends SyntaxClass {
 		switch(keyWord) {
 			case KeyWord.BEGIN:
 				// case KeyWord.BEGIN: PsiParse.nextToken(); return (new MaybeBlockDeclaration(null).expectMaybeBlock(lineNumber));
-				if(Option.TRACE_ACCEPT_STATEMENT > 1) IO.println("\nStatement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
-				MaybeBlockDeclaration block = new MaybeBlockDeclaration(psiBuilder.psiTree, null);
+//				if(Option.TRACE_ACCEPT_STATEMENT > 1)
+					IO.println("\nStatement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
+				MaybeBlockDeclaration block = new MaybeBlockDeclaration(psiBuilder, null);
 				block.expectMaybeBlock(psiBuilder);
 				statement = new BlockStatement(psiBuilder, block, "Statement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
 				break;
@@ -138,7 +148,7 @@ public abstract class Statement extends SyntaxClass {
 //				Util.IERR("DETTE MÅ SKRIVES");
 //				Util.STOP();
 //				break;
-			case KeyWord.IDENTIFIER:
+			case KeyWord.IDENTIFIER:				
 			case KeyWord.NEW:
 		    case KeyWord.THIS:
 				if(Option.TRACE_ACCEPT_STATEMENT > 2) {
@@ -147,12 +157,12 @@ public abstract class Statement extends SyntaxClass {
 				}
 				
 				Expression expr = Expression.acceptExpression(psiBuilder);
-//				IO.println("\n\nStatement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr+" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
+				IO.println("\n\nStatement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr+" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
 				
 				if(Option.TRACE_ACCEPT_STATEMENT > 2) {
 					IO.println("\nStatement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr);
 					expr.getPsiTree().printPsiTree("Statement.acceptUnlabeledStatement: IDENTIFIER");
-					psiBuilder.printPSI("Statement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr);
+					psiBuilder.printPSI("Statement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr.getClass().getSimpleName()+" "+expr);
 				}
 				
 				if(expr!=null) {
@@ -162,13 +172,19 @@ public abstract class Statement extends SyntaxClass {
 							
 						if (PsiParse.accept(psiBuilder, KeyWord.BEGIN)) {
 //							Util.IERR("Statement.acceptUnlabeledStatement: PREFIXED BLOCK: NOT IMPL");
-							//return new BlockStatement(PrefixedBlockDeclaration.expectPrefixedBlock(var,false));
-							BlockStatement prfblk = new BlockStatement(psiBuilder, PrefixedBlockDeclaration.expectPrefixedBlock(psiBuilder, var,false)
-									, "Statement.acceptIdentifierStatement: GOT VariableExpression: "+var);
-							return prfblk;
+//							if(Option.TESTING_BLOCKS) {
+//								psiBuilder.startSubtree(PsiTree.Kind.blockStatement, "BlockStatement");
+//							}
+							PrefixedBlockDeclaration prfblk = PrefixedBlockDeclaration.expectPrefixedBlock(psiBuilder, var,false);
+							statement = new BlockStatement(psiBuilder, prfblk, "Statement.acceptIdentifierStatement: GOT VariableExpression: "+var);
+//							if(Option.TESTING_BLOCKS) {
+//								psiBuilder.doneSubtree(PsiTree.Kind.blockStatement, statement);
+//							}
 	      				}
+	      			} else {
+	      				statement = new StandaloneExpression(psiBuilder, expr);
 	      			}
-	      			statement = new StandaloneExpression(psiBuilder, expr);
+//					IO.println("\nStatement.acceptUnlabeledStatement: GOT STATEMENT: "+statement);
 	      		}
 		    	
 				break;
@@ -185,9 +201,11 @@ public abstract class Statement extends SyntaxClass {
 		        Util.STOP();
 				break;
 		}
-//		if(statement != null)
-//			 psiBuilder.doneSubtree(statement);
-//		else psiBuilder.dropSubtree();
+		if(Option.TESTING_STATEMENT) {
+			if(statement != null)
+				 psiBuilder.doneSubtree(PsiTree.Kind.statement, statement);
+			else psiBuilder.dropSubtree(PsiTree.Kind.statement, " is not a Statement");
+		}
 		return statement;
   }
 

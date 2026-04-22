@@ -390,7 +390,10 @@ public final class VariableExpression extends Expression {
 
 			case ObjectKind.SimpleVariableDeclaration:
 			case ObjectKind.UndefinedDeclaration:
-				if(params != null) Util.error("Illegal subscription of variable " + this.identifier);
+				if(params != null) {
+//					IO.println("VariableExpression.doChecking: " + ObjectKind.edit(decl.declarationKind) + " " + decl);
+					Util.error("Illegal subscription of variable " + this.identifier);
+				}
 				break;
 				
 			case ObjectKind.InspectVariableDeclaration:
@@ -604,8 +607,11 @@ public final class VariableExpression extends Expression {
 	
 			case ObjectKind.ContextFreeMethod:
 				// Standard Library Procedure
-				if (Util.equals(identifier, "sourceline"))
-					return ("" + Global.sourceLineNumber);
+				if (Util.equals(identifier, "sourceline")) {
+					int lno = this.firstLineNumber();
+					if(lno <= 0) Util.IERR("VariableExpressiopn.editVariable: Illegal lineNumber: " + lno);
+					return "" + lno;
+				}
 				if (destination) {
 					Util.IERR();
 					return ("_RESULT=" + rightPart);
@@ -769,8 +775,11 @@ public final class VariableExpression extends Expression {
 				break;
 
 			case ObjectKind.ContextFreeMethod:
-				if (Util.equals(identifier, "sourceline"))
-					 Constant.buildIntConst(codeBuilder, this.firstLineNumber());
+				if (Util.equals(identifier, "sourceline")) {
+					int lno = this.firstLineNumber();
+					if(lno <= 0) Util.IERR("VariableExpressiopn.buildEvaluation: Illegal lineNumber: " + lno);
+					Constant.buildIntConst(codeBuilder, lno);
+				}
 				else BuildCP.staticStandardProcedure(this,codeBuilder);
 				break;
 

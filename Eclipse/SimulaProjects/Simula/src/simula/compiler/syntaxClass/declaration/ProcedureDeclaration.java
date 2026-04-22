@@ -153,7 +153,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		proc.type = type;
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ProcedureDeclaration, type=" + type);
-		proc.modifyIdentifier(PsiParse.expectIdentifier(psiBuilder));
+		proc.modifyIdentifier(PsiParse.expectIdentifier(psiBuilder).edText());
 //		IO.println("ProcedureDeclaration.expectProcedureDeclaration: "+proc.identifier);
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) {
 			expectFormalParameterPart(psiBuilder, proc.parameterList);
@@ -167,8 +167,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Line "+proc.firstLineNumber()+": ProcedureDeclaration: "+proc);
 		Global.setScope(proc.declaredIn);
-		psiBuilder.doneSubtree(proc);
-		psiBuilder.startSubtree("NextDeclaration");
+		psiBuilder.doneSubtree(PsiTree.Kind.declaration, proc);
+		psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
 		return (proc);
 	}
 
@@ -193,7 +193,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					? Parameter.Mode.value
 					: Parameter.Mode.name;
 			do {
-				String identifier = PsiParse.expectIdentifier(psiBuilder);
+				String identifier = PsiParse.expectIdentifier(psiBuilder).edText();
 				Parameter parameter = null;
 				for (Parameter par : pList)
 					if (Util.equals(identifier, par.identifier)) {
@@ -247,7 +247,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 				else if(type == null) break LOOP;
 			}
 			do {
-				String identifier = PsiParse.expectIdentifier(psiBuilder);
+				String identifier = PsiParse.expectIdentifier(psiBuilder).edText();
 				Parameter parameter = null;
 				for (Parameter par : proc.parameterList)
 					if (Util.equals(identifier,par.identifier)) { parameter = par; break; }

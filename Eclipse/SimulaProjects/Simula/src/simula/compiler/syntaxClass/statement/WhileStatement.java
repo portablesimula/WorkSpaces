@@ -26,6 +26,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// While Statement.
@@ -54,7 +55,9 @@ public final class WhileStatement extends Statement {
 	/// @param line the source line number
 	WhileStatement(final PsiBuilder psiBuilder) {
 		super(psiBuilder.psiTree);
-		psiBuilder.startSubtree("WhileStatement");
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.startSubtree(PsiTree.Kind.whileStatement, "WhileStatement");
+		}
 		psiBuilder.consume(KeyWord.WHILE); //  (add it to 'current tree')
 
 //		if (Option.internal.TRACE_PARSE)
@@ -63,7 +66,9 @@ public final class WhileStatement extends Statement {
 		PsiParse.expect(psiBuilder, KeyWord.DO);
 		doStatement = Statement.acceptStatement(psiBuilder);
 		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+firstLineNumber()+": WhileStatement: "+this);
-		psiBuilder.doneSubtree(this);
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.doneSubtree(PsiTree.Kind.whileStatement, this);
+		}
 	}
 
 	@Override

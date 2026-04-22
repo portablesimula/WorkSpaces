@@ -116,8 +116,10 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 //		block.lastLineNumber = Global.sourceLineNumber;
 		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+block.firstLineNumber()+": PrefixedBlockDeclaration: "+block);
 		Global.setScope(block.declaredIn);
-		psiBuilder.doneSubtree(block);
-		psiBuilder.startSubtree("NextDeclaration");
+		if(! Option.TESTING_BLOCKS) {
+			psiBuilder.doneSubtree(PsiTree.Kind.declaration, block);
+			psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
+		}
 		return block;
 	}
 

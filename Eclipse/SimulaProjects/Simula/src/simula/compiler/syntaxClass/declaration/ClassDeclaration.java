@@ -186,7 +186,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		cls.declaredIn.hasLocalClasses = true;
 		if (cls.prefix == null)
 			cls.prefix = StandardClass.CLASS.identifier;
-		cls.modifyIdentifier(PsiParse.expectIdentifier(psiBuilder));
+		cls.modifyIdentifier(PsiParse.expectIdentifier(psiBuilder).edText());
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) {
 			expectFormalParameterPart(psiBuilder, cls.parameterList);
 			PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
@@ -205,8 +205,8 @@ public class ClassDeclaration extends BlockDeclaration {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Line " + cls.firstLineNumber() + ": ClassDeclaration: " + cls);
 		Global.setScope(cls.declaredIn);
-		psiBuilder.doneSubtree(cls);
-		psiBuilder.startSubtree("NextDeclaration");
+		psiBuilder.doneSubtree(PsiTree.Kind.declaration, cls);
+		psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
 		return (cls);
 	}
 
@@ -222,7 +222,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	private static void acceptValuePart(final PsiBuilder psiBuilder, final Vector<Parameter> pList) {
 		if (PsiParse.accept(psiBuilder, KeyWord.VALUE)) {
 			do {
-				String identifier = PsiParse.expectIdentifier(psiBuilder);
+				String identifier = PsiParse.expectIdentifier(psiBuilder).edText();
 				Parameter parameter = null;
 				for (Parameter par : pList)
 					if (Util.equals(identifier, par.identifier)) {
@@ -270,7 +270,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			if (type == null)
 				return;
 			do {
-				String identifier = PsiParse.expectIdentifier(psiBuilder);
+				String identifier = PsiParse.expectIdentifier(psiBuilder).edText();
 				Parameter parameter = null;
 				for (Parameter par : pList)
 					if (Util.equals(identifier, par.identifier)) {
@@ -332,11 +332,11 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @param prtected if true, update the protected list
 	private static void expectHiddenProtectedList(final PsiBuilder psiBuilder, final ClassDeclaration cls, final boolean hidden, final boolean prtected) {
 		do {
-			String identifier = PsiParse.expectIdentifier(psiBuilder);
+			String identifier = PsiParse.expectIdentifier(psiBuilder).edText();
 			if (hidden)
 				cls.hiddenList.add(new HiddenSpecification(psiBuilder, cls, identifier));
 			if (prtected)
-				cls.protectedList.add(new ProtectedSpecification(psiBuilder, cls, identifier));
+				cls.protectedList.add(new ProtectedSpecification(psiBuilder.psiTree, cls, identifier));
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 	}
@@ -470,6 +470,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		Global.enterScope(this);
 		if(Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ClassDeclaration("+this.identifier+").doChecking");
+//		IO.println("ClassDeclaration("+this.identifier+").doChecking");
 		
 		if (hasRealPrefix()) {
 			prefixClass = getPrefixClass();
@@ -1365,10 +1366,15 @@ public class ClassDeclaration extends BlockDeclaration {
 		if(statements1 != null) for (Statement stm : statements1) {
 			if(!(stm instanceof DummyStatement)) {
 				int lno = stm.firstLineNumber();
-				if(lno < 0) {
-					Util.IERR("ClassDeclaration.buildStatementsBeforeInner: Illegal LNO: "+lno+" "+stm.getClass().getSimpleName()+" "+stm);
+//				if(lno < 0) {
+//					Util.IERR("ClassDeclaration.buildStatementsBeforeInner: Illegal LNO: "+lno+" "+stm.getClass().getSimpleName()+" "+stm);
+//				}
+//				Util.buildLineNumber(codeBuilder,lno);
+				if(lno > 0) {
+					Util.buildLineNumber(codeBuilder,lno);
+//				} else {
+//					Util.warning("ClassDeclaration.buildStatementsBeforeInner: Illegal LNO: "+lno+" "+stm.getClass().getSimpleName()+" "+stm);
 				}
-				Util.buildLineNumber(codeBuilder,lno);
 			}
 			stm.buildByteCode(codeBuilder);
 		}

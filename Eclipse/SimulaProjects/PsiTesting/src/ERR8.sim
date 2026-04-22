@@ -1,0 +1,9 @@
+begin
+ integer traceCase;
+   
+%  Simulation
+   begin
+     integer case;
+%     case := 444;
+   end
+ end

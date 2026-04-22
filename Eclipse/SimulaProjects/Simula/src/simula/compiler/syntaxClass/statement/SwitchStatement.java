@@ -25,6 +25,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Switch Statement.
 /// 
@@ -109,8 +110,9 @@ public final class SwitchStatement extends Statement {
 	/// @param line the source line number
 	SwitchStatement(final PsiBuilder psiBuilder) {
 		super(psiBuilder.psiTree);
-
-		psiBuilder.startSubtree("SwitchStatement");
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.startSubtree(PsiTree.Kind.switchStatement, "SwitchStatement");
+		}
 		psiBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
 //		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);
@@ -141,7 +143,9 @@ public final class SwitchStatement extends Statement {
 		}
 		PsiParse.expect(psiBuilder, KeyWord.END);
 		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+firstLineNumber()+": SwitchStatement: "+this);
-		psiBuilder.doneSubtree(this);
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.doneSubtree(PsiTree.Kind.switchStatement, this);
+		}
 	}
 
 	/// Parse Utility: Expect case pair.

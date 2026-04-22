@@ -189,7 +189,7 @@ public final class Constant extends Expression {
 				return "new RTS_TXT(\""+val+"\")";
 			}
 			case Type.T_CHARACTER -> {
-				IO.println("Constant.toJavaCode: "+value.getClass().getSimpleName()+"  "+value);
+//				IO.println("Constant.toJavaCode: "+value.getClass().getSimpleName()+"  "+value);
 //				char charValue=((Character)value).charValue();
 				char charValue=((Character)value).charValue();
 				if(charValue=='\\') return("'\\\\'");

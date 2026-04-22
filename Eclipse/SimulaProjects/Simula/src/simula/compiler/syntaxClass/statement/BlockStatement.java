@@ -61,20 +61,24 @@ import simula.psi.TreeNodeIdent;
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen
 public final class BlockStatement extends Statement {
-	public String debugName;
+//	public String debugName;
 	
 	/// The associated block declaration.
 	public BlockDeclaration blockDeclaration;
 
-	private static int SEQU = 1;
+//	private static int SEQU = 1;
 	/// Create a new BlockStatement.
 	/// @param blockDeclaration the BlockDeclaration
 	public BlockStatement(final PsiBuilder psiBuilder, final BlockDeclaration blockDeclaration, String debugName1) {
 		super(psiBuilder.psiTree);
-		debugName = "BlockStatement: "+SEQU++;
+//		debugName = "ZZZ_BlockStatement: "+SEQU++;
 		this.blockDeclaration = blockDeclaration;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": BlockStatement: "+this);
-		IO.println("NEW BlockStatement: " + debugName + '[' + debugName1 + ']');
+//		IO.println("NEW BlockStatement: " + debugName + '[' + debugName1 + ']');
+	}
+	
+	public String psiKind() {
+		return ObjectKind.edit(blockDeclaration.declarationKind);
 	}
 	
 	@Override
@@ -165,7 +169,10 @@ public final class BlockStatement extends Statement {
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
 		int lno = firstLineNumber();
 		int last = lastLineNumber();
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new TreeNodeIdent(this, Html.edPsi(lno, last, debugName)));
+//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new TreeNodeIdent(this, Html.edPsi(lno, last, debugName)));
+//		String id = blockDeclaration.getClass().getSimpleName();
+//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new TreeNodeIdent(this, Html.edPsi(lno, last, id)));
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new TreeNodeIdent(this, Html.edPsi(lno, last, psiKind())));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
         blockDeclaration.addDeclarationList(tree, model, newNode);
 		blockDeclaration.addStatementList(tree, model, newNode);			

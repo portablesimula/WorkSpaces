@@ -1,21 +1,35 @@
 package simula.psi;
 
-//Base class for leaf nodes (tokens)
-//public class LeafPsiElement implements PsiElement {
-public abstract class PsiElement {// implements PsiElement {
-//	private final String text;
+public class PsiElement {// implements PsiElement {
+    CharSequence sourceText; // Pointer to the Whole FILE
+    int startOffset;
+    int endOffset;
+    
+	public PsiTree parent;
 	public String debugName;
     public int lineNumber;
-	public PsiTree parent;
 	
-	public PsiElement(String debugName) {
+	public PsiElement(String debugName, CharSequence sourceText) {
 		this.debugName = debugName;
+		this.sourceText = sourceText;
+	}
+	
+	public String getText() { return null;}
+	
+	public String getOriginalText() {
+		CharSequence txt = sourceText.subSequence(startOffset, endOffset);
+		return txt.toString();
+	}
+	
+	public String edPsiLine() { return null;}
+	public String edHtmlLine() { return null;}
+	
+	public int firstLineNumber() {
+		return lineNumber;
 	}
 
-//	public PsiElement getParent() { return parent; }
-//	public void setParent(PsiTree parent) { this.parent = parent; }
-	public abstract int firstLineNumber();
-	public abstract int lastLineNumber();
-	public abstract String getText();
+	public int lastLineNumber() {
+		return lineNumber;
+	}
 
 }

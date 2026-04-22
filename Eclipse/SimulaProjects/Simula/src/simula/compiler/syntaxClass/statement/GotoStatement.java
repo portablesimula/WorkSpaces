@@ -28,6 +28,7 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Goto Statement.
@@ -62,14 +63,18 @@ public final class GotoStatement extends Statement {
 	/// @param line source line
 	GotoStatement(final PsiBuilder psiBuilder, final int keyWord) {
 		super(psiBuilder.psiTree);
-		psiBuilder.startSubtree("GotoStatement");
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.startSubtree(PsiTree.Kind.gotoStatement, "GotoStatement");
+		}
 		psiBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to 'current tree')
 		if(keyWord != KeyWord.GOTO) {
 	        if (!PsiParse.accept(psiBuilder, KeyWord.TO))	Util.error("Missing 'TO' after 'GO'");
 		}
 		label = Expression.expectExpression(psiBuilder);
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+this.firstLineNumber()+": GotoStatement: "+this);
-		psiBuilder.doneSubtree(this);
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.doneSubtree(PsiTree.Kind.gotoStatement, this);
+		}
 	}
 
 	@Override

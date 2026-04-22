@@ -93,7 +93,7 @@ public final class ObjectGenerator extends Expression {
 	static Expression expectNew(PsiBuilder psiBuilder) {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse ObjectGenerator, current=" + PsiParse.currentLexToken(psiBuilder));
-		String classIdentifier = PsiParse.expectIdentifier(psiBuilder);
+		String classIdentifier = PsiParse.expectIdentifier(psiBuilder).edText();
 		Vector<Expression> params = new Vector<Expression>();
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) {
 			do {

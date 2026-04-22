@@ -24,6 +24,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Arithmetic expressions
@@ -117,6 +118,7 @@ public final class ArithmeticExpression extends Expression {
 	private ArithmeticExpression(final PsiBuilder psiBuilder, final Expression lhs, final int opr, final Expression rhs) {
 		super(psiBuilder.psiTree);
 		this.opr = opr;
+//		psiBuilder.startSubtree(PsiTree.Kind.arithmeticExpression, "ArithmeticExpression");
 		if (lhs == null) {
 			Util.error("Missing operand before " + KeyWord.edit(opr));
 			this.lhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
@@ -128,6 +130,7 @@ public final class ArithmeticExpression extends Expression {
 		} else
 			this.rhs = rhs;
 		this.lhs.backLink = this.rhs.backLink = this;
+//		psiBuilder.doneSubtree(PsiTree.Kind.arithmeticExpression, this);
 	}
 
 	/// Create a new ArithmeticExpression.

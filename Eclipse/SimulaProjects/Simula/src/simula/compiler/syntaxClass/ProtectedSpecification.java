@@ -18,7 +18,7 @@ import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.VirtualSpecification;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
-import simula.psi.PsiBuilder;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Protected Specification.
@@ -48,8 +48,8 @@ public final class ProtectedSpecification extends SyntaxClass {
     /// Create a new ProtectedSpecification.
     /// @param definedIn the class it is defined in
     /// @param identifier the protected identifier
-	public ProtectedSpecification(final PsiBuilder psiBuilder, final ClassDeclaration definedIn,final String identifier) {
-		super(psiBuilder.psiTree);
+	public ProtectedSpecification(final PsiTree psiTree, final ClassDeclaration definedIn,final String identifier) {
+		super(psiTree);
 		this.definedIn=definedIn;
 		this.identifier=identifier;
 	}

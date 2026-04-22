@@ -40,7 +40,9 @@ public final class StandardProcedure extends ProcedureDeclaration {
 	/// @param type the procedure's type
 	/// @param ident the procedure identifier
 	StandardProcedure(DeclarationScope declaredIn,int kind,Type type, String ident) {
-		super(null, ident,kind); this.declaredIn = declaredIn; this.type = type; }
+		super(null, ident,kind); this.declaredIn = declaredIn; this.type = type;
+//		this.CHECKED = true;
+	}
 
 	/// Create a new StandardProcedure with parameters.
 	/// @param declaredIn the enclosing scope

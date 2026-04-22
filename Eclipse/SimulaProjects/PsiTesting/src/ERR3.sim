@@ -1,4 +1,5 @@
 begin
-%    isum :=
-             isum + intr;
+   integer isum, intr;
+%    isum := isum + intr + 444;
+   sysout.setpos(1);
 end;

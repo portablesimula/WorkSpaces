@@ -36,6 +36,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Connection Statement.
@@ -131,7 +132,9 @@ public final class ConnectionStatement extends Statement {
 	/// @param line the source line number
 	ConnectionStatement(final PsiBuilder psiBuilder) {
 		super(psiBuilder.psiTree);
-		psiBuilder.startSubtree("ConnectionStatement");
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.startSubtree(PsiTree.Kind.connectionStatement, "ConnectionStatement");
+		}
 		psiBuilder.consume(KeyWord.INSPECT); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
@@ -168,7 +171,7 @@ public final class ConnectionStatement extends Statement {
 			connectionBlock.end();
 		} else {
 			while (PsiParse.accept(psiBuilder, KeyWord.WHEN)) {
-				String classIdentifier = PsiParse.expectIdentifier(psiBuilder);
+				String classIdentifier = PsiParse.expectIdentifier(psiBuilder).edText();
 				PsiParse.expect(psiBuilder, KeyWord.DO);
 				ConnectionBlock connectionBlock = new ConnectionBlock(psiBuilder.psiTree, inspectedVariable, classIdentifier);
 				hasWhenPart = true;
@@ -184,7 +187,9 @@ public final class ConnectionStatement extends Statement {
 		this.hasWhenPart=hasWhenPart;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Line "+this.firstLineNumber()+": ConnectionStatement: "+this);
-		psiBuilder.doneSubtree(this);
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.doneSubtree(PsiTree.Kind.connectionStatement, this);
+		}
 	}
 
 	@Override
@@ -211,7 +216,7 @@ public final class ConnectionStatement extends Statement {
 	@Override
 	public void doJavaCoding() {
 		Global.sourceLineNumber = firstLineNumber();
-		IO.println("ConnectionStatement.doJavaCoding: "+Global.sourceLineNumber);
+//		IO.println("ConnectionStatement.doJavaCoding: "+Global.sourceLineNumber);
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code("{");
 		JavaSourceFileCoder.debug("// BEGIN INSPECTION ");

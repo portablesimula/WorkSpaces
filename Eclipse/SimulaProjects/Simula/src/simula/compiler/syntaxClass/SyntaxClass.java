@@ -116,7 +116,9 @@ public abstract class SyntaxClass {
 	
 	/// The first source line number
 	public int firstLineNumber() {
-		return psiTree.firstLineNumber();
+		int lno = psiTree.firstLineNumber();
+//		if(lno < 0) System.err.println("Illegal LintNumber: " + lno + " IN " + this.getClass().getSimpleName()+" "+this);
+		return lno;
 	}
 
 	/// The last source line number

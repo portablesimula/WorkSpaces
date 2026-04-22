@@ -129,7 +129,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse IdentifierList");
 		do {
-			String ident = PsiParse.expectIdentifier(psiBuilder);
+			String ident = PsiParse.expectIdentifier(psiBuilder).edText();
 			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(psiBuilder.psiTree, type, ident);
 			if (PsiParse.accept(psiBuilder, KeyWord.EQ))
 				typeDeclaration.constantElement = Expression.expectExpression(psiBuilder);

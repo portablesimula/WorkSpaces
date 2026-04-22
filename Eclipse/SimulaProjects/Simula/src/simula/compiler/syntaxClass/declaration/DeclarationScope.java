@@ -16,6 +16,8 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import simula.compiler.ModuleManager;
+import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
@@ -165,6 +167,10 @@ public abstract class DeclarationScope extends Declaration  {
 			if (!Global.duringParsing) {
 				Util.error("Undefined variable: " + identifier);
 				Util.STOP();
+			}
+			if(Option.CaseSensitive) {
+				Option.WARNINGS = true;
+				Util.warning("Undefined variable: " + identifier + "  Could be because Option.CaseSensitive == true");
 			}
 			UndefinedDeclaration undef = new UndefinedDeclaration(null, identifier);
 			meaning = new Meaning(undef, this); // Error Recovery

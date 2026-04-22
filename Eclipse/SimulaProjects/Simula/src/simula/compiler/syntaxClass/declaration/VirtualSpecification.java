@@ -127,7 +127,7 @@ public final class VirtualSpecification extends Declaration {
 				if (!PsiParse.accept(psiBuilder, KeyWord.PROCEDURE))
 					break LOOP;
 
-				String identifier = PsiParse.expectIdentifier(psiBuilder);
+				String identifier = PsiParse.expectIdentifier(psiBuilder).edText();
 				ProcedureSpecification procedureSpec = null;
 				if (PsiParse.accept(psiBuilder, KeyWord.IS)) {
 					if(type != null) Util.error("An IS-specified virtual procedure can have its type only after IS.");
@@ -159,7 +159,7 @@ public final class VirtualSpecification extends Declaration {
 	/// @param kind the specifiers kind
 	private static void expectIdentifierList(final PsiBuilder psiBuilder, final ClassDeclaration cls, final Type type, final int kind) {
 		do {
-			String identifier = PsiParse.expectIdentifier(psiBuilder);
+			String identifier = PsiParse.expectIdentifier(psiBuilder).edText();
 			cls.virtualSpecList.add(new VirtualSpecification(psiBuilder.psiTree, identifier, type, kind, cls.prefixLevel(), null));
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);

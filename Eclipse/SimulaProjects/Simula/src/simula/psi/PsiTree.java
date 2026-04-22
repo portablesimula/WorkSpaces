@@ -20,37 +20,59 @@ import javax.swing.tree.TreePath;
 import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Html;
+import simula.compiler.utilities.KeyWord;
 
 public class PsiTree extends PsiElement {
 	public SyntaxClass syntaxClass;
 	protected final List<PsiElement> children = new ArrayList<>();
 //	private String error;
 	
-    public enum Kind { any, programModule, mainModule, label, declaration, block, statement,
+    public enum Kind { any,
+    	// Declarations
+//    	programModule,
+    	mainModule, label, declaration, block,
+//    	externalDeclaration,
+//    	typeDeclaration, arrayDeclaration, externalDeclaration, classDeclaration, procedureDeclaration,
+    	// Statements
+    	statement,
+    	activationStatement, conditionalStatement, connectionStatement,
+    	forStatement,gotoStatement, innerStatement, whileStatement, switchStatement, blockStatement,
     	// Expressions
-    	expression, additiveOperation, postfixExpression }
+    	expression, simpleExpression, booleanExpression, unaryOperation, textExpression,
+    	relationalOperation, arithmeticExpression, constant, postfixExpression,
+    	// textAfterProgramEnd
+    	textAfterProgramEnd
+    }
 	public Kind kind;
 	
 //	public static PsiTree dummyTree = new LocalPsiTree("dymmyTree", null) {
 //		@Override public int firstLineNumber() { return -24; }
 //		@Override public int lastLineNumber()  { return -25; }
 //	};
-	public static PsiTree dummyTree = new PsiTree("dymmyTree", -25, null);
+//	public static PsiTree dummyTree = new PsiTree("dymmyTree", -23, -25, null);
+	public static PsiTree dummyTree = new PsiTree(null, -23, "", -25, "dymmyTree");
 	
-	public PsiTree(String debugName, int lineNumber, PsiTree parent) {
-		super(debugName);
-		this.lineNumber = lineNumber;
+	public PsiTree(PsiTree parent, int tokenStartLine, CharSequence sourceText, int startOffset, String debugName) {
+		super(debugName, sourceText);
+		this.startOffset = startOffset;
+		this.lineNumber = tokenStartLine;
 		this.parent = parent;
 	}
-	
+    
+	/// EndOffset is not set until 'doneSubtree'.
+	/// Use this in debug traces
+	public int getEndOffset() {
+		if(children.isEmpty()) return startOffset;
+		return children.getLast().endOffset;
+	}
+
 	public void addChild(PsiElement child) {
-//		if (child instanceof BasePsiElement) {
-//			((BasePsiElement) child).setParent(this); 
-//		}
 		if(child == null) {
+//			IO.println("PsiTree.addChild: " + child);
 //			Util.IERR("addChild NULL !!");
 			return;
 		}
+//		IO.println("PsiTree.addChild: " + child.getClass().getSimpleName() + " " + child);
 		children.add(child);
 	}
 	
@@ -75,7 +97,7 @@ public class PsiTree extends PsiElement {
 
 
 	public LexToken getLastChild() {
-		if(children.getLast() instanceof LexToken token)
+		if(! children.isEmpty() && children.getLast() instanceof LexToken token)
 			return token;
 		return null;
 	}
@@ -95,6 +117,13 @@ public class PsiTree extends PsiElement {
 	}
 
 	public List<PsiElement> getChildren() { return children; }
+	
+//	public LexToken getFirstChild() {
+//		if(! children.isEmpty() && children.getFirst() instanceof LexToken token)
+//			return token;
+//		return null;
+//	}
+	
 	
 	@Override public int firstLineNumber() {
 		try {
@@ -148,15 +177,8 @@ public class PsiTree extends PsiElement {
         return tree;
 	}
 	
-	private void addNodes(int indent, JTree tree,DefaultTreeModel model, DefaultMutableTreeNode parent, PsiElement elt) {
-//		char cc = (char)(0x00B6);
-//		char cc = (char)(0x204B);
-//		String xxx = "" + cc + elt.getLineNumber() + ": " + elt.debugName + " |" + elt.getText() +"|";
-//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(xxx);
+	private void addNodes(int indent, JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent, PsiElement elt) {
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(elt);
-//		int lno = elt.getLineNumber();
-//		int lastLine = elt.lastLineNumber();
-//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(Html.edPsi(lno, lastLine, elt.toString()));
         model.insertNodeInto(newNode, parent, parent.getChildCount());
 		if(elt instanceof PsiTree psiTree) {
 	        for(PsiElement subelt:psiTree.getChildren()) {
@@ -285,9 +307,7 @@ public class PsiTree extends PsiElement {
     }
 
     private static void printPsiTree(PsiElement element, int depth) {
-    	int line = element.firstLineNumber();
-    	String text = element.getText().replace("\r", "\\r").replace("\n", "\\n");
-    	IO.println("  ".repeat(depth) + "Line " + line + ": " + element.getClass().getSimpleName() + "("+element.debugName+"): [" + text + "]");
+    	IO.println("  ".repeat(depth) + element.edPsiLine());
         if(element instanceof PsiTree subTree) {
 	        for (PsiElement child : subTree.getChildren()) {
 	            printPsiTree(child, depth + 1);
@@ -295,13 +315,33 @@ public class PsiTree extends PsiElement {
         }
     }
 
-	@Override public String toString() {
-//		return "Line-" + this.getLineNumber() + ":PsiTree(" + debugName + ":" + level() + ") Text=\"" + getText().replace("\n", "\\n").replace("\r", "\\r") + '"';
-//		return "PsiTree(" + debugName + ":" + level() + ") Text=\"" + getText().replace("\n", "\\n").replace("\r", "\\r") + '"';
-		String ID = "PsiTree(" + debugName + ") Text=\"" + getText().replace("\n", "\\n").replace("\r", "\\r") + '"';
+	public String edPsiLine() {
+		int lno = this.firstLineNumber();
+		int lastLine = this.lastLineNumber();
+		String ID1 = (syntaxClass == null)? "" : "==> " + syntaxClass.getClass().getSimpleName();
+//		String ID = "PsiTree(" + debugName + ") " + ID1 + " Text=\"" + getText().replace("\n", "\\n").replace("\r", "\\r") + '"';
+		String ID = "PsiTree[" + startOffset + ':' + getEndOffset() + "]=" + debugName + " Text=" + getText().replace("\n", "\\n").replace("\r", "\\r") + '"';
+		if(ID.length() > 200) ID = ID.substring(0, 200) + " ... Truncated";
+		StringBuilder sb = new StringBuilder();
+		if(lno > 0) {
+			sb.append("Line ").append(lno);
+			if(lastLine > 0 && lastLine != lno) sb.append('-').append(lastLine);
+			sb.append(": ");
+		}
+		sb.append(ID);
+		return sb.toString();		
+	}
+	
+	public String edHtmlLine() {
+		String ID = "PsiTree[" + startOffset + ':' + getEndOffset() + "]=" + debugName + " Text=" + getText().replace("\n", "\\n").replace("\r", "\\r") + '"';
+		if(ID.length() > 200) ID = ID.substring(0, 200) + " ... Truncated";
 		int lno = this.firstLineNumber();
 		int lastLine = this.lastLineNumber();
         return Html.edPsi(lno, lastLine, ID);
+	}
+
+	@Override public String toString() {
+		return edHtmlLine();
 	}
 
 }

@@ -17,6 +17,7 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 import simula.psi.PsiTree;
@@ -135,12 +136,19 @@ public abstract class Declaration extends SyntaxClass {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse Declaration");
 		DeclarationList declarationList=enclosure.declarationList;
-		String maybePrefix = PsiParse.acceptIdentifier(psiBuilder);
+		LexToken maybePrefix = PsiParse.acceptIdentifier(psiBuilder);
 		if (maybePrefix != null) {
 			if (PsiParse.accept(psiBuilder, KeyWord.CLASS))
-				declarationList.add(ClassDeclaration.expectClassDeclaration(psiBuilder, maybePrefix));
+				declarationList.add(ClassDeclaration.expectClassDeclaration(psiBuilder, maybePrefix.getText()));
 			else {
-				PsiParse.rollBack(psiBuilder, " is NOT a class prefix"); // Identifier is NOT a class prefix.
+//				if(! Option.TESTING_DROP_TREE) {
+//					PsiParse.rollBackIdentifier(psiBuilder, maybePrefix, " is NOT a class prefix"); // Identifier is NOT a class prefix.
+//				}
+//				else Thread.dumpStack();
+				psiBuilder.dropSubtree(PsiTree.Kind.label, " s NOT a class prefix");
+//				psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
+
+				IO.println("Declaration.acceptDeclaration: " + maybePrefix + " is NOT a class prefix");
 				return (false);
 			}
 		} else if (PsiParse.accept(psiBuilder, KeyWord.ARRAY))
@@ -155,13 +163,15 @@ public abstract class Declaration extends SyntaxClass {
 		} else if (PsiParse.accept(psiBuilder, KeyWord.CLASS))
 			declarationList.add(ClassDeclaration.expectClassDeclaration(psiBuilder, null));
 		else if (PsiParse.accept(psiBuilder, KeyWord.SWITCH)) {
-			String ident = PsiParse.acceptIdentifier(psiBuilder);
+			LexToken ident = PsiParse.acceptIdentifier(psiBuilder);
 			if (ident == null) {
 				// Switch Statement
-				PsiParse.rollBack(psiBuilder, " HVA GJØR VI HER");
+//				PsiParse.rollBackIdentifier(psiBuilder, ident, " HVA GJØR VI HER");
+				Util.IERR("HVA GJØR VI HER");
+				Util.STOP();
 				return (false);
 			}
-			declarationList.add(new SwitchDeclaration(psiBuilder, ident));
+			declarationList.add(new SwitchDeclaration(psiBuilder, ident.getText()));
 		} else if (PsiParse.accept(psiBuilder, KeyWord.EXTERNAL))
 			ExternalDeclaration.expectExternalHead(psiBuilder, enclosure);
 		else {
@@ -192,9 +202,12 @@ public abstract class Declaration extends SyntaxClass {
 	/// @param enclosure the owning block.
 	protected static void acceptDeclarations(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
 		psiBuilder.startSubtree(PsiTree.Kind.declaration, "Declaration");
-		while (Declaration.acceptDeclaration(psiBuilder, enclosure))
+		while (Declaration.acceptDeclaration(psiBuilder, enclosure)) {
 			PsiParse.accept(psiBuilder, KeyWord.SEMICOLON);
-		psiBuilder.dropSubtree(PsiTree.Kind.declaration);
+//			psiBuilder.doneSubtree(PsiTree.Kind.declaration, typeDeclaration);
+//			psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
+		}
+		psiBuilder.dropSubtree(PsiTree.Kind.declaration, " is not a Declaration");
 	}
 
 	// ***********************************************************************************************

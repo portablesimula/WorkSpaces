@@ -2,9 +2,12 @@ package simula.psi;
 
 import java.io.Reader;
 
+import javax.lang.model.SourceVersion;
+
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.LOG;
+import simula.compiler.utilities.Util;
 
 
 /// The Simula Parser Utilities.
@@ -41,7 +44,7 @@ import simula.compiler.utilities.LOG;
 /// "https://github.com/portablesimula/WorkSpaces/Eclipse/blob/main/SimulaProjects/Simula/src/simula/compiler/parsing/Parse.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public interface PsiParse {
+public class PsiParse {
 	
 //	/// The saved Token used by 'pushBack'
 //	private static Token savedToken; // Used by 'pushBack'
@@ -75,11 +78,6 @@ public interface PsiParse {
 //		nextToken();
 	}
 
-	public static void rollBack(final PsiBuilder psiBuilder, String debugInfo) {
-		psiBuilder.rollBack(debugInfo);
-//		Util.IERR("Parse.rollBack: KAN IKKE BRUKES: FORSØK  drop()  eller rollbackTo()");
-	}
-
 	public static LexToken prevToken(final PsiBuilder psiBuilder) {
 //		Util.IERR("Parse.prevToken: KAN IKKE BRUKES: SKRIV OM KODEN");
 		return psiBuilder.prevToken();
@@ -102,7 +100,7 @@ public interface PsiParse {
 
 	/// Return the Parser current Token.
 	public static LexToken getParserToken(final PsiBuilder psiBuilder) {
-        return (LexToken)psiBuilder.getParserToken();
+        return psiBuilder.getParserToken();
 	}
 	
 	/// Advance to next Token.
@@ -146,6 +144,7 @@ public interface PsiParse {
 	}
 	
 	public static boolean accept_AND_THEN(final PsiBuilder psiBuilder) {
+		Util.IERR("SKAL FLYTTES TIL LEXER");
 //		IO.println("\nPsiParse.accept_AND_THEN: BEGIN ======================================================================");
 		if(accept(psiBuilder, KeyWord.AND_THEN)) {
 //			IO.println("PsiParse.accept_AND_THEN: GOT: AND_THEN");
@@ -165,6 +164,7 @@ public interface PsiParse {
 	}
 
 	public static boolean accept_AND_ONLY(final PsiBuilder psiBuilder) {
+		Util.IERR("SKAL FLYTTES TIL LEXER");
 //		IO.println("\nPsiParse.accept_AND_THEN: BEGIN ======================================================================");
 		LexToken prv = psiBuilder.getCurrentLexerToken();
 		if(accept(psiBuilder, KeyWord.AND)) {
@@ -181,6 +181,7 @@ public interface PsiParse {
 	}
 	
 	public static boolean accept_OR_ELSE(final PsiBuilder psiBuilder) {
+		Util.IERR("SKAL FLYTTES TIL LEXER");
 //		IO.println("\nPsiParse.accept_OR_ELSE: BEGIN ======================================================================");
 		if(accept(psiBuilder, KeyWord.OR_ELSE)) {
 //			IO.println("PsiParse.accept_OR_ELSE: GOT: OR_ELSE");
@@ -200,6 +201,7 @@ public interface PsiParse {
 	}
 
 	public static boolean accept_OR_ONLY(final PsiBuilder psiBuilder) {
+		Util.IERR("SKAL FLYTTES TIL LEXER");
 //		IO.println("\nPsiParse.accept_OR_THEN: BEGIN ======================================================================");
 		LexToken prv = psiBuilder.getCurrentLexerToken();
 		if(accept(psiBuilder, KeyWord.OR)) {
@@ -222,28 +224,73 @@ public interface PsiParse {
 		nextToken(psiBuilder);
 	}
 	
+	
+//	private static String pendingIdentifier = null;
+//	private static void setPendingIdentifier(String ident) {
+//		pendingIdentifier = ident;
+//	}
+//	
+//	private static LexToken pendingIDToken = null;
+//	private static void setPendingIdentifier(LexToken ident) {
+//		pendingIDToken = ident;
+//	}
+//
+//	public static void rollBackIdentifier(final PsiBuilder psiBuilder, String ident, String debugInfo) {
+////		psiBuilder.rollBack(debugInfo);
+//		PsiParse.setPendingIdentifier(ident);
+//	}
+//
+//	public static void rollBackIdentifier(final PsiBuilder psiBuilder, LexToken ident, String debugInfo) {
+//		boolean TESTING = true;
+//		if(TESTING) {
+//			IO.println("PsiParse.rollBackIdentifier: " + ident);
+//			psiBuilder.rollBackTo(ident, debugInfo);
+//			PsiParse.setPendingIdentifier(ident);
+//		} else {
+////			psiBuilder.rollBack(debugInfo);
+//			PsiParse.setPendingIdentifier(ident);
+//		}
+//	}
+	
 	/// Test to accept an identifier.
 	/// @return the identifier or null
-	public static String acceptIdentifier(final PsiBuilder psiBuilder) {
-		LexToken token = null;
-		if ((token = PsiParse.acceptParserToken(psiBuilder, KeyWord.IDENTIFIER)) != null)
-//			return ((Identifier)token).value;
-			return token.getText();
-		return (null);
+//	public static String acceptIdentifier(final PsiBuilder psiBuilder) {
+//		if(pendingIdentifier != null) {
+//			String res = pendingIdentifier;
+//			pendingIdentifier = null;
+//			return res;
+//		}
+//		LexToken token = null;
+//		if ((token = PsiParse.acceptParserToken(psiBuilder, KeyWord.IDENTIFIER)) != null) {
+//			String ident = token.getText();
+////			if(SourceVersion.isKeyword(ident)) // Check for Java keyWord
+////				ident = "_" + ident;
+//			return ident;
+//		}
+//		return (null);
+//	}
+	public static LexToken acceptIdentifier(final PsiBuilder psiBuilder) {
+//		LexToken token = pendingIDToken; pendingIDToken = null;
+//		if(token == null)
+			
+		LexToken token = PsiParse.acceptParserToken(psiBuilder, KeyWord.IDENTIFIER);
+		return (token);
 	}
 
+	
 	/// Test to expect an identifier.
 	/// 
 	/// If failing to do so, an error is printed.
 	/// @return the identifier or null
-	public static String expectIdentifier(final PsiBuilder psiBuilder) {
+//	public static String expectIdentifier(final PsiBuilder psiBuilder) {
+//        LexToken currentToken = getParserToken(psiBuilder);
+//		String ident = acceptIdentifier(psiBuilder);
+//		if(ident == null) LOG.error("Got symbol " + currentToken + " while expecting an Identifier");
+//		return (ident);
+//	}  
+	public static LexToken expectIdentifier(final PsiBuilder psiBuilder) {
         LexToken currentToken = getParserToken(psiBuilder);
-//		if (acceptIdentifier(psiBuilder) != null) {
-//			return ((Identifier)currentToken).value;
-//		}
-//		LOG.error("Got symbol " + currentToken + " while expecting an Identifier");
-//		return (null);
-		String ident = acceptIdentifier(psiBuilder);
+        LexToken ident = acceptIdentifier(psiBuilder);
 		if(ident == null) LOG.error("Got symbol " + currentToken + " while expecting an Identifier");
 		return (ident);
 	}  

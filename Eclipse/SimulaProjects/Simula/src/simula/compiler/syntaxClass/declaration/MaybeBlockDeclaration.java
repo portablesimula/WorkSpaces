@@ -73,11 +73,12 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Create a new MaybeBlockDeclaration, i.e. CompoundStatement or SubBlock.
 	/// @param identifier block identifier
-	public MaybeBlockDeclaration(final PsiTree psiTree, final String identifier) {
-		super(psiTree, identifier);
+	public MaybeBlockDeclaration(final PsiBuilder psiBuilder, final String identifier) {
+		super(psiBuilder.psiTree, identifier);
 		if(identifier != null)
 			modifyIdentifier(identifier);
-		else modifyIdentifier("Block" + firstLineNumber());
+//		else modifyIdentifier("Block" + firstLineNumber());
+		else modifyIdentifier("Block" + psiBuilder.getSourceLineNumber());
 	}
 
 //	// ***********************************************************************************************
@@ -122,11 +123,15 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 			PsiParse.TRACE("Parse MayBeBlock");
 		
 		String debugName = "MaybeBlockDeclaration: "+(SEQU++);
-		psiBuilder.startSubtree(PsiTree.Kind.block, debugName);
+//		psiBuilder.startSubtree(PsiTree.Kind.block, debugName);
+		
+//		psiBuilder.psiTree.printPsiTree(debugName);
+		psiBuilder.getRoot().printPsiTree(debugName);
+		
 		int lno = psiBuilder.getSourceLineNumber();
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN "+debugName);
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("BlockStatement expectMaybeBlock: BEGIN " + debugName);
-		IO.println("BlockStatement.expectMaybeBlock: BEGIN "+debugName);
+//		IO.println("BlockStatement.expectMaybeBlock: BEGIN "+debugName);
 
 		psiBuilder.consume(KeyWord.BEGIN); // consume BEGIN (add it to 'current tree')
 
@@ -135,6 +140,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 			Statement stm = Statement.acceptStatement(psiBuilder);
 			if (stm != null) statements.add(stm);
 		}
+		IO.println("MaybeBlockDeclaration.expectMaybeBlock: GOT END or EOF");
 //		if (PsiParse.prevToken.keyWord == KeyWord.EOF) {
 //			Util.error("Illegal termination of block. Missing END.");
 //		}		
@@ -148,13 +154,14 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 			}
 		}
 //		this.lastLineNumber = Global.sourceLineNumber;
-		IO.println("BlockStatement.expectMaybeBlock: BEFORE BLKSTM "+debugName);
+//		IO.println("BlockStatement.expectMaybeBlock: BEFORE BLKSTM "+debugName);
 		BlockStatement block = new BlockStatement(psiBuilder, this, debugName);
-		IO.println("BlockStatement.expectMaybeBlock: AFTER BLKSTM "+debugName);
+//		IO.println("BlockStatement.expectMaybeBlock: AFTER BLKSTM "+debugName);
 		
-		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("BlockStatement expectMaybeBlock: ENDOF " + debugName + "  " + block);
-//		psiBuilder.doneSubtree(block);
-		psiBuilder.doneSubtree(PsiTree.Kind.block, this);
+		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("MaybeBlockDeclaration.expectMaybeBlock: ENDOF " + debugName + "  " + block);
+		
+//		psiBuilder.doneSubtree(PsiTree.Kind.block, this);
+//		psiBuilder.psiTree.printPsiTree(debugName);
 		
 		Global.setScope(declaredIn);
 //		Util.ASSERT(psiTree.firstLineNumber() == lno, "NEW BlockStatement.expectMaybeBlock: firstLineNumber="+psiTree.firstLineNumber()+" equals lno="+lno);

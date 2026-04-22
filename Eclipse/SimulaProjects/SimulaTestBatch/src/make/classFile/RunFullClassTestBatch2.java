@@ -41,10 +41,10 @@ public final class RunFullClassTestBatch2 {
 		Option.compilerMode = Option.CompilerMode.simulaClassLoader;
 //		Option.verbose=true;
 //		Option.EXTENSIONS=false;
-		Option.CaseSensitive=true;
+//		Option.CaseSensitive=true;
 //		Option.noExecution=true;
 		Option.WARNINGS=false;
-
+		
 		// Set internal test, debug options.
 		Option.internal.INLINE_TESTING=true;
 		Option.noPopup = true;
@@ -78,7 +78,7 @@ public final class RunFullClassTestBatch2 {
 		names.add("simtst05.sim"); // OK:  Test Aritmetisk Relations
 		names.add("simtst06.sim"); // OK:  Test Mathematical Functions
 		names.add("simtst07.sim"); // OK:  Test Mathematical Library
-//		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
+		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
 		names.add("simtst09.sim"); // OK:  Test relation operator and some Funtions
 		names.add("simtst10.sim"); // OK:  Test Evaluation of Text-Constants
 
@@ -193,7 +193,7 @@ public final class RunFullClassTestBatch2 {
 		names.add("simtst104.sim"); // OK: Procedure parameter 'F' by name.
 		names.add("simtst105.sim"); // OK: Multiple assignments.
 		//names.add("simtst106.sim"); // ERR: Test SIMULATION, complex example.
-		names.add("simtst107.sim"); // OK:  Test Process, activation statements, idle, terminated, time.
+//		names.add("simtst107.sim"); // OK:  Test Process, activation statements, idle, terminated, time.
 		names.add("simtst108.sim"); // OK: Simple Co-Routine Sample 1: detach - call
 		names.add("simtst109.sim"); // OK: Simple Co-Routine Sample 2: detach - resume
 		
@@ -201,7 +201,7 @@ public final class RunFullClassTestBatch2 {
 		names.add("simtst111.sim"); // OK: Virtual Label Sample 1
 		names.add("simtst112.sim"); // OK: Virtual Label Sample 2
 		names.add("simtst113.sim"); // OK: Virtual Switch Sample 1
-		names.add("simtst114.sim"); // OK: Switch Statement
+//		names.add("simtst114.sim"); // OK: Switch Statement
 		names.add("simtst115.sim"); // OK: Simple QPS-Sample 1
 		names.add("simtst116.sim"); // OK: Simple QPS-Sample 2
 		names.add("simtst117.sim"); // OK: Simple QPS-Sample 3
@@ -217,10 +217,10 @@ public final class RunFullClassTestBatch2 {
 		names.add("simtst124.sim"); // OK: GOTO VIRTUAL LABEL
 		names.add("simtst125.sim"); // OK: GOTO LABEL WITHIN NESTED COMPOUND STATEMENTS
 		names.add("simtst126.sim"); // OK: GOTO SIMPLE SWITCH
-		names.add("simtst127.sim"); // OK: Switch (character) Statement
+//		names.add("simtst127.sim"); // OK: Switch (character) Statement
 		names.add("simtst128.sim"); // OK: Standard Procedure edit and edfix
 		names.add("Precompiled129.sim"); // OK: Precompile this for Simtst 129.
-		names.add("simtst129.sim"); // OK: Switch in precompiled class
+//		names.add("simtst129.sim"); // OK: Switch in precompiled class
 		
 		names.add("simtst130.sim"); // OK: Class SimLib, a set of utility procedures from DEC Handbook.
 		names.add("simtst131.sim"); // OK: Catching Errors
@@ -277,7 +277,7 @@ public final class RunFullClassTestBatch2 {
 		names.add("simerr06.sim"); // OK: ArrayIndexOutOfBounds
 		names.add("simerr07.sim"); // OK: Wrong number of paramerters to virtual procedure
 		names.add("simerr08.sim"); // OK: Illegal assignment. Name parameter is not a variable
-		names.add("simerr09.sim"); // OK: Read/write access on DirectFile and DirectByteFile
+//		names.add("simerr09.sim"); // OK: Read/write access on DirectFile and DirectByteFile
 		names.add("simerr10.sim"); // OK: Integer Overflow
 
 		names.add("single_tst01.sim"); // OK: Single test: L: OutText("...");

@@ -37,12 +37,13 @@ public final class InlineStatement extends Statement {
 	public InlineStatement(final PsiTree psiTree, String kind) {
 		super(psiTree);
 		this.kind = kind;
+		SET_SEMANTICS_CHECKED();
 	}
 
 	@Override
 	public void doChecking() {
-		if (IS_SEMANTICS_CHECKED())	return;
-		SET_SEMANTICS_CHECKED();
+//		if (IS_SEMANTICS_CHECKED())	return;
+//		SET_SEMANTICS_CHECKED();
 	}
 
 	@Override

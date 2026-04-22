@@ -23,6 +23,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Text expression.
@@ -103,8 +104,8 @@ public final class TextExpression extends Expression {
 	/// @param rhs rigth hand side
 	TextExpression(final PsiBuilder psiBuilder, final Expression lhs, final Expression rhs) {
 		super(psiBuilder.psiTree);
-		this.lhs = lhs;
-		this.rhs = rhs;
+		this.lhs = lhs; this.rhs = rhs;
+//		psiBuilder.startSubtree(PsiTree.Kind.textExpression, "TextExpression");
 		if (this.lhs == null) {
 			Util.error("Missing operand before &");
 			this.lhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
@@ -114,6 +115,7 @@ public final class TextExpression extends Expression {
 			this.rhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
+//		psiBuilder.doneSubtree(PsiTree.Kind.textExpression, this);
 	}
 
 	@Override

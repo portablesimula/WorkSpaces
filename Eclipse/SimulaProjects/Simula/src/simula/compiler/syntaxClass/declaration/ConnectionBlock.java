@@ -219,7 +219,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		Util.println(spc + beg);
 		for (Declaration decl : declarationList)
 			decl.print(indent + 1);
-		statement.print(indent + 1);
+		if(statement != null) statement.print(indent + 1);
 		Util.println(spc + "end[" + edScopeChain() + ']');
 	}
 

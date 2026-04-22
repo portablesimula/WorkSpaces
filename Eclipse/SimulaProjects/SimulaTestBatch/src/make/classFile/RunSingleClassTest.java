@@ -51,11 +51,11 @@ public final class RunSingleClassTest {
 		Option.noPopup = true;
 		Option.internal.TESTING_STACK_SIZE = true;
 //		Option.internal.DEBUGGING=true;
-		Option.internal.LIST_GENERATED_CLASS_FILES=true;
+//		Option.internal.LIST_GENERATED_CLASS_FILES=true;
 //		Option.internal.TRACE_CODING=true;
 
 		// Overall TRACING Options
-//		Option.internal.TRACING=true;
+		Option.internal.TRACING=true;
 
 		// Scanner Trace Options
 //		Option.internal.TRACE_LEXER=true;
@@ -64,12 +64,12 @@ public final class RunSingleClassTest {
 		// Parser Trace Options
 //		Option.internal.TRACE_PARSE=true;
 //		Option.internal.PRINT_SYNTAX_TREE=1;
-		Option.internal.TRACE_ATTRIBUTE_OUTPUT=true;
-		Option.internal.TRACE_ATTRIBUTE_INPUT=true;
+//		Option.internal.TRACE_ATTRIBUTE_OUTPUT=true;
+//		Option.internal.TRACE_ATTRIBUTE_INPUT=true;
 
 		// Checker Trace Options
 //		Option.internal.TRACE_FIND_MEANING=4;
-//		Option.internal.TRACE_CHECKER=true;
+		Option.internal.TRACE_CHECKER=true;
 //		Option.internal.TRACE_CHECKER_OUTPUT=true;
 
 		Global.packetName="simulaTestBatch";
@@ -99,7 +99,7 @@ public final class RunSingleClassTest {
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
 		
-		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
 //		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
@@ -109,7 +109,7 @@ public final class RunSingleClassTest {
 //		names.add("simtst06.sim"); // OK:  Test Mathematical Functions
 //		names.add("simtst07.sim"); // OK:  Test Mathematical Library
 //		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
-		names.add("simtst09.sim"); // OK:  Test relation operator and some Funtions
+//		names.add("simtst09.sim"); // OK:  Test relation operator and some Funtions
 //		names.add("simtst10.sim"); // OK:  Test Evaluation of Text-Constants
 //
 //		names.add("simtst11.sim"); // OK:  Text Attributes constant, start, length, pos and main
@@ -223,7 +223,7 @@ public final class RunSingleClassTest {
 //		names.add("simtst104.sim"); // OK: Procedure parameter 'F' by name.
 //		names.add("simtst105.sim"); // OK: Multiple assignments.
 //		names.add("simtst106.sim"); // ERR: Test SIMULATION, complex example.
-//		names.add("simtst107.sim"); // OK:  Test Process, activation statements, idle, terminated, time.
+		names.add("simtst107.sim"); // OK:  Test Process, activation statements, idle, terminated, time.
 //		names.add("simtst108.sim"); // OK: Simple Co-Routine Sample 1: detach - call
 //		names.add("simtst109.sim"); // OK: Simple Co-Routine Sample 2: detach - resume
 //		names.add("simtst110.sim"); // OK: Simple Co-Routine Sample 3: detach - resume - chain

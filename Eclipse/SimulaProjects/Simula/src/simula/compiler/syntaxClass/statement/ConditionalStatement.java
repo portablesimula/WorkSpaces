@@ -25,6 +25,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Conditional Statement.
@@ -61,7 +62,9 @@ public final class ConditionalStatement extends Statement {
 	ConditionalStatement(PsiBuilder psiBuilder) {
 		super(psiBuilder.psiTree);
 
-		psiBuilder.startSubtree("ConditionalStatement");
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.startSubtree(PsiTree.Kind.conditionalStatement, "ConditionalStatement");
+		}
 		int lno = psiBuilder.getSourceLineNumber();
 //		IO.println("NEW ConditionalStatement: "+psiBuilder.getSourceLineNumber());
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN IfStatement: ");
@@ -80,7 +83,9 @@ public final class ConditionalStatement extends Statement {
 		    }
 		}
 		this.elseStatement=elseStatement;
-		psiBuilder.doneSubtree(this);
+		if(! Option.TESTING_STATEMENT) {
+			psiBuilder.doneSubtree(PsiTree.Kind.conditionalStatement, this);
+		}
 //		IO.println("NEW ConditionalStatement: firstLineNumber: "+psiTree.firstLineNumber());
 //		IO.println("NEW ConditionalStatement: lastLineNumber: "+psiTree.lastLineNumber());
 //		psiTree.printPsiTree("NEW ConditionalStatement: ZZZZZ");

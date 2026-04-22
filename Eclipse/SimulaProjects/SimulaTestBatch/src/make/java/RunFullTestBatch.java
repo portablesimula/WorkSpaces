@@ -43,7 +43,7 @@ public final class RunFullTestBatch {
 		
 //		Option.verbose=true;
 //		Option.EXTENSIONS=false;
-		Option.CaseSensitive=true;
+//		Option.CaseSensitive=true;
 //		Option.noExecution=true;
 		Option.WARNINGS=false;
 
@@ -72,9 +72,9 @@ public final class RunFullTestBatch {
 		names.add("simtst03.sim"); // OK:  Test Text Value Relations
 		names.add("simtst04.sim"); // OK:  To test putint and putreal.
 		names.add("simtst05.sim"); // OK:  Test Aritmetisk Relations
-//		names.add("simtst06.sim"); // OK:  Test Mathematical Functions
-//		names.add("simtst07.sim"); // OK:  Test Mathematical Library
-//		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
+		names.add("simtst06.sim"); // OK:  Test Mathematical Functions
+		names.add("simtst07.sim"); // OK:  Test Mathematical Library
+		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
 		names.add("simtst09.sim"); // OK:  Test relation operator and some Funtions
 		names.add("simtst10.sim"); // OK:  Test Evaluation of Text-Constants
 

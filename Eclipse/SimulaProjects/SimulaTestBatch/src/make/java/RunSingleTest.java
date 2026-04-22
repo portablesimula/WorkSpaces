@@ -35,7 +35,7 @@ public final class RunSingleTest {
 		
 		// Set options.
 		Option.compilerMode = Option.CompilerMode.viaJavaSource;
-		Option.verbose=true;
+//		Option.verbose=true;
 //		Option.EXTENSIONS=false;
 //		Option.CaseSensitive=true;
 //		Option.noExecution=true;
@@ -51,10 +51,11 @@ public final class RunSingleTest {
 //		Option.internal.LIST_GENERATED_CLASS_FILES=true;
 
 		// Overall TRACING Options
-//		Option.internal.TRACING=true;
+		Option.internal.TRACING=true;
 
 		// Scanner Trace Options
-//		Option.TRACE_LEXER=true;
+//		Option.internal.TRACE_LEXER = 2;
+		Option.internal.TRACE_NEW_LEXTOKEN = 2;
 //		Option.TRACE_COMMENTS=true;
 
 		// Parser Trace Options
@@ -112,7 +113,7 @@ public final class RunSingleTest {
 //		names.add("simtst05.sim"); // OK:  Test Aritmetisk Relations
 //		names.add("simtst06.sim"); // OK:  Test Mathematical Functions
 //		names.add("simtst07.sim"); // OK:  Test Mathematical Library
-//			names.add("simtst08.sim"); // OK:  Test Scope of Variables.
+//		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
 //		names.add("simtst09.sim"); // OK:  Test relation operator and some Funtions
 //		names.add("simtst10.sim"); // OK:  Test Evaluation of Text-Constants
 //

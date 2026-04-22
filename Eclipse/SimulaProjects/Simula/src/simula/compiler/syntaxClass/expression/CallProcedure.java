@@ -260,8 +260,11 @@ public final class CallProcedure {
 						if(decl instanceof StandardProcedure) {
 							if(Util.equals(decl.identifier, "sourceline")) {
 //								actualParameter=new Constant(Type.Integer,Global.sourceLineNumber);
-								actualParameter=new Constant(null, Type.Integer, decl.firstLineNumber());
-								actualParameter.doChecking();
+//								actualParameter=new Constant(null, Type.Integer, decl.firstLineNumber());
+								int lno = var.firstLineNumber();
+								if(lno <= 0) Util.IERR("CallProcedure.codeCPF: Illegal lineNumber: " + lno);
+								actualParameter=new Constant(null, Type.Integer, lno);
+							actualParameter.doChecking();
 							}
 						}
 						switch(decl.declarationKind) {

@@ -88,7 +88,7 @@ public final class LocalObject extends Expression {
 	static Expression expectThisIdentifier(PsiBuilder psiBuilder) {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse ThisObjectExpression, current=" + PsiParse.currentLexToken(psiBuilder));
-		String classIdentifier = PsiParse.expectIdentifier(psiBuilder);
+		String classIdentifier = PsiParse.expectIdentifier(psiBuilder).edText();
 		Expression expr = new LocalObject(psiBuilder, classIdentifier);
 		return(expr);
 	}

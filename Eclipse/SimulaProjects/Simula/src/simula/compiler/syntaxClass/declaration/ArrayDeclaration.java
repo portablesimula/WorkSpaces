@@ -46,6 +46,7 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 import simula.psi.TreeNodeIdent;
 
@@ -163,7 +164,7 @@ public final class ArrayDeclaration extends Declaration {
 			// IdentifierList = Identifier { , Identifier }
 			Vector<String> identList = new Vector<String>();
 			do {
-				identList.add(PsiParse.expectIdentifier(psiBuilder));
+				identList.add(PsiParse.expectIdentifier(psiBuilder).edText());
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 			PsiParse.expect(psiBuilder, KeyWord.BEGPAR);
 			psiBuilder.setParsingBoundPairList(true);
@@ -183,8 +184,8 @@ public final class ArrayDeclaration extends Declaration {
 				String identifier = e.nextElement();
 				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(psiBuilder, identifier, type, boundPairList);
 				declarationList.add(arrayDeclaration);
-				psiBuilder.doneSubtree(arrayDeclaration);
-				psiBuilder.startSubtree("NextDeclaration");
+				psiBuilder.doneSubtree(PsiTree.Kind.declaration, arrayDeclaration);
+				psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
 			}
 			
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));

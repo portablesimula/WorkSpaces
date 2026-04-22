@@ -20,6 +20,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// External Declaration.
 /// <pre>
@@ -125,7 +126,7 @@ public final class ExternalDeclaration extends Declaration {
 	/// @param enclosure the BlockDeclaration which is updated
 	/// @return a Vector of ExternalDeclaration
 	public static Vector<ExternalDeclaration> expectExternalHead(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
-		String kind = PsiParse.acceptIdentifier(psiBuilder);
+		String kind = PsiParse.acceptIdentifier(psiBuilder).edText();
 		if (kind != null)
 			Util.error("*** NOT IMPLEMENTED: " + "External " + kind + " Procedure");
 		Type expectedType = PsiParse.acceptType(psiBuilder);
@@ -133,7 +134,7 @@ public final class ExternalDeclaration extends Declaration {
 			Util.error("parseExternalDeclaration: Expecting CLASS or PROCEDURE");
 
 		Vector<ExternalDeclaration> externalDeclarations = new Vector<ExternalDeclaration>();
-		String identifier = PsiParse.expectIdentifier(psiBuilder);
+		String identifier = PsiParse.expectIdentifier(psiBuilder).edText();
 		LOOP: while (true) {
 			LexToken externalIdentifier = null;
 			if (PsiParse.accept(psiBuilder, KeyWord.EQ)) {
@@ -145,8 +146,8 @@ public final class ExternalDeclaration extends Declaration {
 			ExternalDeclaration externalDeclaration = new ExternalDeclaration(psiBuilder, identifier, extIdentitier);
 			externalDeclarations.add(externalDeclaration);
 			
-			psiBuilder.doneSubtree(externalDeclaration);
-			psiBuilder.startSubtree("NextDeclaration");
+			psiBuilder.doneSubtree(PsiTree.Kind.declaration  , externalDeclaration);
+			psiBuilder.startSubtree(PsiTree.Kind.declaration  , "NextDeclaration");
 
 			File jarFile = JarFileBuilder.findJarFile(identifier, extIdentitier);
 			if (jarFile != null) {
@@ -169,7 +170,7 @@ public final class ExternalDeclaration extends Declaration {
 			}
 			if (!PsiParse.accept(psiBuilder, KeyWord.COMMA))
 				break LOOP;
-			identifier = PsiParse.expectIdentifier(psiBuilder);
+			identifier = PsiParse.expectIdentifier(psiBuilder).edText();
 		}
 		return externalDeclarations;
 	}
