@@ -15,7 +15,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
@@ -288,7 +288,7 @@ public final class RelationalOperation extends Expression {
 		Util.TRACE_OUTPUT("writeRelationalOperation: " + this);
 		oupt.writeKind(ObjectKind.RelationalOperation);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -306,11 +306,11 @@ public final class RelationalOperation extends Expression {
 	public static RelationalOperation readObject(AttributeInputStream inpt) throws IOException {
 		RelationalOperation expr = new RelationalOperation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxClass) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** RelationalOperation
 		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();

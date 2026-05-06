@@ -14,6 +14,7 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
+import java.util.Vector;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,6 +25,7 @@ import javax.swing.tree.DefaultTreeModel;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.expression.Expression;
@@ -34,6 +36,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 import simula.psi.PsiTree;
@@ -121,11 +124,41 @@ public class SimpleVariableDeclaration extends Declaration {
 	///        |  identifier  "="  text-expression
 	///   
 	/// </pre>
-	/// Precodition: Type  is already read.
-	/// @param type            the variable type
+	/// Precondition: Type  is already read.
+	/// Endcondition: The terminating semicolon is read.
+	/// @param type the variable type
 	/// @param declarationList the declaration list to update
+	static void ZZ_expectSimpleVariable(final PsiBuilder psiBuilder, final Type type, final DeclarationList declarationList) {
+		// identifier-list = identifier { , identifier }
+		if (Option.internal.TRACE_PARSE)
+			PsiParse.TRACE("Parse IdentifierList");
+		LexToken sep = null;
+		do {
+//			String ident = PsiParse.expectIdentifier(psiBuilder).edText();
+			String ident = PsiParse.expectIdentifierText(psiBuilder);
+			if(ident == null) {
+				ident = "undefined";
+			}
+			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(psiBuilder.psiTree, type, ident);
+			if (PsiParse.accept(psiBuilder, KeyWord.EQ))
+				typeDeclaration.constantElement = Expression.expectExpression(psiBuilder);
+			
+			sep = PsiParse.acceptParserToken(psiBuilder, KeyWord.SEMICOLON, KeyWord.COMMA); 
+			if(sep == null) {
+				LexToken current = PsiParse.currentLexToken(psiBuilder);
+				Util.error(current, "Got symbol " + KeyWord.edit(current.keyWord) + " while expecting KeyWord COMMA or SEMICOLON");
+				sep = PsiParse.skipUntil(psiBuilder, KeyWord.SEMICOLON);
+			}
+			
+			declarationList.add(typeDeclaration);
+			psiBuilder.doneSubtree(PsiTree.Kind.declaration, typeDeclaration);
+			psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be NextDeclaration");
+//		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
+		} while (sep.keyWord == KeyWord.COMMA);
+	}
 	static void expectSimpleVariable(final PsiBuilder psiBuilder, final Type type, final DeclarationList declarationList) {
 		// identifier-list = identifier { , identifier }
+		Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse IdentifierList");
 		do {
@@ -133,11 +166,17 @@ public class SimpleVariableDeclaration extends Declaration {
 			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(psiBuilder.psiTree, type, ident);
 			if (PsiParse.accept(psiBuilder, KeyWord.EQ))
 				typeDeclaration.constantElement = Expression.expectExpression(psiBuilder);
+			syntaxElements.add(typeDeclaration);
 			declarationList.add(typeDeclaration);
-			psiBuilder.doneSubtree(PsiTree.Kind.declaration, typeDeclaration);
-			psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
+//			psiBuilder.doneSubtree(PsiTree.Kind.declaration, typeDeclaration);
+//			psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
+
+		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
+		psiBuilder.doneSubtree(PsiTree.Kind.declaration, syntaxElements);
+		psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
 	}
+
 
 	@Override
 	public void doChecking() {
@@ -259,7 +298,7 @@ public class SimpleVariableDeclaration extends Declaration {
 	}
 
 	@Override
-	public JPanel getPanel() {
+	public JPanel getSyntaxPanel() {
 		String[] table = {
 				"  declarationKind:",	""+declarationKind+":"+ObjectKind.edit(declarationKind),
 				"  declarationClass:",	""+this.getClass().getSimpleName(),
@@ -309,7 +348,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 
 		// *** Declaration
@@ -331,7 +370,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		SimpleVariableDeclaration var = new SimpleVariableDeclaration();
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
-		// *** SyntaxClass
+		// *** SyntaxElement
 		var.psiTree = readPsiTree(inpt);
 
 		// *** Declaration

@@ -22,7 +22,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.RemoteVariable;
@@ -534,7 +534,7 @@ public final class Parameter extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static SyntaxClass readObject(AttributeInputStream inpt) throws IOException {
+	public static SyntaxElement readObject(AttributeInputStream inpt) throws IOException {
 		Parameter par = new Parameter();
 		par.OBJECT_SEQU = inpt.readSEQU(par);
 		// *** Parameter

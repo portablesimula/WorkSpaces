@@ -34,7 +34,7 @@ import simula.psi.SyntaxTree;
 /// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/ProtectedSpecification.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public final class ProtectedSpecification extends SyntaxClass {
+public final class ProtectedSpecification extends SyntaxElement {
 	
 	/// The protected identifier.
 	public String identifier;
@@ -90,7 +90,7 @@ public final class ProtectedSpecification extends SyntaxClass {
 
 	@Override
 	public void printTree(final int indent, final Object head) {
-		IO.println(SyntaxClass.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
+		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
 	
 	@Override
@@ -129,7 +129,7 @@ public final class ProtectedSpecification extends SyntaxClass {
 		Util.TRACE_OUTPUT("writeProtectedSpecification: " + identifier);
 		oupt.writeKind(ObjectKind.ProtectedSpecification);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** ProtectedSpecification
 		oupt.writeString(identifier);
@@ -143,7 +143,7 @@ public final class ProtectedSpecification extends SyntaxClass {
 	public static ProtectedSpecification readObject(AttributeInputStream inpt) throws IOException {
 		ProtectedSpecification spec = new ProtectedSpecification();
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		spec.psiTree = readPsiTree(inpt);
 		// *** ProtectedSpecification
 		spec.identifier = inpt.readString();

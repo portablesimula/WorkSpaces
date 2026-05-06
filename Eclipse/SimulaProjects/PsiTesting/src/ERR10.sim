@@ -1,9 +1,14 @@
 begin
- integer traceCase;
+ integer traceCase, mere;
+ integer array AA,BB(0:12);
+ switch S := s1, s2, s3;
+
+ switch (lowkey:hikey) key
+ begin
+    when 0 do statement_0;
+    --      ...
+    when none do statement_e;
+ end
    
 %  Simulation
-%   begin
-%     integer case;
-%     case := 444;
-%   end
  end

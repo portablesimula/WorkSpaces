@@ -32,7 +32,7 @@ import simula.psi.SyntaxTree;
 /// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/HiddenSpecification.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public final class HiddenSpecification extends SyntaxClass {
+public final class HiddenSpecification extends SyntaxElement {
 
 	/// The hidden identifier.
 	public String identifier;
@@ -123,7 +123,7 @@ public final class HiddenSpecification extends SyntaxClass {
 
 	@Override
 	public void printTree(final int indent, final Object head) {
-		IO.println(SyntaxClass.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
+		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
 
 	@Override
@@ -156,7 +156,7 @@ public final class HiddenSpecification extends SyntaxClass {
 		Util.TRACE_OUTPUT("writeHiddenSpecification: " + identifier);
 		oupt.writeKind(ObjectKind.HiddenSpecification);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** HiddenSpecification
 		oupt.writeString(identifier);
@@ -170,7 +170,7 @@ public final class HiddenSpecification extends SyntaxClass {
 	public static HiddenSpecification readObject(AttributeInputStream inpt) throws IOException {
 		HiddenSpecification spec = new HiddenSpecification();
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		spec.psiTree = readPsiTree(inpt);
 		// *** HiddenSpecification
 		spec.identifier = inpt.readString();

@@ -12,7 +12,7 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
 
 import simula.compiler.syntaxClass.ProcedureSpecification;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.syntaxClass.declaration.Declaration;
@@ -119,7 +119,7 @@ public abstract class BuildCPV {
 	/// @param virtual Virtual Specification
 	/// @param backLink if not null, this procedure call is part of the backLink Expression/Statement.
 	/// @param codeBuilder the CodeBuilder to use
-	static void remoteVirtual(final Expression obj,final VariableExpression variable,final VirtualSpecification virtual,final SyntaxClass backLink,CodeBuilder codeBuilder) {
+	static void remoteVirtual(final Expression obj,final VariableExpression variable,final VirtualSpecification virtual,final SyntaxElement backLink,CodeBuilder codeBuilder) {
 		if(! variable.hasArguments()) {
 			if(virtual.procedureSpec != null && virtual.procedureSpec.parameterList.size() > 0)
 				Util.error("Missing parameter(s) to " + variable.identifier);
@@ -217,7 +217,7 @@ public abstract class BuildCPV {
 	/// @param variable the variable
 	/// @param codeBuilder the codeBuilder to use.
 	private static void BuildLoad_RESULT(VariableExpression variable, CodeBuilder codeBuilder) {
-		SyntaxClass backLink = variable.backLink;
+		SyntaxElement backLink = variable.backLink;
 		if(backLink instanceof RemoteVariable rem) backLink = rem.backLink;
 		Type resultType = functionResultType(variable);
 		if(resultType!=null && variable.backLink!=null) {

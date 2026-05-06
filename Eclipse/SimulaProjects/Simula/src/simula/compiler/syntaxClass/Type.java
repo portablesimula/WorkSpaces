@@ -57,7 +57,7 @@ import simula.psi.SyntaxTree;
 /// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/Type.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public class Type extends SyntaxClass {
+public class Type extends SyntaxElement {
 
 	/// The keyWord attribute
 	public int keyWord;

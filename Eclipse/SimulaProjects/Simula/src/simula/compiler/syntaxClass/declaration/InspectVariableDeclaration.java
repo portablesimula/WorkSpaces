@@ -152,7 +152,7 @@ public class InspectVariableDeclaration extends Declaration {
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 
 		// *** Declaration
@@ -174,7 +174,7 @@ public class InspectVariableDeclaration extends Declaration {
 		InspectVariableDeclaration var = new InspectVariableDeclaration();
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
-		// *** SyntaxClass
+		// *** SyntaxElement
 		var.psiTree = readPsiTree(inpt);
 
 		// *** Declaration

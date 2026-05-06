@@ -14,7 +14,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.utilities.Global;
@@ -190,7 +190,7 @@ public final class ObjectRelation extends Expression {
 		Util.TRACE_OUTPUT("writeObjectRelation: " + this);
 		oupt.writeKind(ObjectKind.ObjectRelation);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -210,7 +210,7 @@ public final class ObjectRelation extends Expression {
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		expr.psiTree = readPsiTree(inpt);
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxClass) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();
 		expr.classIdentifier = inpt.readString();

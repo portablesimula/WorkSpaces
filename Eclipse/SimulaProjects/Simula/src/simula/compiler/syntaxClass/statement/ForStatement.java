@@ -164,15 +164,12 @@ public final class ForStatement extends Statement {
 	/// @param line the source line number
 	ForStatement(final PsiBuilder psiBuilder) {
 		super(psiBuilder.psiTree);
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.startSubtree(PsiTree.Kind.forStatement, "ForStatement");
-		}
 		psiBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ForStatement");
 		controlVariable = new VariableExpression(psiBuilder.psiTree, PsiParse.expectIdentifier(psiBuilder).edText());
-		LexToken prevToken = PsiParse.getParserToken(psiBuilder);
+		LexToken prevToken = PsiParse.getCurrentParserToken(psiBuilder);
 		if (!PsiParse.accept(psiBuilder, KeyWord.ASSIGNVALUE))
 			PsiParse.expect(psiBuilder, KeyWord.ASSIGNREF);
 		assignmentOperator = prevToken.keyWord;
@@ -188,9 +185,6 @@ public final class ForStatement extends Statement {
 		this.doStatement = doStatement;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Line " + this.firstLineNumber() + ": ForStatement: " + this);
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.doneSubtree(PsiTree.Kind.forStatement, this);
-		}
 	}
 
 	/// Parse a for-list element.
@@ -426,7 +420,7 @@ public final class ForStatement extends Statement {
 		Util.TRACE_OUTPUT("writeForStatement: " + this);
 		oupt.writeKind(ObjectKind.ForStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** ForStatement
 		oupt.writeObj(controlVariable);
@@ -443,7 +437,7 @@ public final class ForStatement extends Statement {
 	public static ForStatement readObject(AttributeInputStream inpt) throws IOException {
 		ForStatement stm = new ForStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		stm.psiTree = readPsiTree(inpt);
 		// *** ForStatement
 		stm.controlVariable = (VariableExpression) inpt.readObj();

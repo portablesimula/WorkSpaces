@@ -108,20 +108,14 @@ public final class ActivationStatement extends Statement {
 	/// @param line the source line number
 	ActivationStatement(final PsiBuilder psiBuilder) {
 		super(psiBuilder.psiTree);
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.startSubtree(PsiTree.Kind.activationStatement, "ActivationStatement");
-		}
-		LexToken activator = PsiParse.getParserToken(psiBuilder);
+		LexToken activator = PsiParse.getCurrentParserToken(psiBuilder);
 		REAC = activator.keyWord == KeyWord.REACTIVATE;
 		psiBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to 'current tree')
-
-//		LexToken activator = PsiParse.prevToken();
-//		REAC = activator.keyWord == KeyWord.REACTIVATE;
 		if (Option.internal.TRACE_PARSE) PsiParse.TRACE("Parse ActivationStatement");
 		object1 = Expression.expectExpression(psiBuilder);
 		object1.backLink = this;
 		code = ActivationCode.direct;
-		LexToken prevToken = PsiParse.getParserToken(psiBuilder);
+		LexToken prevToken = PsiParse.getCurrentParserToken(psiBuilder);
 		if (PsiParse.accept(psiBuilder, KeyWord.AT) || PsiParse.accept(psiBuilder, KeyWord.DELAY)) {
 			code = (prevToken.keyWord == KeyWord.AT) ? ActivationCode.at : ActivationCode.delay;
 			time = Expression.expectExpression(psiBuilder);
@@ -133,9 +127,6 @@ public final class ActivationStatement extends Statement {
 			object2.backLink = this;
 		}
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": ActivationStatement: "+this);
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.doneSubtree(PsiTree.Kind.activationStatement, this);
-		}
 	}
 
 	@Override
@@ -365,7 +356,7 @@ public final class ActivationStatement extends Statement {
 		Util.TRACE_OUTPUT("writeActivationStatement: " + this);
 		oupt.writeKind(ObjectKind.ActivationStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** ActivationStatement
 		oupt.writeBoolean(REAC);
@@ -382,7 +373,7 @@ public final class ActivationStatement extends Statement {
 	public static ActivationStatement readObject(AttributeInputStream inpt) throws IOException {
 		ActivationStatement stm = new ActivationStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		stm.psiTree = readPsiTree(inpt);
 		// *** ActivationStatement
 		stm.REAC = inpt.readBoolean();

@@ -25,7 +25,7 @@ import simula.psi.PsiTree;
 /// 
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen
-public final class Comment extends SyntaxClass {
+public final class Comment extends SyntaxElement {
 	
 	/// Create a new DummyStatement.
 	/// @param line the source line number
@@ -75,7 +75,7 @@ public final class Comment extends SyntaxClass {
 //		Util.TRACE_OUTPUT("writeDummyStatement: " + this);
 //		oupt.writeKind(ObjectKind.DummyStatement);
 //		oupt.writeShort(OBJECT_SEQU);
-//		// *** SyntaxClass
+//		// *** SyntaxElement
 //		writePsiTree(oupt);
 //	}
 //
@@ -86,7 +86,7 @@ public final class Comment extends SyntaxClass {
 //	public static Comment readObject(AttributeInputStream inpt) throws IOException {
 //		Comment stm = new Comment();
 //		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-//		// *** SyntaxClass
+//		// *** SyntaxElement
 //		stm.psiTree = readPsiTree(inpt);
 //		Util.TRACE_INPUT("DummyStatement: " + stm);
 //		return(stm);

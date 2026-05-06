@@ -16,7 +16,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
@@ -342,7 +342,7 @@ public final class Constant extends Expression {
 		Util.TRACE_OUTPUT("Constant: "+type+' '+value);
 		oupt.writeKind(ObjectKind.Constant);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -358,11 +358,11 @@ public final class Constant extends Expression {
 	public static Constant readObject(AttributeInputStream inpt) throws IOException {
 		Constant cnst = new Constant();
 		cnst.OBJECT_SEQU = inpt.readSEQU(cnst);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		cnst.psiTree = readPsiTree(inpt);
 		// *** Expression
 		cnst.type = inpt.readType();
-		cnst.backLink = (SyntaxClass) inpt.readObj();
+		cnst.backLink = (SyntaxElement) inpt.readObj();
 		// *** Constant
 		cnst.value=inpt.readConstant();
 		Util.TRACE_INPUT("Constant: "+cnst);

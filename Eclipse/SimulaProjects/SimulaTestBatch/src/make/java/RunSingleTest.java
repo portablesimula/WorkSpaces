@@ -96,7 +96,7 @@ public final class RunSingleTest {
 		
 		Vector<String> names=new Vector<String>();
 //		names.add("AdHoc_SimulaTest.sim"); // Simula TestBatch Framework
-		names.add("adHoc00.sim"); // For ad'hoc testing
+//		names.add("adHoc00.sim"); // For ad'hoc testing
 //		names.add("adHoc01.sim"); // For ad'hoc testing
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
@@ -104,7 +104,7 @@ public final class RunSingleTest {
 		
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
-//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+		names.add("SimulaTest.sim"); // Simula TestBatch Framework
 //		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
@@ -135,7 +135,7 @@ public final class RunSingleTest {
 //		names.add("simtst25.sim"); // OK:  Multiple arithmetic assignment
 //		names.add("simtst26.sim"); // OK:  Designational expressions, goto statement and switch declaration.
 //		names.add("simtst27.sim"); // OK:  Test while-loops.
-//		names.add("simtst28.sim"); // OK:  Paramenter transmission to procedures by value.
+		names.add("simtst28.sim"); // OK:  Paramenter transmission to procedures by value.
 //		names.add("simtst29.sim"); // OK:  Procedure parameters by value
 //		names.add("simtst30a.sim"); // OK:  Simple test of Arrays.
 //		names.add("simtst30.sim"); // OK:  Name parameters (Modified: 2-dim arrays removed)

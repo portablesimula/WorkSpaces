@@ -15,7 +15,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ArrayDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -324,7 +324,7 @@ public final class RemoteVariable extends Expression {
 		Util.TRACE_OUTPUT("writeRemoteVariable: " + this);
 		oupt.writeKind(ObjectKind.RemoteVariable);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -341,11 +341,11 @@ public final class RemoteVariable extends Expression {
 	public static RemoteVariable readObject(AttributeInputStream inpt) throws IOException {
 		RemoteVariable rem = new RemoteVariable();
 		rem.OBJECT_SEQU = inpt.readSEQU(rem);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		rem.psiTree = readPsiTree(inpt);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		rem.type = inpt.readType();
-		rem.backLink = (SyntaxClass) inpt.readObj();
+		rem.backLink = (SyntaxElement) inpt.readObj();
 		// *** RemoteVariable
 		rem.obj = (Expression) inpt.readObj();
 		rem.var = (VariableExpression) inpt.readObj();

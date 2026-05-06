@@ -13,7 +13,7 @@ import java.io.InputStream;
 
 import simula.compiler.syntaxClass.HiddenSpecification;
 import simula.compiler.syntaxClass.ProtectedSpecification;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ArrayDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -193,10 +193,10 @@ public class AttributeInputStream {
 	}
 
 	/// Reads and returns an Object sequence number from the underlying DataInputStream.
-	/// @param obj the corresponding SyntaxClass object.
+	/// @param obj the corresponding SyntaxElement object.
 	/// @return the Object sequence number read.
 	/// @throws IOException if an I/O error occurs.
-    public int readSEQU(SyntaxClass obj) throws IOException {
+    public int readSEQU(SyntaxElement obj) throws IOException {
     	int OBJECT_SEQU = inpt.readShort();
     	if(TRACE) IO.println("AttributeInputStream.readSEQU: " + OBJECT_SEQU + "  ====>  " + obj.getClass().getSimpleName());
 		objectReference.put(OBJECT_SEQU, obj);
@@ -206,7 +206,7 @@ public class AttributeInputStream {
     /// Reads and returns an Object from the underlying DataInputStream.
     /// @return the Object read.
     /// @throws IOException if an I/O error occurs.
-	public SyntaxClass readObj() throws IOException {
+	public SyntaxElement readObj() throws IOException {
 		int kind = readKind();
 		switch(kind) {
 		case ObjectKind.NULL:
@@ -215,7 +215,7 @@ public class AttributeInputStream {
 		case ObjectKind.ObjectReference:
 			int OBJECT_SEQU = inpt.readShort();
 			if(TRACE) IO.println("AttributeInputStream.readObj: OBJECT_SEQU="+OBJECT_SEQU);
-			SyntaxClass obj = objectReference.get(OBJECT_SEQU);
+			SyntaxElement obj = objectReference.get(OBJECT_SEQU);
 			Util.ASSERT(obj != null, "Invariant: OBJECT_SEQU="+moduleID+"#"+OBJECT_SEQU);
 			if(TRACE) IO.println("AttributeInputStream.readObj: "+obj);
 			return(obj);
@@ -235,7 +235,7 @@ public class AttributeInputStream {
 	/// @param inpt the AttributeInputStream to read from.
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	private SyntaxClass readObj(int kind,AttributeInputStream inpt) throws IOException {
+	private SyntaxElement readObj(int kind,AttributeInputStream inpt) throws IOException {
 		switch(kind) {
 			case ObjectKind.NULL:						return null;
 			

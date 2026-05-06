@@ -16,7 +16,7 @@ import javax.swing.tree.DefaultTreeModel;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.Parameter;
@@ -42,7 +42,7 @@ import simula.psi.PsiBuilder;
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public class ForListElement extends SyntaxClass {
+public class ForListElement extends SyntaxElement {
 	/// The For-statement.
 	ForStatement forStatement;
 
@@ -176,7 +176,7 @@ public class ForListElement extends SyntaxClass {
 		Util.TRACE_OUTPUT("ForListElement: " + this);
 		oupt.writeKind(ObjectKind.ForListElement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** ForListElement
 		oupt.writeObj(forStatement);
@@ -190,7 +190,7 @@ public class ForListElement extends SyntaxClass {
 	public static ForListElement readObject(AttributeInputStream inpt) throws IOException {
 		ForListElement elt = new ForListElement();
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		elt.psiTree = readPsiTree(inpt);
 		// *** ForListElement
 		elt.forStatement = (ForStatement) inpt.readObj();

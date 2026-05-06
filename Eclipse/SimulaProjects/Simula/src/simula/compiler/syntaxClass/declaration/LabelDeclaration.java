@@ -246,7 +246,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		oupt.writeString(identifier);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 
 		// *** Declaration
@@ -272,7 +272,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		LabelDeclaration lab = new LabelDeclaration(null, identifier);
 		lab.OBJECT_SEQU = inpt.readSEQU(lab);
 
-		// *** SyntaxClass
+		// *** SyntaxElement
 		lab.psiTree = readPsiTree(inpt);
 
 		// *** Declaration

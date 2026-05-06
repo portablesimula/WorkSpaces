@@ -9,7 +9,7 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
 import java.lang.classfile.CodeBuilder;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.*;
 import simula.compiler.utilities.Meaning;
@@ -61,7 +61,7 @@ public class BuildCP {
 		}
 		codeBuilder.invokespecial(CD_prc, "<init>", prc.getConstructorMethodTypeDesc());
 		// Note: TOS points to the Procedure object.
-		SyntaxClass backLink = variable.backLink;
+		SyntaxElement backLink = variable.backLink;
 		if(prc.type != null && backLink != null) {
 			// Using TOS to access TOS._RESULT
 			codeBuilder.getfield(prc.getResultFieldRefEntry(codeBuilder.constantPool()));
@@ -79,7 +79,7 @@ public class BuildCP {
 	/// @param func Function Designator, may be subscripted
 	/// @param backLink if not null, this procedure call is part of the backLink Expression/Statement.
 	/// @param codeBuilder the CodeBuilder
-	static void remote(final Expression obj,final ProcedureDeclaration procedure,final VariableExpression func,final SyntaxClass backLink,CodeBuilder codeBuilder) {
+	static void remote(final Expression obj,final ProcedureDeclaration procedure,final VariableExpression func,final SyntaxElement backLink,CodeBuilder codeBuilder) {
 		if(procedure.myVirtual!=null) {
 			// Call Remote Virtual Procedure
 			BuildCPV.remoteVirtual(obj,func,procedure.myVirtual.virtualSpec,backLink,codeBuilder);
@@ -90,7 +90,7 @@ public class BuildCP {
 			// Call Remote Standard Member Method
 			callRemoteStandardProcedure(obj,(StandardProcedure) procedure,func,codeBuilder);
 			if(procedure.type != null) {
-				SyntaxClass backLnk = obj.backLink;
+				SyntaxElement backLnk = obj.backLink;
 				if(backLnk instanceof QualifiedObject qua)	backLnk = qua.backLink;
 				if(backLnk instanceof RemoteVariable rem)	backLnk = rem.backLink;
 				if(backLnk == null) codeBuilder.pop();

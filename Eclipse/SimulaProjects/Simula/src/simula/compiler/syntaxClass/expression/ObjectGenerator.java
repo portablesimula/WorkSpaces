@@ -18,7 +18,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.Declaration;
@@ -287,7 +287,7 @@ public final class ObjectGenerator extends Expression {
 		Util.TRACE_OUTPUT("ObjectGenerator: "+this);
 		oupt.writeKind(ObjectKind.ObjectGenerator);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -309,11 +309,11 @@ public final class ObjectGenerator extends Expression {
 	public static ObjectGenerator readObject(AttributeInputStream inpt) throws IOException {
 		ObjectGenerator gen = new ObjectGenerator();
 		gen.OBJECT_SEQU = inpt.readSEQU(gen);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		gen.psiTree = readPsiTree(inpt);
 		// *** Expression
 		gen.type = inpt.readType();
-		gen.backLink = (SyntaxClass) inpt.readObj();
+		gen.backLink = (SyntaxElement) inpt.readObj();
 		// *** ObjectGenerator
 		gen.classIdentifier = inpt.readString();
 		int n = inpt.readShort();

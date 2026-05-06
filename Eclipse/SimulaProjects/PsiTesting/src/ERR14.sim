@@ -1,0 +1,4 @@
+begin
+ integer traceCase;
+   K:L: traceCase := 444;
+ E:end

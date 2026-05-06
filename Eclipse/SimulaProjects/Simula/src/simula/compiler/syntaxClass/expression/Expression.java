@@ -7,7 +7,7 @@ package simula.compiler.syntaxClass.expression;
 
 import java.lang.classfile.CodeBuilder;
 
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.Declaration;
@@ -90,13 +90,13 @@ import simula.token.RealConst;
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen
 /// @author Stein Krogdahl
-public abstract class Expression extends SyntaxClass {
+public abstract class Expression extends SyntaxElement {
 
 	/// The type
 	public Type type = null;
 	
 	/// This Expression is part of  backLink Expression/Statement.
-	public SyntaxClass backLink;
+	public SyntaxElement backLink;
 
 	/// Expression.
 	public Expression(final PsiTree psiTree){
@@ -410,7 +410,7 @@ public abstract class Expression extends SyntaxClass {
 //		if(TEST1) psiBuilder.startSubtree(PsiTree.Kind.expression, Expression.class, "acceptBASICEXPR");
 //		if(TEST2) psiBuilder.startSubtree(PsiTree.Kind.expression, Expression.class, "acceptBASICEXPR");
 		Expression expr=null;
-		LexToken prevToken = PsiParse.getParserToken(psiBuilder);
+		LexToken prevToken = PsiParse.getCurrentParserToken(psiBuilder);
 		if(PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) { expr = acceptExpression(psiBuilder); PsiParse.expect(psiBuilder, KeyWord.ENDPAR); }
 		else if(PsiParse.accept(psiBuilder, KeyWord.INTEGERKONST)) expr = new Constant(psiBuilder.psiTree, Type.Integer,((IntegerConst)prevToken).value);
 		else if(PsiParse.accept(psiBuilder, KeyWord.REALKONST)) expr = Constant.createRealType(psiBuilder.psiTree, ((RealConst)prevToken).value);
@@ -427,7 +427,7 @@ public abstract class Expression extends SyntaxClass {
 		else if(PsiParse.accept(psiBuilder, KeyWord.NEW)) expr = ObjectGenerator.expectNew(psiBuilder);
 		else if(PsiParse.accept(psiBuilder, KeyWord.THIS)) expr = LocalObject.expectThisIdentifier(psiBuilder); 
 		else {
-			LexToken prevToken2 = PsiParse.getParserToken(psiBuilder) ;
+			LexToken prevToken2 = PsiParse.getCurrentParserToken(psiBuilder) ;
 			String ident = PsiParse.acceptIdentifier(psiBuilder).getText();
 			if(ident != null) {
 				expr=VariableExpression.expectVariable(psiBuilder, ident);

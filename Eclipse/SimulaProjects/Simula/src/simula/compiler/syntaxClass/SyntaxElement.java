@@ -5,10 +5,13 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass;
 
+import java.awt.BorderLayout;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -23,15 +26,15 @@ import simula.compiler.utilities.Util;
 import simula.psi.ExternalPsiTree;
 import simula.psi.PsiTree;
 
-/// The class SyntaxClass.
+/// The class SyntaxElement.
 /// 
 /// The Simula syntax is formally defined in the Simula Standard.
 /// Some non-terminal symbols give rise to a Java class with almost the same name.
-/// They are all subclasses of the class SyntaxClass.
+/// They are all subclasses of the class SyntaxElement.
 /// The subclass hierarchy of the Syntax class is described below
 /// 
 /// <pre>
-///            SyntaxClass
+///            SyntaxElement
 ///               HiddenSpecification 
 ///               ProtectedSpecification 
 ///               Type 
@@ -88,10 +91,10 @@ import simula.psi.PsiTree;
 /// </pre>
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/SyntaxClass.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/SyntaxElement.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public abstract class SyntaxClass {
+public abstract class SyntaxElement {
 
 	/// The associated PSI Tree
 	public PsiTree psiTree;
@@ -128,11 +131,11 @@ public abstract class SyntaxClass {
 
 	
 	
-	/// Create a new SyntaxClass.
-	protected SyntaxClass(PsiTree psiTree) {
+	/// Create a new SyntaxElement.
+	protected SyntaxElement(PsiTree psiTree) {
 //		OLD_lineNumber = Global.sourceLineNumber;
 		this.psiTree = (psiTree != null)? psiTree : PsiTree.dummyTree;
-//		IO.println("NEW SyntaxClass: "+this.getClass().getSimpleName());
+//		IO.println("NEW SyntaxElement: "+this.getClass().getSimpleName());
 	}
 	
 //	public SyntaxTree buildSyntaxTree() {
@@ -144,9 +147,28 @@ public abstract class SyntaxClass {
 		Util.IERR("Method addSyntaxNodes need a redefinition in "+this.getClass().getSimpleName());
     }
 
-	public JPanel getPanel() {
-		IO.println("Method getPanel need a redefinition in "+this.getClass().getSimpleName());
-		Util.IERR("Method getPanel need a redefinition in "+this.getClass().getSimpleName());
+
+	public void popUpSyntaxPanel() {
+		JPanel panel = getSyntaxPanel();
+//		SwingUtilities.invokeLater(() -> {
+			JFrame frame = new JFrame("Syntax Info");
+			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	        try { frame.setIconImage(Global.favicon.getImage()); } 
+	        catch (Exception e) {}// Util.IERR("Impossible",e); }
+
+			JScrollPane scrollPane = new JScrollPane(panel);
+			frame.add(scrollPane, BorderLayout.CENTER);
+
+			frame.pack();
+			frame.setLocationRelativeTo(null);
+			frame.setVisible(true);
+//		});
+	}
+
+	/// Redefined in all subclasses
+	public JPanel getSyntaxPanel() {
+		IO.println("Method getSyntaxPanel need a redefinition in "+this.getClass().getSimpleName());
+		Util.IERR("Method getSyntaxPanel need a redefinition in "+this.getClass().getSimpleName());
 		return null;
 	}
 	
@@ -279,18 +301,18 @@ public abstract class SyntaxClass {
 		return new ExternalPsiTree("ExternalClass", firstLineNumber, lastLineNumber);
 	}
 
-	/// Write a SyntaxClass object to a AttributeOutputStream.
+	/// Write a SyntaxElement object to a AttributeOutputStream.
 	/// @param oupt the AttributeOutputStream to write to.
 	/// @throws IOException if something went wrong.
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.IERR("Method 'writeObject' needs a redefinition in "+this.getClass().getSimpleName());
 	}
 
-	/// Read and return a SyntaxClass object.
+	/// Read and return a SyntaxElement object.
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static SyntaxClass readObject(AttributeInputStream inpt) throws IOException {
+	public static SyntaxElement readObject(AttributeInputStream inpt) throws IOException {
 		Util.IERR("Method 'readObject' needs a redefiniton");
 		return(null);
 	}

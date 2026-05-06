@@ -26,7 +26,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// While Statement.
@@ -55,9 +54,6 @@ public final class WhileStatement extends Statement {
 	/// @param line the source line number
 	WhileStatement(final PsiBuilder psiBuilder) {
 		super(psiBuilder.psiTree);
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.startSubtree(PsiTree.Kind.whileStatement, "WhileStatement");
-		}
 		psiBuilder.consume(KeyWord.WHILE); //  (add it to 'current tree')
 
 //		if (Option.internal.TRACE_PARSE)
@@ -66,9 +62,6 @@ public final class WhileStatement extends Statement {
 		PsiParse.expect(psiBuilder, KeyWord.DO);
 		doStatement = Statement.acceptStatement(psiBuilder);
 		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+firstLineNumber()+": WhileStatement: "+this);
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.doneSubtree(PsiTree.Kind.whileStatement, this);
-		}
 	}
 
 	@Override
@@ -148,7 +141,7 @@ public final class WhileStatement extends Statement {
 		Util.TRACE_OUTPUT("writeWhileStatement: " + this);
 		oupt.writeKind(ObjectKind.WhileStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** WhileStatement
 		oupt.writeObj(condition);
@@ -162,7 +155,7 @@ public final class WhileStatement extends Statement {
 	public static WhileStatement readObject(AttributeInputStream inpt) throws IOException {
 		WhileStatement stm = new WhileStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		stm.psiTree = readPsiTree(inpt);
 		// *** WhileStatement
 		stm.condition  = (Expression) inpt.readObj();

@@ -22,7 +22,7 @@ import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.syntaxClass.HiddenSpecification;
 import simula.compiler.syntaxClass.ProcedureSpecification;
 import simula.compiler.syntaxClass.ProtectedSpecification;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
@@ -261,7 +261,7 @@ public final class VirtualSpecification extends Declaration {
 
 	@Override
 	public void printTree(int indent, final Object head) {
-		IO.println(SyntaxClass.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
+		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
 
 	@Override
@@ -319,7 +319,7 @@ public final class VirtualSpecification extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static SyntaxClass readObject(AttributeInputStream inpt) throws IOException {
+	public static SyntaxElement readObject(AttributeInputStream inpt) throws IOException {
 		VirtualSpecification virt = new VirtualSpecification();
 		virt.OBJECT_SEQU = inpt.readSEQU(virt);
 		// *** VirtualSpecification

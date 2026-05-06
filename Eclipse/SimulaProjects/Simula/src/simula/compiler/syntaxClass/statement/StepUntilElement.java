@@ -384,7 +384,7 @@ public class StepUntilElement extends ForListElement {
 		Util.TRACE_OUTPUT("StepUntilElement: " + this);
 		oupt.writeKind(ObjectKind.StepUntilElement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** ForListElement
 		oupt.writeObj(forStatement);
@@ -400,7 +400,7 @@ public class StepUntilElement extends ForListElement {
 	public static StepUntilElement readObject(AttributeInputStream inpt) throws IOException {
 		StepUntilElement elt = new StepUntilElement();
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		elt.psiTree = readPsiTree(inpt);
 		// *** ForListElement
 		elt.forStatement = (ForStatement) inpt.readObj();

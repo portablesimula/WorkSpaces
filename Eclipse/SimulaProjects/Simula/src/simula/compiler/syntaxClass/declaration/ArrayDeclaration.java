@@ -29,7 +29,7 @@ import javax.swing.tree.DefaultTreeModel;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.expression.Expression;
@@ -157,12 +157,17 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param declarationList the given declaration list
 	static void expectArrayDeclaration(final PsiBuilder psiBuilder, final Type type, final DeclarationList declarationList) {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ArrayDeclaration, type=" + type + ", current=" + PsiParse.getParserToken(psiBuilder));
+			Util.TRACE("Parse ArrayDeclaration, type=" + type + ", current=" + PsiParse.getCurrentParserToken(psiBuilder));
+		// IdentifierList = Identifier { , Identifier }
+		Vector<String> identList = new Vector<String>();
+//		Vector<BoundPair> boundPairList = new Vector<BoundPair>();
+		Vector<BoundPair> boundPairList = null;
+		ArrayDeclaration lastArrayDeclaration = null;
+		
+		boolean TESTING = true;
 		do {
 			if (Option.internal.TRACE_PARSE)
 				PsiParse.TRACE("Parse ArraySegment");
-			// IdentifierList = Identifier { , Identifier }
-			Vector<String> identList = new Vector<String>();
 			do {
 				identList.add(PsiParse.expectIdentifier(psiBuilder).edText());
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
@@ -171,7 +176,7 @@ public final class ArrayDeclaration extends Declaration {
 			// BoundPairList = BoundPair { , BoundPair }
 			if (Option.internal.TRACE_PARSE)
 				PsiParse.TRACE("Parse BoundPairList");
-			Vector<BoundPair> boundPairList = new Vector<BoundPair>();
+			boundPairList = new Vector<BoundPair>();
 			do {
 				Expression LB = Expression.expectExpression(psiBuilder);
 				PsiParse.expect(psiBuilder, KeyWord.COLON);
@@ -180,15 +185,46 @@ public final class ArrayDeclaration extends Declaration {
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 			PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
 			psiBuilder.setParsingBoundPairList(false);
-			for (Enumeration<String> e = identList.elements(); e.hasMoreElements();) {
-				String identifier = e.nextElement();
-				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(psiBuilder, identifier, type, boundPairList);
-				declarationList.add(arrayDeclaration);
-				psiBuilder.doneSubtree(PsiTree.Kind.declaration, arrayDeclaration);
-				psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
+			if(TESTING) {
+				for (Enumeration<String> e = identList.elements(); e.hasMoreElements();) {
+					String identifier = e.nextElement();
+					ArrayDeclaration arrayDeclaration = new ArrayDeclaration(psiBuilder, identifier, type, boundPairList);
+					IO.println("ArrayDecleration.expectArrayDeclaration: NEW "+arrayDeclaration);
+					lastArrayDeclaration = arrayDeclaration;
+					declarationList.add(arrayDeclaration);
+//					psiBuilder.doneSubtree(PsiTree.Kind.declaration, arrayDeclaration);
+//					psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be NextDeclaration");
+				}				
+			} else {
+				for (Enumeration<String> e = identList.elements(); e.hasMoreElements();) {
+					String identifier = e.nextElement();
+					ArrayDeclaration arrayDeclaration = new ArrayDeclaration(psiBuilder, identifier, type, boundPairList);
+					IO.println("ArrayDecleration.expectArrayDeclaration: NEW "+arrayDeclaration);
+					lastArrayDeclaration = arrayDeclaration;
+					declarationList.add(arrayDeclaration);
+					psiBuilder.doneSubtree(PsiTree.Kind.declaration, arrayDeclaration);
+					psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be NextDeclaration");
+				}
 			}
 			
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
+		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
+		
+		
+		if(TESTING) {
+			Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
+			for (Enumeration<String> e = identList.elements(); e.hasMoreElements();) {
+				String identifier = e.nextElement();
+				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(psiBuilder, identifier, type, boundPairList);
+				syntaxElements.add(arrayDeclaration);
+				declarationList.add(arrayDeclaration);
+			}
+			psiBuilder.doneSubtree(PsiTree.Kind.declaration, syntaxElements);
+			psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be NextDeclaration");
+		} else {
+			psiBuilder.doneSubtree(PsiTree.Kind.declaration, lastArrayDeclaration);
+			psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be NextDeclaration");
+		}
 	}
 
 	/// Utility Class to hold a BoundPair.
@@ -542,7 +578,7 @@ public final class ArrayDeclaration extends Declaration {
 
 	@Override
 	public void printTree(final int indent, final Object head) {
-		IO.println(SyntaxClass.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
+		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
 
 	@Override
@@ -581,7 +617,7 @@ public final class ArrayDeclaration extends Declaration {
 	}
 
 	@Override
-	public JPanel getPanel() {
+	public JPanel getSyntaxPanel() {
 		String[] table = {
 				"  declarationKind:",	""+declarationKind+":"+ObjectKind.edit(declarationKind),
 				"  declarationClass:",	""+this.getClass().getSimpleName(),
@@ -634,7 +670,7 @@ public final class ArrayDeclaration extends Declaration {
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 
 		// *** Declaration
@@ -658,7 +694,7 @@ public final class ArrayDeclaration extends Declaration {
 		ArrayDeclaration arr = new ArrayDeclaration();
 		arr.OBJECT_SEQU = inpt.readSEQU(arr);
 
-		// *** SyntaxClass
+		// *** SyntaxElement
 		arr.psiTree = readPsiTree(inpt);
 
 		// *** Declaration

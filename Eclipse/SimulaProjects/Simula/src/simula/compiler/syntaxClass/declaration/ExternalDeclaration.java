@@ -126,7 +126,7 @@ public final class ExternalDeclaration extends Declaration {
 	/// @param enclosure the BlockDeclaration which is updated
 	/// @return a Vector of ExternalDeclaration
 	public static Vector<ExternalDeclaration> expectExternalHead(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
-		String kind = PsiParse.acceptIdentifier(psiBuilder).edText();
+		LexToken kind = PsiParse.acceptIdentifier(psiBuilder);
 		if (kind != null)
 			Util.error("*** NOT IMPLEMENTED: " + "External " + kind + " Procedure");
 		Type expectedType = PsiParse.acceptType(psiBuilder);
@@ -146,8 +146,9 @@ public final class ExternalDeclaration extends Declaration {
 			ExternalDeclaration externalDeclaration = new ExternalDeclaration(psiBuilder, identifier, extIdentitier);
 			externalDeclarations.add(externalDeclaration);
 			
+			PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 			psiBuilder.doneSubtree(PsiTree.Kind.declaration  , externalDeclaration);
-			psiBuilder.startSubtree(PsiTree.Kind.declaration  , "NextDeclaration");
+			psiBuilder.startSubtree(PsiTree.Kind.declaration  , "May be NextDeclaration");
 
 			File jarFile = JarFileBuilder.findJarFile(identifier, extIdentitier);
 			if (jarFile != null) {
@@ -172,6 +173,7 @@ public final class ExternalDeclaration extends Declaration {
 				break LOOP;
 			identifier = PsiParse.expectIdentifier(psiBuilder).edText();
 		}
+
 		return externalDeclarations;
 	}
 
@@ -214,7 +216,7 @@ public final class ExternalDeclaration extends Declaration {
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 
 		// *** Declaration
@@ -231,7 +233,7 @@ public final class ExternalDeclaration extends Declaration {
 		ExternalDeclaration ext = new ExternalDeclaration();
 		ext.OBJECT_SEQU = inpt.readSEQU(ext);
 
-		// *** SyntaxClass
+		// *** SyntaxElement
 		ext.psiTree = readPsiTree(inpt);
 
 		// *** Declaration

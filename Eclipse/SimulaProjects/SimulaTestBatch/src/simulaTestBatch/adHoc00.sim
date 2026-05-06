@@ -1,9 +1,9 @@
 begin
- integer traceCase;
-   
-%  Simulation
-%   begin
-%     integer case;
-%     case := 444;
-%   end
- end
+outtext("aaa"
+
+  comment xxxx;
+    "bbb" -- eeee
+    
+    "ccc"
+    );
+end;

@@ -15,6 +15,7 @@ import java.util.Vector;
 
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.syntaxClass.ProtectedSpecification;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.utilities.Global;
@@ -25,6 +26,7 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Switch Declaration.
 /// 
@@ -52,14 +54,23 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 	/// @param ident switch identifier
 	public SwitchDeclaration(PsiBuilder psiBuilder, final String ident) {
 		super(psiBuilder.psiTree, ident, ObjectKind.Procedure);
-		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchDeclaration");
+		Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
+		syntaxElements.add(this);
+		if (Option.internal.TRACE_PARSE)
+			PsiParse.TRACE("Parse SwitchDeclaration");
 		this.type = Type.Label;
 		PsiParse.expect(psiBuilder, KeyWord.ASSIGNVALUE);
 		do { switchList.add(Expression.expectExpression(psiBuilder));
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
-		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchDeclaration(3), switchList=" + switchList);
+		if (Option.internal.TRACE_PARSE)
+			PsiParse.TRACE("Parse SwitchDeclaration(3), switchList=" + switchList);
 		new Parameter(psiBuilder.psiTree, "_SW", Type.Integer, Parameter.Kind.Simple).into(parameterList);
 		Global.setScope(declaredIn);
+
+		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
+		for(Expression expr:switchList) syntaxElements.add(expr);
+		psiBuilder.doneSubtree(PsiTree.Kind.declaration, syntaxElements);
+		psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
 	}
 
 	@Override

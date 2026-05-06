@@ -282,7 +282,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		oupt.writeString(identifier);
 		oupt.writeShort(OBJECT_SEQU);
 		
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		
 		// *** Declaration
@@ -315,7 +315,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		ConnectionBlock blk = new ConnectionBlock(identifier);
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
 		
-		// *** SyntaxClass
+		// *** SyntaxElement
 		blk.psiTree = readPsiTree(inpt);
 
 		// *** Declaration

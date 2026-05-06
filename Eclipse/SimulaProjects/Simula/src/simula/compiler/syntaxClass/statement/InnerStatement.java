@@ -22,6 +22,7 @@ import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
+import simula.psi.PsiParse;
 import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
@@ -51,39 +52,27 @@ public final class InnerStatement extends Statement {
 //			cls.statements = new ObjectList<Statement>();
 //		} else Util.error("Missplaced Inner");
 //	}
-
-	public static InnerStatement ofExplicit(final PsiBuilder psiBuilder) {
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.startSubtree(PsiTree.Kind.innerStatement, "InnerStatement");
-		}
-//		 psiBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
-		 InnerStatement innerStatement = new InnerStatement(psiBuilder);		
-		 if(! Option.TESTING_STATEMENT) {
-			 psiBuilder.doneSubtree(PsiTree.Kind.innerStatement, innerStatement);
-		 }
-		 return innerStatement;
-	}
-
-	public static InnerStatement ofImplicit(final PsiBuilder psiBuilder) {
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.startSubtree(PsiTree.Kind.innerStatement, "InnerStatement");
-		}
-		 InnerStatement innerStatement = new InnerStatement(psiBuilder);		
-		 if(! Option.TESTING_STATEMENT) {
-			 psiBuilder.doneSubtree(PsiTree.Kind.innerStatement, innerStatement);
-		 }
-		 return innerStatement;
-	}
 		
 	/// Create a new InnerStatement.
 	/// @param line the source line number
-	private InnerStatement(final PsiBuilder psiBuilder) {
+	public InnerStatement(final PsiBuilder psiBuilder, boolean explicit) {
 		super(psiBuilder.psiTree);
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": InnerStatement: "+this);
+		IO.println("NEW InnerStatement: Line "+firstLineNumber()+": InnerStatement: "+this+ "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+		Thread.dumpStack();
+		
+		if(explicit) psiBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
+		
 		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
-			cls.statements1 = cls.statements;
-			cls.statements = new ObjectList<Statement>();
-		} else Util.error("Missplaced Inner");
+			if(cls.statements1 != null) {
+				Util.error("Multiple Inner Statements: statements1'last: "+cls.statements1.lastElement());
+				Util.IERR("SJEKK DETTE");
+//				Util.STOP();
+			} else {
+				cls.statements1 = cls.statements;
+				cls.statements = new ObjectList<Statement>();
+			}
+		} else Util.error("Missplaced Inner Statement");
 	}
 
 	@Override
@@ -142,7 +131,7 @@ public final class InnerStatement extends Statement {
 		Util.TRACE_OUTPUT("writeInnerStatement: " + this);
 		oupt.writeKind(ObjectKind.InnerStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 	}
 
@@ -153,7 +142,7 @@ public final class InnerStatement extends Statement {
 	public static InnerStatement readObject(AttributeInputStream inpt) throws IOException {
 		InnerStatement stm = new InnerStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		stm.psiTree = readPsiTree(inpt);
 		Util.TRACE_INPUT("InnerStatement: " + stm);
 		return(stm);

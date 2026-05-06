@@ -10,7 +10,7 @@ import java.util.Vector;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 
 /// Utility class to hold a list of objects.
 /// 
@@ -39,7 +39,7 @@ public class ObjectList<E> extends Vector<E> {
 	public static void write(ObjectList<?> list, AttributeOutputStream oupt) throws IOException {
 		if(list != null) {
 			oupt.writeShort(list.size());
-			for(Object stm:list) oupt.writeObj((SyntaxClass) stm);
+			for(Object stm:list) oupt.writeObj((SyntaxElement) stm);
 		} else oupt.writeShort(-1);
 	}
 

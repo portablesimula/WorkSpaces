@@ -8,7 +8,7 @@ package simula.compiler.syntaxClass.expression;
 import java.util.Iterator;
 
 import simula.compiler.syntaxClass.ProcedureSpecification;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ArrayDeclaration;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
@@ -65,7 +65,7 @@ public final class CallProcedure {
 	/// @param func Function Designator, may be subscripted
 	/// @param backLink if not null, this procedure call is part of the backLink Expression/Statement.
 	/// @return piece of Java source code
-	static String remote(final Expression obj,final ProcedureDeclaration procedure,final VariableExpression func,final SyntaxClass backLink) {
+	static String remote(final Expression obj,final ProcedureDeclaration procedure,final VariableExpression func,final SyntaxElement backLink) {
 		if(procedure.myVirtual!=null) {
 			// Call Remote Virtual Procedure
 			return(remoteVirtual(obj,func,procedure.myVirtual.virtualSpec));

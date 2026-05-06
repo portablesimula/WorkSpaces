@@ -1,0 +1,13 @@
+external class SimulaTest;
+
+SimulaTest
+begin
+ integer traceCase;
+   
+%  Simulation
+%   goto L;
+    detach;
+
+%     case := 444;
+ 
+ end

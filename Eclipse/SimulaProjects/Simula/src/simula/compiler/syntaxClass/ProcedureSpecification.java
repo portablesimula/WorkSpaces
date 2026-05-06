@@ -59,7 +59,7 @@ import simula.psi.PsiTree;
 /// 
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen
-public final class ProcedureSpecification extends SyntaxClass {
+public final class ProcedureSpecification extends SyntaxElement {
 	
 	/// The procedure identifier.
 	private String identifier;

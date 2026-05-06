@@ -15,7 +15,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
@@ -358,7 +358,7 @@ public final class ArithmeticExpression extends Expression {
 		Util.TRACE_OUTPUT("writeArithmeticExpression: " + this);
 		oupt.writeKind(ObjectKind.ArithmeticExpression);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -376,11 +376,11 @@ public final class ArithmeticExpression extends Expression {
 	public static ArithmeticExpression readObject(AttributeInputStream inpt) throws IOException {
 		ArithmeticExpression expr = new ArithmeticExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxClass) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** ArithmeticExpression
 		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();

@@ -136,7 +136,7 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 		Util.TRACE_OUTPUT("writeWhenPart: " + this);
 		oupt.writeKind(ObjectKind.ConnectionWhenPart);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** ConnectionWhenPart
 		oupt.writeString(classIdentifier);
@@ -151,7 +151,7 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 	public static ConnectionDoPart readObject(AttributeInputStream inpt) throws IOException {
 		ConnectionWhenPart whn = new ConnectionWhenPart();
 		whn.OBJECT_SEQU = inpt.readSEQU(whn);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		whn.psiTree = readPsiTree(inpt);
 		// *** ConnectionDoPart
 		whn.classIdentifier = inpt.readString();

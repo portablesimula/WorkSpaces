@@ -13,7 +13,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.utilities.Global;
@@ -149,7 +149,7 @@ public final class QualifiedObject extends Expression {
 		Util.TRACE_OUTPUT("writeQualifiedObject: " + this);
 		oupt.writeKind(ObjectKind.QualifiedObject);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -166,11 +166,11 @@ public final class QualifiedObject extends Expression {
 	public static QualifiedObject readObject(AttributeInputStream inpt) throws IOException {
 		QualifiedObject expr = new QualifiedObject();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxClass) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** QualifiedObject
 		expr.lhs = (Expression) inpt.readObj();
 		expr.classIdentifier = inpt.readString();

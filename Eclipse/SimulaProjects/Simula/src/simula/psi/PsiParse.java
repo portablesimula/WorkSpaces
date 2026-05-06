@@ -99,8 +99,8 @@ public class PsiParse {
 	}
 
 	/// Return the Parser current Token.
-	public static LexToken getParserToken(final PsiBuilder psiBuilder) {
-        return psiBuilder.getParserToken();
+	public static LexToken getCurrentParserToken(final PsiBuilder psiBuilder) {
+        return psiBuilder.getCurrentParserToken();
 	}
 	
 	/// Advance to next Token.
@@ -115,7 +115,8 @@ public class PsiParse {
 	/// @return true if the keyword was accepted, otherwise false
 	public static boolean expect(final PsiBuilder psiBuilder, final int key) {
 		if (accept(psiBuilder, key)) return (true);
-		LOG.error("Got symbol '" + PsiParse.currentLexToken(psiBuilder) + "' while expecting KeyWord " + KeyWord.edit(key).toLowerCase());
+		Util.error("Got symbol '" + PsiParse.currentLexToken(psiBuilder) + "' while expecting KeyWord " + KeyWord.edit(key).toLowerCase());
+		Util.STOP();
 		return (false);
 	}
 
@@ -132,7 +133,7 @@ public class PsiParse {
 	}
 
 	public static LexToken acceptParserToken(final PsiBuilder psiBuilder, final int... keywords) {
-        LexToken currentToken = getParserToken(psiBuilder);
+        LexToken currentToken = getCurrentParserToken(psiBuilder);
         int currentKeyWord = (currentToken == null)? KeyWord.EOF : currentToken.keyWord;
 		for (int keyword : keywords)
 			if (currentKeyWord == keyword) {
@@ -144,7 +145,7 @@ public class PsiParse {
 	}
 	
 	public static boolean accept_AND_THEN(final PsiBuilder psiBuilder) {
-		Util.IERR("SKAL FLYTTES TIL LEXER");
+//		Util.IERR("WARNING: SKAL FLYTTES TIL LEXER: accept_AND_THEN");
 //		IO.println("\nPsiParse.accept_AND_THEN: BEGIN ======================================================================");
 		if(accept(psiBuilder, KeyWord.AND_THEN)) {
 //			IO.println("PsiParse.accept_AND_THEN: GOT: AND_THEN");
@@ -164,7 +165,7 @@ public class PsiParse {
 	}
 
 	public static boolean accept_AND_ONLY(final PsiBuilder psiBuilder) {
-		Util.IERR("SKAL FLYTTES TIL LEXER");
+//		Util.IERR("WARNING: SKAL FLYTTES TIL LEXER: accept_AND_ONLY");
 //		IO.println("\nPsiParse.accept_AND_THEN: BEGIN ======================================================================");
 		LexToken prv = psiBuilder.getCurrentLexerToken();
 		if(accept(psiBuilder, KeyWord.AND)) {
@@ -181,7 +182,7 @@ public class PsiParse {
 	}
 	
 	public static boolean accept_OR_ELSE(final PsiBuilder psiBuilder) {
-		Util.IERR("SKAL FLYTTES TIL LEXER");
+//		Util.IERR("WARNING: SKAL FLYTTES TIL LEXER: accept_OR_ELSE");
 //		IO.println("\nPsiParse.accept_OR_ELSE: BEGIN ======================================================================");
 		if(accept(psiBuilder, KeyWord.OR_ELSE)) {
 //			IO.println("PsiParse.accept_OR_ELSE: GOT: OR_ELSE");
@@ -201,7 +202,7 @@ public class PsiParse {
 	}
 
 	public static boolean accept_OR_ONLY(final PsiBuilder psiBuilder) {
-		Util.IERR("SKAL FLYTTES TIL LEXER");
+//		Util.IERR("WARNING: SKAL FLYTTES TIL LEXER: accept_OR_ONLY");
 //		IO.println("\nPsiParse.accept_OR_THEN: BEGIN ======================================================================");
 		LexToken prv = psiBuilder.getCurrentLexerToken();
 		if(accept(psiBuilder, KeyWord.OR)) {
@@ -220,8 +221,18 @@ public class PsiParse {
 
 	/// Skip misplaced current symbol.
 	public static void skipMisplacedCurrentSymbol(final PsiBuilder psiBuilder) {
-		LOG.error("Misplaced symbol: "+PsiParse.currentLexToken(psiBuilder)+" -- Ignored");
+		Util.error("Misplaced symbol: "+PsiParse.currentLexToken(psiBuilder)+" -- Ignored");
 		nextToken(psiBuilder);
+	}
+
+	/// Skip until the given symbol.
+	public static LexToken skipUntil(final PsiBuilder psiBuilder, int keyWord) {
+		LexToken token = null;
+		do { nextToken(psiBuilder);
+			 token = psiBuilder.getCurrentLexerToken();
+		} while (token.keyWord != keyWord);
+		psiBuilder.advanceLexer();
+		return token;
 	}
 	
 	
@@ -283,16 +294,24 @@ public class PsiParse {
 	/// If failing to do so, an error is printed.
 	/// @return the identifier or null
 //	public static String expectIdentifier(final PsiBuilder psiBuilder) {
-//        LexToken currentToken = getParserToken(psiBuilder);
+//        LexToken currentToken = getCurrentParserToken(psiBuilder);
 //		String ident = acceptIdentifier(psiBuilder);
-//		if(ident == null) LOG.error("Got symbol " + currentToken + " while expecting an Identifier");
+//		if(ident == null) Util.error("Got symbol " + currentToken + " while expecting an Identifier");
 //		return (ident);
 //	}  
 	public static LexToken expectIdentifier(final PsiBuilder psiBuilder) {
-        LexToken currentToken = getParserToken(psiBuilder);
         LexToken ident = acceptIdentifier(psiBuilder);
-		if(ident == null) LOG.error("Got symbol " + currentToken + " while expecting an Identifier");
 		return (ident);
+	}  
+	public static String expectIdentifierText(final PsiBuilder psiBuilder) {
+        LexToken currentToken = getCurrentParserToken(psiBuilder);
+        LexToken ident = acceptIdentifier(psiBuilder);
+		if(ident == null) {
+			Util.error(currentToken, "Got symbol " + KeyWord.edit(currentToken.keyWord) + " while expecting an Identifier");
+			psiBuilder.advanceLexer();
+			return null;
+		}
+		return ident.getText();
 	}  
 
 	/// Test to accept a Type.
@@ -307,7 +326,7 @@ public class PsiParse {
 		else if(accept(psiBuilder, KeyWord.LONG)) { PsiParse.expect(psiBuilder, KeyWord.REAL); type=Type.LongReal; }
 		else if(accept(psiBuilder, KeyWord.TEXT)) type=Type.Text;
 		else if(accept(psiBuilder, KeyWord.REF))	{
-			PsiParse.expect(psiBuilder, KeyWord.BEGPAR); LexToken classIdentifier=PsiParse.getParserToken(psiBuilder);
+			PsiParse.expect(psiBuilder, KeyWord.BEGPAR); LexToken classIdentifier=PsiParse.getCurrentParserToken(psiBuilder);
 			PsiParse.expect(psiBuilder, KeyWord.IDENTIFIER); PsiParse.expect(psiBuilder, KeyWord.ENDPAR); 
 //			type=Type.Ref(classIdentifier.toString()); 
 			type=Type.Ref(classIdentifier.getText()); 

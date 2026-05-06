@@ -17,6 +17,7 @@ import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiTree;
@@ -49,18 +50,14 @@ public final class DummyStatement extends Statement {
 	}
 
 	public static DummyStatement ofExplicit(final PsiBuilder psiBuilder) {
-		 psiBuilder.startSubtree(PsiTree.Kind.statement, "DummyStatement");
-		 psiBuilder.consume(KeyWord.SEMICOLON); //  (add it to 'current tree')
-		 DummyStatement dummyStatement = new DummyStatement(psiBuilder.psiTree);		
-		 psiBuilder.doneSubtree(PsiTree.Kind.statement, dummyStatement);
-		 return dummyStatement;
+		psiBuilder.consume(KeyWord.SEMICOLON); //  (add it to 'current tree')
+		DummyStatement dummyStatement = new DummyStatement(psiBuilder.psiTree);		
+		return dummyStatement;
 	}
 
 	public static DummyStatement ofImplicit(final PsiBuilder psiBuilder) {
-		 psiBuilder.startSubtree(PsiTree.Kind.statement, "DummyStatement");
-		 DummyStatement dummyStatement = new DummyStatement(psiBuilder.psiTree);		
-		 psiBuilder.doneSubtree(PsiTree.Kind.statement, dummyStatement);
-		 return dummyStatement;
+		DummyStatement dummyStatement = new DummyStatement(psiBuilder.psiTree);		
+		return dummyStatement;
 	}
 
 	@Override
@@ -110,7 +107,7 @@ public final class DummyStatement extends Statement {
 		Util.TRACE_OUTPUT("writeDummyStatement: " + this);
 		oupt.writeKind(ObjectKind.DummyStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 	}
 
@@ -121,7 +118,7 @@ public final class DummyStatement extends Statement {
 	public static DummyStatement readObject(AttributeInputStream inpt) throws IOException {
 		DummyStatement stm = new DummyStatement(null);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		stm.psiTree = readPsiTree(inpt);
 		Util.TRACE_INPUT("DummyStatement: " + stm);
 		return(stm);

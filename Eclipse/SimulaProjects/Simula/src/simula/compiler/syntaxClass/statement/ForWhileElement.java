@@ -165,7 +165,7 @@ public class ForWhileElement extends ForListElement {
 		Util.TRACE_OUTPUT("ForWhileElement: " + this);
 		oupt.writeKind(ObjectKind.ForWhileElement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** ForListElement
 		oupt.writeObj(forStatement);
@@ -180,7 +180,7 @@ public class ForWhileElement extends ForListElement {
 	public static ForWhileElement readObject(AttributeInputStream inpt) throws IOException {
 		ForWhileElement elt = new ForWhileElement();
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		elt.psiTree = readPsiTree(inpt);
 		// *** ForListElement
 		elt.forStatement = (ForStatement) inpt.readObj();

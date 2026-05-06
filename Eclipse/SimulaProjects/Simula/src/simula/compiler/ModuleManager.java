@@ -39,6 +39,10 @@ public class ModuleManager {
 		if(textPanel != null) return textPanel.getText();
 		return Files.readString(sourceFile.toPath());
 	}
+	
+	public void dropPsiTree() {
+		psiTree = null;
+	}
 
 	public PsiTree getPsiTree() {
 		if(psiTree == null) {

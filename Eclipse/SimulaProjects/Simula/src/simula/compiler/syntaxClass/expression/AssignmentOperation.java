@@ -16,7 +16,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ArrayDeclaration;
 import simula.compiler.syntaxClass.declaration.Declaration;
@@ -483,7 +483,7 @@ public final class AssignmentOperation extends Expression {
 		Util.TRACE_OUTPUT("writeAssignmentOperation: " + this);
 		oupt.writeKind(ObjectKind.AssignmentOperation);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -501,11 +501,11 @@ public final class AssignmentOperation extends Expression {
 	public static AssignmentOperation readObject(AttributeInputStream inpt) throws IOException {
 		AssignmentOperation expr = new AssignmentOperation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxClass) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** AssignmentOperation
 		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();

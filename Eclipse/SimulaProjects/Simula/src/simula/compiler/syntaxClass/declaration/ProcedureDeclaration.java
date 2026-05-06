@@ -38,6 +38,7 @@ import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.statement.DummyStatement;
+import simula.compiler.syntaxClass.statement.InnerStatement;
 import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.ClassHierarchy;
 import simula.compiler.utilities.RTS;
@@ -161,14 +162,18 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			while(acceptModePart(psiBuilder, proc.parameterList));
 			expectSpecificationPart(psiBuilder, proc);
 		} else PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
+		IO.println("ProcedureDeclaration.expectProcedureDeclaration: BEFORE PARSE PROCEDURE BLOCK");
 		expectProcedureBody(psiBuilder, proc);
 
 //		proc.lastLineNumber = Global.sourceLineNumber;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Line "+proc.firstLineNumber()+": ProcedureDeclaration: "+proc);
 		Global.setScope(proc.declaredIn);
+		
+		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
+
 		psiBuilder.doneSubtree(PsiTree.Kind.declaration, proc);
-		psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
+		psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be NextDeclaration");
 		return (proc);
 	}
 
@@ -187,7 +192,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @param pList the parameter list
 	/// @return true: if mode-part was present.
 	private static boolean acceptModePart(PsiBuilder psiBuilder, Vector<Parameter> pList) {
-		LexToken prevToken = PsiParse.getParserToken(psiBuilder);
+		LexToken prevToken = PsiParse.getCurrentParserToken(psiBuilder);
 		if (PsiParse.accept(psiBuilder, KeyWord.VALUE, KeyWord.NAME)) {
 			int mode = (prevToken.keyWord == KeyWord.VALUE)
 					? Parameter.Mode.value
@@ -305,19 +310,22 @@ public class ProcedureDeclaration extends BlockDeclaration {
 //	}
 
 	private static void expectProcedureBody(PsiBuilder psiBuilder, ProcedureDeclaration proc) {
+		IO.println("ProcedureDeclaration.expectProcedureBody: START PARSE PROCEDURE BLOCK");
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGIN)) {
-			Statement stm;
-			if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse Procedure Block");
-//			while (Declaration.acceptDeclaration(psiBuilder, proc)) {
-//				PsiParse.accept(psiBuilder, KeyWord.SEMICOLON);
-//			}
-			Declaration.acceptDeclarations(psiBuilder, proc);
-//			Vector<Statement> stmList = proc.statements;
-			ObjectList<Statement> stmList = proc.statements;
-			while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
-				stm = Statement.acceptStatement(psiBuilder);
-				if (stm != null) stmList.add(stm);
+			if (Option.internal.TRACE_PARSE)
+				PsiParse.TRACE("Parse Procedure Block");
+			
+			if(Option.TESTING_BLOCKS) {
+				proc.parseBlock(psiBuilder);
+			} else {
+				Declaration.acceptDeclarations(psiBuilder, proc);
+				ObjectList<Statement> stmList = proc.statements;
+				while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
+					Statement stm = Statement.acceptStatement(psiBuilder);
+					if (stm != null) stmList.add(stm);
+				}
 			}
+
 			if (PsiParse.prevToken(psiBuilder).keyWord == KeyWord.EOF) {
 				Util.error("Illegal termination of procedure declaration. Missing END.");
 			}
@@ -1096,7 +1104,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
     }
 
 	@Override
-	public JPanel getPanel() {
+	public JPanel getSyntaxPanel() {
 		String[] table = {
 				"  declarationKind:",	""+declarationKind+":"+ObjectKind.edit(declarationKind),
 				"  declarationClass:",	""+this.getClass().getSimpleName(),
@@ -1148,7 +1156,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		oupt.writeString(identifier);
 		oupt.writeShort(OBJECT_SEQU);
 		
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 
 		// *** Declaration
@@ -1175,7 +1183,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		ProcedureDeclaration pro = new ProcedureDeclaration(null, identifier, ObjectKind.Procedure);
 		pro.OBJECT_SEQU = inpt.readSEQU(pro);
 
-		// *** SyntaxClass
+		// *** SyntaxElement
 		pro.psiTree = readPsiTree(inpt);
 
 		// *** Declaration

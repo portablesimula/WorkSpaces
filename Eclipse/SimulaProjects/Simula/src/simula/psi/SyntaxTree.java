@@ -13,14 +13,14 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 
 public class SyntaxTree {
-	SyntaxClass rootClass;
+	SyntaxElement rootClass;
 	
-	public SyntaxTree(SyntaxClass rootClass) {
+	public SyntaxTree(SyntaxElement rootClass) {
 		this.rootClass = rootClass;
 	}
 
@@ -105,54 +105,14 @@ public class SyntaxTree {
 //		TreeNodeIdent treeNodeIdent = (TreeNodeIdent) last.getUserObject();
 		if(last.getUserObject() instanceof TreeNodeIdent treeNodeIdent) {
 	   		IO.println("PsiTree.doRenderPsiTreeAction: gotSingleClick: GOT TreeNodeIdent:  " + treeNodeIdent);
-			if(treeNodeIdent.object instanceof SyntaxClass syntaxClass) {
-				IO.println("PsiTree.doRenderPsiTreeAction: gotSingleClick: GOT SYNTAX CLASS: " + syntaxClass.getClass().getSimpleName() + " " + syntaxClass);
-				if(syntaxClass != null) {
-					popUpSyntaxPanel(syntaxClass);//(psiTree.toString());
+			if(treeNodeIdent.object instanceof SyntaxElement syntaxElement) {
+				IO.println("PsiTree.doRenderPsiTreeAction: gotSingleClick: GOT SYNTAX CLASS: " + syntaxElement.getClass().getSimpleName() + " " + syntaxElement);
+				if(syntaxElement != null) {
+//					popUpSyntaxPanel(syntaxElement);//(psiTree.toString());
+					syntaxElement.popUpSyntaxPanel();
 				}
 			}
 		}
-	}
-
-	public void popUpSyntaxPanel(SyntaxClass elt) {
-//		JTree tree = this.doRenderPsiTreeAction();
-		JPanel panel = getPanel(elt);
-//		JPanel panel = elt.getPanel();
-//		SwingUtilities.invokeLater(() -> {
-			JFrame frame = new JFrame("Syntax Info");
-			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	        try { frame.setIconImage(Global.favicon.getImage()); } 
-	        catch (Exception e) {}// Util.IERR("Impossible",e); }
-
-			JScrollPane scrollPane = new JScrollPane(panel);
-			frame.add(scrollPane, BorderLayout.CENTER);
-
-//			frame.setSize(500, 600);
-			frame.pack();
-			frame.setLocationRelativeTo(null);
-			frame.setVisible(true);
-//		});
-	}
-	
-	private JPanel getPanel(SyntaxClass elt) {
-		JPanel panel = new JPanel(new BorderLayout());
-//		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS)); // Vertical stacking
-		panel.add(elt.getPanel(), BorderLayout.CENTER);
-		PsiTree psiTree = elt.getPsiTree();
-		if(psiTree != null) {
-//			panel.add(new JLabel("SyntaxClass: " + psiTree.syntaxClass.getClass().getSimpleName() + " " + psiTree.syntaxClass));
-//			panel.add(new JLabel("SyntaxClass.psiTree: " + psiTree.syntaxClass.psiTree));
-			JButton button = new JButton("Open Psi Tree");
-	        panel.add(button, BorderLayout.SOUTH);
-	        
-	        button.addActionListener(e -> {
-	            System.out.println("Button was clicked!  elt: " + elt + e);
-    			IO.println("PsiTree.doRenderPsiTreeAction: gotSingleClick: GOT SYNTAX CLASS: " + psiTree.syntaxClass.getClass().getSimpleName() + " " + psiTree.syntaxClass);
-				psiTree.syntaxClass.printTree(1, "GOT SYNTAX CLASS: ");
-    			psiTree.popUp();
-	        });
-		}
-        return panel;
 	}
 
 }

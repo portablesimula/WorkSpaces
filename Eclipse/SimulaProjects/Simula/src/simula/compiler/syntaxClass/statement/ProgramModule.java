@@ -111,9 +111,10 @@ public final class ProgramModule extends Statement {
 			Global.getCurrentScope().sourceBlockLevel=0;
 			
 			psiBuilder.startSubtree(PsiTree.Kind.declaration  , "ExternalDeclaration");
+			
 			while(PsiParse.accept(psiBuilder, KeyWord.EXTERNAL)) {
 				externalHead = ExternalDeclaration.expectExternalHead(psiBuilder, StandardClass.BASICIO);		
-				PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
+//				PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 			}
 			psiBuilder.dropSubtree(PsiTree.Kind.declaration, " not ExternalDeclaration");
 			
@@ -143,7 +144,7 @@ public final class ProgramModule extends Statement {
 			
 			StandardClass.BASICIO.declarationList.add(mainModule);
 			
-			LexToken token = PsiParse.getParserToken(psiBuilder);
+			LexToken token = PsiParse.getCurrentParserToken(psiBuilder);
 			if(token != null && token.keyWord != KeyWord.EOF) {
 				psiBuilder.startSubtree(PsiTree.Kind.textAfterProgramEnd, "TextAfterProgramEnd");
 				Comment dum = new Comment(psiBuilder.psiTree);
@@ -167,32 +168,16 @@ public final class ProgramModule extends Statement {
 	/// Parse Simula Program by expecting a Statement.
 	/// @return the Program Statement.
 	private DeclarationScope doParseProgram(final PsiBuilder psiBuilder) {
+//		BlockDeclaration mainBlock = new MaybeBlockDeclaration(psiBuilder, "MainBlock: " + Global.sourceName);
 		BlockDeclaration mainBlock = new MaybeBlockDeclaration(psiBuilder, Global.sourceName);
-//		psiBuilder.startSubtree(PsiTree.Kind.mainModule, "MainProgramBlock");
 		
 		mainBlock.isMainModule = true;
 		mainBlock.declarationKind = ObjectKind.SimulaProgram;
-//		IO.println("ProramModule.doParseProgram: do acceptStatement");
-//		Util.IERR();
 		Statement program = Statement.acceptStatement(psiBuilder);
 		mainBlock.statements.add(program);
-//		mainBlock.psiTree.addChild(program.psiTree);
-//		psiBuilder.doneSubtree(PsiTree.Kind.mainModule, this);
-		psiBuilder.getRoot().printPsiTree("DONE ProgramModule.doParseProgram");
+//		psiBuilder.getRoot().printPsiTree("DONE ProgramModule.doParseProgram");
 		return mainBlock;
 	}
-
-
-//	/// Parse Simula Program by expecting a Statement.
-//	/// @return the Program Statement.
-//	private DeclarationScope doParseProgram() {
-//		BlockDeclaration mainBlock = new MaybeBlockDeclaration(Global.sourceName);
-//		mainBlock.isMainModule = true;
-//		mainBlock.declarationKind = ObjectKind.SimulaProgram;
-//		Statement program = Statement.expectStatement();
-//		mainBlock.statements.add(program);
-//		return mainBlock;
-//	}
 
 	@Override
 	public void doChecking() {

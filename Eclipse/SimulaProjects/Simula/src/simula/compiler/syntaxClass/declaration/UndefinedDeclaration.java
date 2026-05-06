@@ -127,7 +127,7 @@ public class UndefinedDeclaration extends Declaration {
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 
 		// *** Declaration
@@ -149,7 +149,7 @@ public class UndefinedDeclaration extends Declaration {
 		UndefinedDeclaration var = new UndefinedDeclaration();
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
-		// *** SyntaxClass
+		// *** SyntaxElement
 		var.psiTree = readPsiTree(inpt);
 
 		// *** Declaration

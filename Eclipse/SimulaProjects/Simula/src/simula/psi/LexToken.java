@@ -15,6 +15,8 @@ public class LexToken extends PsiElement {
 //    int endOffset;
     
 //    public int lineNumber;
+	
+	public static LexToken prevToken;
 
 	public LexToken(int tokenStartLine, CharSequence sourceText, int startOffset, int endOffset, int keyWord) {
 		super(KeyWord.edit(keyWord), sourceText);
@@ -23,6 +25,21 @@ public class LexToken extends PsiElement {
 //		this.sourceText = sourceText;
 		this.startOffset = startOffset;
 		this.endOffset = endOffset;
+		if(endOffset <= startOffset) {
+			if(keyWord != KeyWord.EOF)
+				Util.IERR("NEW LexToken: Illegal Token: " + this.getClass().getSimpleName()+ " " + this);
+		}
+//		if(Option.TESTING_SUBSEQUENT_TOKENS) {
+//			if(prevToken != null) {
+//				if(startOffset != prevToken.endOffset) {
+//					System.err.println("NEW LexToken: Prev Token: " + prevToken.getClass().getSimpleName()+ " " + prevToken);
+//					System.err.println("NEW LexToken: This Token: " + this.getClass().getSimpleName()+ " " + this);
+//					Util.IERR("\"NEW LexToken: Illegal gap between tokens: ");
+//					Util.STOP();
+//				}
+//			}
+//			prevToken = this;
+//		}
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) {
 			if(Option.internal.TRACE_NEW_LEXTOKEN > 1) {
 				IO.println("NEW LexToken: Line: "+lineNumber+": "+this); //+"  CALLED FROM: " + Util.calledFrom(3, 25));
@@ -37,6 +54,9 @@ public class LexToken extends PsiElement {
 //			IO.println("NEW LexToken: "+this+"  CALLED FROM: " + Util.calledFrom(3, 25));
 //			Thread.dumpStack();
 		}
+//		if(startOffset == 63) {
+//			Util.IERR("STOP ON TOKEN: " + this);
+//		}
 	}
 
 //	public LexToken(int tokenStartLine, int keyWord) {

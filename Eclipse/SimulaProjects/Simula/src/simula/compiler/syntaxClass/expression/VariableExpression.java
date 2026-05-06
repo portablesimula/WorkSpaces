@@ -22,7 +22,7 @@ import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.OverLoad;
 import simula.compiler.syntaxClass.ProcedureSpecification;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ArrayDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -998,7 +998,7 @@ public final class VariableExpression extends Expression {
 		Util.TRACE_OUTPUT("BEGIN Write VariableExpression: "+this);
 		oupt.writeKind(ObjectKind.VariableExpression);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -1022,11 +1022,11 @@ public final class VariableExpression extends Expression {
 	public static VariableExpression readObject(AttributeInputStream inpt) throws IOException {
 		VariableExpression var = new VariableExpression();
 		var.OBJECT_SEQU = inpt.readSEQU(var);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		var.psiTree = readPsiTree(inpt);
 		// *** Expression
 		var.type = inpt.readType();
-		var.backLink = (SyntaxClass) inpt.readObj();
+		var.backLink = (SyntaxElement) inpt.readObj();
 		// *** VariableExpression
 		var.identifier = inpt.readString();
 		var.remotelyAccessed = inpt.readBoolean();

@@ -95,7 +95,6 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	/// @return the resulting PrefixedBlockDeclaration
 	public static PrefixedBlockDeclaration expectPrefixedBlock(final PsiBuilder psiBuilder, final VariableExpression blockPrefix,boolean isMainModule) {
 		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(psiBuilder.psiTree, isMainModule);
-//		block.OLD_lineNumber=psiBuilder.getSourceLineNumber();
 		block.declarationKind=ObjectKind.PrefixedBlock;
 		Util.ASSERT(blockPrefix != null,"blockPrefix == null");
 		block.blockPrefix = blockPrefix;
@@ -104,22 +103,22 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		String ID = (isMainModule)? Global.sourceName : block.prefix + "Begin";
 		block.modifyIdentifier(ID);
 		if (Option.internal.TRACE_PARSE) PsiParse.TRACE("Parse PrefixedBlock");
-//		while (Declaration.acceptDeclaration(psiBuilder, block)) Parse.accept(psiBuilder, KeyWord.SEMICOLON);
-		Declaration.acceptDeclarations(psiBuilder, block);
-		while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
-			Statement stm = Statement.acceptStatement(psiBuilder);
-			if (stm != null) block.statements.add(stm);
-		}
-		if (PsiParse.prevToken(psiBuilder).keyWord == KeyWord.EOF) {
-			Util.error("Illegal termination of prefixed block. Missing END.");
+		
+		if(Option.TESTING_BLOCKS) {
+			block.parseBlock(psiBuilder);
+		} else {
+			Declaration.acceptDeclarations(psiBuilder, block);
+			while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
+				Statement stm = Statement.acceptStatement(psiBuilder);
+				if (stm != null) block.statements.add(stm);
+			}
+			if (PsiParse.prevToken(psiBuilder).keyWord == KeyWord.EOF) {
+				Util.error("Illegal termination of prefixed block. Missing END.");
+			}
 		}
 //		block.lastLineNumber = Global.sourceLineNumber;
 		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+block.firstLineNumber()+": PrefixedBlockDeclaration: "+block);
 		Global.setScope(block.declaredIn);
-		if(! Option.TESTING_BLOCKS) {
-			psiBuilder.doneSubtree(PsiTree.Kind.declaration, block);
-			psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
-		}
 		return block;
 	}
 
@@ -359,7 +358,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	}
 
 	@Override
-	public JPanel getPanel() {
+	public JPanel getSyntaxPanel() {
 		String[] table = {
 				"  declarationKind:",	""+declarationKind+":"+ObjectKind.edit(declarationKind),
 				"  ZZ_declarationClass:",	""+this.getClass().getSimpleName(),
@@ -404,7 +403,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		oupt.writeKind(declarationKind); // Mark: This is a PrefixedBlockDeclaration
 		oupt.writeString(identifier);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		
 		// *** Declaration
@@ -446,7 +445,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		pbl.identifier = (String) inpt.readString();
 		pbl.declarationKind = ObjectKind.Class;
 		pbl.OBJECT_SEQU = inpt.readSEQU(pbl);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		pbl.psiTree = readPsiTree(inpt);
 
 		// *** Declaration

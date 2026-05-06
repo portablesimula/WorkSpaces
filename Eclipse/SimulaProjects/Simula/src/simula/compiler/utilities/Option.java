@@ -35,9 +35,10 @@ import javax.swing.JTextField;
 /// @author Øystein Myhre Andersen
 public final class Option {
 
-	public static boolean TESTING_STATEMENT = false;//true;
+	public static boolean TESTING_SUBSEQUENT_TOKENS = true;
+
 	public static boolean TESTING_BLOCKS = true;
-	public static boolean TESTING_DROP_TREE = true;
+	public static boolean TESTING_LABELED_STATEMENT = true;
 	
 	public static int TRACE_PSITREE_START_DONE = 0;
 	public static int TRACE_ACCEPT_EXPRESSION = 0;
@@ -100,7 +101,7 @@ public final class Option {
 
 		// Lexer Trace Options
 		/** Debug option */	public static int TRACE_LEXER = 0;
-		/** Debug option */	public static int TRACE_NEW_LEXTOKEN = 0;
+		/** Debug option */	public static int TRACE_NEW_LEXTOKEN = 1;//0;
 		/** Debug option */	public static boolean TRACE_COMMENTS = false;
 
 		// Parser Trace Options

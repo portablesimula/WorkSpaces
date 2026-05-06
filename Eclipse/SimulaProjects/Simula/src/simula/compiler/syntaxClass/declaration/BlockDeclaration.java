@@ -21,6 +21,7 @@ import javax.swing.tree.DefaultTreeModel;
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
+import simula.compiler.syntaxClass.statement.InnerStatement;
 import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
@@ -132,6 +133,59 @@ public abstract class BlockDeclaration extends DeclarationScope {
 		PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
 	}
 
+	// ***********************************************************************************************
+	// *** Parsing: parseBlock
+	// ***********************************************************************************************
+	protected void parseBlock(final PsiBuilder psiBuilder) {
+		// NOTE: As a consequence of Simula Standard:
+		// 
+		// MaybeBlock = begin [ declaration { ; declaration } ; ] statement { ; statement } end
+		//
+		// class-body = begin [ declaration { ; declaration } ; ] statement { ; statement } end
+		//            | begin [ declaration { ; declaration } ; ] { statement ; } { label : } inner end
+		//            | begin [ declaration { ; declaration } ; ] { statement ; } { label : } inner ; statement { ; statement } end
+		//
+		// Suppose: STM = statement | { label : } inner
+		//
+		// ==> all-blocks = begin { declaration ; } STM { ; STM } end
+		//
+		// where inner occurs at most once within a class body
+		//
+			// However; since ; is treated as a dummy statement we get the following simplified form:
+			//
+			// ==> all-blocks = begin { declaration ; } { STM } end
+		//
+		// Solution: Statement.expectStatement is extended to accept inner as a unlabeled statement.
+		//           With the following restriction:
+		//           - the parameter 'allowInner == true'
+		//   
+		
+		/// Repeatedly parse a declaration and add it to the given BlockDeclaration's' declaration list.
+		/// Continue until there are no more declarations.
+//		Declaration.acceptDeclarations(psiBuilder, enclosure);
+//		protected static void acceptDeclarations(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
+			psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be first Declaration");
+			while (Declaration.acceptDeclaration(psiBuilder, this)) {}
+			psiBuilder.dropSubtree(PsiTree.Kind.declaration, " is not a Declaration: DROP LAST MAYBE DECLARATION TREE");
+//		}
+
+		
+//		do {
+//			Statement stm = Statement.expectStatement(psiBuilder, allowInner);
+//			enclosure.statements.add(stm);
+//			if(allowInner && stm instanceof InnerStatement) allowInner = false;
+//		} while(PsiParse.accept(psiBuilder, KeyWord.SEMICOLON));
+//		PsiParse.expect(psiBuilder, KeyWord.END);
+		
+		while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
+			Statement stm = Statement.acceptStatement(psiBuilder);
+			if (stm != null) statements.add(stm);
+			PsiParse.accept(psiBuilder, KeyWord.SEMICOLON);
+		}
+
+//		Util.STOP();
+	}
+	
 	// ***********************************************************************************************
 	// *** Coding: isBlockWithLocalClasses
 	// ***********************************************************************************************

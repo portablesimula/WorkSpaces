@@ -11,7 +11,7 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.MethodTypeDesc;
 
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.psi.PsiTree;
@@ -71,7 +71,7 @@ public final class VirtualMatch extends Declaration {
 
 	@Override
 	public void printTree(final int indent, final Object head) {
-		IO.println(SyntaxClass.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
+		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
 
 	@Override

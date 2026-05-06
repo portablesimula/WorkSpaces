@@ -110,10 +110,7 @@ public final class SwitchStatement extends Statement {
 	/// @param line the source line number
 	SwitchStatement(final PsiBuilder psiBuilder) {
 		super(psiBuilder.psiTree);
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.startSubtree(PsiTree.Kind.switchStatement, "SwitchStatement");
-		}
-		psiBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
+		psiBuilder.consume(KeyWord.SWITCH); //  (add it to 'current tree')
 
 //		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);
 		PsiParse.expect(psiBuilder, KeyWord.BEGPAR);
@@ -126,6 +123,9 @@ public final class SwitchStatement extends Statement {
 		PsiParse.expect(psiBuilder, KeyWord.BEGIN);
 		has_NONE_case=false;
 		while (PsiParse.accept(psiBuilder, KeyWord.WHEN)) {
+//			psiBuilder.startSubtree(PsiTree.Kind.switchStatement, "WhenCase");
+//			Util.STOP();
+
 			Vector<SwitchInterval> caseKeyList=new Vector<SwitchInterval>();
 			if (PsiParse.accept(psiBuilder, KeyWord.NONE)) {
 				caseKeyList.add(null);
@@ -137,15 +137,19 @@ public final class SwitchStatement extends Statement {
 				while(PsiParse.accept(psiBuilder, KeyWord.COMMA)) caseKeyList.add(expectCasePair(psiBuilder));
 			}
 			PsiParse.expect(psiBuilder, KeyWord.DO);
+			
+			psiBuilder.startSubtree(PsiTree.Kind.switchStatement, "WhenCase");
 			Statement statement = Statement.acceptStatement(psiBuilder);
+			psiBuilder.doneSubtree(PsiTree.Kind.switchStatement, statement);
+			
 			PsiParse.accept(psiBuilder, KeyWord.SEMICOLON);
-			switchCases.add(new SwitchWhenPart(caseKeyList, statement));
+			SwitchWhenPart whenPart = new SwitchWhenPart(caseKeyList, statement);
+			switchCases.add(whenPart);
+			
+//			psiBuilder.doneSubtree(PsiTree.Kind.switchStatement, whenPart);
 		}
 		PsiParse.expect(psiBuilder, KeyWord.END);
 		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+firstLineNumber()+": SwitchStatement: "+this);
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.doneSubtree(PsiTree.Kind.switchStatement, this);
-		}
 	}
 
 	/// Parse Utility: Expect case pair.
@@ -423,7 +427,7 @@ public final class SwitchStatement extends Statement {
 		Util.TRACE_OUTPUT("writeSwitchStatement: " + this);
 		oupt.writeKind(ObjectKind.SwitchStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** SwitchStatement
 		oupt.writeObj(lowKey);
@@ -438,7 +442,7 @@ public final class SwitchStatement extends Statement {
 	public static SwitchStatement readObject(AttributeInputStream inpt) throws IOException {
 		SwitchStatement stm = new SwitchStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		stm.psiTree = readPsiTree(inpt);
 		stm.lowKey = (Expression) inpt.readObj();
 		stm.hiKey = (Expression) inpt.readObj();

@@ -14,7 +14,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ConnectionBlock;
 import simula.compiler.syntaxClass.expression.AssignmentOperation;
@@ -32,7 +32,7 @@ import simula.psi.SyntaxTree;
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public class ConnectionDoPart extends SyntaxClass {
+public class ConnectionDoPart extends SyntaxElement {
 	
 	/// The associated connection statement.
 	ConnectionStatement connectionStatement;
@@ -112,7 +112,7 @@ public class ConnectionDoPart extends SyntaxClass {
 		Util.TRACE_OUTPUT("writeDoPart: " + this);
 		oupt.writeKind(ObjectKind.ConnectionDoPart);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** ConnectionDoPart
 		oupt.writeObj(connectionStatement);
@@ -126,7 +126,7 @@ public class ConnectionDoPart extends SyntaxClass {
 	public static ConnectionDoPart readObject(AttributeInputStream inpt) throws IOException {
 		ConnectionDoPart dop = new ConnectionDoPart();
 		dop.OBJECT_SEQU = inpt.readSEQU(dop);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		dop.psiTree = readPsiTree(inpt);
 		// *** ConnectionDoPart
 		dop.connectionStatement = (ConnectionStatement) inpt.readObj();

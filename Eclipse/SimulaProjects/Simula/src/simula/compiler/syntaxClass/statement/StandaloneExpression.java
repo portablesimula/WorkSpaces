@@ -180,7 +180,7 @@ public final class StandaloneExpression extends Statement {
 		Util.TRACE_OUTPUT("writeStandaloneExpression: " + this);
 		oupt.writeKind(ObjectKind.StandaloneExpression);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** StandaloneExpression
 		oupt.writeObj(expression);
@@ -193,7 +193,7 @@ public final class StandaloneExpression extends Statement {
 	public static StandaloneExpression readObject(AttributeInputStream inpt) throws IOException {
 		StandaloneExpression stm = new StandaloneExpression();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		stm.psiTree = readPsiTree(inpt);
 		// *** StandaloneExpression
 		stm.expression = (Expression) inpt.readObj();

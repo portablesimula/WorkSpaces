@@ -42,7 +42,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 import simula.psi.TreeNodeIdent;
 
 /// Maybe Block Declaration. I.e: CompoundStatement or SubBlock depends on
@@ -125,8 +124,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		String debugName = "MaybeBlockDeclaration: "+(SEQU++);
 //		psiBuilder.startSubtree(PsiTree.Kind.block, debugName);
 		
-//		psiBuilder.psiTree.printPsiTree(debugName);
-		psiBuilder.getRoot().printPsiTree(debugName);
+//		psiBuilder.getRoot().printPsiTree(debugName);
 		
 		int lno = psiBuilder.getSourceLineNumber();
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN "+debugName);
@@ -135,10 +133,14 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 
 		psiBuilder.consume(KeyWord.BEGIN); // consume BEGIN (add it to 'current tree')
 
-		Declaration.acceptDeclarations(psiBuilder, this);
-		while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
-			Statement stm = Statement.acceptStatement(psiBuilder);
-			if (stm != null) statements.add(stm);
+		if(Option.TESTING_BLOCKS) {
+			parseBlock(psiBuilder);
+		} else {
+			Declaration.acceptDeclarations(psiBuilder, this);
+			while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
+				Statement stm = Statement.acceptStatement(psiBuilder);
+				if (stm != null) statements.add(stm);
+			}
 		}
 		IO.println("MaybeBlockDeclaration.expectMaybeBlock: GOT END or EOF");
 //		if (PsiParse.prevToken.keyWord == KeyWord.EOF) {
@@ -566,7 +568,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
     }
 
 	@Override
-	public JPanel getPanel() {
+	public JPanel getSyntaxPanel() {
 		String[] table = {
 				"  declarationKind:",	""+declarationKind+":"+ObjectKind.edit(declarationKind),
 				"  declarationClass:",	""+this.getClass().getSimpleName(),
@@ -611,7 +613,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		
 		// *** Declaration
@@ -645,7 +647,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		MaybeBlockDeclaration blk = new MaybeBlockDeclaration();
 		blk.declarationKind = declarationKind;
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		blk.psiTree = readPsiTree(inpt);
 
 		// *** Declaration

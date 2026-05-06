@@ -14,7 +14,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
@@ -186,7 +186,7 @@ public final class TextExpression extends Expression {
 		Util.TRACE_OUTPUT("writeTextExpression: " + this);
 		oupt.writeKind(ObjectKind.TextExpression);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -203,11 +203,11 @@ public final class TextExpression extends Expression {
 	public static TextExpression readObject(AttributeInputStream inpt) throws IOException {
 		TextExpression expr = new TextExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxClass) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** TextExpression
 		expr.lhs = (Expression) inpt.readObj();
 		expr.rhs = (Expression) inpt.readObj();

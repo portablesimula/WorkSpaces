@@ -1,6 +1,6 @@
 package simula.compiler.utilities;
 
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 
 public class LOG {
 
@@ -8,7 +8,7 @@ public class LOG {
 		if(!b) IO.println("LOG REPORTS(1) ASSERTION FAILED: ");
 	}
 
-	public static void assertTrue(boolean b, SyntaxClass contentElementType) {
+	public static void assertTrue(boolean b, SyntaxElement contentElementType) {
 		if(!b) IO.println("LOG REPORTS(2) ASSERTION FAILED: ");
 	}
 	

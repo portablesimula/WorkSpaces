@@ -15,7 +15,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
@@ -183,7 +183,7 @@ public final class UnaryOperation extends Expression {
 		Util.TRACE_OUTPUT("writeUnaryOperation: " + this);
 		oupt.writeKind(ObjectKind.UnaryOperation);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -200,11 +200,11 @@ public final class UnaryOperation extends Expression {
 	public static UnaryOperation readObject(AttributeInputStream inpt) throws IOException {
 		UnaryOperation expr = new UnaryOperation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxClass) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** UnaryOperation
 		expr.oprator = inpt.readShort();
 		expr.operand = (Expression) inpt.readObj();

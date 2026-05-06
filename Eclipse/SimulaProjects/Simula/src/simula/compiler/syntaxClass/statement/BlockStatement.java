@@ -179,7 +179,7 @@ public final class BlockStatement extends Statement {
     }
 
 	@Override
-	public JPanel getPanel() {
+	public JPanel getSyntaxPanel() {
 		String[] table = {
 				"  BlockStatement:",	""+blockDeclaration.declaredIn.identifier,
 				"  declarationKind:",	""+blockDeclaration.declarationKind+":"+ObjectKind.edit(blockDeclaration.declarationKind),
@@ -225,7 +225,7 @@ public final class BlockStatement extends Statement {
 		Util.TRACE_OUTPUT("writeBlockStatement: " + this);
 		oupt.writeKind(ObjectKind.BlockStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** BlockStatement
 		oupt.writeObj(blockDeclaration);
@@ -238,7 +238,7 @@ public final class BlockStatement extends Statement {
 	public static BlockStatement readObject(AttributeInputStream inpt) throws IOException {
 		BlockStatement stm = new BlockStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		stm.psiTree = readPsiTree(inpt);
 		// *** BlockStatement
 		stm.blockDeclaration = (BlockDeclaration) inpt.readObj();

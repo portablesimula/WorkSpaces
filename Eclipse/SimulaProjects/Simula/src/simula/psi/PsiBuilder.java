@@ -1,9 +1,14 @@
 package simula.psi;
 
-import simula.compiler.syntaxClass.SyntaxClass;
+import java.util.Vector;
+
+import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.declaration.Declaration;
+import simula.compiler.syntaxClass.declaration.MaybeBlockDeclaration;
 import simula.compiler.syntaxClass.statement.BlockStatement;
 import simula.compiler.utilities.Html;
 import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.token.SimpleString;
@@ -47,22 +52,23 @@ public class PsiBuilder {
     	}
     }
 
-    /// Invariant: Lexer'currentLexerToken is a ParserToken
+    ///  ????  ?????
     /// 
-    /// Invariant: Lexer'currentLexerToken is first token of construct
-    ///            I.e: lexer.currentLexerToken.keyWord == parameter'keyWord'
+    ///  Invariant: Lexer'currentLexerToken is a ParserToken
+    /// 
+    /// Invariant: Lexer'parserToken is first token of construct
     /// 
     public void startSubtree(PsiTree.Kind kind, String debugName) {
-    	lexer.snapShot("StartSubTree "+debugName);
-		getParserToken(); // Get next Parser Token while skipped LexTokens are added to current psiTree.
-    	LexToken checkPoint = lexer.getCurrentLexerToken();
-//    	LexToken checkPoint = lexer.getPrevParserToken();
-//    	int startOffset = lexer.getCurrentPosition();
-    	int startOffset = lexer.getCurrentLexerToken().startOffset;
+    	LexToken checkPoint = this.getCurrentParserToken();
+//		IO.println("\n\nPsiBuilder.startSubtree: "+debugName+", CHECKPOINT: "+checkPoint+" CALLED FROM: "+Util.calledFrom(3,6));
+//    	lexer.snapShot("START SubTree: "+ lexer.getCurrentLexerToken()+ " " + debugName);
+    	int startOffset = checkPoint.startOffset;
     	
+//		getCurrentParserToken(); // Get next Parser Token while skipped LexTokens are added to current psiTree.
 //		psiTree = new PsiTree(debugName, startOffset, getSourceLineNumber(), psiTree);
 		psiTree = new PsiTree(psiTree, getSourceLineNumber(), sourceText, startOffset, debugName);
 		psiTree.kind = kind;
+		psiTree.checkPoint = checkPoint;
 		psiTree.parent.addChild(psiTree);
 		if(Option.TRACE_PSITREE_START_DONE > 0) {
 			String ID = ""+psiTree.level()+':'+kind+"]: "+debugName;
@@ -75,24 +81,51 @@ public class PsiBuilder {
 		IO.println("PsiBuilder.startSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+", checkPoint: "+checkPoint+" CALLED FROM: "+Util.calledFrom(3,6));
 	}
 		
-	public void doneSubtree(PsiTree.Kind kind, SyntaxClass element) {
-		IO.println("PsiBuilder.doneSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+", CALLED FROM: "+Util.calledFrom(3,6));
+	public void doneSubtree(PsiTree.Kind kind, SyntaxElement syntaxElement) {
+		Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
+		syntaxElements.add(syntaxElement);
+		doneSubtree(kind, syntaxElements);
+	}
+	
+	public void doneSubtree(PsiTree.Kind kind, Vector<SyntaxElement> syntaxElements) {
+		IO.println("\n\nPsiBuilder.doneSubtree["+psiTree.level()+':'+kind+"]: "+psiTree.edChildrenText()+" CALLED FROM: "+Util.calledFrom(3,6));
+//		IO.println("PsiBuilder.doneSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+", CALLED FROM: "+Util.calledFrom(3,6));
 		if(psiTree.kind != kind) {
-			IO.println("PsiBuilder.doneSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+" "+element.getClass().getSimpleName()+"="+element+", CALLED FROM: "+Util.calledFrom(3,6));
+//			IO.println("PsiBuilder.doneSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+" "+syntaxElement.getClass().getSimpleName()+"="+syntaxElement+", CALLED FROM: "+Util.calledFrom(3,6));
 			psiTree.printAncesterChain("");
 //			Util.IERR("PsiBuilder.doneSubtree: Wrong top PsiTree kind: " + psiTree.kind + ", expected: " + kind);
 			Util.IERR("PsiBuilder.doneSubtree: Can't terminate PsiTree as kind: " + kind + ", because top kind = " + psiTree.kind + " " + psiTree.debugName);
 //			Util.STOP();
 		}
 		if(Option.TRACE_PSITREE_START_DONE > 0) {
-			IO.println("PsiBuilder.doneSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+" "+element.getClass().getSimpleName()+"="+element+", CALLED FROM: "+Util.calledFrom(3,6));
+//			IO.println("PsiBuilder.doneSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+" "+syntaxElement.getClass().getSimpleName()+"="+syntaxElement+", CALLED FROM: "+Util.calledFrom(3,6));
+		}
+		boolean TESTING = true;
+		if(TESTING) {
+			for(SyntaxElement syntaxElement:syntaxElements) {
+				if(syntaxElement instanceof Declaration) {
+					// Testing Declaration END-Condition
+					LexToken token = this.psiTree.getLastChild();
+					if(token != null) {
+						int keyWord = token.keyWord;
+						if(keyWord == KeyWord.SEMICOLON)  ; // OK
+//						else if(keyWord == KeyWord.COMMA) ; // OK
+						else {
+							Util.IERR("PsiBuilder.doneSubtree:  Wrong termination of " + syntaxElement.getClass().getSimpleName()+" lastChild="+token+" Should be ;");
+						}
+					}
+				}
+			}
 		}
 		
 		psiTree.endOffset = psiTree.getEndOffset();
-        element.psiTree = psiTree;
-        psiTree.syntaxClass = element;
+		for(SyntaxElement syntaxElement:syntaxElements) {
+			syntaxElement.psiTree = psiTree;
+		}
+//        psiTree.syntaxClass = syntaxElement;
+//        psiTree.syntaxElements.add(syntaxElement);
+        psiTree.syntaxElements = syntaxElements;
 		
-		boolean TESTING = true;
 		if(TESTING) {
 			String text = psiTree.getText().replace("\n", "\\n").replace("\r", "\\r");
 			String original = psiTree.getOriginalText().replace("\n", "\\n").replace("\r", "\\r");
@@ -100,16 +133,26 @@ public class PsiBuilder {
 				System.err.println("PsiBuilder.doneSubtree: "+psiTree.debugName+": created  text: "+text);
 				System.err.println("PsiBuilder.doneSubtree: "+psiTree.debugName+": original text: "+original);					
 				Util.IERR("Resulting text differ from original text");
+				Util.STOP();
 			}
 		}
 		
-		if(element instanceof BlockStatement blk) {
-	        psiTree.debugName = psiTree.debugName + " ==> " + Html.styledText(Html.styleKeyWord, blk.psiKind());
-		} else
-        psiTree.debugName = psiTree.debugName + " ==> " + Html.styledText(Html.styleKeyWord, element.getClass().getSimpleName());
+//		for(SyntaxElement syntaxElement:syntaxElements) {
+		SyntaxElement syntaxElement = syntaxElements.firstElement();
+			if(syntaxElement instanceof BlockStatement blk) {
+//		        psiTree.debugName = psiTree.debugName + " ==> " + Html.styledText(Html.styleKeyWord, blk.psiKind());
+		        psiTree.debugName = Html.styledText(Html.styleKeyWord, blk.psiKind());
+			} else if(syntaxElement instanceof MaybeBlockDeclaration blk && blk.declarationKind == ObjectKind.SimulaProgram) {
+//				psiTree.debugName = psiTree.debugName + " ==> " + Html.styledText(Html.styleKeyWord, "SimulaProgram");				
+				psiTree.debugName = Html.styledText(Html.styleKeyWord, "SimulaProgram");				
+			} else {
+//				psiTree.debugName = psiTree.debugName + " ==> " + Html.styledText(Html.styleKeyWord, syntaxElement.getClass().getSimpleName());
+				psiTree.debugName = Html.styledText(Html.styleKeyWord, syntaxElement.getClass().getSimpleName());
+			}
+//		}
         
 		if(Option.TRACE_PSITREE_START_DONE > 1) {
-        IO.println("PsiBuilder.doneSubtree: "+element.getClass().getSimpleName()+"'PSITree = "+psiTree);
+//        IO.println("PsiBuilder.doneSubtree: "+syntaxElement.getClass().getSimpleName()+"'PSITree = "+psiTree);
 			if(Option.TRACE_PSITREE_START_DONE > 1) {
 		        psiTree.printPsiTree("============================ doneSubtree: " + psiTree.debugName);
 		        psiRoot.printPsiTree("============================ doneSubtree: ROOT " + psiRoot.debugName);
@@ -119,32 +162,35 @@ public class PsiBuilder {
 	}
 	
 	public void dropSubtree(PsiTree.Kind kind, String debugName) {
-		IO.println("PsiBuilder.dropSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+" CALLED FROM: "+Util.calledFrom(3,6));
+		IO.println("\n\nPsiBuilder.dropSubtree["+psiTree.level()+':'+kind+"]: "+psiTree.edChildrenText()+" CALLED FROM: "+Util.calledFrom(3,6));
+//    	lexer.snapShot("DROP SubTree: "+ lexer.getCurrentLexerToken()+ " " + debugName);
+//		IO.println("PsiBuilder.dropSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+" CALLED FROM: "+Util.calledFrom(3,6));
 		if(psiTree.kind != kind) {
 			IO.println("PsiBuilder.dropSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+" CALLED FROM: "+Util.calledFrom(3,6));
 			psiTree.printAncesterChain("");
 			Util.IERR("PsiBuilder.dropSubtree: Wrong PsiTree kind: " + kind + ", expected: " + psiTree.kind);
 			Util.STOP();
 		}
-//		if(Option.TRACE_PSITREE_START_DONE > 0) {
+		if(Option.TRACE_PSITREE_START_DONE > 0) {
 			IO.println("\n\nPsiBuilder.dropSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+" CALLED FROM: "+Util.calledFrom(3,6));
 			IO.println("PsiBuilder.dropSubtree: CurrentLexerToken=" + lexer.getCurrentLexerToken());
-//			if(Option.TRACE_PSITREE_START_DONE > 1) {
+			if(Option.TRACE_PSITREE_START_DONE > 1) {
 //				IO.println("============================================= DROP SUB-TREE ====================================================================");
 //				psiTree.printPsiTree("============================ dropSubtree: " + psiTree.debugName);
 				psiRoot.printPsiTree("============================ dropSubtree: ROOT TREE BEFORE DROP TREE: "+psiTree.debugName+debugName+" CurrentLexerToken=" + lexer.getCurrentLexerToken());
-//			}
-//		}
+			}
+		}
 		
 		if(! psiTree.isEmpty()) {
-			lexer.setNextLexerToken("dropSubTree", psiTree);
+			lexer.resetCheckPoint("dropSubTree", psiTree);
 		}
 		
 		psiTree.parent.removeLastChild();
         psiTree = psiTree.parent;
-//		if(Option.TRACE_PSITREE_START_DONE > 1) {
+		if(Option.TRACE_PSITREE_START_DONE > 1) {
 			psiRoot.printPsiTree("============================ dropSubtree: ROOT TREE AFTER DROP TREE: "+psiTree.debugName+" CurrentLexerToken=" + lexer.getCurrentLexerToken());
-//		}
+		}
+//    	lexer.snapShot("END DROP SubTree: "+ lexer.getCurrentLexerToken()+ " " + debugName);
 	}
 	
 	public void advanceLexer() {
@@ -155,7 +201,7 @@ public class PsiBuilder {
 	}
 	
 	public void consume(int... keyWords) {
-		LexToken lexToken = getParserToken();
+		LexToken lexToken = getCurrentParserToken();
 //		IO.println("PsiBuilder.consume: lexToken=" + KeyWord.edit(lexToken.keyWord));
 		boolean OK = false;
 		LOOP:for(int keyWord:keyWords) {
@@ -196,7 +242,7 @@ public class PsiBuilder {
 		IO.println("PsiBuilder.rollBackTo: "+prev);
 		IO.println("PsiBuilder.rollBackTo: CurrentLexerToken: "+getCurrentLexerToken());
 		IO.println("PsiBuilder.rollBackTo: LastParserChild: "+psiTree.getLastParserChild());
-		psiTree.printPsiTree("PsiBuilder.rollBackTo: "+prev);
+//		psiTree.printPsiTree("PsiBuilder.rollBackTo: "+prev);
 		LOOP:while(true) {
 			IO.println("PsiBuilder.rollBackTo: REMOVE: last="+psiTree.getLastChild());
 			if(psiTree.removeLastChild() == prev) break LOOP;
@@ -216,7 +262,6 @@ public class PsiBuilder {
 	}
 
 	public boolean eof() {
-		// TODO Auto-generated method stub
 		return getCurrentLexerToken() == null;
 	}
 
@@ -224,24 +269,26 @@ public class PsiBuilder {
 		return lexer.getCurrentLexerToken();
 	}
 
+	/// Return next 'Parser' token.
+	/// Skip Comment, Whitespace and Newline tokens.
+    public LexToken getNextParserToken() {
+    	// if(DEBUG > 1) IO.println("PsiBuilder.getNextParserToken: "+currentLexerToken);
+    	Util.IERR("DENNE ER IKKE BRUKT FØR - MÅ SJEKKES");
+    	getCurrentParserToken();
+    	advanceLexer();
+    	return getCurrentParserToken();
+    }
+
 	/// Return current 'Parser' token.
 	/// Skip Comment, Whitespace and Newline tokens.
-//    public LexToken getParserToken() {
-//    	return lexer.getParserToken(psiTree);
-//    }
-    public LexToken getParserToken() {
-    	// if(DEBUG > 1) IO.println("PsiBuilder.getParserToken: "+currentLexerToken);
+    public LexToken getCurrentParserToken() {
+    	// if(DEBUG > 1) IO.println("PsiBuilder.getCurrentParserToken: "+currentLexerToken);
         while(true) {
     		LexToken token = getCurrentLexerToken();
-//        	IO.println("PsiBuilder.getParserToken: "+token);
     		if(token == null) {
-//    			public LexToken(int tokenStartLine, CharSequence sourceText, int startOffset, int endOffset, int keyWord) {
     			token = lexer.getEOFToken();
-//    			return null;
     		}
         	if(token.isParserToken()) return token;
-//        	IO.println("PsiBuilder.getParserToken: SKIP TOKEN: "+token);
-//        	psiTree.addChild(token);
         	advanceLexer();
 		}
     }
@@ -259,8 +306,8 @@ public class PsiBuilder {
 //		LexToken nextToken = prevToken;
 //		IO.println("\n\nPsiBuilder.getTextString: nextToken: "+nextToken);
 		String result = ((SimpleString)prevToken).value;
-//    	while((nextToken=getParserToken()) instanceof SimpleString str) {
-    	while(getParserToken() instanceof SimpleString str) {
+//    	while((nextToken=getCurrentParserToken()) instanceof SimpleString str) {
+    	while(getCurrentParserToken() instanceof SimpleString str) {
     		result += str.value;
 //       	IO.println("PsiBuilder.getTextString: RESULT: "+result);
 //        	IO.println("PsiBuilder.getTextString: NEXT TOKEN: "+nextToken);
@@ -271,12 +318,12 @@ public class PsiBuilder {
     }
 //    private String OLD_getTextString(LexToken prevToken) {
 //		LexToken nextToken = prevToken;
-////		LexToken nextToken = getParserToken();
+////		LexToken nextToken = getCurrentParserToken();
 //		IO.println("\n\nPsiBuilder.getTextString: nextToken: "+nextToken);
 //		String result = "";
 //    	while(nextToken instanceof SimpleString str) {
 //    		result += str.value;
-//    		nextToken = getParserToken();
+//    		nextToken = getCurrentParserToken();
 //        	advanceLexer();
 //        	IO.println("PsiBuilder.getTextString: RESULT: "+result);
 //        	IO.println("PsiBuilder.getTextString: NEXT TOKEN: "+nextToken);

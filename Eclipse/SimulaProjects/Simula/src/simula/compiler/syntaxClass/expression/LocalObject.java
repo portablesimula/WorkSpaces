@@ -15,7 +15,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.ConnectionBlock;
@@ -201,7 +201,7 @@ public final class LocalObject extends Expression {
 		Util.TRACE_OUTPUT("writeLocalObject: " + this);
 		oupt.writeKind(ObjectKind.LocalObject);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -217,11 +217,11 @@ public final class LocalObject extends Expression {
 	public static LocalObject readObject(AttributeInputStream inpt) throws IOException {
 		LocalObject expr = new LocalObject();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxClass) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** LocalObject
 		expr.classIdentifier = inpt.readString();
 		Util.TRACE_INPUT("readLocalObject: " + expr);

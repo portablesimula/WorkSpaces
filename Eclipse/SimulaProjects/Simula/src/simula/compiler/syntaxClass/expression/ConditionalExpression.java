@@ -15,7 +15,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
@@ -149,7 +149,7 @@ public final class ConditionalExpression extends Expression {
 		Util.TRACE_OUTPUT("writeConditionalExpression: " + this);
 		oupt.writeKind(ObjectKind.ConditionalExpression);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -167,11 +167,11 @@ public final class ConditionalExpression extends Expression {
 	public static ConditionalExpression readObject(AttributeInputStream inpt) throws IOException {
 		ConditionalExpression expr = new ConditionalExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxClass) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** ConditionalExpression
 		expr.condition = (Expression) inpt.readObj();
 		expr.thenExpression = (Expression) inpt.readObj();

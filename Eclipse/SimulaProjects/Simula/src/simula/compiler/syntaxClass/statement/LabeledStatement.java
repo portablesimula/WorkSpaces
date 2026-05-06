@@ -139,7 +139,7 @@ public final class LabeledStatement extends Statement {
 		Util.TRACE_OUTPUT("writeLabeledStatement: " + this);
 		oupt.writeKind(ObjectKind.LabeledStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** LabeledStatement
 		oupt.writeObj(statement);
@@ -154,7 +154,7 @@ public final class LabeledStatement extends Statement {
 	public static LabeledStatement readObject(AttributeInputStream inpt) throws IOException {
 		LabeledStatement stm = new LabeledStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		stm.psiTree = readPsiTree(inpt);
 		// *** LabeledStatement
 		stm.statement = (Statement) inpt.readObj();

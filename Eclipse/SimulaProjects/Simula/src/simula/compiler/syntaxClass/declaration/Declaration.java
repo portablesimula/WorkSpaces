@@ -10,7 +10,7 @@ import java.lang.classfile.CodeBuilder;
 import java.util.Vector;
 
 import simula.compiler.syntaxClass.ProtectedSpecification;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.Global;
@@ -44,7 +44,7 @@ import simula.psi.PsiTree;
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public abstract class Declaration extends SyntaxClass {
+public abstract class Declaration extends SyntaxElement {
 
 	/// The type
 	public Type type = null;
@@ -132,23 +132,19 @@ public abstract class Declaration extends SyntaxClass {
 	/// Parse a declaration and add it to the given declaration list.
 	/// @param enclosure the owning block.
 	/// @return true if a declaration was found, false otherwise
-	private static boolean acceptDeclaration(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
+	protected static boolean acceptDeclaration(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse Declaration");
+		IO.println("Declaration.acceptDeclaration: enclosure: " + enclosure);
 		DeclarationList declarationList=enclosure.declarationList;
 		LexToken maybePrefix = PsiParse.acceptIdentifier(psiBuilder);
+		IO.println("Declaration.acceptDeclaration: maybePrefix: " + maybePrefix);
 		if (maybePrefix != null) {
 			if (PsiParse.accept(psiBuilder, KeyWord.CLASS))
 				declarationList.add(ClassDeclaration.expectClassDeclaration(psiBuilder, maybePrefix.getText()));
 			else {
-//				if(! Option.TESTING_DROP_TREE) {
-//					PsiParse.rollBackIdentifier(psiBuilder, maybePrefix, " is NOT a class prefix"); // Identifier is NOT a class prefix.
-//				}
-//				else Thread.dumpStack();
-				psiBuilder.dropSubtree(PsiTree.Kind.label, " s NOT a class prefix");
-//				psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
-
-				IO.println("Declaration.acceptDeclaration: " + maybePrefix + " is NOT a class prefix");
+//				psiBuilder.dropSubtree(PsiTree.Kind.declaration, " is NOT a class prefix. Ie. is not a Declaration");
+				IO.println("Declaration.acceptDeclaration: " + maybePrefix + " is NOT a class prefix. Ie. is not a Declaration");
 				return (false);
 			}
 		} else if (PsiParse.accept(psiBuilder, KeyWord.ARRAY))
@@ -167,9 +163,9 @@ public abstract class Declaration extends SyntaxClass {
 			if (ident == null) {
 				// Switch Statement
 //				PsiParse.rollBackIdentifier(psiBuilder, ident, " HVA GJØR VI HER");
-				Util.IERR("HVA GJØR VI HER");
-				Util.STOP();
-				return (false);
+//				Util.IERR("HVA GJØR VI HER");
+//				Util.STOP();
+				return false;
 			}
 			declarationList.add(new SwitchDeclaration(psiBuilder, ident.getText()));
 		} else if (PsiParse.accept(psiBuilder, KeyWord.EXTERNAL))
@@ -178,7 +174,7 @@ public abstract class Declaration extends SyntaxClass {
 			Type type = PsiParse.acceptType(psiBuilder);
 			if (type == null) {
 //				psiBuilder.dropSubtree();
-				return (false);
+				return false;
 			}
 			if (PsiParse.accept(psiBuilder, KeyWord.PROCEDURE)) {
 //				Util.IERR("NOT IMPL");
@@ -197,17 +193,32 @@ public abstract class Declaration extends SyntaxClass {
 		return (true);
 	}
 
+	//	subblock = block-head ; compound-tail
+	//	block-head
+	//	= begin declaration { ; declaration }
+	//	compound-statement
+	//	= begin compound-tail
+	//	compound-tail
+	//	= statement { ; statement } end
+	
+	/// NOTE:
+	/// 
+	///    subblock           = begin declaration { ; declaration } ; statement { ; statement } end
+	///    compound-statement = begin                                 statement { ; statement } end
+	///
+	/// ==>   block = begin { declaration ; } statement { ; statement } end
+	
+	///
+	/// 
 	/// Repeatedly parse a declaration and add it to the given BlockDeclaration's' declaration list.
 	/// Continue until there are no more declarations.
+	/// 
+	/// 
 	/// @param enclosure the owning block.
 	protected static void acceptDeclarations(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
-		psiBuilder.startSubtree(PsiTree.Kind.declaration, "Declaration");
-		while (Declaration.acceptDeclaration(psiBuilder, enclosure)) {
-			PsiParse.accept(psiBuilder, KeyWord.SEMICOLON);
-//			psiBuilder.doneSubtree(PsiTree.Kind.declaration, typeDeclaration);
-//			psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
-		}
-		psiBuilder.dropSubtree(PsiTree.Kind.declaration, " is not a Declaration");
+		psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be first Declaration");
+		while (Declaration.acceptDeclaration(psiBuilder, enclosure)) {}
+		psiBuilder.dropSubtree(PsiTree.Kind.declaration, " is not a Declaration: DROP LAST MAYBE DECLARATION TREE");
 	}
 
 	// ***********************************************************************************************

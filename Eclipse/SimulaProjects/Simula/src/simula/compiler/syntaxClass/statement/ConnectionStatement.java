@@ -132,9 +132,6 @@ public final class ConnectionStatement extends Statement {
 	/// @param line the source line number
 	ConnectionStatement(final PsiBuilder psiBuilder) {
 		super(psiBuilder.psiTree);
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.startSubtree(PsiTree.Kind.connectionStatement, "ConnectionStatement");
-		}
 		psiBuilder.consume(KeyWord.INSPECT); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
@@ -187,9 +184,6 @@ public final class ConnectionStatement extends Statement {
 		this.hasWhenPart=hasWhenPart;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Line "+this.firstLineNumber()+": ConnectionStatement: "+this);
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.doneSubtree(PsiTree.Kind.connectionStatement, this);
-		}
 	}
 
 	@Override
@@ -338,7 +332,7 @@ public final class ConnectionStatement extends Statement {
 		Util.TRACE_OUTPUT("writeConnectionStatement: " + this);
 		oupt.writeKind(ObjectKind.ConnectionStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** ConnectionStatement
 		oupt.writeObj(objectExpression);
@@ -357,7 +351,7 @@ public final class ConnectionStatement extends Statement {
 	public static ConnectionStatement readObject(AttributeInputStream inpt) throws IOException {
 		ConnectionStatement stm = new ConnectionStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		stm.psiTree = readPsiTree(inpt);
 		// *** ConnectionStatement
 		stm.objectExpression = (Expression) inpt.readObj();

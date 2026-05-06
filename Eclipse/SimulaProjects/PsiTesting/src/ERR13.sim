@@ -1,0 +1,10 @@
+begin
+  outtext("aaa"
+
+    comment xxxx;
+    "bbb" -- eeee
+    
+    "ccc"
+    );
+
+end;

@@ -61,10 +61,6 @@ public final class ConditionalStatement extends Statement {
 	/// @param line the source line number
 	ConditionalStatement(PsiBuilder psiBuilder) {
 		super(psiBuilder.psiTree);
-
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.startSubtree(PsiTree.Kind.conditionalStatement, "ConditionalStatement");
-		}
 		int lno = psiBuilder.getSourceLineNumber();
 //		IO.println("NEW ConditionalStatement: "+psiBuilder.getSourceLineNumber());
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN IfStatement: ");
@@ -83,14 +79,6 @@ public final class ConditionalStatement extends Statement {
 		    }
 		}
 		this.elseStatement=elseStatement;
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.doneSubtree(PsiTree.Kind.conditionalStatement, this);
-		}
-//		IO.println("NEW ConditionalStatement: firstLineNumber: "+psiTree.firstLineNumber());
-//		IO.println("NEW ConditionalStatement: lastLineNumber: "+psiTree.lastLineNumber());
-//		psiTree.printPsiTree("NEW ConditionalStatement: ZZZZZ");
-		
-//		Util.ASSERT(psiTree.firstLineNumber() == lno, "NEW ConditionalStatement: firstLineNumber="+psiTree.firstLineNumber()+" equals lno="+lno);
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Line " + psiBuilder.getSourceLineNumber() + ": DONE IfStatement started at line: " + lno + ": " + this);
 	}
@@ -198,7 +186,7 @@ public final class ConditionalStatement extends Statement {
 		Util.TRACE_OUTPUT("writeConditionalStatement: " + this);
 		oupt.writeKind(ObjectKind.ConditionalStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** ConditionalStatement
 		oupt.writeObj(condition);
@@ -213,7 +201,7 @@ public final class ConditionalStatement extends Statement {
 	public static ConditionalStatement readObject(AttributeInputStream inpt) throws IOException {
 		ConditionalStatement stm = new ConditionalStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		stm.psiTree = readPsiTree(inpt);
 		// *** ConditionalStatement
 		stm.condition = (Expression) inpt.readObj();

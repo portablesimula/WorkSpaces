@@ -63,18 +63,12 @@ public final class GotoStatement extends Statement {
 	/// @param line source line
 	GotoStatement(final PsiBuilder psiBuilder, final int keyWord) {
 		super(psiBuilder.psiTree);
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.startSubtree(PsiTree.Kind.gotoStatement, "GotoStatement");
-		}
 		psiBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to 'current tree')
 		if(keyWord != KeyWord.GOTO) {
 	        if (!PsiParse.accept(psiBuilder, KeyWord.TO))	Util.error("Missing 'TO' after 'GO'");
 		}
 		label = Expression.expectExpression(psiBuilder);
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+this.firstLineNumber()+": GotoStatement: "+this);
-		if(! Option.TESTING_STATEMENT) {
-			psiBuilder.doneSubtree(PsiTree.Kind.gotoStatement, this);
-		}
 	}
 
 	@Override
@@ -149,7 +143,7 @@ public final class GotoStatement extends Statement {
 		Util.TRACE_OUTPUT("writeGotoStatement: " + this);
 		oupt.writeKind(ObjectKind.GotoStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** GotoStatement
 		oupt.writeObj(label);
@@ -162,7 +156,7 @@ public final class GotoStatement extends Statement {
 	public static GotoStatement readObject(AttributeInputStream inpt) throws IOException {
 		GotoStatement stm = new GotoStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		stm.psiTree = readPsiTree(inpt);
 		// *** GotoStatement
 		stm.label = (Expression) inpt.readObj();

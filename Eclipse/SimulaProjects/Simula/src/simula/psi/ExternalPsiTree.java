@@ -1,7 +1,5 @@
 package simula.psi;
 
-import simula.compiler.utilities.Util;
-
 //public class ExternalPsiTree extends PsiElement {
 public class ExternalPsiTree extends PsiTree {
 	int lastLine;
@@ -12,7 +10,7 @@ public class ExternalPsiTree extends PsiTree {
 		super(null, firstLineNumber, null, 0, debugName);
 //		this.lineNumber = firstLineNumber;
 		this.lastLine = lastLineNumber;
-		Util.IERR("DETTE MÅ SJEKKES");
+//		Util.IERR("NEW ExternalPsiTree: DETTE MÅ SJEKKES");
 	}
 
 	@Override

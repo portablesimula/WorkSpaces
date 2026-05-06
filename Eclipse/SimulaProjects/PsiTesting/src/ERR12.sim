@@ -1,0 +1,6 @@
+begin
+          if realdiff then
+          begin
+             outimage; outimage
+          end if
+end;

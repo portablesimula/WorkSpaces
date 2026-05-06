@@ -16,7 +16,7 @@ import java.util.Vector;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
@@ -236,9 +236,9 @@ public class LabelList {
 	/// @param owner the BlockDeclaration owning this LabelList
 	public void printTree(final int indent, final BlockDeclaration owner) {
 		if(Option.internal.PRINT_SYNTAX_TREE > 2) {
-			IO.println(SyntaxClass.edIndent(indent)+this);
+			IO.println(SyntaxElement.edIndent(indent)+this);
 		} else {
-			IO.println(SyntaxClass.edIndent(indent) + "LabelList with " + (declaredLabels.size()) + " DeclaredLabels ...");
+			IO.println(SyntaxElement.edIndent(indent) + "LabelList with " + (declaredLabels.size()) + " DeclaredLabels ...");
 		}
 	}
 	

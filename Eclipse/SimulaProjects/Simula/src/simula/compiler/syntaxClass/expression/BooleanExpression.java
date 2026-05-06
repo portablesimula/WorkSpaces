@@ -15,7 +15,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
@@ -284,7 +284,7 @@ public final class BooleanExpression extends Expression {
 		Util.TRACE_OUTPUT("writeBooleanExpression: " + this);
 		oupt.writeKind(ObjectKind.BooleanExpression);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -302,11 +302,11 @@ public final class BooleanExpression extends Expression {
 	public static BooleanExpression readObject(AttributeInputStream inpt) throws IOException {
 		BooleanExpression expr = new BooleanExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxClass) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** BooleanExpression
 		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();

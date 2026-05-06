@@ -5,9 +5,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,15 +17,21 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Html;
-import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.Util;
 
 public class PsiTree extends PsiElement {
-	public SyntaxClass syntaxClass;
+
+//	public SyntaxElement syntaxClass;
+	/// The SyntaxElement elements connected to this PsiTree
+	Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
+
 	protected final List<PsiElement> children = new ArrayList<>();
 //	private String error;
+	
+	public LexToken checkPoint;
 	
     public enum Kind { any,
     	// Declarations
@@ -73,16 +79,12 @@ public class PsiTree extends PsiElement {
 			return;
 		}
 //		IO.println("PsiTree.addChild: " + child.getClass().getSimpleName() + " " + child);
+		IO.println("PsiTree.addChild: " + debugName + ": " + edChildrenText());
 		children.add(child);
 	}
 	
 	public void addTree(PsiTree psiTree) {
-		
-//		for(PsiElement elt:psiTree.children) {
-//			children.add(elt);
-//		}
 		children.addAll(psiTree.children);
-	
 	}
 	
 	public boolean isEmpty() {
@@ -193,66 +195,19 @@ public class PsiTree extends PsiElement {
 		PsiElement psiElement = (PsiElement) last.getUserObject();
    		IO.println("PsiTree.doRenderPsiTreeAction: gotSingleClick: GOT PSI ELEMENT:  " + psiElement);
 		if(psiElement instanceof PsiTree psiTree) {
-			IO.println("PsiTree.doRenderPsiTreeAction: gotSingleClick: GOT SYNTAX CLASS: " + psiTree.syntaxClass.getClass().getSimpleName() + " " + psiTree.syntaxClass);
-			if(psiTree.syntaxClass != null) {
-//				psiTree.syntaxClass.printTree(1, "GOT SYNTAX CLASS: ");
-//				SyntaxTree syntaxTree = new SyntaxTree(psiTree.syntaxClass);
-//				syntaxTree.popUp(psiTree.toString());
-				popUpPsiPanel(psiElement);//(psiTree.toString());
+			for(SyntaxElement syntaxElement:psiTree.syntaxElements) {
+				IO.println("PsiTree.doRenderPsiTreeAction: gotSingleClick: GOT SYNTAX ELEMENT: " + syntaxElement.getClass().getSimpleName() + " " + syntaxElement);
+				if(syntaxElement != null) {
+					syntaxElement.popUpSyntaxPanel();
+				}
 			}
+			Util.IERR("DENNE MÅ SKRIVES OM MHT PsiTree.Vector<SyntaxElement> elements ");
 		}
 		
 //		Util.IERR("");
 	}
-	
-	
-	public void popUpPsiPanel(PsiElement elt) {
-//		JTree tree = this.doRenderPsiTreeAction();
-		JPanel panel = getPanel(elt);
-//		SwingUtilities.invokeLater(() -> {
-			JFrame frame = new JFrame("Program Structure Tree Info");
-			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	        try { frame.setIconImage(Global.favicon.getImage()); } 
-	        catch (Exception e) {}// Util.IERR("Impossible",e); }
 
-			JScrollPane scrollPane = new JScrollPane(panel);
-			frame.add(scrollPane, BorderLayout.CENTER);
-
-			frame.setSize(1000, 600);
-			frame.setLocationRelativeTo(null);
-			frame.setVisible(true);
-//		});
-	}
-	
-	private JPanel getPanel(PsiElement elt) {
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS)); // Vertical stacking
-		panel.add(new JLabel("Dette er label 1"));
-		panel.add(new JLabel("PsiElement: " + elt.getClass().getSimpleName()));
-		panel.add(new JLabel("DebugName: " + elt.debugName));
-		panel.add(new JLabel("Parent: " + elt.parent));
-		if(elt instanceof PsiTree psiTree) {
-			panel.add(new JLabel("SyntaxClass: " + psiTree.syntaxClass));
-			if(psiTree.syntaxClass != null) {
-				panel.add(new JLabel("SyntaxClass: " + psiTree.syntaxClass.getClass().getSimpleName() + " " + psiTree.syntaxClass));
-				panel.add(new JLabel("SyntaxClass.psiTree: " + psiTree.syntaxClass.getPsiTree()));
-				JButton button = new JButton("Open Syntax Tree");
-		        panel.add(button);
-		        
-		        button.addActionListener(e -> {
-		            System.out.println("Button was clicked!  elt: " + elt + e);
-	    			IO.println("PsiTree.doRenderPsiTreeAction: gotSingleClick: GOT SYNTAX CLASS: " + psiTree.syntaxClass.getClass().getSimpleName() + " " + psiTree.syntaxClass);
-					psiTree.syntaxClass.printTree(1, "GOT SYNTAX CLASS: ");
-	    			SyntaxTree syntaxTree = new SyntaxTree(psiTree.syntaxClass);
-	    			syntaxTree.popUp(toString());
-	//				popUpPsiPanel();//(psiTree.toString());
-		        });
-			}
-		}
-        return panel;
-	}
-
-	public void popUp() {
+	public void popUpPsiTree() {
 		JTree tree = this.doRenderPsiTreeAction();
 //		SwingUtilities.invokeLater(() -> {
 			JFrame frame = new JFrame("Program Structure Tree");
@@ -278,6 +233,14 @@ public class PsiTree extends PsiElement {
             sep = ", ";
         }
 		return sb.toString();
+	}
+	
+	public String edChildrenText() {
+		StringBuilder sb = new StringBuilder("\"");
+        for (PsiElement child : getChildren()) {
+            sb.append(child.getOriginalText());
+        }
+		return sb.toString().replace("\r", "\\r").replace("\n", "\\n") + '"';
 	}
 
 	public void printAncesterChain(String title) {
@@ -318,9 +281,12 @@ public class PsiTree extends PsiElement {
 	public String edPsiLine() {
 		int lno = this.firstLineNumber();
 		int lastLine = this.lastLineNumber();
-		String ID1 = (syntaxClass == null)? "" : "==> " + syntaxClass.getClass().getSimpleName();
+		
+		//String ID1 = (syntaxClass == null)? "" : "==> " + syntaxClass.getClass().getSimpleName();
+		
+		
 //		String ID = "PsiTree(" + debugName + ") " + ID1 + " Text=\"" + getText().replace("\n", "\\n").replace("\r", "\\r") + '"';
-		String ID = "PsiTree[" + startOffset + ':' + getEndOffset() + "]=" + debugName + " Text=" + getText().replace("\n", "\\n").replace("\r", "\\r") + '"';
+		String ID = "PsiTree[" + startOffset + ':' + getEndOffset() + "]=" + debugName + " Text=\"" + getText().replace("\n", "\\n").replace("\r", "\\r") + '"';
 		if(ID.length() > 200) ID = ID.substring(0, 200) + " ... Truncated";
 		StringBuilder sb = new StringBuilder();
 		if(lno > 0) {
@@ -333,7 +299,7 @@ public class PsiTree extends PsiElement {
 	}
 	
 	public String edHtmlLine() {
-		String ID = "PsiTree[" + startOffset + ':' + getEndOffset() + "]=" + debugName + " Text=" + getText().replace("\n", "\\n").replace("\r", "\\r") + '"';
+		String ID = "PsiTree[" + startOffset + ':' + getEndOffset() + "]=" + debugName + " Text=\"" + getText().replace("\n", "\\n").replace("\r", "\\r") + '"';
 		if(ID.length() > 200) ID = ID.substring(0, 200) + " ... Truncated";
 		int lno = this.firstLineNumber();
 		int lastLine = this.lastLineNumber();

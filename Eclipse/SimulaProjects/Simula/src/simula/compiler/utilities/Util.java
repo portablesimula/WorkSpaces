@@ -15,6 +15,8 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import simula.psi.LexToken;
+
 /// A set of all static Utility Methods
 /// 
 /// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/Util.java"><b>Source File</b></a>.
@@ -95,6 +97,17 @@ public final class Util {
 		String err = edLINE(": Error: " + msg);
 		nError++;
 		printError(err);
+	}
+
+	/// Print a error message.
+	/// @param msg the message
+	public static void error(final LexToken token, final String msg) {
+		int lno = Global.sourceLineNumber;
+		Global.sourceLineNumber = token.lineNumber;
+		String err = edLINE(": Error: " + msg);
+		nError++;
+		printError(err);
+		Global.sourceLineNumber = lno;
 	}
 
 	/// Exit with Thread.dumpStack

@@ -17,7 +17,7 @@ import javax.swing.tree.DefaultTreeModel;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.OverLoad;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.Type.ConversionKind;
 import simula.compiler.utilities.Global;
@@ -282,7 +282,7 @@ public final class TypeConversion extends Expression {
 		Util.TRACE_OUTPUT("writeTypeConversion: " + this);
 		oupt.writeKind(ObjectKind.TypeConversion);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		// *** Expression
 		oupt.writeType(type);
@@ -298,11 +298,11 @@ public final class TypeConversion extends Expression {
 	public static TypeConversion readObject(AttributeInputStream inpt) throws IOException {
 		TypeConversion expr = new TypeConversion();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxClass
+		// *** SyntaxElement
 		expr.psiTree = readPsiTree(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxClass) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** TypeConversion
 		expr.expression = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("readTypeConversion: " + expr);

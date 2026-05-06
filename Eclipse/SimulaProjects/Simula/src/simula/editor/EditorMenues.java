@@ -599,8 +599,9 @@ public class EditorMenues extends JMenuBar {
 		SwingUtilities.invokeLater(() -> {
 			Option.internal.DEBUGGING=false;
 			SourceTextPanel current=SimulaEditor.currentTextPanel;			
+			current.moduleManager.dropPsiTree();
 			PsiTree psiTree = current.moduleManager.getPsiTree();
-			psiTree.popUp();
+			psiTree.popUpPsiTree();
 		});
 	}
 	

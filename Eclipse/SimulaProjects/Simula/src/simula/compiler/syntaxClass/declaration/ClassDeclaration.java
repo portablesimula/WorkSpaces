@@ -136,6 +136,10 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// Possible statements before inner.
 	/// If this is non-null then 'statements' contains the statements after inner
 	public ObjectList<Statement> statements1; // Statement code before inner
+	
+	/// Returns true iff this class has an explicit inner statement
+	/// @return true iff this class has an explicit inner statement
+	public boolean hasInner() {	return statements1 != null;	}
 
 	/// Class Prefix in case of a SubClass or Prefixed Block.
 	public String prefix;
@@ -205,8 +209,11 @@ public class ClassDeclaration extends BlockDeclaration {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Line " + cls.firstLineNumber() + ": ClassDeclaration: " + cls);
 		Global.setScope(cls.declaredIn);
+		
+		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
+
 		psiBuilder.doneSubtree(PsiTree.Kind.declaration, cls);
-		psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
+		psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be NextDeclaration");
 		return (cls);
 	}
 
@@ -398,37 +405,41 @@ public class ClassDeclaration extends BlockDeclaration {
 
 	private static void expectClassBody(final PsiBuilder psiBuilder, ClassDeclaration cls) {
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGIN)) {
-			Statement stm;
 			if (Option.internal.TRACE_PARSE)
 				PsiParse.TRACE("Parse Block");
-//			while (Declaration.acceptDeclaration(psiBuilder, cls)) {
-//				PsiParse.accept(psiBuilder, KeyWord.SEMICOLON);
-//			}
-			Declaration.acceptDeclarations(psiBuilder, cls);
-			boolean seen = false;
-			while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
-				stm = Statement.acceptStatement(psiBuilder);
-				if (stm != null)
-					cls.statements.add(stm);
-				if (PsiParse.accept(psiBuilder, KeyWord.INNER)) {
-					if (seen)
-						Util.error("Max one INNER per Block");
-					else
-						cls.statements.add(InnerStatement.ofExplicit(psiBuilder));
-					seen = true;
+			
+			if(Option.TESTING_BLOCKS) {
+				cls.parseBlock(psiBuilder);
+				if(! cls.hasInner()) {
+					IO.println("ClassDeclaration.expectClassBody: ADD IMPLICIT INNER");
+					cls.statements.add(new InnerStatement(psiBuilder, false)); // Implicit INNER
 				}
+			} else {
+				Declaration.acceptDeclarations(psiBuilder, cls);
+				boolean seen = false;
+				while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
+					Statement stm = Statement.acceptStatement(psiBuilder);
+					if (stm != null)
+						cls.statements.add(stm);
+					if (PsiParse.accept(psiBuilder, KeyWord.INNER)) {
+						if (seen)
+							Util.error("Max one INNER per Block");
+						else
+							cls.statements.add(new InnerStatement(psiBuilder, false));
+						seen = true;
+					}
+				}
+				if (PsiParse.prevToken(psiBuilder).keyWord == KeyWord.EOF) {
+					Util.error("Illegal termination of class declaration. Missing END.");
+				}
+				if (!seen)
+					cls.statements.add(new InnerStatement(psiBuilder, false)); // Implicit INNER
 			}
-			if (PsiParse.prevToken(psiBuilder).keyWord == KeyWord.EOF) {
-				Util.error("Illegal termination of class declaration. Missing END.");
-			}
-			if (!seen)
-				cls.statements.add(InnerStatement.ofImplicit(psiBuilder)); // Implicit INNER
-		}
-		else {
-//			if(PsiParse.currentToken(psiBuilder).keyWord != KeyWord.SEMICOLON)
-			if(PsiParse.getParserToken(psiBuilder).keyWord != KeyWord.SEMICOLON)
+		} else {
+			if(PsiParse.getCurrentParserToken(psiBuilder).keyWord != KeyWord.SEMICOLON)
 				cls.statements.add(Statement.acceptStatement(psiBuilder));
-			cls.statements.add(InnerStatement.ofImplicit(psiBuilder)); // Implicit INNER
+			if(! cls.hasInner())
+				cls.statements.add(new InnerStatement(psiBuilder, false)); // Implicit INNER
 		}
 	}
 
@@ -1503,7 +1514,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	}
 
 	@Override
-	public JPanel getPanel() {
+	public JPanel getSyntaxPanel() {
 		String[] table = {
 				"  declarationKind:",	""+declarationKind+":"+ObjectKind.edit(declarationKind),
 				"  declarationClass:",	""+this.getClass().getSimpleName(),
@@ -1544,7 +1555,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		oupt.writeString(identifier);
 		oupt.writeShort(OBJECT_SEQU);
 		
-		// *** SyntaxClass
+		// *** SyntaxElement
 		writePsiTree(oupt);
 		
 		// *** Declaration
@@ -1586,7 +1597,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		cls.declarationKind = ObjectKind.Class;
 		cls.OBJECT_SEQU = inpt.readSEQU(cls);
 		
-		// *** SyntaxClass
+		// *** SyntaxElement
 		cls.psiTree = readPsiTree(inpt);
 		
 		// *** Declaration
