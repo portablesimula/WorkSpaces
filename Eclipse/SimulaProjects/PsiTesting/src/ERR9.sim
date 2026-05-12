@@ -1,7 +1,9 @@
+class catch;
 begin
    class private; begin
       procedure char(int); integer int; begin
          integer case;
+         break: outint(int, 0);
       end;
    end;
 

@@ -22,8 +22,6 @@ import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
-import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Inner Statement.
@@ -58,8 +56,8 @@ public final class InnerStatement extends Statement {
 	public InnerStatement(final PsiBuilder psiBuilder, boolean explicit) {
 		super(psiBuilder.psiTree);
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": InnerStatement: "+this);
-		IO.println("NEW InnerStatement: Line "+firstLineNumber()+": InnerStatement: "+this+ "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-		Thread.dumpStack();
+//		IO.println("NEW InnerStatement: Line "+firstLineNumber()+": InnerStatement: "+this+ "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+//		Thread.dumpStack();
 		
 		if(explicit) psiBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
 		

@@ -5,13 +5,20 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.declaration;
 
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 import simula.compiler.AttributeFileIO;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JarFileBuilder;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
@@ -20,7 +27,7 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
+import simula.token.SimpleString;
 
 /// External Declaration.
 /// <pre>
@@ -115,17 +122,24 @@ public final class ExternalDeclaration extends Declaration {
 	/// Parse an external declaration updating a declaration list.
 	/// <pre>
 	///    external-head = external-declaration ; { external-declaration ; }
+	/// 
 	///       external-class-declaration
 	///            =  EXTERNAL  CLASS  external-list
 	///        
 	///       external-procedure-declaration
 	///            = EXTERNAL [ kind ] [ type ] PROCEDURE external-list
 	///            | EXTERNAL kind PROCEDURE external-item  IS procedure-declaration
+	/// 
+	///			 external-list = external-item { , external-item }
+	/// 
+	/// 			external-item = identifier [ = external-identification ]
+	/// 
+	/// 				external-identification = string
 	/// </pre>
 	/// Precondition: EXTERNAL  is already read.
 	/// @param enclosure the BlockDeclaration which is updated
 	/// @return a Vector of ExternalDeclaration
-	public static Vector<ExternalDeclaration> expectExternalHead(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
+	public static Vector<SyntaxElement> expectExternalDeclaration(final PsiBuilder psiBuilder) {
 		LexToken kind = PsiParse.acceptIdentifier(psiBuilder);
 		if (kind != null)
 			Util.error("*** NOT IMPLEMENTED: " + "External " + kind + " Procedure");
@@ -133,27 +147,36 @@ public final class ExternalDeclaration extends Declaration {
 		if (!(PsiParse.accept(psiBuilder, KeyWord.CLASS) || PsiParse.accept(psiBuilder, KeyWord.PROCEDURE)))
 			Util.error("parseExternalDeclaration: Expecting CLASS or PROCEDURE");
 
-		Vector<ExternalDeclaration> externalDeclarations = new Vector<ExternalDeclaration>();
+		Vector<SyntaxElement> declarations = new Vector<SyntaxElement>();
 		String identifier = PsiParse.expectIdentifier(psiBuilder).edText();
 		LOOP: while (true) {
-			LexToken externalIdentifier = null;
+//			IO.println("ExternalDeclaration.expectExternalDeclaration: identifier=" + identifier);
+			String externalIdentifier = null;
 			if (PsiParse.accept(psiBuilder, KeyWord.EQ)) {
-				externalIdentifier = PsiParse.currentLexToken(psiBuilder);
-				PsiParse.expect(psiBuilder, KeyWord.TEXTKONST);
+//				externalIdentifier = Parse.currentToken;
+//				Parse.expect(KeyWord.TEXTKONST);
+				LexToken token = PsiParse.getCurrentParserToken(psiBuilder);
+//				IO.println("ExternalDeclaration.expectExternalDeclaration: " + token.getClass().getSimpleName());
+				if(token instanceof SimpleString xident) {
+					String extIdentifier = xident.value;
+//					IO.println("ExternalDeclaration.expectExternalDeclaration: extIdentifier" + extIdentifier);
+				} else {
+					Util.error(token, "Expecting external identifier string");
+				}
 			}
-			String extIdentitier = (externalIdentifier==null)?null:externalIdentifier.getText();
-			
-			ExternalDeclaration externalDeclaration = new ExternalDeclaration(psiBuilder, identifier, extIdentitier);
-			externalDeclarations.add(externalDeclaration);
-			
-			PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
-			psiBuilder.doneSubtree(PsiTree.Kind.declaration  , externalDeclaration);
-			psiBuilder.startSubtree(PsiTree.Kind.declaration  , "May be NextDeclaration");
+			ExternalDeclaration externalDeclaration = new ExternalDeclaration(psiBuilder, identifier, externalIdentifier);
+			externalDeclaration.type = expectedType;
+			declarations.add(externalDeclaration);
+//			IO.println("ExternalDeclaration.expectExternalDeclaration: externalDeclaration" + externalDeclaration);
 
-			File jarFile = JarFileBuilder.findJarFile(identifier, extIdentitier);
+			File jarFile = JarFileBuilder.findJarFile(identifier, externalIdentifier);
+			if(jarFile == null) {
+				Util.IERR(""+jarFile);
+			}
 			if (jarFile != null) {
 				if(checkJarFiles(jarFile)) {
-					Type moduleType = AttributeFileIO.readAttributeFile(identifier, jarFile, enclosure);
+					DeclarationScope scope = Global.getCurrentScope();
+					Type moduleType = AttributeFileIO.readAttributeFile(identifier, jarFile, scope.getEnclosingBlock());
 					if(moduleType == null) {
 						if (expectedType != null) Util.error("Missing external type: "+expectedType);
 					} else if(expectedType == null) {
@@ -174,9 +197,36 @@ public final class ExternalDeclaration extends Declaration {
 			identifier = PsiParse.expectIdentifier(psiBuilder).edText();
 		}
 
-		return externalDeclarations;
+		return declarations;
 	}
 
+
+	@Override
+	public void doChecking() {
+		if (IS_SEMANTICS_CHECKED())
+			return;
+		Global.sourceLineNumber = firstLineNumber();
+		DeclarationScope declaredIn = Global.getCurrentScope();
+		// ...
+		
+		IO.println("\n\nExternalDeclaration.doChecking: " + this);
+		IO.println("ExternalDeclaration.doChecking: +++++++++++++++++ BASICIO ++++++++++++++++++++++");
+//		StandardClass.BASICIO.printTree(0, decl);
+		for(Declaration memb:StandardClass.BASICIO.declarationList) {
+			IO.println("ExternalDeclaration.doChecking: " + memb);
+		}
+		IO.println("ExternalDeclaration.doChecking: +++++++++++++++++ CURRENT SCOPE "+Global.getCurrentScope().identifier +" ++++++++++++++++++++++");
+		for(Declaration z:Global.getCurrentScope().declarationList) {
+			IO.println("ExternalDeclaration.doChecking: " + z);
+			if(z instanceof ExternalDeclaration ext) {
+				
+			}
+		}
+
+		
+		IO.println("ExternalDeclaration.doChecking: " + this);
+		SET_SEMANTICS_CHECKED();
+	}
 
 	/// Check if the jarFile is already included.
 	/// @param jarFile the jarFile.
@@ -200,6 +250,31 @@ public final class ExternalDeclaration extends Declaration {
 		}		
 	}
 
+
+	@Override
+	public JPanel getSyntaxPanel() {
+		String[] table = {
+				"  declarationKind:",	""+declarationKind+":"+ObjectKind.edit(declarationKind),
+				"  declarationClass:",	""+this.getClass().getSimpleName(),
+				"  lines:",				""+this.firstLineNumber() + " ==> " + this.lastLineNumber(),
+				// *** Declaration
+				"  identifier:",		""+identifier,
+				"  externalIdent:",	    ""+externalIdent,
+				"  type:",			    ""+type,
+				"  declaredIn:",		""+declaredIn.identifier,
+//				// *** SimpleVariableDeclaration
+//				"  constant:",			""+constant,
+//				"  constantElement: ",	""+constantElement
+		};
+		JPanel panel = new JPanel(new GridLayout(table.length/2, 2));
+		Font monoFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
+		for(String s:table) {
+			JLabel lab = new JLabel(s);
+			lab.setFont(monoFont);
+			panel.add(lab);
+		}
+		return panel;
+	}
 
 	public String toString() {
 		return "ExternalDeclaration: identifier=" + identifier + ", externalIdent=" + externalIdent;

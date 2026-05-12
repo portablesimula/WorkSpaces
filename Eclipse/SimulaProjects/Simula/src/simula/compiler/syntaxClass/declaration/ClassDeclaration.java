@@ -185,7 +185,6 @@ public class ClassDeclaration extends BlockDeclaration {
 	public static ClassDeclaration expectClassDeclaration(final PsiBuilder psiBuilder, final String ident) {
 		ClassDeclaration cls = new ClassDeclaration(psiBuilder.psiTree, null);
 		cls.sourceFileName = Global.sourceFileName;
-//		cls.OLD_lineNumber = PsiParse.prevToken.lineNumber;
 		cls.prefix = ident;
 		cls.declaredIn.hasLocalClasses = true;
 		if (cls.prefix == null)
@@ -204,16 +203,11 @@ public class ClassDeclaration extends BlockDeclaration {
 			VirtualSpecification.expectVirtualPart(psiBuilder, cls);
 		expectClassBody(psiBuilder, cls);
 		
-//		cls.lastLineNumber = Global.sourceLineNumber;
 		cls.type = Type.Ref(cls.identifier);
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Line " + cls.firstLineNumber() + ": ClassDeclaration: " + cls);
 		Global.setScope(cls.declaredIn);
-		
-		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 
-		psiBuilder.doneSubtree(PsiTree.Kind.declaration, cls);
-		psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be NextDeclaration");
 		return (cls);
 	}
 
@@ -408,32 +402,10 @@ public class ClassDeclaration extends BlockDeclaration {
 			if (Option.internal.TRACE_PARSE)
 				PsiParse.TRACE("Parse Block");
 			
-			if(Option.TESTING_BLOCKS) {
-				cls.parseBlock(psiBuilder);
-				if(! cls.hasInner()) {
-					IO.println("ClassDeclaration.expectClassBody: ADD IMPLICIT INNER");
-					cls.statements.add(new InnerStatement(psiBuilder, false)); // Implicit INNER
-				}
-			} else {
-				Declaration.acceptDeclarations(psiBuilder, cls);
-				boolean seen = false;
-				while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
-					Statement stm = Statement.acceptStatement(psiBuilder);
-					if (stm != null)
-						cls.statements.add(stm);
-					if (PsiParse.accept(psiBuilder, KeyWord.INNER)) {
-						if (seen)
-							Util.error("Max one INNER per Block");
-						else
-							cls.statements.add(new InnerStatement(psiBuilder, false));
-						seen = true;
-					}
-				}
-				if (PsiParse.prevToken(psiBuilder).keyWord == KeyWord.EOF) {
-					Util.error("Illegal termination of class declaration. Missing END.");
-				}
-				if (!seen)
-					cls.statements.add(new InnerStatement(psiBuilder, false)); // Implicit INNER
+			cls.parseBlock(psiBuilder);
+			if(! cls.hasInner()) {
+//				IO.println("ClassDeclaration.expectClassBody: ADD IMPLICIT INNER");
+				cls.statements.add(new InnerStatement(psiBuilder, false)); // Implicit INNER
 			}
 		} else {
 			if(PsiParse.getCurrentParserToken(psiBuilder).keyWord != KeyWord.SEMICOLON)

@@ -7,10 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -20,6 +17,7 @@ import javax.swing.tree.TreePath;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Html;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 public class PsiTree extends PsiElement {
@@ -39,6 +37,7 @@ public class PsiTree extends PsiElement {
     	mainModule, label, declaration, block,
 //    	externalDeclaration,
 //    	typeDeclaration, arrayDeclaration, externalDeclaration, classDeclaration, procedureDeclaration,
+    	virtualSpecification,
     	// Statements
     	statement,
     	activationStatement, conditionalStatement, connectionStatement,
@@ -74,12 +73,11 @@ public class PsiTree extends PsiElement {
 
 	public void addChild(PsiElement child) {
 		if(child == null) {
-//			IO.println("PsiTree.addChild: " + child);
-//			Util.IERR("addChild NULL !!");
+			Util.IERR("addChild NULL !!");
 			return;
 		}
-//		IO.println("PsiTree.addChild: " + child.getClass().getSimpleName() + " " + child);
-		IO.println("PsiTree.addChild: " + debugName + ": " + edChildrenText());
+		if(Option.internal.TRACE_PSITREE_GROW)
+			IO.println("PsiTree.addChild: " + debugName + ": " + edChildrenText());
 		children.add(child);
 	}
 	

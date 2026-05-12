@@ -1,0 +1,9 @@
+begin
+   class A; virtual:
+%   procedure myFile is ref(File) procedure actual(i,j); integer i,j;;
+%   procedure virt2 is procedure act2(j); integer j;;
+   procedure virt3 is procedure act3;;
+   procedure virt4 is procedure act4;;
+   begin integer i;
+   end;
+end;

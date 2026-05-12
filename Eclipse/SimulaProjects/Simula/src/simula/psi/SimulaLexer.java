@@ -42,23 +42,16 @@ public class SimulaLexer {
     
     
 	public void resetCheckPoint(String debugName, PsiTree psiTree) {
-		IO.println("\n\nSimulaLexer.resetCheckPoint: psiTree: " + psiTree);
-		IO.println("SimulaLexer.resetCheckPoint: psiTree.startOffset: " + psiTree.startOffset);
+//		IO.println("\n\nSimulaLexer.resetCheckPoint: psiTree: " + psiTree);
+//		IO.println("SimulaLexer.resetCheckPoint: psiTree.startOffset: " + psiTree.startOffset);
 	    nextLineNumber = psiTree.lineNumber;
 	    
 	    currentLexerToken = psiTree.checkPoint;
 		tokenStartOffset = currentLexerToken.startOffset;
-		IO.println("SimulaLexer.resetCheckPoint: psiTree.checkPoint'startOffset: " + tokenStartOffset);
+//		IO.println("SimulaLexer.resetCheckPoint: psiTree.checkPoint'startOffset: " + tokenStartOffset);
 		tokenEndOffset = currentPosition = currentLexerToken.endOffset;
 		tokenStartLine = nextLineNumber;
 		
-//	    if(! tokenQueue.isEmpty()){
-//	    	LexToken token = tokenQueue.peekFirst();
-//			IO.println("SimulaLexer.resetCheckPoint: REMOVE from tokenQueue: currentPosition: " + currentPosition + " MayRemove: "+token);
-//			if(token.startOffset > currentPosition) {
-//				tokenQueue.removeFirst();
-//			}
-//	    }
 	    tokenQueue=new LinkedList<LexToken>();
 	    LexToken.prevToken = currentLexerToken;
 	}

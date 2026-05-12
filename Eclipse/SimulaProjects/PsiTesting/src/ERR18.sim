@@ -1,0 +1,3 @@
+class A; begin
+   integer i;
+end

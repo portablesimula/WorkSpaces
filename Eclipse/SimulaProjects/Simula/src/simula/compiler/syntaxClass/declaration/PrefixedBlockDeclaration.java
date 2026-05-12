@@ -104,19 +104,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		block.modifyIdentifier(ID);
 		if (Option.internal.TRACE_PARSE) PsiParse.TRACE("Parse PrefixedBlock");
 		
-		if(Option.TESTING_BLOCKS) {
-			block.parseBlock(psiBuilder);
-		} else {
-			Declaration.acceptDeclarations(psiBuilder, block);
-			while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
-				Statement stm = Statement.acceptStatement(psiBuilder);
-				if (stm != null) block.statements.add(stm);
-			}
-			if (PsiParse.prevToken(psiBuilder).keyWord == KeyWord.EOF) {
-				Util.error("Illegal termination of prefixed block. Missing END.");
-			}
-		}
-//		block.lastLineNumber = Global.sourceLineNumber;
+		block.parseBlock(psiBuilder);
+		
 		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+block.firstLineNumber()+": PrefixedBlockDeclaration: "+block);
 		Global.setScope(block.declaredIn);
 		return block;

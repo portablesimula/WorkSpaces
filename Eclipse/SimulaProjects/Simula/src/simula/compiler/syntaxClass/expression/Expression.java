@@ -428,7 +428,8 @@ public abstract class Expression extends SyntaxElement {
 		else if(PsiParse.accept(psiBuilder, KeyWord.THIS)) expr = LocalObject.expectThisIdentifier(psiBuilder); 
 		else {
 			LexToken prevToken2 = PsiParse.getCurrentParserToken(psiBuilder) ;
-			String ident = PsiParse.acceptIdentifier(psiBuilder).getText();
+//			String ident = PsiParse.acceptIdentifier(psiBuilder).getText();
+			String ident = PsiParse.acceptIdentifier(psiBuilder).edText();
 			if(ident != null) {
 				expr=VariableExpression.expectVariable(psiBuilder, ident);
 			} else {
@@ -445,7 +446,8 @@ public abstract class Expression extends SyntaxElement {
 			if (opr == KeyWord.DOT ) 
 				expr=new RemoteVariable(psiBuilder.psiTree, expr, expectVariable(psiBuilder));
 			else {  // opr == IS or opr == IN or opr == QUA.  Then a class identifier must follow.
-				String classIdentifier=PsiParse.acceptIdentifier(psiBuilder).getText();
+//				String classIdentifier=PsiParse.acceptIdentifier(psiBuilder).getText();
+				String classIdentifier=PsiParse.acceptIdentifier(psiBuilder).edText();
 				if(opr==KeyWord.QUA)
 					expr=new QualifiedObject(psiBuilder, expr, classIdentifier);
 				else expr=new ObjectRelation(psiBuilder, expr, opr, classIdentifier);
@@ -467,7 +469,8 @@ public abstract class Expression extends SyntaxElement {
 	/// @return the created Variable
 	private static VariableExpression expectVariable(PsiBuilder psiBuilder) { 
 		// An identifier, possibly followed by arguments in parentheses.
-		String ident=PsiParse.acceptIdentifier(psiBuilder).getText();
+//		String ident=PsiParse.acceptIdentifier(psiBuilder).getText();
+		String ident=PsiParse.acceptIdentifier(psiBuilder).edText();
 		return(VariableExpression.expectVariable(psiBuilder, ident));
 	}
 

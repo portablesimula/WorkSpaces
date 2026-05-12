@@ -96,7 +96,7 @@ public class RTS_Simulation extends RTS_Simset {
 	final RTS_Ranking sqs;
 	
 	/// The main program.
-	public final RTS_MAIN_PROGRAM main_1;
+	public final RTS_MAIN_PROGRAM main;
 
 	/// Create a new Simulation.
 	/// @param SL staticLink
@@ -107,9 +107,9 @@ public class RTS_Simulation extends RTS_Simset {
 		sqs.ll = sqs;
 		sqs.rl = sqs;
 
-		main_1 = (RTS_MAIN_PROGRAM) new RTS_MAIN_PROGRAM((RTS_Simulation) _CUR)._START();
-		main_1.EVENT = new RTS_EVENT_NOTICE(0, main_1);
-		RTS_Ranking.INTO(main_1.EVENT, sqs, 0);
+		main = (RTS_MAIN_PROGRAM) new RTS_MAIN_PROGRAM((RTS_Simulation) _CUR)._START();
+		main.EVENT = new RTS_EVENT_NOTICE(0, main);
+		RTS_Ranking.INTO(main.EVENT, sqs, 0);
 	}
 
 	@Override

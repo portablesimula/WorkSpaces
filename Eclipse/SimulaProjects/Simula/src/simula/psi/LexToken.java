@@ -42,12 +42,14 @@ public class LexToken extends PsiElement {
 //		}
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) {
 			if(Option.internal.TRACE_NEW_LEXTOKEN > 1) {
-				IO.println("NEW LexToken: Line: "+lineNumber+": "+this); //+"  CALLED FROM: " + Util.calledFrom(3, 25));
+//				IO.println("NEW LexToken: Line: "+lineNumber+": "+this); //+"  CALLED FROM: " + Util.calledFrom(3, 25));
+				IO.println("NEW LexToken: Line: "+lineNumber+": "+this+"  CALLED FROM: " + Util.calledFrom(3, 25));
 			} else {
 				if(keyWord == KeyWord.WHITESPACES) ; // Nothing
 				else if(keyWord == KeyWord.NEWLINE) ; // Nothing
 				else {
-					IO.println("NEW LexToken: Line: "+lineNumber+": "+this); //+"  CALLED FROM: " + Util.calledFrom(3, 25));
+//					IO.println("NEW LexToken: Line: "+lineNumber+": "+this); //+"  CALLED FROM: " + Util.calledFrom(3, 25));
+					IO.println("NEW LexToken: Line: "+lineNumber+": "+this+"  CALLED FROM: " + Util.calledFrom(3, 25));
 //					Thread.dumpStack();
 				}
 			}

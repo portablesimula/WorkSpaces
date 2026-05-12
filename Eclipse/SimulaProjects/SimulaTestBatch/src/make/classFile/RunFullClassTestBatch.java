@@ -8,11 +8,10 @@
 package make.classFile;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Vector;
 
+import simula.compiler.ModuleManager;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
@@ -292,9 +291,12 @@ public final class RunFullClassTestBatch {
 			String fileName = sourceDir+name;
 			Option.internal.RUNTIME_USER_DIR=new File(fileName).getParent();
 			try {
-				File file = new File(fileName);
-				InputStreamReader reader = new InputStreamReader(new FileInputStream(file), Global._CHARSET);
-				new SimulaCompiler(fileName, reader).doCompile();
+//				File file = new File(fileName);
+//				InputStreamReader reader = new InputStreamReader(new FileInputStream(file), Global._CHARSET);
+//				new SimulaCompiler(fileName, reader).doCompile();
+				File sourceFile = new File(fileName);
+		    	Global.moduleManager = new ModuleManager(sourceFile);
+				new SimulaCompiler(fileName).doCompile(Global.moduleManager.getProgramModule());
 			} catch (IOException e) {
 				Util.error("can't open " + fileName + ", reason: " + e);
 			}

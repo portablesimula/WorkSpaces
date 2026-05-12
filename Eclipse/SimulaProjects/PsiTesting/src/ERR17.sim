@@ -1,0 +1,11 @@
+begin
+  external integer procedure pa, pb ;
+
+  real procedure rp ;
+   ;
+
+   procedure AP (i, r, bool, ch, ra, t) ;
+   begin
+      integer jj;
+   end;
+end;

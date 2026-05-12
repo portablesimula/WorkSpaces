@@ -396,16 +396,17 @@ public final class VariableExpression extends Expression {
 				}
 				break;
 				
+			case ObjectKind.ExternalDeclaration:
 			case ObjectKind.InspectVariableDeclaration:
 			case ObjectKind.LabelDeclaration:
 				break;
 				
 			default:
-				Util.IERR();
+				Util.IERR("VariableExpression.doChecking: END Variable(" + identifier + ").doChecking: type=" + type + ", kind=" + ObjectKind.edit(decl.declarationKind));
 			}
 
 		if (Option.internal.TRACE_CHECKER)
-			Util.TRACE("END Variable(" + identifier + ").doChecking: type=" + type);
+			Util.TRACE("END Variable(" + identifier + ").doChecking: type=" + type + ", kind=" + ObjectKind.edit(decl.declarationKind));
 		SET_SEMANTICS_CHECKED();
 	}
 

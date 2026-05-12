@@ -19,11 +19,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
-import simula.compiler.syntaxClass.statement.InnerStatement;
 import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.RTS;
+import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Html;
 import simula.compiler.utilities.KeyWord;
@@ -151,31 +152,27 @@ public abstract class BlockDeclaration extends DeclarationScope {
 		//
 		// where inner occurs at most once within a class body
 		//
-			// However; since ; is treated as a dummy statement we get the following simplified form:
-			//
-			// ==> all-blocks = begin { declaration ; } { STM } end
-		//
 		// Solution: Statement.expectStatement is extended to accept inner as a unlabeled statement.
-		//           With the following restriction:
-		//           - the parameter 'allowInner == true'
+		//           With the parameter 'allowInner == true'
 		//   
 		
 		/// Repeatedly parse a declaration and add it to the given BlockDeclaration's' declaration list.
 		/// Continue until there are no more declarations.
-//		Declaration.acceptDeclarations(psiBuilder, enclosure);
-//		protected static void acceptDeclarations(final PsiBuilder psiBuilder, final BlockDeclaration enclosure) {
-			psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be first Declaration");
-			while (Declaration.acceptDeclaration(psiBuilder, this)) {}
-			psiBuilder.dropSubtree(PsiTree.Kind.declaration, " is not a Declaration: DROP LAST MAYBE DECLARATION TREE");
-//		}
-
-		
-//		do {
-//			Statement stm = Statement.expectStatement(psiBuilder, allowInner);
-//			enclosure.statements.add(stm);
-//			if(allowInner && stm instanceof InnerStatement) allowInner = false;
-//		} while(PsiParse.accept(psiBuilder, KeyWord.SEMICOLON));
-//		PsiParse.expect(psiBuilder, KeyWord.END);
+		psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be first Declaration");
+		DeclarationList declarationList=this.declarationList;
+		Vector<SyntaxElement> declarations = null;
+		while( (declarations = Declaration.acceptDeclaration(psiBuilder)) != null) {
+			for(SyntaxElement decl:declarations) {
+				if(! (decl instanceof ExternalDeclaration)) {
+					// ExternalDeclaration should not be added to the declaration list.
+					declarationList.add((Declaration)decl);
+				}
+			}
+			PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
+			psiBuilder.doneSubtree(PsiTree.Kind.declaration, declarations);
+			psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be NextDeclaration");
+		}
+		psiBuilder.dropSubtree(PsiTree.Kind.declaration, " is not a Declaration: DROP LAST MAYBE DECLARATION TREE");
 		
 		while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
 			Statement stm = Statement.acceptStatement(psiBuilder);

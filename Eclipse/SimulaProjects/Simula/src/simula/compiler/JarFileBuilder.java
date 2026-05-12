@@ -258,16 +258,25 @@ public class JarFileBuilder {
 				// If present search extLib
 				if (Global.extLib != null) {
 					jarFile = new File(Global.extLib, identifier + ".jar");
-					if (jarFile.exists())
+					if (jarFile.exists()) {
+//						IO.println("JarFileBuilder.findJarFile: FOUND in extlib: " + jarFile);
 						return (jarFile);
+					}
+//					IO.println("JarFileBuilder.findJarFile: NOT FOUND in extlib: " + jarFile);
 				}
 				jarFile = new File(Global.outputDir, identifier + ".jar");
-				if (jarFile.exists())
+				if (jarFile.exists()) {
+//					IO.println("JarFileBuilder.findJarFile: FOUND in outputDir: " + jarFile);
 					return (jarFile);
+				}
+//				IO.println("JarFileBuilder.findJarFile: NOT FOUND in outputDir: " + jarFile);
 			} else {
 				jarFile = new File(externalIdentifier);
-				if (jarFile.exists())
+				if (jarFile.exists()) {
+//					IO.println("JarFileBuilder.findJarFile: FOUND using externalIdentifier: " + jarFile);
 					return (jarFile);
+				}
+//				IO.println("JarFileBuilder.findJarFile: NOT FOUND using externalIdentifier: " + jarFile);
 			}
 		} catch (Exception e) {
 			Util.IERR("Can't find attribute file: " + jarFile, e);

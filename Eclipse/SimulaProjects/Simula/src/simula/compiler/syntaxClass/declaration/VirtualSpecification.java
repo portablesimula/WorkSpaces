@@ -117,6 +117,7 @@ public final class VirtualSpecification extends Declaration {
 	static void expectVirtualPart(final PsiBuilder psiBuilder, final ClassDeclaration cls) {
 		PsiParse.expect(psiBuilder, KeyWord.COLON);
 		LOOP: while (true) {
+//			psiBuilder.startSubtree(PsiTree.Kind.virtualSpecification, "May be Virtual");
 			Type type;
 			if (PsiParse.accept(psiBuilder, KeyWord.SWITCH)) {
 				expectIdentifierList(psiBuilder, cls, Type.Label, Kind.Switch);
@@ -124,10 +125,14 @@ public final class VirtualSpecification extends Declaration {
 				expectIdentifierList(psiBuilder, cls, Type.Label, Kind.Label);
 			} else {
 				type = PsiParse.acceptType(psiBuilder);
-				if (!PsiParse.accept(psiBuilder, KeyWord.PROCEDURE))
+//				IO.println("VirtualSpecification.expectVirtualPart: LEXER TOKEN: " + psiBuilder.getCurrentLexerToken());
+				if (!PsiParse.accept(psiBuilder, KeyWord.PROCEDURE)) {
+//					psiBuilder.dropSubtree(PsiTree.Kind.virtualSpecification, " is not a virtualSpecification: DROP LAST MAYBE TREE");
 					break LOOP;
+				}
 
 				String identifier = PsiParse.expectIdentifier(psiBuilder).edText();
+//				IO.println("\n\nVirtualSpecification.expectVirtualPart: " + identifier);
 				ProcedureSpecification procedureSpec = null;
 				if (PsiParse.accept(psiBuilder, KeyWord.IS)) {
 					if(type != null) Util.error("An IS-specified virtual procedure can have its type only after IS.");
@@ -143,7 +148,11 @@ public final class VirtualSpecification extends Declaration {
 					else
 						PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 				}
+//				IO.println("\n\nVirtualSpecification.expectVirtualPart: AFTER: " + identifier);
 			}
+//			psiBuilder.doneSubtree(PsiTree.Kind.virtualSpecification, cls.virtualSpecList.lastElement());
+//			psiBuilder.startSubtree(PsiTree.Kind.virtualSpecification, "May be next Virtual");
+
 		}
 		if(cls.virtualSpecList.size()==0) Util.error("Missing virtual specifier after VIRTUAL:");
 	}

@@ -115,37 +115,21 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	/// @param line source line number
 	/// @return a BlockStatement
 	private static int SEQU = 1;
-//	public BlockStatement expectMaybeBlock(PsiBuilder psiBuilder, int line) {
-//		this.OLD_lineNumber=line;
 	public BlockStatement expectMaybeBlock(PsiBuilder psiBuilder) {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse MayBeBlock");
 		
 		String debugName = "MaybeBlockDeclaration: "+(SEQU++);
-//		psiBuilder.startSubtree(PsiTree.Kind.block, debugName);
-		
-//		psiBuilder.getRoot().printPsiTree(debugName);
 		
 		int lno = psiBuilder.getSourceLineNumber();
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN "+debugName);
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("BlockStatement expectMaybeBlock: BEGIN " + debugName);
-//		IO.println("BlockStatement.expectMaybeBlock: BEGIN "+debugName);
 
 		psiBuilder.consume(KeyWord.BEGIN); // consume BEGIN (add it to 'current tree')
 
-		if(Option.TESTING_BLOCKS) {
-			parseBlock(psiBuilder);
-		} else {
-			Declaration.acceptDeclarations(psiBuilder, this);
-			while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
-				Statement stm = Statement.acceptStatement(psiBuilder);
-				if (stm != null) statements.add(stm);
-			}
-		}
-		IO.println("MaybeBlockDeclaration.expectMaybeBlock: GOT END or EOF");
-//		if (PsiParse.prevToken.keyWord == KeyWord.EOF) {
-//			Util.error("Illegal termination of block. Missing END.");
-//		}		
+		parseBlock(psiBuilder);
+
+//		IO.println("MaybeBlockDeclaration.expectMaybeBlock: GOT END or EOF");
 		if (declarationKind != ObjectKind.SimulaProgram) {
 			if (!declarationList.isEmpty()) {
 				declarationKind = ObjectKind.SubBlock;
@@ -155,18 +139,9 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 					moveLabelsFrom(this); // Label is also declaration
 			}
 		}
-//		this.lastLineNumber = Global.sourceLineNumber;
-//		IO.println("BlockStatement.expectMaybeBlock: BEFORE BLKSTM "+debugName);
 		BlockStatement block = new BlockStatement(psiBuilder, this, debugName);
-//		IO.println("BlockStatement.expectMaybeBlock: AFTER BLKSTM "+debugName);
-		
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("MaybeBlockDeclaration.expectMaybeBlock: ENDOF " + debugName + "  " + block);
-		
-//		psiBuilder.doneSubtree(PsiTree.Kind.block, this);
-//		psiBuilder.psiTree.printPsiTree(debugName);
-		
 		Global.setScope(declaredIn);
-//		Util.ASSERT(psiTree.firstLineNumber() == lno, "NEW BlockStatement.expectMaybeBlock: firstLineNumber="+psiTree.firstLineNumber()+" equals lno="+lno);
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Line " + psiBuilder.getSourceLineNumber() + ": DONE "+debugName+" started at line: " + lno + ": " + this);
 		return (block);

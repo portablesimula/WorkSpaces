@@ -67,10 +67,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		new Parameter(psiBuilder.psiTree, "_SW", Type.Integer, Parameter.Kind.Simple).into(parameterList);
 		Global.setScope(declaredIn);
 
-		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 		for(Expression expr:switchList) syntaxElements.add(expr);
-		psiBuilder.doneSubtree(PsiTree.Kind.declaration, syntaxElements);
-		psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
 	}
 
 	@Override

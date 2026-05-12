@@ -5,10 +5,14 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.expression;
 
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -265,6 +269,28 @@ public final class BooleanExpression extends Expression {
 		SyntaxTree.addKeyWordNode(tree, model, newNode, opr);
 		rhs.addSyntaxNodes(tree, model, newNode);
     }
+
+	@Override
+	public JPanel getSyntaxPanel() {
+		String[] table = {
+				// *** Expression
+				"  type:",			    ""+type,
+				"  backLink:",		    ""+backLink,
+				// *** BooleanExpression
+//				"  lhs:",			    ""+lhs,
+				"  opr:",			    KeyWord.edit(opr),
+//				"  rhs:",			    ""+rhs,
+
+		};
+		JPanel panel = new JPanel(new GridLayout(table.length/2, 2));
+		Font monoFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
+		for(String s:table) {
+			JLabel lab = new JLabel(s);
+			lab.setFont(monoFont);
+			panel.add(lab);
+		}
+		return panel;
+	}
 
 	@Override
 	public String toString() {

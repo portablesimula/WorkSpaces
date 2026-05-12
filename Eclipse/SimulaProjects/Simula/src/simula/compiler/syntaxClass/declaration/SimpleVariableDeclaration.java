@@ -128,37 +128,9 @@ public class SimpleVariableDeclaration extends Declaration {
 	/// Endcondition: The terminating semicolon is read.
 	/// @param type the variable type
 	/// @param declarationList the declaration list to update
-	static void ZZ_expectSimpleVariable(final PsiBuilder psiBuilder, final Type type, final DeclarationList declarationList) {
+	static Vector<SyntaxElement> expectSimpleVariable(final PsiBuilder psiBuilder, final Type type) {
 		// identifier-list = identifier { , identifier }
-		if (Option.internal.TRACE_PARSE)
-			PsiParse.TRACE("Parse IdentifierList");
-		LexToken sep = null;
-		do {
-//			String ident = PsiParse.expectIdentifier(psiBuilder).edText();
-			String ident = PsiParse.expectIdentifierText(psiBuilder);
-			if(ident == null) {
-				ident = "undefined";
-			}
-			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(psiBuilder.psiTree, type, ident);
-			if (PsiParse.accept(psiBuilder, KeyWord.EQ))
-				typeDeclaration.constantElement = Expression.expectExpression(psiBuilder);
-			
-			sep = PsiParse.acceptParserToken(psiBuilder, KeyWord.SEMICOLON, KeyWord.COMMA); 
-			if(sep == null) {
-				LexToken current = PsiParse.currentLexToken(psiBuilder);
-				Util.error(current, "Got symbol " + KeyWord.edit(current.keyWord) + " while expecting KeyWord COMMA or SEMICOLON");
-				sep = PsiParse.skipUntil(psiBuilder, KeyWord.SEMICOLON);
-			}
-			
-			declarationList.add(typeDeclaration);
-			psiBuilder.doneSubtree(PsiTree.Kind.declaration, typeDeclaration);
-			psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be NextDeclaration");
-//		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
-		} while (sep.keyWord == KeyWord.COMMA);
-	}
-	static void expectSimpleVariable(final PsiBuilder psiBuilder, final Type type, final DeclarationList declarationList) {
-		// identifier-list = identifier { , identifier }
-		Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
+		Vector<SyntaxElement> declarations = new Vector<SyntaxElement>();
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse IdentifierList");
 		do {
@@ -166,15 +138,9 @@ public class SimpleVariableDeclaration extends Declaration {
 			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(psiBuilder.psiTree, type, ident);
 			if (PsiParse.accept(psiBuilder, KeyWord.EQ))
 				typeDeclaration.constantElement = Expression.expectExpression(psiBuilder);
-			syntaxElements.add(typeDeclaration);
-			declarationList.add(typeDeclaration);
-//			psiBuilder.doneSubtree(PsiTree.Kind.declaration, typeDeclaration);
-//			psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
+			declarations.add(typeDeclaration);
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
-
-		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
-		psiBuilder.doneSubtree(PsiTree.Kind.declaration, syntaxElements);
-		psiBuilder.startSubtree(PsiTree.Kind.declaration, "NextDeclaration");
+		return declarations;
 	}
 
 

@@ -15,6 +15,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -75,7 +76,8 @@ public final class AttributeFileIO {
 		oupt.writeString(version);
 		ClassHierarchy.writeObject(oupt);
 		if(program.externalHead != null) {
-			for(ExternalDeclaration xdecl:program.externalHead) {
+//			for(ExternalDeclaration xdecl:program.externalHead) {
+			for(SyntaxElement xdecl:program.externalHead) {
 				oupt.writeObj(xdecl);
 			}
 		}

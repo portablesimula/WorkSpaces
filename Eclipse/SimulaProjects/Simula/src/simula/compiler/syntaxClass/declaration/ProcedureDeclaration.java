@@ -38,7 +38,6 @@ import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.statement.DummyStatement;
-import simula.compiler.syntaxClass.statement.InnerStatement;
 import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.ClassHierarchy;
 import simula.compiler.utilities.RTS;
@@ -141,6 +140,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	///                = procedure-identifier [ formal-parameter-part ; [ mode-part ] specification-part ] 
 	///                
 	///            procedure-identifier = identifier
+	/// 
+	/// 		   procedure-body = statement
 	/// </pre>
 	/// 
 	/// Precondition: [ type ] PROCEDURE is already read.
@@ -162,7 +163,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			while(acceptModePart(psiBuilder, proc.parameterList));
 			expectSpecificationPart(psiBuilder, proc);
 		} else PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
-		IO.println("ProcedureDeclaration.expectProcedureDeclaration: BEFORE PARSE PROCEDURE BLOCK");
+//		IO.println("ProcedureDeclaration.expectProcedureDeclaration: BEFORE PARSE PROCEDURE BLOCK");
 		expectProcedureBody(psiBuilder, proc);
 
 //		proc.lastLineNumber = Global.sourceLineNumber;
@@ -170,10 +171,6 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			Util.TRACE("Line "+proc.firstLineNumber()+": ProcedureDeclaration: "+proc);
 		Global.setScope(proc.declaredIn);
 		
-		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
-
-		psiBuilder.doneSubtree(PsiTree.Kind.declaration, proc);
-		psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be NextDeclaration");
 		return (proc);
 	}
 
@@ -194,6 +191,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	private static boolean acceptModePart(PsiBuilder psiBuilder, Vector<Parameter> pList) {
 		LexToken prevToken = PsiParse.getCurrentParserToken(psiBuilder);
 		if (PsiParse.accept(psiBuilder, KeyWord.VALUE, KeyWord.NAME)) {
+//			IO.println("ProcedureDeclaration.acceptModePart: BEGIN VALUE/NAME");
 			int mode = (prevToken.keyWord == KeyWord.VALUE)
 					? Parameter.Mode.value
 					: Parameter.Mode.name;
@@ -211,6 +209,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 				}
 				parameter.setMode(mode);
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
+//			IO.println("ProcedureDeclaration.acceptModePart: END VALUE/NAME - Expect SEMICOLON");
 			PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 			return(true);
 		}
@@ -228,7 +227,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// </pre>
 	/// @param proc the procedure declaration
 	private static void expectSpecificationPart(PsiBuilder psiBuilder, ProcedureDeclaration proc) {
-		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse ParameterSpecifications");
+		if (Option.internal.TRACE_PARSE)
+			PsiParse.TRACE("Parse ParameterSpecifications");
 		LOOP: while(true) {
 			Type type;
 			int kind = Parameter.Kind.Simple;
@@ -262,6 +262,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 				}
 				parameter.setTypeAndKind(type, kind);
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
+//			IO.println("ProcedureDeclaration.expectSpecificationPart: END TYPE Identifiers - Expect SEMICOLON");
 			PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 			continue LOOP;
 		}
@@ -310,27 +311,27 @@ public class ProcedureDeclaration extends BlockDeclaration {
 //	}
 
 	private static void expectProcedureBody(PsiBuilder psiBuilder, ProcedureDeclaration proc) {
-		IO.println("ProcedureDeclaration.expectProcedureBody: START PARSE PROCEDURE BLOCK");
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGIN)) {
+//			IO.println("ProcedureDeclaration.expectProcedureBody: START PARSE PROCEDURE BLOCK");
 			if (Option.internal.TRACE_PARSE)
 				PsiParse.TRACE("Parse Procedure Block");
 			
-			if(Option.TESTING_BLOCKS) {
-				proc.parseBlock(psiBuilder);
-			} else {
-				Declaration.acceptDeclarations(psiBuilder, proc);
-				ObjectList<Statement> stmList = proc.statements;
-				while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
-					Statement stm = Statement.acceptStatement(psiBuilder);
-					if (stm != null) stmList.add(stm);
-				}
-			}
+			proc.parseBlock(psiBuilder);
 
 			if (PsiParse.prevToken(psiBuilder).keyWord == KeyWord.EOF) {
 				Util.error("Illegal termination of procedure declaration. Missing END.");
 			}
 		}
-		else proc.statements.add(Statement.acceptStatement(psiBuilder));
+		else {
+//			IO.println("ProcedureDeclaration.expectProcedureBody: START PARSE PROCEDURE BODY STATEMENT");
+			LexToken token =psiBuilder.getCurrentParserToken();
+//			IO.println("ProcedureDeclaration.expectProcedureBody: token: " + token);
+			if(token.keyWord != KeyWord.SEMICOLON) {
+				Statement stm = Statement.acceptStatement(psiBuilder);
+				proc.statements.add(stm);
+			}
+//			IO.println("ProcedureDeclaration.expectProcedureBody: END PARSE PROCEDURE BODY STATEMENT");
+		}
 	}
 
 	// ***********************************************************************************************
@@ -1133,7 +1134,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	@Override
 	public String toString() {
 		StringBuilder s = new StringBuilder();
-		s.append(identifier).append("[externalIdent=").append(externalIdent).append("] Kind=")
+		if(type != null) s.append(type.toString()).append(" ");
+		s.append("procedure ").append(identifier).append("[externalIdent=").append(externalIdent).append("] Kind=")
 		.append(declarationKind).append(", QUAL=").append(this.getClass().getSimpleName()).append(", HashCode=").append(hashCode());
 		if (isProtected != null) {
 			s.append(", Protected by ").append(isProtected.identifier);
@@ -1198,7 +1200,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		pro.parameterList = (ObjectList<Parameter>) inpt.readObjectList();
 
 		pro.isPreCompiledFromFile = inpt.jarFileName;
-		Util.TRACE_INPUT("END Read ProcedureDeclaration: Procedure "+identifier+", Declared in: "+pro.declaredIn);
+//		Util.TRACE_INPUT("END Read ProcedureDeclaration: Procedure "+identifier+", Declared in: "+pro.declaredIn);
+		Util.TRACE_INPUT("END Read ProcedureDeclaration: "+pro+", Declared in: "+pro.declaredIn);
 		Global.setScope(pro.declaredIn);
 		return(pro);
 	}

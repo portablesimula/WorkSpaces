@@ -13,6 +13,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.syntaxClass.Comment;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -71,7 +72,7 @@ public final class ProgramModule extends Statement {
 	public DeclarationScope mainModule;
 
 	/// The external head
-	public Vector<ExternalDeclaration> externalHead;
+	public Vector<SyntaxElement> externalHead;
 
 	/// Returns the mainModule identifier.
 	/// @return the mainModule identifier
@@ -113,8 +114,13 @@ public final class ProgramModule extends Statement {
 			psiBuilder.startSubtree(PsiTree.Kind.declaration  , "ExternalDeclaration");
 			
 			while(PsiParse.accept(psiBuilder, KeyWord.EXTERNAL)) {
-				externalHead = ExternalDeclaration.expectExternalHead(psiBuilder, StandardClass.BASICIO);		
-//				PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
+//				externalHead = ExternalDeclaration.expectExternalDeclaration(psiBuilder, StandardClass.BASICIO);		
+				Vector<SyntaxElement> external = ExternalDeclaration.expectExternalDeclaration(psiBuilder);	
+				if(externalHead == null) externalHead = new Vector<SyntaxElement>();
+				externalHead.addAll(external);
+				PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
+				psiBuilder.doneSubtree(PsiTree.Kind.declaration, external);
+				psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be NextDeclaration");
 			}
 			psiBuilder.dropSubtree(PsiTree.Kind.declaration, " not ExternalDeclaration");
 			
@@ -124,10 +130,10 @@ public final class ProgramModule extends Statement {
 			psiBuilder.startSubtree(PsiTree.Kind.declaration, "May be class declaration");
 			LexToken mayBeClassIdent=PsiParse.acceptIdentifier(psiBuilder);
 			if(mayBeClassIdent!=null) {
-				if(PsiParse.accept(psiBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(psiBuilder, mayBeClassIdent.getText());
+				if(PsiParse.accept(psiBuilder, KeyWord.CLASS)) {
+					mainModule=ClassDeclaration.expectClassDeclaration(psiBuilder, mayBeClassIdent.edText());
+				}
 			    else {
-//			    	PsiParse.rollBackIdentifier(psiBuilder, mayBeClassIdent, " is not a class identifier");
-//					PsiParse.setPendingIdentifier(mayBeClassIdent);
 					psiBuilder.dropSubtree(PsiTree.Kind.declaration, " is not a class identifier");
 					psiBuilder.startSubtree(PsiTree.Kind.declaration, " MainModule");
 			    	mainModule = doParseProgram(psiBuilder);

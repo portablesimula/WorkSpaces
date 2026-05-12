@@ -5,10 +5,14 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.statement;
 
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -25,7 +29,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Conditional Statement.
@@ -167,6 +170,23 @@ public final class ConditionalStatement extends Statement {
 		}
     }
 
+	@Override
+	public JPanel getSyntaxPanel() {
+		String[] table = {
+				// *** ConditionalStatement
+				"  condition:",			""+condition,
+				"  thenExpression:",	""+thenStatement,
+				"  elseExpression:",	""+elseStatement,
+		};
+		JPanel panel = new JPanel(new GridLayout(table.length/2, 2));
+		Font monoFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
+		for(String s:table) {
+			JLabel lab = new JLabel(s);
+			lab.setFont(monoFont);
+			panel.add(lab);
+		}
+		return panel;
+	}
 	@Override
 	public String toString() {
 		return "IF " + condition + " THEN " + thenStatement + " ELSE "	+ elseStatement + ';';

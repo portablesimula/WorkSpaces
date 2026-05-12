@@ -16,7 +16,6 @@ import simula.compiler.SimulaCompiler;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.RTOption;
 
 /**
  * Simula Test Batch donated by Simula as.
@@ -55,14 +54,14 @@ public final class RunSingleTest {
 
 		// Scanner Trace Options
 //		Option.internal.TRACE_LEXER = 2;
-		Option.internal.TRACE_NEW_LEXTOKEN = 2;
+//		Option.internal.TRACE_NEW_LEXTOKEN = 2;
 //		Option.TRACE_COMMENTS=true;
 
 		// Parser Trace Options
 //		Option.internal.TRACE_PARSE=true;
 //		Option.internal.PRINT_SYNTAX_TREE=1;
 //		Option.TRACE_ATTRIBUTE_OUTPUT=true;
-//		Option.TRACE_ATTRIBUTE_INPUT=true;
+//		Option.internal.TRACE_ATTRIBUTE_INPUT=true;
 
 		// Checker Trace Options
 //		Option.internal.TRACE_FIND_MEANING=4;
@@ -101,10 +100,18 @@ public final class RunSingleTest {
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
 //		names.add("CLASS_COMMON.sim"); // For ad'hoc testing
+	
+		/// AD'HOC TEST DENNE GANG'
+//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+//		names.add("p40b.sim");     // OK:  Precompile this for Simtst 40.
+//		names.add("p40a.sim");     // OK:  Precompile this for Simtst 40.
+//		names.add("p40c.sim");     // OK:  Precompile this for Simtst 40.
+//		names.add("simtst40.sim"); // OK:  Test separate compilation of procedures.
+
 		
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
-		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
 //		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
@@ -135,7 +142,7 @@ public final class RunSingleTest {
 //		names.add("simtst25.sim"); // OK:  Multiple arithmetic assignment
 //		names.add("simtst26.sim"); // OK:  Designational expressions, goto statement and switch declaration.
 //		names.add("simtst27.sim"); // OK:  Test while-loops.
-		names.add("simtst28.sim"); // OK:  Paramenter transmission to procedures by value.
+//		names.add("simtst28.sim"); // OK:  Paramenter transmission to procedures by value.
 //		names.add("simtst29.sim"); // OK:  Procedure parameters by value
 //		names.add("simtst30a.sim"); // OK:  Simple test of Arrays.
 //		names.add("simtst30.sim"); // OK:  Name parameters (Modified: 2-dim arrays removed)
@@ -254,8 +261,8 @@ public final class RunSingleTest {
 //		names.add("simtst126.sim"); // OK: GOTO SIMPLE SWITCH
 //		names.add("simtst127.sim"); // OK: Switch (character) Statement
 //		names.add("simtst128.sim"); // OK: Standard Procedure edit and edfix
-//		names.add("Precompiled129.sim"); // OK: Precompile this for Simtst 129.
-//		names.add("simtst129.sim"); // OK: Switch in precompiled class
+			names.add("Precompiled129.sim"); // OK: Precompile this for Simtst 129.
+			names.add("simtst129.sim"); // OK: Switch in precompiled class
 //		names.add("simtst130.sim"); // OK: Class SimLib, a set of utility procedures from DEC Handbook.
 //
 //		names.add("simtst131.sim"); // OK: Catching Errors

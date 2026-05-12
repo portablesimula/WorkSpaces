@@ -238,7 +238,12 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
-	
+	public LabelDeclaration(final String identifier) {
+		super(null, Type.Label, identifier);
+		this.externalIdent = "_LABEL_" + identifier;
+		this.declarationKind = ObjectKind.LabelDeclaration;
+	}
+
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeLabelDeclaration: " + identifier);
@@ -269,7 +274,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// @throws IOException if something went wrong.
 	public static LabelDeclaration readObject(AttributeInputStream inpt) throws IOException {
 		String identifier = inpt.readString();
-		LabelDeclaration lab = new LabelDeclaration(null, identifier);
+		LabelDeclaration lab = new LabelDeclaration(identifier);
 		lab.OBJECT_SEQU = inpt.readSEQU(lab);
 
 		// *** SyntaxElement

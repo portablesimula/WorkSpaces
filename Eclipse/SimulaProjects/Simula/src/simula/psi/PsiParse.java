@@ -2,8 +2,6 @@ package simula.psi;
 
 import java.io.Reader;
 
-import javax.lang.model.SourceVersion;
-
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.LOG;
@@ -114,7 +112,13 @@ public class PsiParse {
 	/// @param key a keyword
 	/// @return true if the keyword was accepted, otherwise false
 	public static boolean expect(final PsiBuilder psiBuilder, final int key) {
-		if (accept(psiBuilder, key)) return (true);
+		if (accept(psiBuilder, key)) {
+//			if(key == KeyWord.SEMICOLON) {
+//				IO.println("PsiParse.expect: "  + KeyWord.edit(key).toUpperCase() + ", current: " + PsiParse.currentLexToken(psiBuilder)
+//				+ "  SUCCESS -  CALLED FROM: " + Util.calledFrom(3, 25));
+//			}
+			return (true);
+		}
 		Util.error("Got symbol '" + PsiParse.currentLexToken(psiBuilder) + "' while expecting KeyWord " + KeyWord.edit(key).toLowerCase());
 		Util.STOP();
 		return (false);
@@ -303,16 +307,16 @@ public class PsiParse {
         LexToken ident = acceptIdentifier(psiBuilder);
 		return (ident);
 	}  
-	public static String expectIdentifierText(final PsiBuilder psiBuilder) {
-        LexToken currentToken = getCurrentParserToken(psiBuilder);
-        LexToken ident = acceptIdentifier(psiBuilder);
-		if(ident == null) {
-			Util.error(currentToken, "Got symbol " + KeyWord.edit(currentToken.keyWord) + " while expecting an Identifier");
-			psiBuilder.advanceLexer();
-			return null;
-		}
-		return ident.getText();
-	}  
+//	public static String expectIdentifierText(final PsiBuilder psiBuilder) {
+//        LexToken currentToken = getCurrentParserToken(psiBuilder);
+//        LexToken ident = acceptIdentifier(psiBuilder);
+//		if(ident == null) {
+//			Util.error(currentToken, "Got symbol " + KeyWord.edit(currentToken.keyWord) + " while expecting an Identifier");
+//			psiBuilder.advanceLexer();
+//			return null;
+//		}
+//		return ident.getText();
+//	}  
 
 	/// Test to accept a Type.
 	/// @return the type or null

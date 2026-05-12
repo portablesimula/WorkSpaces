@@ -12,10 +12,12 @@ import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.Parameter;
 import simula.compiler.syntaxClass.declaration.ProcedureDeclaration;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
+import simula.psi.PsiParse;
 import simula.psi.PsiTree;
 
 /// Procedure Specification.
@@ -107,7 +109,10 @@ public final class ProcedureSpecification extends SyntaxElement {
 	/// @param type procedure's type
 	/// @return a newly created ProcedureSpecification
 	public static ProcedureSpecification expectProcedureSpecification(final PsiBuilder psiBuilder, final Type type) {
+//		IO.println("\n\nProcedureSpecification.expectProcedureSpecification: BEFORE expectProcedureDeclaration");
 		ProcedureDeclaration block = ProcedureDeclaration.expectProcedureDeclaration(psiBuilder, type);
+//		IO.println("\n\nProcedureSpecification.expectProcedureSpecification: AFTER expectProcedureDeclaration: "+block);
+		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON); // TODO: DENNE ER NY !
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("END ProcedureSpecification: " + block);
 		Global.setScope(block.declaredIn);

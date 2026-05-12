@@ -1,11 +1,5 @@
-begin
-Simset begin
-% inspect new Simset do begin
-	ref(Head) liste;
-	ref(Link) elt;
+Simulation begin
 	
-	elt :- liste.first;
+	 reactivate main at time+20.0;
 	
-end;
-end;	
-	
+end	

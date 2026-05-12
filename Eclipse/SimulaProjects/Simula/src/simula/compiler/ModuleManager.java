@@ -74,17 +74,22 @@ public class ModuleManager {
 	private void checkPsiText() {
 //		if(! psiTree.getText().equals(textPanel.getText())) {
 		try {
-			if(! psiTree.getText().equals(getSourceText())) {
+			String txt1 = psiTree.getText().replace("\t", "");
+			String txt2 = getSourceText().replace("\t", "");
+			if(! txt1.equals(txt2)) {
+				compare(psiTree.getText(), getSourceText());
 				if(textPanel != null) {
 					String curTxt = (""+textPanel.getText()).replace("\r", "\\r").replace("\n", "\\n");
 					String psiTxt = (psiTree.getText()).replace("\r", "\\r").replace("\n", "\\n");
 					IO.println("EditorMenues.doRenderSyntaxTreeAction: curTxt: "+curTxt);
 					IO.println("EditorMenues.doRenderSyntaxTreeAction: psiTxt: "+psiTxt);
+					compare(curTxt, psiTxt);
 				} else {
-					String curTxt = (getSourceText()).replace("\r", "\\r").replace("\n", "\\n");
-					String psiTxt = (psiTree.getText()).replace("\r", "\\r").replace("\n", "\\n");
-					IO.println("EditorMenues.doRenderSyntaxTreeAction: curTxt: "+curTxt);
-					IO.println("EditorMenues.doRenderSyntaxTreeAction: psiTxt: "+psiTxt);					
+					String curTxt = (getSourceText()).replace("\r", "\\r").replace("\n", "\\n").replace("\t", "\\t");
+					String psiTxt = (psiTree.getText()).replace("\r", "\\r").replace("\n", "\\n").replace("\t", "\\t");
+					IO.println("EditorMenues.doRenderSyntaxTreeAction: curTxt: ]"+curTxt+'[');
+					IO.println("EditorMenues.doRenderSyntaxTreeAction: psiTxt: ]"+psiTxt+'[');
+					compare(curTxt, psiTxt);
 				}
 				Util.IERR("Resulting text differ from original text");
 //				Util.STOP();
@@ -94,6 +99,14 @@ public class ModuleManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
+	
+	private void compare(String s1, String s2) {
+		if(s1.length() != s2.length()) IO.println("EditorMenues.doRenderSyntaxTreeAction: Different length: "+s1.length()+" "+s2.length());
+		int n = Math.min(s1.length(), s2.length());
+		for(int i=0;i<n;i++) {
+			if(s1.charAt(i) != s2.charAt(i)) IO.println("EditorMenues.doRenderSyntaxTreeAction: Diff at pos: "+i+ "" +s1.charAt(i)+" "+s2.charAt(i));
+		}
+	}
+	
 }
