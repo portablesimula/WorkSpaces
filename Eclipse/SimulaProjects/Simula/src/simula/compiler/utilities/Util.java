@@ -107,6 +107,7 @@ public final class Util {
 		String err = edLINE(": Error: " + msg);
 		nError++;
 		printError(err);
+		token.addError(err);
 		Global.sourceLineNumber = lno;
 	}
 

@@ -1,5 +1,8 @@
 package simula.psi;
 
+import javax.swing.text.Style;
+import simula.editor.PsiTextPanel;
+
 public class PsiElement {// implements PsiElement {
     CharSequence sourceText; // Pointer to the Whole FILE
     int startOffset;
@@ -15,7 +18,10 @@ public class PsiElement {// implements PsiElement {
 	}
 	
 	public String getText() { return null;}
-	
+
+
+	public String edText() { return null; }
+
 	public String getOriginalText() {
 		CharSequence txt = sourceText.subSequence(startOffset, endOffset);
 		return txt.toString();
@@ -30,6 +36,12 @@ public class PsiElement {// implements PsiElement {
 
 	public int lastLineNumber() {
 		return lineNumber;
+	}
+
+	/// Returns the style for this PsiElement.
+	/// @return the style for this PsiElement
+	public Style getStyle(final PsiTextPanel psiText) {
+		return psiText.styleRegular;
 	}
 
 }

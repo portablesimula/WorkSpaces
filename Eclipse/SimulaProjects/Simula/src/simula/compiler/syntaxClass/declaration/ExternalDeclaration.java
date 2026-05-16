@@ -158,11 +158,12 @@ public final class ExternalDeclaration extends Declaration {
 				LexToken token = PsiParse.getCurrentParserToken(psiBuilder);
 //				IO.println("ExternalDeclaration.expectExternalDeclaration: " + token.getClass().getSimpleName());
 				if(token instanceof SimpleString xident) {
-					String extIdentifier = xident.value;
-//					IO.println("ExternalDeclaration.expectExternalDeclaration: extIdentifier" + extIdentifier);
+					externalIdentifier = xident.value;
+					IO.println("ExternalDeclaration.expectExternalDeclaration: extIdentifier" + externalIdentifier);
 				} else {
 					Util.error(token, "Expecting external identifier string");
 				}
+				psiBuilder.advanceLexer();
 			}
 			ExternalDeclaration externalDeclaration = new ExternalDeclaration(psiBuilder, identifier, externalIdentifier);
 			externalDeclaration.type = expectedType;

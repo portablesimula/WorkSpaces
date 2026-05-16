@@ -1,22 +1,26 @@
 package simula.psi;
 
-import javax.lang.model.SourceVersion;
+import java.util.Vector;
 
+import javax.lang.model.SourceVersion;
+import javax.swing.text.Style;
 import simula.compiler.utilities.Html;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.editor.PsiTextPanel;
 
 public class LexToken extends PsiElement {
 	public int keyWord;
-
-//    CharSequence sourceText; // Pointer to the Whole FILE
-//    int startOffset;
-//    int endOffset;
-    
-//    public int lineNumber;
+	public Vector<String> errors;
 	
 	public static LexToken prevToken;
+	
+	public void addError(String err) {
+		if(errors == null) errors = new Vector<String>();
+		errors.add(err);
+	}
+
 
 	public LexToken(int tokenStartLine, CharSequence sourceText, int startOffset, int endOffset, int keyWord) {
 		super(KeyWord.edit(keyWord), sourceText);
@@ -90,6 +94,7 @@ public class LexToken extends PsiElement {
 		return str;
 	}
 
+	@Override
 	public String edText() {
 		try {
 			CharSequence txt = sourceText.subSequence(startOffset, endOffset);
@@ -139,5 +144,29 @@ public class LexToken extends PsiElement {
 //		if(keyWord == KeyWord.WHITESPACES) return true;
 //		return false;
 //	}
+
+	/// Returns the style for this Token's keyword.
+	/// @return the style for this Token's keyword
+	@Override
+	public Style getStyle(final PsiTextPanel psiText) {
+		if(errors != null) return psiText.styleError;
+		switch(keyWord) {
+		    case KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF, KeyWord.COMMA, KeyWord.COLON, KeyWord.SEMICOLON,
+		    	 KeyWord.BEGPAR, KeyWord.ENDPAR, KeyWord.BEGBRACKET, KeyWord.ENDBRACKET, KeyWord.EQR, KeyWord.NER,
+			     KeyWord.EQ, KeyWord.GE, KeyWord.GT, KeyWord.LE, KeyWord.LT, KeyWord.NE,
+			     KeyWord.PLUS, KeyWord.MINUS, KeyWord.MUL, KeyWord.DIV, KeyWord.INTDIV, KeyWord.EXP,
+			     KeyWord.IDENTIFIER, KeyWord.DOT:
+		    	 return psiText.styleRegular;
+		    	 
+		    case KeyWord.BOOLEANKONST, KeyWord.INTEGERKONST, KeyWord.CHARACTERKONST,
+		    	 KeyWord.REALKONST, KeyWord.TEXTKONST, KeyWord.STRING:
+		    	 return psiText.styleConstant;
+		    	 
+		    case KeyWord.COMMENT:
+		    	 return psiText.styleComment;
+		    	 
+		    default: return psiText.styleKeyword;
+		}
+	}
 
 }

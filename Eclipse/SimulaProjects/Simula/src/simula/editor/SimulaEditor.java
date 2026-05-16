@@ -50,6 +50,8 @@ import simula.compiler.utilities.ConsolePanel;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.editor.SimulaEditor.Language;
+import simula.psi.PsiTree;
 
 /// The SimulaEditor.
 /// 
@@ -431,6 +433,40 @@ public class SimulaEditor extends JFrame {
     				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
     				currentTextPanel.fillTextPane(reader,0);
     			} catch(IOException e) { Util.IERR("Impossible",e); }
+    			menuBar.updateMenuItems();
+    		}}).start();
+    }
+    
+    // ****************************************************************
+    // *** doNewTabbedPsiPanel
+    // ****************************************************************
+    /// Create a new Tab with text generated from the given psi tree.
+    /// @param file the file
+    /// @param lang the language
+    static void doNewTabbedPsiPanel(PsiTree psiTree,Language lang) {
+    	new Thread(new Runnable() {
+    		public void run() {
+    			PsiTextPanel psiTextPanel=new PsiTextPanel(psiTree, lang, menuBar.popupMenu);
+//    			tabbedPane.addTab((file==null)?"unnamed":file.getName(), null, currentTextPanel, "Tool tip ...");
+    			tabbedPane.addTab("Rendered - unnamed", null, psiTextPanel, "Tool tip ...");
+    			// select the last tab
+    			tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
+    			psiTextPanel.fileChanged=false;
+//    			if(file==null)psiTextPanel.fillTextPane(new StringReader("begin\n\nend;\n"),0);
+//    			else
+    				if(lang==Language.Simula) {
+    					psiTextPanel.fillTextPane(0, psiTree);
+    			}
+//    			else if(lang==Language.Jar) {
+//    				psiTextPanel.fillTextPane(getJarFileReader(file),0);
+//    			}
+//    			else if(lang==Language.Other) {
+//    				psiTextPanel.fillTextPane(getHexFileReader(file),0);
+//    			}
+//    			else if(lang==Language.Text)
+//    				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
+//    				psiTextPanel.fillTextPane(reader,0);
+//    			} catch(IOException e) { Util.IERR("Impossible",e); }
     			menuBar.updateMenuItems();
     		}}).start();
     }

@@ -119,8 +119,8 @@ public class PsiParse {
 //			}
 			return (true);
 		}
-		Util.error("Got symbol '" + PsiParse.currentLexToken(psiBuilder) + "' while expecting KeyWord " + KeyWord.edit(key).toLowerCase());
-		Util.STOP();
+		Util.error(psiBuilder.getCurrentParserToken(), 
+				"Got symbol '" + PsiParse.currentLexToken(psiBuilder) + "' while expecting KeyWord " + KeyWord.edit(key).toLowerCase());
 		return (false);
 	}
 

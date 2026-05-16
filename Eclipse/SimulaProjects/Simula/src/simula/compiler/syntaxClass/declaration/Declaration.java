@@ -135,16 +135,12 @@ public abstract class Declaration extends SyntaxElement {
 	protected static Vector<SyntaxElement> acceptDeclaration(final PsiBuilder psiBuilder) {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse Declaration");
-//		IO.println("Declaration.acceptDeclaration: enclosure: ");
 		Declaration decl = null;
 		LexToken maybePrefix = PsiParse.acceptIdentifier(psiBuilder);
-//		IO.println("Declaration.acceptDeclaration: maybePrefix: " + maybePrefix);
 		if (maybePrefix != null) {
 			if (PsiParse.accept(psiBuilder, KeyWord.CLASS)) {
-//				decl = ClassDeclaration.expectClassDeclaration(psiBuilder, maybePrefix.getText());
 				decl = ClassDeclaration.expectClassDeclaration(psiBuilder, maybePrefix.edText());
 			} else {
-//				IO.println("Declaration.acceptDeclaration: " + maybePrefix + " is NOT a class prefix. Ie. is not a Declaration");
 				return null;
 			}
 		} else if (PsiParse.accept(psiBuilder, KeyWord.ARRAY))
@@ -164,22 +160,9 @@ public abstract class Declaration extends SyntaxElement {
 				// Switch Statement
 				return null;
 			}
-//			decl = new SwitchDeclaration(psiBuilder, ident.getText());
 			decl = new SwitchDeclaration(psiBuilder, ident.edText());
 		} else if (PsiParse.accept(psiBuilder, KeyWord.EXTERNAL)) {
-//			return ExternalDeclaration.expectExternalDeclaration(psiBuilder);
 			Vector<SyntaxElement> ext = ExternalDeclaration.expectExternalDeclaration(psiBuilder);	
-			IO.println("Declaration.acceptDeclaration: " + ext);
-			IO.println("Declaration.acceptDeclaration: +++++++++++++++++ BASICIO ++++++++++++++++++++++");
-//			StandardClass.BASICIO.printTree(0, decl);
-			for(Declaration memb:StandardClass.BASICIO.declarationList) {
-				IO.println("Declaration.acceptDeclaration: " + memb);
-			}
-			IO.println("Declaration.acceptDeclaration: +++++++++++++++++ CURRENT SCOPE "+Global.getCurrentScope().identifier +" ++++++++++++++++++++++");
-			for(Declaration z:Global.getCurrentScope().declarationList) {
-				IO.println("Declaration.acceptDeclaration: " + z);
-			}
-			
 			return ext;
 		} else {
 			Type type = PsiParse.acceptType(psiBuilder);

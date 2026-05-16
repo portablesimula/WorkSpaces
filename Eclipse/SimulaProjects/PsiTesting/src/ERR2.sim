@@ -3,12 +3,12 @@ begin
   
   begin
    integer block5;
-   outtext ("In Block 5");
+   outtext ("In Block 5"; outint{4);
   end;
   
   begin
    integer block10;
-   outtext ("In Block 10");
+   outtext"In Block 10");
   end;
 
 end

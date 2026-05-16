@@ -27,7 +27,6 @@ public class PsiTree extends PsiElement {
 	Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
 
 	protected final List<PsiElement> children = new ArrayList<>();
-//	private String error;
 	
 	public LexToken checkPoint;
 	

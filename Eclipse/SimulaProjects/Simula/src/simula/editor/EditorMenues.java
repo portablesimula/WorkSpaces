@@ -12,9 +12,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
 import java.net.URI;
 import java.util.ArrayList;
@@ -42,6 +46,7 @@ import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.editor.SimulaEditor.Language;
 import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
@@ -105,6 +110,7 @@ public class EditorMenues extends JMenuBar {
     /** Menu */ private JMenu toolsMenu=new JMenu("Tools");
     /** Menu item */ private JMenuItem psiTree = new JMenuItem("Show PSI Tree");
     /** Menu item */ private JMenuItem syntaxTree = new JMenuItem("Show Syntax Tree");
+    /** Menu item */ private JMenuItem renderPsi = new JMenuItem("Render from PSI");
 
     /** Menu */ private JMenu helpMenu=new JMenu("Help");
     /** Menu item */ private JMenuItem about = new JMenuItem("About Simula");
@@ -186,6 +192,7 @@ public class EditorMenues extends JMenuBar {
 		this.add(toolsMenu);
 		toolsMenu.add(psiTree); psiTree.setEnabled(false); psiTree.addActionListener(actionListener);
 		toolsMenu.add(syntaxTree); syntaxTree.setEnabled(false); syntaxTree.addActionListener(actionListener);
+		toolsMenu.add(renderPsi); renderPsi.setEnabled(false); renderPsi.addActionListener(actionListener);
 		this.add(helpMenu);
 		
 	    addPopupMenuItems();
@@ -313,6 +320,7 @@ public class EditorMenues extends JMenuBar {
 //		redo.setEnabled(canRedo);         redo2.setEnabled(canRedo);
 		psiTree.setEnabled(mayBuild);
 		syntaxTree.setEnabled(mayBuild);
+		renderPsi.setEnabled(mayBuild);
 		SimulaEditor.autoRefresher.reset();
 	}	
 	
@@ -349,6 +357,7 @@ public class EditorMenues extends JMenuBar {
 			else if(item==runtimeOption  || item==runtimeOption2) RTOption.selectRuntimeOptions();			
 			else if(item==psiTree) doShowPsiTreeAction();
 			else if(item==syntaxTree) doShowSyntaxTreeAction();
+			else if(item==renderPsi) doRenderFromPSIAction();
 			else if(item==about || item==about2) doAboutAction();
 			else if(item==more || item==more2) doMoreAction();
 		}
@@ -645,7 +654,26 @@ public class EditorMenues extends JMenuBar {
 ////			Util.STOP();
 		});
 	}
-    
+	
+	
+	// ****************************************************************
+	// *** doRenderFromPSIAction
+	// ****************************************************************
+	/// The render from psi action
+	private void doRenderFromPSIAction() {
+		SwingUtilities.invokeLater(() -> {
+			Option.internal.DEBUGGING=false;
+			SourceTextPanel current=SimulaEditor.currentTextPanel;
+			ProgramModule programModule = current.moduleManager.getProgramModule();
+			current.moduleManager.dropPsiTree();
+			PsiTree psiTree = current.moduleManager.getPsiTree();
+//			PsiTextPanel psiTextPanel=new PsiTextPanel(psiTree);
+			SimulaEditor.doNewTabbedPsiPanel(psiTree, Language.Simula);
+		});
+		Thread.dumpStack();
+	}
+
+
 	// ****************************************************************
 	// *** selectWorkspaceAction
 	// ****************************************************************
