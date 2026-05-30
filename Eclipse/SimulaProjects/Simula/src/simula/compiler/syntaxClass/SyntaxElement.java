@@ -8,6 +8,7 @@ package simula.compiler.syntaxClass;
 import java.awt.BorderLayout;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
+import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -24,6 +25,8 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Html;
 import simula.compiler.utilities.Util;
 import simula.psi.ExternalPsiTree;
+import simula.psi.LexToken;
+import simula.psi.PsiElement;
 import simula.psi.PsiTree;
 
 /// The class SyntaxElement.
@@ -99,6 +102,9 @@ public abstract class SyntaxElement {
 	/// The associated PSI Tree
 	public PsiTree psiTree;
 
+//	/// All errors associated with this SyntaxElement
+//	public Vector<String> errors;
+
 	/// Returns the associated PSI Tree
 	/// This method may be redefined.
 	/// @return the associated PSI Tree
@@ -129,6 +135,16 @@ public abstract class SyntaxElement {
 		return psiTree.lastLineNumber();
 	}
 
+	
+	public void addError(String err) {
+//		if(errors == null) errors = new Vector<String>();
+//		errors.add(err);
+		for(PsiElement elt : psiTree.getChildren()) {
+			if(elt instanceof LexToken token) {
+				token.addError(err);
+			}
+		}
+	}
 	
 	
 	/// Create a new SyntaxElement.

@@ -1,20 +1,22 @@
 package simula.psi;
 
+import java.util.ArrayDeque;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Stack;
 
 public class PsiTreeIterator implements Iterator<PsiElement> {
+	
 	public static boolean TRACING = false;
-	private final Stack<PsiElement> stack;
-
+	
+	private final ArrayDeque<PsiElement> stack = new ArrayDeque<>();
+	
 	public PsiTreeIterator(PsiElement root) {
 		if(TRACING) IO.println("NEW PsiTreeIterator ROOT: "+root.edText());
-		stack = new Stack<PsiElement>();
-		if (root != null) {
-			stack.push(root);
+        if (root != null) {
+            stack.push(root);
 			if(TRACING) IO.println(" Push "+root.edText() + " ==> STACK: " + edStack());
-		}
+        }
 	}
 
 	@Override
@@ -23,34 +25,31 @@ public class PsiTreeIterator implements Iterator<PsiElement> {
 	}
 
 	@Override
-	public PsiElement next() {
-		if (!hasNext()) {
-			throw new NoSuchElementException();
-		}
-
-		// Hent neste node fra toppen av stakken
-		PsiElement current = stack.pop();
-		if(TRACING) IO.println(" Pop  "+current.edText() + " ==> STACK: " + edStack());
-
-		if(current instanceof PsiTree psiTree) {
-			// Legg til barn i omvendt rekkefølge på stakken
-			// Dette sikrer at det første barnet behandles først (Pre-order)
-			for (int i = psiTree.children.size() - 1; i >= 0; i--) {
-				PsiElement elt = psiTree.children.get(i);
-//				if(!(elt instanceof PsiTree)) {
-					stack.push(elt);
-					if(TRACING) IO.println(" Push "+elt.edText() + " ==> STACK: " + edStack());
-//				}
-			}
-		}
-
-		return current;
+    public PsiElement next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        PsiElement current = stack.pop();
+		if(TRACING) IO.println(" ".repeat(50) + " Pop  [" + current.firstLineNumber() + "]" + current.edText() + " ==> STACK: " + edStack());
+        
+        List<PsiElement> children = current.getChildren();
+        if (children != null) {
+            for (int i = children.size() - 1; i >= 0; i--) {
+				PsiElement child = children.get(i);
+                if (child != null) {
+                    stack.push(child);
+					if(TRACING) IO.println(" ".repeat(10) + " Push "+child + '\n' + " ".repeat(55) + " ==> STACK: " + edStack());
+                }
+            }
+        }
+        return current;
 	}
 	
 	public String edStack() {
 		StringBuilder sb = new StringBuilder();
-		for(int i=0;i<stack.size();i++) {
-			sb.append(stack.get(i).edText()).append(", ");
+		PsiElement[] arr = stack.toArray(new PsiElement[0]);
+		for(PsiElement elt:arr) {
+			sb.append("[" + elt.firstLineNumber() + "]" + elt.edText()).append(", ");			
 		}
 		return sb.toString();
 	}

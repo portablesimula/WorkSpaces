@@ -34,11 +34,10 @@ import javax.swing.JTextField;
 /// 
 /// @author Øystein Myhre Andersen
 public final class Option {
+	public static boolean PSI_VERIFY = true;
 
-	public static boolean TESTING_SUBSEQUENT_TOKENS = true;
-
-	public static boolean TESTING_BLOCKS = true;
-	public static boolean TESTING_LABELED_STATEMENT = true;
+	public static boolean TESTING_MODULE = true;
+	public static boolean TESTING_EOF = true;
 	
 	public static int TRACE_PSITREE_START_DONE = 0;
 	public static int TRACE_ACCEPT_EXPRESSION = 0;

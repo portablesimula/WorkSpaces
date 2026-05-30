@@ -1,5 +1,10 @@
-begin
-   integer isum, intr;
-%    isum := isum + intr + 444;
-   sysout.setpos(1);
+ begin
+
+ Simulation begin
+ 
+%  reactivate main at time+20.0;
+  x.main :- none;
+ 
+% end;
 end;
+then

@@ -36,6 +36,7 @@ import simula.compiler.syntaxClass.declaration.ProcedureDeclaration;
 import simula.compiler.syntaxClass.declaration.SimpleVariableDeclaration;
 import simula.compiler.syntaxClass.declaration.StandardProcedure;
 import simula.compiler.syntaxClass.declaration.SwitchDeclaration;
+import simula.compiler.syntaxClass.declaration.UndefinedDeclaration;
 import simula.compiler.syntaxClass.declaration.VirtualSpecification;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
@@ -238,17 +239,34 @@ public final class VariableExpression extends Expression {
 			if (type != null)
 				type = new Type(type, conn);
 		}
+//		if (meaning.declaredAs instanceof StandardProcedure) {
+//			if (Util.equals(identifier, "detach")) {
+//				if (meaning.declaredIn instanceof ConnectionBlock conn)
+//					conn.classDeclaration.detachUsed = true;
+//				else if (meaning.declaredIn instanceof ClassDeclaration cdecl)
+//					cdecl.detachUsed = true;
+//				else
+//					Util.error("Variable(" + identifier + ").doChecking:INTERNAL ERROR, "
+//							+ meaning.declaredIn.getClass().getSimpleName());
+//			}
+//		}
 
-		if (meaning.declaredAs instanceof StandardProcedure) {
-			if (Util.equals(identifier, "detach")) {
-				if (meaning.declaredIn instanceof ConnectionBlock conn)
-					conn.classDeclaration.detachUsed = true;
-				else if (meaning.declaredIn instanceof ClassDeclaration cdecl)
-					cdecl.detachUsed = true;
-				else
-					Util.error("Variable(" + identifier + ").doChecking:INTERNAL ERROR, "
-							+ meaning.declaredIn.getClass().getSimpleName());
+		switch(meaning.declaredAs) {
+			case UndefinedDeclaration undef -> {
+				Util.semanticError(this, "Undefined variable: " + undef.identifier);
 			}
+			case StandardProcedure sproc -> {
+				if (Util.equals(sproc.identifier, "detach")) {
+					if (meaning.declaredIn instanceof ConnectionBlock conn)
+						conn.classDeclaration.detachUsed = true;
+					else if (meaning.declaredIn instanceof ClassDeclaration cdecl)
+						cdecl.detachUsed = true;
+					else
+						Util.error("Variable(" + identifier + ").doChecking:INTERNAL ERROR, "
+								+ meaning.declaredIn.getClass().getSimpleName());
+				}
+			}
+			default -> {}
 		}
 		Declaration decl = meaning.declaredAs;
 		if (decl != null)
@@ -818,7 +836,7 @@ public final class VariableExpression extends Expression {
 						int bl = declaredIn.getRTBlockLevel();
 						if(bl == 0) { // Accessing _USR
 //							ClassDesc main = Global.programModule.mainModule.getClassDesc();
-							ClassDesc main = Global.moduleManager.getProgramModule().mainModule.getClassDesc();
+							ClassDesc main = Global.moduleManager.getSyntaxTree().mainModule.getClassDesc();
 							codeBuilder.checkcast(main);
 						} else {
 							while(declaredIn.declaredIn.getRTBlockLevel() == bl) declaredIn = declaredIn.declaredIn;

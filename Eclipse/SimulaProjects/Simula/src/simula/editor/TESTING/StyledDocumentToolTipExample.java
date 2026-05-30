@@ -1,4 +1,4 @@
-package simula.editor;
+package simula.editor.TESTING;
 
 import javax.swing.*;
 import javax.swing.text.*;

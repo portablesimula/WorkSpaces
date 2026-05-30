@@ -1,18 +1,5 @@
 begin
- integer isum;
- begin
-  integer block1;
-  
-  begin
-   integer block6;
-   outtext ("In Block 6"); outimage;
-  end;
-
-  begin
-   integer block11;
-   outtext ("In Block 11"); outimage;
-  end;
-
- end;
-
-end
+   comment dette
+   er en 
+   kommentar over flere linjer ;
+end;

@@ -13,6 +13,7 @@ import simula.compiler.syntaxClass.ProcedureSpecification;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
@@ -41,6 +42,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 	/// @param ident the procedure identifier
 	StandardProcedure(DeclarationScope declaredIn,int kind,Type type, String ident) {
 		super(null, ident,kind); this.declaredIn = declaredIn; this.type = type;
+//		this.declarationKind = ObjectKind.StandardProcedure;
 //		this.CHECKED = true;
 	}
 

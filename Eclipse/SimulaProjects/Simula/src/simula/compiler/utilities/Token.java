@@ -95,7 +95,10 @@ public final class Token {
 		    	 KeyWord.REALKONST, KeyWord.TEXTKONST, KeyWord.STRING:
 		    	 return(Token.StyleCode.constant);
 		    	 
-		    case KeyWord.COMMENT:
+		    case KeyWord.COMMENT_KEY:
+		    	return(Token.StyleCode.comment);
+		    	 
+		    case KeyWord.COMMENT_TEXT:
 		    	 return(Token.StyleCode.comment);
 		    	 
 		    default: return(Token.StyleCode.keyword);

@@ -4,14 +4,9 @@ import java.util.Vector;
 
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
-import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.Declaration;
-import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.MaybeBlockDeclaration;
-import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.BlockStatement;
-import simula.compiler.syntaxClass.statement.ProgramModule;
-import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Html;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
@@ -105,28 +100,33 @@ public class PsiBuilder {
 		if(Option.TRACE_PSITREE_START_DONE > 0) {
 //			IO.println("PsiBuilder.doneSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+" "+syntaxElement.getClass().getSimpleName()+"="+syntaxElement+", CALLED FROM: "+Util.calledFrom(3,6));
 		}
-		boolean TESTING = true;
-		if(TESTING) {
-			LOOP:for(SyntaxElement syntaxElement:syntaxElements) {
-				if(syntaxElement instanceof BlockDeclaration blk) {
-//					IO.println("PsiBuilder.doneSubtree: blk.sourceBlockLevel: " + blk.sourceBlockLevel);
-					if(blk.sourceBlockLevel == 1) {
-						// Testing Declaration END-Condition
-						LexToken token = this.psiTree.getLastChild();
-						if(token != null && token.keyWord != KeyWord.END) {
-							Util.IERR("PsiBuilder.doneSubtree:  Wrong termination of " + syntaxElement.getClass().getSimpleName()+" lastChild="+token+" Should be END");
-						}
-						break LOOP;
-					}
-				}
-				if(syntaxElement instanceof Declaration) {
-					// Testing Declaration END-Condition
-					LexToken token = this.psiTree.getLastChild();
-					if(token != null && token.keyWord != KeyWord.SEMICOLON) 
-						Util.IERR("PsiBuilder.doneSubtree:  Wrong termination of " + syntaxElement.getClass().getSimpleName()+" lastChild="+token+" Should be ;");
-				}
-			}
-		}
+//		if(Option.PSI_VERIFY) {
+//			LOOP:for(SyntaxElement syntaxElement:syntaxElements) {
+//				if(syntaxElement instanceof BlockDeclaration blk) {
+//					IO.println("PsiBuilder.doneSubtree: BlockDeclaration: isMainModule=" + blk.isMainModule);
+//					IO.println("PsiBuilder.doneSubtree: blk.sourceBlockLevel: " + blk.getClass().getSimpleName() + " " + blk.sourceBlockLevel);
+//					if(blk.sourceBlockLevel == 1) {
+//						// Testing Declaration END-Condition
+////						LexToken token = this.psiTree.getLastChild();
+//						LexToken token = this.psiTree.getLastParserChild();
+//						if(token != null && token.keyWord != KeyWord.END) {
+//							psiTree.printPsiTree("PsiBuilder.doneSubtree: PSI VERIFIER FAILED");
+//							Util.IERR("PsiBuilder.doneSubtree:  Wrong termination of " + syntaxElement.getClass().getSimpleName()+" lastChild="+token+" Should be END");
+//						}
+//						break LOOP;
+//					}
+//				}
+//				if(syntaxElement instanceof Declaration) {
+//					// Testing Declaration END-Condition
+////					LexToken token = this.psiTree.getLastChild();
+//					LexToken token = this.psiTree.getLastParserChild();
+//					if(token != null && token.keyWord != KeyWord.SEMICOLON) {
+//						psiTree.printPsiTree("PsiBuilder.doneSubtree: PSI VERIFIER FAILED");
+//						Util.IERR("PsiBuilder.doneSubtree:  Wrong termination of " + syntaxElement.getClass().getSimpleName()+" lastChild="+token+" Should be ;");
+//					}
+//				}
+//			}
+//		}
 		
 		psiTree.endOffset = psiTree.getEndOffset();
 		for(SyntaxElement syntaxElement:syntaxElements) {
@@ -134,7 +134,7 @@ public class PsiBuilder {
 		}
         psiTree.syntaxElements = syntaxElements;
 		
-		if(TESTING) {
+		if(Option.PSI_VERIFY) {
 			String text = psiTree.getText().replace("\n", "\\n").replace("\r", "\\r");
 			String original = psiTree.getOriginalText().replace("\n", "\\n").replace("\r", "\\r");
 			if(! text.equals(original)) {
@@ -258,7 +258,7 @@ public class PsiBuilder {
 	}
 
 	public boolean eof() {
-		return getCurrentLexerToken() == null;
+		return lexer.EOF != null;
 	}
 
 	public LexToken getCurrentLexerToken() {

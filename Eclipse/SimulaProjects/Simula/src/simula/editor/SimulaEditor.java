@@ -46,6 +46,7 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import simula.compiler.ModuleManager;
 import simula.compiler.utilities.ConsolePanel;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
@@ -70,6 +71,11 @@ public class SimulaEditor extends JFrame {
 
 	/// The current SourceTextPanel
 	static SourceTextPanel currentTextPanel;
+	
+	///
+	static ModuleManager getCurrentModule() {
+		return currentTextPanel.moduleManager;
+	}
 
 	/// The autoRefresher
 	static AutoRefresher autoRefresher;
@@ -446,7 +452,7 @@ public class SimulaEditor extends JFrame {
     static void doNewTabbedPsiPanel(PsiTree psiTree,Language lang) {
     	new Thread(new Runnable() {
     		public void run() {
-    			PsiTextPanel psiTextPanel=new PsiTextPanel(psiTree, lang, menuBar.popupMenu);
+    			PsiTextPanel psiTextPanel=new PsiTextPanel(lang, menuBar.popupMenu);
 //    			tabbedPane.addTab((file==null)?"unnamed":file.getName(), null, currentTextPanel, "Tool tip ...");
     			tabbedPane.addTab("Rendered - unnamed", null, psiTextPanel, "Tool tip ...");
     			// select the last tab

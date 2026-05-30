@@ -15,7 +15,9 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.psi.LexToken;
+import simula.psi.PsiTree;
 
 /// A set of all static Utility Methods
 /// 
@@ -101,13 +103,26 @@ public final class Util {
 
 	/// Print a error message.
 	/// @param msg the message
-	public static void error(final LexToken token, final String msg) {
+	public static void syntaxError(final LexToken token, final String msg) {
 		int lno = Global.sourceLineNumber;
 		Global.sourceLineNumber = token.lineNumber;
 		String err = edLINE(": Error: " + msg);
 		nError++;
 		printError(err);
 		token.addError(err);
+		IO.println("Util.error: ADD ERROR TEXT: " + token + " " + msg);
+		Global.sourceLineNumber = lno;
+	}
+	
+	public static void semanticError(final SyntaxElement elt, final String msg) {
+		int lno = Global.sourceLineNumber;
+		Global.sourceLineNumber = elt.firstLineNumber();
+		String err = edLINE(": Error: " + msg);
+		nError++;
+		
+		printError(err);
+		elt.addError(err);
+		IO.println("Util.error: ADD ERROR TEXT: " + elt + " " + msg);
 		Global.sourceLineNumber = lno;
 	}
 

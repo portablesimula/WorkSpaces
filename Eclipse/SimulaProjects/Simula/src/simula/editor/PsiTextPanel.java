@@ -29,7 +29,7 @@ import javax.swing.undo.UndoableEdit;
 
 import simula.compiler.ModuleManager;
 import simula.compiler.utilities.KeyWord;
-import simula.compiler.utilities.Token;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.editor.SimulaEditor.Language;
 import simula.psi.LexToken;
@@ -39,6 +39,7 @@ import simula.psi.PsiTreeIterator;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.util.Set;
 import java.util.Vector;
 
 /// The Source text Panel.
@@ -60,16 +61,26 @@ public class PsiTextPanel extends JPanel {
 	
 	/// The ScrollPane
 	private JScrollPane styleScrollPane;
+
+	/** Style name */ public final static String styleNameRegular = "regular";
+	/** Style name */ public final static String styleNameKeyword = "keyword";
+	/** Style name */ public final static String styleNameComment = "comment";
+	/** Style name */ public final static String styleNameConstant = "constant";
+	/** Style name */ public final static String styleNameClassIdent = "classIdent";
+	/** Style name */ public final static String styleNameProcedure = "procedure";
+	/** Style name */ public final static String styleNameError = "error";
  	
 	/** Style */ public Style styleRegular;
 	/** Style */ public Style styleKeyword;
 	/** Style */ public Style styleComment;
 	/** Style */ public Style styleConstant;
+	/** Style */ public Style styleClassIdent;
+	/** Style */ public Style styleProcedure;
 	/** Style */ public Style styleError;
 	/** Style */ private Style styleLineNumber;
 	
 	/// The StyledDocument.
-	private StyledDocument doc;
+	public StyledDocument doc;
 	
 	/// Editable text pane with undo/redo history.
 	JTextPane editTextPane;
@@ -158,18 +169,15 @@ public class PsiTextPanel extends JPanel {
 	/// @param lang the language
 	/// @param popupMenu the popupMenu
 //    PsiTextPanel(File sourceFile, SimulaEditor.Language lang, JPopupMenu popupMenu) {
-    PsiTextPanel(PsiTree psiTree, Language lang, JPopupMenu popupMenu) {
+//    PsiTextPanel(PsiTree psiTree, Language lang, JPopupMenu popupMenu) {
+    PsiTextPanel(Language lang, JPopupMenu popupMenu) {
 //   	this.moduleManager = new ModuleManager(this, sourceFile);
 //    	this.sourceFile=sourceFile;
 //    	this.lang=lang;
 //    	this.popupMenu=popupMenu;
     	
-        
-//      Palette.init(Palette.ColorTheme.lightIntellij);
-//      Palette.init(Palette.ColorTheme.darkIntellij);
-      Palette.init(Palette.ColorTheme.lightVSC);
-//      Palette.init(Palette.ColorTheme.darkVSC);
-//      Palette.init(Palette.ColorTheme.oldSimEditor);
+//    	Palette.updatePalette(null, true);
+//    	Palette.init();
 
         editTextPane = new TooltipTextPane(); editTextPane.setEditable(false);
 //        editTextPane.addMouseListener(mouseListener);
@@ -240,42 +248,46 @@ public class PsiTextPanel extends JPanel {
 				PsiTreeIterator itr = new PsiTreeIterator(psiTree);
 				while (itr.hasNext()) {
 					PsiElement elt = itr.next();
-					IO.println(" GOT NEXT: " + elt.edText());
+//					IO.println("PsiTextPanel.fillTextPane: GOT NEXT: " + elt.edText());
+					IO.println("PsiTextPanel.fillTextPane: GOT NEXT: " + elt);
 				}
 				PsiTreeIterator.TRACING = false;
 			}
 			
 			PsiTreeIterator iterator = new PsiTreeIterator(psiTree);
 			
-			Vector<String> errorLines = null;
+			Set<String> errorLines = null;
 			// Standard traversal loop
 			while (iterator.hasNext()) {
 			    PsiElement elt = iterator.next();
+//				IO.println("PsiTextPanel.fillTextPane: GOT NEXT: " + elt);
 			    if(elt != null) {
-			    	if(elt instanceof LexToken lxt) {
-			    		if(lxt.keyWord == KeyWord.NEWLINE) {
+			    	if(elt instanceof LexToken lexToken) {
+			    		if(lexToken.keyWord == KeyWord.EOF) {
+				    	    SimpleAttributeSet attrs = lexToken.getTooltipAttrs(errorLines);
+					    	if(attrs != null) {
+			    				lin.insertString(lin.getLength(),edLineNumber(lineNumber++), attrs);					    		
+			    				errorLines = null;
+					    	}
+			    		} else if(lexToken.keyWord == KeyWord.NEWLINE) {
+							if(Option.PSI_VERIFY && elt.firstLineNumber() != lineNumber) {
+								Util.IERR("GOT NEWLINE: PSI VERIFIER FAILED: " + elt.firstLineNumber() + " != lineNumber=" + lineNumber);
+							}
 		    				String lineString = edLineNumber(lineNumber++);
 			    			// Should only be here AFTER a complete line is rendered
-			    			if(errorLines != null) {
-			    				String tooltipText = getTooltipText(errorLines);
+				    	    SimpleAttributeSet attrs = lexToken.getTooltipAttrs(errorLines);
+					    	if(attrs != null) {
+			    				lin.insertString(lin.getLength(),lineString, attrs);					    		
 			    				errorLines = null;
-					    	    SimpleAttributeSet attrs = getTooltipAttrs(tooltipText);
-			    				lin.insertString(lin.getLength(),lineString, attrs);
 			    			} else {
 				    			lin.insertString(lin.getLength(),lineString, styleLineNumber);
-			    				
 			    			}
 			    		}
-//				    	doc.insertString(doc.getLength(), elt.getText(), style);
-				    	Vector<String> lexErrors = ((LexToken) elt).errors;
-				    	if(lexErrors != null) {
-				    		if(errorLines == null) errorLines = new Vector<String>();
-				    		errorLines.addAll(lexErrors);
-		    				String tooltipText = getTooltipText(lexErrors);
-				    	    SimpleAttributeSet attrs = getTooltipAttrs(tooltipText);
+			        	errorLines = lexToken.accumErrors(errorLines);
+			    	    SimpleAttributeSet attrs = lexToken.getTooltipAttrs(null);
+				    	if(attrs != null) {
 					    	doc.insertString(doc.getLength(), elt.getText(), attrs);
 				    	} else {
-//					    	doc.insertString(doc.getLength(), elt.getText(), elt.getStyle(doc));				    		
 					    	doc.insertString(doc.getLength(), elt.getText(), elt.getStyle(this));				    		
 				    	}
 			    	}
@@ -289,30 +301,6 @@ public class PsiTextPanel extends JPanel {
     	doc.addUndoableEditListener(undoListener);
         editTextPane.setEditable(true);
 	    editTextPane.setCaretPosition(caretPosition);
-    }
-    
-    private SimpleAttributeSet getTooltipAttrs(String tooltipText) {
-		SimpleAttributeSet attrs = new SimpleAttributeSet();
-        StyleConstants.setFontFamily(attrs, "Courier New");
-
-		StyleConstants.setForeground(attrs, Color.WHITE);
-		StyleConstants.setBackground(attrs, Color.RED);
-//		StyleConstants.setUnderline(attrs, true);
-        StyleConstants.setBold(attrs, true);
-		attrs.addAttribute("tooltip", tooltipText);
-    	return attrs;
-    }
-    
-    private String getTooltipText(Vector<String> errorLines) {
-    	if(errorLines.size() == 1) {
-    		return errorLines.firstElement();
-    	} else {
-    		String res = "<html>Multiple markers on this line:<ul>";
-    		for(String msg:errorLines) {
-    			res = res + "<li>" + msg + "</li>";
-    		}
-    		return res + "</ul>";
-    	}
     }
 
 	// ****************************************************************
@@ -381,10 +369,10 @@ public class PsiTextPanel extends JPanel {
         Style defaultStyle = StyleContext.getDefaultStyleContext().
                         getStyle(StyleContext.DEFAULT_STYLE);
         
-        Style regular = doc.addStyle("regular", defaultStyle);
+        Style regular = doc.addStyle(styleNameRegular, defaultStyle);
         StyleConstants.setFontFamily(defaultStyle, "Courier New");
  
-        Style s = doc.addStyle("error", regular);
+        Style s = doc.addStyle(styleNameError, regular);
         StyleConstants.setBold(s, true);
         StyleConstants.setForeground(s,new Color(0xff0000));
         StyleConstants.setUnderline(s, true);
@@ -394,7 +382,7 @@ public class PsiTextPanel extends JPanel {
         StyleConstants.setForeground(s,new Color(204,204,255));
         StyleConstants.setForeground(s,Palette.LineNumberForeground);
         
-//        styleError=doc.getStyle("error");
+//        styleError=doc.getStyle(styleNameError);
         styleLineNumber=doc.getStyle("lineNumber");
     }
 
@@ -403,25 +391,33 @@ public class PsiTextPanel extends JPanel {
     /// @param doc the document
     private void addStylesToSourceDocument(final StyledDocument doc) {
         //Initialize some styles.
-        Style defaultStyle = StyleContext.getDefaultStyleContext().
-                        getStyle(StyleContext.DEFAULT_STYLE);
+        Style defaultStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
         
-        Style regular = doc.addStyle("regular", defaultStyle);
+        Style regular = doc.addStyle(styleNameRegular, defaultStyle);
         StyleConstants.setFontFamily(defaultStyle, "Courier New");
  
-        Style s = doc.addStyle("comment", regular);
+        Style s = doc.addStyle(styleNameComment, regular);
         StyleConstants.setItalic(s, true);
         StyleConstants.setForeground(s, Palette.CommentForeground);
 
-        s = doc.addStyle("keyword", regular);
+        s = doc.addStyle(styleNameKeyword, regular);
         StyleConstants.setBold(s, true);
+        IO.println("PsiTextPanel.addStylesToSourceDocument: KeywordForeground: " + Palette.toHex(Palette.KeywordForeground));
         StyleConstants.setForeground(s, Palette.KeywordForeground);
 
-        s = doc.addStyle("constant", regular);
+        s = doc.addStyle(styleNameConstant, regular);
         StyleConstants.setBold(s, true);
         StyleConstants.setForeground(s, Palette.ConstantForeground);
 
-        s = doc.addStyle("error", regular);
+        s = doc.addStyle(styleNameClassIdent, regular);
+        StyleConstants.setBold(s, true);
+        StyleConstants.setForeground(s, Palette.ClassIdentForeground);
+
+        s = doc.addStyle(styleNameProcedure, regular);
+        StyleConstants.setBold(s, true);
+        StyleConstants.setForeground(s, Palette.ProcedureForeground);
+
+        s = doc.addStyle(styleNameError, regular);
         StyleConstants.setBold(s, true);
         StyleConstants.setForeground(s,Palette.ErrorForeground);
         StyleConstants.setBackground(s,Palette.ErrorBackground);
@@ -431,11 +427,13 @@ public class PsiTextPanel extends JPanel {
 //        StyleConstants.setBold(s, true);
 //        StyleConstants.setForeground(s,new Color(204,204,255));
         
-        styleRegular=doc.getStyle("regular");
-        styleKeyword=doc.getStyle("keyword");
-        styleComment=doc.getStyle("comment");
-        styleConstant=doc.getStyle("constant");
-        styleError=doc.getStyle("error");
+        styleRegular = doc.getStyle(styleNameRegular);
+        styleKeyword = doc.getStyle(styleNameKeyword);
+        styleComment = doc.getStyle(styleNameComment);
+        styleConstant = doc.getStyle(styleNameConstant);
+    	styleClassIdent = doc.getStyle(styleNameClassIdent);
+    	styleProcedure = doc.getStyle(styleNameProcedure);
+       styleError=doc.getStyle(styleNameError);
 //        styleLineNumber=doc.getStyle("lineNumber");
     }
     

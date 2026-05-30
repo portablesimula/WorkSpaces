@@ -1,0 +1,17 @@
+ 
+begin
+
+   if verbose then begin
+      outtext ("START");
+   end;
+ 
+%  inner;
+ 
+   if noMessage then  begin
+
+      if verbose then begin
+        outtext ("END");
+      end;
+   end;
+ 
+end

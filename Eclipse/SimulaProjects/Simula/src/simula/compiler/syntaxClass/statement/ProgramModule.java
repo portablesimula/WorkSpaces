@@ -102,7 +102,7 @@ public final class ProgramModule extends Statement {
 
 		sysin=new VariableExpression(null, "sysin");
 		sysout=new VariableExpression(null, "sysout");
-		try	{
+//		try	{
 			if(Option.internal.TRACE_PARSE) PsiParse.TRACE("Parse Program");
 			Global.setScope(StandardClass.BASICIO);		    	// BASICIO Begin
 			new ConnectionBlock(null, sysin, null)                     	//    Inspect sysin do
@@ -165,10 +165,10 @@ public final class ProgramModule extends Statement {
 			}
 			
 			if(Option.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
-		} catch(Throwable e) {
-			e.printStackTrace();
-			Util.IERR();
-		}
+//		} catch(Throwable e) {
+//			e.printStackTrace();
+//			Util.IERR();
+//		}
 	}
 	
 	/// Parse Simula Program by expecting a Statement.

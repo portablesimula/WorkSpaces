@@ -39,6 +39,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.undo.UndoManager;
 
+import simula.compiler.ModuleManager;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.StandardClass;
@@ -103,6 +104,7 @@ public class EditorMenues extends JMenuBar {
     																+ "procedures. If not found, output directory is also searched. ");
     /** Menu item */ private JMenuItem workSpaces = new JMenuItem("Remove WorkSpaces");
     /** Menu item */ private JMenuItem editorUIScale = new JMenuItem("Resert UIScale");
+    /** Menu item */ private JMenuItem editorPalette = new JMenuItem("Update Palette");
     /** Menu item */ private JMenuItem compilerMode = new JMenuItem("Compiler Mode");
     /** Menu item */ private JMenuItem compilerOption = new JMenuItem("Compiler Options");
     /** Menu item */ private JMenuItem runtimeOption = new JMenuItem("Runtime Options");
@@ -140,6 +142,7 @@ public class EditorMenues extends JMenuBar {
     /** Popup Menu item */ private JMenuItem setExtLibDir2 = new JMenuItem("Select ExtLib Dir.");
     /** Popup Menu item */ private JMenuItem workSpaces2 = new JMenuItem("Remove WorkSpaces");
     /** Popup Menu item */ private JMenuItem editorUIScale2 = new JMenuItem("Reset UIScale");
+    /** Popup Menu item */ private JMenuItem editorPalette2 = new JMenuItem("Update Palette");
     /** Popup Menu item */ private JMenuItem compilerMode2 = new JMenuItem("Compiler Mode");
     /** Popup Menu item */ private JMenuItem compilerOption2 = new JMenuItem("Compiler Options");
     /** Popup Menu item */ private JMenuItem runtimeOption2 = new JMenuItem("Runtime Options");
@@ -178,6 +181,7 @@ public class EditorMenues extends JMenuBar {
 		this.add(runMenu);
 		settings.add(autoRefresh); autoRefresh.setEnabled(false); autoRefresh.addActionListener(actionListener);
         settings.add(editorUIScale); editorUIScale.addActionListener(actionListener);
+        settings.add(editorPalette); editorPalette.addActionListener(actionListener);
         settings.add(compilerMode); compilerMode.addActionListener(actionListener);
         settings.add(setWorkSpace); setWorkSpace.addActionListener(actionListener);
         settings.add(setJavaDir); setJavaDir.addActionListener(actionListener);
@@ -266,6 +270,7 @@ public class EditorMenues extends JMenuBar {
         popupMenu.add(autoRefresh2); autoRefresh2.setEnabled(false); autoRefresh2.addActionListener(actionListener);
         popupMenu.addSeparator();
         popupMenu.add(editorUIScale2); editorUIScale2.addActionListener(actionListener);
+        popupMenu.add(editorPalette2); editorPalette2.addActionListener(actionListener);
         popupMenu.add(compilerMode2); compilerMode2.addActionListener(actionListener);
         popupMenu.add(setWorkSpace2); setWorkSpace2.addActionListener(actionListener);
         popupMenu.add(setJavaDir2); setJavaDir2.addActionListener(actionListener);
@@ -346,13 +351,14 @@ public class EditorMenues extends JMenuBar {
 			else if(item==debug || item==debug2) doDebugAction();
 			else if(item==autoRefresh) current.AUTO_REFRESH=autoRefresh.isSelected();
 			else if(item==autoRefresh2) current.AUTO_REFRESH=autoRefresh2.isSelected();
-			else if(item==setWorkSpace || item==setWorkSpace2) selectWorkspaceAction();
-			else if(item==setJavaDir || item==setJavaDir2) selectJavaDirAction();
-			else if(item==setOutputDir || item==setOutputDir2) selectOutputDirAction();
-			else if(item==setExtLibDir || item==setExtLibDir2) selectExtLibDirAction();
-			else if(item==workSpaces || item==workSpaces2) removeWorkspacesAction();
-			else if(item==editorUIScale || item==editorUIScale2) Option.resetUIScale();
-			else if(item==compilerMode || item==compilerMode2) Option.setCompilerMode();
+			else if(item==setWorkSpace   || item==setWorkSpace2) selectWorkspaceAction();
+			else if(item==setJavaDir     || item==setJavaDir2) selectJavaDirAction();
+			else if(item==setOutputDir   || item==setOutputDir2) selectOutputDirAction();
+			else if(item==setExtLibDir   || item==setExtLibDir2) selectExtLibDirAction();
+			else if(item==workSpaces     || item==workSpaces2) removeWorkspacesAction();
+			else if(item==editorUIScale  || item==editorUIScale2) Option.resetUIScale();
+			else if(item==editorPalette  || item==editorPalette2) Palette.doUpdatePalette();
+			else if(item==compilerMode   || item==compilerMode2) Option.setCompilerMode();
 			else if(item==compilerOption || item==compilerOption2) Option.selectCompilerOptions();
 			else if(item==runtimeOption  || item==runtimeOption2) RTOption.selectRuntimeOptions();			
 			else if(item==psiTree) doShowPsiTreeAction();
@@ -573,7 +579,7 @@ public class EditorMenues extends JMenuBar {
 		SourceTextPanel current=SimulaEditor.currentTextPanel;			
 //		PsiTree psiTree = current.moduleManager.getPsiTree();
 		String sourceFileName = current.moduleManager.getName();
-		ProgramModule programModule = current.moduleManager.getProgramModule();
+		ProgramModule programModule = current.moduleManager.getSyntaxTree();
 		
 		IO.println("EditorMenues.doStartRunning: programModule: "+programModule);
 		IO.println("EditorMenues.doStartRunning: programModule'identifier: "+programModule.getIdentifier());
@@ -606,11 +612,9 @@ public class EditorMenues extends JMenuBar {
 	/// The show PSI Tree action
 	private void doShowPsiTreeAction() {
 		SwingUtilities.invokeLater(() -> {
-			Option.internal.DEBUGGING=false;
-			SourceTextPanel current=SimulaEditor.currentTextPanel;			
-			current.moduleManager.dropPsiTree();
-			PsiTree psiTree = current.moduleManager.getPsiTree();
-			psiTree.popUpPsiTree();
+			ModuleManager current = SimulaEditor.getCurrentModule();
+			current.buildPsiAndSyntaxTrees();
+			current.getPsiTree().popUpPsiTree();
 		});
 	}
 	
@@ -620,38 +624,17 @@ public class EditorMenues extends JMenuBar {
 	/// The show Syntax Tree action
 	private void doShowSyntaxTreeAction() {
 		SwingUtilities.invokeLater(() -> {
-			Option.internal.DEBUGGING=false;
-			SourceTextPanel current=SimulaEditor.currentTextPanel;
-			ProgramModule programModule = current.moduleManager.getProgramModule();
+			ModuleManager current = SimulaEditor.getCurrentModule();
+//			Option.internal.DEBUGGING=false;
+//			SourceTextPanel current=SimulaEditor.currentTextPanel;
+//			ProgramModule programModule = current.moduleManager.getSyntaxTree();
 			
+			current.buildPsiAndSyntaxTrees();
+			ProgramModule programModule = current.getSyntaxTree();
 			DeclarationScope mainModule = programModule.mainModule;
 			IO.println("EditorMenues.doShowSyntaxTreeAction: mainModule=" + mainModule.getClass());
-//			DeclarationScope
-//			IO.println("EditorMenues.doShowSyntaxTreeAction: mainModule.declaredIn=" + mainModule.declaredIn   .getClass());
-			
-			
-//			if(mainModule instanceof MaybeBlockDeclaration mainBlock) {
-////				Declaration firstDcl = mainBlock.declarationList.getFirst();
-//				Statement firstStm = mainBlock.statements.getFirst();
-//				IO.println("EditorMenues.doShowSyntaxTreeAction: firstStm: " + firstStm);
-//				SyntaxTree syntaxTree = new SyntaxTree(firstStm);
-//				syntaxTree.popUp("MainModule: " + firstStm);
-////				Util.STOP();
-//			} else if(mainModule instanceof BlockDeclaration mainBlock) {
-//				SyntaxTree syntaxTree = new SyntaxTree(mainBlock);
-//				syntaxTree.popUp("MainBlock: ");
-////				Util.STOP();
-//			}
-			
-//			SyntaxTree syntaxTree = new SyntaxTree(Global.programModule.mainModule);
-			
-			
-			
-//			SyntaxTree syntaxTree = new SyntaxTree(mainModule);
 			SyntaxTree syntaxTree = new SyntaxTree(StandardClass.BASICIO);
 			syntaxTree.popUp("MainModule");
-//			Thread.dumpStack();
-////			Util.STOP();
 		});
 	}
 	
@@ -662,15 +645,12 @@ public class EditorMenues extends JMenuBar {
 	/// The render from psi action
 	private void doRenderFromPSIAction() {
 		SwingUtilities.invokeLater(() -> {
-			Option.internal.DEBUGGING=false;
-			SourceTextPanel current=SimulaEditor.currentTextPanel;
-			ProgramModule programModule = current.moduleManager.getProgramModule();
-			current.moduleManager.dropPsiTree();
-			PsiTree psiTree = current.moduleManager.getPsiTree();
-//			PsiTextPanel psiTextPanel=new PsiTextPanel(psiTree);
+			ModuleManager current = SimulaEditor.getCurrentModule();
+			current.buildPsiAndSyntaxTrees();
+			PsiTree psiTree = current.getPsiTree();
 			SimulaEditor.doNewTabbedPsiPanel(psiTree, Language.Simula);
 		});
-		Thread.dumpStack();
+//		Thread.dumpStack();
 	}
 
 

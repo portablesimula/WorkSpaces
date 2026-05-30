@@ -32,6 +32,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 import simula.psi.PsiTree;
@@ -174,13 +175,19 @@ public abstract class BlockDeclaration extends DeclarationScope {
 		}
 		psiBuilder.dropSubtree(PsiTree.Kind.declaration, " is not a Declaration: DROP LAST MAYBE DECLARATION TREE");
 		
-		while (!PsiParse.accept(psiBuilder, KeyWord.END, KeyWord.EOF)) {
+		LOOP:while(true) {
+			LexToken token = PsiParse.acceptParserToken(psiBuilder, KeyWord.END, KeyWord.EOF);
+//	        IO.println("BlockDeclaration.parseBlock: TESTING token: " + token);
+	        if(token != null) {
+		        if(token.keyWord == KeyWord.EOF)
+		        	Util.syntaxError(token, "Missing final block end");
+	        	break LOOP;
+	        }
 			Statement stm = Statement.acceptStatement(psiBuilder);
 			if (stm != null) statements.add(stm);
 			PsiParse.accept(psiBuilder, KeyWord.SEMICOLON);
+//		        IO.println("BlockDeclaration.parseBlock: TESTING stm: " + stm);
 		}
-
-//		Util.STOP();
 	}
 	
 	// ***********************************************************************************************

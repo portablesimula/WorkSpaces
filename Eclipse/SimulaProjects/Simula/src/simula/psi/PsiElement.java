@@ -1,5 +1,6 @@
 package simula.psi;
 
+import java.util.List;
 import javax.swing.text.Style;
 import simula.editor.PsiTextPanel;
 
@@ -15,6 +16,10 @@ public class PsiElement {// implements PsiElement {
 	public PsiElement(String debugName, CharSequence sourceText) {
 		this.debugName = debugName;
 		this.sourceText = sourceText;
+	}
+
+	public List<PsiElement> getChildren() {
+		return null;
 	}
 	
 	public String getText() { return null;}

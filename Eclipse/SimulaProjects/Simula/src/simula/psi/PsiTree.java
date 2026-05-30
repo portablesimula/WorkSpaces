@@ -78,6 +78,7 @@ public class PsiTree extends PsiElement {
 		if(Option.internal.TRACE_PSITREE_GROW)
 			IO.println("PsiTree.addChild: " + debugName + ": " + edChildrenText());
 		children.add(child);
+		child.parent = this;
 	}
 	
 	public void addTree(PsiTree psiTree) {
@@ -108,13 +109,13 @@ public class PsiTree extends PsiElement {
 		for(int i=n-1;n>=0;i--) {
 			PsiElement elt = children.get(i);
 //			IO.println("PsiTree.getLastParserChild: CHECK elt "+i+": "+elt);
-			if(elt instanceof LexToken token && token.isParserToken()) {
-				return token;
-			}
+			if(elt instanceof LexToken token && token.isParserToken()) return token;
+			if(elt instanceof PsiTree psiTree) return psiTree.getLastParserChild();
 		}
 		return null;
 	}
 
+	@Override
 	public List<PsiElement> getChildren() { return children; }
 	
 //	public LexToken getFirstChild() {

@@ -51,10 +51,9 @@ public class TooltipTextPane extends JTextPane {
 //        tip.setBackground(Color.YELLOW);
 //        tip.setBackground(Color.WHITE);
 //        tip.setForeground(Color.RED);
-        tip.setBackground(Palette.TooltipBackground);
-        tip.setForeground(Palette.TooltipForeground);
-        Border border = new LineBorder(Palette.TooltipBorder);
-        tip.setBorder(border);
+        tip.setBackground(Palette.HoverBackground);
+        tip.setForeground(Palette.HoverForeground);
+//        tip.setBorder(new LineBorder(Palette.HoverForeground));
 //        tip.setFont(new Font("Courier New", Font.PLAIN, 14));
         tip.setFont(new Font("Courier New", Font.BOLD, 12));
         return tip;

@@ -63,100 +63,46 @@ public abstract class Statement extends SyntaxElement {
 		super(psiTree);
 	}
 	
-	private static int SEQU = 0;
 	/// Parse a statement.
 	/// @return the statement
 	public static Statement acceptStatement(PsiBuilder psiBuilder) {
-//		if(SEQU++ > 50) Util.STOP();
 		ObjectList<LabelDeclaration> labels = null;
-		int lineNumber=PsiParse.getCurrentParserToken(psiBuilder).lineNumber;
-		if (Option.internal.TRACE_PARSE)
+		if (Option.internal.TRACE_PARSE) {
+			int lineNumber=PsiParse.getCurrentParserToken(psiBuilder).lineNumber;
 			Util.TRACE("Statement.acceptStatement: LabeledStatement: lineNumber="+lineNumber+", current=" + PsiParse.getCurrentParserToken(psiBuilder));//	+ ", prev=" + PsiParse.prevToken);
-
-		if(Option.TESTING_LABELED_STATEMENT) {
-			psiBuilder.startSubtree(PsiTree.Kind.label, "May be LabeledStatement");
-			Statement statement = null;
-			
-//			LexToken mayBeLabel = PsiParse.acceptIdentifier(psiBuilder);
-//			if (mayBeLabel != null) {
-//				IO.println("\n\nStatement.acceptStatement: MAYBE LABEL IDENTIFIER: " + mayBeLabel);
-//				while (PsiParse.accept(psiBuilder, KeyWord.COLON)) {
-//					if (mayBeLabel != null) {
-//						if (labels == null)	labels = new ObjectList<LabelDeclaration>();
-//						LabelDeclaration label = new LabelDeclaration(psiBuilder, mayBeLabel.getText());
-//						labels.add(label);
-//						DeclarationScope scope = Global.getCurrentScope();
-//						if(scope.labelList == null) scope.labelList = new LabelList(scope); 
-//						scope.labelList.add(label);
-//					} else Util.error("Missplaced ':'");
-//					mayBeLabel = PsiParse.acceptIdentifier(psiBuilder);
-//				}
-//			}
-			
-
-			LexToken mayBeLabel = PsiParse.acceptIdentifier(psiBuilder);
-			LOOP:while (mayBeLabel != null) {
-//				IO.println("\n\nStatement.acceptStatement: MAYBE LABEL IDENTIFIER: " + mayBeLabel);
-				if(PsiParse.accept(psiBuilder, KeyWord.COLON)) {
-					if (labels == null)	labels = new ObjectList<LabelDeclaration>();
-//					LabelDeclaration label = new LabelDeclaration(psiBuilder, mayBeLabel.getText());
-					LabelDeclaration label = new LabelDeclaration(psiBuilder, mayBeLabel.edText());
-					labels.add(label);
-					DeclarationScope scope = Global.getCurrentScope();
-					if(scope.labelList == null) scope.labelList = new LabelList(scope); 
-					scope.labelList.add(label);
-				} else break LOOP;
-				mayBeLabel = PsiParse.acceptIdentifier(psiBuilder);
-			}
-			
-			
-			if (labels != null) {
-//				IO.println("Statement.acceptStatement: LABELS: " + labels);
-//				IO.println("Statement.acceptStatement: prevParserToken: " + psiBuilder.prevParserToken());
-				if(mayBeLabel != null) {
-					psiBuilder.rollBackTo(psiBuilder.prevParserToken(), "RollBack to Statement after labels start");
-//					IO.println("Statement.acceptStatement: ROLLBACK DONE: ");	
-				}
-				statement = acceptUnlabeledStatement(psiBuilder);
-				statement = new LabeledStatement(psiBuilder, labels, statement);
-//				IO.println("Statement.acceptStatement: DONE LabeledStatement: " + statement);				
-				psiBuilder.doneSubtree(PsiTree.Kind.label, statement);
-			} else {
-				psiBuilder.dropSubtree(PsiTree.Kind.label, " is not a label");
-				statement = acceptUnlabeledStatement(psiBuilder);
-			}
-	//		IO.println("Statement.acceptStatement: DONE: " + statement);
-			return (statement);
-			
-		} else {
-			psiBuilder.startSubtree(PsiTree.Kind.label, "May be first LabelDeclaration");
-			LexToken mayBeLabel = PsiParse.acceptIdentifier(psiBuilder);
-//			IO.println("Statement.acceptStatement: IDENTIFIER: " + mayBeLabel);
-			while (PsiParse.accept(psiBuilder, KeyWord.COLON)) {
-				if (mayBeLabel != null) {
-					if (labels == null)	labels = new ObjectList<LabelDeclaration>();
-//					LabelDeclaration label = new LabelDeclaration(psiBuilder, mayBeLabel.getText());
-					LabelDeclaration label = new LabelDeclaration(psiBuilder, mayBeLabel.edText());
-					psiBuilder.doneSubtree(PsiTree.Kind.label, label);
-					psiBuilder.startSubtree(PsiTree.Kind.label, "May be next LabelDeclaration");
-					labels.add(label);
-					DeclarationScope scope = Global.getCurrentScope();
-					if(scope.labelList == null) scope.labelList = new LabelList(scope); 
-					scope.labelList.add(label);
-				} else Util.error("Missplaced ':'");
-				mayBeLabel = PsiParse.acceptIdentifier(psiBuilder);
-			}
-			psiBuilder.dropSubtree(PsiTree.Kind.label, " is not a label");
-			
-			Statement statement = acceptUnlabeledStatement(psiBuilder);
-			if (labels != null && statement != null) {
-				statement = new LabeledStatement(psiBuilder, labels, statement);
-//				IO.println("Statement.acceptStatement: DONE LabeledStatement: " + statement);
-	//			Util.STOP();
-			}
-	//		IO.println("Statement.acceptStatement: DONE: " + statement);
-			return (statement);
 		}
+		psiBuilder.startSubtree(PsiTree.Kind.label, "May be LabeledStatement");
+		Statement statement = null;
+		LexToken mayBeLabel = PsiParse.acceptIdentifier(psiBuilder);
+		LOOP:while (mayBeLabel != null) {
+//			IO.println("\n\nStatement.acceptStatement: MAYBE LABEL IDENTIFIER: " + mayBeLabel);
+			if(PsiParse.accept(psiBuilder, KeyWord.COLON)) {
+				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
+				LabelDeclaration label = new LabelDeclaration(psiBuilder, mayBeLabel.edText());
+				labels.add(label);
+				DeclarationScope scope = Global.getCurrentScope();
+				if(scope.labelList == null) scope.labelList = new LabelList(scope); 
+				scope.labelList.add(label);
+			} else break LOOP;
+			mayBeLabel = PsiParse.acceptIdentifier(psiBuilder);
+		}
+		if (labels != null) {
+//			IO.println("Statement.acceptStatement: LABELS: " + labels);
+//			IO.println("Statement.acceptStatement: prevParserToken: " + psiBuilder.prevParserToken());
+			if(mayBeLabel != null) {
+				psiBuilder.rollBackTo(psiBuilder.prevParserToken(), "RollBack to Statement after labels start");
+//				IO.println("Statement.acceptStatement: ROLLBACK DONE: ");	
+			}
+			statement = acceptUnlabeledStatement(psiBuilder);
+			statement = new LabeledStatement(psiBuilder, labels, statement);
+//			IO.println("Statement.acceptStatement: DONE LabeledStatement: " + statement);				
+			psiBuilder.doneSubtree(PsiTree.Kind.label, statement);
+		} else {
+			psiBuilder.dropSubtree(PsiTree.Kind.label, " is not a label");
+			statement = acceptUnlabeledStatement(psiBuilder);
+		}
+//		IO.println("Statement.acceptStatement: DONE: " + statement);
+		return (statement);
 	}
 
 	/// Invariant: All Statement handlers starts with 'startSubtree' and ends with 'doneSubtree'.
@@ -249,7 +195,7 @@ public abstract class Statement extends SyntaxElement {
 			default:
 		        IO.println("Statement.default: " + KeyWord.edit(simToken.keyWord) + " " + (char)simToken.keyWord);
 		        // Error handling and consuming unknown tokens
-		        Util.error(simToken, "Misplaced symbol: " + KeyWord.edit(simToken.keyWord) + " ignored");
+		        Util.syntaxError(simToken, "Misplaced symbol: " + KeyWord.edit(simToken.keyWord) + " ignored");
 		        psiBuilder.advanceLexer();
 		        statement = DummyStatement.ofImplicit(psiBuilder);
 			break;

@@ -1,6 +1,6 @@
 begin
-   integer array arr(1:5);
-   integer isum, intr;
-    isum :=
-             isum + intr + 444;
+   comment dette
+ er
+ en 
+ kommentar ;
 end;

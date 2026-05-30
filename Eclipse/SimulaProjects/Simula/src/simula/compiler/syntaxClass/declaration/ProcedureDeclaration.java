@@ -50,6 +50,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.editor.PsiTextPanel;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
@@ -155,7 +156,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		proc.type = type;
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ProcedureDeclaration, type=" + type);
-		proc.modifyIdentifier(PsiParse.expectIdentifier(psiBuilder).edText());
+		proc.modifyIdentifier(PsiParse.expectIdentifier(psiBuilder, PsiTextPanel.styleNameProcedure).edText());
 //		IO.println("ProcedureDeclaration.expectProcedureDeclaration: "+proc.identifier);
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) {
 			expectFormalParameterPart(psiBuilder, proc.parameterList);

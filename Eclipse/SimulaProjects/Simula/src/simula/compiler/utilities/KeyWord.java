@@ -24,7 +24,7 @@ public class KeyWord {
 	/** Simula Keyword */ public final static int BOOLEAN      = 8;
 	/** Simula Keyword */ public final static int CHARACTER    = 9;
 	/** Simula Keyword */ public final static int CLASS        = 10;
-	/** Simula Keyword */ public final static int COMMENT      = 11;
+	/** Simula Keyword */ public final static int COMMENT_KEY  = 11;
 	/** Simula Keyword */ public final static int AMPERSAND    = 12;
 	/** Simula Keyword */ public final static int DELAY        = 13;
 	/** Simula Keyword */ public final static int DO           = 14;
@@ -112,7 +112,8 @@ public class KeyWord {
 	/** Other Symbol */ public final static int REALKONST      = 94;
 	/** Other Symbol */ public final static int LONGREALKONST  = 95;
 	/** Other Symbol */ public final static int TEXTKONST      = 96;
-	/** Other Symbol */ public final static int BAD_CHARACTERS = 97;
+	/** Other Symbol */ public final static int COMMENT_TEXT   = 97;
+	/** Other Symbol */ public final static int BAD_CHARACTERS = 98;
 
 	/// Returns the corresponding String.
 	/// @param key the argument key.
@@ -129,7 +130,7 @@ public class KeyWord {
 			case BOOLEAN    : return("BOOLEAN");
 			case CHARACTER  : return("CHARACTER");
 			case CLASS      : return("CLASS");
-			case COMMENT    : return("COMMENT");
+			case COMMENT_KEY: return("COMMENT");
 			case AMPERSAND  : return("AMPERSAND");
 			case DELAY      : return("DELAY");
 			case DO         : return("DO");
@@ -209,6 +210,7 @@ public class KeyWord {
 			case REALKONST:      return("REALKONST");
 			case LONGREALKONST:  return("LONGREALKONST");
 			case TEXTKONST:      return("TEXTKONST");
+			case COMMENT_TEXT:   return("COMMENT_TEXT");
 			case OR_ELSE:        return("OR_ELSE");
 			case AND_THEN:       return("AND_THEN");
 			case DOT:            return("DOT");

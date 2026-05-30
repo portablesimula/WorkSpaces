@@ -165,8 +165,8 @@ public abstract class DeclarationScope extends Declaration  {
 		
 		if (meaning == null) {
 			if (!Global.duringParsing) {
+				IO.println("DeclarationScope.findMeaning: Undefined variable: " + identifier);
 				Util.error("Undefined variable: " + identifier);
-				Util.STOP();
 			}
 			if(Option.CaseSensitive) {
 				Option.WARNINGS = true;

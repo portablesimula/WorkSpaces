@@ -1,28 +1,44 @@
 package simula.psi;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.lang.model.SourceVersion;
+import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+
 import simula.compiler.utilities.Html;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.editor.Palette;
 import simula.editor.PsiTextPanel;
 
 public class LexToken extends PsiElement {
 	public int keyWord;
-	public Vector<String> errors;
+	public String styleName;
+	
+	/// All errors associated with this LexToken
+	private Set<String> errors;
 	
 	public static LexToken prevToken;
 	
 	public void addError(String err) {
-		if(errors == null) errors = new Vector<String>();
+		if(errors == null) errors = new HashSet<String>();
 		errors.add(err);
 	}
 
+	public Set<String> getErrors() {
+		return errors;
+	}
 
 	public LexToken(int tokenStartLine, CharSequence sourceText, int startOffset, int endOffset, int keyWord) {
+		this(tokenStartLine, sourceText, startOffset, endOffset, keyWord, null);
+	}
+	
+	public LexToken(int tokenStartLine, CharSequence sourceText, int startOffset, int endOffset, int keyWord, String styleName) {
 		super(KeyWord.edit(keyWord), sourceText);
 		this.lineNumber = tokenStartLine;
 		this.keyWord = keyWord;
@@ -33,36 +49,33 @@ public class LexToken extends PsiElement {
 			if(keyWord != KeyWord.EOF)
 				Util.IERR("NEW LexToken: Illegal Token: " + this.getClass().getSimpleName()+ " " + this);
 		}
-//		if(Option.TESTING_SUBSEQUENT_TOKENS) {
-//			if(prevToken != null) {
-//				if(startOffset != prevToken.endOffset) {
-//					System.err.println("NEW LexToken: Prev Token: " + prevToken.getClass().getSimpleName()+ " " + prevToken);
-//					System.err.println("NEW LexToken: This Token: " + this.getClass().getSimpleName()+ " " + this);
-//					Util.IERR("\"NEW LexToken: Illegal gap between tokens: ");
-//					Util.STOP();
-//				}
-//			}
-//			prevToken = this;
-//		}
+		
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) {
 			if(Option.internal.TRACE_NEW_LEXTOKEN > 1) {
-//				IO.println("NEW LexToken: Line: "+lineNumber+": "+this); //+"  CALLED FROM: " + Util.calledFrom(3, 25));
 				IO.println("NEW LexToken: Line: "+lineNumber+": "+this+"  CALLED FROM: " + Util.calledFrom(3, 25));
 			} else {
 				if(keyWord == KeyWord.WHITESPACES) ; // Nothing
 				else if(keyWord == KeyWord.NEWLINE) ; // Nothing
 				else {
-//					IO.println("NEW LexToken: Line: "+lineNumber+": "+this); //+"  CALLED FROM: " + Util.calledFrom(3, 25));
 					IO.println("NEW LexToken: Line: "+lineNumber+": "+this+"  CALLED FROM: " + Util.calledFrom(3, 25));
-//					Thread.dumpStack();
 				}
 			}
-//			IO.println("NEW LexToken: "+this+"  CALLED FROM: " + Util.calledFrom(3, 25));
-//			Thread.dumpStack();
 		}
-//		if(startOffset == 63) {
-//			Util.IERR("STOP ON TOKEN: " + this);
-//		}
+		
+		if(Option.PSI_VERIFY) {
+			if(keyWord != KeyWord.NEWLINE && this.getText().contains("\n"))
+				Util.IERR("NEW LexToken: PSI_VERIFY FAILD: Token text contais NEWLINE: " + this);
+			if(prevToken != null) {
+				if(keyWord != KeyWord.EOF && startOffset != prevToken.endOffset) {
+					System.err.println("NEW LexToken: Prev Token: " + prevToken.getClass().getSimpleName()+ " " + prevToken);
+					System.err.println("NEW LexToken: This Token: " + this.getClass().getSimpleName()+ " " + this);
+					Util.IERR("\"NEW LexToken: Illegal gap between tokens: ");
+					Util.STOP();
+				}
+			}
+//			prevToken = this;
+			prevToken = (keyWord != KeyWord.EOF)? this : null;
+		}
 	}
 
 //	public LexToken(int tokenStartLine, int keyWord) {
@@ -135,7 +148,8 @@ public class LexToken extends PsiElement {
 	public boolean isParserToken() {
 		if(keyWord == KeyWord.NEWLINE) return false;
 		if(keyWord == KeyWord.WHITESPACES) return false;
-		if(keyWord == KeyWord.COMMENT) return false;
+		if(keyWord == KeyWord.COMMENT_KEY) return false;
+		if(keyWord == KeyWord.COMMENT_TEXT) return false;
 		return true;
 	}
 
@@ -149,24 +163,70 @@ public class LexToken extends PsiElement {
 	/// @return the style for this Token's keyword
 	@Override
 	public Style getStyle(final PsiTextPanel psiText) {
-		if(errors != null) return psiText.styleError;
+		if(getErrors() != null) return psiText.styleError;
+		if(styleName != null) return psiText.doc.getStyle(styleName);
 		switch(keyWord) {
 		    case KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF, KeyWord.COMMA, KeyWord.COLON, KeyWord.SEMICOLON,
 		    	 KeyWord.BEGPAR, KeyWord.ENDPAR, KeyWord.BEGBRACKET, KeyWord.ENDBRACKET, KeyWord.EQR, KeyWord.NER,
 			     KeyWord.EQ, KeyWord.GE, KeyWord.GT, KeyWord.LE, KeyWord.LT, KeyWord.NE,
 			     KeyWord.PLUS, KeyWord.MINUS, KeyWord.MUL, KeyWord.DIV, KeyWord.INTDIV, KeyWord.EXP,
-			     KeyWord.IDENTIFIER, KeyWord.DOT:
+			     KeyWord.IDENTIFIER,
+			     KeyWord.DOT:
 		    	 return psiText.styleRegular;
 		    	 
 		    case KeyWord.BOOLEANKONST, KeyWord.INTEGERKONST, KeyWord.CHARACTERKONST,
 		    	 KeyWord.REALKONST, KeyWord.TEXTKONST, KeyWord.STRING:
 		    	 return psiText.styleConstant;
 		    	 
-		    case KeyWord.COMMENT:
+		    case KeyWord.COMMENT_TEXT:
 		    	 return psiText.styleComment;
 		    	 
 		    default: return psiText.styleKeyword;
 		}
 	}
 
+    
+    public SimpleAttributeSet getTooltipAttrs(Set<String> errorLines) {
+    	
+    	if(errorLines != null || getErrors() != null) {
+    		IO.println("\n\nPsiTextPanel.getTooltipText: BEGIN: errorLines: "+errorLines);
+    		IO.println("PsiTextPanel.getTooltipText: BEGIN: lexErrors: "+getErrors());
+    	}
+    	errorLines = accumErrors(errorLines);
+    	
+    	if(errorLines == null) return null;
+    	IO.println("PsiTextPanel.getTooltipText: RENDER: errorLines: "+errorLines);
+    	
+    	String tooltipText = null;
+    	if(errorLines.size() == 1) {
+//    		tooltipText = errorLines.firstElement();
+    		for(String msg:errorLines) {
+    			tooltipText = msg;
+    		}    		
+    	} else {
+    		String res = "<html>Multiple markers on this line:<ul>";
+    		for(String msg:errorLines) {
+    			res = res + "<li>" + msg + "</li>";
+    		}
+        	IO.println("PsiTextPanel.getTooltipText: RESULT: "+res);
+        	tooltipText = res + "</ul>";
+    	}
+
+		SimpleAttributeSet attrs = new SimpleAttributeSet();
+        StyleConstants.setFontFamily(attrs, "Courier New");
+		StyleConstants.setForeground(attrs, Palette.ErrorForeground);
+		StyleConstants.setBackground(attrs, Palette.ErrorBackground);
+        StyleConstants.setBold(attrs, true);
+		attrs.addAttribute("tooltip", tooltipText);
+    	return attrs;
+    }
+
+    public Set<String> accumErrors(Set<String> errorLines) {
+    	Set<String> errors = getErrors();
+    	if(errors != null) {
+    		if(errorLines == null) errorLines = new HashSet<String>();
+    		errorLines.addAll(errors);
+    	}
+    	return errorLines;
+    }
 }

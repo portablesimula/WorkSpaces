@@ -48,6 +48,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.editor.PsiTextPanel;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 import simula.psi.PsiTree;
@@ -189,7 +190,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		cls.declaredIn.hasLocalClasses = true;
 		if (cls.prefix == null)
 			cls.prefix = StandardClass.CLASS.identifier;
-		cls.modifyIdentifier(PsiParse.expectIdentifier(psiBuilder).edText());
+		cls.modifyIdentifier(PsiParse.expectIdentifier(psiBuilder, PsiTextPanel.styleNameClassIdent).edText());
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) {
 			expectFormalParameterPart(psiBuilder, cls.parameterList);
 			PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);

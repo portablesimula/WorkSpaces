@@ -7,9 +7,7 @@
 package simula.compiler;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Vector;
 
 import simula.compiler.parsing.SimulaScanner;
@@ -218,7 +216,7 @@ public final class Simula {
 					Util.IERR("SJEKK DETTE NØYE !!!");
 					File sourceFile = new File(fileName);
 			    	Global.moduleManager = new ModuleManager(sourceFile);
-					new SimulaCompiler(fileName).doCompile(Global.moduleManager.getProgramModule());
+					new SimulaCompiler(fileName).doCompile(Global.moduleManager.getSyntaxTree());
 
 				} catch (IOException e) {
 					Util.error("can't open " + fileName + ", reason: " + e);

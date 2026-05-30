@@ -134,7 +134,7 @@ public final class SimulaScanner extends DefaultScanner {
   			  token = scanBasic();    
   	  } else {
   		do token = scanBasic();
-  		while (token!=null && ( token.getKeyWord() == KeyWord.COMMENT || token.getKeyWord() == KeyWord.STRING ));
+  		while (token!=null && ( token.getKeyWord() == KeyWord.COMMENT_KEY || token.getKeyWord() == KeyWord.STRING ));
   	  }
   	  return(token);
     }
@@ -832,7 +832,7 @@ public final class SimulaScanner extends DefaultScanner {
 		getNext();
 		if(current==' ') {
 			readUntilEndofLine(); // Skip comment line
-		    return (newToken(KeyWord.COMMENT));
+		    return (newToken(KeyWord.COMMENT_KEY));
 		} else if(current=='+' || current=='-') {
 			if(!lineSelected()) {
 				//Util.println("SimulaScanner.scanDirectiveLine: NOT SELECTED char="+(char)current);
@@ -840,13 +840,13 @@ public final class SimulaScanner extends DefaultScanner {
 		    }
 			//Util.println("SimulaScanner.scanDirectiveLine: RETURN char="+(char)current);
 			getNext(); if(current != ' ') pushBack(current);
-		    return (newToken(KeyWord.COMMENT));
+		    return (newToken(KeyWord.COMMENT_KEY));
 		} else if(Character.isLetter(current)) {
 			String id=scanName();
 			if (id.equalsIgnoreCase("SELECT")) setSelectors();
 			else Directive.treatDirectiveLine(this,id,readUntilEndofLine());
 		}
-	    return (newToken(KeyWord.COMMENT));
+	    return (newToken(KeyWord.COMMENT_KEY));
 	}
 	
 	/// Utility: Read until end-of-line.
@@ -927,7 +927,7 @@ public final class SimulaScanner extends DefaultScanner {
 		}
 		if (Option.internal.TRACE_LEXER > 0) Util.TRACE("END scanComment: " + edcurrent() + "  skipped=\"" + skipped + '"');
 		if (Option.internal.TRACE_COMMENTS) Util.TRACE("COMMENT:\"" + skipped + "\" Skipped and replaced with a SPACE");
-		return (newToken(KeyWord.COMMENT));
+		return (newToken(KeyWord.COMMENT_KEY));
 	}
 	  
 	// ********************************************************************************
@@ -952,7 +952,7 @@ public final class SimulaScanner extends DefaultScanner {
 		skipped.append((char) current);
 		if (Option.internal.TRACE_LEXER > 0) Util.TRACE("END scanCommentToEndOfLine: " + edcurrent() + "  skipped=\"" + skipped + '"');
 		if (Option.internal.TRACE_COMMENTS) Util.TRACE("COMMENT:\"" + skipped + "\" Skipped and replaced with a SPACE");
-		return (newToken(KeyWord.COMMENT));
+		return (newToken(KeyWord.COMMENT_KEY));
 	}
 	
 	// ********************************************************************************
@@ -995,7 +995,7 @@ public final class SimulaScanner extends DefaultScanner {
 				if (Option.internal.TRACE_COMMENTS) Util.TRACE("ENDCOMMENT:\"" + skipped + '"');
 				if (firstLine < lastLine && (skipped.length() > 0))
 					Util.warning("END-Comment span mutiple source lines");
-				if(editorMode && accum.length()>0) tokenQueue.add(newToken(KeyWord.COMMENT));
+				if(editorMode && accum.length()>0) tokenQueue.add(newToken(KeyWord.COMMENT_KEY));
 				tokenQueue.add(newToken(KeyWord.SEMICOLON)); break LOOP;  
 			} else if (Character.isLetter(current)) {
 				String name = scanName();
@@ -1005,7 +1005,7 @@ public final class SimulaScanner extends DefaultScanner {
 					if (Option.internal.TRACE_COMMENTS) Util.TRACE("END-COMMENT:\"" + skipped + '"');
 					if (firstLine < lastLine && (skipped.length() > 0))
 						Util.warning("END-Comment span mutiple source lines");
-					if(editorMode) tokenQueue.add(newToken(KeyWord.COMMENT)); break LOOP;		   
+					if(editorMode) tokenQueue.add(newToken(KeyWord.COMMENT_KEY)); break LOOP;		   
 				}
 				skipped.append(name); // lastLine=Global.sourceLineNumber;
 			} else if (!isWhiteSpace(current)) {
@@ -1014,7 +1014,7 @@ public final class SimulaScanner extends DefaultScanner {
 			}
 		}
 		
-		if(editorMode && accum.length()>0) tokenQueue.add(newToken(KeyWord.COMMENT));
+		if(editorMode && accum.length()>0) tokenQueue.add(newToken(KeyWord.COMMENT_KEY));
 		if (Option.internal.TRACE_COMMENTS)
 			Util.TRACE("ENDCOMMENT:\"" + skipped + '"');
 		Token res=tokenQueue.remove();

@@ -87,7 +87,7 @@ public final class RunSimulaSample {
 //			new SimulaCompiler(fileName, reader).doCompile();
 			File sourceFile = new File(fileName);
 	    	Global.moduleManager = new ModuleManager(sourceFile);
-			new SimulaCompiler(fileName).doCompile(Global.moduleManager.getProgramModule());
+			new SimulaCompiler(fileName).doCompile(Global.moduleManager.getSyntaxTree());
 		} catch (IOException e) {
 			Util.error("can't open " + fileName + ", reason: " + e);
 		}

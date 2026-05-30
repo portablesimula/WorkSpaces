@@ -1,64 +1,9 @@
+ begin
 
- class MainSeparat(i); integer i; virtual: switch EXIT;
-begin
-   boolean TESTING=true;
-   integer traceCase;
-   text array facit(0:14);
-
-   integer IINT=45;
-   integer IREA=IINT+1;
-   character cc='a';
-   text ttt="Abracadabra";
-   boolean bb=true;
-   real rr=IINT+sqrt(4);
-   
-   text t; 
-   integer nA,nB; integer array iA(1:6);
-   ref(A) x; 
-   ref(B) y; 
-
-   procedure trace(msg); text msg;
-   begin
-      if verbose then
-      begin outtext(msg); outimage; end;
-      if TESTING then
-      begin
-         if msg <> facit(traceCase) then
-         begin err("Case " & edit(traceCase));
-            outtext("Trace: " & msg); outimage;
-            outtext("Facit: " & facit(traceCase)); outimage;
-         end;
-         traceCase:=traceCase+1;
-      end;
-   end;
-    
-   text procedure edIdent(id,n); character id; integer n; 
-   begin text t; t:-copy("(Xn)"); 
-         t.sub(2,1).putchar(id); 
-         t.sub(3,1).putchar(char(rank('0')+n)); 
-         edIdent:-t; 
-   end; 
-  
-  Infile class MyInfile; virtual: procedure pvirt is ref(File) procedure actual(i,j); integer i,j;;
-  begin 
-     ref(File) procedure pvirt(i,j); integer i,j; 
-     begin i:=34; 
-     end; 
-     integer procedure inRom; 
-     begin  
-        ref(File) myFile; 
-        myFile :- pvirt(4,3); 
-     end; 
-  end; 
- 
-   class A; 
-   begin real array X(P:1); 
-         integer ord; 
-         text procedure idA; begin idA:-edIdent('A',ord); end; 
-         ord:=nA:=nA+1; 
-         trace("Event A-1: " & idA); 
-   end; 
- 
-
- 
+	Simulation begin
+	
+%		reactivate main at time+20.0;
+		xmain :- none;
+	
+%	end;
 end

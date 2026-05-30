@@ -161,7 +161,7 @@ public final class ExternalDeclaration extends Declaration {
 					externalIdentifier = xident.value;
 					IO.println("ExternalDeclaration.expectExternalDeclaration: extIdentifier" + externalIdentifier);
 				} else {
-					Util.error(token, "Expecting external identifier string");
+					Util.syntaxError(token, "Expecting external identifier string");
 				}
 				psiBuilder.advanceLexer();
 			}

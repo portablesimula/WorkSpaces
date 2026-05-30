@@ -119,7 +119,7 @@ public class PsiParse {
 //			}
 			return (true);
 		}
-		Util.error(psiBuilder.getCurrentParserToken(), 
+		Util.syntaxError(psiBuilder.getCurrentParserToken(), 
 				"Got symbol '" + PsiParse.currentLexToken(psiBuilder) + "' while expecting KeyWord " + KeyWord.edit(key).toLowerCase());
 		return (false);
 	}
@@ -269,54 +269,30 @@ public class PsiParse {
 	
 	/// Test to accept an identifier.
 	/// @return the identifier or null
-//	public static String acceptIdentifier(final PsiBuilder psiBuilder) {
-//		if(pendingIdentifier != null) {
-//			String res = pendingIdentifier;
-//			pendingIdentifier = null;
-//			return res;
-//		}
-//		LexToken token = null;
-//		if ((token = PsiParse.acceptParserToken(psiBuilder, KeyWord.IDENTIFIER)) != null) {
-//			String ident = token.getText();
-////			if(SourceVersion.isKeyword(ident)) // Check for Java keyWord
-////				ident = "_" + ident;
-//			return ident;
-//		}
-//		return (null);
-//	}
-	public static LexToken acceptIdentifier(final PsiBuilder psiBuilder) {
-//		LexToken token = pendingIDToken; pendingIDToken = null;
-//		if(token == null)
-			
+	public static LexToken acceptIdentifier(final PsiBuilder psiBuilder, String styleName) {
 		LexToken token = PsiParse.acceptParserToken(psiBuilder, KeyWord.IDENTIFIER);
+		token.styleName = styleName;
 		return (token);
 	}
 
+	public static LexToken acceptIdentifier(final PsiBuilder psiBuilder) {
+		LexToken token = PsiParse.acceptParserToken(psiBuilder, KeyWord.IDENTIFIER);
+		return (token);
+	}
 	
 	/// Test to expect an identifier.
 	/// 
 	/// If failing to do so, an error is printed.
 	/// @return the identifier or null
-//	public static String expectIdentifier(final PsiBuilder psiBuilder) {
-//        LexToken currentToken = getCurrentParserToken(psiBuilder);
-//		String ident = acceptIdentifier(psiBuilder);
-//		if(ident == null) Util.error("Got symbol " + currentToken + " while expecting an Identifier");
-//		return (ident);
-//	}  
+	public static LexToken expectIdentifier(final PsiBuilder psiBuilder, String styleName) {
+        LexToken ident = acceptIdentifier(psiBuilder, styleName);
+		return (ident);
+	} 
+	
 	public static LexToken expectIdentifier(final PsiBuilder psiBuilder) {
         LexToken ident = acceptIdentifier(psiBuilder);
 		return (ident);
 	}  
-//	public static String expectIdentifierText(final PsiBuilder psiBuilder) {
-//        LexToken currentToken = getCurrentParserToken(psiBuilder);
-//        LexToken ident = acceptIdentifier(psiBuilder);
-//		if(ident == null) {
-//			Util.error(currentToken, "Got symbol " + KeyWord.edit(currentToken.keyWord) + " while expecting an Identifier");
-//			psiBuilder.advanceLexer();
-//			return null;
-//		}
-//		return ident.getText();
-//	}  
 
 	/// Test to accept a Type.
 	/// @return the type or null

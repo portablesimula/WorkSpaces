@@ -7,6 +7,8 @@ import java.nio.file.Path;
 
 import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
+import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.editor.SourceTextPanel;
 import simula.psi.PsiBuilder;
@@ -17,7 +19,7 @@ public class ModuleManager {
 	public File sourceFile;
 	
 	PsiTree psiTree;
-	private ProgramModule programModule; // Root of Syntax Tree
+	private ProgramModule syntaxTree; // Root of Syntax Tree
 	
 	SourceTextPanel textPanel;
 	
@@ -40,38 +42,42 @@ public class ModuleManager {
 		return Files.readString(sourceFile.toPath());
 	}
 	
-	public void dropPsiTree() {
+	public void dropPsiAndSyntaxTrees() {
 		psiTree = null;
+		syntaxTree = null;
+	}
+
+	public void buildPsiAndSyntaxTrees() {
+		PsiBuilder psiBuilder = new PsiBuilder();
+		try {
+			psiBuilder.start(getSourceText());
+			syntaxTree = new ProgramModule(psiBuilder);
+		} catch (Exception e) {
+			IO.println("ModuleManager.buildPsiAndSyntaxTrees: GOT EXCEPTION: " + e.getMessage());
+			e.printStackTrace();
+		}
+			
+		StandardClass.ENVIRONMENT.doChecking();
+		Global.duringParsing = false;
+		syntaxTree.doChecking();
+		psiTree = psiBuilder.getRoot();
+		if(Option.PSI_VERIFY) {
+			checkPsiText(psiTree);
+		}
 	}
 
 	public PsiTree getPsiTree() {
-		if(psiTree == null) {
-			PsiBuilder psiBuilder = new PsiBuilder();
-//			psiBuilder.start(textPanel.getText());
-			try {
-				psiBuilder.start(getSourceText());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			programModule = new ProgramModule(psiBuilder);
-			StandardClass.ENVIRONMENT.doChecking();
-//			programModule.doChecking();
-			psiTree = psiBuilder.getRoot();
-			checkPsiText();
-		}
+		if(psiTree == null) buildPsiAndSyntaxTrees();
 		return psiTree;
 	}
 	
-	public ProgramModule getProgramModule() {
-		if(programModule == null) {
-//			Global.programModule.printTree(1, this);
-			getPsiTree();
-		}
-		return programModule;
+//	public ProgramModule getSyntaxTree() {
+	public ProgramModule getSyntaxTree() {
+		if(syntaxTree == null) buildPsiAndSyntaxTrees();
+		return syntaxTree;
 	}
 	
-	private void checkPsiText() {
+	private void checkPsiText(PsiTree psiTree) {
 //		if(! psiTree.getText().equals(textPanel.getText())) {
 		try {
 			String txt1 = psiTree.getText().replace("\t", "");

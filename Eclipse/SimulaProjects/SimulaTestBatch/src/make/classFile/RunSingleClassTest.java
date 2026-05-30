@@ -53,10 +53,11 @@ public final class RunSingleClassTest {
 //		Option.internal.TRACE_CODING=true;
 
 		// Overall TRACING Options
-		Option.internal.TRACING=true;
+//		Option.internal.TRACING=true;
 
 		// Scanner Trace Options
 //		Option.internal.TRACE_LEXER=true;
+		Option.internal.TRACE_NEW_LEXTOKEN=2;
 //		Option.internal.TRACE_COMMENTS=true;
 
 		// Parser Trace Options
@@ -67,7 +68,7 @@ public final class RunSingleClassTest {
 
 		// Checker Trace Options
 //		Option.internal.TRACE_FIND_MEANING=4;
-		Option.internal.TRACE_CHECKER=true;
+//		Option.internal.TRACE_CHECKER=true;
 //		Option.internal.TRACE_CHECKER_OUTPUT=true;
 
 		Global.packetName="simulaTestBatch";
@@ -83,13 +84,13 @@ public final class RunSingleClassTest {
 //		RTOption.BLOCK_TRACING = true;
 //		RTOption.GOTO_TRACING = true;
 //		RTOption.QPS_TRACING = true;
-		RTOption.SML_TRACING = true;
+//		RTOption.SML_TRACING = true;
 		
 //		Option.internal.RUNTIME_USER_DIR = "C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/TestBatch/";
     	//System.setProperty("file.encoding","UTF-8");
 		Vector<String> names=new Vector<String>();
 //		names.add("AdHoc_SimulaTest.sim"); // Simula TestBatch Framework
-//		names.add("adHoc00.sim"); // For ad'hoc testing
+		names.add("adHoc00.sim"); // For ad'hoc testing
 //		names.add("adHoc01.sim"); // For ad'hoc testing
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
@@ -221,7 +222,7 @@ public final class RunSingleClassTest {
 //		names.add("simtst104.sim"); // OK: Procedure parameter 'F' by name.
 //		names.add("simtst105.sim"); // OK: Multiple assignments.
 //		names.add("simtst106.sim"); // ERR: Test SIMULATION, complex example.
-		names.add("simtst107.sim"); // OK:  Test Process, activation statements, idle, terminated, time.
+//			names.add("simtst107.sim"); // OK:  Test Process, activation statements, idle, terminated, time.
 //		names.add("simtst108.sim"); // OK: Simple Co-Routine Sample 1: detach - call
 //		names.add("simtst109.sim"); // OK: Simple Co-Routine Sample 2: detach - resume
 //		names.add("simtst110.sim"); // OK: Simple Co-Routine Sample 3: detach - resume - chain
@@ -305,6 +306,7 @@ public final class RunSingleClassTest {
 //		names.add("simerr07.sim"); // OK: Wrong number of paramerters to virtual procedure
 //		names.add("simerr08.sim"); // OK: Illegal assignment. Name parameter is not a variable
 //		names.add("simerr09.sim"); // OK: Read/write access on DirectFile and DirectByteFile
+//		names.add("simerr10.sim"); // OK: Integer Overflow
 
 //		names.add("single_tst01.sim"); // OK: Single test: L: OutText("...");
 //		names.add("single_tst02.sim"); // OK: Single test: OutText("...");
@@ -325,7 +327,7 @@ public final class RunSingleClassTest {
 //				new SimulaCompiler(fileName, reader).doCompile();
 				File sourceFile = new File(fileName);
 		    	Global.moduleManager = new ModuleManager(sourceFile);
-				new SimulaCompiler(fileName).doCompile(Global.moduleManager.getProgramModule());
+				new SimulaCompiler(fileName).doCompile(Global.moduleManager.getSyntaxTree());
 			} catch (IOException e) {
 				Util.error("can't open " + fileName + ", reason: " + e);
 			}

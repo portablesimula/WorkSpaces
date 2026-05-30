@@ -23,6 +23,7 @@ import simula.compiler.ModuleManager;
 import simula.compiler.JarFileBuilder;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.StandardClass;
+import simula.editor.Palette;
 import simula.editor.RTOption;
 
 /// Global Variables.
@@ -180,6 +181,7 @@ public final class Global {
 				} catch(Exception e) {}
 			}
 		}
+    	Palette.init();
 	}
 
 	/// The declaration scope stack.
