@@ -52,7 +52,7 @@ public final class InnerStatement extends Statement {
 		
 		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
 			if(cls.statements1 != null) {
-				Util.semanticError(this, "Multiple Inner Statements: statements1'last: "+cls.statements1.lastElement()+" at line; "+cls.statements1.lastElement().firstLineNumber());
+				Util.semanticError(this, "Multiple Inner Statements");
 			} else {
 				cls.statements1 = cls.statements;
 				cls.statements = new ObjectList<Statement>();

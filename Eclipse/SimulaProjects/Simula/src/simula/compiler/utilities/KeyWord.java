@@ -219,7 +219,7 @@ public class KeyWord {
 			case WHITESPACES:    return("WHITESPACES");
 			case EOF:            return("EOF");
 		}
-		return("Unknown:"+key);
+		return("Unknown KeyWord:" + key);
 	}
 	
 	/// Returns the corresponding Java code.

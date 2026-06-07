@@ -218,7 +218,7 @@ public class PsiTextPanel extends JPanel {
 	public String getText() {
 		try {
 			String text = doc.getText(0, doc.getLength());
-			IO.println("SourceTextPanel.getText: |" + text.replace("\r", "\\r").replace("\n", "\\n")+'|');
+//			IO.println("PsiTextPanel.getText: |" + text.replace("\r", "\\r").replace("\n", "\\n")+'|');
 			return text;
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
@@ -402,7 +402,6 @@ public class PsiTextPanel extends JPanel {
 
         s = doc.addStyle(styleNameKeyword, regular);
         StyleConstants.setBold(s, true);
-        IO.println("PsiTextPanel.addStylesToSourceDocument: KeywordForeground: " + Palette.toHex(Palette.KeywordForeground));
         StyleConstants.setForeground(s, Palette.KeywordForeground);
 
         s = doc.addStyle(styleNameConstant, regular);

@@ -113,14 +113,10 @@ public class PsiParse {
 	/// @return true if the keyword was accepted, otherwise false
 	public static boolean expect(final PsiBuilder psiBuilder, final int key) {
 		if (accept(psiBuilder, key)) {
-//			if(key == KeyWord.SEMICOLON) {
-//				IO.println("PsiParse.expect: "  + KeyWord.edit(key).toUpperCase() + ", current: " + PsiParse.currentLexToken(psiBuilder)
-//				+ "  SUCCESS -  CALLED FROM: " + Util.calledFrom(3, 25));
-//			}
 			return (true);
 		}
 		Util.syntaxError(psiBuilder.getCurrentParserToken(), 
-				"Got symbol '" + PsiParse.currentLexToken(psiBuilder) + "' while expecting KeyWord " + KeyWord.edit(key).toLowerCase());
+				"Got symbol '" + PsiParse.currentLexToken(psiBuilder).edText() + "' while expecting KeyWord " + KeyWord.edit(key).toLowerCase());
 		return (false);
 	}
 

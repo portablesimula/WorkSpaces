@@ -157,7 +157,7 @@ public abstract class SyntaxElement {
 	public void addError(String err) {
 //		if(errors == null) errors = new Vector<String>();
 //		errors.add(err);
-		IO.println("SyntaxElement.addError: TREATING " + this.getClass().getSimpleName() + " " + this + "  ERR="+err);
+//		IO.println("SyntaxElement.addError: TREATING " + this.getClass().getSimpleName() + " " + this + "  ERR="+err);
 		for(PsiElement elt : psiTree.getChildren()) {
 			if(elt instanceof LexToken token) {
 				switch(token.keyWord) {
@@ -166,7 +166,7 @@ public abstract class SyntaxElement {
 					case KeyWord.COMMENT_TEXT:
 						break;
 					default:
-						IO.println("SyntaxElement.addError: ADD TO " + token);
+//						IO.println("SyntaxElement.addError: ADD TO " + token);
 					    token.addError(err);
 				}
 			}

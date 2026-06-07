@@ -123,7 +123,7 @@ public final class Util {
 		nError++;
 		printError(err);
 		token.addError(mss);
-		IO.println("Util.: ADD ERROR TEXT: " + token + " " + msg);
+//		IO.println("Util.: ADD ERROR TEXT: " + token + " " + msg);
 		Global.sourceLineNumber = lno;
 	}
 	
@@ -134,7 +134,7 @@ public final class Util {
 		String err = edLINE(": " + mss);
 		nError++;
 		
-		IO.println("\n\nUtil.semanticError: ADD ERROR TEXT: " + elt + " " + msg);
+//		IO.println("\n\nUtil.semanticError: ADD ERROR TEXT: " + elt + " " + msg);
 		printError(err);
 		elt.addError(mss);
 		Global.sourceLineNumber = lno;

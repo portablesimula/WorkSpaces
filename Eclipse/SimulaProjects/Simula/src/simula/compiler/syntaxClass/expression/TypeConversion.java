@@ -153,7 +153,7 @@ public final class TypeConversion extends Expression {
 		}
 		Type fromType = expression.type;
 		if(fromType==null) {
-			Util.semanticError(expression, "Expression "+expression+" has no type - can't be converted to "+toType);
+//			Util.semanticError(expression, "Expression "+expression+" has no type - can't be converted to "+toType);
 //			Thread.dumpStack();
 			return(false);
 		}
@@ -163,7 +163,8 @@ public final class TypeConversion extends Expression {
 			case ConvertValue:
 			case ConvertRef:		return (true);
 			case Illegal:
-				Util.semanticError(expression, "TypeConversion: Illegal cast: (" + toType + ") " + expression);
+				if(expression.type != Type.Undef)
+					Util.semanticError(expression, "TypeConversion: Illegal cast: (" + toType + ") " + expression);
 			default: return (false);
 		}
 	}

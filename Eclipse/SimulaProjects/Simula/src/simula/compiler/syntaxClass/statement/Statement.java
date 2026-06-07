@@ -193,9 +193,8 @@ public abstract class Statement extends SyntaxElement {
 				break;
 				
 			default:
-		        IO.println("Statement.default: " + KeyWord.edit(simToken.keyWord) + " " + (char)simToken.keyWord);
 		        // Error handling and consuming unknown tokens
-		        Util.syntaxError(simToken, "Misplaced symbol: " + KeyWord.edit(simToken.keyWord) + " ignored");
+		        Util.syntaxError(simToken, "Misplaced symbol: '" + simToken.edText() + "' ignored");
 		        psiBuilder.advanceLexer();
 		        statement = DummyStatement.ofImplicit(psiBuilder);
 			break;

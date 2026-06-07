@@ -424,7 +424,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		
 		if (hasRealPrefix()) {
 			prefixClass = getPrefixClass();
-			IO.println("ClassDecleration.doChecking: prefixClass: " + prefixClass );
+//			IO.println("ClassDecleration.doChecking: prefixClass: " + prefixClass );
 			if(prefixClass == null) {
 				Util.semanticError(this, "Prefix " + prefix + " is not a Class");
 			} else {
