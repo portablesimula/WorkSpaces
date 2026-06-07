@@ -104,14 +104,20 @@ public class PsiTree extends PsiElement {
 	
 	public LexToken getLastParserChild() {
 		int n = children.size();
-//		IO.println("PsiTree.getLastParserChild: "+n);
-//		this.printPsiTree("PsiTree.getLastParserChild: ");
-		for(int i=n-1;n>=0;i--) {
-			PsiElement elt = children.get(i);
-//			IO.println("PsiTree.getLastParserChild: CHECK elt "+i+": "+elt);
-			if(elt instanceof LexToken token && token.isParserToken()) return token;
-			if(elt instanceof PsiTree psiTree) return psiTree.getLastParserChild();
+		if(n > 0) {
+			for(int i=n-1;n>=0;i--) {
+				PsiElement elt = children.get(i);
+//				IO.println("PsiTree.getLastParserChild: CHECK elt "+i+": "+elt);
+				if(elt instanceof LexToken token && token.isParserToken()) return token;
+//				if(elt instanceof PsiTree psiTree) return psiTree.getLastParserChild();
+			}
 		}
+		IO.println("PsiTree.getLastParserChild: children.size="+n);
+		this.printPsiTree("PsiTree.getLastParserChild: ");
+		IO.println("PsiTree.getLastParserChild: parent="+parent);
+		parent.printPsiTree("PsiTree.getLastParserChild: PARENT TREE: ");
+		if(parent != null) return parent.getLastParserChild();
+//			Util.STOP();			
 		return null;
 	}
 

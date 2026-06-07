@@ -79,8 +79,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// ***********************************************************************************************
 	/// PrefixedBlock.
 	/// @param isMainModule true: this is the main module.
-	private PrefixedBlockDeclaration(final PsiTree psiTree, final boolean isMainModule) {
-		super(psiTree, null);
+	private PrefixedBlockDeclaration(final PsiBuilder psiBuilder, final boolean isMainModule) {
+		super(psiBuilder, null);
 //		if(isMainModule)
 //			modifyIdentifier(Global.sourceName);
 //		else modifyIdentifier("PBLK" + firstLineNumber());
@@ -94,7 +94,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	/// @param isMainModule true if main module
 	/// @return the resulting PrefixedBlockDeclaration
 	public static PrefixedBlockDeclaration expectPrefixedBlock(final PsiBuilder psiBuilder, final VariableExpression blockPrefix,boolean isMainModule) {
-		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(psiBuilder.psiTree, isMainModule);
+		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(psiBuilder, isMainModule);
 		block.declarationKind=ObjectKind.PrefixedBlock;
 		Util.ASSERT(blockPrefix != null,"blockPrefix == null");
 		block.blockPrefix = blockPrefix;
@@ -121,7 +121,13 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		Global.enterScope(this.declaredIn);
 			blockPrefix.doChecking();
 			prefix = blockPrefix.identifier;
-			getPrefixClass().doChecking();
+//			getPrefixClass().doChecking();
+			prefixClass = getPrefixClass();
+			if(prefixClass == null) {
+				Util.semanticError(this, "Prefix " + prefix + " is not a Class");
+			} else {
+				prefixClass.doChecking();
+			}
 			LabelList.accumLabelList(this);
 		Global.exitScope();
 		

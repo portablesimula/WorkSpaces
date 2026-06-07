@@ -53,7 +53,7 @@ public final class LabeledStatement extends Statement {
 	/// @param statement the labeled statement
 //	LabeledStatement(final int line,final ObjectList<LabelDeclaration> labels,final Statement statement) {
 	LabeledStatement(final PsiBuilder psiBuilder, final ObjectList<LabelDeclaration> labels, final Statement statement) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		this.labels = labels;
 		this.statement = statement;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": LabeledStatement: "+this);

@@ -53,12 +53,12 @@ public final class WhileStatement extends Statement {
 	/// Create a new WhileStatement.
 	/// @param line the source line number
 	WhileStatement(final PsiBuilder psiBuilder) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		psiBuilder.consume(KeyWord.WHILE); //  (add it to 'current tree')
 
 //		if (Option.internal.TRACE_PARSE)
 //			Util.TRACE("Parse WhileStatement: line="+line+", current=" + PsiParse.currentLexToken(psiBuilder));
-		condition = Expression.expectExpression(psiBuilder);
+		condition = Expression.expectExpression(psiBuilder, "while");
 		PsiParse.expect(psiBuilder, KeyWord.DO);
 		doStatement = Statement.acceptStatement(psiBuilder);
 		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+firstLineNumber()+": WhileStatement: "+this);
@@ -69,7 +69,7 @@ public final class WhileStatement extends Statement {
 		if (IS_SEMANTICS_CHECKED())	return;
 		Global.sourceLineNumber=firstLineNumber();
 		condition.doChecking(); condition.backLink=this;
-		if (condition.type == null || condition.type.keyWord != Type.T_BOOLEAN) Util.error("While condition is not Boolean");
+		if (condition.type == null || condition.type.keyWord != Type.T_BOOLEAN) Util.semanticError(this, "While condition is not Boolean");
 		doStatement.doChecking();
 		SET_SEMANTICS_CHECKED();
 	}

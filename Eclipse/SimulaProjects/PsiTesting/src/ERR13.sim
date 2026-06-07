@@ -1,10 +1,17 @@
 begin
-  outtext("aaa"
+  array A(0:4);
+  text t;
+  integer z;
+  ref(DirectFile) df;
+  ref(InbyteFile) ibf;
 
-    comment xxxx;
-    "bbb" -- eeee
-    
-    "ccc"
-    );
-
-end;
+  outtext();
+  outtext(x, "abra");
+  outtext("abra" & x);
+  P(x, y);
+  A(1, 3);
+  t :- A(2);
+  z := t.min;
+  z := t.44;
+  df :- ibf qua DirectFile;
+ end;

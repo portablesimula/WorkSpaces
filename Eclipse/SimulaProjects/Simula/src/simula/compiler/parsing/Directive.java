@@ -44,7 +44,7 @@ public class Directive {
 		if (file.exists() && file.canRead()) {
 			scanner.insert(file);
 		} else
-			Util.error("Can't open " + fileName + " for reading");
+			Util.generalError("Can't open " + fileName + " for reading");
 	}
 
 }

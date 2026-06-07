@@ -225,7 +225,7 @@ public class PsiParse {
 
 	/// Skip misplaced current symbol.
 	public static void skipMisplacedCurrentSymbol(final PsiBuilder psiBuilder) {
-		Util.error("Misplaced symbol: "+PsiParse.currentLexToken(psiBuilder)+" -- Ignored");
+		Util.syntaxError(psiBuilder, "Misplaced symbol: "+PsiParse.currentLexToken(psiBuilder)+" -- Ignored");
 		nextToken(psiBuilder);
 	}
 

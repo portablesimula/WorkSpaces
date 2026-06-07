@@ -22,6 +22,7 @@ import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.ExternalDeclaration;
 import simula.compiler.syntaxClass.declaration.ProcedureDeclaration;
+import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.ClassHierarchy;
 import simula.compiler.utilities.DeclarationList;
@@ -29,6 +30,7 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 
 /// Simula attribute file input/output.
 /// 
@@ -92,11 +94,11 @@ public final class AttributeFileIO {
 	/// @param file the .jar file to read
 	/// @param enclosure the declaration list to update
 	/// @return the module type
-	public static Type readAttributeFile(final String identifier, final File file, final BlockDeclaration enclosure) {
+	public static Type readAttributeFile(final PsiBuilder psiBuilder,final String identifier, final File file, final BlockDeclaration enclosure) {
 		Type moduleType = null;
 		Util.warning("Separate Compiled Module is read from: \"" + file + "\"");
 		if (!(file.exists() && file.canRead())) {
-			Util.error("Can't read attribute file: " + file);
+			Util.generalError("Can't read attribute file: " + file);
 			return (null);
 		}
 		try {
@@ -114,7 +116,7 @@ public final class AttributeFileIO {
 
 			InputStream inputStream = jarFile.getInputStream(zipEntry);
 			byte[] bytes = inputStream.readAllBytes(); inputStream.close();
-			BlockDeclaration module = AttributeFileIO.readPrecompiled(file.toString(),bytes);
+			BlockDeclaration module = AttributeFileIO.readPrecompiled(psiBuilder, file.toString(),bytes);
 			moduleType = module.type;
 
 			Declaration d=declarationList.find(module.identifier);
@@ -139,30 +141,53 @@ public final class AttributeFileIO {
 			}
 
 		} catch (IOException e) {
-			Util.error("Unable to read Attribute File: " + file + " caused by: " + e);
+			Util.generalError("Unable to read Attribute File: " + file + " caused by: " + e);
 			Util.warning("It may be necessary to recompile '" + identifier + "'");
 			Util.IERR("Caused by:", e);
 		}
 		return (moduleType);
 	}
 	
+	/// Check if the jarFile is already included.
+	/// @param jarFile the jarFile.
+	/// @return false: if the jarFile is already included.
+	public static boolean checkJarFiles(File jarFile) {
+		for(File f:Global.externalJarFiles) if(f.equals(jarFile)) {
+			Util.warning("External already included: "+jarFile.getName());
+			return(false);
+		}
+		return true;
+	}
+
 	/// Read and return precompiled class or procedure.
 	/// @param fileID the file ident.
 	/// @param attrFile the attribute file.
 	/// @return the resulting class or procedure.
 	/// @throws IOException if somthing went wrong.
-	private static BlockDeclaration readPrecompiled(String fileID,byte[] attrFile) throws IOException {
+	private static BlockDeclaration readPrecompiled(PsiBuilder psiBuilder, String fileID,byte[] attrFile) throws IOException {
 		AttributeInputStream inpt = new AttributeInputStream(new ByteArrayInputStream(attrFile), fileID);
 
 		String vers = inpt.readString();
-		if(!(vers.equals(version))) Util.error("Malformed SimulaAttributeFile: " + fileID);
+		if(!(vers.equals(version))) Util.generalError("Malformed SimulaAttributeFile: " + fileID);
 
 		ClassHierarchy.readObject(inpt);
 
 		int declarationKind = inpt.readKind();
 		while(declarationKind == ObjectKind.ExternalDeclaration) {
 			ExternalDeclaration xdecl = ExternalDeclaration.readObject(inpt);
-			xdecl.readExternalAttributeFile();
+//			xdecl.readExternalAttributeFile();
+			/// Read external Attribute file.
+//			public void readExternalAttributeFile() {
+				File jarFile = JarFileBuilder.findJarFile(xdecl.identifier, xdecl.externalIdent);
+				if (jarFile == null) {
+					Util.syntaxError(psiBuilder, "Can't find attribute file: " + xdecl.identifier + '[' + xdecl.externalIdent + ']');
+				} else {
+					if(checkJarFiles(jarFile)) {
+						BlockDeclaration enclosure = StandardClass.BASICIO;
+						AttributeFileIO.readAttributeFile(psiBuilder, xdecl.identifier, jarFile, enclosure);
+					}
+				}		
+//			}
 			declarationKind = inpt.readKind();
 		}
 		

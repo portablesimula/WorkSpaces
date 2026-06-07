@@ -47,7 +47,7 @@ public final class Thunk extends DeclarationScope {
 	/// @param kind the kind code
 	/// @param expr the Thunk expression.
 	private Thunk(int kind,Expression expr) {
-		super(expr.psiTree, Global.sourceName + "$THUNK$" + (++OBJECT_SEQU));
+		super(expr.psiBuilder, Global.sourceName + "$THUNK$" + (++OBJECT_SEQU));
 		this.declarationKind = ObjectKind.Thunk;
 		this.kind = kind;
 		this.expr = expr;
@@ -449,7 +449,7 @@ public final class Thunk extends DeclarationScope {
 			} else Util.IERR();
 			
 			
-		} else Util.error("Illegal Procedure Expression as Actual Parameter: " + apar);
+		} else Util.codingError("Illegal Procedure Expression as Actual Parameter: " + apar);
 	}
 
 

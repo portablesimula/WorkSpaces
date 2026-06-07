@@ -19,6 +19,7 @@ import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiTree;
 
 /// Undefined Declaration.
@@ -34,8 +35,8 @@ public class UndefinedDeclaration extends Declaration {
 	/// Create a new UndefinedDeclaration.
 	/// 
 	/// @param identifier the variable identifier
-	public UndefinedDeclaration(final PsiTree psiTree, final String identifier) {
-		super(psiTree, identifier);
+	public UndefinedDeclaration(final PsiBuilder psiBuilder, final String identifier) {
+		super(psiBuilder, identifier);
 		this.declarationKind = ObjectKind.UndefinedDeclaration;
 		this.type = Type.Undef;
 	}
@@ -45,7 +46,7 @@ public class UndefinedDeclaration extends Declaration {
 		if (IS_SEMANTICS_CHECKED())
 			return;
 		Global.sourceLineNumber = firstLineNumber();
-		if(type != null) type.doChecking(Global.getCurrentScope());
+		if(type != null) type.doChecking(Global.getCurrentScope(), this);
 		
 		SET_SEMANTICS_CHECKED();
 	}

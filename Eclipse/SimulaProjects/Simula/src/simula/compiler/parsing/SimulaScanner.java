@@ -155,7 +155,7 @@ public final class SimulaScanner extends DefaultScanner {
 		            if(getNext() == '=')   return(newToken(KeyWord.EQR));
 		            if(current == '/')
 		            if(getNext() == '=')   return(newToken(KeyWord.NER));
-		            else Util.error("Illegal character combination ="+(char)current);
+		            else Util.generalError("Illegal character combination ="+(char)current);
 		            pushBack(current);     return(newToken(KeyWord.EQ));
 	            case '>':
 		            if(getNext() == '=')   return(newToken(KeyWord.GE));
@@ -212,7 +212,7 @@ public final class SimulaScanner extends DefaultScanner {
 	            case '\f':			/* FF */
 	            case '\r':			/* CR */
 	            	break;
-	            default: Util.error("Illegal character: "+(char)current+", Value="+(int)current);
+	            default: Util.generalError("Illegal character: "+(char)current+", Value="+(int)current);
 	                break;
     		}
     	}
@@ -466,7 +466,7 @@ public final class SimulaScanner extends DefaultScanner {
     	try {
     		res=Integer.parseInt(result,radix);
     	} catch (NumberFormatException e) {
-    		Util.error("Integer number out of range: "+result);
+    		Util.generalError("Integer number out of range: "+result);
     	}
     	return(newToken(KeyWord.INTEGERKONST,res));
     }
@@ -503,7 +503,7 @@ public final class SimulaScanner extends DefaultScanner {
     	try {
     		return(newToken(KeyWord.REALKONST,Float.parseFloat(result)));
     	} catch(NumberFormatException e) {
-    		Util.error("Illegal number: "+result);
+    		Util.generalError("Illegal number: "+result);
     		return(newToken(KeyWord.REALKONST,null));
     	}
     }
@@ -543,7 +543,7 @@ public final class SimulaScanner extends DefaultScanner {
     		if(doubleAmpersand) return(newToken(KeyWord.REALKONST,Double.parseDouble(result)));
     		return(newToken(KeyWord.REALKONST,Float.parseFloat(result)));
     	} catch(NumberFormatException e) {
-    		Util.error("Illegal number: "+result);
+    		Util.generalError("Illegal number: "+result);
     		return(newToken(KeyWord.REALKONST,null));
     	}
     }
@@ -605,10 +605,10 @@ public final class SimulaScanner extends DefaultScanner {
     		result=(char)current; getNext();
     	} else if(current == '!') {
     		result=(char)scanPossibleIsoCode(); getNext();
-    	} else Util.error("Illegal character constant. "+edcurrent());
+    	} else Util.generalError("Illegal character constant. "+edcurrent());
     	
     	if(current != '\'') {
-    		Util.error("Character constant is not terminated. "+edcurrent());
+    		Util.generalError("Character constant is not terminated. "+edcurrent());
     		pushBack(current);
     	}
     	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("END scanCharacterConstant, result='"+result+"', "+edcurrent());
@@ -655,7 +655,7 @@ public final class SimulaScanner extends DefaultScanner {
     				accumulatedTextConstant.append((char)code);
     			}
     			else if(current == EOF_MARK) {
-    				Util.error("Text constant is not terminated.");
+    				Util.generalError("Text constant is not terminated.");
     				String result=accumulatedTextConstant.toString(); accumulatedTextConstant=null;
     				if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanTextConstant(1): Result=\""+result+"\", "+edcurrent());
     				tokenQueue.add(newToken(KeyWord.TEXTKONST,result));
@@ -922,7 +922,7 @@ public final class SimulaScanner extends DefaultScanner {
 		if (current == ';')
 			current = ' '; // getNext();
 		else {
-			Util.error("Comment is not terminated with ';'.");
+			Util.generalError("Comment is not terminated with ';'.");
 			pushBack(current);
 		}
 		if (Option.internal.TRACE_LEXER > 0) Util.TRACE("END scanComment: " + edcurrent() + "  skipped=\"" + skipped + '"');

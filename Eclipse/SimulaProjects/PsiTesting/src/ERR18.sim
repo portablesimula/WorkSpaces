@@ -1,3 +1,13 @@
-class A; begin
-   integer i;
+begin
+   integer i, C;
+   A class B;;
+
+   W class W;;
+
+   class Q(x); value z; integer y;;
+
+   i := 666;
+   C begin
+   end;
+
 end

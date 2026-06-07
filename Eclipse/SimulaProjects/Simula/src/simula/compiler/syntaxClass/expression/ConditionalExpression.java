@@ -21,6 +21,7 @@ import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
+import simula.compiler.syntaxClass.declaration.UndefinedDeclaration;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
@@ -61,7 +62,7 @@ public final class ConditionalExpression extends Expression {
 	/// @param thenExpression then branch expression
 	/// @param elseExpression else branch expression
 	ConditionalExpression(final PsiBuilder psiBuilder, final Type type, final Expression condition, final Expression thenExpression, final Expression elseExpression) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		this.condition = condition;
 		this.thenExpression = thenExpression; thenExpression.backLink=this;
 		this.elseExpression = elseExpression; elseExpression.backLink=this;
@@ -75,18 +76,36 @@ public final class ConditionalExpression extends Expression {
 		Global.sourceLineNumber=firstLineNumber();
 		condition.doChecking();
 		condition.backLink=this; // To ensure _RESULT from functions
-		Type cType = condition.type;
-		if (cType.keyWord != Type.T_BOOLEAN)
-			Util.error("ConditionalExpression: Condition is not a boolean (rather " + cType + ")");
+		if(! Type.checkType(condition, Type.T_BOOLEAN)) {
+			Util.semanticError(this, "ConditionalExpression: Condition is not a boolean (rather " + condition.type + ")");
+		}
 		thenExpression.doChecking();
 		elseExpression.doChecking();
-		Type expectedType=Type.commonTypeConversion(thenExpression.type,elseExpression.type);
+		Type expectedType=commonTypeConversion(thenExpression.type,elseExpression.type);
 		thenExpression = TypeConversion.testAndCreate(expectedType, thenExpression);
 		elseExpression = TypeConversion.testAndCreate(expectedType, elseExpression);
 		thenExpression.doChecking(); // In case TypeConversion was added
 		elseExpression.doChecking(); // In case TypeConversion was added
 		this.type=expectedType;
 		SET_SEMANTICS_CHECKED();
+	}
+  
+	/// Returns the type to which both types can be converted.
+	/// @param type1 argument
+	/// @param type2 argument
+	/// @return the resulting Type
+	private Type commonTypeConversion(final Type type1,final Type type2) {
+		if(type1.equals(type2)) return(type1);
+		Type atype=Type.arithmeticTypeConversion(type1,type2);
+		if(atype!=null) return(atype);
+		if(type1.isReferenceType() && type2.isReferenceType()) {
+			if(type1.isSubReferenceOf(type2)) return(type2);
+		    if(type2.isSubReferenceOf(type1)) return(type1);
+		    Util.semanticError(this, "Incompatible types: "+type1+", "+type2);
+		    return(type1);
+		}
+		Util.semanticError(this, "Incompatible types: "+type1+", "+type2);
+		return(null);
 	}
 
 	// Returns true if this expression may be used as a statement.

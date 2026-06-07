@@ -59,8 +59,8 @@ import simula.psi.PsiTree;
 public abstract class Statement extends SyntaxElement {
 	
 	/// Create a new Statement.
-	protected Statement(final PsiTree psiTree) {
-		super(psiTree);
+	protected Statement(final PsiBuilder psiBuilder) {
+		super(psiBuilder);
 	}
 	
 	/// Parse a statement.

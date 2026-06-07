@@ -130,17 +130,17 @@ public final class BooleanExpression extends Expression {
 	/// @param opr Boolean operation
 	/// @param rhs right hand side
 	BooleanExpression(final PsiBuilder psiBuilder, Expression lhs, int opr, Expression rhs) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		this.lhs = lhs; this.opr = opr; this.rhs = rhs;
 //		psiBuilder.startSubtree(PsiTree.Kind.booleanExpression, "BooleanExpression");
 //		IO.println("NEW BooleanExpression: "+this);
 		if (this.lhs == null) {
-			Util.error("Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
+			Util.syntaxError(psiBuilder, "Missing operand before " + KeyWord.edit(opr));
+			this.lhs = new MissingExpression(psiBuilder);
 		}
 		if (this.rhs == null) {
-			Util.error("Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
+			Util.syntaxError(psiBuilder, "Missing operand after " + KeyWord.edit(opr));
+			this.rhs = new MissingExpression(psiBuilder);
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 //		psiBuilder.doneSubtree(PsiTree.Kind.booleanExpression, this);
@@ -163,7 +163,7 @@ public final class BooleanExpression extends Expression {
 				&&  (type2 != null && type2.keyWord == Type.T_BOOLEAN) )
 					this.type = Type.Boolean;
 				if (this.type == null)
-					Util.error("Incompatible types in binary operation: " + toString());
+					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
 				break;
 		    }
 		    default: Util.IERR();

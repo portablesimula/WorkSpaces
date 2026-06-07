@@ -243,7 +243,7 @@ public final class CallProcedure {
 	private static String codeCPF(final String ident,final VariableExpression variable,final ProcedureSpecification procedureSpec) {
 		if(! variable.hasArguments()) {
 			if(procedureSpec != null && procedureSpec.parameterList.size() > 0)
-				Util.error("Missing parameter(s) to " + variable.identifier);
+				Util.codingError("Missing parameter(s) to " + variable.identifier);
 		}
 		StringBuilder s=new StringBuilder();
 		if(procedureSpec!=null) s.append(codeCSVP(ident,variable,procedureSpec));
@@ -363,7 +363,7 @@ public final class CallProcedure {
 						Util.warning("Parameter Array " + actualParameter
 								+ " remains unchecked. Java or Runtime errors may occur");
 					else if (aDim != formalParameter.nDim)
-						Util.error("Parameter Array " + actualParameter + " has wrong number of dimensions");
+						Util.codingError("Parameter Array " + actualParameter + " has wrong number of dimensions");
 				}
 				if (prevPar)
 					s.append(',');
@@ -575,7 +575,7 @@ public final class CallProcedure {
 			} else Util.IERR("Flere sånne(2) tilfeller ???  QUAL="+decl.getClass().getSimpleName());
 			String procIdent = var.meaning.declaredAs.getJavaIdentifier();
 			return("new RTS_PRCQNT(" + staticLink + "," + procIdent + ".class)");
-		} else Util.error("Illegal Procedure Expression as Actual Parameter: " + apar);
+		} else Util.codingError("Illegal Procedure Expression as Actual Parameter: " + apar);
 	    return("UNKNOWN"); // Error recovery
 	}
 

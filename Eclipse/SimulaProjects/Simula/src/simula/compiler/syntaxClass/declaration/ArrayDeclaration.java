@@ -35,7 +35,6 @@ import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.TypeConversion;
 import simula.compiler.syntaxClass.expression.VariableExpression;
-import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Html;
 import simula.compiler.utilities.KeyWord;
@@ -46,7 +45,6 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 import simula.psi.TreeNodeIdent;
 
@@ -128,7 +126,7 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param type the array type
 	/// @param boundPairList The list of BoundPair
 	private ArrayDeclaration(final PsiBuilder psiBuilder, final String identifier, final Type type, final Vector<BoundPair> boundPairList) {
-		super(psiBuilder.psiTree, identifier);
+		super(psiBuilder, identifier);
 		this.declarationKind = ObjectKind.ArrayDeclaration;
 		this.type = type;
 		this.boundPairList = boundPairList;
@@ -175,9 +173,9 @@ public final class ArrayDeclaration extends Declaration {
 				PsiParse.TRACE("Parse BoundPairList");
 			boundPairList = new Vector<BoundPair>();
 			do {
-				Expression LB = Expression.expectExpression(psiBuilder);
+				Expression LB = Expression.expectExpression(psiBuilder, "lowerbound");
 				PsiParse.expect(psiBuilder, KeyWord.COLON);
-				Expression UB = Expression.expectExpression(psiBuilder);
+				Expression UB = Expression.expectExpression(psiBuilder, "upperbound");
 				boundPairList.add(new BoundPair(LB, UB));
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 			PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
@@ -234,7 +232,7 @@ public final class ArrayDeclaration extends Declaration {
 		Global.sourceLineNumber = firstLineNumber();
 		if (type == null)
 			type = Type.Real;
-		type.doChecking(declaredIn);
+		type.doChecking(declaredIn, this);
 		if (boundPairList != null)
 			for (BoundPair it : boundPairList)
 				it.doChecking();

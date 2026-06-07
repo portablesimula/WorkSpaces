@@ -109,16 +109,16 @@ public final class SwitchStatement extends Statement {
 	/// Create a new SwitchStatement.
 	/// @param line the source line number
 	SwitchStatement(final PsiBuilder psiBuilder) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		psiBuilder.consume(KeyWord.SWITCH); //  (add it to 'current tree')
 
 //		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);
 		PsiParse.expect(psiBuilder, KeyWord.BEGPAR);
-		lowKey = Expression.expectExpression(psiBuilder);
+		lowKey = Expression.expectExpression(psiBuilder, "lowkey");
 		PsiParse.expect(psiBuilder, KeyWord.COLON);
-		hiKey = Expression.expectExpression(psiBuilder);
+		hiKey = Expression.expectExpression(psiBuilder, "hikey");
 		PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
-		switchKey = Expression.expectExpression(psiBuilder);
+		switchKey = Expression.expectExpression(psiBuilder, "switch");
 		switchKey.backLink=this;
 		PsiParse.expect(psiBuilder, KeyWord.BEGIN);
 		has_NONE_case=false;
@@ -129,7 +129,7 @@ public final class SwitchStatement extends Statement {
 			Vector<SwitchInterval> caseKeyList=new Vector<SwitchInterval>();
 			if (PsiParse.accept(psiBuilder, KeyWord.NONE)) {
 				caseKeyList.add(null);
-				if(has_NONE_case) Util.error("NONE Case is already used");
+				if(has_NONE_case) Util.syntaxError(psiBuilder, "NONE Case is already used");
 				has_NONE_case=true;
 			}
 			else {
@@ -155,9 +155,9 @@ public final class SwitchStatement extends Statement {
 	/// Parse Utility: Expect case pair.
 	/// @return the resulting SwitchInterval
 	private SwitchInterval expectCasePair(final PsiBuilder psiBuilder) {
-		Expression lowCase=Expression.expectExpression(psiBuilder);
+		Expression lowCase=Expression.expectExpression(psiBuilder, "case");
 		Expression hiCase=null;
-		if(PsiParse.accept(psiBuilder, KeyWord.COLON)) hiCase=Expression.expectExpression(psiBuilder);
+		if(PsiParse.accept(psiBuilder, KeyWord.COLON)) hiCase=Expression.expectExpression(psiBuilder, "hicase");
 		return(new SwitchInterval(lowCase,hiCase));
 	}
 

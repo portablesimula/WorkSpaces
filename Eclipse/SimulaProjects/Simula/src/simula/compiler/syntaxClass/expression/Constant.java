@@ -23,7 +23,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
-import simula.psi.PsiTree;
+import simula.psi.PsiBuilder;
 
 /// Constant.
 /// 
@@ -49,8 +49,8 @@ public final class Constant extends Expression {
 	/// Create a new Constant.
 	/// @param type the constant's type
 	/// @param value the constant's value
-	public Constant(final PsiTree psiTree, final Type type,final Object value) {
-		super(psiTree);
+	public Constant(final PsiBuilder psiBuilder, final Type type,final Object value) {
+		super(psiBuilder);
 		this.type=type;
 		this.value = value;
 	}
@@ -63,17 +63,17 @@ public final class Constant extends Expression {
 //      if(value instanceof Double) type=Type.LongReal;
 //      return(new Constant(psiTree, type,value));
 //    }
-    static Constant createRealType(final PsiTree psiTree, final float value) {
+    static Constant createRealType(final PsiBuilder psiBuilder, final float value) {
     	Type type=Type.Real;
-    	return(new Constant(psiTree, type,value));
+    	return(new Constant(psiBuilder, type,value));
     }
 	
 	/// Create a long real type Constant.
 	/// @param value a long real type value
 	/// @return the resulting Constant
-    static Constant createLongRealType(final PsiTree psiTree, final double value) {
+    static Constant createLongRealType(final PsiBuilder psiBuilder, final double value) {
     	Type type = Type.LongReal;
-    	return(new Constant(psiTree, type,value));
+    	return(new Constant(psiBuilder, type,value));
     }
     
     /// Returns the type of this number.
@@ -90,7 +90,7 @@ public final class Constant extends Expression {
     /// @param opr an unary operation
     /// @param rhn a right hand Number
     /// @return the resulting Constant
-    static Constant evaluate(final PsiTree psiTree, final int opr,final Number rhn) { 
+    static Constant evaluate(final PsiBuilder psiBuilder, final int opr,final Number rhn) { 
     	Type type=getType(rhn);
 		Number result=null;
 		switch(type.keyWord) {
@@ -114,7 +114,7 @@ public final class Constant extends Expression {
 			} }
 		}
 		if(result==null) Util.IERR();
-		return(new Constant(psiTree, type,result));
+		return(new Constant(psiBuilder, type,result));
     }
   
     /// Simplify this Constant.
@@ -122,7 +122,7 @@ public final class Constant extends Expression {
     /// @param opr an binary operation
     /// @param rhn a right hand Number
     /// @return the resulting Constant
-    static Constant evaluate(final PsiTree psiTree, final Number lhn,final int opr,final Number rhn) { 
+    static Constant evaluate(final PsiBuilder psiBuilder, final Number lhn,final int opr,final Number rhn) { 
     	Type type=Type.arithmeticTypeConversion(getType(lhn),getType(rhn));
 		if(opr==KeyWord.DIV && type.keyWord == Type.T_INTEGER) type=Type.Real;
 		Number result=null;
@@ -133,11 +133,11 @@ public final class Constant extends Expression {
 	        		case KeyWord.MINUS  -> result=lhn.longValue() - rhn.longValue();
 	        		case KeyWord.MUL    -> result=lhn.longValue() * rhn.longValue();
 	        		case KeyWord.INTDIV -> result=lhn.longValue() / rhn.longValue();
-	        		case KeyWord.EXP    -> result=Util.IPOW(lhn.longValue(),rhn.longValue());
+	        		case KeyWord.EXP    -> result=Util.IPOW(psiBuilder, lhn.longValue(),rhn.longValue());
 	        		default     -> Util.IERR();
 				}
 				if(result.longValue() > Integer.MAX_VALUE || result.longValue() < Integer.MIN_VALUE)
-					Util.error("Arithmetic overflow: "+lhn+' '+KeyWord.edit(opr)+' '+rhn);
+					Util.syntaxError(psiBuilder, "Arithmetic overflow: "+lhn+' '+KeyWord.edit(opr)+' '+rhn);
 				result=(int) result.longValue();
 			}
 			case Type.T_REAL -> {
@@ -160,14 +160,14 @@ public final class Constant extends Expression {
 			} }
 		}
 		if(result==null) Util.IERR();
-		return(new Constant(psiTree, type,result));
+		return(new Constant(psiBuilder, type,result));
     }
     
 	@Override
     public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
 		Global.sourceLineNumber=firstLineNumber();
-		this.type.doChecking(Global.getCurrentScope());
+		this.type.doChecking(Global.getCurrentScope(), this);
 		SET_SEMANTICS_CHECKED();
 	}
 

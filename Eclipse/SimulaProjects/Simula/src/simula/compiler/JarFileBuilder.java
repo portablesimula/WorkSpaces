@@ -250,7 +250,7 @@ public class JarFileBuilder {
 	/// Find the .jar file containing an external class or procedure.
 	/// @param identifier class or procedure identifier
 	/// @param externalIdentifier the external identifier if any
-	/// @return the resulting File
+	/// @return the resulting File or null
 	public static File findJarFile(final String identifier, final String externalIdentifier) {
 		File jarFile = null;
 		try {
@@ -278,11 +278,8 @@ public class JarFileBuilder {
 				}
 //				IO.println("JarFileBuilder.findJarFile: NOT FOUND using externalIdentifier: " + jarFile);
 			}
-		} catch (Exception e) {
-			Util.IERR("Can't find attribute file: " + jarFile, e);
-		}
-		Util.error("Can't find attribute file: " + identifier + '[' + externalIdentifier + ']');
-		return (null);
+		} catch (Exception e) {}
+		return null;
 	}
 
 	/// Add the jarFile to the includeQueue.
@@ -420,7 +417,7 @@ public class JarFileBuilder {
 	public static void listJarFile(final File file) {
 		Util.println("---------  LIST .jar File: " + file + "  ---------");
 		if (!(file.exists() && file.canRead())) {
-			Util.error("Can't read .jar file: " + file);
+			Util.generalError("Can't read .jar file: " + file);
 			return;
 		}
 		JarFile jarFile = null;

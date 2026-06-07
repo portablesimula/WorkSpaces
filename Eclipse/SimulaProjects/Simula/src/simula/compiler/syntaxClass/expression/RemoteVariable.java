@@ -33,6 +33,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
@@ -76,8 +77,8 @@ public final class RemoteVariable extends Expression {
 	/// Create a new RemoteVariable
 	/// @param obj object expression
 	/// @param var the variable
-	RemoteVariable(final PsiTree psiTree, final Expression obj, final VariableExpression var) {
-		super(psiTree);
+	RemoteVariable(final PsiBuilder psiBuilder, final Expression obj, final VariableExpression var) {
+		super(psiBuilder);
 		this.obj = obj;
 		this.var = var;
 		obj.backLink = var.backLink = this;
@@ -109,21 +110,21 @@ public final class RemoteVariable extends Expression {
 		obj.doChecking();
 		Type objType = obj.type;
 		if(objType == null) {
-			Util.error("doRemoteChecking: Object Expression (" + obj + ") has no type");
+			Util.semanticError(obj, "doRemoteChecking: Object Expression (" + obj + ") has no type");
 			return Type.Undef;
 		}
 		if (objType.keyWord == Type.T_TEXT)
 			return (doRemoteTextChecking(obj, attr));
 
-		objType.doChecking(Global.getCurrentScope()); // Nødvendig hvis TypeDeclaration er nedenfor
+		objType.doChecking(Global.getCurrentScope(), obj); // Nødvendig hvis TypeDeclaration er nedenfor
 		ClassDeclaration qual = objType.getQual();
 		if (qual == null) {
 			if(objType.keyWord != Type.T_UNDEF)
-				Util.error("doRemoteChecking: Object Expression (" + obj + ") is not a ref() type rather " + objType);
+				Util.semanticError(obj, "doRemoteChecking: Object Expression (" + obj + ") is not a ref() type rather " + objType);
 		} else if (qual.hasLocalClasses) {
 			if (Option.EXTENSIONS)
 				 Util.warning("Illegal remote access into object of class with local classes.");
-			else Util.error("Illegal remote access into object of class with local classes.");
+			else Util.semanticError(obj, "Illegal remote access into object of class with local classes.");
 		}
 
 		if (attr instanceof VariableExpression var) {
@@ -132,7 +133,7 @@ public final class RemoteVariable extends Expression {
 			if(qual!=null) remoteAttribute = qual.findRemoteAttributeMeaning(ident);
 			if (remoteAttribute == null) {
 				if(objType.keyWord != Type.T_UNDEF)
-					Util.error("RemoteVariable.doRemoteChecking: " + ident + " is not an attribute of "	+ objType.getRefIdent());
+					Util.semanticError(obj, "RemoteVariable.doRemoteChecking: " + ident + " is not an attribute of "	+ objType.getRefIdent());
 				UndefinedDeclaration undef = new UndefinedDeclaration(null, ident);
 				remoteAttribute = new Meaning(undef, Global.getCurrentScope()); // Error Recovery
 			}
@@ -156,7 +157,7 @@ public final class RemoteVariable extends Expression {
 				return (result);
 			}
 		} else {
-			Util.error("Illegal attribute(" + attr + ") in remote access");
+			Util.semanticError(obj, "Illegal attribute(" + attr + ") in remote access");
 			result = attr.type;
 		}
 		return (result);
@@ -170,15 +171,18 @@ public final class RemoteVariable extends Expression {
 		Type result;
 		if (attr instanceof VariableExpression var) { // Covers FunctionDesignator and SubscriptedVariable since they are subclasses
 			String ident = var.identifier;
-			Meaning remote = StandardClass.typeText.findMeaning(ident);
-			if (remote == null)
-				Util.error("RemoteVariable.doRemoteTextChecking: " + ident + " is not a Text attribute");
-			var.setRemotelyAccessed(remote);
-			callRemoteProcedure = (ProcedureDeclaration) remote.declaredAs;
-			result = remote.declaredAs.type;
+			Meaning meaning = StandardClass.typeText.findMeaning(ident);
+//			IO.println("RemoteVatiable.doRemoteTextChecking: meaning=" + meaning.declaredAs.getClass().getSimpleName());
+			if (meaning.declaredAs instanceof UndefinedDeclaration) {
+				Util.semanticError(obj, "RemoteVariable.doRemoteTextChecking: " + ident + " is not a Text attribute");
+				return Type.Undef;
+			}
+			var.setRemotelyAccessed(meaning);
+			callRemoteProcedure = (ProcedureDeclaration) meaning.declaredAs;
+			result = meaning.declaredAs.type;
 
 		} else {
-			Util.error("Illegal attribute(" + attr + ") in remote access");
+			Util.semanticError(obj, "Illegal attribute(" + attr + ") in remote access");
 			result = attr.type;
 		}
 		return (result);

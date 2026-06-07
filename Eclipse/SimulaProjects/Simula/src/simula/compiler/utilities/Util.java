@@ -17,7 +17,7 @@ import javax.swing.UIManager;
 
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.psi.LexToken;
-import simula.psi.PsiTree;
+import simula.psi.PsiBuilder;
 
 /// A set of all static Utility Methods
 /// 
@@ -93,9 +93,17 @@ public final class Util {
 	/// Number of error messages.
 	public static int nError;
 
+//	/// Print a error message.
+//	/// @param msg the message
+//	public static void error(final String msg) {
+//		String err = edLINE(": OLD_Error: " + msg);
+//		nError++;
+//		printError(err);
+//	}
+
 	/// Print a error message.
 	/// @param msg the message
-	public static void error(final String msg) {
+	public static void generalError(final String msg) {
 		String err = edLINE(": Error: " + msg);
 		nError++;
 		printError(err);
@@ -103,27 +111,48 @@ public final class Util {
 
 	/// Print a error message.
 	/// @param msg the message
+	public static void syntaxError(final PsiBuilder psiBuilder, final String msg) {
+		syntaxError(psiBuilder.prevParserToken(), msg);
+	}
+	
 	public static void syntaxError(final LexToken token, final String msg) {
 		int lno = Global.sourceLineNumber;
-		Global.sourceLineNumber = token.lineNumber;
-		String err = edLINE(": Error: " + msg);
+		Global.sourceLineNumber = (token == null)? -99 : token.lineNumber;
+		String mss = "Syntax Error: " + msg;
+		String err = edLINE(": " + mss);
 		nError++;
 		printError(err);
-		token.addError(err);
-		IO.println("Util.error: ADD ERROR TEXT: " + token + " " + msg);
+		token.addError(mss);
+		IO.println("Util.: ADD ERROR TEXT: " + token + " " + msg);
 		Global.sourceLineNumber = lno;
 	}
 	
 	public static void semanticError(final SyntaxElement elt, final String msg) {
 		int lno = Global.sourceLineNumber;
 		Global.sourceLineNumber = elt.firstLineNumber();
-		String err = edLINE(": Error: " + msg);
+		String mss = "Semantic Error: " + msg;
+		String err = edLINE(": " + mss);
+		nError++;
+		
+		IO.println("\n\nUtil.semanticError: ADD ERROR TEXT: " + elt + " " + msg);
+		printError(err);
+		elt.addError(mss);
+		Global.sourceLineNumber = lno;
+//		Thread.dumpStack();
+	}
+	
+	/// Error during Code generation: SHOULD NOT OCCURE !
+	public static void codingError(final String msg) {
+//		int lno = Global.sourceLineNumber;
+//		Global.sourceLineNumber = elt.firstLineNumber();
+		String err = edLINE(": Coding Error: " + msg);
 		nError++;
 		
 		printError(err);
-		elt.addError(err);
-		IO.println("Util.error: ADD ERROR TEXT: " + elt + " " + msg);
-		Global.sourceLineNumber = lno;
+//		elt.addError(err);
+//		IO.println("Util.error: ADD ERROR TEXT: " + elt + " " + msg);
+//		Global.sourceLineNumber = lno;
+		Util.IERR("Util.codingError: SHOULD NOT OCCURE !");
 	}
 
 	/// Exit with Thread.dumpStack
@@ -313,19 +342,19 @@ public final class Util {
 	/// @param base argument base
 	/// @param x argument x
 	/// @return Returns the value of 'base' raised to the power of 'x'
-	public static int IPOW(final long base, long x) {
+	public static int IPOW(final PsiBuilder psiBuilder, final long base, long x) {
 		if (x == 0) {
 			if (base == 0)
-				error("Exponentiation: " + base + " ** " + x + "  Result is undefined.");
+				syntaxError(psiBuilder, "Exponentiation: " + base + " ** " + x + "  Result is undefined.");
 			return (1); // any ** 0 ==> 1
 		} else if (x < 0)
-			error("Exponentiation: " + base + " ** " + x + "  Result is undefined.");
+			syntaxError(psiBuilder, "Exponentiation: " + base + " ** " + x + "  Result is undefined.");
 		else if (base == 0)
 			return (0); // 0 ** non_zero ==> 0
 		
 		long res=(long) Math.pow((double)base,(double)x);
 		if(res > Integer.MAX_VALUE || res < Integer.MIN_VALUE)
-			error("Arithmetic overflow: "+base+" ** "+x+" ==> "+res
+			syntaxError(psiBuilder, "Arithmetic overflow: "+base+" ** "+x+" ==> "+res
 					+" which is outside integer value range["+Integer.MIN_VALUE+':'+Integer.MAX_VALUE+']');
 		return((int)res);
 	}

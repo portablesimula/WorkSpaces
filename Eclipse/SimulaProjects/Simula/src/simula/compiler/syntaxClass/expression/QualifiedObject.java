@@ -80,7 +80,7 @@ public final class QualifiedObject extends Expression {
 	/// @param lhs left hand side
 	/// @param classIdentifier class identifier
 	QualifiedObject(final PsiBuilder psiBuilder, final Expression lhs, final String classIdentifier) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		this.lhs = lhs;
 		this.classIdentifier = classIdentifier;
 		lhs.backLink = this;
@@ -93,9 +93,12 @@ public final class QualifiedObject extends Expression {
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN QualifiedObject" + toString() + ".doChecking - Current Scope Chain: "	+ Global.getCurrentScope().edScopeChain());
 		classDeclaration = getQualification(classIdentifier);
+		if(classDeclaration == null)
+			Util.semanticError(this, "Undefined cast because " + classIdentifier + " is not a class");
+
 		lhs.doChecking();
 		if (!checkCompatibility(lhs, classIdentifier))
-			Util.error("Illegal Object Expression: " + lhs + " is not compatible with " + classIdentifier);
+			Util.semanticError(this, "Illegal Object Expression: " + lhs + " is not compatible with " + classIdentifier);
 		this.type = new Type(classIdentifier);
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("END QualifiedObject" + toString() + ".doChecking - Result type=" + this.type);

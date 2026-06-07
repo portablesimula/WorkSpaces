@@ -37,7 +37,6 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// For Statement.
@@ -163,12 +162,12 @@ public final class ForStatement extends Statement {
 	/// Create a new ForStatement.
 	/// @param line the source line number
 	ForStatement(final PsiBuilder psiBuilder) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		psiBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ForStatement");
-		controlVariable = new VariableExpression(psiBuilder.psiTree, PsiParse.expectIdentifier(psiBuilder).edText());
+		controlVariable = new VariableExpression(psiBuilder, PsiParse.expectIdentifier(psiBuilder).edText());
 		LexToken prevToken = PsiParse.getCurrentParserToken(psiBuilder);
 		if (!PsiParse.accept(psiBuilder, KeyWord.ASSIGNVALUE))
 			PsiParse.expect(psiBuilder, KeyWord.ASSIGNREF);
@@ -179,7 +178,7 @@ public final class ForStatement extends Statement {
 		PsiParse.expect(psiBuilder, KeyWord.DO);
 		Statement doStatement = Statement.acceptStatement(psiBuilder);
 		if (doStatement == null) {
-			Util.error("No statement following DO in For statement");
+			Util.syntaxError(psiBuilder, "No statement following DO in For statement");
 			doStatement = DummyStatement.ofImplicit(psiBuilder);
 		}
 		this.doStatement = doStatement;
@@ -192,13 +191,13 @@ public final class ForStatement extends Statement {
 	private ForListElement expectForListElement(PsiBuilder psiBuilder) {
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ForListElement");
-		Expression expr1 = Expression.expectExpression(psiBuilder);
+		Expression expr1 = Expression.expectExpression(psiBuilder, "for list");
 		if (PsiParse.accept(psiBuilder, KeyWord.WHILE))
-			return (new ForWhileElement(psiBuilder, this, expr1, Expression.expectExpression(psiBuilder)));
+			return (new ForWhileElement(psiBuilder, this, expr1, Expression.expectExpression(psiBuilder, "for while")));
 		if (PsiParse.accept(psiBuilder, KeyWord.STEP)) {
-			Expression expr2 = Expression.expectExpression(psiBuilder);
+			Expression expr2 = Expression.expectExpression(psiBuilder, "for step");
 			PsiParse.expect(psiBuilder, KeyWord.UNTIL);
-			return (new StepUntilElement(psiBuilder, this, expr1, expr2, Expression.expectExpression(psiBuilder)));
+			return (new StepUntilElement(psiBuilder, this, expr1, expr2, Expression.expectExpression(psiBuilder, "for until")));
 		} else
 			return (new ForListElement(psiBuilder, this, expr1));
 	}
@@ -211,10 +210,10 @@ public final class ForStatement extends Statement {
 		controlVariable.doChecking();
 		Declaration decl = controlVariable.meaning.declaredAs;
 		if (decl instanceof Parameter par && par.mode == Parameter.Mode.name)
-			Util.error("For-Statement's Controled Variable(" + controlVariable + ") can't be a formal parameter by Name");
+			Util.semanticError(this, "For-Statement's Controled Variable(" + controlVariable + ") can't be a formal parameter by Name");
 		Type type = controlVariable.type;
 		if (type.keyWord != Type.T_TEXT && assignmentOperator == KeyWord.ASSIGNVALUE && type.isReferenceType())
-			Util.error("Illegal For-Statement with object value assignment ( := )");
+			Util.semanticError(this, "Illegal For-Statement with object value assignment ( := )");
 		Iterator<ForListElement> iterator = forList.iterator();
 		while (iterator.hasNext()) {
 			iterator.next().doChecking();
@@ -250,7 +249,7 @@ public final class ForStatement extends Statement {
 		JavaSourceFileCoder.code("for(boolean " + CB + ":new FOR_List(");
 		char del = ' ';
 		for (ForListElement elt : forList) {
-			String classIdent = (refType) ? elt.expr1.type.getJavaRefIdent() : "Number";
+			String classIdent = (refType) ? elt.expr1.type.getJavaRefIdent(elt.expr1) : "Number";
 			switch(elt.expr1.type.keyWord) {
 				case Type.T_CHARACTER -> classIdent = "Character"; // AD'HOC
 				case Type.T_BOOLEAN -> classIdent = "Boolean"; // AD'HOC

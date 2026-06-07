@@ -432,7 +432,7 @@ public class EditorMenues extends JMenuBar {
     		String text=current.editTextPane.getText();
     		out.write(text); out.close();
     		current.fileChanged = false;
-    	} catch (Exception e) { Util.error("Internal Error: "+e.getMessage()); }
+    	} catch (Exception e) { Util.IERR("Internal Error: "+e.getMessage()); }
     }
 	
     // ****************************************************************

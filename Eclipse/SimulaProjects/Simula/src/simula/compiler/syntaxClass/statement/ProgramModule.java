@@ -96,7 +96,7 @@ public final class ProgramModule extends Statement {
 
 	/// Create a new ProgramModule.
 	public ProgramModule(PsiBuilder psiBuilder) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 //		String debugName = "ProgramModule";
 //		psiBuilder.startSubtree(PsiTree.Kind.programModule, debugName);
 
@@ -153,7 +153,7 @@ public final class ProgramModule extends Statement {
 			LexToken token = PsiParse.getCurrentParserToken(psiBuilder);
 			if(token != null && token.keyWord != KeyWord.EOF) {
 				psiBuilder.startSubtree(PsiTree.Kind.textAfterProgramEnd, "TextAfterProgramEnd");
-				Comment dum = new Comment(psiBuilder.psiTree);
+				Comment dum = new Comment(psiBuilder);
 				while(!psiBuilder.eof()) psiBuilder.advanceLexer(); // consume tokens  (add it to 'current tree')
 				psiBuilder.doneSubtree(PsiTree.Kind.textAfterProgramEnd, dum);
 //				IO.println("NEW ProgramModule: TextAfterEnd: \"" + dum.psiTree.getText().replace("\n", "\\n") + '"');

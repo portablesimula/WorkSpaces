@@ -16,6 +16,7 @@ import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
+import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.ConnectionBlock;
 import simula.compiler.syntaxClass.expression.AssignmentOperation;
 import simula.compiler.utilities.KeyWord;
@@ -45,7 +46,7 @@ public class ConnectionDoPart extends SyntaxElement {
 	/// @param connectionBlock The associated connection block
 	/// @param statement the statement after DO
 	ConnectionDoPart(final PsiBuilder psiBuilder, final ConnectionStatement connectionStatement, final ConnectionBlock connectionBlock,final Statement statement) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		this.connectionStatement = connectionStatement;
 		this.connectionBlock = connectionBlock; // this.statement=statement;
 		connectionBlock.setStatement(statement);
@@ -57,9 +58,16 @@ public class ConnectionDoPart extends SyntaxElement {
 	public void doChecking() {
 		Type type = connectionStatement.inspectVariableDeclaration.type;
 		String refIdentifier = type.getRefIdent();
-		if (refIdentifier == null)
-			Util.error("The Variable " + connectionStatement.inspectedVariable + " is not ref() type");
-		connectionBlock.setClassDeclaration(AssignmentOperation.getQualification(refIdentifier));
+		if (refIdentifier == null) {
+			Util.semanticError(this, "The Variable " + connectionStatement.inspectedVariable + " is not ref() type");
+		}
+		ClassDeclaration classDeclaration = AssignmentOperation.getQualification(refIdentifier);
+		if(classDeclaration != null) {
+			connectionBlock.setClassDeclaration(classDeclaration);
+		} else {
+			Util.semanticError(this, "Illegal: " + refIdentifier + " is not a class");			
+		}
+		
 		connectionBlock.doChecking();
 		SET_SEMANTICS_CHECKED();
 	}

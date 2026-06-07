@@ -54,7 +54,6 @@ import simula.editor.PsiTextPanel;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 import simula.psi.TreeNodeIdent;
 
 /// Procedure Declaration.
@@ -121,8 +120,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// Create a new ProcedureDeclaration.
 	/// @param identifier procedure identifier
 	/// @param declarationKind procedure or switch
-	protected ProcedureDeclaration(final PsiTree psiTree, final String identifier,final int declarationKind) {
-		super(psiTree, identifier);
+	protected ProcedureDeclaration(final PsiBuilder psiBuilder, final String identifier,final int declarationKind) {
+		super(psiBuilder, identifier);
 		this.declarationKind = declarationKind;
 	}
 
@@ -150,7 +149,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @param type procedure's type
 	/// @return a newly created ProcedureDeclaration
 	public static ProcedureDeclaration expectProcedureDeclaration(final PsiBuilder psiBuilder, final Type type) {
-		ProcedureDeclaration proc = new ProcedureDeclaration(psiBuilder.psiTree, null, ObjectKind.Procedure);
+		ProcedureDeclaration proc = new ProcedureDeclaration(psiBuilder, null, ObjectKind.Procedure);
 		proc.sourceFileName = Global.sourceFileName;
 //		proc.OLD_lineNumber = psiBuilder.getSourceLineNumber();
 		proc.type = type;
@@ -205,8 +204,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(psiBuilder.psiTree, identifier);
+					Util.syntaxError(psiBuilder, "Identifier " + identifier + " is not defined in this scope");
+					parameter = new Parameter(psiBuilder, identifier);
 				}
 				parameter.setMode(mode);
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
@@ -258,8 +257,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 				for (Parameter par : proc.parameterList)
 					if (Util.equals(identifier,par.identifier)) { parameter = par; break; }
 				if (parameter == null) {
-					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(psiBuilder.psiTree, identifier);
+					Util.syntaxError(psiBuilder, "Identifier " + identifier + " is not defined in this scope");
+					parameter = new Parameter(psiBuilder, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
@@ -277,7 +276,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 				case Parameter.Kind.Simple:
 				default:
 					if (par.type == null)
-						Util.error("Missing specification of parameter: " + par.identifier);
+						Util.syntaxError(psiBuilder, "Missing specification of parameter: " + par.identifier);
 				}
 		}
 	}
@@ -291,26 +290,6 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// </pre>
 	/// 
 	/// @param proc the procedure
-//	private static void expectProcedureBody(ProcedureDeclaration proc) {
-//		if (Parse.accept(KeyWord.BEGIN)) {
-//			Statement stm;
-//			if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse Procedure Block");
-//			while (Declaration.acceptDeclaration(proc)) {
-//				Parse.accept(KeyWord.SEMICOLON);
-//			}
-////			Vector<Statement> stmList = proc.statements;
-//			ObjectList<Statement> stmList = proc.statements;
-//			while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
-//				stm = Statement.expectStatement();
-//				if (stm != null) stmList.add(stm);
-//			}
-//			if (Parse.prevToken.keyWord == KeyWord.EOF) {
-//				Util.error("Illegal termination of procedure declaration. Missing END.");
-//			}
-//		}
-//		else proc.statements.add(Statement.expectStatement());
-//	}
-
 	private static void expectProcedureBody(PsiBuilder psiBuilder, ProcedureDeclaration proc) {
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGIN)) {
 //			IO.println("ProcedureDeclaration.expectProcedureBody: START PARSE PROCEDURE BLOCK");
@@ -320,7 +299,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			proc.parseBlock(psiBuilder);
 
 			if (PsiParse.prevToken(psiBuilder).keyWord == KeyWord.EOF) {
-				Util.error("Illegal termination of procedure declaration. Missing END.");
+				Util.syntaxError(psiBuilder, "Illegal termination of procedure declaration. Missing END.");
 			}
 		}
 		else {
@@ -359,19 +338,19 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			if (virtualSpec != null) {
 				// This Procedure is a Virtual Match
 				if(! Type.equalsOrSubordinate(virtualSpec.type, this.type))
-					Util.error("Virtual match has wrong type " + type + ", specified as " + virtualSpec.type);
+					Util.semanticError(this, "Virtual match has wrong type " + type + ", specified as " + virtualSpec.type);
 				if(virtualSpec.procedureSpec != null) {
 					ObjectList<Parameter> list1 = this.parameterList;
 					ObjectList<Parameter> list2 = virtualSpec.procedureSpec.parameterList;
 					if(list1.size() != list2.size()) {
-						Util.error("Virtual match has wrong number of parameters " + list1.size() + ". Specified with " + list2.size());	
+						Util.semanticError(this, "Virtual match has wrong number of parameters " + list1.size() + ". Specified with " + list2.size());	
 					} else {
 						for(int i=0;i<list1.size();i++)
 							if(! list1.get(i).equals(list2.get(i)))
-								Util.error("Virtual match has wrong heading. Parameter " + (i+1) + " does not match the specification");	
+								Util.semanticError(this, "Virtual match has wrong heading. Parameter " + (i+1) + " does not match the specification");	
 					}
 				} 
-				myVirtual = new VirtualMatch(psiTree, virtualSpec, this);
+				myVirtual = new VirtualMatch(psiBuilder, virtualSpec, this);
 				ClassDeclaration decl = (ClassDeclaration) declaredIn;
 				decl.virtualMatchList.add(myVirtual);
 				if (decl == virtualSpec.declaredIn) virtualSpec.hasDefaultMatch = true;

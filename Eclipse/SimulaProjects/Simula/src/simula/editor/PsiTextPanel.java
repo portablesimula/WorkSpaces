@@ -271,7 +271,7 @@ public class PsiTextPanel extends JPanel {
 					    	}
 			    		} else if(lexToken.keyWord == KeyWord.NEWLINE) {
 							if(Option.PSI_VERIFY && elt.firstLineNumber() != lineNumber) {
-								Util.IERR("GOT NEWLINE: PSI VERIFIER FAILED: " + elt.firstLineNumber() + " != lineNumber=" + lineNumber);
+								Util.IERR("GOT NEWLINE: " + lexToken + " -- PSI VERIFIER FAILED: " + elt.firstLineNumber() + " != lineNumber=" + lineNumber);
 							}
 		    				String lineString = edLineNumber(lineNumber++);
 			    			// Should only be here AFTER a complete line is rendered

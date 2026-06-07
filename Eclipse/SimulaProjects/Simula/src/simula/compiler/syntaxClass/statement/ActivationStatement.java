@@ -28,7 +28,6 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Activation Statement.
@@ -107,23 +106,23 @@ public final class ActivationStatement extends Statement {
 	/// Create a new ActivationStatement.
 	/// @param line the source line number
 	ActivationStatement(final PsiBuilder psiBuilder) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		LexToken activator = PsiParse.getCurrentParserToken(psiBuilder);
 		REAC = activator.keyWord == KeyWord.REACTIVATE;
 		psiBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to 'current tree')
 		if (Option.internal.TRACE_PARSE) PsiParse.TRACE("Parse ActivationStatement");
-		object1 = Expression.expectExpression(psiBuilder);
+		object1 = Expression.expectExpression(psiBuilder, "process");
 		object1.backLink = this;
 		code = ActivationCode.direct;
 		LexToken prevToken = PsiParse.getCurrentParserToken(psiBuilder);
 		if (PsiParse.accept(psiBuilder, KeyWord.AT) || PsiParse.accept(psiBuilder, KeyWord.DELAY)) {
 			code = (prevToken.keyWord == KeyWord.AT) ? ActivationCode.at : ActivationCode.delay;
-			time = Expression.expectExpression(psiBuilder);
+			time = Expression.expectExpression(psiBuilder, "at/delay");
 			time.backLink = this;
 			if (PsiParse.accept(psiBuilder, KeyWord.PRIOR)) prior = true;
 		} else if (PsiParse.accept(psiBuilder, KeyWord.BEFORE) || PsiParse.accept(psiBuilder, KeyWord.AFTER)) {
 			code = (prevToken.keyWord == KeyWord.BEFORE) ? ActivationCode.before : ActivationCode.after;
-			object2 = Expression.expectExpression(psiBuilder);
+			object2 = Expression.expectExpression(psiBuilder, "before/after");
 			object2.backLink = this;
 		}
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": ActivationStatement: "+this);

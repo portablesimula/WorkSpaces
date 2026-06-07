@@ -103,16 +103,16 @@ public final class TextExpression extends Expression {
 	/// @param lhs left hand side
 	/// @param rhs rigth hand side
 	TextExpression(final PsiBuilder psiBuilder, final Expression lhs, final Expression rhs) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		this.lhs = lhs; this.rhs = rhs;
 //		psiBuilder.startSubtree(PsiTree.Kind.textExpression, "TextExpression");
 		if (this.lhs == null) {
-			Util.error("Missing operand before &");
-			this.lhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
+			Util.syntaxError(psiBuilder, "Missing operand before &");
+			this.lhs = new MissingExpression(psiBuilder);
 		}
 		if (this.rhs == null) {
-			Util.error("Missing operand after &");
-			this.rhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
+			Util.syntaxError(psiBuilder, "Missing operand after &");
+			this.rhs = new MissingExpression(psiBuilder);
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 //		psiBuilder.doneSubtree(PsiTree.Kind.textExpression, this);
@@ -128,7 +128,7 @@ public final class TextExpression extends Expression {
 		lhs.doChecking();
 		rhs.doChecking();
 		if (lhs.type.keyWord != Type.T_TEXT || rhs.type.keyWord != Type.T_TEXT) {
-			Util.error("Operand Type to Text Concatenation(&) is not Text: "+lhs.type+" & "+rhs.type);
+			Util.semanticError(this, "Operand Type to Text Concatenation(&) is not Text: "+lhs.type+" & "+rhs.type);
 		}
 		this.type = Type.Text;
 		if (Option.internal.TRACE_CHECKER)

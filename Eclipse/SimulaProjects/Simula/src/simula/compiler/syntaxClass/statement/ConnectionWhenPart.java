@@ -5,10 +5,14 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.statement;
 
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -64,10 +68,11 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 			Type type = connectionStatement.inspectVariableDeclaration.type;
 			classIdentifier = type.getRefIdent();
 			if (classIdentifier == null)
-				Util.error("The Variable " + connectionStatement.inspectedVariable + " is not ref() type");
+				Util.semanticError(this, "The Variable " + connectionStatement.inspectedVariable + " is not ref() type");
 		}
 		if (classIdentifier != null) {
 			classDeclaration = AssignmentOperation.getQualification(classIdentifier);
+			if(classDeclaration == null) Util.semanticError(this, "Illegal WHEN part: " + classIdentifier + " is not a class");
 			connectionBlock.setClassDeclaration(classDeclaration);
 		}
 		if (!AssignmentOperation.checkCompatibility(connectionStatement.objectExpression, classIdentifier)) {
@@ -119,6 +124,25 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 //		connectionStatement.addSyntaxNodes(tree, model, parent);
 		connectionBlock.addSyntaxNodes(tree, model, parent);
     }
+
+	@Override
+	public JPanel getSyntaxPanel() {
+		String[] table = {
+				// *** ConnectionWhenPart
+//				oupt.writeString(classIdentifier);
+//				oupt.writeObj(connectionStatement);
+//				oupt.writeObj(connectionBlock);
+				"  classIdentifier:",	    classIdentifier,
+				"  connectionStatement: ",	""+connectionStatement,
+		};
+		JPanel panel = new JPanel(new GridLayout(table.length/2, 2));
+		Font monoFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
+		for(String s:table) {
+			JLabel lab = new JLabel(s);
+			lab.setFont(monoFont); panel.add(lab);
+		}
+		return panel;
+	}
 
 	@Override
 	public String toString() {

@@ -23,6 +23,7 @@ import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.Parameter;
+import simula.compiler.syntaxClass.declaration.UndefinedDeclaration;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
@@ -75,7 +76,7 @@ public final class ObjectGenerator extends Expression {
 	/// @param ident class-identifier
 	/// @param params the actual parameters
 	private ObjectGenerator(final PsiBuilder psiBuilder, final String ident,final Vector<Expression> params) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		this.classIdentifier = ident;
 		this.type = Type.Ref(classIdentifier);
 		this.params = params;
@@ -98,7 +99,7 @@ public final class ObjectGenerator extends Expression {
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) {
 			do {
 				Expression par=acceptExpression(psiBuilder);
-				if(par==null) Util.error("Missing class parameter");
+				if(par==null) Util.syntaxError(psiBuilder, "Missing class parameter");
 				else params.add(par);
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 			PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
@@ -115,21 +116,24 @@ public final class ObjectGenerator extends Expression {
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ObjectGenerator(" + classIdentifier + ").doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());
 		meaning = Global.getCurrentScope().findMeaning(classIdentifier);
-		if (meaning == null) {
-			Util.error("Undefined class identifier: " + classIdentifier);
-			meaning = new Meaning(null, null); // Error Recovery: No Meaning
+		if (meaning.declaredAs instanceof UndefinedDeclaration) {
+			Util.semanticError(this, "Undefined class identifier: " + classIdentifier);
+//			meaning = new Meaning(null, null); // Error Recovery: No Meaning
 		}
 		if (!(meaning.declaredAs instanceof ClassDeclaration)) {
-			Util.error("NEW " + classIdentifier + ": Not a Class");
+			Util.semanticError(this, "NEW " + classIdentifier + ": Not a Class");
+			SET_SEMANTICS_CHECKED();
 			return;
 		}
 		ClassDeclaration cls = (ClassDeclaration) meaning.declaredAs;
 		// Check parameters
 		Iterator<Parameter> formalIterator = cls.parameterIterator();
 		Iterator<Expression> actualIterator = params.iterator();
-		while (actualIterator.hasNext()) {
-			if (!formalIterator.hasNext())
-				Util.error("Wrong number of parameters to " + cls);
+		LOOP: while (actualIterator.hasNext()) {
+			if (!formalIterator.hasNext()) {
+				Util.semanticError(this, "Wrong number of parameters to Class " + cls.identifier);
+				break LOOP;
+			}
 			Declaration formalParameter = formalIterator.next();
 			Type formalType = formalParameter.type;
 			if (Option.internal.TRACE_CHECKER)
@@ -146,7 +150,7 @@ public final class ObjectGenerator extends Expression {
 
 		}
 		if (formalIterator.hasNext())
-			Util.error("Missing parameter("+formalIterator.next()+") to " + cls);
+			Util.semanticError(this, "Missing parameter '"+formalIterator.next().identifier+"' to Class " + cls.identifier);
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("END ObjectGenerator(" + classIdentifier + ").doChecking: type=" + type);
 		SET_SEMANTICS_CHECKED();

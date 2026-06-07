@@ -21,6 +21,10 @@ import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.Parameter;
 import simula.compiler.syntaxClass.declaration.StandardClass;
+import simula.compiler.syntaxClass.declaration.UndefinedDeclaration;
+import simula.compiler.syntaxClass.expression.Expression;
+import simula.compiler.syntaxClass.expression.MissingExpression;
+import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Html;
 import simula.compiler.utilities.ObjectKind;
@@ -193,12 +197,16 @@ public class Type extends SyntaxElement {
 		return(null); 
 	}
   
-	/// Returns the Java ref-identifier or null.
-	/// @return the Java ref-identifier or null
 	public String getJavaRefIdent() {
+		return getJavaRefIdent(null);
+	}
+	/// Returns the Java ref-identifier or null.
+	/// @param elt the syntax element containing the type
+	/// @return the Java ref-identifier or null
+	public String getJavaRefIdent(final SyntaxElement elt) {
 		if(keyWord == Type.T_REF) {
 			if(classIdent == null) return("RTS_RTObject");
-			if(!IS_SEMANTICS_CHECKED()) this.doChecking(Global.getCurrentScope());
+			if(!IS_SEMANTICS_CHECKED()) this.doChecking(Global.getCurrentScope(), elt);
 			if(qual==null) return("UNKNOWN");
 			return(qual.getJavaIdentifier());
 		}
@@ -207,7 +215,8 @@ public class Type extends SyntaxElement {
 	
 	/// Perform semantic checking in the given scope.
 	/// @param scope the given scope
-	public void doChecking(final DeclarationScope scope) {
+	/// @param elt the syntax element containing the type
+	public void doChecking(final DeclarationScope scope, final SyntaxElement elt) {
 		if(qual!=null) SET_SEMANTICS_CHECKED(); // This Ref-Type is read from attribute file
 		if(IS_SEMANTICS_CHECKED()) return;
 		Global.enterScope(scope);
@@ -216,7 +225,14 @@ public class Type extends SyntaxElement {
 			if(!refIdent.equals("RTS_LABEL") && !refIdent.equals("_UNKNOWN")) {
 				Declaration decl=scope.findMeaning(refIdent).declaredAs;
 			    if(decl instanceof ClassDeclaration cdecl) qual=cdecl;
-			    else Util.error("Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class");
+//			    else Util.generalError("Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class");
+//			    else Util.semanticError(scope, "Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class");
+			    else {
+			    	String err = "Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class";
+			    	if(elt != null)
+			    		 Util.semanticError(elt, err);
+				    else Util.generalError(err);
+			    }
 			}
 		}
 		Global.exitScope();
@@ -255,6 +271,23 @@ public class Type extends SyntaxElement {
 	/// @return true if this type is ref type
 	public boolean isRefClassType() {
 		if(keyWord == Type.T_REF) return(true);
+		return false;
+	}
+	
+	/// Return true if the expression is of the given type.
+	/// The following expressions are treated as of any type:
+	/// - the expression 'MissingExpression'.
+	/// - an expression with no meaning.
+	/// - an undeclared Variable
+	public static boolean checkType(Expression expr, int keyWord) {
+		if(expr.type == null) return true;
+		if(expr.type.keyWord == keyWord) return true;
+		if(expr instanceof MissingExpression) return true;
+		if(expr instanceof VariableExpression var) {
+			IO.println("ConditionalExpression.doChecking: var.meaning: " + var.meaning);
+			if(var.meaning == null) return true;
+			if(var.meaning.declaredAs instanceof UndefinedDeclaration) return true;
+		}
 		return false;
 	}
   
@@ -323,24 +356,6 @@ public class Type extends SyntaxElement {
 		if(type1.isSubReferenceOf(type2)) return(type2);
 	    if(type2.isSubReferenceOf(type1)) return(type1);
 		return(type1);
-	}
-  
-	/// Returns the type to which both types can be converted.
-	/// @param type1 argument
-	/// @param type2 argument
-	/// @return the resulting Type
-	public static Type commonTypeConversion(final Type type1,final Type type2) {
-		if(type1.equals(type2)) return(type1);
-		Type atype=arithmeticTypeConversion(type1,type2);
-		if(atype!=null) return(atype);
-		if(type1.isReferenceType() && type2.isReferenceType()) {
-			if(type1.isSubReferenceOf(type2)) return(type2);
-		    if(type2.isSubReferenceOf(type1)) return(type1);
-		    Util.error("Incompatible types: "+type1+", "+type2);
-		    return(type1);
-		}
-		Util.error("Incompatible types: "+type1+", "+type2);
-		return(null);
 	}
 	
 	/// Returns the most dominant type.
@@ -720,6 +735,7 @@ public class Type extends SyntaxElement {
 	@Override
 	public String toString() {
 		switch(keyWord) {
+			case T_UNDEF:		return "UNDEFINED";
 			case T_INTEGER:		return "Integer";
 			case T_REAL:		return "Real";
 			case T_LONG_REAL:	return "Long Real";

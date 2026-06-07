@@ -23,9 +23,11 @@ import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Html;
+import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Util;
 import simula.psi.ExternalPsiTree;
 import simula.psi.LexToken;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiElement;
 import simula.psi.PsiTree;
 
@@ -99,6 +101,10 @@ import simula.psi.PsiTree;
 /// @author Øystein Myhre Andersen
 public abstract class SyntaxElement {
 
+	/// The associated PSI Builder
+	public PsiBuilder psiBuilder;
+	
+	/// Set by PsiBuilder.doneSubtree
 	/// The associated PSI Tree
 	public PsiTree psiTree;
 
@@ -109,6 +115,9 @@ public abstract class SyntaxElement {
 	/// This method may be redefined.
 	/// @return the associated PSI Tree
 	public PsiTree getPsiTree() {
+//		if(psiBuilder == null) return PsiTree.dummyTree;
+//		PsiTree psiTree = psiBuilder.psiTree;
+//		return (psiTree != null)? psiTree : PsiTree.dummyTree;
 		return psiTree;
 	}
 
@@ -123,6 +132,15 @@ public abstract class SyntaxElement {
 	/// See: Global.Object_SEQU
 	public int OBJECT_SEQU;
 	
+	/// Create a new SyntaxElement.
+	protected SyntaxElement(PsiBuilder psiBuilder) {
+//		OLD_lineNumber = Global.sourceLineNumber;
+//		this.psiTree = (psiTree != null)? psiTree : PsiTree.dummyTree;
+		this.psiBuilder= psiBuilder;
+//		if(psiBuilder == null) { Util.IERR("NEW SyntaxElement: "+this.getClass().getSimpleName() + "  psiBuilder == null");
+		this.psiTree = (psiBuilder == null)? PsiTree.dummyTree : psiBuilder.psiTree;
+	}
+
 	/// The first source line number
 	public int firstLineNumber() {
 		int lno = psiTree.firstLineNumber();
@@ -139,25 +157,22 @@ public abstract class SyntaxElement {
 	public void addError(String err) {
 //		if(errors == null) errors = new Vector<String>();
 //		errors.add(err);
+		IO.println("SyntaxElement.addError: TREATING " + this.getClass().getSimpleName() + " " + this + "  ERR="+err);
 		for(PsiElement elt : psiTree.getChildren()) {
 			if(elt instanceof LexToken token) {
-				token.addError(err);
+				switch(token.keyWord) {
+					case KeyWord.NEWLINE:
+					case KeyWord.WHITESPACES:
+					case KeyWord.COMMENT_TEXT:
+						break;
+					default:
+						IO.println("SyntaxElement.addError: ADD TO " + token);
+					    token.addError(err);
+				}
 			}
 		}
 	}
 	
-	
-	/// Create a new SyntaxElement.
-	protected SyntaxElement(PsiTree psiTree) {
-//		OLD_lineNumber = Global.sourceLineNumber;
-		this.psiTree = (psiTree != null)? psiTree : PsiTree.dummyTree;
-//		IO.println("NEW SyntaxElement: "+this.getClass().getSimpleName());
-	}
-	
-//	public SyntaxTree buildSyntaxTree() {
-//		
-//	}
-
     public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
 		IO.println("Method addSyntaxNodes need a redefinition in "+this.getClass().getSimpleName());
 		Util.IERR("Method addSyntaxNodes need a redefinition in "+this.getClass().getSimpleName());
@@ -221,7 +236,7 @@ public abstract class SyntaxElement {
 		if (this instanceof Declaration decl) {
 			if (decl.externalIdent == null) {
 				Thread.dumpStack();
-				Util.error("External Identifier is not set -- "+this.getClass().getSimpleName()+"  "+this);
+				Util.generalError("External Identifier is not set -- "+this.getClass().getSimpleName()+"  "+this);
 			}
 		}
 	}

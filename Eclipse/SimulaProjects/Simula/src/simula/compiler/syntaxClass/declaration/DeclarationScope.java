@@ -16,8 +16,6 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-import simula.compiler.ModuleManager;
-import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Global;
@@ -27,7 +25,7 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.psi.PsiTree;
+import simula.psi.PsiBuilder;
 
 /// Declaration Scope.
 /// 
@@ -65,8 +63,8 @@ public abstract class DeclarationScope extends Declaration  {
 	/// Create a new DeclarationScope.
 	/// 
 	/// @param ident scope identifier
-	protected DeclarationScope(final PsiTree psiTree, final String ident) {
-		super(psiTree, ident);
+	protected DeclarationScope(final PsiBuilder psiBuilder, final String ident) {
+		super(psiBuilder, ident);
 		declarationList = new DeclarationList(getClass().getSimpleName() + ':' + ident + ":Line=" + Global.sourceLineNumber);
 		declaredIn = Global.getCurrentScope();
 		Global.setScope(this);
@@ -164,10 +162,10 @@ public abstract class DeclarationScope extends Declaration  {
 		}
 		
 		if (meaning == null) {
-			if (!Global.duringParsing) {
-				IO.println("DeclarationScope.findMeaning: Undefined variable: " + identifier);
-				Util.error("Undefined variable: " + identifier);
-			}
+//			if (!Global.duringParsing) {
+//				IO.println("DeclarationScope.findMeaning: Undefined variable: " + identifier);
+//				Util.error("Undefined variable: " + identifier);
+//			}
 			if(Option.CaseSensitive) {
 				Option.WARNINGS = true;
 				Util.warning("Undefined variable: " + identifier + "  Could be because Option.CaseSensitive == true");

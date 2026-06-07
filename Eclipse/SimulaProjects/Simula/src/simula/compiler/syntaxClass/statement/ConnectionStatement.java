@@ -131,15 +131,15 @@ public final class ConnectionStatement extends Statement {
 	/// Pre-Condition: INSPECT  is already read.
 	/// @param line the source line number
 	ConnectionStatement(final PsiBuilder psiBuilder) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		psiBuilder.consume(KeyWord.INSPECT); //  (add it to 'current tree')
 
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse ConnectionStatement");
-		objectExpression = Expression.expectExpression(psiBuilder);
+		objectExpression = Expression.expectExpression(psiBuilder, "connected object");
 		objectExpression.backLink = this;
 		String ident = "_inspect_" + firstLineNumber() + '_' + (SEQUX++);
-		inspectedVariable = new VariableExpression(psiBuilder.psiTree, ident);
+		inspectedVariable = new VariableExpression(psiBuilder, ident);
 		DeclarationScope scope = Global.getCurrentScope();
 		inspectVariableDeclaration = new InspectVariableDeclaration(psiBuilder, Type.Ref("RTObject"), ident, scope, this);
 		
@@ -158,7 +158,7 @@ public final class ConnectionStatement extends Statement {
 		boolean hasWhenPart=false;
 		if (PsiParse.accept(psiBuilder, KeyWord.DO)) {
 			hasDoPart = true;
-			ConnectionBlock connectionBlock = new ConnectionBlock(psiBuilder.psiTree, inspectedVariable, null);
+			ConnectionBlock connectionBlock = new ConnectionBlock(psiBuilder, inspectedVariable, null);
 			DeclarationScope prevScope = Global.getCurrentScope();
 			Global.setScope(connectionBlock);
 			Statement statement = Statement.acceptStatement(psiBuilder);
@@ -167,17 +167,24 @@ public final class ConnectionStatement extends Statement {
 			connectionPart.add(new ConnectionDoPart(psiBuilder, this,connectionBlock, statement));
 			connectionBlock.end();
 		} else {
+			psiBuilder.startSubtree(PsiTree.Kind.statement, "Connection WHEN");
 			while (PsiParse.accept(psiBuilder, KeyWord.WHEN)) {
+//				psiBuilder.startSubtree(PsiTree.Kind.statement, "Connection WHEN");
 				String classIdentifier = PsiParse.expectIdentifier(psiBuilder).edText();
 				PsiParse.expect(psiBuilder, KeyWord.DO);
-				ConnectionBlock connectionBlock = new ConnectionBlock(psiBuilder.psiTree, inspectedVariable, classIdentifier);
+				ConnectionBlock connectionBlock = new ConnectionBlock(psiBuilder, inspectedVariable, classIdentifier);
 				hasWhenPart = true;
 				Statement statement = Statement.acceptStatement(psiBuilder);
-				connectionPart.add(new ConnectionWhenPart(psiBuilder, this,classIdentifier, connectionBlock, statement));
+				ConnectionWhenPart whenPart = new ConnectionWhenPart(psiBuilder, this,classIdentifier, connectionBlock, statement);
+				psiBuilder.doneSubtree(PsiTree.Kind.statement, whenPart);
+				psiBuilder.startSubtree(PsiTree.Kind.statement, "Connection WHEN");
+				connectionPart.add(whenPart);
 				connectionBlock.end();
 			}
+			psiBuilder.dropSubtree(PsiTree.Kind.statement, "Connection WHEN");
+
 		}
-		if(!(hasDoPart | hasWhenPart)) Util.error("Incomplete Inspect statement: "+objectExpression);
+		if(!(hasDoPart | hasWhenPart)) Util.syntaxError(psiBuilder, "Incomplete Inspect statement: "+objectExpression + ", missing DO or WHEN");
 		Statement otherwise = null;
 		if (PsiParse.accept(psiBuilder, KeyWord.OTHERWISE)) otherwise = Statement.acceptStatement(psiBuilder);
 		this.otherwise=otherwise;
@@ -194,7 +201,7 @@ public final class ConnectionStatement extends Statement {
 			Util.TRACE("BEGIN ConnectionStatement(" + toString() + ").doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());		
 		objectExpression.doChecking();
 		Type exprType = objectExpression.type;
-		exprType.doChecking(Global.getCurrentScope());
+		exprType.doChecking(Global.getCurrentScope(), this);
 		inspectVariableDeclaration.type = exprType;
 		inspectedVariable.type = exprType;
 		inspectedVariable.doChecking();
@@ -214,8 +221,8 @@ public final class ConnectionStatement extends Statement {
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code("{");
 		JavaSourceFileCoder.debug("// BEGIN INSPECTION ");
-//		Expression assignment = new AssignmentOperation(null, inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
-		Expression assignment = new AssignmentOperation(this.psiTree, inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
+		Expression assignment = new AssignmentOperation(null, inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
+//		Expression assignment = new AssignmentOperation(this.psiTree, inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
 		assignment.doChecking();
 		JavaSourceFileCoder.code(assignment.toJavaCode() + ';');
 		if (!hasWhenPart) JavaSourceFileCoder.code("if(" + inspectedVariable.toJavaCode() + "!=null) {","INSPECT " + inspectedVariable);

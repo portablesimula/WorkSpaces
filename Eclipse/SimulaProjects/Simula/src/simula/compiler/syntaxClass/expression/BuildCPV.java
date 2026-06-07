@@ -46,7 +46,7 @@ public abstract class BuildCPV {
 	static void virtual(final VariableExpression variable,final VirtualSpecification virtual,final boolean remotelyAccessed,CodeBuilder codeBuilder) {
 		if(! variable.hasArguments()) {
 			if(virtual.procedureSpec != null && virtual.procedureSpec.parameterList.size() > 0) {
-				Util.error("Missing parameter(s) to " + variable.identifier);
+				Util.codingError("Missing parameter(s) to " + variable.identifier);
 			}
 		}
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
@@ -122,7 +122,7 @@ public abstract class BuildCPV {
 	static void remoteVirtual(final Expression obj,final VariableExpression variable,final VirtualSpecification virtual,final SyntaxElement backLink,CodeBuilder codeBuilder) {
 		if(! variable.hasArguments()) {
 			if(virtual.procedureSpec != null && virtual.procedureSpec.parameterList.size() > 0)
-				Util.error("Missing parameter(s) to " + variable.identifier);
+				Util.codingError("Missing parameter(s) to " + variable.identifier);
 		}
 		//return("<Object>.<IDENT>.CPF().setPar(4).setpar(3.14)._ENT()");
 	    String ident=virtual.getSimpleVirtualIdentifier();

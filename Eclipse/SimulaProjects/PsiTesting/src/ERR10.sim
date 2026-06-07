@@ -1,14 +1,16 @@
 begin
  integer traceCase, mere;
  integer array AA,BB(0:12);
- switch S := s1, s2, s3;
+ switch S := s1, s2, s3, mere;
 
  switch (lowkey:hikey) key
  begin
     when 0 do statement_0;
     --      ...
     when none do statement_e;
- end
+ end switch;
+
+ mere := s1 + s2;
    
 %  Simulation
  end

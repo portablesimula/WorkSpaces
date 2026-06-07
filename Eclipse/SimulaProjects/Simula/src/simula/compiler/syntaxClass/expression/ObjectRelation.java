@@ -98,7 +98,7 @@ public final class ObjectRelation extends Expression {
 	/// @param opr the operation: IN or IS
 	/// @param classIdentifier the right hand class identifier
 	ObjectRelation(final PsiBuilder psiBuilder, final Expression lhs, final int opr, final String classIdentifier) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		this.lhs = lhs;
 		this.opr = opr;
 		this.classIdentifier = classIdentifier;
@@ -113,6 +113,9 @@ public final class ObjectRelation extends Expression {
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ObjectRelation" + toString() + ".doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());
 		classDeclaration = getQualification(classIdentifier);
+		if(classDeclaration == null) {
+			Util.semanticError(this, "Illegal Object relation IS/IN: " + classIdentifier + " is not a class");
+		}
 		// Object IS ClassIdentifier | Object IN ClassIdentifier
 		lhs.doChecking();
 		Type type1 = lhs.type;

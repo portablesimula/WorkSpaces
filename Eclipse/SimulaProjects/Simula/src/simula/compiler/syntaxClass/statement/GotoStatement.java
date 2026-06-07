@@ -28,7 +28,6 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Goto Statement.
@@ -62,12 +61,13 @@ public final class GotoStatement extends Statement {
 	/// Create a new GotoStatement.
 	/// @param line source line
 	GotoStatement(final PsiBuilder psiBuilder, final int keyWord) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		psiBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to 'current tree')
 		if(keyWord != KeyWord.GOTO) {
-	        if (!PsiParse.accept(psiBuilder, KeyWord.TO))	Util.error("Missing 'TO' after 'GO'");
+	        if (!PsiParse.accept(psiBuilder, KeyWord.TO))
+	        	Util.syntaxError(psiBuilder, "Missing 'TO' after 'GO'");
 		}
-		label = Expression.expectExpression(psiBuilder);
+		label = Expression.expectExpression(psiBuilder, "designational");
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+this.firstLineNumber()+": GotoStatement: "+this);
 	}
 
@@ -75,8 +75,11 @@ public final class GotoStatement extends Statement {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
 		label.doChecking();
-		if (label.type == null || label.type.keyWord != Type.T_LABEL)
-			Util.error("Goto " + label + ", " + label + " is not a Label");
+		IF_TEST:if (label.type == null) {
+			if(label.type.keyWord == Type.T_LABEL) break IF_TEST;
+			if(label.type.keyWord == Type.T_UNDEF) break IF_TEST;
+			Util.semanticError(this, "Goto " + label + ", " + label + " is not a Label");
+		}
 		label.backLink = this; // To ensure _RESULT from functions
 		SET_SEMANTICS_CHECKED();
 	}

@@ -105,8 +105,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// 
 	/// Used by expectMaybeBlock, i.e. CompoundStatement, SubBlock or PrefixedBlock.
 	/// @param identifier the given identifier
-	protected BlockDeclaration(final PsiTree psiTree, String identifier) {
-		super(psiTree, identifier);
+	protected BlockDeclaration(final PsiBuilder psiBuilder, String identifier) {
+		super(psiBuilder, identifier);
 	}
 
 	/// Create a new BlockDeclaration.
@@ -114,8 +114,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// This constructor is only used by ClassDeclaration. ProcedureDeclaration and MaybeBlockDeclaration.
 	/// @param identifier the block identifier
 	/// @param declarationKind the declaration kind
-	private BlockDeclaration(final PsiTree psiTree, final String identifier,final int declarationKind) {
-		super(psiTree, identifier);
+	private BlockDeclaration(final PsiBuilder psiBuilder, final String identifier,final int declarationKind) {
+		super(psiBuilder, identifier);
 		this.declarationKind = declarationKind;
 	}
 	
@@ -130,7 +130,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// @param pList the parameter list
 	protected static void expectFormalParameterPart(final PsiBuilder psiBuilder, final Vector<Parameter> pList) {
 		do { // ParameterPart = Parameter ; { Parameter ; }
-			new Parameter(psiBuilder.psiTree, PsiParse.expectIdentifier(psiBuilder).edText()).into(pList);
+			new Parameter(psiBuilder, PsiParse.expectIdentifier(psiBuilder).edText()).into(pList);
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 		PsiParse.expect(psiBuilder, KeyWord.ENDPAR);
 	}

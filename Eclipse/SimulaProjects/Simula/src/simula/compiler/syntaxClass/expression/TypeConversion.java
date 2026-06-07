@@ -20,6 +20,7 @@ import simula.compiler.syntaxClass.OverLoad;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.Type.ConversionKind;
+import simula.compiler.syntaxClass.declaration.UndefinedDeclaration;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
@@ -108,7 +109,7 @@ public final class TypeConversion extends Expression {
 			int rhsBL=(fromType!=null && fromType.declaredIn!=null)?fromType.declaredIn.getRTBlockLevel() : 0;
 			int lhsBL=(toType!=null && toType.declaredIn!=null)?toType.declaredIn.getRTBlockLevel() : 0;
 			if(rhsBL != 0 && lhsBL != 0 && rhsBL != lhsBL) {
-				Util.error("Incompatible types: "+expression+" of type "+expression.type+" can't be converted to "+toType);
+				Util.semanticError(expression, "Incompatible types: "+expression+" of type "+expression.type+" can't be converted to "+toType);
 			}
 		}
 		if (testCastNeccessary(toType, expression)) {
@@ -139,9 +140,10 @@ public final class TypeConversion extends Expression {
 	/// Java coding utility: Test if a Type Cast is necessary.
 	/// @param toType the desired type
 	/// @param expression the expression
-	/// @return piece of Java source code
+	/// @return true: a type cast is necessary
 	private static boolean testCastNeccessary(Type toType,final Expression expression) {
-		if (toType == null)	return (false);
+		if (toType == null)	return false;
+		if(expression instanceof MissingExpression) return false;
 		if(Option.compilerMode != Option.CompilerMode.viaJavaSource) {
 			if(toType instanceof OverLoad otp) {
 				if(!otp.contains(expression.type)) {
@@ -151,7 +153,7 @@ public final class TypeConversion extends Expression {
 		}
 		Type fromType = expression.type;
 		if(fromType==null) {
-			Util.error("Expression "+expression+" has no type - can't be converted to "+toType);
+			Util.semanticError(expression, "Expression "+expression+" has no type - can't be converted to "+toType);
 //			Thread.dumpStack();
 			return(false);
 		}
@@ -161,7 +163,7 @@ public final class TypeConversion extends Expression {
 			case ConvertValue:
 			case ConvertRef:		return (true);
 			case Illegal:
-				Util.error("TypeConversion: Illegal cast: (" + toType + ") " + expression);
+				Util.semanticError(expression, "TypeConversion: Illegal cast: (" + toType + ") " + expression);
 			default: return (false);
 		}
 	}
@@ -176,11 +178,11 @@ public final class TypeConversion extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		type.doChecking(Global.getCurrentScope());
+		type.doChecking(Global.getCurrentScope(), expression);
 		expression.doChecking();
 		Type type = expression.type;
 		if (type.isConvertableTo(this.type).equals(Type.ConversionKind.Illegal))
-			Util.error("Illegal Type Conversion " + type + " ==> " + this.type);
+			Util.semanticError(this, "Illegal Type Conversion " + type + " ==> " + this.type);
 		SET_SEMANTICS_CHECKED();
 	}
 

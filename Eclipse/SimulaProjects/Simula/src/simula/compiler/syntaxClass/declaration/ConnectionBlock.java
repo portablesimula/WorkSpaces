@@ -29,6 +29,7 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiTree;
 
 /// Connection Block.
@@ -70,9 +71,9 @@ public final class ConnectionBlock extends DeclarationScope {
 	/// Create a new ConnectionBlock.
 	/// @param inspectedVariable   the inspected variable
 	/// @param whenClassIdentifier the when class identifier
-	public ConnectionBlock(final PsiTree psiTree, final VariableExpression inspectedVariable, final String whenClassIdentifier) {
+	public ConnectionBlock(final PsiBuilder psiBuilder, final VariableExpression inspectedVariable, final String whenClassIdentifier) {
 //		super("Connection block at line " + (Global.sourceLineNumber - 1));
-		super(psiTree, "Inspect " + inspectedVariable);
+		super(psiBuilder, "Inspect " + inspectedVariable);
 		declarationKind = ObjectKind.ConnectionBlock;
 		this.inspectedVariable = inspectedVariable;
 		this.whenClassIdentifier = whenClassIdentifier;
@@ -121,7 +122,7 @@ public final class ConnectionBlock extends DeclarationScope {
 			result = declaredIn.findMeaning(identifier);
 		}
 		if (result == null) {
-			Util.error("Undefined variable: " + identifier);
+//			Util.error("Undefined variable: " + identifier);
 			UndefinedDeclaration undef = new UndefinedDeclaration(null, identifier);
 			result = new Meaning(undef, this); // Error Recovery
 		}

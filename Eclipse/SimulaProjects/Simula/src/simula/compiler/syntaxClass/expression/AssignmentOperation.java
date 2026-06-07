@@ -23,6 +23,7 @@ import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ArrayDeclaration;
+import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.Parameter;
 import simula.compiler.syntaxClass.declaration.ProcedureDeclaration;
@@ -34,6 +35,7 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
@@ -72,30 +74,33 @@ public final class AssignmentOperation extends Expression {
 	/// @param lhs the left hand side
 	/// @param opr the operation
 	/// @param rhs the right hand side
-	public AssignmentOperation(final PsiTree psiTree, final Expression lhs, final int opr, final Expression rhs) {
-		super(psiTree);
+//	public AssignmentOperation(final PsiTree psiTree, final Expression lhs, final int opr, final Expression rhs) {
+	public AssignmentOperation(final PsiBuilder psiBuilder, final Expression lhs, final int opr, final Expression rhs) {
+		super(psiBuilder);
 		this.lhs = lhs;
 		this.opr = opr;
 		this.rhs = rhs;
 		if (this.lhs == null) {
-			Util.error("Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new VariableExpression(psiTree, "UNKNOWN_");
+			Util.syntaxError(psiBuilder, "Missing operand before " + KeyWord.edit(opr));
+			this.lhs = new MissingExpression(psiBuilder);
 		}
 		if (this.rhs == null) {
-			Util.error("Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new VariableExpression(psiTree, "UNKNOWN_");
+			Util.syntaxError(psiBuilder, "Missing operand after " + KeyWord.edit(opr));
+			this.rhs = new MissingExpression(psiBuilder);
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
 
 	@Override
 	public int firstLineNumber() {
+//		PsiTree psiTree = psiBuilder.psiTree;
 		if(psiTree != null) return psiTree.firstLineNumber();
 		return lhs.firstLineNumber();
 	}
 
 	@Override
 	public int lastLineNumber() {
+		PsiTree psiTree = psiBuilder.psiTree;
 		if(psiTree != null) return psiTree.lastLineNumber();
 		return rhs.lastLineNumber();
 	}
@@ -110,16 +115,23 @@ public final class AssignmentOperation extends Expression {
 					+ Global.getCurrentScope().edScopeChain());
 		lhs.doChecking();
 		Type toType = lhs.type;
+		if(toType == null) toType = Type.Undef;
+//		IO.println("AssignmentOperation.doChecking: lhs="+lhs.getClass().getSimpleName()+"  "+lhs);
 		if (lhs instanceof VariableExpression var) {
 			Meaning meaning = var.getMeaning();
-			if (meaning.declaredAs instanceof SimpleVariableDeclaration dcl) {
-				if (dcl.isConstant())
-					Util.error("Assignment to Constant: '" + lhs + "' is Illegal");
+//			IO.println("AssignmentOperation.doChecking: meaning.declaredAs="+meaning.declaredAs.getClass().getSimpleName()+"  "+meaning.declaredAs);
+			switch(meaning.declaredAs) {
+				case SimpleVariableDeclaration dcl -> { if (dcl.isConstant()) Util.semanticError(var, "Assignment to Constant: '" + lhs + "' is Illegal"); }
+				case ClassDeclaration cls -> { Util.semanticError(lhs, "Can't assign to Class Identifier: " + cls.identifier); }
+				default -> {} // NOTHING
 			}
-		} else {
-			if (lhs.getWriteableVariable() == null)
-				Util.error("Can't assign to " + lhs);
 		}
+//		else {
+			if (lhs.getWriteableVariable() == null) {
+				Util.semanticError(lhs, "Can't assign to " + lhs);
+			}
+//			else IO.println("AssignmentOperation.doChecking: lhs.getWriteableVariable="+lhs.getWriteableVariable().getClass().getSimpleName() + "  " + lhs.getWriteableVariable());
+//		}
 		rhs.doChecking();
 		Type fromType = rhs.type;
 		if(toType.keyWord == Type.T_UNDEF) {
@@ -130,7 +142,7 @@ public final class AssignmentOperation extends Expression {
 		rhs = (Expression) TypeConversion.testAndCreate(toType, rhs);
 		this.type = toType;
 		if (this.type == null)
-			Util.error("doAssignmentChecking: Illegal types: " + toType + " := " + fromType);
+			Util.semanticError(rhs, "doAssignmentChecking: Illegal types: " + toType + " := " + fromType);
 		SET_SEMANTICS_CHECKED();
 	}
 

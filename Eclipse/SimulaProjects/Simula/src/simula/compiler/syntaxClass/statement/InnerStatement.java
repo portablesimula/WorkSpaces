@@ -42,19 +42,8 @@ public final class InnerStatement extends Statement {
 
 	/// Create a new InnerStatement.
 	/// @param line the source line number
-//	public InnerStatement(final int line) {
-////		super(line);
-//		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": InnerStatement: "+this);
-//		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
-//			cls.statements1 = cls.statements;
-//			cls.statements = new ObjectList<Statement>();
-//		} else Util.error("Missplaced Inner");
-//	}
-		
-	/// Create a new InnerStatement.
-	/// @param line the source line number
 	public InnerStatement(final PsiBuilder psiBuilder, boolean explicit) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": InnerStatement: "+this);
 //		IO.println("NEW InnerStatement: Line "+firstLineNumber()+": InnerStatement: "+this+ "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 //		Thread.dumpStack();
@@ -63,14 +52,12 @@ public final class InnerStatement extends Statement {
 		
 		if(Global.getCurrentScope() instanceof ClassDeclaration cls) {
 			if(cls.statements1 != null) {
-				Util.error("Multiple Inner Statements: statements1'last: "+cls.statements1.lastElement());
-				Util.IERR("SJEKK DETTE");
-//				Util.STOP();
+				Util.semanticError(this, "Multiple Inner Statements: statements1'last: "+cls.statements1.lastElement()+" at line; "+cls.statements1.lastElement().firstLineNumber());
 			} else {
 				cls.statements1 = cls.statements;
 				cls.statements = new ObjectList<Statement>();
 			}
-		} else Util.error("Missplaced Inner Statement");
+		} else Util.semanticError(this, "Missplaced Inner Statement");
 	}
 
 	@Override

@@ -8,4 +8,6 @@ begin
    begin
       integer jj;
    end;
+
+   integer rp;
 end;

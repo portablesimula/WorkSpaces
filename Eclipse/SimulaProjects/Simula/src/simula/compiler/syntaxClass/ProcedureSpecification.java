@@ -18,7 +18,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 
 /// Procedure Specification.
 /// <pre>
@@ -79,8 +78,8 @@ public final class ProcedureSpecification extends SyntaxElement {
 	/// @param identifier procedure-identifier
 	/// @param type procedure's type or null
 	/// @param pList the parameter lList
-	public ProcedureSpecification(final PsiTree psiTree, final String identifier, final Type type, final ObjectList<Parameter> pList) {
-		super(psiTree);
+	public ProcedureSpecification(final PsiBuilder psiBuilder, final String identifier, final Type type, final ObjectList<Parameter> pList) {
+		super(psiBuilder);
 		this.identifier = identifier;
 		this.type = type;
 		this.parameterList = pList;
@@ -116,7 +115,7 @@ public final class ProcedureSpecification extends SyntaxElement {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("END ProcedureSpecification: " + block);
 		Global.setScope(block.declaredIn);
-		ProcedureSpecification procedureSpecification = new ProcedureSpecification(psiBuilder.psiTree, block.identifier, type, block.parameterList);
+		ProcedureSpecification procedureSpecification = new ProcedureSpecification(psiBuilder, block.identifier, type, block.parameterList);
 		return (procedureSpecification);
 	}
 
@@ -128,7 +127,7 @@ public final class ProcedureSpecification extends SyntaxElement {
 	/// @param scope the DeclarationScope
 	public void doChecking(final DeclarationScope scope) {
 		if (type != null)
-			type.doChecking(scope);
+			type.doChecking(scope, this);
 		// Check parameters
 		if (parameterList != null) {
 			for (Parameter par : parameterList)

@@ -73,7 +73,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	/// Create a new MaybeBlockDeclaration, i.e. CompoundStatement or SubBlock.
 	/// @param identifier block identifier
 	public MaybeBlockDeclaration(final PsiBuilder psiBuilder, final String identifier) {
-		super(psiBuilder.psiTree, identifier);
+		super(psiBuilder, identifier);
 		if(identifier != null)
 			modifyIdentifier(identifier);
 //		else modifyIdentifier("Block" + firstLineNumber());

@@ -1,10 +1,15 @@
-class catch;
 begin
-   class private; begin
-      procedure char(int); integer int; begin
-         integer case;
-         break: outint(int, 0);
-      end;
-   end;
+   class A;;
+   ref(A) x;
+   ref(C) z;
 
+   inspect x;
+
+   inspect x
+      when C do begin end
+      when A do begin end
+      when z do begin end;
+
+   if x in C
+   then z :- x qua C;
 end;

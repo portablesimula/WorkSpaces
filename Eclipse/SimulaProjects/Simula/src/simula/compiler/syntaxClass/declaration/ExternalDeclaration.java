@@ -108,7 +108,7 @@ public final class ExternalDeclaration extends Declaration {
 	/// @param identifier the identifier.
 	/// @param extIdentitier the external identifier.
 	private ExternalDeclaration(final PsiBuilder psiBuilder, String identifier,String extIdentitier) {
-		super(psiBuilder.psiTree, identifier);
+		super(psiBuilder, identifier);
 		this.declarationKind = ObjectKind.ExternalDeclaration;
 		this.externalIdent = extIdentitier;
 	}
@@ -142,10 +142,12 @@ public final class ExternalDeclaration extends Declaration {
 	public static Vector<SyntaxElement> expectExternalDeclaration(final PsiBuilder psiBuilder) {
 		LexToken kind = PsiParse.acceptIdentifier(psiBuilder);
 		if (kind != null)
-			Util.error("*** NOT IMPLEMENTED: " + "External " + kind + " Procedure");
+			Util.syntaxError(psiBuilder, "*** NOT IMPLEMENTED: " + "External " + kind + " Procedure");
 		Type expectedType = PsiParse.acceptType(psiBuilder);
-		if (!(PsiParse.accept(psiBuilder, KeyWord.CLASS) || PsiParse.accept(psiBuilder, KeyWord.PROCEDURE)))
-			Util.error("parseExternalDeclaration: Expecting CLASS or PROCEDURE");
+//		if (!(PsiParse.accept(psiBuilder, KeyWord.CLASS) || PsiParse.accept(psiBuilder, KeyWord.PROCEDURE)))
+		if (!(PsiParse.accept(psiBuilder, KeyWord.CLASS, KeyWord.PROCEDURE)))
+//			Util.syntaxError(psiBuilder.getCurrentLexerToken(), "parseExternalDeclaration: Expecting CLASS or PROCEDURE");
+			Util.syntaxError(psiBuilder, "parseExternalDeclaration: Expecting CLASS or PROCEDURE");
 
 		Vector<SyntaxElement> declarations = new Vector<SyntaxElement>();
 		String identifier = PsiParse.expectIdentifier(psiBuilder).edText();
@@ -172,25 +174,25 @@ public final class ExternalDeclaration extends Declaration {
 
 			File jarFile = JarFileBuilder.findJarFile(identifier, externalIdentifier);
 			if(jarFile == null) {
-				Util.IERR(""+jarFile);
+				Util.syntaxError(psiBuilder, "Can't find attribute file: " + identifier + '[' + externalIdentifier + ']');
 			}
 			if (jarFile != null) {
-				if(checkJarFiles(jarFile)) {
+				if(AttributeFileIO.checkJarFiles(jarFile)) {
 					DeclarationScope scope = Global.getCurrentScope();
-					Type moduleType = AttributeFileIO.readAttributeFile(identifier, jarFile, scope.getEnclosingBlock());
+					Type moduleType = AttributeFileIO.readAttributeFile(psiBuilder, identifier, jarFile, scope.getEnclosingBlock());
 					if(moduleType == null) {
-						if (expectedType != null) Util.error("Missing external type: "+expectedType);
+						if (expectedType != null) Util.syntaxError(psiBuilder, "Missing external type: "+expectedType);
 					} else if(expectedType == null) {
 						// NOTHING
 					} else if (!moduleType.equals(expectedType)) {
 						if (expectedType != null)
-							Util.error("Wrong external type: "+moduleType+". Expected type: "+expectedType);
+							Util.syntaxError(psiBuilder, "Wrong external type: "+moduleType+". Expected type: "+expectedType);
 					}
 				}
 			}
 
 			if (PsiParse.accept(psiBuilder, KeyWord.IS)) {
-				Util.error("*** NOT IMPLEMENTED: " + "External non-Simula Procedure");
+				Util.syntaxError(psiBuilder, "*** NOT IMPLEMENTED: " + "External non-Simula Procedure");
 				break LOOP;
 			}
 			if (!PsiParse.accept(psiBuilder, KeyWord.COMMA))
@@ -229,27 +231,27 @@ public final class ExternalDeclaration extends Declaration {
 		SET_SEMANTICS_CHECKED();
 	}
 
-	/// Check if the jarFile is already included.
-	/// @param jarFile the jarFile.
-	/// @return false: if the jarFile is already included.
-	private static boolean checkJarFiles(File jarFile) {
-		for(File f:Global.externalJarFiles) if(f.equals(jarFile)) {
-			Util.warning("External already included: "+jarFile.getName());
-			return(false);
-		}
-		return true;
-	}
-
-	/// Read external Attribute file.
-	public void readExternalAttributeFile() {
-		File jarFile = JarFileBuilder.findJarFile(identifier, externalIdent);
-		if (jarFile != null) {
-			if(checkJarFiles(jarFile)) {
-				BlockDeclaration enclosure = StandardClass.BASICIO;
-				AttributeFileIO.readAttributeFile(identifier, jarFile, enclosure);
-			}
-		}		
-	}
+//	/// Check if the jarFile is already included.
+//	/// @param jarFile the jarFile.
+//	/// @return false: if the jarFile is already included.
+//	private static boolean checkJarFiles(File jarFile) {
+//		for(File f:Global.externalJarFiles) if(f.equals(jarFile)) {
+//			Util.warning("External already included: "+jarFile.getName());
+//			return(false);
+//		}
+//		return true;
+//	}
+//
+//	/// Read external Attribute file.
+//	public void readExternalAttributeFile() {
+//		File jarFile = JarFileBuilder.findJarFile(identifier, externalIdent);
+//		if (jarFile != null) {
+//			if(checkJarFiles(jarFile)) {
+//				BlockDeclaration enclosure = StandardClass.BASICIO;
+//				AttributeFileIO.readAttributeFile(identifier, jarFile, enclosure);
+//			}
+//		}		
+//	}
 
 
 	@Override

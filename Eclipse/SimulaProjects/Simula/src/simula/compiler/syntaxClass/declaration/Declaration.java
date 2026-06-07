@@ -19,7 +19,6 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 
 /// Declaration.
 ///  
@@ -69,8 +68,8 @@ public abstract class Declaration extends SyntaxElement {
 	// ***********************************************************************************************
 	/// Create a new Declaration.
 	/// @param identifier the given identifier
-	protected Declaration(final PsiTree psiTree, final String identifier) {
-		super(psiTree);
+	protected Declaration(final PsiBuilder psiBuilder, final String identifier) {
+		super(psiBuilder);
 		this.identifier = identifier;
 		if(identifier != null) this.externalIdent = identifier; // May be overwritten
 		declaredIn = Global.getCurrentScope();
@@ -123,7 +122,7 @@ public abstract class Declaration extends SyntaxElement {
 			}
 		}
 		if (error)
-			Util.error(identifier + " is alrerady defined in " + declaredIn.identifier);
+			Util.syntaxError(psiBuilder, identifier + " is alrerady defined in " + declaredIn.identifier);
 		else if (warning)
 			Util.warning(identifier + " is alrerady defined in " + declaredIn.identifier);
 	}
@@ -198,9 +197,9 @@ public abstract class Declaration extends SyntaxElement {
 	/// @return the resulting boolean value
 	public boolean isCompatibleClasses(final Declaration other) {
 		if (!(this instanceof ClassDeclaration))
-			Util.error("" + this + " is not a class");
+			Util.semanticError(this, "" + this + " is not a class");
 		if (!(other instanceof ClassDeclaration))
-			Util.error("" + other + " is not a class");
+			Util.semanticError(other, "" + other + " is not a class");
 
 		if (((ClassDeclaration) this).isSubClassOf((ClassDeclaration) other))
 			return (true);

@@ -55,12 +55,12 @@ public final class UnaryOperation extends Expression {
 	/// @param oprator the unary operator.
 	/// @param operand the operand Expression
 	private UnaryOperation(final PsiBuilder psiBuilder, final int oprator,final Expression operand) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		this.oprator = oprator; this.operand = operand;
 //		psiBuilder.startSubtree(PsiTree.Kind.unaryOperation, "UnaryOperation");
 		if(this.operand==null)
-		{ Util.error("Missing operand after unary "+KeyWord.edit(oprator));
-		  this.operand=new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
+		{ Util.syntaxError(psiBuilder, "Missing operand after unary "+KeyWord.edit(oprator));
+		  this.operand=new MissingExpression(psiBuilder);
 		}
 		this.operand.backLink=this;
 //		psiBuilder.doneSubtree(PsiTree.Kind.unaryOperation, this);
@@ -75,24 +75,24 @@ public final class UnaryOperation extends Expression {
 			try { // Try to Compile-time Evaluate this expression
 				Number rhn=operand.getNumber();
 				if(rhn!=null) {
-					return(Constant.evaluate(psiBuilder.psiTree, oprator, rhn));
+					return(Constant.evaluate(psiBuilder, oprator, rhn));
 				}  
 			} catch(Exception e) {}
 		}
 		return(new UnaryOperation(psiBuilder, oprator, operand));
 	}
 	
-	@Override
-	public Expression evaluate() {
-		// Try to Compile-time Evaluate this expression
-		if (oprator == KeyWord.PLUS || oprator == KeyWord.MINUS) {
-			Number rhn=operand.getNumber();
-			if(rhn!=null) {
-				return(Constant.evaluate(null, oprator,rhn));
-			}  
-		}
-		return(this);
-	}
+//	@Override
+//	public Expression evaluate(final PsiBuilder psiBuilder) {
+//		// Try to Compile-time Evaluate this expression
+//		if (oprator == KeyWord.PLUS || oprator == KeyWord.MINUS) {
+//			Number rhn=operand.getNumber();
+//			if(rhn!=null) {
+//				return(Constant.evaluate(null, oprator,rhn));
+//			}  
+//		}
+//		return(this);
+//	}
 
 	@Override
 	public void doChecking() {

@@ -552,7 +552,7 @@ public final class SimulaCompiler {
 			exitValue = callJavaSystemCompiler(compiler, classPath);
 			msg = "System";
 			if (exitValue != 0) {
-				Util.error("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
+				Util.generalError("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
 				msg = "Commandline"; // Try use CommandLine Compiler
 				exitValue = callJavacCompiler(classPath);
 			}
@@ -566,7 +566,7 @@ public final class SimulaCompiler {
 		}
 		if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + Global.sourceName + ": Class Files Generated - From Java Source");
 		if (exitValue != 0) {
-			Util.error("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
+			Util.generalError("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
 			Util.println("\nCompiler terminated after error(s) during Java Compilation");
 			return;
 		}

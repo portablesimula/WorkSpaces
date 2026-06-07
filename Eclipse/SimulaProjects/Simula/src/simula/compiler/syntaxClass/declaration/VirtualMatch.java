@@ -14,7 +14,7 @@ import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
-import simula.psi.PsiTree;
+import simula.psi.PsiBuilder;
 
 /// Virtual match.
 /// 
@@ -34,8 +34,8 @@ public final class VirtualMatch extends Declaration {
 	/// Create a new VirtualMatch.
 	/// @param virtualSpec the virtual specification
 	/// @param match a matching ProcedureDeclaration
-	VirtualMatch(final PsiTree psiTree, final VirtualSpecification virtualSpec, final ProcedureDeclaration match) {
-		super(psiTree, virtualSpec.identifier);
+	VirtualMatch(final PsiBuilder psiBuilder, final VirtualSpecification virtualSpec, final ProcedureDeclaration match) {
+		super(psiBuilder, virtualSpec.identifier);
 		this.declarationKind = ObjectKind.VirtualMatch;
 		// NOTE: Called during Checking
 		this.virtualSpec = virtualSpec;

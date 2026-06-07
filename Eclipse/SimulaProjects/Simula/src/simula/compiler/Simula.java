@@ -219,7 +219,7 @@ public final class Simula {
 					new SimulaCompiler(fileName).doCompile(Global.moduleManager.getSyntaxTree());
 
 				} catch (IOException e) {
-					Util.error("can't open " + fileName + ", reason: " + e);
+					Util.generalError("can't open " + fileName + ", reason: " + e);
 				}
 			}
 		}

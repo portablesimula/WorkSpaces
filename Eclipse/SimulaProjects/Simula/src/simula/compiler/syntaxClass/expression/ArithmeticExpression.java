@@ -120,17 +120,17 @@ public final class ArithmeticExpression extends Expression {
 	/// @param opr arithmetic operation
 	/// @param rhs right hand side
 	private ArithmeticExpression(final PsiBuilder psiBuilder, final Expression lhs, final int opr, final Expression rhs) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		this.opr = opr;
 //		psiBuilder.startSubtree(PsiTree.Kind.arithmeticExpression, "ArithmeticExpression");
 		if (lhs == null) {
-			Util.error("Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
+			Util.syntaxError(psiBuilder, "Missing operand before " + KeyWord.edit(opr));
+			this.lhs = new MissingExpression(psiBuilder);
 		} else
 			this.lhs = lhs;
 		if (rhs == null) {
-			Util.error("Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
+			Util.syntaxError(psiBuilder, "Missing operand after " + KeyWord.edit(opr));
+			this.rhs = new MissingExpression(psiBuilder);
 		} else
 			this.rhs = rhs;
 		this.lhs.backLink = this.rhs.backLink = this;
@@ -148,26 +148,26 @@ public final class ArithmeticExpression extends Expression {
 			if (lhn != null) {
 				Number rhn = rhs.getNumber();
 				if (rhn != null)
-					return (Constant.evaluate(psiBuilder.psiTree, lhn, opr, rhn));
+					return (Constant.evaluate(psiBuilder, lhn, opr, rhn));
 			}
 		} catch (Exception e) {
-			Util.error("Arithmetic overflow: " + lhs + ' ' + KeyWord.edit(opr) + ' ' + rhs + "   " + e);
+			Util.syntaxError(psiBuilder, "Arithmetic overflow: " + lhs + ' ' + KeyWord.edit(opr) + ' ' + rhs + "   " + e);
 			e.printStackTrace();
 		}
 		return (new ArithmeticExpression(psiBuilder, lhs, opr, rhs));
 	}
 
-	@Override
-	public Expression evaluate() {
-		// Try to Compile-time Evaluate this expression
-		Number lhn = lhs.getNumber();
-		if (lhn != null) {
-			Number rhn = rhs.getNumber();
-			if (rhn != null)
-				return (Constant.evaluate(lhs.psiTree, lhn, opr, rhn));
-		}
-		return (this);
-	}
+//	@Override
+//	public Expression evaluate(final PsiBuilder psiBuilder) {
+//		// Try to Compile-time Evaluate this expression
+//		Number lhn = lhs.getNumber();
+//		if (lhn != null) {
+//			Number rhn = rhs.getNumber();
+//			if (rhn != null)
+//				return (Constant.evaluate(psiBuilder, lhn, opr, rhn));
+//		}
+//		return (this);
+//	}
 
 	@Override
 	public void doChecking() {
@@ -187,7 +187,7 @@ public final class ArithmeticExpression extends Expression {
 				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
 				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);
 				if (this.type == null)
-					Util.error("Incompatible types in binary operation: " + toString());
+					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
 			}
 			case KeyWord.DIV -> { // Real Division
 				// The operator / denotes real division.
@@ -203,13 +203,13 @@ public final class ArithmeticExpression extends Expression {
 				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
 				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);
 				if (this.type == null)
-					Util.error("Incompatible types in binary operation: " + toString());
+					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
 			}
 			case KeyWord.INTDIV -> { // Integer Division
 				lhs.doChecking();
 				rhs.doChecking();
 				if ((lhs.type.keyWord != Type.T_INTEGER) || (rhs.type.keyWord != Type.T_INTEGER))
-					Util.error("Incompatible types in binary operation: " + toString());
+					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
 				this.type = Type.Integer;
 				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
 				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);

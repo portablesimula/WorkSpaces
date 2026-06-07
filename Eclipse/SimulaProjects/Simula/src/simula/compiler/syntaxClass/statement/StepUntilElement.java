@@ -58,24 +58,21 @@ public class StepUntilElement extends ForListElement {
 		super(psiBuilder, forStatement, expr1);
 		this.expr2 = expr2;
 		this.expr3 = expr3;
-		if (expr1 == null)
-			Util.error("Missing expression before 'step' in ForStatement");
-		if (expr2 == null)
-			Util.error("Missing expression after 'step' in ForStatement");
-		if (expr3 == null)
-			Util.error("Missing expression after 'until' in ForStatement");
 	}
 
 	@Override
 	public void doChecking() {
 		expr1.doChecking();
 		expr1 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr1);
+//		expr1.doChecking();
+		expr1.backLink = forStatement; // To ensure _RESULT from functions
 		expr2.doChecking();
 		expr2 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr2);
+//		expr2.doChecking();
+		expr2.backLink = forStatement; // To ensure _RESULT from functions
 		expr3.doChecking();
 		expr3 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr3);
-		expr1.backLink = forStatement; // To ensure _RESULT from functions
-		expr2.backLink = forStatement; // To ensure _RESULT from functions
+//		expr3.doChecking();
 		expr3.backLink = forStatement; // To ensure _RESULT from functions
 	}
 

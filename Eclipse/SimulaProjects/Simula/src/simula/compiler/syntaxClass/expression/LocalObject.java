@@ -76,7 +76,7 @@ public final class LocalObject extends Expression {
 	/// Create a new LocalObject
 	/// @param ident class-identifier
 	private LocalObject(final PsiBuilder psiBuilder, final String ident) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		this.classIdentifier = ident;
 		this.type=Type.Ref(classIdentifier);
 		if (Option.internal.TRACE_PARSE)
@@ -102,7 +102,7 @@ public final class LocalObject extends Expression {
 		Meaning meaning=Global.getCurrentScope().findMeaning(classIdentifier);
 		Declaration decl = meaning.declaredAs;
 		if (decl instanceof ClassDeclaration cdecl) classDeclaration=cdecl;
-		else Util.error("LocalObject("+this+") "+classIdentifier+" is not a class");
+		else Util.semanticError(this, "LocalObject("+this+") "+classIdentifier+" is not a class");
 		findThis();
 		SET_SEMANTICS_CHECKED();
 	}
@@ -135,7 +135,7 @@ public final class LocalObject extends Expression {
 			}
 			thisScope=thisScope.declaredIn;
 		}
-		Util.error("This "+classIdentifier+" -- Is not on static chain.");
+		Util.semanticError(this, "This "+classIdentifier+" -- Is not on static chain.");
 	}
 
 	// Returns true if this expression may be used as a statement.

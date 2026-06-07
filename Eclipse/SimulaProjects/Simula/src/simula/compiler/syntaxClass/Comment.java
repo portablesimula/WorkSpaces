@@ -8,7 +8,7 @@ package simula.compiler.syntaxClass;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.psi.PsiTree;
+import simula.psi.PsiBuilder;
 
 /// Comment or White Spaces.
 /// 
@@ -29,8 +29,8 @@ public final class Comment extends SyntaxElement {
 	
 	/// Create a new DummyStatement.
 	/// @param line the source line number
-	public Comment(PsiTree psiTree) {
-		super(psiTree);
+	public Comment(PsiBuilder psiBuilder) {
+		super(psiBuilder);
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": DummyStatement: "+this);
 	}
 

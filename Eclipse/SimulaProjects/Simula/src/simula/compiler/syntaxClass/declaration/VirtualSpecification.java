@@ -30,7 +30,6 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Virtual Quantities.
@@ -87,8 +86,8 @@ public final class VirtualSpecification extends Declaration {
 	/// @param kind the vitual Kind
 	/// @param prefixLevel the prefix level of the class with this virtual specification
 	/// @param procedureSpec the ProcedureSpecification or null if not present
-	VirtualSpecification(final PsiTree psiTree, final String identifier, final Type type, final int kind, final int prefixLevel, final ProcedureSpecification procedureSpec) {
-		super(psiTree, identifier);
+	VirtualSpecification(final PsiBuilder psiBuilder, final String identifier, final Type type, final int kind, final int prefixLevel, final ProcedureSpecification procedureSpec) {
+		super(psiBuilder, identifier);
 		this.declarationKind = ObjectKind.VirtualSpecification;
 		this.externalIdent = identifier;
 		this.type = type;
@@ -135,14 +134,14 @@ public final class VirtualSpecification extends Declaration {
 //				IO.println("\n\nVirtualSpecification.expectVirtualPart: " + identifier);
 				ProcedureSpecification procedureSpec = null;
 				if (PsiParse.accept(psiBuilder, KeyWord.IS)) {
-					if(type != null) Util.error("An IS-specified virtual procedure can have its type only after IS.");
+					if(type != null) Util.syntaxError(psiBuilder, "An IS-specified virtual procedure can have its type only after IS.");
 					type = PsiParse.acceptType(psiBuilder);
 					PsiParse.expect(psiBuilder, KeyWord.PROCEDURE);
 					procedureSpec = ProcedureSpecification.expectProcedureSpecification(psiBuilder, type);						
 					cls.virtualSpecList
-							.add(new VirtualSpecification(psiBuilder.psiTree, identifier, type, Kind.Procedure, cls.prefixLevel(), procedureSpec));
+							.add(new VirtualSpecification(psiBuilder, identifier, type, Kind.Procedure, cls.prefixLevel(), procedureSpec));
 				} else {
-					cls.virtualSpecList.add(new VirtualSpecification(psiBuilder.psiTree, identifier, type, Kind.Procedure, cls.prefixLevel(), null));
+					cls.virtualSpecList.add(new VirtualSpecification(psiBuilder, identifier, type, Kind.Procedure, cls.prefixLevel(), null));
 					if (PsiParse.accept(psiBuilder, KeyWord.COMMA))
 						expectIdentifierList(psiBuilder, cls, type, Kind.Procedure);
 					else
@@ -154,7 +153,7 @@ public final class VirtualSpecification extends Declaration {
 //			psiBuilder.startSubtree(PsiTree.Kind.virtualSpecification, "May be next Virtual");
 
 		}
-		if(cls.virtualSpecList.size()==0) Util.error("Missing virtual specifier after VIRTUAL:");
+		if(cls.virtualSpecList.size()==0) Util.syntaxError(psiBuilder, "Missing virtual specifier after VIRTUAL:");
 	}
 
 	/// Parse a virtual identifier list.
@@ -169,7 +168,7 @@ public final class VirtualSpecification extends Declaration {
 	private static void expectIdentifierList(final PsiBuilder psiBuilder, final ClassDeclaration cls, final Type type, final int kind) {
 		do {
 			String identifier = PsiParse.expectIdentifier(psiBuilder).edText();
-			cls.virtualSpecList.add(new VirtualSpecification(psiBuilder.psiTree, identifier, type, kind, cls.prefixLevel(), null));
+			cls.virtualSpecList.add(new VirtualSpecification(psiBuilder, identifier, type, kind, cls.prefixLevel(), null));
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 	}

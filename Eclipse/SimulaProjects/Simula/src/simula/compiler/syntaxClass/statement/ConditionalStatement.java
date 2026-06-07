@@ -63,13 +63,13 @@ public final class ConditionalStatement extends Statement {
 	/// Create a new ConditionalStatement.
 	/// @param line the source line number
 	ConditionalStatement(PsiBuilder psiBuilder) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		int lno = psiBuilder.getSourceLineNumber();
 //		IO.println("NEW ConditionalStatement: "+psiBuilder.getSourceLineNumber());
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN IfStatement: ");
 		psiBuilder.consume(KeyWord.IF); //  (add it to 'current tree')
 
-		condition = Expression.expectExpression(psiBuilder);
+		condition = Expression.expectExpression(psiBuilder, "if-condition");
 		PsiParse.expect(psiBuilder, KeyWord.THEN);
 		Statement elseStatement = null;
 		if (PsiParse.accept(psiBuilder, KeyWord.ELSE)) {
@@ -106,8 +106,10 @@ public final class ConditionalStatement extends Statement {
 //		IO.println("ConditionalStatement.doChecking: " + condition.getClass().getSimpleName() + "  " + this);
 		condition.doChecking();
 		condition.backLink=this; // To ensure _RESULT from functions
-		if (condition.type == null || condition.type.keyWord != Type.T_BOOLEAN)
-			Util.error("ConditionalStatement.doChecking: Condition is not of Type Boolean, but: " + condition.type);
+		if (condition.type == null || condition.type.keyWord != Type.T_BOOLEAN) {
+			if(condition.type != Type.Undef )
+				Util.semanticError(this, "ConditionalStatement.doChecking: Condition is not of Type Boolean, but: " + condition.type);
+		}
 		thenStatement.doChecking();
 		if (elseStatement != null) {
 			elseStatement.doChecking();

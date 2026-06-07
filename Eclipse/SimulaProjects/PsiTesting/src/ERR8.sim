@@ -1,13 +1,13 @@
 begin
- integer traceCase;
-   
-  Simulation
-   begin
-     integer case;
-     case := 444;
-K:L: case := 555;
-%    case := 666
-   E:end text 
-       mere
-   ;
- end
+ class A; begin
+   integer i;
+   i := 44;
+   inner;
+   goto L;
+   i := 55;
+   inner;
+   go first;
+ end;
+
+   inner;
+end

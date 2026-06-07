@@ -18,6 +18,7 @@ import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.VirtualSpecification;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
@@ -48,8 +49,8 @@ public final class ProtectedSpecification extends SyntaxElement {
     /// Create a new ProtectedSpecification.
     /// @param definedIn the class it is defined in
     /// @param identifier the protected identifier
-	public ProtectedSpecification(final PsiTree psiTree, final ClassDeclaration definedIn,final String identifier) {
-		super(psiTree);
+	public ProtectedSpecification(final PsiBuilder psiBuilder, final ClassDeclaration definedIn,final String identifier) {
+		super(psiBuilder);
 		this.definedIn=definedIn;
 		this.identifier=identifier;
 	}
@@ -76,11 +77,11 @@ public final class ProtectedSpecification extends SyntaxElement {
 	public void doChecking() {
 		Declaration attribute=getAttribute();
 		if(attribute!=null) attribute.isProtected=this;
-		else Util.error("No Attribute "+identifier+" match 'protected' specification: "+this);
+		else Util.semanticError(this, "No Attribute "+identifier+" match 'protected' specification: "+this);
 		VirtualSpecification virtSpec=VirtualSpecification.getVirtualSpecification(attribute);
 		if(virtSpec!=null) {
 			if( virtSpec.declaredIn != attribute.declaredIn )
-				Util.error("A virtual attribute may only be specified protected in the class heading in which the virtual specification occurs.");
+				Util.semanticError(this, "A virtual attribute may only be specified protected in the class heading in which the virtual specification occurs.");
 		}
 		// Virtual specification together with Attribute definition.
 		VirtualSpecification vir=getVirtualSpecification();

@@ -10,7 +10,7 @@ import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
-import simula.psi.PsiTree;
+import simula.psi.PsiBuilder;
 
 /// Inline Statement.
 /// 
@@ -34,8 +34,8 @@ public final class InlineStatement extends Statement {
 	
 	/// Create a new InlineStatement.
 	/// @param kind the kind code string.
-	public InlineStatement(final PsiTree psiTree, String kind) {
-		super(psiTree);
+	public InlineStatement(final PsiBuilder psiBuilder, String kind) {
+		super(psiBuilder);
 		this.kind = kind;
 		SET_SEMANTICS_CHECKED();
 	}

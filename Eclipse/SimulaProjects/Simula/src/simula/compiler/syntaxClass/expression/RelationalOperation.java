@@ -24,7 +24,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
-import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
 /// Relational Operation.
@@ -68,17 +67,17 @@ public final class RelationalOperation extends Expression {
 	/// @param opr the relation
 	/// @param rhs the right hand side
 	RelationalOperation(final PsiBuilder psiBuilder, final Expression lhs,final int opr,final Expression rhs) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		this.type = Type.Boolean;
 		this.lhs = lhs; this.opr = opr; this.rhs = rhs;
 //		psiBuilder.startSubtree(PsiTree.Kind.relationalOperation, "RelationalOperation");
 		if (this.lhs == null) {
-			Util.error("Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
+			Util.semanticError(this, "Missing operand before " + KeyWord.edit(opr));
+			this.lhs = new MissingExpression(psiBuilder);
 		}
 		if (this.rhs == null) {
-			Util.error("Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new VariableExpression(psiBuilder.psiTree, "UNKNOWN_");
+			Util.semanticError(this, "Missing operand after " + KeyWord.edit(opr));
+			this.rhs = new MissingExpression(psiBuilder);
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 //		psiBuilder.doneSubtree(PsiTree.Kind.relationalOperation, this);
@@ -94,31 +93,33 @@ public final class RelationalOperation extends Expression {
 		rhs.doChecking();
 		Type type1 = lhs.type;
 		Type type2 = rhs.type;
-		this.type = Type.Boolean;
-		switch (opr) {
-		case KeyWord.LT, KeyWord.LE, KeyWord.EQ, KeyWord.NE, KeyWord.GE, KeyWord.GT: {
-			if (type1.keyWord == Type.T_TEXT      && type2.keyWord == Type.T_TEXT) break;
-			if (type1.keyWord == Type.T_CHARACTER && type2.keyWord == Type.T_CHARACTER) break;
-			if (type1.keyWord == Type.T_BOOLEAN   && type2.keyWord == Type.T_BOOLEAN) break;
-			// Arithmetic Relation
-			Type atype = Type.arithmeticTypeConversion(type1, type2);
-			if (atype == null) {
-				Util.error("Incompatible types in binary operation: " + toString());
-				Util.error("RelationalOperation: Illegal types: " + type1 + " " + opr + " " + type2);
+		if(type1.keyWord != Type.T_UNDEF && type2.keyWord != Type.T_UNDEF) {
+			this.type = Type.Boolean;
+			switch (opr) {
+			case KeyWord.LT, KeyWord.LE, KeyWord.EQ, KeyWord.NE, KeyWord.GE, KeyWord.GT: {
+				if (type1.keyWord == Type.T_TEXT      && type2.keyWord == Type.T_TEXT) break;
+				if (type1.keyWord == Type.T_CHARACTER && type2.keyWord == Type.T_CHARACTER) break;
+				if (type1.keyWord == Type.T_BOOLEAN   && type2.keyWord == Type.T_BOOLEAN) break;
+				// Arithmetic Relation
+				Type atype = Type.arithmeticTypeConversion(type1, type2);
+				if (atype == null) {
+					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
+					Util.semanticError(this, "RelationalOperation: Illegal types: " + type1 + " " + opr + " " + type2);
+				}
+				lhs = (Expression) TypeConversion.testAndCreate(atype, lhs);
+				rhs = (Expression) TypeConversion.testAndCreate(atype, rhs);
+				break;
 			}
-			lhs = (Expression) TypeConversion.testAndCreate(atype, lhs);
-			rhs = (Expression) TypeConversion.testAndCreate(atype, rhs);
-			break;
-		}
-		case KeyWord.EQR: case KeyWord.NER: {
-			// Object =/= Object or Object == Object
-			if ((!type1.isReferenceType()) || (!type2.isReferenceType()))
-				Util.error("RelationalOperation: Illegal types: " + type1 + " " + opr + " " + type2);
-			break;
-		}
-		default:
-			Util.IERR();
-			this.type = rhs.type;
+			case KeyWord.EQR: case KeyWord.NER: {
+				// Object =/= Object or Object == Object
+				if ((!type1.isReferenceType()) || (!type2.isReferenceType()))
+					Util.semanticError(this, "RelationalOperation: Illegal types: " + type1 + " " + opr + " " + type2);
+				break;
+			}
+			default:
+				Util.IERR();
+				this.type = rhs.type;
+			}
 		}
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("END RelationalOperation" + toString() + ".doChecking - Result type=" + this.type);

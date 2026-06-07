@@ -26,7 +26,6 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
 
 /// Switch Declaration.
 /// 
@@ -53,18 +52,18 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 	/// Create a new SwitchDeclaration.
 	/// @param ident switch identifier
 	public SwitchDeclaration(PsiBuilder psiBuilder, final String ident) {
-		super(psiBuilder.psiTree, ident, ObjectKind.Procedure);
+		super(psiBuilder, ident, ObjectKind.Procedure);
 		Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
 		syntaxElements.add(this);
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse SwitchDeclaration");
 		this.type = Type.Label;
 		PsiParse.expect(psiBuilder, KeyWord.ASSIGNVALUE);
-		do { switchList.add(Expression.expectExpression(psiBuilder));
+		do { switchList.add(Expression.expectExpression(psiBuilder, "designational"));
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 		if (Option.internal.TRACE_PARSE)
 			PsiParse.TRACE("Parse SwitchDeclaration(3), switchList=" + switchList);
-		new Parameter(psiBuilder.psiTree, "_SW", Type.Integer, Parameter.Kind.Simple).into(parameterList);
+		new Parameter(psiBuilder, "_SW", Type.Integer, Parameter.Kind.Simple).into(parameterList);
 		Global.setScope(declaredIn);
 
 		for(Expression expr:switchList) syntaxElements.add(expr);
@@ -75,7 +74,8 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		super.doChecking();
 		for (Expression expr : switchList) {
 			expr.doChecking();
-			if(expr.type.keyWord != Type.T_LABEL) Util.error("Switch element "+expr+" is not a Label");
+//			if(expr.type.keyWord != Type.T_LABEL) Util.semanticError(this, "Switch element "+expr+" is not a Label");
+			if(! Type.checkType(expr, Type.T_LABEL)) Util.semanticError(expr, "Switch element "+expr+" is not a Label");
 			expr.backLink = this; // To ensure _RESULT from functions
 		}
 		VirtualSpecification virtSpec=VirtualSpecification.getVirtualSpecification(this);

@@ -1,8 +1,14 @@
 begin
-   class A; begin
-      integer i;
-      i := 444;
-      inner;
-      i := 666:
-   end;
+   class A;;
+   integer procedure func;;
+   procedure P;;
+   boolean bbb;
+   comment MAXINT = 2147483647;
+   integer j, i = 2147483648;
+   j := 2147483647 + 1;
+   A := 44;
+   func := 66;
+   P := 99;
+   bbb := bbb or 33;
+   bbb := j in P;
 end;

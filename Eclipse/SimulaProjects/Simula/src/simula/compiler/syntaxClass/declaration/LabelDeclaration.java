@@ -54,7 +54,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// 
 	/// @param identifier label identifier
 	public LabelDeclaration(final PsiBuilder psiBuilder, final String identifier) {
-		super(psiBuilder.psiTree, Type.Label, identifier);
+		super(psiBuilder, Type.Label, identifier);
 		this.externalIdent = "_LABEL_" + identifier;
 		this.declarationKind = ObjectKind.LabelDeclaration;
 	}
@@ -66,7 +66,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		Global.sourceLineNumber = firstLineNumber();
 		DeclarationScope declaredIn = Global.getCurrentScope();
 		this.externalIdent = "_LABEL_" + declaredIn.externalIdent + '_' + identifier + '_' + declaredIn.prefixLevel();
-		type.doChecking(declaredIn);
+		type.doChecking(declaredIn, this);
 		VirtualSpecification virtSpec = VirtualSpecification.getVirtualSpecification(this);
 		if (virtSpec == null) {
 			// Label attributes are implicit specified 'protected'

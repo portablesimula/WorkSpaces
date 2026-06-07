@@ -160,7 +160,7 @@ public final class RunSimulaSample {
 			}
 		}
 		if (error.length() > 0)
-			Util.error(error.toString());
+			Util.generalError(error.toString());
 		return (process.exitValue());
 	}
 

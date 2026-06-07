@@ -30,13 +30,11 @@ import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.TypeConversion;
-import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
 import simula.psi.PsiTree;
@@ -81,8 +79,8 @@ public class SimpleVariableDeclaration extends Declaration {
 	/// 
 	/// @param type       the variable type
 	/// @param identifier the variable identifier
-	public SimpleVariableDeclaration(final PsiTree psiTree, final Type type, final String identifier) {
-		super(psiTree, identifier);
+	public SimpleVariableDeclaration(final PsiBuilder psiBuilder, final Type type, final String identifier) {
+		super(psiBuilder, identifier);
 		this.declarationKind = ObjectKind.SimpleVariableDeclaration;
 		this.type = type;
 	}
@@ -92,8 +90,8 @@ public class SimpleVariableDeclaration extends Declaration {
 	/// @param identifier      the variable identifier
 	/// @param constant        the constant indicator
 	/// @param constantElement a constant initial value
-	SimpleVariableDeclaration(final PsiTree psiTree, final Type type, final String identifier, final boolean constant, final Constant constantElement) {
-		this(psiTree, type, identifier);
+	SimpleVariableDeclaration(final PsiBuilder psiBuilder, final Type type, final String identifier, final boolean constant, final Constant constantElement) {
+		this(psiBuilder, type, identifier);
 		this.constant = constant;
 		this.constantElement = constantElement;
 	}
@@ -135,9 +133,9 @@ public class SimpleVariableDeclaration extends Declaration {
 			PsiParse.TRACE("Parse IdentifierList");
 		do {
 			String ident = PsiParse.expectIdentifier(psiBuilder).edText();
-			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(psiBuilder.psiTree, type, ident);
+			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(psiBuilder, type, ident);
 			if (PsiParse.accept(psiBuilder, KeyWord.EQ))
-				typeDeclaration.constantElement = Expression.expectExpression(psiBuilder);
+				typeDeclaration.constantElement = Expression.expectExpression(psiBuilder, "constant");
 			declarations.add(typeDeclaration);
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 		return declarations;
@@ -149,7 +147,8 @@ public class SimpleVariableDeclaration extends Declaration {
 		if (IS_SEMANTICS_CHECKED())
 			return;
 		Global.sourceLineNumber = firstLineNumber();
-		type.doChecking(Global.getCurrentScope());
+		
+		type.doChecking(Global.getCurrentScope(), this);
 		if (constantElement != null) {
 			constantElement.doChecking();
 			constantElement = TypeConversion.testAndCreate(type, constantElement);
@@ -183,7 +182,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		if (this.isConstant())
 			modifier = modifier + "final ";
 		if (constantElement != null) {
-			constantElement = TypeConversion.testAndCreate(type, constantElement.evaluate());
+//			constantElement = TypeConversion.testAndCreate(type, constantElement.evaluate(null));
 			constantElement.doChecking();
 			if (constantElement instanceof Constant) {
 				String value = constantElement.toJavaCode();

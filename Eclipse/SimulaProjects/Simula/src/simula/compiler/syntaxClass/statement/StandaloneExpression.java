@@ -15,6 +15,7 @@ import javax.swing.tree.DefaultTreeModel;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.AssignmentOperation;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.utilities.Global;
@@ -55,7 +56,7 @@ public final class StandaloneExpression extends Statement {
 //	StandaloneExpression(final PsiBuilder psiBuilder, final int line,final Expression expression) {
 //		super(line);
 	StandaloneExpression(final PsiBuilder psiBuilder, final Expression expression) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 //		IO.println("\nNEW StandaloneExpression: expr="+expression);
 //		psiBuilder.printPSI("NEW StandaloneExpression: expr="+expression);
 
@@ -68,7 +69,7 @@ public final class StandaloneExpression extends Statement {
 		while ((prevToken = PsiParse.acceptParserToken(psiBuilder, KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF)) != null) { 
 //			IO.println("NEW StandaloneExpression: prevToken="+prevToken);
 			psiBuilder.startSubtree(PsiTree.Kind.expression, "AssignmentOperation");
-			this.expression = new AssignmentOperation(psiBuilder.psiTree, this.expression, prevToken.keyWord, expectStandaloneExpression(psiBuilder));
+			this.expression = new AssignmentOperation(psiBuilder, this.expression, prevToken.keyWord, expectStandaloneExpression(psiBuilder));
 			psiBuilder.doneSubtree(PsiTree.Kind.expression, this);
 		}		
 		
@@ -79,6 +80,7 @@ public final class StandaloneExpression extends Statement {
 
 	@Override
 	public PsiTree getPsiTree() {
+		PsiTree psiTree = (psiBuilder == null)? null : psiBuilder.psiTree;
 		if(psiTree == null) psiTree = expression.getPsiTree();
 		return psiTree;
 	}
@@ -92,11 +94,11 @@ public final class StandaloneExpression extends Statement {
 	/// Pre-Condition: First expression is already read.
 	/// @return the resulting StandaloneExpression
 	private static Expression expectStandaloneExpression(PsiBuilder psiBuilder) { 
-		Expression retExpr=Expression.expectExpression(psiBuilder);
+		Expression retExpr=Expression.expectExpression(psiBuilder, "standalone");
 		LexToken prevToken = null;
 		while ((prevToken = PsiParse.acceptParserToken(psiBuilder, KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) != null) {
 			int opr=prevToken.keyWord;
-			retExpr=new AssignmentOperation(psiBuilder.psiTree, retExpr, opr, expectStandaloneExpression(psiBuilder));
+			retExpr=new AssignmentOperation(psiBuilder, retExpr, opr, expectStandaloneExpression(psiBuilder));
 		}
 //		IO.println("StandaloneExpression.expectStandaloneExpression: RETURN: "+retExpr+" ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 		return retExpr;
@@ -108,7 +110,9 @@ public final class StandaloneExpression extends Statement {
 		Global.sourceLineNumber=firstLineNumber();
 		if (Option.internal.TRACE_CHECKER) Util.TRACE("StandaloneExpression("+expression+").doChecking - Current Scope Chain: "+Global.getCurrentScope().edScopeChain());
 		expression.doChecking();
-		if(!expression.maybeStatement()) Util.error("Illegal/Missplaced Expression: "+expression);
+		if(!expression.maybeStatement() && expression.type != Type.Undef) {
+			Util.semanticError(expression, "Illegal/Missplaced Expression: "+expression);
+		}
 		if (Option.internal.TRACE_CHECKER) Util.TRACE("END StandaloneExpression(" + expression+ ").doChecking:");
 		SET_SEMANTICS_CHECKED();
 	}

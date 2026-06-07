@@ -99,8 +99,8 @@ public abstract class Expression extends SyntaxElement {
 	public SyntaxElement backLink;
 
 	/// Expression.
-	public Expression(final PsiTree psiTree){
-		super(psiTree);
+	public Expression(final PsiBuilder psiBuilder){
+		super(psiBuilder);
 	}
 
 	/// Accept expression.
@@ -145,11 +145,15 @@ public abstract class Expression extends SyntaxElement {
 	/// 	        |  IF  BooleanExpression  THEN  SimpleExpression  ELSE  Expression
 	/// </pre>
 	/// If no expression is found an error message is printed.
-	/// @return Expression or null if no expression is found.
-	public static Expression expectExpression(PsiBuilder psiBuilder) {
+	/// @return Expression or 'MissingExpression' if no expression is found.
+	public static Expression expectExpression(PsiBuilder psiBuilder, String kind) {
 //		IO.println("Expression.expectExpression: BEGIN");
 		Expression expr=acceptExpression(psiBuilder);
-		if(expr==null) Util.error("Expecting Expression");
+		if(expr==null) {
+//			Util.syntaxError(psiBuilder, "Expecting Expression");
+			expr = new MissingExpression(psiBuilder);
+			Util.semanticError(expr, "Expecting " + kind + " Expression");
+		}
 //		IO.println("Expression.expectExpression: END: expr="+expr);
 		return(expr);
 	}
@@ -412,24 +416,25 @@ public abstract class Expression extends SyntaxElement {
 		Expression expr=null;
 		LexToken prevToken = PsiParse.getCurrentParserToken(psiBuilder);
 		if(PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) { expr = acceptExpression(psiBuilder); PsiParse.expect(psiBuilder, KeyWord.ENDPAR); }
-		else if(PsiParse.accept(psiBuilder, KeyWord.INTEGERKONST)) expr = new Constant(psiBuilder.psiTree, Type.Integer,((IntegerConst)prevToken).value);
-		else if(PsiParse.accept(psiBuilder, KeyWord.REALKONST)) expr = Constant.createRealType(psiBuilder.psiTree, ((RealConst)prevToken).value);
-		else if(PsiParse.accept(psiBuilder, KeyWord.LONGREALKONST)) expr = Constant.createLongRealType(psiBuilder.psiTree, ((LongRealConst)prevToken).value);
+		else if(PsiParse.accept(psiBuilder, KeyWord.INTEGERKONST)) expr = new Constant(psiBuilder, Type.Integer,((IntegerConst)prevToken).value);
+		else if(PsiParse.accept(psiBuilder, KeyWord.REALKONST)) expr = Constant.createRealType(psiBuilder, ((RealConst)prevToken).value);
+		else if(PsiParse.accept(psiBuilder, KeyWord.LONGREALKONST)) expr = Constant.createLongRealType(psiBuilder, ((LongRealConst)prevToken).value);
 
 //		else if(PsiParse.accept(psiBuilder, KeyWord.BOOLEANKONST)) expr = new Constant(Type.Boolean,((IntegerConst)prevToken).value);
-		else if(PsiParse.accept(psiBuilder, KeyWord.TRUE)) expr = new Constant(psiBuilder.psiTree, Type.Boolean,true);
-		else if(PsiParse.accept(psiBuilder, KeyWord.FALSE)) expr = new Constant(psiBuilder.psiTree, Type.Boolean,false);
+		else if(PsiParse.accept(psiBuilder, KeyWord.TRUE)) expr = new Constant(psiBuilder, Type.Boolean,true);
+		else if(PsiParse.accept(psiBuilder, KeyWord.FALSE)) expr = new Constant(psiBuilder, Type.Boolean,false);
 
-		else if(PsiParse.accept(psiBuilder, KeyWord.CHARACTERKONST)) expr = new Constant(psiBuilder.psiTree, Type.Character,((CharacterConst)prevToken).value);
-		else if(PsiParse.accept(psiBuilder, KeyWord.TEXTKONST)) expr = new Constant(psiBuilder.psiTree, Type.Text,psiBuilder.getTextString(prevToken));
-		else if(PsiParse.accept(psiBuilder, KeyWord.NONE)) expr = new Constant(psiBuilder.psiTree, Type.Ref,null);
-		else if(PsiParse.accept(psiBuilder, KeyWord.NOTEXT)) expr = new Constant(psiBuilder.psiTree, Type.Text,null);
+		else if(PsiParse.accept(psiBuilder, KeyWord.CHARACTERKONST)) expr = new Constant(psiBuilder, Type.Character,((CharacterConst)prevToken).value);
+		else if(PsiParse.accept(psiBuilder, KeyWord.TEXTKONST)) expr = new Constant(psiBuilder, Type.Text,psiBuilder.getTextString(prevToken));
+		else if(PsiParse.accept(psiBuilder, KeyWord.NONE)) expr = new Constant(psiBuilder, Type.Ref,null);
+		else if(PsiParse.accept(psiBuilder, KeyWord.NOTEXT)) expr = new Constant(psiBuilder, Type.Text,null);
 		else if(PsiParse.accept(psiBuilder, KeyWord.NEW)) expr = ObjectGenerator.expectNew(psiBuilder);
 		else if(PsiParse.accept(psiBuilder, KeyWord.THIS)) expr = LocalObject.expectThisIdentifier(psiBuilder); 
 		else {
 			LexToken prevToken2 = PsiParse.getCurrentParserToken(psiBuilder) ;
 //			String ident = PsiParse.acceptIdentifier(psiBuilder).getText();
-			String ident = PsiParse.acceptIdentifier(psiBuilder).edText();
+			LexToken token = PsiParse.acceptIdentifier(psiBuilder);
+			String ident = (token != null)? token.edText() : null;
 			if(ident != null) {
 				expr=VariableExpression.expectVariable(psiBuilder, ident);
 			} else {
@@ -444,7 +449,7 @@ public abstract class Expression extends SyntaxElement {
 		while ((prevToken = PsiParse.acceptPostfixOprator(psiBuilder)) != null) {
 			int opr = prevToken.keyWord; // opr == DOT || opr== IS || opr == IN || opr == QUA
 			if (opr == KeyWord.DOT ) 
-				expr=new RemoteVariable(psiBuilder.psiTree, expr, expectVariable(psiBuilder));
+				expr=new RemoteVariable(psiBuilder, expr, expectVariable(psiBuilder));
 			else {  // opr == IS or opr == IN or opr == QUA.  Then a class identifier must follow.
 //				String classIdentifier=PsiParse.acceptIdentifier(psiBuilder).getText();
 				String classIdentifier=PsiParse.acceptIdentifier(psiBuilder).edText();
@@ -487,7 +492,7 @@ public abstract class Expression extends SyntaxElement {
 		String refIdent=expr.type.getRefIdent();
 		Declaration objDecl = Global.getCurrentScope().findMeaning(refIdent).declaredAs;
 		if(objDecl instanceof ClassDeclaration cls)	return(cls);
-		Util.error("Illegal ref(" + refIdent + "): " + refIdent + " is not a class");
+		Util.semanticError(expr, "Illegal ref(" + refIdent + "): " + refIdent + " is not a class");
 		return(null);
 	}
 
@@ -497,7 +502,6 @@ public abstract class Expression extends SyntaxElement {
 	public static ClassDeclaration getQualification(final String classIdentifier) {
 		Declaration classDecl=Global.getCurrentScope().findMeaning(classIdentifier).declaredAs;
 		if(classDecl instanceof ClassDeclaration cls) return(cls);
-		Util.error("Illegal: " + classIdentifier + " is not a class");
 		return(null);
 	}
 
@@ -508,15 +512,18 @@ public abstract class Expression extends SyntaxElement {
 	public static boolean checkCompatibility(final Expression simpleObjectExpression,final String classIdentifier) {
 		ClassDeclaration objDecl=getQualification(simpleObjectExpression);
 		ClassDeclaration quaDecl=getQualification(classIdentifier);
-		if(quaDecl==objDecl) ; // Nothing: Util.warning("Unneccessary QUA/IS/IN "+ classIdentifier);
-		else if(quaDecl==null) Util.error("Illegal QUA -- " + classIdentifier + " is not a class");
-		else if(!(objDecl.isCompatibleClasses(quaDecl))) return(false);
+		if(quaDecl == null) {
+//			Util.semanticError(simpleObjectExpression, "Illegal: " + classIdentifier + " is not a class");
+		} else {
+			if(quaDecl==objDecl) ; // Nothing: Util.warning("Unneccessary QUA/IS/IN "+ classIdentifier);
+			else if(!(objDecl.isCompatibleClasses(quaDecl))) return(false);
+		}
 		return(true);
 	}
 
-	/// Try to Compile-time Evaluate this expression
-	/// @return the resulting evaluated expression
-	public Expression evaluate() { return(this); }
+//	/// Try to Compile-time Evaluate this expression
+//	/// @return the resulting evaluated expression
+//	public Expression evaluate(final PsiBuilder psiBuilder) { return(this); }
 
 	/// Returns true if this expression may be used as a statement.
 	/// @return true if this expression may be used as a statement

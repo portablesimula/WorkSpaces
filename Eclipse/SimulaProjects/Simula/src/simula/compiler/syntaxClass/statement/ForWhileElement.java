@@ -62,13 +62,15 @@ public class ForWhileElement extends ForListElement {
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN WhileElement(" + this + ").doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());
 		expr1.doChecking();
+		expr1 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr1);
+//		expr1.doChecking();
+		expr1.backLink = forStatement; // To ensure _RESULT from functions
 		expr2.doChecking();
 		expr2.backLink = forStatement; // To ensure _RESULT from functions
-		if (expr2.type == null || expr2.type.keyWord != Type.T_BOOLEAN)
-			Util.error("While condition is not Boolean but " + expr2.type);				
-		expr1 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr1);
-		expr1.backLink = forStatement; // To ensure _RESULT from functions
-//		expr2.backLink = forStatement; // To ensure _RESULT from functions
+//		if (expr2.type == null || expr2.type.keyWord != Type.T_BOOLEAN)
+		if(! Type.checkType(expr2, Type.T_BOOLEAN)) {
+			Util.semanticError(this, "While condition is not Boolean but " + expr2.type);	
+		}
 	}
 
 	@Override

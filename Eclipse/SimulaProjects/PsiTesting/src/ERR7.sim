@@ -1,16 +1,14 @@
 begin
+   integer i, cond;
 
-   ref(A) x;
+   ref(A) x, z;
+   ref(B) y;
+   ref(C) w;
 
-   class A; virtual: procedure P;
-   begin
-      procedure P(line); integer line;
-      begin
-   outtext("LINE: "); outint(line, 0); outimage;
-      end;
-   end;
-   
-   x:-new A;
-   x.P(sourceline);
+   class A;;
+   class B;;
+
+   x :- if cond > 4 then x else y;
+   i := if cond then 44 else z;
 
 end

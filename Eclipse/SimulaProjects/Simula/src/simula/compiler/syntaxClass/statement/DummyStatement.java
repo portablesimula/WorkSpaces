@@ -45,18 +45,18 @@ public final class DummyStatement extends Statement {
 //		super(line);
 //		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": DummyStatement: "+this);
 //	}
-	private DummyStatement(final PsiTree psiTree) {
-		super(psiTree);
+	private DummyStatement(final PsiBuilder psiBuilder) {
+		super(psiBuilder);
 	}
 
 	public static DummyStatement ofExplicit(final PsiBuilder psiBuilder) {
 		psiBuilder.consume(KeyWord.SEMICOLON); //  (add it to 'current tree')
-		DummyStatement dummyStatement = new DummyStatement(psiBuilder.psiTree);		
+		DummyStatement dummyStatement = new DummyStatement(psiBuilder);		
 		return dummyStatement;
 	}
 
 	public static DummyStatement ofImplicit(final PsiBuilder psiBuilder) {
-		DummyStatement dummyStatement = new DummyStatement(psiBuilder.psiTree);		
+		DummyStatement dummyStatement = new DummyStatement(psiBuilder);		
 		return dummyStatement;
 	}
 

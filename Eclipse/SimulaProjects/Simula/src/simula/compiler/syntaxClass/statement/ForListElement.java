@@ -53,7 +53,7 @@ public class ForListElement extends SyntaxElement {
 	/// @param forStatement the ForStatement
 	/// @param expr1 The first expression
 	public ForListElement(final PsiBuilder psiBuilder, final ForStatement forStatement, final Expression expr1) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		this.forStatement = forStatement;
 		this.expr1 = expr1;
 		if (Option.internal.TRACE_PARSE)
@@ -67,7 +67,7 @@ public class ForListElement extends SyntaxElement {
 					+ Global.getCurrentScope().edScopeChain());
 		expr1.doChecking();
 		expr1 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr1);
-		expr1.doChecking();
+//		expr1.doChecking();
 		expr1.backLink = forStatement; // To ensure _RESULT from functions
 	}
 

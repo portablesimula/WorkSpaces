@@ -55,7 +55,7 @@ public final class HiddenSpecification extends SyntaxElement {
 	/// @param definedIn  the class where Hidden is specified
 	/// @param identifier the hidden identifier
 	public HiddenSpecification(final PsiBuilder psiBuilder, final ClassDeclaration definedIn, final String identifier) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 		this.definedIn = definedIn;
 		this.identifier = identifier;
 	}
@@ -90,7 +90,7 @@ public final class HiddenSpecification extends SyntaxElement {
 			}
 			scope = scope.getPrefixClass();
 		}
-		Util.error(identifier + " is specified HIDDEN without being PROTECTED");
+		Util.semanticError(this, identifier + " is specified HIDDEN without being PROTECTED");
 		return (null);
 	}
 

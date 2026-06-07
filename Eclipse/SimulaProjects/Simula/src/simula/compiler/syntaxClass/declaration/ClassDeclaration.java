@@ -157,8 +157,8 @@ public class ClassDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Create a new ClassDeclaration.
 	/// @param identifier the given identifier
-	protected ClassDeclaration(final PsiTree psiTree, String identifier) {
-		super(psiTree, identifier);
+	protected ClassDeclaration(final PsiBuilder psiBuilder, String identifier) {
+		super(psiBuilder, identifier);
 		this.declarationKind = ObjectKind.Class;
 	}
 
@@ -184,7 +184,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @param prefix class identifier
 	/// @return the resulting ClassDeclaration
 	public static ClassDeclaration expectClassDeclaration(final PsiBuilder psiBuilder, final String ident) {
-		ClassDeclaration cls = new ClassDeclaration(psiBuilder.psiTree, null);
+		ClassDeclaration cls = new ClassDeclaration(psiBuilder, null);
 		cls.sourceFileName = Global.sourceFileName;
 		cls.prefix = ident;
 		cls.declaredIn.hasLocalClasses = true;
@@ -232,8 +232,8 @@ public class ClassDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(psiBuilder.psiTree, identifier);
+					Util.syntaxError(psiBuilder, "Identifier " + identifier + " is not defined in this scope");
+					parameter = new Parameter(psiBuilder, identifier);
 				}
 				parameter.setMode(Parameter.Mode.value);
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
@@ -280,8 +280,8 @@ public class ClassDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(psiBuilder.psiTree, identifier);
+					Util.syntaxError(psiBuilder, "Identifier " + identifier + " is not defined in this scope");
+					parameter = new Parameter(psiBuilder, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
 			} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
@@ -338,7 +338,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			if (hidden)
 				cls.hiddenList.add(new HiddenSpecification(psiBuilder, cls, identifier));
 			if (prtected)
-				cls.protectedList.add(new ProtectedSpecification(psiBuilder.psiTree, cls, identifier));
+				cls.protectedList.add(new ProtectedSpecification(psiBuilder, cls, identifier));
 		} while (PsiParse.accept(psiBuilder, KeyWord.COMMA));
 		PsiParse.expect(psiBuilder, KeyWord.SEMICOLON);
 	}
@@ -364,40 +364,6 @@ public class ClassDeclaration extends BlockDeclaration {
 	///               | ; statement { ; statement } END
 	/// </pre>
 	/// @param cls the ClassDeclaration
-//	private static void expectClassBody(ClassDeclaration cls) {
-//		if (Parse.accept(KeyWord.BEGIN)) {
-//			Statement stm;
-//			if (Option.internal.TRACE_PARSE)
-//				Parse.TRACE("Parse Block");
-//			while (Declaration.acceptDeclaration(cls)) {
-//				Parse.accept(KeyWord.SEMICOLON);
-//			}
-//			boolean seen = false;
-//			while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
-//				stm = Statement.expectStatement();
-//				if (stm != null)
-//					cls.statements.add(stm);
-//				if (Parse.accept(KeyWord.INNER)) {
-//					if (seen)
-//						Util.error("Max one INNER per Block");
-//					else
-//						cls.statements.add(new InnerStatement(Parse.currentToken.lineNumber));
-//					seen = true;
-//				}
-//			}
-//			if (Parse.prevToken.keyWord == KeyWord.EOF) {
-//				Util.error("Illegal termination of class declaration. Missing END.");
-//			}
-//			if (!seen)
-//				cls.statements.add(new InnerStatement(Parse.currentToken.lineNumber)); // Implicit INNER
-//		}
-//		else {
-//			if(Parse.currentToken.keyWord != KeyWord.SEMICOLON)
-//				cls.statements.add(Statement.expectStatement());
-//			cls.statements.add(new InnerStatement(Parse.currentToken.lineNumber)); // Implicit INNER
-//		}
-//	}
-
 	private static void expectClassBody(final PsiBuilder psiBuilder, ClassDeclaration cls) {
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGIN)) {
 			if (Option.internal.TRACE_PARSE)
@@ -458,15 +424,20 @@ public class ClassDeclaration extends BlockDeclaration {
 		
 		if (hasRealPrefix()) {
 			prefixClass = getPrefixClass();
-			prefixClass.doChecking();
-			if (prefixClass.declarationKind != ObjectKind.StandardClass) {
-				if (sourceBlockLevel != prefixClass.sourceBlockLevel)
-					Util.warning("Subclass on a deeper block level not allowed.");
+			IO.println("ClassDecleration.doChecking: prefixClass: " + prefixClass );
+			if(prefixClass == null) {
+				Util.semanticError(this, "Prefix " + prefix + " is not a Class");
+			} else {
+				prefixClass.doChecking();
+				if (prefixClass.declarationKind != ObjectKind.StandardClass) {
+					if (sourceBlockLevel != prefixClass.sourceBlockLevel)
+						Util.warning("Subclass on a deeper block level not allowed.");
+				}
 			}
 		}
 		LabelList.accumLabelList(this);
 		
-		if(type != null) type.doChecking(declaredIn);
+		if(type != null) type.doChecking(declaredIn, this);
 		int prfx = prefixLevel();
 		for (Parameter par : this.parameterList)
 			par.setExternalIdentifier(prfx);
@@ -732,19 +703,21 @@ public class ClassDeclaration extends BlockDeclaration {
 		
 		Meaning meaning = declaredIn.findMeaning(prefix);
 		if (meaning == null)
-			Util.error("Undefined prefix: " + prefix);
+//			Util.error("Undefined prefix: " + prefix);
+			return null;
 		Declaration decl = meaning.declaredAs;
 		if (decl == this) {
-			Util.error("Class prefix chain loops: " + identifier);
+			Util.semanticError(this, "Class prefix chain loops: " + identifier);
+			return null;
 		}
 		if (decl instanceof ClassDeclaration cls) {
 			prefixClass = cls;
 			return (cls);
 		}
-		Util.error("Prefix " + prefix + " is not a Class but " + decl.getClass().getSimpleName()
-				+ " Declared in " + this.sourceFileName + " at line " + decl.firstLineNumber());
-		printStaticChain("",0);
-		return (null);
+//		Util.error("Prefix " + prefix + " is not a Class but " + decl.getClass().getSimpleName()
+//				+ " Declared in " + this.sourceFileName + " at line " + decl.firstLineNumber());
+//		printStaticChain("",0);
+		return null;
 	}
 
 	// ***********************************************************************************************
@@ -1281,7 +1254,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			if(this instanceof PrefixedBlockDeclaration)
 				buildMethod_CatchingErrors_TRY_CATCH(codeBuilder, begScope, endScope);
 			else {
-				Util.error("It is not allowed to declare a subclass of StandardClass CatchingErrors");
+				Util.codingError("It is not allowed to declare a subclass of StandardClass CatchingErrors");
 				buildStatementsBeforeInner(codeBuilder);
 				buildStatementsAfterInner(codeBuilder);
 			}

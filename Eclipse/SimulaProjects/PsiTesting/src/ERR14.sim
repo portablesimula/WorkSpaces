@@ -1,4 +1,12 @@
 begin
- integer traceCase;
-   K:L: traceCase := 444;
- E:end
+   class A(x, y); integer x, y;;
+
+   new A();
+   new A(1,5);
+   new A(1,5,);
+   new A(1, 5, 6);
+   new A(1);
+   new C(8);
+
+   this C;
+end

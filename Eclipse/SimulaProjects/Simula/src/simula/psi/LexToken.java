@@ -188,14 +188,14 @@ public class LexToken extends PsiElement {
     
     public SimpleAttributeSet getTooltipAttrs(Set<String> errorLines) {
     	
-    	if(errorLines != null || getErrors() != null) {
-    		IO.println("\n\nPsiTextPanel.getTooltipText: BEGIN: errorLines: "+errorLines);
-    		IO.println("PsiTextPanel.getTooltipText: BEGIN: lexErrors: "+getErrors());
-    	}
+//    	if(errorLines != null || getErrors() != null) {
+//    		IO.println("\n\nPsiTextPanel.getTooltipText: BEGIN: errorLines: "+errorLines);
+//    		IO.println("PsiTextPanel.getTooltipText: BEGIN: lexErrors: "+getErrors());
+//    	}
     	errorLines = accumErrors(errorLines);
     	
     	if(errorLines == null) return null;
-    	IO.println("PsiTextPanel.getTooltipText: RENDER: errorLines: "+errorLines);
+//    	IO.println("PsiTextPanel.getTooltipText: RENDER: errorLines: "+errorLines);
     	
     	String tooltipText = null;
     	if(errorLines.size() == 1) {
@@ -208,7 +208,7 @@ public class LexToken extends PsiElement {
     		for(String msg:errorLines) {
     			res = res + "<li>" + msg + "</li>";
     		}
-        	IO.println("PsiTextPanel.getTooltipText: RESULT: "+res);
+//        	IO.println("PsiTextPanel.getTooltipText: RESULT: "+res);
         	tooltipText = res + "</ul>";
     	}
 

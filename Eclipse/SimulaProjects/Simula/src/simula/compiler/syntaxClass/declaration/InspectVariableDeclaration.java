@@ -53,7 +53,7 @@ public class InspectVariableDeclaration extends Declaration {
 	/// @param connectionScope the connectionScope
 	/// @param connectionStatement the connectionStatement
 	public InspectVariableDeclaration(final PsiBuilder psiBuilder, final Type type, final String identifier,final DeclarationScope connectionScope, final ConnectionStatement connectionStatement) {
-		super(psiBuilder.psiTree, identifier);
+		super(psiBuilder, identifier);
 		this.declarationKind = ObjectKind.InspectVariableDeclaration;
 		this.type = type;
 		this.connectionScope = connectionScope;

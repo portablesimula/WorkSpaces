@@ -32,6 +32,7 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.psi.PsiBuilder;
 import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 	
@@ -99,8 +100,8 @@ public final class Parameter extends Declaration {
 
 	/// Create a new Parameter.
 	/// @param identifier parameter identifier
-	public Parameter(final PsiTree psiTree, final String identifier) {
-		super(psiTree, identifier);
+	public Parameter(final PsiBuilder psiBuilder, final String identifier) {
+		super(psiBuilder, identifier);
 		this.declarationKind = ObjectKind.Parameter;
 	}
 
@@ -108,8 +109,8 @@ public final class Parameter extends Declaration {
 	/// @param identifier parameter identifier
 	/// @param type parameter type
 	/// @param kind parameter kind
-	Parameter(final PsiTree psiTree, final String identifier, final Type type, final int kind) {
-		this(psiTree, identifier);
+	Parameter(final PsiBuilder psiBuilder, final String identifier, final Type type, final int kind) {
+		this(psiBuilder, identifier);
 		this.type = type;
 		this.kind = kind;
 	}
@@ -119,8 +120,8 @@ public final class Parameter extends Declaration {
 	/// @param type parameter type
 	/// @param kind parameter kind
 	/// @param nDim parameter's number of dimension in case of array kind.
-	public Parameter(final PsiTree psiTree, final String identifier, final Type type, final int kind, final int nDim) {
-		this(psiTree, identifier, type, kind);
+	public Parameter(final PsiBuilder psiBuilder, final String identifier, final Type type, final int kind, final int nDim) {
+		this(psiBuilder, identifier, type, kind);
 		this.nDim = nDim;
 	}
 
@@ -132,7 +133,7 @@ public final class Parameter extends Declaration {
 	public void into(final Vector<Parameter> parameterList) {
 		for (Parameter par : parameterList)
 			if (Util.equals(par.identifier, this.identifier)) {
-				Util.error("Parameter already defined: " + identifier);
+				Util.syntaxError(psiBuilder, "Parameter already defined: " + identifier);
 				return;
 			}
 		parameterList.add(this);
@@ -156,7 +157,7 @@ public final class Parameter extends Declaration {
 	/// @param mode the new mode
 	void setMode(final int mode) {
 		if (this.mode != 0)
-			Util.error("Parameter " + identifier + " is already specified by " + this.mode);
+			Util.syntaxError(psiBuilder, "Parameter " + identifier + " is already specified by " + this.mode);
 		this.mode = mode;
 	}
 
@@ -182,14 +183,14 @@ public final class Parameter extends Declaration {
 			return;
 		Global.sourceLineNumber = firstLineNumber();
 		if (kind == 0) {
-			Util.error("Parameter " + identifier + " is not specified -- assumed Simple Integer");
+			Util.semanticError(this.declaredIn, "Parameter " + identifier + " is not specified -- assumed Simple Integer");
 			kind = Kind.Simple;
 			type = Type.Integer;
 		}
 		if (type != null)
-			type.doChecking(Global.getCurrentScope().declaredIn);
+			type.doChecking(Global.getCurrentScope().declaredIn, this);
 		if (!legalTransmitionMode())
-			Util.error("Illegal transmission mode: " + mode + ' ' + kind + ' ' + identifier + " by " + edMode(mode) + " is not allowed");
+			Util.semanticError(this, "Illegal transmission mode: " + mode + ' ' + kind + ' ' + identifier + " by " + edMode(mode) + " is not allowed");
 		SET_SEMANTICS_CHECKED();
 	}
 

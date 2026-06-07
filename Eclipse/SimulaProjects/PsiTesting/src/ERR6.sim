@@ -1,13 +1,8 @@
 begin
-   character c1, c2;
-   c1 := 'A';
-   c2 := 'Z';
-
-if   char (rank (c1)) <> c1
-  or char (rank (c2)) <> c2
-  or char (rank ('9')) <> '9'
-  or char (rank ('!55!')) <> '7'
-  or char (1) >= char (2)
-  or char (0) > char (rank ('B'))  then outtext("*** error : In procedure char.");
-
-end;
+   real r;
+   class A;;
+   ref(A) x;
+   if x =/: z then
+   r := 1.%&&&'5;
+   outchar('C);
+   outtext("*** error : In procedure char.

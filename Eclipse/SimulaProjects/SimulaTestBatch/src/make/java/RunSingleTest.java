@@ -340,7 +340,7 @@ public final class RunSingleTest {
 		    	Global.moduleManager = new ModuleManager(sourceFile);
 				new SimulaCompiler(fileName).doCompile(Global.moduleManager.getSyntaxTree());
 			} catch (IOException e) {
-				Util.error("can't open " + fileName + ", reason: " + e);
+				Util.generalError("can't open " + fileName + ", reason: " + e);
 			}
 		}
 	}

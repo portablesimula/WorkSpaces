@@ -70,7 +70,7 @@ public final class BlockStatement extends Statement {
 	/// Create a new BlockStatement.
 	/// @param blockDeclaration the BlockDeclaration
 	public BlockStatement(final PsiBuilder psiBuilder, final BlockDeclaration blockDeclaration, String debugName1) {
-		super(psiBuilder.psiTree);
+		super(psiBuilder);
 //		debugName = "ZZZ_BlockStatement: "+SEQU++;
 		this.blockDeclaration = blockDeclaration;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": BlockStatement: "+this);
