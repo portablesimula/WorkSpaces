@@ -214,9 +214,10 @@ public final class Simula {
 //					new SimulaCompiler(fileName, reader).doCompile();
 					
 					Util.IERR("SJEKK DETTE NØYE !!!");
-					File sourceFile = new File(fileName);
-			    	Global.moduleManager = new ModuleManager(sourceFile);
-					new SimulaCompiler(fileName).doCompile(Global.moduleManager.getSyntaxTree());
+					Global.initiate();
+			    	new SourceModule(new File(fileName));
+					new SimulaCompiler(fileName).doCompile(Global.currentModule.getSyntaxTree());
+
 
 				} catch (IOException e) {
 					Util.generalError("can't open " + fileName + ", reason: " + e);

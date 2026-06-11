@@ -3,38 +3,70 @@ package simula.compiler;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-
 import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.editor.PsiTextPanel;
 import simula.editor.SourceTextPanel;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiTree;
 
-public class ModuleManager {
-	
+public class SourceModule {
 	public File sourceFile;
+	private String tabName;
 	
 	PsiTree psiTree;
 	private ProgramModule syntaxTree; // Root of Syntax Tree
 	
-	SourceTextPanel textPanel;
+	private SourceTextPanel textPanel;
+	private PsiTextPanel psiTextPanel;
 	
-	public ModuleManager(SourceTextPanel textPanel, File sourceFile) {
-		this.textPanel = textPanel;
+	public SourceModule(File sourceFile) {
 		this.sourceFile = sourceFile;
+		Global.currentModule = this;
+
+		// Update moduleMap
+		String tabName0 = getName();
+		IO.println("SourceModule.getTabName: " + tabName0);
+		tabName = tabName0;
+		int sequ = 1;
+		while(Global.moduleMap.containsKey(tabName)) {
+			tabName = tabName0 + '(' + (sequ++) + ')';
+			IO.println("SourceModule.getTabName: " + tabName0);
+		}
+		Global.moduleMap.put(tabName, this);
+		SourceModule THIS = Global.moduleMap.get(tabName);
+		if(THIS != this) {
+			Util.STOP();
+		}
 	}
 	
-	public ModuleManager(File sourceFile) {
-		this.sourceFile = sourceFile;
+	public void setTextPanel(SourceTextPanel textPanel) {
+		this.textPanel = textPanel;
+	}
+	
+	public void setPsiTextPanel(PsiTextPanel psiTextPanel) {
+		this.psiTextPanel = psiTextPanel;
 	}
 	
 	public String getName() {
 		if(sourceFile != null) return sourceFile.getName();
 		return "Unnamed.sim";
+	}
+	
+	public String getTabName() {
+//		String tabName0 = getName();
+//		IO.println("SourceModule.getTabName: " + tabName0);
+//		String tabName = tabName0;
+//		int sequ = 1;
+//		while(tabNames.contains(tabName)) {
+//			tabName = tabName0 + '(' + (sequ++) + ')';
+//			IO.println("SourceModule.getTabName: " + tabName0);
+//		}
+//		tabNames.add(tabName);
+		return tabName;
 	}
 	
 	public String getSourceText() throws IOException {
@@ -53,7 +85,7 @@ public class ModuleManager {
 			psiBuilder.start(getSourceText());
 			syntaxTree = new ProgramModule(psiBuilder);
 		} catch (Exception e) {
-			IO.println("ModuleManager.buildPsiAndSyntaxTrees: GOT EXCEPTION: " + e.getMessage());
+			IO.println("SourceModule.buildPsiAndSyntaxTrees: GOT EXCEPTION: " + e.getMessage());
 			e.printStackTrace();
 		}
 			

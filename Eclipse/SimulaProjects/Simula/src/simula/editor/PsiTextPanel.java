@@ -27,7 +27,7 @@ import javax.swing.text.StyledDocument;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
-import simula.compiler.ModuleManager;
+import simula.compiler.SourceModule;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
@@ -40,7 +40,6 @@ import simula.psi.PsiTreeIterator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.Set;
-import java.util.Vector;
 
 /// The Source text Panel.
 /// 
@@ -54,7 +53,7 @@ public class PsiTextPanel extends JPanel {
 	/// DEBUG on/off
 	private static final boolean DEBUG=false;//true;
 	
-	public ModuleManager moduleManager;
+	public SourceModule currentModule;
 
 	/// The line number side-panel.
 	private JTextPane lineNumbers;
@@ -171,7 +170,7 @@ public class PsiTextPanel extends JPanel {
 //    PsiTextPanel(File sourceFile, SimulaEditor.Language lang, JPopupMenu popupMenu) {
 //    PsiTextPanel(PsiTree psiTree, Language lang, JPopupMenu popupMenu) {
     PsiTextPanel(Language lang, JPopupMenu popupMenu) {
-//   	this.moduleManager = new ModuleManager(this, sourceFile);
+//   	this.currentModule = new SourceModule(this, sourceFile);
 //    	this.sourceFile=sourceFile;
 //    	this.lang=lang;
 //    	this.popupMenu=popupMenu;
@@ -439,7 +438,7 @@ public class PsiTextPanel extends JPanel {
     @Override
     public String toString() {
     	String s="SourceTextPanel(";
-        s=s+moduleManager.getName();
+        s=s+currentModule.getName();
     	if(this.AUTO_REFRESH) s=s+",AUTO_REFRESH";
     	s=s+')';
     	return(s);

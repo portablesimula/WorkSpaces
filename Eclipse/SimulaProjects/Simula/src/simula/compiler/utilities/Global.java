@@ -10,7 +10,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayDeque;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Stack;
 import java.util.Vector;
@@ -19,7 +21,7 @@ import java.util.jar.JarFile;
 import javax.swing.ImageIcon;
 
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.ModuleManager;
+import simula.compiler.SourceModule;
 import simula.compiler.JarFileBuilder;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.StandardClass;
@@ -46,6 +48,8 @@ public final class Global {
 	/// The Simula favicon
 	public static ImageIcon favicon;
 	/// A Simula icon
+	public static ImageIcon simulaIcon;
+	/// A Sim icon
 	public static ImageIcon simIcon;
 	/// A small Simula icon
 	static ImageIcon sIcon;
@@ -83,8 +87,12 @@ public final class Global {
 //	/// The programModule.
 //	public static ProgramModule programModule;
 	
-	/// The current ModuleManager.
-	public static ModuleManager moduleManager;
+	/// The current SourceModule.
+	public static SourceModule currentModule;
+	
+	/// Maps TabNames against Source modules
+	public static Map<String, SourceModule> moduleMap;
+
 	
 	/// Where to find the Simula Runtime System.
 	public static File simulaRtsLib; // The simula runtime system
@@ -159,6 +167,8 @@ public final class Global {
 
 	/// Initiate Global variables.
 	public static void initiate() {
+    	currentModule = null;
+    	moduleMap = new HashMap<>();
 		Object_SEQU = 8001;
 		jarFileBuilder = null;
 		simulaClassLoader = null;
@@ -178,10 +188,13 @@ public final class Global {
 					favicon = new ImageIcon(new File(simdir, "icons/favicon.png").toString());
 					simIcon = new ImageIcon(new File(simdir, "icons/sim2.png").toString());
 					sIcon = new ImageIcon(new File(simdir, "icons/sim.png").toString());
+					simulaIcon = new ImageIcon(new File(simdir, "icons/simula.png").toString());
 				} catch(Exception e) {}
 			}
 		}
     	Palette.init();
+    	IO.println("Global.initiate completed");
+//    	Thread.dumpStack();
 	}
 
 	/// The declaration scope stack.

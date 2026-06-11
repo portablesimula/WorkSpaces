@@ -137,7 +137,7 @@ public final class SimulaCompiler {
 		}
 	}
 	public SimulaCompiler(final String sourceFileName) {
-		Global.initiate();
+//		Global.initiate();
 //		this.reader = reader;
 		if(Option.verbose) Util.println("Input Source File: " + sourceFileName);
 		if (!sourceFileName.toLowerCase().endsWith(".sim"))
@@ -291,7 +291,7 @@ public final class SimulaCompiler {
 //		Util.IERR("DETTE MÅ RETTES");
 //		Global.programModule = programModule;
 		
-//		programModule = Global.moduleManager.programModule;
+//		programModule = Global.currentModule.programModule;
 		
 //		IO.println("SimulaCompiler.doCompile: mainModule"+programModule.mainModule);
 //		IO.println("SimulaCompiler.doCompile: mainModule"+programModule.mainModule.declaredIn);

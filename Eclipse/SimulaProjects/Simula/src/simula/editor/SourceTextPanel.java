@@ -25,7 +25,7 @@ import javax.swing.text.StyledDocument;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
-import simula.compiler.ModuleManager;
+import simula.compiler.SourceModule;
 import simula.compiler.parsing.DefaultScanner;
 import simula.compiler.parsing.SimulaScanner;
 import simula.compiler.utilities.Token;
@@ -51,7 +51,7 @@ public class SourceTextPanel extends JPanel {
 	/// DEBUG on/off
 	private static final boolean DEBUG=false;//true;
 	
-	public ModuleManager moduleManager;
+	public SourceModule currentModule;
 
 	/// The line number side-panel.
 	private JTextPane lineNumbers;
@@ -161,8 +161,8 @@ public class SourceTextPanel extends JPanel {
 	/// @param sourceFile the source file
 	/// @param lang the language
 	/// @param popupMenu the popupMenu
-    SourceTextPanel(File sourceFile, SimulaEditor.Language lang, JPopupMenu popupMenu) {
-    	this.moduleManager = new ModuleManager(this, sourceFile);
+    SourceTextPanel(SourceModule currentModule, SimulaEditor.Language lang, JPopupMenu popupMenu) {
+    	this.currentModule = currentModule;
 //    	this.sourceFile=sourceFile;
     	this.lang=lang;
     	this.popupMenu=popupMenu;
@@ -348,7 +348,7 @@ public class SourceTextPanel extends JPanel {
     @Override
     public String toString() {
     	String s="SourceTextPanel(";
-        s=s+moduleManager.getName();
+        s=s+currentModule.getName();
     	if(this.AUTO_REFRESH) s=s+",AUTO_REFRESH";
     	s=s+')';
     	return(s);

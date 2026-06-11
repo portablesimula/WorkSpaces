@@ -831,7 +831,7 @@ public final class VariableExpression extends Expression {
 						int bl = declaredIn.getRTBlockLevel();
 						if(bl == 0) { // Accessing _USR
 //							ClassDesc main = Global.programModule.mainModule.getClassDesc();
-							ClassDesc main = Global.moduleManager.getSyntaxTree().mainModule.getClassDesc();
+							ClassDesc main = Global.currentModule.getSyntaxTree().mainModule.getClassDesc();
 							codeBuilder.checkcast(main);
 						} else {
 							while(declaredIn.declaredIn.getRTBlockLevel() == bl) declaredIn = declaredIn.declaredIn;

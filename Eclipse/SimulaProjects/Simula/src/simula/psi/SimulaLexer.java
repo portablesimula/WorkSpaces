@@ -1061,7 +1061,7 @@ public class SimulaLexer {
 	}
    
     private int mayBe_AddCommentToken_ToTokenQueue(int nPhrase) {
-        currentPosition--;
+        if(current != EOF_MARK) currentPosition--;
         if(currentPosition > tokenStartOffset) {
         	tokenQueueAdd("scanEndComment - SEMICOLON", KeyWord.COMMENT_TEXT);
             tokenStartOffset = currentPosition;

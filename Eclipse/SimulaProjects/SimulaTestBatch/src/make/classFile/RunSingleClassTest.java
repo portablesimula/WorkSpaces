@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 
-import simula.compiler.ModuleManager;
+import simula.compiler.SourceModule;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
@@ -90,7 +90,7 @@ public final class RunSingleClassTest {
     	//System.setProperty("file.encoding","UTF-8");
 		Vector<String> names=new Vector<String>();
 //		names.add("AdHoc_SimulaTest.sim"); // Simula TestBatch Framework
-		names.add("adHoc00.sim"); // For ad'hoc testing
+//		names.add("adHoc00.sim"); // For ad'hoc testing
 //		names.add("adHoc01.sim"); // For ad'hoc testing
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
@@ -111,7 +111,7 @@ public final class RunSingleClassTest {
 //		names.add("simtst09.sim"); // OK:  Test relation operator and some Funtions
 //		names.add("simtst10.sim"); // OK:  Test Evaluation of Text-Constants
 //
-//		names.add("simtst11.sim"); // OK:  Text Attributes constant, start, length, pos and main
+		names.add("simtst11.sim"); // OK:  Text Attributes constant, start, length, pos and main
 //		names.add("simtst12.sim"); // OK:  Text value and reference relations.
 //		names.add("simtst13.sim"); // OK:  Text value assignment and text reference assigment.
 //		names.add("simtst14.sim"); // OK:  Text attributes: pos, setpos, more, getchar and putchar.
@@ -322,12 +322,9 @@ public final class RunSingleClassTest {
 		for(String name:names) {
 			String fileName = sourceDir+name;
 			try {
-//				File file = new File(fileName);
-//				InputStreamReader reader = new InputStreamReader(new FileInputStream(file), Global._CHARSET);
-//				new SimulaCompiler(fileName, reader).doCompile();
-				File sourceFile = new File(fileName);
-		    	Global.moduleManager = new ModuleManager(sourceFile);
-				new SimulaCompiler(fileName).doCompile(Global.moduleManager.getSyntaxTree());
+				Global.initiate();
+		    	new SourceModule(new File(fileName));
+				new SimulaCompiler(fileName).doCompile(Global.currentModule.getSyntaxTree());
 			} catch (IOException e) {
 				Util.generalError("can't open " + fileName + ", reason: " + e);
 			}

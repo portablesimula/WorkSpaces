@@ -6,6 +6,7 @@
 package simula.editor;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Choice;
 import java.awt.Color;
 import java.awt.Component;
@@ -37,6 +38,7 @@ import java.util.jar.Manifest;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -46,12 +48,11 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import simula.compiler.ModuleManager;
+import simula.compiler.SourceModule;
 import simula.compiler.utilities.ConsolePanel;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.SimulaEditor.Language;
 import simula.psi.PsiTree;
 
 /// The SimulaEditor.
@@ -62,20 +63,12 @@ import simula.psi.PsiTree;
 /// @author Øystein Myhre Andersen
 @SuppressWarnings("serial")
 public class SimulaEditor extends JFrame {
-
-	/// The tabbed pane.
-	static JTabbedPane tabbedPane; 
-
+	
+	/// The main CardPanel 
+	JPanel mainCardPanel;  // TESTING_NEW_LAYOUT
+	
 	/// The menu bar.
 	static EditorMenues menuBar;
-
-	/// The current SourceTextPanel
-	static SourceTextPanel currentTextPanel;
-	
-	///
-	static ModuleManager getCurrentModule() {
-		return currentTextPanel.moduleManager;
-	}
 
 	/// The autoRefresher
 	static AutoRefresher autoRefresher;
@@ -149,22 +142,32 @@ public class SimulaEditor extends JFrame {
         setLocationRelativeTo(null); // center the frame on screen
 
         getContentPane().setLayout(new BorderLayout()); // the BorderLayout bit makes it fill it automatically
-        tabbedPane = new JTabbedPane();
-        tabbedPane.addMouseListener(mouseListener);
-        tabbedPane.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				Component selected=tabbedPane.getSelectedComponent();
-				if(selected instanceof SourceTextPanel panel) {
-					currentTextPanel=panel;
-					Global.moduleManager = currentTextPanel.moduleManager;
-					menuBar.updateMenuItems();
-				}
-			}});
-        boolean continuousLayout = true;
-        JSplitPane splitPane1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,continuousLayout, tabbedPane,Global.console);
-        splitPane1.setOneTouchExpandable(true);
-        splitPane1.setDividerLocation(topHeight);
-        getContentPane().add(splitPane1);
+        if(Option.TESTING_NEW_LAYOUT) {
+        	CardLayout cardLayout = new CardLayout();
+        	JPanel mainCardPanel = new JPanel(cardLayout);
+	        getContentPane().add(mainCardPanel);
+	        mainCardPanel.setBackground(Color.YELLOW);
+	        getContentPane().setBackground(Color.YELLOW);
+	        this.setBackground(Color.YELLOW);
+//	        JPanel welcomePanel = new JPanel();
+////	        welcomePanel.setBackground(Color.LIGHT_GRAY);
+//	        welcomePanel.setBackground(Color.YELLOW);
+//	        welcomePanel.add(new JLabel("Welcome to SIMULA EDITOR IDE"));
+	        WelcomePanel welcomePanel = new WelcomePanel();
+	        mainCardPanel.add(welcomePanel);
+ 
+	        mainCardPanel.setBackground(Color.YELLOW);
+	        getContentPane().setBackground(Color.YELLOW);
+	        this.setBackground(Color.YELLOW);
+	        ((JPanel)this.getContentPane()).setOpaque(false);
+        } else {
+        	TabbedTextHandler.doOpenTabbedPane();
+        	boolean continuousLayout = true;
+	        JSplitPane splitPane1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,continuousLayout, TabbedTextHandler.tabbedPane,Global.console);
+	        splitPane1.setOneTouchExpandable(true);
+	        splitPane1.setDividerLocation(topHeight);
+	        getContentPane().add(splitPane1);
+        }
 
         autoRefresher=new AutoRefresher(); autoRefresher.start();
 
@@ -218,20 +221,6 @@ public class SimulaEditor extends JFrame {
 		} catch (Exception e) {}
 		return (0);
 	}
-
-	// ****************************************************************
-	// *** MouseListener
-	// ****************************************************************
-	/// The MouseListener.
-    MouseListener mouseListener = new MouseListener() {
-		public void mousePressed(MouseEvent e) {}
-		public void mouseReleased(MouseEvent e) {}
-		public void mouseEntered(MouseEvent e) {}
-		public void mouseExited(MouseEvent e) {}
-		public void mouseClicked(MouseEvent e) {
-    	    if(e.getButton()==3) menuBar.popupMenu.show(tabbedPane,e.getX(),e.getY());
-    	}
-    };
     
     // ****************************************************************
     // *** processWindowEvent
@@ -239,7 +228,7 @@ public class SimulaEditor extends JFrame {
     @Override
     protected void processWindowEvent(WindowEvent e) {
         if (e.getID() == WindowEvent.WINDOW_CLOSING) {
-        	menuBar.doExitAction(); 
+        	TabbedTextHandler.doExitAction(); 
         }
     }
 
@@ -247,7 +236,7 @@ public class SimulaEditor extends JFrame {
     // *** doSelectWorkspace
     // ****************************************************************
     /// Select Workspace dialog.
-    static void doSelectWorkspace() {
+    public static void doSelectWorkspace() {
     	if (Option.internal.TRACING) Util.println("SimulaEditor.doSelectWorkspace: ");
     	String text="The Simula Editor uses the directory workspace to "
     			   +"\nretrieve Simula source files and save the results"
@@ -393,163 +382,6 @@ public class SimulaEditor extends JFrame {
             }
         } catch(Exception e) { }
     }
-    
-    
-    // ****************************************************************
-    // *** setSelectedTabTitle  /  removeSelectedTab
-    // ****************************************************************
-    /// Set selected tab's title
-    /// @param title the new title
-    static void setSelectedTabTitle(String title) { tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(),title); }
-    
-    /// Remove selected tab.
-    static void removeSelectedTab() {
-    	tabbedPane.removeTabAt(tabbedPane.getSelectedIndex());
-        currentTextPanel=(SourceTextPanel)tabbedPane.getSelectedComponent();
-        menuBar.updateMenuItems();
-    }
-    
-    // ****************************************************************
-    // *** doNewTabbedPanel
-    // ****************************************************************
-    /// Create a new Tab with text generated from the given file.
-    /// @param file the file
-    /// @param lang the language
-    static void doNewTabbedPanel(File file,Language lang) {
-    	new Thread(new Runnable() {
-    		public void run() {
-     			currentTextPanel=new SourceTextPanel(file,lang,menuBar.popupMenu);
-    			tabbedPane.addTab((file==null)?"unnamed":file.getName(), null, currentTextPanel, "Tool tip ...");
-    			// select the last tab
-    			tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
-    			currentTextPanel.fileChanged=false;
-    			if(file==null)currentTextPanel.fillTextPane(new StringReader("begin\n\nend;\n"),0);
-    			else if(lang==Language.Simula) {
-    				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
-    					  currentTextPanel.fillTextPane(reader,0);
-    				} catch(IOException e) { Util.IERR("Impossible",e); }
-    			}
-    			else if(lang==Language.Jar) {
-    				currentTextPanel.fillTextPane(getJarFileReader(file),0);
-    			}
-    			else if(lang==Language.Other) {
-    				currentTextPanel.fillTextPane(getHexFileReader(file),0);
-    			}
-    			else if(lang==Language.Text)
-    				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
-    				currentTextPanel.fillTextPane(reader,0);
-    			} catch(IOException e) { Util.IERR("Impossible",e); }
-    			menuBar.updateMenuItems();
-    		}}).start();
-    }
-    
-    // ****************************************************************
-    // *** doNewTabbedPsiPanel
-    // ****************************************************************
-    /// Create a new Tab with text generated from the given psi tree.
-    /// @param file the file
-    /// @param lang the language
-    static void doNewTabbedPsiPanel(PsiTree psiTree,Language lang) {
-    	new Thread(new Runnable() {
-    		public void run() {
-    			PsiTextPanel psiTextPanel=new PsiTextPanel(lang, menuBar.popupMenu);
-//    			tabbedPane.addTab((file==null)?"unnamed":file.getName(), null, currentTextPanel, "Tool tip ...");
-    			tabbedPane.addTab("Rendered - unnamed", null, psiTextPanel, "Tool tip ...");
-    			// select the last tab
-    			tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
-    			psiTextPanel.fileChanged=false;
-//    			if(file==null)psiTextPanel.fillTextPane(new StringReader("begin\n\nend;\n"),0);
-//    			else
-    				if(lang==Language.Simula) {
-    					psiTextPanel.fillTextPane(0, psiTree);
-    			}
-//    			else if(lang==Language.Jar) {
-//    				psiTextPanel.fillTextPane(getJarFileReader(file),0);
-//    			}
-//    			else if(lang==Language.Other) {
-//    				psiTextPanel.fillTextPane(getHexFileReader(file),0);
-//    			}
-//    			else if(lang==Language.Text)
-//    				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
-//    				psiTextPanel.fillTextPane(reader,0);
-//    			} catch(IOException e) { Util.IERR("Impossible",e); }
-    			menuBar.updateMenuItems();
-    		}}).start();
-    }
-    
-    /// Utility: Get HexFile Reader.
-    /// @param file the file to read
-    /// @return The resulting reader
-    private static Reader getHexFileReader(File file) {
-    	StringBuilder sb=new StringBuilder();
-    	String hexPart="",charPart="";
-    	FileInputStream inpt;
-    	try { inpt=new FileInputStream(file);
-    		int b;
-    		while((b=inpt.read()) != -1) {
-    			hexPart=hexPart+' '+AppendLeadingZeroes(Integer.toHexString(b),2);
-    			charPart=charPart+((b>31 && b<128)?((char)b):'.');
-    			if((charPart.length())>15) {
-    				sb.append("  "+hexPart+"  "+charPart+"\n");
-    				hexPart=""; charPart="";
-    			}
-    		}
-    		if((charPart.length())>0) {
-    	    	while(hexPart.length()<(16*3)) hexPart=hexPart+" ";
-				sb.append("  "+hexPart+"  "+charPart+"\n");    			
-    		}
-    	} catch(IOException e) { Util.IERR("Impossible",e); }
-    	return(new StringReader(sb.toString()));
-    }
-    
-    /// Utility: Append leading zeroes.
-    /// @param s the input string
-    /// @param n the expected length
-    /// @return the resulting string
-    private static String AppendLeadingZeroes(String s,int n) {
-    	while(s.length()<n) s="0"+s;
-    	return(s.toUpperCase());
-    }
-   
-    /// Get .jar file Reader
-    /// @param file the file
-    /// @return a .jar file Reader
-    private static Reader getJarFileReader(File file) {
-    	StringBuilder sb=new StringBuilder();
-    	sb.append("File: "+file).append("\n");
-    	if(!(file.exists() && file.canRead())) {
-    		sb.append("Can't read .jar file: "+file).append("\n");
-    	} else {
-    		JarFile jarFile=null;
-    		try {
-    			jarFile=new JarFile(file);
-    			Manifest manifest=jarFile.getManifest();
-    			Attributes mainAttributes=manifest.getMainAttributes();
-    			Set<Object> keys=mainAttributes.keySet();
-    			for(Object key:keys) {
-    				String val=mainAttributes.getValue(key.toString());
-    				sb.append(key.toString()+"=\""+val+"\"").append("\n");
-    			}
-
-    			Enumeration<JarEntry> entries=jarFile.entries();
-    			while(entries.hasMoreElements()) {
-    				JarEntry entry=entries.nextElement();
-    				String size=""+entry.getSize();
-    				while(size.length()<6) size=" "+size;
-    				FileTime fileTime=entry.getLastModifiedTime();
-    				String date = DateTimeFormatter.ofPattern("uuuu-MMM-dd HH:mm:ss", Locale.getDefault())
-    						.withZone(ZoneId.systemDefault()).format(fileTime.toInstant());
-    				sb.append("Jar-Entry: "+size+"  "+date+"  \""+entry+"\"").append("\n");
-    			}
-    		} catch(IOException e) {
-    			Util.IERR("Caused by:",e);
-    		} finally {
-    			if(jarFile!=null)
-    				try { jarFile.close(); } catch (IOException e) { e.printStackTrace(); }
-    		}
-    	}
-    	return(new StringReader(sb.toString()));
-    }
 	
 	// ****************************************************************
 	// *** doRunJarFile
@@ -592,8 +424,8 @@ public class SimulaEditor extends JFrame {
 			while (!stoped) {
 				try { sleep(100); } catch (InterruptedException e) {}
 				if ((counter--) <= 0) {
-					try { if (currentTextPanel.AUTO_REFRESH && currentTextPanel != null && currentTextPanel.refreshNeeded) {
-							  currentTextPanel.refreshNeeded = false;
+					try { if (TabbedTextHandler.currentTextPanel.AUTO_REFRESH && TabbedTextHandler.currentTextPanel != null && TabbedTextHandler.currentTextPanel.refreshNeeded) {
+						TabbedTextHandler.currentTextPanel.refreshNeeded = false;
 							  menuBar.refresh.doClick();
 						  }
 					} catch (Throwable t) {}

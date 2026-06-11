@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 
-import simula.compiler.ModuleManager;
+import simula.compiler.SourceModule;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
@@ -285,12 +285,9 @@ public final class RunFullTestBatch {
 			String fileName = sourceDir+name;
 			Option.internal.RUNTIME_USER_DIR=new File(fileName).getParent();
 			try {
-//				File file = new File(fileName);
-//				InputStreamReader reader = new InputStreamReader(new FileInputStream(file), Global._CHARSET);
-//				new SimulaCompiler(fileName, reader).doCompile();
-				File sourceFile = new File(fileName);
-		    	Global.moduleManager = new ModuleManager(sourceFile);
-				new SimulaCompiler(fileName).doCompile(Global.moduleManager.getSyntaxTree());
+				Global.initiate();
+		    	new SourceModule(new File(fileName));
+				new SimulaCompiler(fileName).doCompile(Global.currentModule.getSyntaxTree());
 			} catch (IOException e) {
 				Util.generalError("can't open " + fileName + ", reason: " + e);
 			}

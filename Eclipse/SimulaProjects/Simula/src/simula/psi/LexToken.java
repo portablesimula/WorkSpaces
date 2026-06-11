@@ -96,15 +96,19 @@ public class LexToken extends PsiElement {
 //	}
 
 	public String getText() {
-		CharSequence txt = sourceText.subSequence(startOffset, endOffset);
-		String str = txt.toString();
-//		if(keyWord == KeyWord.IDENTIFIER) {
-//			if(SourceVersion.isKeyword(str)) { // Check for Java keyWord
-//				str = "_" + str;
-//				Util.IERR("LexToken.getText: Illegal use of KeyWord: " + str);
+		try {
+			CharSequence txt = sourceText.subSequence(startOffset, endOffset);
+			String str = txt.toString();
+//			if(keyWord == KeyWord.IDENTIFIER) {
+//				if(SourceVersion.isKeyword(str)) { // Check for Java keyWord
+//					str = "_" + str;
+//					Util.IERR("LexToken.getText: Illegal use of KeyWord: " + str);
+//				}
 //			}
-//		}
-		return str;
+			return str;
+		} catch(Exception e) {
+			return "EOF";
+		}
 	}
 
 	@Override

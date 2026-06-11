@@ -36,7 +36,7 @@ import javax.swing.JTextField;
 public final class Option {
 	public static boolean PSI_VERIFY = true;
 
-//	public static boolean TESTING_MODULE = true;
+	public static boolean TESTING_NEW_LAYOUT = true;
 //	public static boolean TESTING_EOF = true;
 	
 	public static int TRACE_PSITREE_START_DONE = 0;

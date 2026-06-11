@@ -12,13 +12,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.Writer;
 import java.net.URI;
 import java.util.ArrayList;
@@ -39,7 +35,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.undo.UndoManager;
 
-import simula.compiler.ModuleManager;
+import simula.compiler.SourceModule;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.StandardClass;
@@ -113,6 +109,7 @@ public class EditorMenues extends JMenuBar {
     /** Menu item */ private JMenuItem psiTree = new JMenuItem("Show PSI Tree");
     /** Menu item */ private JMenuItem syntaxTree = new JMenuItem("Show Syntax Tree");
     /** Menu item */ private JMenuItem renderPsi = new JMenuItem("Render from PSI");
+    /** Menu item */ private JMenuItem renderOld = new JMenuItem("Render from OLD");
 
     /** Menu */ private JMenu helpMenu=new JMenu("Help");
     /** Menu item */ private JMenuItem about = new JMenuItem("About Simula");
@@ -197,6 +194,7 @@ public class EditorMenues extends JMenuBar {
 		toolsMenu.add(psiTree); psiTree.setEnabled(false); psiTree.addActionListener(actionListener);
 		toolsMenu.add(syntaxTree); syntaxTree.setEnabled(false); syntaxTree.addActionListener(actionListener);
 		toolsMenu.add(renderPsi); renderPsi.setEnabled(false); renderPsi.addActionListener(actionListener);
+		toolsMenu.add(renderOld); renderOld.setEnabled(false); renderOld.addActionListener(actionListener);
 		this.add(helpMenu);
 		
 	    addPopupMenuItems();
@@ -289,7 +287,7 @@ public class EditorMenues extends JMenuBar {
 	// ****************************************************************
 	/// Update menu items.
 	void updateMenuItems() {
-		SourceTextPanel current=SimulaEditor.currentTextPanel;
+		SourceTextPanel current=TabbedTextHandler.currentTextPanel;
 		boolean source=false;
 		boolean text=false;
 		boolean mayRun=false;
@@ -326,6 +324,7 @@ public class EditorMenues extends JMenuBar {
 		psiTree.setEnabled(mayBuild);
 		syntaxTree.setEnabled(mayBuild);
 		renderPsi.setEnabled(mayBuild);
+		renderOld.setEnabled(mayBuild);
 		SimulaEditor.autoRefresher.reset();
 	}	
 	
@@ -336,14 +335,14 @@ public class EditorMenues extends JMenuBar {
 	ActionListener actionListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			Object item=e.getSource();
-			SourceTextPanel current=SimulaEditor.currentTextPanel;
-			if(item==newFile || item==newFile2) SimulaEditor.doNewTabbedPanel(null,SimulaEditor.Language.Simula);
-			else if(item==openFile || item==openFile2) doOpenFileAction();
-			else if(item==saveFile || item==saveFile2) doSaveCurrentFile(false);
-			else if(item==saveAs   || item==saveAs2) doSaveCurrentFile(true);
-			else if(item==close    || item==close2) doCloseCurrentFileAction();
-			else if(item==closeAll || item==closeAll2) doCloseAllAction();
-			else if(item==exit     || item==exit2) doExitAction();
+			SourceTextPanel current=TabbedTextHandler.currentTextPanel;
+			if(item==newFile || item==newFile2) TabbedTextHandler.doNewTabbedPanel(null, "", SimulaEditor.Language.Simula);
+			else if(item==openFile || item==openFile2) TabbedTextHandler.doOpenFileAction();
+			else if(item==saveFile || item==saveFile2) TabbedTextHandler.doSaveCurrentFile(false);
+			else if(item==saveAs   || item==saveAs2) TabbedTextHandler.doSaveCurrentFile(true);
+			else if(item==close    || item==close2) TabbedTextHandler.doCloseCurrentFileAction();
+			else if(item==closeAll || item==closeAll2) TabbedTextHandler.doCloseAllAction();
+			else if(item==exit     || item==exit2) TabbedTextHandler.doExitAction();
 			else if(item==undo || item==undo2) undoAction();
 //			else if(item==redo || item==redo2) redoAction();
 			else if(item==refresh || item==refresh2) current.doRefresh();
@@ -364,147 +363,18 @@ public class EditorMenues extends JMenuBar {
 			else if(item==psiTree) doShowPsiTreeAction();
 			else if(item==syntaxTree) doShowSyntaxTreeAction();
 			else if(item==renderPsi) doRenderFromPSIAction();
+			else if(item==renderOld) doRenderFromOLDAction();
 			else if(item==about || item==about2) doAboutAction();
 			else if(item==more || item==more2) doMoreAction();
 		}
 	};
-	
-    // ****************************************************************
-    // *** doOpenFileAction
-    // ****************************************************************
-	/// Open file action
-	private void doOpenFileAction() {
-        JFileChooser fileChooser = new JFileChooser(Global.currentWorkspace);
-        if (fileChooser.showOpenDialog(SimulaEditor.tabbedPane)==JFileChooser.APPROVE_OPTION) {
-        	File file=fileChooser.getSelectedFile();
-    		if(!file.exists()) { Util.popUpError("Can't open file\n"+file); return; }
-    		String lowName=file.getName().toLowerCase();
-    		if(lowName.endsWith(".sim")) {
-    			SimulaEditor.doNewTabbedPanel(file,SimulaEditor.Language.Simula);
-            	Global.setCurrentWorkspace(fileChooser.getCurrentDirectory());
-    		}
-    		else if(lowName.endsWith(".jar")) {
-    			IO.println("EditorMenues.doOpenFileAction: "+file);
-    				int res = Util.optionDialog("Executable Jarfile\nDo you want to execute ?",
-    						"Execute or List Jarfile", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, "Yes", "No");
-    				if (res == JOptionPane.YES_OPTION)
-    	    			 SimulaEditor.doRunJarFile(file);
-    				else SimulaEditor.doNewTabbedPanel(file,SimulaEditor.Language.Jar);
-    		}
-    		else if(isTextFile(lowName)) SimulaEditor.doNewTabbedPanel(file,SimulaEditor.Language.Text);
-    		else SimulaEditor.doNewTabbedPanel(file,SimulaEditor.Language.Other);
-    		
-        }
-	}
-	
-	/// Test if a file is a text file
-	/// @param lowName the ident after .
-	/// @return true if it is a text file
-	private boolean isTextFile(String lowName) {
-		String[] kind= {".java", ".txt", ".bat", ".sh", ".md", ".html", ".xml" }; // TODO: More ?
-		for(String k:kind) if(lowName.endsWith(k)) return(true);
-		return(false);
-	}
-	
-    // ****************************************************************
-    // *** doSaveCurrentFile
-    // ****************************************************************
-	/// Do save current source file.
-	/// @param saveAs true if a file chooser is wanted
-	void doSaveCurrentFile(boolean saveAs) {
-		SourceTextPanel current=SimulaEditor.currentTextPanel;
-		if(saveAs || current.moduleManager.sourceFile==null) {
-	        JFileChooser fileChooser = new JFileChooser(Global.currentWorkspace);
-	        if (fileChooser.showSaveDialog(SimulaEditor.tabbedPane)!=JFileChooser.APPROVE_OPTION) return; // Do Nothing
-	        File file=fileChooser.getSelectedFile();
-	        Global.setCurrentWorkspace(fileChooser.getCurrentDirectory());
-	        if(file.exists() && overwriteDialog(file)!=JOptionPane.YES_OPTION) return; // Do Nothing
-	        if(!file.getName().toLowerCase().endsWith(".sim")) {
-	        	if(noSimTypeDialog(file)!=JOptionPane.OK_OPTION) return; // Do Nothing
-	        }
-	        current.moduleManager.sourceFile=file;
-	        SimulaEditor.setSelectedTabTitle(file.getName());
-	        current.fileChanged=true;
-		}
-    	if(current.fileChanged)	try {
-    		Writer writer=new OutputStreamWriter(new FileOutputStream(current.moduleManager.sourceFile.getPath()),Global._CHARSET);
-    		BufferedWriter out = new BufferedWriter(writer);
-    		String text=current.editTextPane.getText();
-    		out.write(text); out.close();
-    		current.fileChanged = false;
-    	} catch (Exception e) { Util.IERR("Internal Error: "+e.getMessage()); }
-    }
-	
-    // ****************************************************************
-    // *** doCloseCurrentFileAction
-    // ****************************************************************
-	/// Close current file acation.
-	private void doCloseCurrentFileAction() {
-			maybeSaveCurrentFile();
-			SimulaEditor.removeSelectedTab();
-	}
-	
-    // ****************************************************************
-    // *** doCloseAllAction
-    // ****************************************************************
-	/// Close action.
-	void doCloseAllAction() {
-		while(SimulaEditor.tabbedPane.getSelectedIndex()>=0)
-		    doCloseCurrentFileAction();
-	}
-	
-    // ****************************************************************
-    // *** doExitAction
-    // ****************************************************************
-	/// Exit action.
-	void doExitAction() {
-		doCloseAllAction();
-		System.exit(0);
-	}
-
-    // ****************************************************************
-    // *** maybeSaveCurrentFile
-    // ****************************************************************
-	/// Maybe save current source file.
-	/// 
-	/// Also used by RunMeny.
-	void maybeSaveCurrentFile() {
-		SourceTextPanel current=SimulaEditor.currentTextPanel;
-		if(current==null) return; if(!current.fileChanged) return;
-		if(saveDialog(current.moduleManager.sourceFile)==JOptionPane.YES_OPTION) doSaveCurrentFile(false);
-	}
-
-	/// Popup a warning: The file: 'name' Already exists - Do you want to overwrite it ?
-	/// @param file the file
-	/// @return an integer indicating the option chosen by the user, or CLOSED_OPTION if the user closed the dialog
-	private int overwriteDialog(File file) {
- 		String msg="The file: \n"+file+"\nAlready exists - Do you want to overwrite it ?";
- 		return(Util.optionDialog(msg,"Warning",JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE,"Yes","No"));
-	}
-
-	/// Popup a warning: The file 'name' Does not end with the recomended .sim
-	/// @param file the file
-	/// @return an integer indicating the option chosen by the user, or CLOSED_OPTION if the user closed the dialog
-	private int noSimTypeDialog(File file) {
-        String msg="The file name\n"+file+"\nDoes not end with the recomended \".sim\"";
-		return(Util.optionDialog(msg,"Warning",JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,"Ok","Cancel"));
-	}
-	
-	/// Save file dialog
-	/// @param file the file
-	/// @return an integer indicating the option chosen by the user, or CLOSED_OPTION if the user closed the dialog
-	private int saveDialog(File file) {
-		String msg=(file==null)?"The source text has unsaved changes.\nDo you want to save it in a file ?"
-		                       :"The file: \n"+file+"\nHas changed - do you want to save it ?";
-		return(Util.optionDialog(msg,"Question",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,"Yes","No"));
-	}
 	
 	// ****************************************************************
 	// *** undoAction
 	// ****************************************************************
 	/// The undo action
 	private void undoAction() {
-		SourceTextPanel current=SimulaEditor.currentTextPanel;
+		SourceTextPanel current=TabbedTextHandler.currentTextPanel;
 		current.getUndoManager().undo();
 		current.fileChanged=true; current.refreshNeeded=true;
 		updateMenuItems();
@@ -575,11 +445,11 @@ public class EditorMenues extends JMenuBar {
 //		} catch(Exception e) { Util.popUpError("Can't run: "+e);}
 //	}
 	private void doStartRunning() {
-		maybeSaveCurrentFile();
-		SourceTextPanel current=SimulaEditor.currentTextPanel;			
-//		PsiTree psiTree = current.moduleManager.getPsiTree();
-		String sourceFileName = current.moduleManager.getName();
-		ProgramModule programModule = current.moduleManager.getSyntaxTree();
+		TabbedTextHandler.maybeSaveCurrentFile();
+		SourceTextPanel current=TabbedTextHandler.currentTextPanel;			
+//		PsiTree psiTree = current.currentModule.getPsiTree();
+		String sourceFileName = current.currentModule.getName();
+		ProgramModule programModule = current.currentModule.getSyntaxTree();
 		
 		IO.println("EditorMenues.doStartRunning: programModule: "+programModule);
 		IO.println("EditorMenues.doStartRunning: programModule'identifier: "+programModule.getIdentifier());
@@ -593,7 +463,7 @@ public class EditorMenues extends JMenuBar {
 					e.printStackTrace();
 			}});
 			// Start compiler ....
-			Util.ASSERT(SimulaEditor.currentTextPanel!=null,"EditorMenues.doRunAction: Invariant-1");
+			Util.ASSERT(TabbedTextHandler.currentTextPanel!=null,"EditorMenues.doRunAction: Invariant-1");
 //			String text=SimulaEditor.currentTextPanel.editTextPane.getText();
 //			StringReader reader=new StringReader(text);
 //			String name=(file!=null)?file.getPath():Global.tempJavaFileDir+"/unnamed.sim";
@@ -612,7 +482,7 @@ public class EditorMenues extends JMenuBar {
 	/// The show PSI Tree action
 	private void doShowPsiTreeAction() {
 		SwingUtilities.invokeLater(() -> {
-			ModuleManager current = SimulaEditor.getCurrentModule();
+			SourceModule current = Global.currentModule;
 			current.buildPsiAndSyntaxTrees();
 			current.getPsiTree().popUpPsiTree();
 		});
@@ -624,10 +494,10 @@ public class EditorMenues extends JMenuBar {
 	/// The show Syntax Tree action
 	private void doShowSyntaxTreeAction() {
 		SwingUtilities.invokeLater(() -> {
-			ModuleManager current = SimulaEditor.getCurrentModule();
+			SourceModule current = Global.currentModule;
 //			Option.internal.DEBUGGING=false;
 //			SourceTextPanel current=SimulaEditor.currentTextPanel;
-//			ProgramModule programModule = current.moduleManager.getSyntaxTree();
+//			ProgramModule programModule = current.currentModule.getSyntaxTree();
 			
 			current.buildPsiAndSyntaxTrees();
 			ProgramModule programModule = current.getSyntaxTree();
@@ -645,12 +515,24 @@ public class EditorMenues extends JMenuBar {
 	/// The render from psi action
 	private void doRenderFromPSIAction() {
 		SwingUtilities.invokeLater(() -> {
-			ModuleManager current = SimulaEditor.getCurrentModule();
+			SourceModule current = Global.currentModule;
 			current.buildPsiAndSyntaxTrees();
 			PsiTree psiTree = current.getPsiTree();
-			SimulaEditor.doNewTabbedPsiPanel(psiTree, Language.Simula);
+			TabbedTextHandler.doNewTabbedPsiPanel(psiTree, "PSI:", Language.Simula);
 		});
 //		Thread.dumpStack();
+	}
+	
+	// ****************************************************************
+	// *** doRenderFromOLDAction
+	// ****************************************************************
+	/// The render from psi action
+	private void doRenderFromOLDAction() {
+		SwingUtilities.invokeLater(() -> {
+			SourceModule current = Global.currentModule;
+			TabbedTextHandler.doNewTabbedPanel(current.sourceFile, "OLD:", Language.Simula);
+		});
+		Thread.dumpStack();
 	}
 
 
