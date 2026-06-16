@@ -28,6 +28,7 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
 import simula.compiler.SourceModule;
+import simula.compiler.utilities.Global;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
@@ -39,6 +40,8 @@ import simula.psi.PsiTreeIterator;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Set;
 
 /// The Source text Panel.
@@ -48,18 +51,18 @@ import java.util.Set;
 /// 
 /// @author Øystein Myhre Andersen
 /// @author Google AI
-@SuppressWarnings("serial")
-public class PsiTextPanel extends JPanel {
+@SuppressWarnings({ "serial", "unused" })
+public class PsiTextPanel extends TabTextPanel {
 	/// DEBUG on/off
 	private static final boolean DEBUG=false;//true;
 	
-	public SourceModule currentModule;
-
-	/// The line number side-panel.
-	private JTextPane lineNumbers;
-	
-	/// The ScrollPane
-	private JScrollPane styleScrollPane;
+//	public SourceModule currentModule;
+//
+//	/// The line number side-panel.
+//	private JTextPane lineNumbers;
+//	
+//	/// The ScrollPane
+//	private JScrollPane styleScrollPane;
 
 	/** Style name */ public final static String styleNameRegular = "regular";
 	/** Style name */ public final static String styleNameKeyword = "keyword";
@@ -78,48 +81,52 @@ public class PsiTextPanel extends JPanel {
 	/** Style */ public Style styleError;
 	/** Style */ private Style styleLineNumber;
 	
-	/// The StyledDocument.
-	public StyledDocument doc;
+//	/// The popup Menu.
+//	private JPopupMenu popupMenu;
+//	
+//	/// The StyledDocument.
+//	public StyledDocument doc;
+//	
+//	/// Editable text pane with undo/redo history.
+//	JTextPane editTextPane;
 	
-	/// Editable text pane with undo/redo history.
-	JTextPane editTextPane;
-	
-	/// Current language.
-    SimulaEditor.Language lang;
-	
-	/// Signals auto refresh.
-    boolean AUTO_REFRESH=true;//false;
-
-	/// The undo manager.
-	private UndoManager undoManager = new UndoManager();
-	
-	/// Returns the undo manager.
-	/// @return the undo manager
-	UndoManager getUndoManager() { return(undoManager); }
-	
-    /// Indicates that the source file has changed.
-    boolean fileChanged = false;
-    
-    /// Indicates that refresh is needed.
-    boolean refreshNeeded = false;
-
-	// ****************************************************************
-	// *** UndoableEditListener
-	// ****************************************************************
-    /// The UndoableEditListener.
-    private UndoableEditListener undoListener=new UndoableEditListener() {
-		public void undoableEditHappened(UndoableEditEvent e) {
-			UndoableEdit edit=e.getEdit();
-			undoManager.addEdit(edit);
-			fileChanged=true; refreshNeeded=true;
-			SimulaEditor.menuBar.updateMenuItems();
-		}
-	};
-
-	// ****************************************************************
-	// *** MouseListener
-	// ****************************************************************
-	/// The MouseListener.
+//	/// Current language.
+//    SimulaEditor.Language lang;
+//	
+//	/// Signals auto refresh.
+//    boolean AUTO_REFRESH=true;//false;
+//
+//	/// The undo manager.
+//	private UndoManager undoManager = new UndoManager();
+//	
+//	/// Returns the undo manager.
+//	/// @return the undo manager
+//	UndoManager getUndoManager() { return(undoManager); }
+//	
+//    /// Indicates that the source file has changed.
+//    boolean fileChanged = false;
+//    
+//    /// Indicates that refresh is needed.
+//    boolean refreshNeeded = false;
+//
+//	// ****************************************************************
+//	// *** UndoableEditListener
+//	// ****************************************************************
+//    /// The UndoableEditListener.
+//    private UndoableEditListener undoListener=new UndoableEditListener() {
+//		public void undoableEditHappened(UndoableEditEvent e) {
+//			UndoableEdit edit=e.getEdit();
+//			Global.currentModule.undoManager.addEdit(edit);
+//			Global.currentModule.fileChanged=true;
+//			Global.currentModule.refreshNeeded=true;
+//			SimulaEditor.menuBar.updateMenuItems();
+//		}
+//	};
+//
+//	// ****************************************************************
+//	// *** MouseListener
+//	// ****************************************************************
+//	/// The MouseListener.
 //    MouseListener mouseListener = new MouseListener() {
 //		public void mousePressed(MouseEvent e) {}
 //		public void mouseReleased(MouseEvent e) {}
@@ -129,47 +136,47 @@ public class PsiTextPanel extends JPanel {
 //    	    if(e.getButton()==3) popupMenu.show(editTextPane,e.getX(),e.getY());
 //    	}
 //    };
-
-	// ****************************************************************
-	// *** DocumentListener
-	// ****************************************************************
-    /// The DocumentListener.
-	DocumentListener documentListener=new DocumentListener() {
-		public void insertUpdate(DocumentEvent e)  { debugTrace("Insert",e); }
-		public void removeUpdate(DocumentEvent e)  { debugTrace("Remove",e); }
-		public void changedUpdate(DocumentEvent e) { debugTrace("Changed",e); }
-		
-		private void debugTrace(String id,DocumentEvent evt) {
-			if(DEBUG) {
-			    int ofst=evt.getOffset();
-			    int lng=evt.getLength();
-			    String styleName="UNKNOWN";
-			    String lastText="UNKNOWN";
-				try { // debugTrace
-				    StyledDocument doc=(StyledDocument)editTextPane.getDocument();
-				    if(id.equals("Insert")) lastText= doc.getText(ofst,lng);
-				    if(id.equals("addition")) lastText= doc.getText(ofst,lng);
-				    Element elt=doc.getCharacterElement(ofst);
-				    if(elt instanceof LeafElement leaf) {
-					    styleName=(String)leaf.getAttribute(StyleConstants.NameAttribute);
-				    }
-				    lastText=lastText.replace("\n","\\n");
-				} catch (Exception ex) { Util.IERR("Impossible",ex); }			
-				IO.println("DocumentListener: "+id + '[' + ofst + ',' + lng + "]="+styleName+"\"" + lastText + '"');
-			}
-		}	
-	};
+//
+//	// ****************************************************************
+//	// *** DocumentListener
+//	// ****************************************************************
+//    /// The DocumentListener.
+//	DocumentListener documentListener=new DocumentListener() {
+//		public void insertUpdate(DocumentEvent e)  { debugTrace("Insert",e); }
+//		public void removeUpdate(DocumentEvent e)  { debugTrace("Remove",e); }
+//		public void changedUpdate(DocumentEvent e) { debugTrace("Changed",e); }
+//		
+//		private void debugTrace(String id,DocumentEvent evt) {
+//			if(DEBUG) {
+//			    int ofst=evt.getOffset();
+//			    int lng=evt.getLength();
+//			    String styleName="UNKNOWN";
+//			    String lastText="UNKNOWN";
+//				try { // debugTrace
+//				    StyledDocument doc=(StyledDocument)editTextPane.getDocument();
+//				    if(id.equals("Insert")) lastText= doc.getText(ofst,lng);
+//				    if(id.equals("addition")) lastText= doc.getText(ofst,lng);
+//				    Element elt=doc.getCharacterElement(ofst);
+//				    if(elt instanceof LeafElement leaf) {
+//					    styleName=(String)leaf.getAttribute(StyleConstants.NameAttribute);
+//				    }
+//				    lastText=lastText.replace("\n","\\n");
+//				} catch (Exception ex) { Util.IERR("Impossible",ex); }			
+//				IO.println("DocumentListener: "+id + '[' + ofst + ',' + lng + "]="+styleName+"\"" + lastText + '"');
+//			}
+//		}	
+//	};
 	
 	// ****************************************************************
 	// *** Constructor
 	// ****************************************************************
 	/// Create a new PsiTextPanel.
 	/// @param sourceFile the source file
-	/// @param lang the language
 	/// @param popupMenu the popupMenu
 //    PsiTextPanel(File sourceFile, SimulaEditor.Language lang, JPopupMenu popupMenu) {
 //    PsiTextPanel(PsiTree psiTree, Language lang, JPopupMenu popupMenu) {
-    PsiTextPanel(Language lang, JPopupMenu popupMenu) {
+    PsiTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
+    	super(sourceModule, popupMenu);
 //   	this.currentModule = new SourceModule(this, sourceFile);
 //    	this.sourceFile=sourceFile;
 //    	this.lang=lang;
@@ -178,53 +185,53 @@ public class PsiTextPanel extends JPanel {
 //    	Palette.updatePalette(null, true);
 //    	Palette.init();
 
-        editTextPane = new TooltipTextPane(); editTextPane.setEditable(false);
+//        editTextPane = new TooltipTextPane(); editTextPane.setEditable(false);
 //        editTextPane.addMouseListener(mouseListener);
-        ToolTipManager.sharedInstance().registerComponent(editTextPane);
-        ToolTipManager.sharedInstance().setDismissDelay(20000); // 20 sekunder
-        
-        lineNumbers = new TooltipTextPane(); lineNumbers.setEditable(false);
-//        lineNumbers.addMouseListener(mouseListener);
-//        ToolTipManager.sharedInstance().registerComponent(lineNumbers);
-        lineNumbers.setForeground(Palette.TextPaneForeground);
-        lineNumbers.setBackground(Palette.TextPaneBackground);
-        
-        JPanel extra=new JPanel();
-        
-        doc=new DefaultStyledDocument(); addStylesToSourceDocument(doc);
-        
-        doc.putProperty(DefaultEditorKit.EndOfLineStringProperty,"\n");
-    	doc.addUndoableEditListener(undoListener);
-    	doc.addDocumentListener(documentListener);
-        editTextPane.setStyledDocument(doc);
-        editTextPane.setEditable(true);
-        editTextPane.setForeground(Palette.TextPaneForeground);
-        editTextPane.setBackground(Palette.TextPaneBackground);
-        
-        
-        extra.setLayout(new BorderLayout());
-        extra.add(lineNumbers,BorderLayout.WEST);
-        extra.add(editTextPane,BorderLayout.CENTER);
-       
-        styleScrollPane = new JScrollPane(extra);        
-        styleScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        
-        this.setLayout(new BorderLayout());
-        this.add(styleScrollPane,BorderLayout.CENTER);
+//        ToolTipManager.sharedInstance().registerComponent(editTextPane);
+//        ToolTipManager.sharedInstance().setDismissDelay(20000); // 20 sekunder
+//        
+//        lineNumbers = new TooltipTextPane(); lineNumbers.setEditable(false);
+////        lineNumbers.addMouseListener(mouseListener);
+////        ToolTipManager.sharedInstance().registerComponent(lineNumbers);
+//        lineNumbers.setForeground(Palette.TextPaneForeground);
+//        lineNumbers.setBackground(Palette.TextPaneBackground);
+//        
+//        JPanel extra=new JPanel();
+//        
+//        doc=new DefaultStyledDocument(); addStylesToSourceDocument(doc);
+//        
+//        doc.putProperty(DefaultEditorKit.EndOfLineStringProperty,"\n");
+//    	doc.addUndoableEditListener(undoListener);
+//    	doc.addDocumentListener(documentListener);
+//        editTextPane.setStyledDocument(doc);
+//        editTextPane.setEditable(true);
+//        editTextPane.setForeground(Palette.TextPaneForeground);
+//        editTextPane.setBackground(Palette.TextPaneBackground);
+//        
+//        
+//        extra.setLayout(new BorderLayout());
+//        extra.add(lineNumbers,BorderLayout.WEST);
+//        extra.add(editTextPane,BorderLayout.CENTER);
+//       
+//        styleScrollPane = new JScrollPane(extra);        
+//        styleScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+//        
+//        this.setLayout(new BorderLayout());
+//        this.add(styleScrollPane,BorderLayout.CENTER);
     }
     
 
-	public String getText() {
-		try {
-			String text = doc.getText(0, doc.getLength());
-//			IO.println("PsiTextPanel.getText: |" + text.replace("\r", "\\r").replace("\n", "\\n")+'|');
-			return text;
-		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
+//	public String getText() {
+//		try {
+//			String text = doc.getText(0, doc.getLength());
+////			IO.println("PsiTextPanel.getText: |" + text.replace("\r", "\\r").replace("\n", "\\n")+'|');
+//			return text;
+//		} catch (BadLocationException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return null;
+//	}
     
 	// ****************************************************************
 	// *** fillTextPane
@@ -295,7 +302,7 @@ public class PsiTextPanel extends JPanel {
 		} catch (BadLocationException ble) {
 			System.err.println("Couldn't insert text into text pane.");
 		}
-		if(lineNumber>500) this.AUTO_REFRESH=false;
+		if(lineNumber>500) Global.currentModule.AUTO_REFRESH=false;
 		lineNumbers.setStyledDocument(lin);
     	doc.addUndoableEditListener(undoListener);
         editTextPane.setEditable(true);
@@ -306,7 +313,7 @@ public class PsiTextPanel extends JPanel {
 	// *** doRefresh
 	// ****************************************************************
     /// Do refresh action.
-	void doRefresh() {
+	public void doRefresh() {
 	    int pos=editTextPane.getCaretPosition();
 	    String txt=editTextPane.getText();
 	    if(!txt.endsWith("\n")) txt=txt+'\n';
@@ -388,7 +395,8 @@ public class PsiTextPanel extends JPanel {
     
     /// Add Styles to the source text document.
     /// @param doc the document
-    private void addStylesToSourceDocument(final StyledDocument doc) {
+    @Override
+    protected void addStylesToSourceDocument(final StyledDocument doc) {
         //Initialize some styles.
         Style defaultStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
         
@@ -438,8 +446,8 @@ public class PsiTextPanel extends JPanel {
     @Override
     public String toString() {
     	String s="SourceTextPanel(";
-        s=s+currentModule.getName();
-    	if(this.AUTO_REFRESH) s=s+",AUTO_REFRESH";
+//        s=s+currentModule.getName();
+//    	if(this.AUTO_REFRESH) s=s+",AUTO_REFRESH";
     	s=s+')';
     	return(s);
     }

@@ -3,7 +3,6 @@ package simula.editor;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,22 +27,31 @@ import java.util.jar.Manifest;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import simula.compiler.SourceModule;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.editor.SimulaEditor.Language;
 import simula.psi.PsiTree;
 
+/// @author Google AI
+/// @author Øystein Myhre Andersen
 public class TabbedTextHandler {
     
 	/// The tabbed pane.
 	static JTabbedPane tabbedPane;
 
-	/// The current SourceTextPanel
-	static SourceTextPanel currentTextPanel;
+//	/// The current SourceTextPanel
+//	static SourceTextPanel currentTextPanel;
+//	static JPanel currentTextPanel;
+
+	/// The current SourceModule
+//	static SourceModuleTextPanel currentTextPanel;
+//	static JPanel currentTextPanel;
     
     // ****************************************************************
     // *** setSelectedTabTitle  /  removeSelectedTab
@@ -54,8 +62,15 @@ public class TabbedTextHandler {
     
     /// Remove selected tab.
     static void removeSelectedTab() {
+		
+		Util.IERR("SJEKK DETTE");
+		Util.STOP();
     	tabbedPane.removeTabAt(tabbedPane.getSelectedIndex());
-        currentTextPanel=(SourceTextPanel)tabbedPane.getSelectedComponent();
+//        currentTextPanel=(SourceTextPanel)tabbedPane.getSelectedComponent();
+    	int index = tabbedPane.getSelectedIndex();
+        String tabName = tabbedPane.getTitleAt(index);
+        SourceModule current = Global.moduleMap.get(tabName);
+        Global.currentModule = current;
         SimulaEditor.menuBar.updateMenuItems();
     }
     
@@ -65,72 +80,68 @@ public class TabbedTextHandler {
     /// Create a new Tab with text generated from the given file.
     /// @param file the file
     /// @param lang the language
-    static void doNewTabbedPanel(File file, String prefix,Language lang) {
-    	new Thread(new Runnable() {
-    		public void run() {
-//    			SourceModule currentModule = new SourceModule(file);
-    			SourceModule currentModule = Global.currentModule;
-     			currentTextPanel=new SourceTextPanel(currentModule,lang,SimulaEditor.menuBar.popupMenu);
-     			currentModule.setTextPanel(currentTextPanel);
-//    			tabbedPane.addTab((file==null)?"unnamed":file.getName(), null, currentTextPanel, "Tool tip ...");
-    			String tabName = prefix + Global.currentModule.getTabName();
-    			tabbedPane.addTab(tabName, null, currentTextPanel, "Tool tip ...");
-    			// select the last tab
-    			tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
-    			currentTextPanel.fileChanged=false;
-    			if(file==null)currentTextPanel.fillTextPane(new StringReader("begin\n\nend;\n"),0);
-    			else if(lang==Language.Simula) {
-    				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
-    					  currentTextPanel.fillTextPane(reader,0);
-    				} catch(IOException e) { Util.IERR("Impossible",e); }
+    static void doNewTabbedPanel(File file, String prefix) {
+    	if(tabbedPane == null) doOpenTabbedPane();
+    	SwingUtilities.invokeLater(() -> {
+    		SourceModule currentModule = Global.currentModule;
+    		SimulaEditor.Language lang = currentModule.lang;
+    		SourceTextPanel currentTextPanel = new SourceTextPanel(currentModule, SimulaEditor.menuBar.popupMenu);
+    		currentModule.setTextPanel(currentTextPanel);
+    		String tabName = prefix + Global.currentModule.getTabName();
+
+    		tabbedPane.addTab(null, currentTextPanel); // Add content first, will be replaced
+    		int index = tabbedPane.getTabCount() - 1;
+    		tabbedPane.setTabComponentAt(index, new ClosableTabPanel("ZZ_"+tabName, tabbedPane, currentTextPanel));
+    		tabbedPane.setSelectedIndex(index);
+    		
+    		currentModule.fileChanged=false;
+    		if(file == null) {
+    			currentTextPanel.fillTextPane(new StringReader(SourceModule.emptyProgram),0);
+    		} else {
+    			switch(lang) {
+					case Simula:
+	    				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
+	    				currentTextPanel.fillTextPane(reader,0);
+	    				} catch(IOException e) { Util.IERR("Impossible",e); }
+						break;
+					case Jar:
+	    				currentTextPanel.fillTextPane(getJarFileReader(file),0);
+						break;
+					case Text:
+	    				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
+	    				currentTextPanel.fillTextPane(reader,0);
+	    				} catch(IOException e) { Util.IERR("Impossible",e); }
+						break;
+					case Other:
+					default:
+	    				currentTextPanel.fillTextPane(getHexFileReader(file),0);
     			}
-    			else if(lang==Language.Jar) {
-    				currentTextPanel.fillTextPane(getJarFileReader(file),0);
-    			}
-    			else if(lang==Language.Other) {
-    				currentTextPanel.fillTextPane(getHexFileReader(file),0);
-    			}
-    			else if(lang==Language.Text)
-    				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
-    				currentTextPanel.fillTextPane(reader,0);
-    			} catch(IOException e) { Util.IERR("Impossible",e); }
-    			SimulaEditor.menuBar.updateMenuItems();
-    		}}).start();
+    		}
+    		SimulaEditor.menuBar.updateMenuItems();
+    	});
     }
-    
+
     // ****************************************************************
     // *** doNewTabbedPsiPanel
     // ****************************************************************
     /// Create a new Tab with text generated from the given psi tree.
     /// @param file the file
     /// @param lang the language
-    static void doNewTabbedPsiPanel(PsiTree psiTree, String prefix, Language lang) {
-    	new Thread(new Runnable() {
-    		public void run() {
-    			PsiTextPanel psiTextPanel=new PsiTextPanel(lang, SimulaEditor.menuBar.popupMenu);
-//    			tabbedPane.addTab((file==null)?"unnamed":file.getName(), null, currentTextPanel, "Tool tip ...");
-    			String tabName = prefix + Global.currentModule.getTabName();
-    			tabbedPane.addTab(tabName, null, psiTextPanel, "Tool tip ...");
-    			// select the last tab
-    			tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
-    			psiTextPanel.fileChanged=false;
-//    			if(file==null)psiTextPanel.fillTextPane(new StringReader("begin\n\nend;\n"),0);
-//    			else
-    				if(lang==Language.Simula) {
-    					psiTextPanel.fillTextPane(0, psiTree);
-    			}
-//    			else if(lang==Language.Jar) {
-//    				psiTextPanel.fillTextPane(getJarFileReader(file),0);
-//    			}
-//    			else if(lang==Language.Other) {
-//    				psiTextPanel.fillTextPane(getHexFileReader(file),0);
-//    			}
-//    			else if(lang==Language.Text)
-//    				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
-//    				psiTextPanel.fillTextPane(reader,0);
-//    			} catch(IOException e) { Util.IERR("Impossible",e); }
-    				SimulaEditor.menuBar.updateMenuItems();
-    		}}).start();
+    static void doNewTabbedPsiPanel(PsiTree psiTree, String prefix) {
+    	if(tabbedPane == null) doOpenTabbedPane();
+    	SwingUtilities.invokeLater(() -> {
+    		PsiTextPanel psiTextPanel=new PsiTextPanel(Global.currentModule, SimulaEditor.menuBar.popupMenu);
+    		String tabName = prefix + Global.currentModule.getTabName();
+
+			tabbedPane.addTab(null, psiTextPanel); // Add content first, will be replaced
+			int index = tabbedPane.getTabCount() - 1;
+			tabbedPane.setTabComponentAt(index, new ClosableTabPanel("WW_"+tabName, tabbedPane, psiTextPanel));
+			tabbedPane.setSelectedIndex(index);
+
+    		Global.currentModule.fileChanged=false;
+    		psiTextPanel.fillTextPane(0, psiTree);
+    		SimulaEditor.menuBar.updateMenuItems();
+    	});
     }
 
     
@@ -223,7 +234,7 @@ public class TabbedTextHandler {
 //    };
 	
     // ****************************************************************
-    // *** doOpenFileAction
+    // *** doOpenTabbedPane
     // ****************************************************************
 	/// Open file action
 	public static void doOpenTabbedPane() {
@@ -236,56 +247,88 @@ public class TabbedTextHandler {
         tabbedPane.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Component selected=tabbedPane.getSelectedComponent();
+				IO.println("SimulaEditor'changeSelectedComponent: " + selected);
+				if(selected == null) {
+					SimulaEditor.reopenWelcomePane();
+					return;
+				}
+
 				IO.println("SimulaEditor'changeSelectedComponent: " + selected.getClass());
 				Global.console.write("SimulaEditor'changeSelectedComponent: " + selected.getClass()+"\n");
-				if(selected instanceof SourceTextPanel panel) {
-					currentTextPanel=panel;
-					Global.currentModule = currentTextPanel.currentModule;
-					SimulaEditor.menuBar.updateMenuItems();
-				}
+//				if(selected instanceof PsiTextPanel panel) {
+//					currentTextPanel=panel;
+//					Global.currentModule = currentTextPanel.currentModule;
+//					SimulaEditor.menuBar.updateMenuItems();
+//				} else
+//				if(selected instanceof SourceTextPanel panel) {
+//					currentTextPanel=panel;
+//					Global.currentModule = currentTextPanel.currentModule;
+//					SimulaEditor.menuBar.updateMenuItems();
+//				}
+				if(selected instanceof TabTextPanel panel) {
+				Global.currentModule = panel.sourceModule;
+				SimulaEditor.menuBar.updateMenuItems();
+			}
+				Util.IERR("SJEKK DETTE");
+//				Util.STOP();
 			}});
+        SimulaEditor.addTabbedPaneToCard();
 	}
 		
     // ****************************************************************
     // *** doOpenFileAction
     // ****************************************************************
 	/// Open file action
+	public static void doNewFileAction() {
+		new SourceModule(null);
+		Global.currentModule.lang = SimulaEditor.Language.Simula;
+		TabbedTextHandler.doNewTabbedPanel(null, "");		
+	}
+
+	// ****************************************************************
+	// *** doOpenFileAction
+	// ****************************************************************
+	/// Open file action
 	public static void doOpenFileAction() {
-		if(tabbedPane == null) doOpenTabbedPane();
+//		if(tabbedPane == null) doOpenTabbedPane();
         JFileChooser fileChooser = new JFileChooser(Global.currentWorkspace);
         if (fileChooser.showOpenDialog(tabbedPane)==JFileChooser.APPROVE_OPTION) {
         	File file=fileChooser.getSelectedFile();
-    		if(!file.exists()) { Util.popUpError("Can't open file\n"+file); return; }
-    		String lowName=file.getName().toLowerCase();
-    		if(lowName.endsWith(".sim")) {
-//    			SimulaEditor.doNewTabbedPanel(file,SimulaEditor.Language.Simula);
-//    			SourceModule currentModule = Global.currentModule;
-    			SourceModule currentModule = new SourceModule(file); 
-    			currentModule.buildPsiAndSyntaxTrees();
-    			PsiTree psiTree = currentModule.getPsiTree();
-    			doNewTabbedPsiPanel(psiTree, "", Language.Simula);
-            	Global.setCurrentWorkspace(fileChooser.getCurrentDirectory());
-    		}
-    		else if(lowName.endsWith(".jar")) {
-    			IO.println("EditorMenues.doOpenFileAction: "+file);
-    				int res = Util.optionDialog("Executable Jarfile\nDo you want to execute ?",
-    						"Execute or List Jarfile", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, "Yes", "No");
-    				if (res == JOptionPane.YES_OPTION)
-    	    			 SimulaEditor.doRunJarFile(file);
-    				else doNewTabbedPanel(file, "", SimulaEditor.Language.Jar);
-    		}
-    		else if(isTextFile(lowName)) doNewTabbedPanel(file, "", SimulaEditor.Language.Text);
-    		else doNewTabbedPanel(file, "", SimulaEditor.Language.Other);
+        	
+        	doOpenFile(file);
         }
 	}
 	
-	/// Test if a file is a text file
-	/// @param lowName the ident after .
-	/// @return true if it is a text file
-	private static boolean isTextFile(String lowName) {
-		String[] kind= {".java", ".txt", ".bat", ".sh", ".md", ".html", ".xml" }; // TODO: More ?
-		for(String k:kind) if(lowName.endsWith(k)) return(true);
-		return(false);
+    // ****************************************************************
+    // *** doOpenFileAction
+    // ****************************************************************
+	/// Open file action
+	public static void doOpenFile(File file) {
+		if(tabbedPane == null) doOpenTabbedPane();
+		if(!file.exists()) { Util.popUpError("Can't open file\n"+file); return; }
+		SourceModule currentModule = new SourceModule(file);
+    	switch(Global.currentModule.lang){
+		case Simula:
+//			SimulaEditor.doNewTabbedPanel(file,SimulaEditor.Language.Simula);
+//			SourceModule currentModule = Global.currentModule;
+//			SourceModule currentModule = new SourceModule(file, SimulaEditor.Language.Simula); 
+			currentModule.buildPsiAndSyntaxTrees();
+			PsiTree psiTree = currentModule.getPsiTree();
+			doNewTabbedPsiPanel(psiTree, "");
+//        	Global.setCurrentWorkspace(fileChooser.getCurrentDirectory());
+			break;
+		case Jar:
+			IO.println("EditorMenues.doOpenFileAction: "+file);
+			int res = Util.optionDialog("Executable Jarfile\nDo you want to execute ?",
+					"Execute or List Jarfile", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, "Yes", "No");
+			if (res == JOptionPane.YES_OPTION) {
+				SimulaEditor.doRunJarFile(file);
+				break;
+			}
+		default:
+			doNewTabbedPanel(file, "");
+			break;
+    	}
 	}
 	
     // ****************************************************************
@@ -294,8 +337,12 @@ public class TabbedTextHandler {
 	/// Do save current source file.
 	/// @param saveAs true if a file chooser is wanted
 	static void doSaveCurrentFile(boolean saveAs) {
-		SourceTextPanel current=currentTextPanel;
-		if(saveAs || current.currentModule.sourceFile==null) {
+//		SourceTextPanel current=currentTextPanel;
+		SourceModule currentModule = Global.currentModule;
+		
+		Util.IERR("SJEKK DETTE");
+		Util.STOP();
+		if(saveAs || currentModule.sourceFile==null) {
 	        JFileChooser fileChooser = new JFileChooser(Global.currentWorkspace);
 	        if (fileChooser.showSaveDialog(tabbedPane)!=JFileChooser.APPROVE_OPTION) return; // Do Nothing
 	        File file=fileChooser.getSelectedFile();
@@ -304,16 +351,17 @@ public class TabbedTextHandler {
 	        if(!file.getName().toLowerCase().endsWith(".sim")) {
 	        	if(noSimTypeDialog(file)!=JOptionPane.OK_OPTION) return; // Do Nothing
 	        }
-	        current.currentModule.sourceFile=file;
+	        currentModule.sourceFile=file;
 	        setSelectedTabTitle(file.getName());
-	        current.fileChanged=true;
+	        currentModule.fileChanged=true;
 		}
-    	if(current.fileChanged)	try {
-    		Writer writer=new OutputStreamWriter(new FileOutputStream(current.currentModule.sourceFile.getPath()),Global._CHARSET);
+    	if(Global.currentModule.fileChanged) try {
+    		Writer writer=new OutputStreamWriter(new FileOutputStream(currentModule.sourceFile.getPath()),Global._CHARSET);
     		BufferedWriter out = new BufferedWriter(writer);
-    		String text=current.editTextPane.getText();
+//    		String text=current.editTextPane.getText();
+    		String text=currentModule.getUpdatedText();
     		out.write(text); out.close();
-    		current.fileChanged = false;
+    		Global.currentModule.fileChanged = false;
     	} catch (Exception e) { Util.IERR("Internal Error: "+e.getMessage()); }
     }
 	
@@ -353,9 +401,14 @@ public class TabbedTextHandler {
 	/// 
 	/// Also used by RunMeny.
 	static void maybeSaveCurrentFile() {
-		SourceTextPanel current=currentTextPanel;
+//		SourceTextPanel current=currentTextPanel;
+//		if(current==null) return; if(!current.fileChanged) return;
+		
+		Util.IERR("SJEKK DETTE");
+		Util.STOP();
+		SourceModule current=Global.currentModule;
 		if(current==null) return; if(!current.fileChanged) return;
-		if(saveDialog(current.currentModule.sourceFile)==JOptionPane.YES_OPTION) doSaveCurrentFile(false);
+		if(saveDialog(current.sourceFile)==JOptionPane.YES_OPTION) doSaveCurrentFile(false);
 	}
 
 	/// Popup a warning: The file: 'name' Already exists - Do you want to overwrite it ?

@@ -9,51 +9,24 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Choice;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.attribute.FileTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Enumeration;
-import java.util.Locale;
 import java.util.Properties;
-import java.util.Set;
-import java.util.jar.Attributes;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
-
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import simula.compiler.SourceModule;
 import simula.compiler.utilities.ConsolePanel;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.psi.PsiTree;
 
 /// The SimulaEditor.
 /// 
@@ -64,8 +37,10 @@ import simula.psi.PsiTree;
 @SuppressWarnings("serial")
 public class SimulaEditor extends JFrame {
 	
+	static CardLayout cardLayout;
+	
 	/// The main CardPanel 
-	JPanel mainCardPanel;  // TESTING_NEW_LAYOUT
+	static JPanel mainCardPanel;
 	
 	/// The menu bar.
 	static EditorMenues menuBar;
@@ -110,7 +85,21 @@ public class SimulaEditor extends JFrame {
 			System.setProperty("sun.java2d.uiScale", Option.editorUIScale);
 		}
 	}
-            
+           
+	/// Create and add a new Tabbed Pane to 'mainCardPanel'
+	public static void addTabbedPaneToCard() {
+		IO.println("mainCardPanel.add(TabbedTextHandler.tabbedPane)");
+        mainCardPanel.add(TabbedTextHandler.tabbedPane,"TabbedPane");
+//        cardLayout.next(TabbedTextHandler.tabbedPane);
+        cardLayout.next(mainCardPanel);
+	}
+
+	/// Create and add a new Tabbed Pane to 'mainCardPanel'
+	public static void reopenWelcomePane() {
+		IO.println("mainCardPanel.reopenWelcomePane");
+		cardLayout.next(mainCardPanel);
+	}
+
 	// ****************************************************************
 	// *** Constructor
 	// ****************************************************************
@@ -127,8 +116,7 @@ public class SimulaEditor extends JFrame {
         Global.console.write(Global.simulaVersion+"\n");
         
         // Set the initial size of the window
-        int frameHeight=800;//500;
-        int topHeight=500;//300;
+        int frameHeight=800;
         int frameWidth=1000;
         setSize(frameWidth, frameHeight);
 
@@ -142,32 +130,12 @@ public class SimulaEditor extends JFrame {
         setLocationRelativeTo(null); // center the frame on screen
 
         getContentPane().setLayout(new BorderLayout()); // the BorderLayout bit makes it fill it automatically
-        if(Option.TESTING_NEW_LAYOUT) {
-        	CardLayout cardLayout = new CardLayout();
-        	JPanel mainCardPanel = new JPanel(cardLayout);
-	        getContentPane().add(mainCardPanel);
-	        mainCardPanel.setBackground(Color.YELLOW);
-	        getContentPane().setBackground(Color.YELLOW);
-	        this.setBackground(Color.YELLOW);
-//	        JPanel welcomePanel = new JPanel();
-////	        welcomePanel.setBackground(Color.LIGHT_GRAY);
-//	        welcomePanel.setBackground(Color.YELLOW);
-//	        welcomePanel.add(new JLabel("Welcome to SIMULA EDITOR IDE"));
-	        WelcomePanel welcomePanel = new WelcomePanel();
-	        mainCardPanel.add(welcomePanel);
- 
-	        mainCardPanel.setBackground(Color.YELLOW);
-	        getContentPane().setBackground(Color.YELLOW);
-	        this.setBackground(Color.YELLOW);
-	        ((JPanel)this.getContentPane()).setOpaque(false);
-        } else {
-        	TabbedTextHandler.doOpenTabbedPane();
-        	boolean continuousLayout = true;
-	        JSplitPane splitPane1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,continuousLayout, TabbedTextHandler.tabbedPane,Global.console);
-	        splitPane1.setOneTouchExpandable(true);
-	        splitPane1.setDividerLocation(topHeight);
-	        getContentPane().add(splitPane1);
-        }
+    	cardLayout = new CardLayout();
+    	mainCardPanel = new JPanel(cardLayout);
+        getContentPane().add(mainCardPanel);
+        
+        WelcomePanel welcomePanel = new WelcomePanel();
+        mainCardPanel.add(welcomePanel,"Welcome");
 
         autoRefresher=new AutoRefresher(); autoRefresher.start();
 
@@ -424,10 +392,17 @@ public class SimulaEditor extends JFrame {
 			while (!stoped) {
 				try { sleep(100); } catch (InterruptedException e) {}
 				if ((counter--) <= 0) {
-					try { if (TabbedTextHandler.currentTextPanel.AUTO_REFRESH && TabbedTextHandler.currentTextPanel != null && TabbedTextHandler.currentTextPanel.refreshNeeded) {
-						TabbedTextHandler.currentTextPanel.refreshNeeded = false;
-							  menuBar.refresh.doClick();
-						  }
+					try {
+//						if (TabbedTextHandler.currentTextPanel.AUTO_REFRESH
+//								&& TabbedTextHandler.currentTextPanel != null
+//								&& TabbedTextHandler.currentTextPanel.refreshNeeded) {
+//							TabbedTextHandler.currentTextPanel.refreshNeeded = false;
+						if (Global.currentModule.AUTO_REFRESH
+								&& Global.currentModule != null
+								&& Global.currentModule.refreshNeeded) {
+							Global.currentModule.refreshNeeded = false;
+							menuBar.refresh.doClick();
+						}
 					} catch (Throwable t) {}
 				}
 			}

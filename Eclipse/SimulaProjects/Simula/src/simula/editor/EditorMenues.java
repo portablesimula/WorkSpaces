@@ -10,18 +10,13 @@ import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.URI;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -43,7 +38,6 @@ import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.SimulaEditor.Language;
 import simula.psi.PsiTree;
 import simula.psi.SyntaxTree;
 
@@ -287,7 +281,8 @@ public class EditorMenues extends JMenuBar {
 	// ****************************************************************
 	/// Update menu items.
 	void updateMenuItems() {
-		SourceTextPanel current=TabbedTextHandler.currentTextPanel;
+//		SourceTextPanel current=TabbedTextHandler.currentTextPanel;
+		SourceModule current=Global.currentModule;
 		boolean source=false;
 		boolean text=false;
 		boolean mayRun=false;
@@ -297,13 +292,14 @@ public class EditorMenues extends JMenuBar {
 		boolean canUndo=false;
 		if(current!=null) {
 			source=true;
-			String editText=current.editTextPane.getText();
+//			String editText=current.editTextPane.getText();
+			String editText=current.getUpdatedText();
 			if(editText!=null && editText.trim().length()!=0) text=true; 
 			if(current.lang==SimulaEditor.Language.Simula && text) mayRun=true;
 			if(current.lang==SimulaEditor.Language.Simula && editText!=null && editText.trim().length()!=0) text=true; 
 			fileChanged=current.fileChanged;
 			auto=source && current.AUTO_REFRESH;
-			UndoManager undoManager = current.getUndoManager();
+			UndoManager undoManager = current.undoManager;
 			canUndo=undoManager.canUndo();
 		}
 		saveFile.setEnabled(fileChanged); saveFile2.setEnabled(fileChanged);
@@ -335,8 +331,9 @@ public class EditorMenues extends JMenuBar {
 	ActionListener actionListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			Object item=e.getSource();
-			SourceTextPanel current=TabbedTextHandler.currentTextPanel;
-			if(item==newFile || item==newFile2) TabbedTextHandler.doNewTabbedPanel(null, "", SimulaEditor.Language.Simula);
+//			SourceTextPanel current=TabbedTextHandler.currentTextPanel;
+			SourceModule current=Global.currentModule;
+			if(item==newFile || item==newFile2) TabbedTextHandler.doNewFileAction();
 			else if(item==openFile || item==openFile2) TabbedTextHandler.doOpenFileAction();
 			else if(item==saveFile || item==saveFile2) TabbedTextHandler.doSaveCurrentFile(false);
 			else if(item==saveAs   || item==saveAs2) TabbedTextHandler.doSaveCurrentFile(true);
@@ -374,8 +371,9 @@ public class EditorMenues extends JMenuBar {
 	// ****************************************************************
 	/// The undo action
 	private void undoAction() {
-		SourceTextPanel current=TabbedTextHandler.currentTextPanel;
-		current.getUndoManager().undo();
+//		SourceTextPanel current=TabbedTextHandler.currentTextPanel;
+		SourceModule current=Global.currentModule;
+		current.undoManager.undo();
 		current.fileChanged=true; current.refreshNeeded=true;
 		updateMenuItems();
 	}
@@ -446,10 +444,11 @@ public class EditorMenues extends JMenuBar {
 //	}
 	private void doStartRunning() {
 		TabbedTextHandler.maybeSaveCurrentFile();
-		SourceTextPanel current=TabbedTextHandler.currentTextPanel;			
+//		SourceTextPanel current=TabbedTextHandler.currentTextPanel;			
+		SourceModule current=Global.currentModule;
 //		PsiTree psiTree = current.currentModule.getPsiTree();
-		String sourceFileName = current.currentModule.getName();
-		ProgramModule programModule = current.currentModule.getSyntaxTree();
+		String sourceFileName = current.getName();
+		ProgramModule programModule = current.getSyntaxTree();
 		
 		IO.println("EditorMenues.doStartRunning: programModule: "+programModule);
 		IO.println("EditorMenues.doStartRunning: programModule'identifier: "+programModule.getIdentifier());
@@ -463,7 +462,8 @@ public class EditorMenues extends JMenuBar {
 					e.printStackTrace();
 			}});
 			// Start compiler ....
-			Util.ASSERT(TabbedTextHandler.currentTextPanel!=null,"EditorMenues.doRunAction: Invariant-1");
+//			Util.ASSERT(TabbedTextHandler.currentTextPanel!=null,"EditorMenues.doRunAction: Invariant-1");
+			Util.ASSERT(current.textPanel!=null,"EditorMenues.doRunAction: Invariant-1");
 //			String text=SimulaEditor.currentTextPanel.editTextPane.getText();
 //			StringReader reader=new StringReader(text);
 //			String name=(file!=null)?file.getPath():Global.tempJavaFileDir+"/unnamed.sim";
@@ -518,7 +518,8 @@ public class EditorMenues extends JMenuBar {
 			SourceModule current = Global.currentModule;
 			current.buildPsiAndSyntaxTrees();
 			PsiTree psiTree = current.getPsiTree();
-			TabbedTextHandler.doNewTabbedPsiPanel(psiTree, "PSI:", Language.Simula);
+//			TabbedTextHandler.doNewTabbedPsiPanel(psiTree, "PSI:", Language.Simula);
+			TabbedTextHandler.doNewTabbedPsiPanel(psiTree, "PSI:");
 		});
 //		Thread.dumpStack();
 	}
@@ -530,7 +531,8 @@ public class EditorMenues extends JMenuBar {
 	private void doRenderFromOLDAction() {
 		SwingUtilities.invokeLater(() -> {
 			SourceModule current = Global.currentModule;
-			TabbedTextHandler.doNewTabbedPanel(current.sourceFile, "OLD:", Language.Simula);
+//			TabbedTextHandler.doNewTabbedPanel(current.sourceFile, "OLD:", Language.Simula);
+			TabbedTextHandler.doNewTabbedPanel(current.sourceFile, "OLD:");
 		});
 		Thread.dumpStack();
 	}

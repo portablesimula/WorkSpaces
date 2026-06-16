@@ -9,6 +9,7 @@ import java.util.Properties;
 
 import javax.swing.SwingUtilities;
 
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 public class Palette {
@@ -30,7 +31,7 @@ public class Palette {
     public static Color HoverBackground;
 
 	/// The color themes used by Simula Editor.
-	public static String[] themeNames = {" Light Intellij", " Dark Intellij", " Light Mode", " Dark Mode", " Old SimEditor"};
+	public static String[] themeNames = {" Atom Light", " Atom Dark", " Light Mode", " Dark Mode", " Old SimEditor"};
 
 	public static int getThemeIndex(String themeName) {
     	for(int i=0;i<themeNames.length;i++) {
@@ -43,12 +44,13 @@ public class Palette {
     public static void init() {
 //    	IO.println("Palette.init: ");
 //    	Thread.dumpStack();
-    	loadAndRenderPalette(null, false);
+//    	loadAndRenderPalette(null, false);
+    	loadAndRenderPalette(Option.selectedTheme, false);
     }
 
 	public static void loadAndRenderPalette(String themeName, boolean reset) {
 		currentThemeName = (themeName != null)? themeName : themeNames[0];
-//		IO.println("Palette.loadAndRenderPalette: " + currentThemeName);
+		IO.println("Palette.loadAndRenderPalette: " + currentThemeName);
 		loadThemeProperties(currentThemeName, reset);
 //		printColors("Palette.loadAndRenderPalette: " + currentThemeName); // DEBUG info
 	}
@@ -115,57 +117,63 @@ public class Palette {
     	}
     }
 
-    public static void initLightIntellij(Properties properties) {
-//		Core Language Defaults HighlightingBelow are the exact default hex codes used for standard language tokens across both major default schemes:Code ElementDarcula (Dark) HexIntelliJ Light HexDescription
-//		Keywords#CC7832 (Orange)#0033B3 (Blue)public, class, return, if
-//		Strings#6A8759 (Olive Green)#067D17 (Green)Text wrapped in quotes "..."
-//		Numbers#6897BB (Light Blue)#1750EB (Blue)Integer and floating-point literals
-//		Comments#808080 (Gray)#8C8C8C (Gray)Line (//) and block (/*) comments
-//		Instance Fields#9876AA (Purple)#871094 (Purple)Non-static class variables
-//		Static Fields#9876AA (Italic Purple)#871094 (Italic Purple)Global class variables
-//		Method Declarations#FFC66D (Yellow)#00627A (Teal)Functions and methods being defined
-//		Method Calls#A9B7C6 (Light Gray)#000000 (Black)Executed method names
-//		Classes/Interfaces#A9B7C6 (Light Gray)#000000 (Black)Type identifiers and declarations
-//		Annotations#BBB529 (Khaki)#9E880D (Dark Yellow)Metadata markers like @Override
-//		Type Parameters#507874 (Dark Teal)#007874 (Teal)Generic types like <T>
-//
-//
-//		General Editor Highlighting
-//		Beyond source code text, IntelliJ utilizes functional highlighting for text states, focus management, and error tracking:
-//		Selection Foreground: Transparent text layer utilizing a background block of #214283 (Darcula) or #A6D2FF (Light).
-//		Identifier under caret: Adds a background block of #344134 (Darcula) or #E2E6D6 (Light) to automatically match all matching variable instances.
-//		Identifier under caret (write): Highlights re-assigned variables using #403333 (Darcula) or #F2E2E2 (Light).
-//		Search Results: Found text highlights with an active background of #32593D (Darcula) or #BCE2C3 (Light).
-//		Errors (Bad Characters): Highlighted with an aggressive red underline or full background block using #BC3F3C.	
-    	TextPaneForeground   = Color.decode(properties.getProperty("textPane.foreground",   "#000001")); // Black
-    	TextPaneBackground   = Color.decode(properties.getProperty("textPane.background",   "#FFFFFF")); // White
-    	LineNumberForeground = Color.decode(properties.getProperty("lineNumber.foreground", "#8C8C8C")); // Gray
-    	LineNumberBackground = Color.decode(properties.getProperty("lineNumber.background", "#FFFFFF")); // White
-    	ClassIdentForeground = Color.decode(properties.getProperty("classIdent.foreground", "#000000")); // Black
-    	ProcedureForeground  = Color.decode(properties.getProperty("procedure.foreground",  "#00627A")); // Teal
-    	CommentForeground    = Color.decode(properties.getProperty("comment.foreground",    "#8C8C8C")); // Gray
-    	KeywordForeground    = Color.decode(properties.getProperty("keyword.foreground",    "#0033B3")); // Gray
-    	ConstantForeground   = Color.decode(properties.getProperty("constant.foreground",   "#067D17")); // Green        
-    	ErrorForeground      = Color.decode(properties.getProperty("error.foreground",      "#FFFFFF")); // White
-    	ErrorBackground      = Color.decode(properties.getProperty("error.background",      "#FF0000")); // Red
-    	HoverForeground      = Color.decode(properties.getProperty("hover.foreground",      "#FF0000")); // Red
-    	HoverBackground      = Color.decode(properties.getProperty("hover.background",      "#FFFF00")); // Yellow
+    // Atom One Light
+    // Element / Kodefunksjon                   HEX-kode    Visuell farge
+    // Bakgrunn (Editor)						#fafafa		Tilnærmet hvit
+    // Bakgrunn (Sidepaneler/UI)				#eaeaea		Lys grå
+    // Normal tekst / Foreground				#383a42		Mørk koksgrå
+    // Kommentarer (Comments)					#a0a1a7		Lys sølvgrå
+    // Nøkkelord (Keywords)						#a626a4		Dyp lilla
+    // Funksjoner & Definisjoner				#4078f2		Klar kongeblå
+    // Strenger (Strings)						#50a14f		Mørkegrønn
+    // Tall & Konstanter						#986801		Okergul / Brun
+    // Innebygde elementer (Built-ins)			#0184bc		Mørk cyan
+    // Klasse-variabler / Variabler				#e45649		Terracotta / Rød
+    
+    public static void initAtomLight(Properties properties) {
+    	TextPaneForeground   = Color.decode(properties.getProperty("textPane.foreground",   "#383a42"));
+    	TextPaneBackground   = Color.decode(properties.getProperty("textPane.background",   "#fafafa"));
+    	LineNumberForeground = Color.decode(properties.getProperty("lineNumber.foreground", "#fafafa"));
+    	LineNumberBackground = Color.decode(properties.getProperty("lineNumber.background", "#eaeaea"));
+    	ClassIdentForeground = Color.decode(properties.getProperty("classIdent.foreground", "#e45649"));
+    	ProcedureForeground  = Color.decode(properties.getProperty("procedure.foreground",  "#4078f2"));
+    	CommentForeground    = Color.decode(properties.getProperty("comment.foreground",    "#a0a1a7"));
+    	KeywordForeground    = Color.decode(properties.getProperty("keyword.foreground",    "#a626a4"));
+    	ConstantForeground   = Color.decode(properties.getProperty("constant.foreground",   "#986801"));        
+    	ErrorForeground      = Color.decode(properties.getProperty("error.foreground",      "#FFFFFF"));
+    	ErrorBackground      = Color.decode(properties.getProperty("error.background",      "#FF0000"));
+    	HoverForeground      = Color.decode(properties.getProperty("hover.foreground",      "#FF0000"));
+    	HoverBackground      = Color.decode(properties.getProperty("hover.background",      "#FFFF00"));
     }
 
-	private static void initDarkIntellij(Properties properties) {
-    	TextPaneForeground   = Color.decode(properties.getProperty("textPane.foreground",   "#FFFFFF")); // White
-    	TextPaneBackground   = Color.decode(properties.getProperty("textPane.background",   "#404040")); // Dark gray
-    	LineNumberForeground = Color.decode(properties.getProperty("lineNumber.foreground", "#808080")); // Gray
-    	LineNumberBackground = Color.decode(properties.getProperty("lineNumber.background", "#FFFFFF")); // White
-    	ClassIdentForeground = Color.decode(properties.getProperty("classIdent.foreground", "#A9B7C6")); // Light gray
-    	ProcedureForeground  = Color.decode(properties.getProperty("procedure.foreground",  "#FFC66D")); // Yellow
-    	CommentForeground    = Color.decode(properties.getProperty("comment.foreground",    "#808080")); // Gray
-    	KeywordForeground    = Color.decode(properties.getProperty("keyword.foreground",    "#CC7832")); // Gray
-    	ConstantForeground   = Color.decode(properties.getProperty("constant.foreground",   "#6A8759")); // Green        
-    	ErrorForeground      = Color.decode(properties.getProperty("error.foreground",      "#FFFFFF")); // White
-    	ErrorBackground      = Color.decode(properties.getProperty("error.background",      "#FF0000")); // Red
-    	HoverForeground      = Color.decode(properties.getProperty("hover.foreground",      "#FF0000")); // Red
-    	HoverBackground      = Color.decode(properties.getProperty("hover.background",      "#FFFF00")); // Yellow
+    // Atom One Dark
+    // Element / Kodefunksjon                   HEX-kode    Visuell farge
+    // Bakgrunn (Editor)						#282c34		Mørk gråblå
+    // Bakgrunn (Sidepaneler/UI)				#21252b		Enda mørkere grå
+    // Normal tekst / Foreground				#abb2bf		Lys gråhvit
+    // Kommentarer (Comments)					#5c6370		Dempet grågrønn
+    // Nøkkelord (Keywords / Syntax)			#c678dd		Lilla / Magenta
+    // Funksjoner & Definisjoner				#61afef		Klar blå
+    // Strenger (Strings)						#98c379		Dus grønn
+    // Tall & Konstanter						#d19a66		Lys oransje / Brun
+    
+    // Innebygde elementer (Built-ins) / RegEx	#56b6c2		Cyan / Turkis
+    // Klasse-variabler / Preprosessering		#e06c75		Svak rød / Korall
+    // Søk- / Valgmarkeringsbakgrunn			#3e4451		Medium gråblå
+	private static void initAtomDark(Properties properties) {
+    	TextPaneForeground   = Color.decode(properties.getProperty("textPane.foreground",   "#abb2bf"));
+    	TextPaneBackground   = Color.decode(properties.getProperty("textPane.background",   "#282c34"));
+    	LineNumberForeground = Color.decode(properties.getProperty("lineNumber.foreground", "#abb2bf"));
+    	LineNumberBackground = Color.decode(properties.getProperty("lineNumber.background", "#21252b"));
+    	ClassIdentForeground = Color.decode(properties.getProperty("classIdent.foreground", "#e06c75"));
+    	ProcedureForeground  = Color.decode(properties.getProperty("procedure.foreground",  "#61afef"));
+    	CommentForeground    = Color.decode(properties.getProperty("comment.foreground",    "#33FF00")); // #5c6370	
+    	KeywordForeground    = Color.decode(properties.getProperty("keyword.foreground",    "#c678dd"));
+    	ConstantForeground   = Color.decode(properties.getProperty("constant.foreground",   "#d19a66"));        
+    	ErrorForeground      = Color.decode(properties.getProperty("error.foreground",      "#FFFFFF"));
+    	ErrorBackground      = Color.decode(properties.getProperty("error.background",      "#FF0000"));
+    	HoverForeground      = Color.decode(properties.getProperty("hover.foreground",      "#FF0000"));
+    	HoverBackground      = Color.decode(properties.getProperty("hover.background",      "#FFFF00"));
 	}
 	
 	private static void initLightMode(Properties properties) {
@@ -218,9 +226,10 @@ public class Palette {
 //		Inaktiv fane: #2D2D2D (Mørkere grå)
 //		Statuslinje: #007ACC (Klassisk VS Code blå)
 //		Tekstmarkering: #264F78 (Mørk blå)
+		IO.println("Palette.initDarkMode: ");
     	TextPaneForeground   = Color.decode(properties.getProperty("textPane.foreground",   "#FFFFFF"));
-    	TextPaneBackground   = Color.decode(properties.getProperty("textPane.background",   "#404040"));
-    	LineNumberForeground = Color.decode(properties.getProperty("lineNumber.foreground", "#808080"));
+    	TextPaneBackground   = Color.decode(properties.getProperty("textPane.background",   "#282c34"));
+    	LineNumberForeground = Color.decode(properties.getProperty("lineNumber.foreground", "#abb2bf"));
     	LineNumberBackground = Color.decode(properties.getProperty("lineNumber.background", "#FFFFFF"));
     	ClassIdentForeground = Color.decode(properties.getProperty("classIdent.foreground", "#FFCC00"));
     	ProcedureForeground  = Color.decode(properties.getProperty("procedure.foreground",  "#DCDCAA"));
@@ -284,8 +293,8 @@ public class Palette {
 		        } catch (IOException e) {}
 			}
 		}
-		if(themeName.equals(themeNames[0])) initLightIntellij(properties);
-		else if(themeName.equals(themeNames[1])) initDarkIntellij(properties);
+		if(themeName.equals(themeNames[0])) initAtomLight(properties);
+		else if(themeName.equals(themeNames[1])) initAtomDark(properties);
 		else if(themeName.equals(themeNames[2])) initLightMode(properties);
 		else if(themeName.equals(themeNames[3])) initDarkMode(properties);
 		else if(themeName.equals(themeNames[4])) initOldSimulaEditor(properties);
@@ -296,6 +305,7 @@ public class Palette {
 		File simulaPropertiesDir = new File(USER_HOME, ".simula");
 		String fileName = ("simulaEditorTheme"+themeName+".xml").replace(' ', '_');
 		File themeSettingsFile = new File(simulaPropertiesDir, fileName);
+    	IO.println("Palette.getThemeSettingsFile: " + themeSettingsFile);
 		return themeSettingsFile;
 	}
 
@@ -317,6 +327,7 @@ public class Palette {
     	properties.setProperty("hover.foreground", toHex(HoverForeground));
     	properties.setProperty("hover.background", toHex(HoverBackground));
         try (FileOutputStream oupt = new FileOutputStream(getThemeSettingsFile(themeName))) {
+        	IO.println("Palette.storeCurrentThemeProperties: ");
         	properties.storeToXML(oupt, "Simula Editor Theme " + themeName + " Properties", "UTF-8");
         } catch (IOException e) {}
 		

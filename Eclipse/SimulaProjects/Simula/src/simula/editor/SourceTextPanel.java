@@ -5,37 +5,19 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.editor;
 
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
-import javax.swing.text.AbstractDocument.LeafElement;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.Element;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
-import javax.swing.undo.UndoManager;
-import javax.swing.undo.UndoableEdit;
-
 import simula.compiler.SourceModule;
 import simula.compiler.parsing.DefaultScanner;
 import simula.compiler.parsing.SimulaScanner;
+import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Token;
-import simula.compiler.utilities.Util;
-
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.File;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.StringTokenizer;
@@ -47,17 +29,17 @@ import java.util.StringTokenizer;
 /// 
 /// @author Øystein Myhre Andersen
 @SuppressWarnings("serial")
-public class SourceTextPanel extends JPanel {
+public class SourceTextPanel extends TabTextPanel {
 	/// DEBUG on/off
 	private static final boolean DEBUG=false;//true;
 	
-	public SourceModule currentModule;
-
-	/// The line number side-panel.
-	private JTextPane lineNumbers;
-	
-	/// The ScrollPane
-	private JScrollPane styleScrollPane;
+//	public SourceModule currentModule;
+//
+//	/// The line number side-panel.
+//	private JTextPane lineNumbers;
+//	
+//	/// The ScrollPane
+//	private JScrollPane styleScrollPane;
  	
 	/** Style */ private Style styleRegular;
 	/** Style */ private Style styleKeyword;
@@ -65,94 +47,95 @@ public class SourceTextPanel extends JPanel {
 	/** Style */ private Style styleConstant;
 	/** Style */ private Style styleLineNumber;
 	
-	/// The popup Menu.
-	private JPopupMenu popupMenu;
+//	/// The popup Menu.
+//	private JPopupMenu popupMenu;
+//	
+//	/// The StyledDocument.
+//	private StyledDocument doc;
+//	
+//	/// Editable text pane with undo/redo history.
+//	JTextPane editTextPane;
 	
-	/// The StyledDocument.
-	private StyledDocument doc;
-	
-	/// Editable text pane with undo/redo history.
-	JTextPane editTextPane;
-	
-	/// Current language.
-    SimulaEditor.Language lang;
-
-	
+//	/// Current language.
+//    SimulaEditor.Language lang;
+//
+//	
 //	/// The source file.
 //	File sourceFile;
-	
-	/// Signals auto refresh.
-    boolean AUTO_REFRESH=true;//false;
-
-	/// The undo manager.
-	private UndoManager undoManager = new UndoManager();
-	
-	/// Returns the undo manager.
-	/// @return the undo manager
-	UndoManager getUndoManager() { return(undoManager); }
-	
-    /// Indicates that the source file has changed.
-    boolean fileChanged = false;
-    
-    /// Indicates that refresh is needed.
-    boolean refreshNeeded = false;
-
-	// ****************************************************************
-	// *** UndoableEditListener
-	// ****************************************************************
-    /// The UndoableEditListener.
-    private UndoableEditListener undoListener=new UndoableEditListener() {
-		public void undoableEditHappened(UndoableEditEvent e) {
-			UndoableEdit edit=e.getEdit();
-			undoManager.addEdit(edit);
-			fileChanged=true; refreshNeeded=true;
-			SimulaEditor.menuBar.updateMenuItems();
-		}
-	};
-
-	// ****************************************************************
-	// *** MouseListener
-	// ****************************************************************
-	/// The MouseListener.
-    MouseListener mouseListener = new MouseListener() {
-		public void mousePressed(MouseEvent e) {}
-		public void mouseReleased(MouseEvent e) {}
-		public void mouseEntered(MouseEvent e) {}
-		public void mouseExited(MouseEvent e) {}
-		public void mouseClicked(MouseEvent e) {
-    	    if(e.getButton()==3) popupMenu.show(editTextPane,e.getX(),e.getY());
-    	}
-    };
-
-	// ****************************************************************
-	// *** DocumentListener
-	// ****************************************************************
-    /// The DocumentListener.
-	DocumentListener documentListener=new DocumentListener() {
-		public void insertUpdate(DocumentEvent e)  { debugTrace("Insert",e); }
-		public void removeUpdate(DocumentEvent e)  { debugTrace("Remove",e); }
-		public void changedUpdate(DocumentEvent e) { debugTrace("Changed",e); }
-		
-		private void debugTrace(String id,DocumentEvent evt) {
-			if(DEBUG) {
-			    int ofst=evt.getOffset();
-			    int lng=evt.getLength();
-			    String styleName="UNKNOWN";
-			    String lastText="UNKNOWN";
-				try { // debugTrace
-				    StyledDocument doc=(StyledDocument)editTextPane.getDocument();
-				    if(id.equals("Insert")) lastText= doc.getText(ofst,lng);
-				    if(id.equals("addition")) lastText= doc.getText(ofst,lng);
-				    Element elt=doc.getCharacterElement(ofst);
-				    if(elt instanceof LeafElement leaf) {
-					    styleName=(String)leaf.getAttribute(StyleConstants.NameAttribute);
-				    }
-				    lastText=lastText.replace("\n","\\n");
-				} catch (Exception ex) { Util.IERR("Impossible",ex); }			
-				IO.println("DocumentListener: "+id + '[' + ofst + ',' + lng + "]="+styleName+"\"" + lastText + '"');
-			}
-		}	
-	};
+//	
+//	/// Signals auto refresh.
+//    boolean AUTO_REFRESH=true;//false;
+//
+//	/// The undo manager.
+//	private UndoManager undoManager = new UndoManager();
+//	
+//	/// Returns the undo manager.
+//	/// @return the undo manager
+//	UndoManager getUndoManager() { return(undoManager); }
+//	
+//    /// Indicates that the source file has changed.
+//    boolean fileChanged = false;
+//    
+//    /// Indicates that refresh is needed.
+//    boolean refreshNeeded = false;
+//
+//	// ****************************************************************
+//	// *** UndoableEditListener
+//	// ****************************************************************
+//    /// The UndoableEditListener.
+//    private UndoableEditListener undoListener=new UndoableEditListener() {
+//		public void undoableEditHappened(UndoableEditEvent e) {
+//			UndoableEdit edit=e.getEdit();
+//			Global.currentModule.undoManager.addEdit(edit);
+//			Global.currentModule.fileChanged=true;
+//			Global.currentModule.refreshNeeded=true;
+//			SimulaEditor.menuBar.updateMenuItems();
+//		}
+//	};
+//
+//	// ****************************************************************
+//	// *** MouseListener
+//	// ****************************************************************
+//	/// The MouseListener.
+//    MouseListener mouseListener = new MouseListener() {
+//		public void mousePressed(MouseEvent e) {}
+//		public void mouseReleased(MouseEvent e) {}
+//		public void mouseEntered(MouseEvent e) {}
+//		public void mouseExited(MouseEvent e) {}
+//		public void mouseClicked(MouseEvent e) {
+//    	    if(e.getButton()==3) popupMenu.show(editTextPane,e.getX(),e.getY());
+//    	}
+//    };
+//
+//	// ****************************************************************
+//	// *** DocumentListener
+//	// ****************************************************************
+//    /// The DocumentListener.
+//	DocumentListener documentListener=new DocumentListener() {
+//		public void insertUpdate(DocumentEvent e)  { debugTrace("Insert",e); }
+//		public void removeUpdate(DocumentEvent e)  { debugTrace("Remove",e); }
+//		public void changedUpdate(DocumentEvent e) { debugTrace("Changed",e); }
+//		
+//		private void debugTrace(String id,DocumentEvent evt) {
+//			if(DEBUG) {
+//			    int ofst=evt.getOffset();
+//			    int lng=evt.getLength();
+//			    String styleName="UNKNOWN";
+//			    String lastText="UNKNOWN";
+//				try { // debugTrace
+//				    StyledDocument doc=(StyledDocument)editTextPane.getDocument();
+//				    if(id.equals("Insert")) lastText= doc.getText(ofst,lng);
+//				    if(id.equals("addition")) lastText= doc.getText(ofst,lng);
+//				    Element elt=doc.getCharacterElement(ofst);
+//				    if(elt instanceof LeafElement leaf) {
+//					    styleName=(String)leaf.getAttribute(StyleConstants.NameAttribute);
+//				    }
+//				    lastText=lastText.replace("\n","\\n");
+//				} catch (Exception ex) { Util.IERR("Impossible",ex); }			
+//				IO.println("DocumentListener: "+id + '[' + ofst + ',' + lng + "]="+styleName+"\"" + lastText + '"');
+//			}
+//		}	
+//	};
 	
 	// ****************************************************************
 	// *** Constructor
@@ -161,49 +144,51 @@ public class SourceTextPanel extends JPanel {
 	/// @param sourceFile the source file
 	/// @param lang the language
 	/// @param popupMenu the popupMenu
-    SourceTextPanel(SourceModule currentModule, SimulaEditor.Language lang, JPopupMenu popupMenu) {
-    	this.currentModule = currentModule;
+//    SourceTextPanel(SimulaEditor.Language lang, JPopupMenu popupMenu) {
+    SourceTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
+    	super(sourceModule, popupMenu);
+//    	this.currentModule = currentModule;
 //    	this.sourceFile=sourceFile;
-    	this.lang=lang;
-    	this.popupMenu=popupMenu;
-        editTextPane = new JTextPane(); editTextPane.setEditable(false);
-        editTextPane.addMouseListener(mouseListener);
-        
-        lineNumbers = new JTextPane(); lineNumbers.setEditable(false);
-        JPanel extra=new JPanel();
-        
-        doc=new DefaultStyledDocument(); addStylesToDocument(doc);
-        doc.putProperty(DefaultEditorKit.EndOfLineStringProperty,"\n");
-    	doc.addUndoableEditListener(undoListener);
-    	doc.addDocumentListener(documentListener);
-        editTextPane.setStyledDocument(doc);
-        editTextPane.setEditable(true);
-        
-        extra.setLayout(new BorderLayout());
-        extra.add(lineNumbers,BorderLayout.WEST);
-        extra.add(editTextPane,BorderLayout.CENTER);
-       
-        styleScrollPane = new JScrollPane(extra);        
-        styleScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        
-        this.setLayout(new BorderLayout());
-        this.add(styleScrollPane,BorderLayout.CENTER);
+//    	this.lang=lang;
+//    	this.popupMenu=popupMenu;
+//        editTextPane = new JTextPane(); editTextPane.setEditable(false);
+//        editTextPane.addMouseListener(mouseListener);
+//        
+//        lineNumbers = new JTextPane(); lineNumbers.setEditable(false);
+//        JPanel extra=new JPanel();
+//        
+//        doc=new DefaultStyledDocument(); addStylesToSourceDocument(doc);
+//        doc.putProperty(DefaultEditorKit.EndOfLineStringProperty,"\n");
+//    	doc.addUndoableEditListener(undoListener);
+//    	doc.addDocumentListener(documentListener);
+//        editTextPane.setStyledDocument(doc);
+//        editTextPane.setEditable(true);
+//        
+//        extra.setLayout(new BorderLayout());
+//        extra.add(lineNumbers,BorderLayout.WEST);
+//        extra.add(editTextPane,BorderLayout.CENTER);
+//       
+//        styleScrollPane = new JScrollPane(extra);        
+//        styleScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+//        
+//        this.setLayout(new BorderLayout());
+//        this.add(styleScrollPane,BorderLayout.CENTER);
     }
     
 
-	public String getText() {
-		// TODO Auto-generated method stub
-//		String text = doc.getText(doc.getStartPosition(), doc.getLength());
-		try {
-			String text = doc.getText(0, doc.getLength());
-//			IO.println("SourceTextPanel.getText: |" + text.replace("\r", "\\r").replace("\n", "\\n")+'|');
-			return text;
-		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
+//	public String getText() {
+//		// TODO Auto-generated method stub
+////		String text = doc.getText(doc.getStartPosition(), doc.getLength());
+//		try {
+//			String text = doc.getText(0, doc.getLength());
+////			IO.println("SourceTextPanel.getText: |" + text.replace("\r", "\\r").replace("\n", "\\n")+'|');
+//			return text;
+//		} catch (BadLocationException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return null;
+//	}
 
 
 	// ****************************************************************
@@ -213,7 +198,7 @@ public class SourceTextPanel extends JPanel {
     /// @param reader the source file reader
     /// @param caretPosition argument
     void fillTextPane(Reader reader,int caretPosition) {
-    	switch(lang) {
+    	switch(Global.currentModule.lang) {
 			case Simula: fillTextPane(caretPosition,new SimulaScanner(reader,true)); break;
 //			case Java:   fillTextPane(caretPosition,new DefaultScanner(reader)); break;
 			default:     fillTextPane(caretPosition,new DefaultScanner(reader)); break;
@@ -228,7 +213,7 @@ public class SourceTextPanel extends JPanel {
     /// @param preScanner the scanner to use
     private void fillTextPane(int caretPosition,DefaultScanner preScanner) {
 		int lineNumber=1;
-		StyledDocument lin=new DefaultStyledDocument(); addStylesToDocument(lin);
+		StyledDocument lin=new DefaultStyledDocument(); addStylesToSourceDocument(lin);
         editTextPane.setEditable(false);
     	doc.removeUndoableEditListener(undoListener);
 		try {
@@ -249,7 +234,7 @@ public class SourceTextPanel extends JPanel {
 		} catch (BadLocationException ble) {
 			System.err.println("Couldn't insert text into text pane.");
 		}
-		if(lineNumber>500) this.AUTO_REFRESH=false;
+		if(lineNumber>500) Global.currentModule.AUTO_REFRESH=false;
 		lineNumbers.setStyledDocument(lin);
     	doc.addUndoableEditListener(undoListener);
         editTextPane.setEditable(true);
@@ -260,7 +245,7 @@ public class SourceTextPanel extends JPanel {
 	// *** doRefresh
 	// ****************************************************************
     /// Do refresh action.
-	void doRefresh() {
+	public void doRefresh() {
 	    int pos=editTextPane.getCaretPosition();
 	    String txt=editTextPane.getText();
 	    if(!txt.endsWith("\n")) txt=txt+'\n';
@@ -314,7 +299,8 @@ public class SourceTextPanel extends JPanel {
     
     /// Add Styles to the document.
     /// @param doc the document
-    private void addStylesToDocument(final StyledDocument doc) {
+    @Override
+    protected void addStylesToSourceDocument(final StyledDocument doc) {
         //Initialize some styles.
         Style defaultStyle = StyleContext.getDefaultStyleContext().
                         getStyle(StyleContext.DEFAULT_STYLE);
@@ -348,8 +334,8 @@ public class SourceTextPanel extends JPanel {
     @Override
     public String toString() {
     	String s="SourceTextPanel(";
-        s=s+currentModule.getName();
-    	if(this.AUTO_REFRESH) s=s+",AUTO_REFRESH";
+//        s=s+currentModule.getName();
+//    	if(this.AUTO_REFRESH) s=s+",AUTO_REFRESH";
     	s=s+')';
     	return(s);
     }

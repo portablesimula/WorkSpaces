@@ -27,6 +27,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import simula.editor.Palette;
+
 /// Compile Time Options.
 /// 
 /// Link to GitHub: <a href=
@@ -36,7 +38,7 @@ import javax.swing.JTextField;
 public final class Option {
 	public static boolean PSI_VERIFY = true;
 
-	public static boolean TESTING_NEW_LAYOUT = true;
+//	public static boolean TESTING_CLOSEABLE_TAB = true;
 //	public static boolean TESTING_EOF = true;
 	
 	public static int TRACE_PSITREE_START_DONE = 0;
@@ -47,6 +49,9 @@ public final class Option {
 	/// See: https://docs.oracle.com/en/java/javase/25/troubleshoot/java-2d-properties.html
 	public static String editorUIScale;
 
+	/// The currently selected Color Theme
+	public static String selectedTheme;
+	
 	/// The Compiler Modes.
 	public enum CompilerMode { 
     	/** Generate Java source and use Java compiler to generate JavaClass files. */					viaJavaSource,
@@ -160,6 +165,7 @@ public final class Option {
 	/// Initiate Compiler options.
 	public static void InitCompilerOptions() {
 		Option.editorUIScale = "1.0";
+		Option.selectedTheme = Palette.themeNames[0];
 //		CompilerMode compilerMode=CompilerMode.viaJavaSource;
 		compilerMode = CompilerMode.directClassFiles;
 //		compilerMode = CompilerMode.simulaClassLoader;
@@ -176,6 +182,7 @@ public final class Option {
 	/// @param properties the properties used.
 	public static void getCompilerOptions(Properties properties) {
 		Option.editorUIScale = properties.getProperty("simula.editor.UIScale", "1.0");
+		Option.selectedTheme = properties.getProperty("simula.editor.theme", Palette.themeNames[0]);
 		setCompilerMode(properties.getProperty("simula.compiler.option.mode", "directClassFiles"));
 		Option.CaseSensitive = properties.getProperty("simula.compiler.option.CaseSensitive", "false").equalsIgnoreCase("true");
 		Option.verbose = properties.getProperty("simula.compiler.option.verbose", "false").equalsIgnoreCase("true");
@@ -188,6 +195,7 @@ public final class Option {
 	/// @param properties the properties used.
 	public static void setCompilerOptions(Properties properties) {
 		properties.setProperty("simula.editor.UIScale", Option.editorUIScale);
+		properties.setProperty("simula.editor.theme", Option.selectedTheme);
 		properties.setProperty("simula.compiler.option.mode", ""+Option.compilerMode);
 		properties.setProperty("simula.compiler.option.CaseSensitive", ""+Option.CaseSensitive);
 		properties.setProperty("simula.compiler.option.verbose", ""+Option.verbose);

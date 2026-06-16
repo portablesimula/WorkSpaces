@@ -2,8 +2,10 @@ package simula.editor;
 
 import javax.swing.*;
 
+import simula.compiler.SourceModule;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Option;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiTree;
 
@@ -11,8 +13,8 @@ import java.awt.*;
 
 @SuppressWarnings("serial")
 public class PaletteChooser extends JDialog {
-	JPanel topPanel; // NOT TESTING
-	JDialog dialog;  // TESTING
+	JPanel topPanel;
+//	JDialog dialog;  // TESTING
 	
     private CardLayout cardLayout = new CardLayout();
     private JPanel demoContainer = new JPanel(cardLayout);
@@ -24,14 +26,12 @@ public class PaletteChooser extends JDialog {
 
     // Temavalg
     private JComboBox<String> themeDropdown;
-    private String currentTheme() { return (String) themeDropdown.getSelectedItem(); }
+    private String selectedTheme() { return (String) themeDropdown.getSelectedItem(); }
     
     // UI-komponenter for fargelinjene
     private JPanel palettePanel;
     private JPanel[] colorPanels;
     private JLabel[] colorLabels;
-
-    boolean TESTING = false;
     
     public PaletteChooser(Frame owner) {
     	super(owner, "Select Color Theme", true);
@@ -44,7 +44,8 @@ public class PaletteChooser extends JDialog {
         setLayout(new BorderLayout(10, 10));
 
         initComponents();
-        Palette.loadAndRenderPalette(currentTheme(), false);
+        themeDropdown.setSelectedItem(Option.selectedTheme);
+        Palette.loadAndRenderPalette(selectedTheme(), false);
         updateThemeColors();
     }
 
@@ -54,36 +55,29 @@ public class PaletteChooser extends JDialog {
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-   	if(TESTING) {
-            dialog = new JDialog(this, "Custom Dialog", true); // true makes it modal
-//            dialog.setLayout(new BoxLayout(dialog, BoxLayout.Y_AXIS));
-//            dialog.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-//            dialog.add(Box.createRigidArea(new Dimension(0, 10)));
-    		dialog.add(topPanel);
-   		
-    	} else {
-    	}
         
         themeDropdown = new JComboBox<String>(Palette.themeNames);
         themeDropdown.setBackground(Color.WHITE);
         themeDropdown.setMaximumSize(new Dimension(150, 30));
         themeDropdown.setAlignmentX(Component.CENTER_ALIGNMENT);
-        themeDropdown.addActionListener(_ -> {
-	        Palette.loadAndRenderPalette(currentTheme(), false);
+        themeDropdown.addActionListener(e -> {
+        	IO.println("PaletteChooser'themeDropdown: e=" + e);
+        	IO.println("PaletteChooser'themeDropdown: selectedTheme=" + selectedTheme());
+	        Palette.loadAndRenderPalette(selectedTheme(), false);
         	updateThemeColors();
+        	IO.println("PaletteChooser'themeDropdown: DONE: selectedTheme=" + selectedTheme());
+        	Option.selectedTheme = selectedTheme();
+        	Global.storeWorkspaceProperties();
         });
-    	if(TESTING) {
-//    		dialog.add(themeDropdown);
-	        add(dialog, BorderLayout.NORTH);    		
-    	} else {
-	        topPanel.add(themeDropdown);
-	        add(topPanel, BorderLayout.NORTH);
-    	}
+//        themeDropdown.setSelectedItem(Option.selectedTheme);
+        topPanel.add(themeDropdown);
+        add(topPanel, BorderLayout.NORTH);
 
         // --- MIDTPANEL (x Linjer med Label og Farge) ---
         palettePanel = new JPanel(new GridLayout(Palette.nColors, 1, 5, 5));
         palettePanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         
+        IO.println("PaletteChooser.initComponents: Palette.nColors=" + Palette.nColors);
         colorPanels = new JPanel[Palette.nColors];
         colorLabels = new JLabel[Palette.nColors];
 
@@ -140,7 +134,8 @@ public class PaletteChooser extends JDialog {
         		+ "    end;\n"
         		+ " end\n";
     	PsiTree psiTree = getPsiTree(sourceText);
-		demoPanel = new PsiTextPanel(SimulaEditor.Language.Simula, null);
+//		demoPanel = new PsiTextPanel(SimulaEditor. Language.Simula, null);
+		demoPanel = new PsiTextPanel(new SourceModule(null), null);
 		demoPanel.fillTextPane(0, psiTree);
 		return demoPanel;
     }
@@ -155,7 +150,9 @@ public class PaletteChooser extends JDialog {
 
     // Oppdaterer visningen når du bytter tema i dropdownmenyen
     private void updateThemeColors() {
+//    	IO.println("PaletteChooser.updateThemeColors: Palette.nColors=" + Palette.nColors + ", colorPanels=" + colorPanels.length);
         for (int i = 0; i < Palette.nColors; i++) {
+//        	IO.println("PaletteChooser.updateThemeColors: i=" + i);
             colorPanels[i].setBackground(Palette.getColor(i));
         }
         
@@ -187,16 +184,18 @@ public class PaletteChooser extends JDialog {
 
     // Resets the current theme back to the default colors.
     private void resetCurrentTheme() {
-        Palette.loadAndRenderPalette(currentTheme(), true);
+        Palette.loadAndRenderPalette(selectedTheme(), true);
         updateThemeColors();
         Palette.storeCurrentThemeProperties();
     }
 
-    public static void main(String[] Array) {
-    	Global.initiate();
-//    	Palette.init();
-        SwingUtilities.invokeLater(() -> {
-            new PaletteChooser(null).setVisible(true);
-        });
-    }
+//    public static void main(String[] Array) {
+//    	Global.initiate();
+////    	Palette.init();
+//        SwingUtilities.invokeLater(() -> {
+//        	Option.selectedTheme = Palette.themeNames[0];
+//            new PaletteChooser(null).setVisible(true);
+//        });
+//    }
+    
 }
