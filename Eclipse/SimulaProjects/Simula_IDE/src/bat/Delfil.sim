@@ -1,0 +1,32 @@
+begin
+	ref(infile) inpt;
+	ref(outfile) out1, out2;
+	integer i, j;
+	text res;
+	text title;
+	boolean b;
+	
+	res :- fileChooser(title, "C:/SPORT");
+%	res :- fileChooser(title, notext);
+	outtext("File Selected: " & res); outimage;
+	
+	b := confirmDialog("TITTEL", "vil du fortsette ?");
+	outtext("Confirm Result: " & (if b then "true" else "false")); outimage;
+
+	res :- prompt("TITLE", "input name: ");
+%	res :- prompt(notext, "input name: ");
+%	res :- prompt("TITLE", notext);
+%	res :- prompt(notext, notext);
+	outtext("Prompt Result: " & res); outimage;
+	
+	outtext("STARTING ....");
+	i := j + 44;
+	outtext(" ZZZ INPUT: ");
+	breakoutimage;
+%	inimage;
+%	outtext(sysin.image); outimage;
+	i := inint;
+	outtext("Delfil got: "); outint(i,0); outimage;
+%	res :- prompt("TITLE", "input name: ");
+
+end;

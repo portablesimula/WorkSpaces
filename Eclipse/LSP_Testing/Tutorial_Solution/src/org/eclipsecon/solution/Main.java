@@ -1,0 +1,29 @@
+package org.eclipsecon.solution;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import org.eclipse.lsp4j.jsonrpc.Launcher;
+import org.eclipse.lsp4j.launch.LSPLauncher;
+import org.eclipse.lsp4j.services.LanguageClient;
+
+import com.google.gson.TypeAdapterFactory;
+
+public class Main {
+	TypeAdapterFactory TEST;
+
+	public static void main(String[] args) throws InterruptedException, ExecutionException {
+		startServer(System.in, System.out);
+	}
+
+	public static void startServer(InputStream in, OutputStream out) throws InterruptedException, ExecutionException {
+		EclipseConLanguageServer server = new EclipseConLanguageServer();
+		Launcher<LanguageClient> l = LSPLauncher.createServerLauncher(server, in, out);
+		Future<?> startListening = l.startListening();
+		server.setRemoteProxy(l.getRemoteProxy());
+		startListening.get();
+	}
+
+}
