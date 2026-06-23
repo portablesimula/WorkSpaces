@@ -7,9 +7,6 @@ package simula.compiler.syntaxClass.expression;
 
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
@@ -17,12 +14,10 @@ import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.utilities.Global;
-import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
-import simula.psi.SyntaxTree;
 
 /// Qualified Object
 /// 
@@ -124,15 +119,6 @@ public final class QualifiedObject extends Expression {
 		lhs.buildEvaluation(null,codeBuilder);
 		codeBuilder.checkcast(classDeclaration.getClassDesc());
 	}
-
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-
-		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.QUA);
-		SyntaxTree.addIdentifier(tree, model, newNode, classIdentifier);
-    }
 
 	@Override
 	public String toString() {

@@ -8,10 +8,6 @@ package simula.compiler.syntaxClass.expression;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.SyntaxElement;
@@ -24,7 +20,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
-import simula.psi.SyntaxTree;
 
 /// Object relations IS and IN.
 /// 
@@ -164,16 +159,6 @@ public final class ObjectRelation extends Expression {
 			codeBuilder.instanceOf(classDeclaration.getClassDesc());
 		} else Util.IERR();
 	}
-
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-
-		lhs.addSyntaxNodes(tree, model, newNode);
-		SyntaxTree.addKeyWordNode(tree, model, newNode, opr);
-		SyntaxTree.addIdentifier(tree, model, newNode, classIdentifier);
-    }
 
 	@Override
 	public String toString() {

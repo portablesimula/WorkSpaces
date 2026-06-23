@@ -5,29 +5,15 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.expression;
 
-import java.awt.Font;
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
-import java.lang.classfile.Label;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
-import simula.compiler.utilities.Global;
-import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
-import simula.psi.SyntaxTree;
 
 /// Unary Operation.
 /// 
@@ -75,34 +61,6 @@ public final class MissingExpression extends Expression {
 		ASSERT_SEMANTICS_CHECKED();
 		Util.IERR("NOT IMPL");
 		return null;
-	}
-
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-
-//		SyntaxTree.addKeyWordNode(tree, model, newNode, oprator);
-//		operand.addSyntaxNodes(tree, model, newNode);
-		Util.IERR("NOT IMPL");
-
-    }
-
-	@Override
-	public JPanel getSyntaxPanel() {
-		String[] table = {
-				// *** Expression
-				"  type:",			    ""+type,
-				"  backLink:",		    ""+backLink,
-		};
-		JPanel panel = new JPanel(new GridLayout(table.length/2, 2));
-		Font monoFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
-		for(String s:table) {
-			JLabel lab = new JLabel(s);
-			lab.setFont(monoFont);
-			panel.add(lab);
-		}
-		return panel;
 	}
 
 	@Override

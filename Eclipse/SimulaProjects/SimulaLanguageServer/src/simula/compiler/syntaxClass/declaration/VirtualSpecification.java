@@ -12,10 +12,6 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -30,7 +26,6 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.SyntaxTree;
 
 /// Virtual Quantities.
 /// <pre>
@@ -271,20 +266,6 @@ public final class VirtualSpecification extends Declaration {
 	public void printTree(int indent, final Object head) {
 		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
-
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-        
-		if(type != null) type.addSyntaxNodes(tree, model, newNode);
-		if (kind == Kind.Procedure) SyntaxTree.addIdentifier(tree, model, newNode, "Procedure");
-		SyntaxTree.addIdentifier(tree, model, newNode, identifier);
-		if (procedureSpec != null) {
-			SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.EQ);
-			procedureSpec.addSyntaxNodes(tree, model, newNode);
-		}
-    }
 
 	@Override
 	public String toString() {

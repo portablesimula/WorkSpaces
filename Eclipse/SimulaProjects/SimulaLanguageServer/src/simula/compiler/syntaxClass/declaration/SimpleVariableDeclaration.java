@@ -5,8 +5,6 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.declaration;
 
-import java.awt.Font;
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.ClassFile;
@@ -15,12 +13,6 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
 import java.util.Vector;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
@@ -37,9 +29,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
-import simula.psi.SyntaxTree;
-import simula.psi.TreeNodeIdent;
 
 /// Simple Variable Declaration.
 /// 
@@ -239,52 +228,6 @@ public class SimpleVariableDeclaration extends Declaration {
 	public void printTree(final int indent, final Object head) {
 		verifyTree(head);
 		IO.println(edTreeIndent(indent)+this);
-	}
-
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(edHtml()));
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new TreeNodeIdent(this, edPsi(edHtml())));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-        
-		type.addSyntaxNodes(tree, model, newNode);
-		SyntaxTree.addIdentifier(tree, model, newNode, identifier);
-		if (constantElement != null) {
-    		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.EQ);
-    		constantElement.addSyntaxNodes(tree, model, newNode);
-		}
-    }
-
-	public String edHtml() {
-		String s = type.edHtml() + " " + identifier;
-		if (constantElement != null)
-			s = s + "=" + constantElement.toString();
-		return (s);
-	}
-
-	@Override
-	public JPanel getSyntaxPanel() {
-		String[] table = {
-				"  declarationKind:",	""+declarationKind+":"+ObjectKind.edit(declarationKind),
-				"  declarationClass:",	""+this.getClass().getSimpleName(),
-				"  lines:",				""+this.firstLineNumber() + " ==> " + this.lastLineNumber(),
-				// *** Declaration
-				"  identifier:",		""+identifier,
-				"  externalIdent:",	    ""+externalIdent,
-				"  type:",			    ""+type,
-				"  declaredIn:",		""+declaredIn.identifier,
-				// *** SimpleVariableDeclaration
-				"  constant:",			""+constant,
-				"  constantElement: ",	""+constantElement
-		};
-		JPanel panel = new JPanel(new GridLayout(table.length/2, 2));
-		Font monoFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
-		for(String s:table) {
-			JLabel lab = new JLabel(s);
-			lab.setFont(monoFont);
-			panel.add(lab);
-		}
-		return panel;
 	}
 
 	@Override

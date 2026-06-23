@@ -12,10 +12,6 @@ import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
 
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -37,7 +33,6 @@ import simula.compiler.utilities.Util;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.SyntaxTree;
 
 /// For Statement.
 /// 
@@ -380,24 +375,6 @@ public final class ForStatement extends Statement {
 		IO.println(edTreeIndent(indent)+"FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + " DO ");
 		doStatement.printTree(indent+1,this);
 	}
-
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-        
-		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.FOR);
-		controlVariable.addSyntaxNodes(tree, model, newNode);
-		SyntaxTree.addKeyWordNode(tree, model, newNode, assignmentOperator);
-		boolean first = true;
-		for(ForListElement elt:forList) {
-			if(!first) SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.COMMA);
-			first = false;
-			elt.addSyntaxNodes(tree, model, newNode);
-		}
-		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.DO);
-		doStatement.addSyntaxNodes(tree, model, newNode);
-    }
 	
 	@Override
 	public String toString() {

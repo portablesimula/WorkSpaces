@@ -8,26 +8,17 @@ package simula.compiler.syntaxClass.expression;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.MethodTypeDesc;
-import java.util.Vector;
-
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.OverLoad;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.Type.ConversionKind;
-import simula.compiler.syntaxClass.declaration.UndefinedDeclaration;
 import simula.compiler.utilities.Global;
-import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
-import simula.psi.SyntaxTree;
 
 /// Type Conversion.
 /// 
@@ -249,22 +240,6 @@ public final class TypeConversion extends Expression {
 				codeBuilder.checkcast(type.toObjectClassDesc());
 		}
 	}
-
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-
-//		SyntaxTree.addIdentifier(tree, model, newNode, identifier);
-//		Vector<Expression> par = (checkedParams != null)? checkedParams : params;
-//        if(par != null) {
-//    		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.BEGPAR);
-//			for(Expression expr:par) {
-//				expr.addSyntaxNodes(tree, model, newNode);
-//			}
-//    		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.ENDPAR);
-//        }
-    }
 
 	@Override
 	public String toString() {

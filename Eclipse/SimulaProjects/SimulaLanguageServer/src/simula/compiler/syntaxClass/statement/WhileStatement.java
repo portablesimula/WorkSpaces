@@ -9,10 +9,6 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -26,7 +22,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.SyntaxTree;
 
 /// While Statement.
 /// 
@@ -111,17 +106,6 @@ public final class WhileStatement extends Statement {
 		IO.println(edTreeIndent(indent)+"WHILE " + condition + " DO");
 		doStatement.printTree(indent+1,this);
 	}
-
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-        
-		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.WHILE);
-		condition.addSyntaxNodes(tree, model, newNode);
-		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.DO);
-		doStatement.addSyntaxNodes(tree, model, newNode);
-    }
 
 	@Override
 	public String toString() {

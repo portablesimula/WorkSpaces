@@ -8,10 +8,6 @@ package simula.compiler.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -28,7 +24,6 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.SyntaxTree;
 
 /// Goto Statement.
 /// 
@@ -118,15 +113,6 @@ public final class GotoStatement extends Statement {
 		IO.println(edTreeIndent(indent)+"GOTO "+label);
 		label.printTree(indent+1,this);
 	}
-
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-        
-		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.GOTO);
-		label.addSyntaxNodes(tree, model, newNode);
-    }
 
 	@Override
 	public String toString() {

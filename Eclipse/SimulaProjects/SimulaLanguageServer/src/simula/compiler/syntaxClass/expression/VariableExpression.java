@@ -14,10 +14,6 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
 import java.util.Vector;
 
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.OverLoad;
@@ -47,8 +43,6 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
-import simula.psi.PsiTree;
-import simula.psi.SyntaxTree;
 
 /// Variable.
 /// 
@@ -971,22 +965,6 @@ public final class VariableExpression extends Expression {
 		sb.append(")");
 		return sb.toString();
 	}
-
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-
-		SyntaxTree.addIdentifier(tree, model, newNode, identifier);
-		Vector<Expression> par = (checkedParams != null)? checkedParams : params;
-        if(par != null) {
-    		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.BEGPAR);
-			for(Expression expr:par) {
-				expr.addSyntaxNodes(tree, model, newNode);
-			}
-    		SyntaxTree.addKeyWordNode(tree, model, newNode, KeyWord.ENDPAR);
-        }
-    }
 
 	@Override
 	public String toString() {

@@ -8,10 +8,6 @@ package simula.compiler.syntaxClass.statement;
 import java.io.IOException;
 import java.util.Vector;
 
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 import simula.compiler.syntaxClass.Comment;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
@@ -219,23 +215,6 @@ public final class ProgramModule extends Statement {
 		}
 		IO.println("=================================================================");
 	}
-	
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode n = new DefaultMutableTreeNode("BASICIO");
-        model.insertNodeInto(n, parent, parent.getChildCount());
-
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-        
-		for(Declaration decl:StandardClass.BASICIO.declarationList) {
-			if(decl instanceof StandardProcedure) ; // Nothing
-			else if(decl instanceof StandardClass) ; // Nothing
-			else decl.addSyntaxNodes(tree, model, newNode);
-		}
-
-        tree.doLayout();
-    }
 	
 	@Override
 	public String toString() {

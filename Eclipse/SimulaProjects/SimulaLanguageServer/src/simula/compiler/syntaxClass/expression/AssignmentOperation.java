@@ -5,18 +5,10 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.expression;
 
-import java.awt.Font;
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
@@ -37,7 +29,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiTree;
-import simula.psi.SyntaxTree;
 
 /// Assignment Operation.
 /// 
@@ -469,38 +460,6 @@ public final class AssignmentOperation extends Expression {
 			lhs.buildEvaluation(rhs,codeBuilder);
 		}
 		if(this.backLink == null) codeBuilder.pop();
-	}
-
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-
-		lhs.addSyntaxNodes(tree, model, newNode);
-		SyntaxTree.addKeyWordNode(tree, model, newNode, opr);
-		rhs.addSyntaxNodes(tree, model, newNode);
-    }
-
-	@Override
-	public JPanel getSyntaxPanel() {
-		String[] table = {
-				// *** Expression
-				"  type:",			    ""+type,
-				"  backLink:",		    ""+backLink,
-				// *** BooleanExpression
-//				"  lhs:",			    ""+lhs,
-				"  opr:",			    KeyWord.edit(opr),
-//				"  rhs:",			    ""+rhs,
-
-		};
-		JPanel panel = new JPanel(new GridLayout(table.length/2, 2));
-		Font monoFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
-		for(String s:table) {
-			JLabel lab = new JLabel(s);
-			lab.setFont(monoFont);
-			panel.add(lab);
-		}
-		return panel;
 	}
 
 	@Override

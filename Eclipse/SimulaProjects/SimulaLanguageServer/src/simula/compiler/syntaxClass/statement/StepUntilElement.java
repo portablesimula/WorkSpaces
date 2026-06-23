@@ -11,10 +11,6 @@ import java.lang.classfile.Label;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.MethodTypeDesc;
 
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -25,12 +21,10 @@ import simula.compiler.syntaxClass.declaration.SimpleVariableDeclaration;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.TypeConversion;
 import simula.compiler.syntaxClass.expression.VariableExpression;
-import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
-import simula.psi.SyntaxTree;
 
 // ************************************************************************************
 // *** ForListElement -- Step Until Element
@@ -355,15 +349,6 @@ public class StepUntilElement extends ForListElement {
 				"(Lsimula/runtime/RTS_NAME;Lsimula/runtime/RTS_NAME;Lsimula/runtime/RTS_NAME;Lsimula/runtime/RTS_NAME;)V");
 		codeBuilder.invokespecial(RTS.CD.FOR_StepUntil, "<init>", MTD); // Invoke Constructor
 	}
-	
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-		expr1.addSyntaxNodes(tree, model, parent);
-		SyntaxTree.addKeyWordNode(tree, model, parent, KeyWord.STEP);
-		expr2.addSyntaxNodes(tree, model, parent);
-		SyntaxTree.addKeyWordNode(tree, model, parent, KeyWord.UNTIL);
-		expr3.addSyntaxNodes(tree, model, parent);
-    }
 
 	@Override
 	public String toString() {

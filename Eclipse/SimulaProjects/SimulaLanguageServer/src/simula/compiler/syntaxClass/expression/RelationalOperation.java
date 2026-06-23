@@ -9,10 +9,6 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.SyntaxElement;
@@ -24,7 +20,6 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
-import simula.psi.SyntaxTree;
 
 /// Relational Operation.
 /// 
@@ -260,16 +255,6 @@ public final class RelationalOperation extends Expression {
 		rhs.buildEvaluation(null,codeBuilder);
 		RTS.buildInvokeTextRel(opr, codeBuilder);
 	}
-
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(edPsi(toString()));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-
-		lhs.addSyntaxNodes(tree, model, newNode);
-		SyntaxTree.addKeyWordNode(tree, model, newNode, opr);
-		rhs.addSyntaxNodes(tree, model, newNode);
-    }
 
 	@Override
 	public String toString() {

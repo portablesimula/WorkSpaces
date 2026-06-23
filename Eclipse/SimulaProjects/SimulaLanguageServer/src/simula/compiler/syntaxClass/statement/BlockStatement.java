@@ -5,16 +5,8 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.statement;
 
-import java.awt.Font;
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
@@ -25,13 +17,11 @@ import simula.compiler.syntaxClass.declaration.PrefixedBlockDeclaration;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.Global;
-import simula.compiler.utilities.Html;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiTree;
-import simula.psi.TreeNodeIdent;
 
 /// BlockStatement.
 /// <pre>
@@ -163,47 +153,6 @@ public final class BlockStatement extends Statement {
 //		IO.println("BlockStatement.lastLineNumber: psiTree: "+getPsiTree());
 		if(getPsiTree() != null) return getPsiTree().lastLineNumber();
 		return -16;
-	}
-
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-		int lno = firstLineNumber();
-		int last = lastLineNumber();
-//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new TreeNodeIdent(this, Html.edPsi(lno, last, debugName)));
-//		String id = blockDeclaration.getClass().getSimpleName();
-//        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new TreeNodeIdent(this, Html.edPsi(lno, last, id)));
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new TreeNodeIdent(this, Html.edPsi(lno, last, psiKind())));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-        blockDeclaration.addDeclarationList(tree, model, newNode);
-		blockDeclaration.addStatementList(tree, model, newNode);			
-    }
-
-	@Override
-	public JPanel getSyntaxPanel() {
-		String[] table = {
-				"  BlockStatement:",	""+blockDeclaration.declaredIn.identifier,
-				"  declarationKind:",	""+blockDeclaration.declarationKind+":"+ObjectKind.edit(blockDeclaration.declarationKind),
-				"  declarationClass:",	""+this.getClass().getSimpleName(),
-				"  lines:",				""+this.firstLineNumber() + " ==> " + this.lastLineNumber(),
-				// *** Declaration
-				"  identifier:",		""+blockDeclaration.identifier,
-				"  externalIdent:",	    ""+blockDeclaration.externalIdent,
-				"  type:",			    ""+blockDeclaration.type,
-				"  declaredIn:",		""+blockDeclaration.declaredIn.identifier,
-				// *** DeclarationScope
-				"  sourceFileName:",	""+blockDeclaration.sourceFileName,
-				"  hasLocalClasses:  ",	""+blockDeclaration.hasLocalClasses,
-				// *** BlockDeclaration
-				"  isMainModule:",		""+blockDeclaration.isMainModule
-		};
-		JPanel panel = new JPanel(new GridLayout(table.length/2, 2));
-		Font monoFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
-		for(String s:table) {
-			JLabel lab = new JLabel(s);
-			lab.setFont(monoFont);
-			panel.add(lab);
-		}
-		return panel;
 	}
 
 	@Override

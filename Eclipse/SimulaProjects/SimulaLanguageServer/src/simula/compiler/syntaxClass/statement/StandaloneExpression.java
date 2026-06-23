@@ -8,10 +8,6 @@ package simula.compiler.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -158,13 +154,6 @@ public final class StandaloneExpression extends Statement {
 		if(getPsiTree() != null) return getPsiTree().lastLineNumber();
 		return -106;
 	}
-
-	@Override
-    public void addSyntaxNodes(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(expression.edPsi(expression.toString()));
-        model.insertNodeInto(newNode, parent, parent.getChildCount());
-        expression.addSyntaxNodes(tree, model, newNode);
-   }
 
 	@Override
 	public String toString() {
