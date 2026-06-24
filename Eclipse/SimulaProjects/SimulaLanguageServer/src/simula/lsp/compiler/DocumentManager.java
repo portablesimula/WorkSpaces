@@ -168,11 +168,9 @@ public class DocumentManager {
 		String currentText = sourceItem.getText();
     	LOG.info("DocumentManager.didChange: Current Text: " + currentText);
 
-    	String sourceCode = DocumentTextUpdater.applyChanges(currentText, params.getContentChanges());
-    	LOG.info("DocumentManager.didChange: Updated Text: " + sourceCode);
-    	sourceItem.setText(sourceCode);
-	    
-    	LOG.info("DocumentManager.didChange: sourceCode: " + sourceCode);
+    	String updatedText = DocumentTextUpdater.applyChanges(currentText, params.getContentChanges());
+    	LOG.info("DocumentManager.didChange: Updated Text: " + updatedText);
+    	sourceItem.setText(updatedText);
 
     	// 3. Kjør syntaks-sjekk / validering
 //    	List<Diagnostic> diagnostics = SimulaLspCompiler.runCompilerOrValidator(documentUri, sourceCode);
@@ -195,7 +193,7 @@ public class DocumentManager {
 		TextDocumentSaveReason reason = params.getReason(); // Manual, AfterDelay, or FocusOut
 
 		// 2. Add your pre-save routine here
-		System.out.println("Document is about to save: " + documentUri + " due to reason: " + reason);
+		LOG.info("Document is about to save: " + documentUri + " due to reason: " + reason);
 
 		// Since TextDocumentSyncKind is 'Full', you already have the latest text state 
 		// synchronized via your prior 'didChange' notification handlers.
