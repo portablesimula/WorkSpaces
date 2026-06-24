@@ -522,8 +522,9 @@ public final class SimulaCompiler {
 		boolean rtsExist = rtsLib.exists();
 		boolean rtsCread = rtsLib.canRead();
 		if (!(rtsExist && rtsCread)) {
-			Util.popUpError("Unable to access the Runtime System at:" + "\n" + rtsLib
-					+ "\nCheck the installation and consider" + "\nto Download it again.\n");
+			Util.IERR("DETTE MÅ RETTES");
+//			Util.popUpError("Unable to access the Runtime System at:" + "\n" + rtsLib
+//					+ "\nCheck the installation and consider" + "\nto Download it again.\n");
 		}
 		if (Option.internal.DEBUGGING) {
 			Util.println(

@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/// @author Øystein Myhre Andersen
+/// @author Google AI
 public class TokenManager {
 	
 	// Standard Token Types defined by VSCode:
@@ -35,37 +37,44 @@ public class TokenManager {
 	// regexp			Regular expressions
 	// operator			Math/logic operators
 	
-	class SimulaTokenType {
-		String VSCode_TokenType;
-		int index;
-		
-		public SimulaTokenType(String VSCode_TokenType, int index) {
-			this.VSCode_TokenType = VSCode_TokenType;
-			this.index = index;
-		}
-	}
+//	class SimulaTokenType {
+//		String VSCode_TokenType;
+//		int index;
+//		
+//		public SimulaTokenType(String VSCode_TokenType, int index) {
+//			this.VSCode_TokenType = VSCode_TokenType;
+//			this.index = index;
+//		}
+//	}
 	
 	// Simula Token Types mapped to Standard Token Types
-	public final SimulaTokenType KEYWORD = new SimulaTokenType( "keyword" , 1 );
+	// KEYWORD, IDENTIFIER, NUMBER_LITERAL, TEXT_LITERAL, OPERATOR, COMMENT, WHITESPACE, UNKNOWN
+	public static final SimulaTokenType KEYWORD =	new SimulaTokenType( "keyword",  1 );
+	public static final SimulaTokenType STRING =	new SimulaTokenType( "string",   2 );
+	public static final SimulaTokenType NUMBER =	new SimulaTokenType( "number",   3 );
+	public static final SimulaTokenType COMMENT =	new SimulaTokenType( "keyword",  4 );
+	public static final SimulaTokenType OTHER =		new SimulaTokenType( "variable", 5 );
+	
+	
 	
 //	public class MyTextDocumentService implements TextDocumentService {
 
-	    // Helper class to hold absolute parsed token data
-	    class AbsoluteToken {
-	        int line;      // 0-based
-	        int character; // 0-based
-	        int length;
-	        int tokenTypeIndex;
-	        int tokenModifiersBitmask;
-
-	        AbsoluteToken(int line, int character, int length, int type, int mod) {
-	            this.line = line;
-	            this.character = character;
-	            this.length = length;
-	            this.tokenTypeIndex = type;
-	            this.tokenModifiersBitmask = mod;
-	        }
-	    }
+//	    // Helper class to hold absolute parsed token data
+//	    class LspToken {
+//	        int line;      // 0-based
+//	        int character; // 0-based
+//	        int length;
+//	        int tokenTypeIndex;
+//	        int tokenModifiersBitmask;
+//
+//	        LspToken(int line, int character, int length, int type, int mod) {
+//	            this.line = line;
+//	            this.character = character;
+//	            this.length = length;
+//	            this.tokenTypeIndex = type;
+//	            this.tokenModifiersBitmask = mod;
+//	        }
+//	    }
 
 //	    @Override
 	    public CompletableFuture<SemanticTokens> semanticTokensFull(SemanticTokensParams params, SimulaLanguageServer server) {
@@ -79,7 +88,7 @@ public class TokenManager {
 	    		String documentText = sourceItem.getText();
 
 	            // 2. Parse text and extract tokens in absolute positions
-	            List<AbsoluteToken> absoluteTokens = parseTokens(documentText);
+	            List<LspToken> absoluteTokens = parseTokens(documentText);
 
 	            // 3. Sort tokens sequentially (Line first, then Character position)
 	            absoluteTokens.sort((t1, t2) -> {
@@ -92,7 +101,7 @@ public class TokenManager {
 	            int prevLine = 0;
 	            int prevChar = 0;
 
-	            for (AbsoluteToken token : absoluteTokens) {
+	            for (LspToken token : absoluteTokens) {
 	                int deltaLine = token.line - prevLine;
 	                // If it is on the same line, char offset is relative to the previous token's start char
 	                int deltaChar = (deltaLine == 0) ? (token.character - prevChar) : token.character;
@@ -112,11 +121,11 @@ public class TokenManager {
 	        });
 	    }
 
-	    private List<AbsoluteToken> parseTokens(String text) {
-	        List<AbsoluteToken> tokens = new ArrayList<>();
+	    private List<LspToken> parseTokens(String text) {
+	        List<LspToken> tokens = new ArrayList<>();
 	        // TODO: Plug your AST parser / Lexer here. 
 	        // Example: If a keyword "class" is at Line 0, Char 5, length 5:
-	        // tokens.add(new AbsoluteToken(0, 5, 5, 3, 0)); // index 3 = "class"
+	        // tokens.add(new LspToken(0, 5, 5, 3, 0)); // index 3 = "class"
 	        return tokens;
 	    }
 	

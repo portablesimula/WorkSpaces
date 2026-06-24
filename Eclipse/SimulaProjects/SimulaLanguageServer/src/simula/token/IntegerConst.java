@@ -1,6 +1,7 @@
 package simula.token;
 
 import simula.compiler.utilities.KeyWord;
+import simula.lsp.compiler.TokenManager;
 import simula.psi.LexToken;
 
 public class IntegerConst extends LexToken {
@@ -17,5 +18,9 @@ public class IntegerConst extends LexToken {
 //	public Style getStyle(final PsiTextPanel psiText) {
 //		return psiText.styleConstant;
 //	}
+	
+	public int getLspTokenType() {
+		return TokenManager.NUMBER.index; 
+	}
 
 }

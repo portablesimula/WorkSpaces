@@ -1,34 +1,32 @@
 package simula.lsp.compiler;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.DidSaveTextDocumentParams;
 import org.eclipse.lsp4j.DocumentDiagnosticParams;
 import org.eclipse.lsp4j.DocumentDiagnosticReport;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
-import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.RelatedFullDocumentDiagnosticReport;
-import org.eclipse.lsp4j.RelatedUnchangedDocumentDiagnosticReport;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.TextDocumentSaveReason;
 import org.eclipse.lsp4j.WillSaveTextDocumentParams;
 
+import simula.compiler.utilities.LOG;
 import simula.lsp.SimulaLanguageServer;
 
 /// Vi må lagre innholdet til dokumentene som er åpne i editoren.
 /// Siden editoren kan ha endringer som ikke er lagret til disken ennå,
 /// må serveren stole på teksten den får tilsendt over LSP
+/// 
+/// @author Øystein Myhre Andersen
+/// @author Google AI
 public class DocumentManager {
+
+	
     // Nøkkelen er filens URI (f.eks. file:///path/to/file.txt)
     private final ConcurrentHashMap<String, SourceDocumentItem> openDocuments = new ConcurrentHashMap<>();
 
@@ -55,7 +53,7 @@ public class DocumentManager {
 //	public static CompletableFuture<DocumentDiagnosticReport> diagnostic(DocumentDiagnosticParams params, SimulaLanguageServer server) {
 	public static DocumentDiagnosticReport diagnostic(DocumentDiagnosticParams params, SimulaLanguageServer server) {
        String documentUri = params.getTextDocument().getUri();
-        String previousResultId = params.getPreviousResultId();
+//        String previousResultId = params.getPreviousResultId();
 
 //        // 1. If the client passes a matching previous result ID and document hasn't changed, 
 //        // return an unchanged report to optimize performance.
@@ -123,6 +121,7 @@ public class DocumentManager {
 	 * Registration Options: {@link org.eclipse.lsp4j.TextDocumentRegistrationOptions}
 	 */
     public static void didOpen(DidOpenTextDocumentParams params, SimulaLanguageServer server) {
+    	LOG.info("DocumentManager.didOpen: BEGIN");
     	// 1. Hent ut dokument-objektet fra parameterne sent av Eclipse (LSP4E)
     	TextDocumentItem document = params.getTextDocument();
     	if (document == null) { return; }
@@ -130,9 +129,12 @@ public class DocumentManager {
   	  	SourceDocumentItem sourceItem = new SourceDocumentItem(document);
 
     	String documentUri = document.getUri();
-    	String sourceCode = document.getText();
-    	String languageId = document.getLanguageId();
-    	int version = document.getVersion();
+    	@SuppressWarnings("unused")
+		String sourceCode = document.getText();
+    	@SuppressWarnings("unused")
+		String languageId = document.getLanguageId();
+    	@SuppressWarnings("unused")
+		int version = document.getVersion();
 
     	// 2. Lagre dokumentet i minnet (viktig for fremtidige didChange- eller hover-forespørsler)
     	DocumentManager documentManager = server.getDocumentManager();
@@ -146,6 +148,7 @@ public class DocumentManager {
     	
 	    // 4. Send feilmeldingene tilbake til VS Code via LSP4J-klienten
 	    server.getClient().publishDiagnostics(new PublishDiagnosticsParams(documentUri, diagnostics));
+    	LOG.info("DocumentManager.didOpen: RETURNS");
     }
     
 
@@ -156,9 +159,20 @@ public class DocumentManager {
 	 * Registration Options: {@link org.eclipse.lsp4j.TextDocumentChangeRegistrationOptions}
 	 */
 	public static void didChange(DidChangeTextDocumentParams params, SimulaLanguageServer server) {
-	    // 1. Hent ut den oppdaterte teksten fra VS Code
-	    String sourceCode = params.getContentChanges().get(0).getText();
+    	LOG.info("DocumentManager.didChange: BEGIN");
+    	
+		DocumentManager documentManager = server.getDocumentManager();
 	    String documentUri = params.getTextDocument().getUri();
+		SourceDocumentItem sourceItem = documentManager.get(documentUri);
+		
+		String currentText = sourceItem.getText();
+    	LOG.info("DocumentManager.didChange: Current Text: " + currentText);
+
+    	String sourceCode = DocumentTextUpdater.applyChanges(currentText, params.getContentChanges());
+    	LOG.info("DocumentManager.didChange: Updated Text: " + sourceCode);
+    	sourceItem.setText(sourceCode);
+	    
+    	LOG.info("DocumentManager.didChange: sourceCode: " + sourceCode);
 
     	// 3. Kjør syntaks-sjekk / validering
 //    	List<Diagnostic> diagnostics = SimulaLspCompiler.runCompilerOrValidator(documentUri, sourceCode);

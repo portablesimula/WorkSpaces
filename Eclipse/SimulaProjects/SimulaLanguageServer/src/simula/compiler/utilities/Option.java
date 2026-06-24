@@ -5,27 +5,8 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.utilities;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Desktop;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
-import java.net.URI;
-import java.util.Enumeration;
 import java.util.Properties;
-
-import javax.swing.AbstractButton;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 /// Compile Time Options.
 /// 
@@ -201,112 +182,6 @@ public final class Option {
 		properties.setProperty("simula.compiler.option.WARNINGS", ""+Option.WARNINGS);
 		properties.setProperty("simula.compiler.option.EXTENSIONS", ""+Option.EXTENSIONS);
 	}
-	
-    // ****************************************************************
-    // *** resetUIScale
-    // ****************************************************************
-    /// Reset the UI-Scale factor dialog.
-    public static void resetUIScale() {
-		String text ="Set the system property (sun.java2d.uiScale) to"
-					+"\noverride the UI scaling factor for Swing and AWT."
-					+"\nIt is particularly useful for apps on High-DPI displays." 
-					+"\n"
-					+"\nAlternatively, you can specify the scaling factor"
-					+"\nwith an environment variable: "
-					+"\n"
-					+"\n     J2D_UISCALE=2.0"
-					+"\n"
-					+"\nThis change requires a restart to take effect." 
-					+"\n";
-
-		// Create sub-panel
-		JPanel panel2 = new JPanel();
-		panel2.setBackground(Color.white);
-		JTextField textField = new JTextField(editorUIScale, 4);
-        panel2.add(new JLabel("Set UI-Scale:")); panel2.add(textField); panel2.add(new JLabel("Eg. 1.5 means 150%"));
-        
-
-    	JPanel panel=new JPanel();
-		panel.setBackground(Color.white);
-    	JTextArea textArea=new JTextArea(text);
-    	panel.setLayout(new BorderLayout());
-    	panel.add(textArea,BorderLayout.NORTH);
-    	panel.add(panel2,BorderLayout.CENTER);
-		int answer = Util.optionDialog(panel,"Reset UI-Scale",JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,"Ok","Cancel","More Info");
-		IO.println("Option.resetUIScale: answer="+answer+", OK_OPTION="+JOptionPane.OK_OPTION);
-		if(answer == 2) {
-			if(Desktop.isDesktopSupported()) {
-				Desktop desktop = Desktop.getDesktop();
-				try { desktop.browse(new URI("https://docs.oracle.com/en/java/javase/25/troubleshoot/java-2d-properties.html"));
-				} catch (Exception ex) {}
-			}
-		} else if(answer == JOptionPane.OK_OPTION) {
-			String value = textField.getText();
-			if(!value.equals(Option.editorUIScale))
-			try {
-				Float.parseFloat(value); // Check legal number
-				Option.editorUIScale = textField.getText();
-
-//				IO.println("Option.resetUIScale: editorUIScale="+editorUIScale);
-		    	Global.storeWorkspaceProperties();
-				int res=Util.optionDialog("\nDo you want to restart now ?","Restart ?",JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, "Yes", "No");
-				if(res == JOptionPane.YES_OPTION) {
-//					IO.println("Option.resetUIScale: DO RESTART !");
-					String home = Global.getSimulaProperty("simula.home", null);
-					File jarFile = new File(home + "/Simula-2.0/simula.jar");
-					new Thread(new Runnable() {
-						@Override
-						public void run() {
-							String[] cmds= {"java","-jar",jarFile.toString()};
-							Util.execute(cmds);
-						}
-					}).start();
-					System.exit(0);
-				}
-
-			} catch(Exception e) {
-//				e.printStackTrace();
-				Util.popUpError(e.getClass().getSimpleName() + "\n" + e.getMessage() + "\n\nUI-Scale factor not changed.\n");
-			}
-		}
-    }
-
-	/// Editor Utility: Set Compiler Mode.
-	public static void setCompilerMode() {
-		JPanel panel=new JPanel();
-		panel.setBackground(Color.white);
-		JCheckBox but1 = checkBox("viaJavaSource","Generate Java source and use Java compiler to generate JavaClass files.");
-		JCheckBox but2 = checkBox("directClassFiles","Generate JavaClass files directly. No Java source files are generated.");
-		JCheckBox but3 = checkBox("simulaClassLoader","Generate ClassFile byte array and load it directly. No intermediate files are created.");
-
-		if(Option.compilerMode == CompilerMode.viaJavaSource) but1.setSelected(true);
-		else if(Option.compilerMode == CompilerMode.directClassFiles) but2.setSelected(true);
-		else if(Option.compilerMode == CompilerMode.simulaClassLoader) but3.setSelected(true);
-		
-		ButtonGroup buttonGroup = new ButtonGroup();
-		panel.add(but1); buttonGroup.add(but1);
-		panel.add(new JLabel("   The Simula Compiler will generate Java source files and use"));
-		panel.add(new JLabel("   the Java compiler to generate JavaClass files which in turn"));
-		panel.add(new JLabel("   are collected together with the Runtime System into the"));
-		panel.add(new JLabel("   resulting executable jar-file."));
-		panel.add(new JLabel(" "));
-		panel.add(but2); buttonGroup.add(but2);
-		panel.add(new JLabel("   The Simula Compiler will generate JavaClass files directly"));
-		panel.add(new JLabel("   which in turn are collected together with the Runtime System"));
-		panel.add(new JLabel("   into the resulting executable jar-file."));
-		panel.add(new JLabel("   No Java source files are generated."));
-		panel.add(new JLabel(" "));
-		panel.add(but3); buttonGroup.add(but3);
-		panel.add(new JLabel("   The Simula Compiler will generate ClassFile byte array and"));
-		panel.add(new JLabel("   load it directly. No intermediate files are created."));
-		panel.add(new JLabel(" "));
-		panel.add(new JLabel("   NOTE:   In this mode, the editor will terminate after the first"));
-		panel.add(new JLabel("                  program execution"));
-		panel.add(new JLabel(" "));
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		Util.optionDialog(panel,"Select Compiler Mode",JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,"Ok");
-    	Global.storeWorkspaceProperties();
-	}
 
 	/// Editor Utility: Set Compiler Mode.
 	/// @param id the mode String.
@@ -319,21 +194,6 @@ public final class Option {
 			Option.compilerMode = CompilerMode.simulaClassLoader;
 		}
 	}
-	
-	/// Utility to get SelectedButtonText.
-	/// @param buttonGroup the button group to inspect.
-	/// @return the selected String.
-	public String getSelectedButtonText(ButtonGroup buttonGroup) {
-        for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {
-            AbstractButton button = buttons.nextElement();
-
-            if (button.isSelected()) {
-                return button.getText();
-            }
-        }
-
-        return null;
-    }
 
 	/// Returns the option name 'id'
 	/// @param id option id
@@ -378,72 +238,5 @@ public final class Option {
 		if(id.equalsIgnoreCase("TRACE_BYTECODE_OUTPUT")) internal.TRACE_BYTECODE_OUTPUT=val; 
 	}
 
-	/// Editor Utility: Select Compiler Options.
-	public static void selectCompilerOptions() {
-		JPanel panel=new JPanel();
-		panel.setBackground(Color.white);
-		panel.add(checkBox("CaseSensitive","Source file is case sensitive."));
-		panel.add(checkBox("Verbose","Output messages about what the compiler is doing"));
-		panel.add(checkBox("Warnings","Generate warning messages"));
-		panel.add(checkBox("Extensions","Disable all language extensions. In other words, follow the Simula Standard literally"));
-		panel.add(checkBox("noExecution","Don't execute generated .jar file"));
-		if(Option.internal.DEBUGGING) {
-			panel.add(checkBox("TRACING","Debug option"));
-			panel.add(checkBox("TRACE_LEXER","Debug option"));
-			panel.add(checkBox("TRACE_COMMENTS","Debug option"));
-			panel.add(checkBox("TRACE_PARSE","Debug option"));
-			panel.add(checkBox("TRACE_ATTRIBUTE_OUTPUT","Debug option"));
-			panel.add(checkBox("TRACE_ATTRIBUTE_INPUT","Debug option"));
-			panel.add(checkBox("TRACE_CHECKER","Debug option"));
-			panel.add(checkBox("TRACE_CHECKER_OUTPUT","Debug option"));
-			panel.add(checkBox("TRACE_CODING","Debug option"));
-			panel.add(checkBox("TRACE_BYTECODE_OUTPUT","Debug option"));
-		}
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		Util.optionDialog(panel,"Select Compiler Options",JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE,"Ok");
-    	Global.storeWorkspaceProperties();
-	}
-
-	/// Editor Utility: Create a checkBox with tooltips.
-	/// @param id option id
-	/// @param tooltip option's tooltip or null
-	/// @return the resulting check box
-	private static JCheckBox checkBox(String id,String tooltip) {
-		return checkBox(id, tooltip,Option.getOption(id));
-	}
-
-	/// Editor Utility: Create a checkBox with tooltips.
-	/// @param id option id.
-	/// @param tooltip option's tooltip or null.
-	/// @param selected true: this checkBox is selected.
-	/// @return the resulting check box.
-	private static JCheckBox checkBox(String id,String tooltip,boolean selected) {
-		JCheckBox item = new JCheckBox(id);
-		item.setBackground(Color.white);
-        item.setSelected(selected);
-        item.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		if(id.equals("viaJavaSource") || id.equals("directClassFiles") || id.equals("simulaClassLoader")) {
-            		if(Option.verbose) Util.println("Compiler Mode: "+id);
-        			Option.setCompilerMode(id);
-        		} else {
-        		Option.setOption(id,item.isSelected());
-        		}
-		}});
-        if(tooltip != null) item.setToolTipText(tooltip);
-        item.addMouseListener(new MouseAdapter() {
-            Color color = item.getBackground();
-            @Override
-            public void mouseEntered(MouseEvent me) {
-               color = item.getBackground();
-               item.setBackground(Color.lightGray); // change the color to lightGray when mouse over a button
-            }
-            @Override
-            public void mouseExited(MouseEvent me) {
-            	item.setBackground(color);
-            }
-         });
-        return(item);
-	}
 
 }

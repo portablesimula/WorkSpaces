@@ -2,6 +2,8 @@ package simula.psi;
 
 import java.util.List;
 
+import simula.lsp.compiler.TokenManager;
+
 public class PsiElement {// implements PsiElement {
     CharSequence sourceText; // Pointer to the Whole FILE
     public int startOffset;
@@ -14,6 +16,10 @@ public class PsiElement {// implements PsiElement {
 	public PsiElement(String debugName, CharSequence sourceText) {
 		this.debugName = debugName;
 		this.sourceText = sourceText;
+	}
+	
+	public int getLspTokenType() {
+		return TokenManager.OTHER.index; 
 	}
 
 	public List<PsiElement> getChildren() {

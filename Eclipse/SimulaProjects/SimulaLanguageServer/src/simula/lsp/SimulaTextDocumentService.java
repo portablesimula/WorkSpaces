@@ -10,6 +10,8 @@ import simula.lsp.compiler.DocumentManager;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/// @author Øystein Myhre Andersen
+/// @author Google AI
 public class SimulaTextDocumentService implements TextDocumentService {
 
     private final SimulaLanguageServer server;
@@ -158,6 +160,9 @@ public class SimulaTextDocumentService implements TextDocumentService {
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++ RESTEN +++++++++++++++++++++++++++++++++++++++++++++++
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++ RESTEN +++++++++++++++++++++++++++++++++++++++++++++++
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++ RESTEN +++++++++++++++++++++++++++++++++++++++++++++++
+    //
+    // USE Google AI: how to implement the method xxxxxx in my textdocumentservice in eclipse lsp4e in java
+    //
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++ RESTEN +++++++++++++++++++++++++++++++++++++++++++++++
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++ RESTEN +++++++++++++++++++++++++++++++++++++++++++++++
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++ RESTEN +++++++++++++++++++++++++++++++++++++++++++++++

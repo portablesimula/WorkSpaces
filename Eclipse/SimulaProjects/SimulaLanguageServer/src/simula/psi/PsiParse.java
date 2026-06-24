@@ -345,7 +345,7 @@ public class PsiParse {
 	/// Debug utility: Utility TRACE.
 	/// @param msg a message
 	public static void TRACE(final String msg) {
-		LOG.println(msg);
+		LOG.info(msg);
 	}
 
 }

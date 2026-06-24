@@ -15,8 +15,6 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.jar.JarFile;
 
-import javax.swing.ImageIcon;
-
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.SourceModule;
 import simula.compiler.JarFileBuilder;
@@ -39,15 +37,6 @@ public final class Global {
 	/// 
 	/// NOTE: When updating release id, change version in SimulaExtractor and RuntimeSystem
 	public static final String simulaReleaseID = "Simula-2.0";
-	
-	/// The Simula favicon
-	public static ImageIcon favicon;
-	/// A Simula icon
-	public static ImageIcon simulaIcon;
-	/// A Sim icon
-	public static ImageIcon simIcon;
-	/// A small Simula icon
-	static ImageIcon sIcon;
 
 	/// The Simula Home directory.
 	public static File simulaHome;
@@ -150,9 +139,6 @@ public final class Global {
 	/// The set of Java SourceFile Coders.
 	public static Vector<JavaSourceFileCoder> javaSourceFileCoders;
 
-	/// The console
-	public static ConsolePanel console;
-
 	/// The Jar files queued for later inclusion.
 	/// See: JarFileBuilder for details.
 	public static LinkedList<JarFile> includeQueue;
@@ -174,19 +160,19 @@ public final class Global {
 		duringSTM_Coding = false;
 		externalJarFiles = new Vector<File>();
 		StandardClass.INITIATE();
-		String SIMULA_HOME = getSimulaProperty("simula.home", null);
-		if (SIMULA_HOME != null) {
-			String SIMULA_VERSION = getSimulaProperty("simula.version", null);
-			if (SIMULA_VERSION != null) {
-				try {
-					File simdir = new File(SIMULA_HOME, SIMULA_VERSION);
-					favicon = new ImageIcon(new File(simdir, "icons/favicon.png").toString());
-					simIcon = new ImageIcon(new File(simdir, "icons/sim2.png").toString());
-					sIcon = new ImageIcon(new File(simdir, "icons/sim.png").toString());
-					simulaIcon = new ImageIcon(new File(simdir, "icons/simula.png").toString());
-				} catch(Exception e) {}
-			}
-		}
+//		String SIMULA_HOME = getSimulaProperty("simula.home", null);
+//		if (SIMULA_HOME != null) {
+//			String SIMULA_VERSION = getSimulaProperty("simula.version", null);
+//			if (SIMULA_VERSION != null) {
+//				try {
+//					File simdir = new File(SIMULA_HOME, SIMULA_VERSION);
+//					favicon = new ImageIcon(new File(simdir, "icons/favicon.png").toString());
+//					simIcon = new ImageIcon(new File(simdir, "icons/sim2.png").toString());
+//					sIcon = new ImageIcon(new File(simdir, "icons/sim.png").toString());
+//					simulaIcon = new ImageIcon(new File(simdir, "icons/simula.png").toString());
+//				} catch(Exception e) {}
+//			}
+//		}
 //    	Palette.init();
     	IO.println("Global.initiate completed");
 //    	Thread.dumpStack();
@@ -278,7 +264,7 @@ public final class Global {
 		try {
 			simulaProperties.loadFromXML(new FileInputStream(simulaPropertiesFile));
 		} catch (Exception e) {
-			Util.popUpError("Can't load: " + simulaPropertiesFile + "\nGot error: " + e);
+			Util.IERR("Can't load: " + simulaPropertiesFile + "\nGot error: " + e);
 //			Thread.dumpStack();
 		}
 		simulaHome = new File(simulaProperties.getProperty("simula.home"));

@@ -3,12 +3,15 @@ package simula.lsp.compiler;
 import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.lsp.SimulaLanguageServer;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiTree;
 
+/// @author Øystein Myhre Andersen
+/// @author Google AI
 public class SimulaLspCompiler {
 
 
@@ -46,10 +49,13 @@ public class SimulaLspCompiler {
 //	    return diagnostics;
 	    
     	// MERK: Alle meldinger legges direkte inn i SourceDocumentItem.diagnostics  ON THE FLY !!!!!
+    	sourceItem.printDiagnostics();
     }
 
 
 	public static void buildPsiAndSyntaxTrees(SourceDocumentItem sourceDocumentItem) {
+    	LOG.info("SimulaLspCompiler.buildPsiAndSyntaxTrees: BEGIN");
+    	sourceDocumentItem.initDiagnostics();
 		String sourceText = sourceDocumentItem.getText();
 		PsiBuilder psiBuilder = new PsiBuilder(sourceDocumentItem);
 		ProgramModule syntaxTree = null;

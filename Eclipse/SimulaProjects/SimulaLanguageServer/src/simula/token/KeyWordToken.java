@@ -1,11 +1,17 @@
 package simula.token;
 
+import simula.lsp.compiler.TokenManager;
 import simula.psi.LexToken;
 
 public class KeyWordToken extends LexToken {
 	
 	public KeyWordToken(int tokenStartLine, CharSequence sourceText, int startOffset, int endOffset, int keyWord) {
 		super(tokenStartLine, sourceText, startOffset, endOffset, keyWord);
+	}
+
+	
+	public int getLspTokenType() {
+		return TokenManager.KEYWORD.index; 
 	}
 
 //	private KeyWordToken(int keyWord, String debugName) { super(keyWord, debugName);	}

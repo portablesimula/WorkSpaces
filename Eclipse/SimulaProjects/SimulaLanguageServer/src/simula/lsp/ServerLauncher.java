@@ -4,12 +4,15 @@ import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
 
-import simula.lsp.client.SimulaEditorClient;
+import simula.compiler.utilities.Global;
+import simula.lsp.client.SimulaDebugClient;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.Future;
 
+/// @author Øystein Myhre Andersen
+/// @author Google AI
 public class ServerLauncher {
 
     private static boolean DEBUG_MODE = true;
@@ -22,7 +25,8 @@ public class ServerLauncher {
     	SimulaLanguageServer server = new SimulaLanguageServer();
 
     	if(DEBUG_MODE) {
-    		LanguageClient client = new SimulaEditorClient();
+    		Global.initiate();
+    		LanguageClient client = new SimulaDebugClient();
     		server.connect(client);
     	} else {
     		try {
@@ -48,6 +52,7 @@ public class ServerLauncher {
     			e.printStackTrace();
     		}
     	}
-
     }
+    
+    
 }

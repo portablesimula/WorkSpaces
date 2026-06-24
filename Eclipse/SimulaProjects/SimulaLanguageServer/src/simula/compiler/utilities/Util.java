@@ -5,15 +5,12 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.utilities;
 
-import java.awt.Color;
 import java.io.InputStream;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -40,38 +37,6 @@ public final class Util {
 	public static String getJavaID() {
 		String javaID="Java version "+System.getProperty("java.version");
         return(javaID);
-	}
-
-	/// Pop up a message box.
-	/// @param msg the message
-	public static void popUpMessage(final Object msg) {
-		Util.optionDialog(msg,"Message",JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE, "OK");
-	}
-	
-	/// Pop up an error message box.
-	/// @param msg the error message
-	public static void popUpError(final String msg) {
-		int res=Util.optionDialog(msg+"\nDo you want to continue ?","Error",JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, "Yes", "No");
-		if(res!=JOptionPane.YES_OPTION) System.exit(0);
-	}
-
-	/// Brings up an option dialog.
-	/// @param msg the message to display
-	/// @param title the title string for the dialog
-	/// @param optionType an integer designating the options available on the dialog
-	/// @param messageType an integer designating the kind of message this is
-	/// @param option an array of objects indicating the possible choices the user can make
-	/// @return an integer indicating the option chosen by the user, or CLOSED_OPTION if the user closed the dialog
-	public static int optionDialog(final Object msg, final String title, final int optionType, final int messageType, final String... option) {
-		Object OptionPaneBackground = UIManager.get("OptionPane.background");
-		Object PanelBackground = UIManager.get("Panel.background");
-		UIManager.put("OptionPane.background", Color.WHITE);
-		UIManager.put("Panel.background", Color.WHITE);
-		int answer = JOptionPane.showOptionDialog(null, msg, title, optionType, messageType, Global.sIcon, option, option[0]);
-		// IO.println("doClose.saveDialog: answer="+answer);
-		UIManager.put("OptionPane.background", OptionPaneBackground);
-		UIManager.put("Panel.background", PanelBackground);
-		return (answer);
 	}
 
 	
@@ -200,7 +165,7 @@ public final class Util {
 	/// Perform FORCED EXIT.
 	private static void FORCED_EXIT() {
 		IO.println("FORCED EXIT");
-		if (Global.console == null) System.exit(-1);
+		System.exit(-1);
 	}
 
 	/// Print a internal error message.
@@ -279,19 +244,19 @@ public final class Util {
 	/// Print a string.
 	/// @param s the string
 	public static void println(final String s) {
-		if (Global.console != null) {
-			String u = s.replace('\r', (char) 0);
-			u = u.replace('\n', (char) 0);
-			Global.console.write(u + '\n');
-		}
-		else IO.println(s);
+//		if (Global.console != null) {
+//			String u = s.replace('\r', (char) 0);
+//			u = u.replace('\n', (char) 0);
+//			Global.console.write(u + '\n');
+//		} else
+			IO.println(s);
 	}  
 
 	/// Print a error message.
 	/// @param s the message
 	public static void printError(final String s) {
 		String u = s.replace('\r', (char) 0);
-		if (Global.console != null)	Global.console.writeError(u + '\n');
+//		if (Global.console != null)	Global.console.writeError(u + '\n');
 //		else
 			System.err.println(u);
 	}  
@@ -300,7 +265,7 @@ public final class Util {
 	/// @param s the message
 	public static void printWarning(final String s) {
 		String u = s.replace('\r', (char) 0);
-		if (Global.console != null)	Global.console.writeWarning(u + '\n');
+//		if (Global.console != null)	Global.console.writeWarning(u + '\n');
 //		else
 			System.err.println(u);
 	}  
@@ -424,19 +389,19 @@ public final class Util {
 		try {
 			Process process = processBuilder.start();		
 			InputStream output = process.getInputStream();  // Process' output
-			if (Global.console != null) {
-				while (process.isAlive()) {
-					while (output.available() > 0) {
-						Global.console.write("" + (char) output.read());
-					}
-				}
-			} else {
+//			if (Global.console != null) {
+//				while (process.isAlive()) {
+//					while (output.available() > 0) {
+//						Global.console.write("" + (char) output.read());
+//					}
+//				}
+//			} else {
 				while (process.isAlive()) {
 					while (output.available() > 0) {
 						System.out.append((char) output.read());
 					}
 				}
-			}
+//			}
 			return (process.exitValue());
 
 		} catch(Exception e) {

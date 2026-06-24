@@ -3,13 +3,16 @@ package simula.lsp;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.*;
 
-import simula.lsp.client.SimulaEditorClient;
+import simula.compiler.utilities.LOG;
+import simula.lsp.client.SimulaDebugClient;
 import simula.lsp.compiler.DocumentManager;
 import simula.lsp.compiler.SourceDocumentItem;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/// @author Øystein Myhre Andersen
+/// @author Google AI
 public class SimulaLanguageServer implements LanguageServer, LanguageClientAware {
 
     private LanguageClient client;
@@ -34,8 +37,8 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         // Valgfritt: Send en infomelding til klienten med en gang vi er koblet til
         MessageParams message = new MessageParams(MessageType.Info, "Serveren er koblet til klienten! " + client.getClass());
         client.logMessage(message);
-        if(client instanceof SimulaEditorClient extendedLanguageClient) {
-        	extendedLanguageClient.start();
+        if(client instanceof SimulaDebugClient extendedLanguageClient) {
+        	extendedLanguageClient.start(this);
         }
     }
 
@@ -52,6 +55,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
     /// må du returnere TextDocumentSyncKind.Full eller Incremental:
     @Override
     public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
+    	LOG.info("SimulaLanguageServer.initialize: BEGIN");
         ServerCapabilities capabilities = new ServerCapabilities();
         
 //        // Fortell klient VSCode/Eclipse/IntelliJ ... at vi vil ha beskjed når filer åpnes, endres og lukkes
@@ -70,7 +74,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         
         capabilities.setTextDocumentSync(syncOptions);
 
-        
+    	LOG.info("SimulaLanguageServer.initialize: RETURNS");
         return CompletableFuture.completedFuture(new InitializeResult(capabilities));
     }
 

@@ -1,11 +1,6 @@
-/**
- * 
- */
-/**
- * 
- */
+///
 module Simula {
-//	requires java.desktop;
+	requires java.desktop;
 	requires java.compiler;
 	
 	requires org.eclipse.lsp4j;

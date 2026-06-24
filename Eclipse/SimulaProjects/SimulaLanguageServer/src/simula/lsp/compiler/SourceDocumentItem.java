@@ -1,24 +1,99 @@
 package simula.lsp.compiler;
 
 import java.util.List;
+import java.util.Vector;
 
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.MarkupContent;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextDocumentItem;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.jsonrpc.util.ToStringBuilder;
 
 import simula.compiler.syntaxClass.statement.ProgramModule;
+import simula.compiler.utilities.LOG;
+import simula.psi.PsiElement;
 import simula.psi.PsiTree;
+import simula.psi.PsiTreeIterator;
 
+/// @author Øystein Myhre Andersen
+/// @author Google AI
 public class SourceDocumentItem {
 
 	private TextDocumentItem textDocumentItem;
 	private List<Diagnostic> diagnostics;
 	private PsiTree psiTree;
+	List<LspToken> tokenList;
 	private ProgramModule syntaxTree; // Root of Syntax Tree
 
 	public SourceDocumentItem(final TextDocumentItem textDocumentItem) {
 		this.textDocumentItem = textDocumentItem;
 	}
+
+	public void printDiagnostics() {
+		LOG.info("++++++++++++++++ DIAGNOSTICS BEGIN ++++++++++++++++++");
+		boolean detailed = false;//true;
+		if(detailed) {
+			for(Diagnostic diagnostic:diagnostics) LOG.info(diagnostic.toString());			
+		} else {
+			for(Diagnostic diagnostic:diagnostics) LOG.info(edDiagnostic(diagnostic));
+		}
+		LOG.info("+++++++++++++++++ DIAGNOSTICS END +++++++++++++++++++");
+	}
+
+	public String edDiagnostic(Diagnostic diagnostic) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(diagnostic.getSeverity()+" ");
+		Range range = diagnostic.getRange();
+		sb.append(edRange(range)+" ");
+		Either<String, MarkupContent> msg = diagnostic.getMessage();
+		sb.append(msg.getLeft());
+		return sb.toString();
+	}
+	
+	public String edRange(Range range) {
+		Position start = range.getStart();
+		Position end = range.getEnd();
+		return "Range[start:" +edPosition(start) + ", end:" + edPosition(end)+ "]";
+	}
+	
+	public String edPosition(Position pos) {
+		return "[line:" + pos.getLine() +", char:" + pos.getCharacter() + "]";
+	}
+	
+	// ****************************************************************
+	// *** createTokenList
+	// ****************************************************************
+    /// Create the tokenList with tokens delivered from the psiTree.
+    public void createTokenList() {
+    	this.tokenList = new Vector<LspToken>();
+		boolean TESTING = true;
+		if(TESTING) {
+//			PsiTreeIterator.TRACING = true;
+			psiTree.printPsiTree("++++++++++++++++ PSI TREE ++++++++++++++++++");
+		}
+		PsiTreeIterator itr = new PsiTreeIterator(psiTree);
+		while (itr.hasNext()) {
+			PsiElement elt = itr.next();
+			if(TESTING) {
+//				IO.println("PsiTextPanel.fillTextPane: GOT NEXT: " + elt.edText());
+			IO.println("PsiTextPanel.fillTextPane: GOT NEXT: " + elt);
+			}
+				
+		    int line = elt.lineNumber;
+		    int character = elt.startOffset;
+		    int length = elt.endOffset - elt.startOffset;
+		    int type = elt.getLspTokenType();
+		    int mod = 0; //????;
+
+			LspToken lspToken = new LspToken(line, character, length, type, mod);
+
+			tokenList.add(lspToken);
+		}
+		PsiTreeIterator.TRACING = false;
+	}
+
 
 	/// Get the text document's SyntaxTree.
 	public ProgramModule getSyntaxTree() {
@@ -45,14 +120,18 @@ public class SourceDocumentItem {
 		return diagnostics;
 	}
 
+	public void initDiagnostics() {
+		diagnostics = new Vector<Diagnostic>();
+	}
+	
 	public void addDiagnostic(Diagnostic diagnostic) {
 		diagnostics.add(diagnostic);
 	}
 
-	/// Set the text document's diagnostics.
-	public void setDiagnostics(final List<Diagnostic> diagnostics) {
-		this.diagnostics = diagnostics;
-	}
+//	/// Set the text document's diagnostics.
+//	public void setDiagnostics(final List<Diagnostic> diagnostics) {
+//		this.diagnostics = diagnostics;
+//	}
 
 	/// Get the text document's uri.
 	public String getUri() {
