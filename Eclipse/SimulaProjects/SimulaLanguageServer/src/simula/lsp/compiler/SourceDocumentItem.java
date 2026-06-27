@@ -24,22 +24,42 @@ public class SourceDocumentItem {
 	private TextDocumentItem textDocumentItem;
 	private List<Diagnostic> diagnostics;
 	private PsiTree psiTree;
-	List<LspToken> tokenList;
+	public List<LspToken> tokenList;
 	private ProgramModule syntaxTree; // Root of Syntax Tree
 
 	public SourceDocumentItem(final TextDocumentItem textDocumentItem) {
 		this.textDocumentItem = textDocumentItem;
 	}
 
-	public void printDiagnostics() {
-		LOG.info("++++++++++++++++ DIAGNOSTICS BEGIN ++++++++++++++++++");
+	public void printAll(String title) {
+		printSyntaxTree(title);
+		printDiagnostics(title);
+		printTokenList(title);
+	}
+	
+	public void printSyntaxTree(String title) {
+		IO.println("======================================== BEGIN SYNTAX TREE: " + title + " ============================ ");
+		syntaxTree.print(0);
+		IO.println("======================================== ENDOF SYNTAX TREE: " + title + " ============================ ");
+	}
+
+	public void printDiagnostics(String title) {
+		LOG.info("++++++++++++++++ BEGIN DIAGNOSTICS: " + title + " ++++++++++++++++++");
 		boolean detailed = false;//true;
 		if(detailed) {
 			for(Diagnostic diagnostic:diagnostics) LOG.info(diagnostic.toString());			
 		} else {
 			for(Diagnostic diagnostic:diagnostics) LOG.info(edDiagnostic(diagnostic));
 		}
-		LOG.info("+++++++++++++++++ DIAGNOSTICS END +++++++++++++++++++");
+		LOG.info("++++++++++++++++ ENDOF DIAGNOSTICS: " + title + " ++++++++++++++++++");
+	}
+	
+	public void printTokenList(String title) {
+		IO.println("======================================== BEGIN TOKEN LIST: " + title + " ============================ ");
+		for(LspToken token:tokenList) {
+			IO.println(""+token);
+		}
+		IO.println("======================================== ENDOF TOKEN LIST: " + title + " ============================ ");		
 	}
 
 	public String edDiagnostic(Diagnostic diagnostic) {
@@ -71,7 +91,8 @@ public class SourceDocumentItem {
 		boolean TESTING = true;
 		if(TESTING) {
 //			PsiTreeIterator.TRACING = true;
-			psiTree.printPsiTree("++++++++++++++++ PSI TREE ++++++++++++++++++");
+			psiTree.printPsiTree("++++++++++++++++ SourceDocumentItem.createTokenList: PSI TREE: " + psiTree + " ++++++++++++++++++");
+			Thread.dumpStack();
 		}
 		PsiTreeIterator itr = new PsiTreeIterator(psiTree);
 		while (itr.hasNext()) {

@@ -43,6 +43,7 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiParse;
+import simula.psi.PsiTree;
 
 /// Variable.
 /// 
@@ -181,8 +182,9 @@ public final class VariableExpression extends Expression {
 	public static VariableExpression expectVariable(final PsiBuilder psiBuilder, final String ident) {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse Variable, current=" + PsiParse.currentLexToken(psiBuilder));
+		IO.println("Parse Variable, current=" + PsiParse.currentLexToken(psiBuilder));
+		Util.STOP();
 		VariableExpression variable = new VariableExpression(psiBuilder, ident);
-//		variable.psiTree = psiBuilder.psiTree;
 		if (PsiParse.accept(psiBuilder, KeyWord.BEGPAR)) {
 //			IO.println("VariableExpression.expectVariable: GOT BEGPAR");
 			variable.params = new Vector<Expression>();
@@ -224,6 +226,7 @@ public final class VariableExpression extends Expression {
 			return;
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN Variable(" + identifier + ").doChecking: type=" + type);
+		IO.println("BEGIN Variable(" + identifier + ").doChecking: type=" + type);
 		Global.sourceLineNumber = firstLineNumber();
 		Declaration declaredAs = getMeaning().declaredAs;
 		if (declaredAs != null)

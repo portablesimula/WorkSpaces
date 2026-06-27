@@ -25,7 +25,9 @@ public class SimulaLexer {
     public LexToken EOF;
     
     private LexToken prevParserToken;
+    private LexToken prevLexerToken;
     private LexToken currentLexerToken;
+    private int currentLineStartPosition; // BARE HVIE TESTING_WITHOUT_PSI = true
     private int currentPosition;
     private int tokenStartOffset;
     private int tokenEndOffset;
@@ -105,7 +107,25 @@ public class SimulaLexer {
 //    	Util.STOP();
     }
     
-    public void start(CharSequence buffer, int startOffset, int endOffset) {
+    public void start(CharSequence sourceText) {
+		if(! Option.TESTING_WITHOUT_PSI) Util.IERR("SimulaLexer.start: Skal burukes");
+    	if(Option.internal.TRACE_LEXER > 0) IO.println(("SimulaLexer.start: " + sourceText).replace("\r", "\\r").replace("\n", "\\n"));
+        this.sourceText = sourceText;
+		int startOffset = 0;
+		int endOffset = sourceText.length();
+        nextLineNumber = 0;
+        
+        currentLineStartPosition = 0;
+        textEndOffset = endOffset;
+        currentPosition = startOffset;
+        tokenStartOffset = startOffset;
+        tokenEndOffset = startOffset;
+        advance();
+//		IO.println("SimulaLexer.START: nextLineNumber: " + nextLineNumber + ", tokenStartLine: " + tokenStartLine);
+    }
+    
+    public void startPsi(CharSequence buffer, int startOffset, int endOffset) {
+		if(Option.TESTING_WITHOUT_PSI) Util.IERR("SimulaLexer.startPsi: Skal ikke burukes");
     	if(Option.internal.TRACE_LEXER > 0) IO.println(("SimulaLexer.start: " + buffer).replace("\r", "\\r").replace("\n", "\\n"));
         sourceText = buffer;
         nextLineNumber = 1;
@@ -118,6 +138,7 @@ public class SimulaLexer {
     }
 
     public void advance() {
+    	prevLexerToken = currentLexerToken;
     	if(currentLexerToken != null && currentLexerToken.isParserToken()) prevParserToken = currentLexerToken;
 //        IO.println("SimulaLexer.advance: BEGIN -----------------------------------------------------------------------");
 //        printQueue();
@@ -201,6 +222,11 @@ public class SimulaLexer {
         }
 		advance();
 	}
+
+	public LexToken getPrevLexerToken() {
+        if(Option.internal.TRACE_LEXER > 1) IO.println("SimulaLexer.getPrevLexerToken: "+prevLexerToken);
+        return prevLexerToken;
+    }
 
 	public LexToken getPrevParserToken() {
         if(Option.internal.TRACE_LEXER > 1) IO.println("SimulaLexer.getPrevParserToken: "+prevParserToken);

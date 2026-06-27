@@ -96,14 +96,12 @@ public final class Util {
 		token.addError(mss);
 //		IO.println("Util.: ADD ERROR TEXT: " + token + " " + msg);
 		Global.sourceLineNumber = lno;
-		
-		
+
 		SourceDocumentItem sourceItem = psiBuilder.sourceDocumentItem;
 		Diagnostic diagnostic = new Diagnostic();
         diagnostic.setSeverity(DiagnosticSeverity.Error);
         diagnostic.setMessage(mss);
         
-        int tokenStart = token.startOffset;
         // LSP bruker 0-indekserte linjer og tegn
 //        Position start = new Position(error.getLine() - 1, error.getCharPosition());
 //        Position end = new Position(error.getLine() - 1, error.getCharPosition() + error.getLength());
@@ -122,7 +120,24 @@ public final class Util {
 		
 //		IO.println("\n\nUtil.semanticError: ADD ERROR TEXT: " + elt + " " + msg);
 		printError(err);
-		elt.addError(mss);
+		if(Option.TESTING_WITHOUT_PSI) {
+			SourceDocumentItem sourceItem = elt.psiBuilder.sourceDocumentItem;
+			Diagnostic diagnostic = new Diagnostic();
+	        diagnostic.setSeverity(DiagnosticSeverity.Error);
+	        diagnostic.setMessage(mss);
+	        
+	        IO.println("Util.semanticError: " + elt.getClass().getSimpleName() + " " + elt + "  " + msg);
+	        LexToken first = elt.getFirstLexToken();
+	        LexToken last = elt.getLastLexToken();
+	        
+	        // LSP bruker 0-indekserte linjer og tegn
+	        Position start = new Position(first.lineNumber - 1, first.startOffset);
+	        Position end = new Position(last.lineNumber - 1, last.endOffset);
+	        diagnostic.setRange(new Range(start, end));
+			sourceItem.addDiagnostic(diagnostic);
+		} else {
+			elt.addError(mss);
+		}
 		Global.sourceLineNumber = lno;
 //		Thread.dumpStack();
 	}

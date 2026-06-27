@@ -5,7 +5,7 @@ import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
 
 import simula.compiler.utilities.Global;
-import simula.lsp.client.SimulaDebugClient;
+import simula.inline.tester.SimulaDebugClient;
 
 import java.io.InputStream;
 import java.io.OutputStream;

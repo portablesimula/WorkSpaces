@@ -96,6 +96,11 @@ public class PsiParse {
         return (LexToken)psiBuilder.getCurrentLexerToken();
 	}
 
+	/// Return the prev Token.
+	public static LexToken getPrevLexToken(final PsiBuilder psiBuilder) {
+        return (LexToken)psiBuilder.getPrevLexerToken();
+	}
+
 	/// Return the Parser current Token.
 	public static LexToken getCurrentParserToken(final PsiBuilder psiBuilder) {
         return psiBuilder.getCurrentParserToken();

@@ -24,6 +24,7 @@ public class SimulaLexer {
     public LexToken EOF;
     
     private LexToken prevParserToken;
+    private LexToken prevLexerToken;
     private LexToken currentLexerToken;
     private int currentPosition;
     private int tokenStartOffset;
@@ -200,6 +201,10 @@ public class SimulaLexer {
         	LexToken.prevToken = null;
         }
 		advance();
+	}
+
+	public LexToken getPrevToken() {
+        return prevLexerToken;
 	}
 
 	public LexToken getPrevParserToken() {

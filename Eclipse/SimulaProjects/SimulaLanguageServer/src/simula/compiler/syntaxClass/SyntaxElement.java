@@ -16,11 +16,14 @@ import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Html;
 import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.psi.LexTokenRange;
 import simula.psi.ExternalPsiTree;
 import simula.psi.LexToken;
 import simula.psi.PsiBuilder;
 import simula.psi.PsiElement;
+import simula.psi.PsiParse;
 import simula.psi.PsiTree;
 
 /// The class SyntaxElement.
@@ -99,6 +102,10 @@ public abstract class SyntaxElement {
 	/// Set by PsiBuilder.doneSubtree
 	/// The associated PSI Tree
 	public PsiTree psiTree;
+	
+	/// Set by PsiBuilder.doneSubtree
+	/// The associated lexTokenRange
+	public LexTokenRange lexTokenRange; // TESTING_WITHOUT_PSI
 
 //	/// All errors associated with this SyntaxElement
 //	public Vector<String> errors;
@@ -133,33 +140,72 @@ public abstract class SyntaxElement {
 		this.psiTree = (psiBuilder == null)? PsiTree.dummyTree : psiBuilder.psiTree;
 	}
 
+//	protected void startParse(final LexToken firstLexToken) { // TESTING_WITHOUT_PSI
+//		IO.println("SyntaxElement.startParse: " + this.getClass().getSimpleName() + " with token: " + firstLexToken);
+//		lexTokenRange.firstLexToken = firstLexToken;
+//		lexTokenRange.lastLexToken = firstLexToken;
+//	}
+//
+//	protected void doneParse(final LexToken lastLexToken) { // TESTING_WITHOUT_PSI
+//		lexTokenRange.lastLexToken = lastLexToken;
+//	}
+
+	/// The first source line number
+	public LexToken getFirstLexToken() {
+		if(Option.TESTING_WITHOUT_PSI) {
+			return lexTokenRange.getFirstLexToken();			
+		} else {
+			Util.IERR("");
+			return null;
+		}
+	}
+
+	/// The last source line number
+	public LexToken getLastLexToken() {
+		if(Option.TESTING_WITHOUT_PSI) {
+			return lexTokenRange.getLastLexToken();			
+		} else {
+			Util.IERR("");
+			return null;
+		}
+	}
+
 	/// The first source line number
 	public int firstLineNumber() {
-		int lno = psiTree.firstLineNumber();
-//		if(lno < 0) System.err.println("Illegal LintNumber: " + lno + " IN " + this.getClass().getSimpleName()+" "+this);
-		return lno;
+		if(Option.TESTING_WITHOUT_PSI) {
+			if(lexTokenRange == null) return -99;
+			return lexTokenRange.getFirstLexToken().firstLineNumber();			
+		} else {
+			return psiTree.firstLineNumber();
+		}
 	}
 
 	/// The last source line number
 	public int lastLineNumber() {
-		return psiTree.lastLineNumber();
+		if(Option.TESTING_WITHOUT_PSI) {
+			if(lexTokenRange == null) return +99;
+			return lexTokenRange.getLastLexToken().lastLineNumber();			
+		} else {
+			return psiTree.lastLineNumber();
+		}
 	}
 
 	
 	public void addError(String err) {
-//		if(errors == null) errors = new Vector<String>();
-//		errors.add(err);
-//		IO.println("SyntaxElement.addError: TREATING " + this.getClass().getSimpleName() + " " + this + "  ERR="+err);
-		for(PsiElement elt : psiTree.getChildren()) {
-			if(elt instanceof LexToken token) {
-				switch(token.keyWord) {
-					case KeyWord.NEWLINE:
-					case KeyWord.WHITESPACES:
-					case KeyWord.COMMENT_TEXT:
-						break;
-					default:
-//						IO.println("SyntaxElement.addError: ADD TO " + token);
-					    token.addError(err);
+		if(Option.TESTING_WITHOUT_PSI) {
+			Util.IERR("SKAL IKKE BRUKES");
+		} else {
+			for(PsiElement elt : psiTree.getChildren()) {
+				if(elt instanceof LexToken token) {
+					switch(token.keyWord) {
+						case KeyWord.NEWLINE:
+						case KeyWord.WHITESPACES:
+						case KeyWord.COMMENT_TEXT:
+							break;
+						default:
+							IO.println("SyntaxElement.addError: ADD TO " + token);
+						    token.addError(err);
+					}
 				}
 			}
 		}

@@ -96,8 +96,8 @@ public final class ProgramModule extends Statement {
 //		String debugName = "ProgramModule";
 //		psiBuilder.startSubtree(PsiTree.Kind.programModule, debugName);
 
-		sysin=new VariableExpression(null, "sysin");
-		sysout=new VariableExpression(null, "sysout");
+		sysin=new VariableExpression(null, "sysin");   sysin.SET_SEMANTICS_CHECKED();
+		sysout=new VariableExpression(null, "sysout"); sysout.SET_SEMANTICS_CHECKED();
 //		try	{
 			if(Option.internal.TRACE_PARSE) PsiParse.TRACE("Parse Program");
 			Global.setScope(StandardClass.BASICIO);		    	// BASICIO Begin

@@ -1,13 +1,18 @@
 package simula.lsp;
 
 import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.jsonrpc.CompletableFutures;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.jsonrpc.messages.Either3;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import simula.lsp.compiler.DocumentManager;
+import simula.lsp.compiler.SourceDocumentItem;
+import simula.lsp.compiler.TokenManager;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 
 /// @author Øystein Myhre Andersen
@@ -91,7 +96,37 @@ public class SimulaTextDocumentService implements TextDocumentService {
 	 */
 	@Override
 	public CompletableFuture<SemanticTokens> semanticTokensFull(SemanticTokensParams params) {
-		throw new UnsupportedOperationException();
+		return TokenManager.semanticTokensFull(params, server);
+//        return CompletableFutures.computeAsync((cancelChecker) -> {
+//            try {
+//                SemanticTokensContext context = ContextBuilder.buildSemanticTokensContext(
+//                        params.getTextDocument().getUri(),
+//                        this.workspaceManagerProxy.get(),
+//                        this.serverContext,
+//                        cancelChecker);
+//
+//                return SemanticTokensUtils.getSemanticTokens(context);
+//            } catch (CancellationException ignore) {
+//                // Ignore cancellation exception
+//            } catch (Throwable e) {
+//                String msg = "Operation 'textDocument/semanticTokens/full' failed!";
+//                this.clientLogger.logError(LSContextOperation.TXT_SEMANTIC_TOKENS_FULL, msg, e,
+//                        new TextDocumentIdentifier(params.getTextDocument().getUri()),
+//                        (Position) null);
+//            }
+//
+//            return new SemanticTokens(new ArrayList<>());
+//        });
+	}
+//	@JsonNotification  TESTING
+//	@Override          TESTING
+	public SemanticTokens getAllSemanticTokens(SemanticTokensParams params) {
+    	return TokenManager.getAllSemanticTokens(params, server);		
+	}
+	public String getUpdatedText(String documentUri) {
+		DocumentManager documentManager = server.getDocumentManager();
+		SourceDocumentItem sourceItem = documentManager.get(documentUri);
+		return sourceItem.getText();
 	}
 
 	/**

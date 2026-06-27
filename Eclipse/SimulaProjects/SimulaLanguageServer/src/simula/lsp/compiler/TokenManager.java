@@ -2,7 +2,10 @@ package simula.lsp.compiler;
 
 import org.eclipse.lsp4j.SemanticTokens;
 import org.eclipse.lsp4j.SemanticTokensParams;
+
+import simula.compiler.utilities.LOG;
 import simula.lsp.SimulaLanguageServer;
+import simula.psi.PsiTree;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,32 +55,110 @@ public class TokenManager {
 	public static final SimulaTokenType KEYWORD =	new SimulaTokenType( "keyword",  1 );
 	public static final SimulaTokenType STRING =	new SimulaTokenType( "string",   2 );
 	public static final SimulaTokenType NUMBER =	new SimulaTokenType( "number",   3 );
-	public static final SimulaTokenType COMMENT =	new SimulaTokenType( "keyword",  4 );
+	public static final SimulaTokenType COMMENT =	new SimulaTokenType( "macro",    4 );
 	public static final SimulaTokenType OTHER =		new SimulaTokenType( "variable", 5 );
 	
+	public static String edSimulaTokenType(int index) {
+		switch(index) {
+			case 1: return "keyword";
+			case 2: return "string";
+			case 3: return "number";
+			case 4: return "comment";
+			case 5: return "other";
+		}
+		return "UNKNOWN";
+	}
 	
-	
-//	public class MyTextDocumentService implements TextDocumentService {
-
-//	    // Helper class to hold absolute parsed token data
-//	    class LspToken {
-//	        int line;      // 0-based
-//	        int character; // 0-based
-//	        int length;
-//	        int tokenTypeIndex;
-//	        int tokenModifiersBitmask;
-//
-//	        LspToken(int line, int character, int length, int type, int mod) {
-//	            this.line = line;
-//	            this.character = character;
-//	            this.length = length;
-//	            this.tokenTypeIndex = type;
-//	            this.tokenModifiersBitmask = mod;
-//	        }
-//	    }
 
 //	    @Override
-	    public CompletableFuture<SemanticTokens> semanticTokensFull(SemanticTokensParams params, SimulaLanguageServer server) {
+	    public static CompletableFuture<SemanticTokens> semanticTokensFull(SemanticTokensParams params, SimulaLanguageServer server) {
+            LOG.info("TokenManager.semanticTokensFull: BEGIN");
+	        return CompletableFuture.supplyAsync(() -> {
+	            return getAllSemanticTokens(params, server) ;
+	        });
+	    }
+
+
+//	    @Override
+	    public static SemanticTokens getAllSemanticTokens(SemanticTokensParams params, SimulaLanguageServer server) {
+            LOG.info("TokenManager.semanticTokensFullBody: BEGIN");
+	            String documentUri = params.getTextDocument().getUri();
+	            
+	            // 1. Fetch your document state (since Sync is FULL, look up your latest document text cache)
+//	            String documentText = MyDocumentTracker.get(uri); 
+	    		DocumentManager documentManager = server.getDocumentManager();
+	    		SourceDocumentItem sourceItem = documentManager.get(documentUri);
+	    		String documentText = sourceItem.getText();
+
+	            // 2. Parse text and extract tokens in absolute positions
+//	            List<LspToken> lspTokens = parseTokens(documentText);
+	    		sourceItem.createTokenList();
+	            List<LspToken> lspTokens = sourceItem.tokenList;
+                LOG.info("TokenManager.semanticTokensFull: lspTokens: " + lspTokens);
+                IO.println("TokenManager.semanticTokensFull: lspTokens: " + lspTokens);
+	            
+	            
+
+	            // 3. Sort tokens sequentially (Line first, then Character position)
+	            lspTokens.sort((t1, t2) -> {
+	                if (t1.line != t2.line) return Integer.compare(t1.line, t2.line);
+	                return Integer.compare(t1.column, t2.column);
+	            });
+
+	            // 4. Compress absolute data into LSP delta format
+	            List<Integer> encodedData = new ArrayList<>();
+	            int prevLine = 0;
+	            int prevChar = 0;
+
+	            for (LspToken token : lspTokens) {
+	                int deltaLine = token.line - prevLine;
+	                // If it is on the same line, char offset is relative to the previous token's start char
+	                int deltaChar = (deltaLine == 0) ? (token.column - prevChar) : token.column;
+	                
+	                LOG.info("TokenManager.semanticTokensFull: " + token
+	                		+ " ==> deltaLine:" + deltaLine
+	                		+ ", deltaChar: " + deltaChar
+	                		+ ", length:" + token.length
+	                		+ ", type:" + token.tokenTypeIndex + ':' + edSimulaTokenType(token.tokenTypeIndex));
+
+	                encodedData.add(deltaLine);
+	                encodedData.add(deltaChar);
+	                encodedData.add(token.length);
+	                encodedData.add(token.tokenTypeIndex);
+	                encodedData.add(token.tokenModifiersBitmask);
+
+	                // Update trackers for next iteration
+	                prevLine = token.line;
+	                prevChar = token.column;
+	            }
+
+	            return new SemanticTokens(encodedData);
+	    }
+	    // SLIK GJØRES DET I BallerinaLang:
+		// public SemanticToken processSemanticToken(List<Integer> data, SemanticToken previousToken) {
+		//    int line = this.getLine();
+		//    int column = this.getColumn();
+		//    int prevTokenLine = line;
+		//    int prevTokenColumn = column;
+		//
+		//    if (previousToken != null) {
+		//        if (line == previousToken.getLine()) {
+		//            column -= previousToken.getColumn();
+		//        }
+		//        line -= previousToken.getLine();
+		//    }
+		//    data.add(line);
+		//    data.add(column);
+		//    data.add(this.getLength());
+		//    data.add(this.getType());
+		//    data.add(this.getModifiers());
+		//    return new SemanticToken(prevTokenLine, prevTokenColumn);
+		// }
+
+
+//	    @Override
+	    public static CompletableFuture<SemanticTokens> OLD_semanticTokensFull(SemanticTokensParams params, SimulaLanguageServer server) {
+            LOG.info("TokenManager.semanticTokensFull: BEGIN");
 	        return CompletableFuture.supplyAsync(() -> {
 	            String documentUri = params.getTextDocument().getUri();
 	            
@@ -88,12 +169,18 @@ public class TokenManager {
 	    		String documentText = sourceItem.getText();
 
 	            // 2. Parse text and extract tokens in absolute positions
-	            List<LspToken> absoluteTokens = parseTokens(documentText);
+//	            List<LspToken> lspTokens = parseTokens(documentText);
+	    		sourceItem.createTokenList();
+	            List<LspToken> lspTokens = sourceItem.tokenList;
+                LOG.info("TokenManager.semanticTokensFull: lspTokens: " + lspTokens);
+                IO.println("TokenManager.semanticTokensFull: lspTokens: " + lspTokens);
+	            
+	            
 
 	            // 3. Sort tokens sequentially (Line first, then Character position)
-	            absoluteTokens.sort((t1, t2) -> {
+	            lspTokens.sort((t1, t2) -> {
 	                if (t1.line != t2.line) return Integer.compare(t1.line, t2.line);
-	                return Integer.compare(t1.character, t2.character);
+	                return Integer.compare(t1.column, t2.column);
 	            });
 
 	            // 4. Compress absolute data into LSP delta format
@@ -101,10 +188,12 @@ public class TokenManager {
 	            int prevLine = 0;
 	            int prevChar = 0;
 
-	            for (LspToken token : absoluteTokens) {
+	            for (LspToken token : lspTokens) {
 	                int deltaLine = token.line - prevLine;
 	                // If it is on the same line, char offset is relative to the previous token's start char
-	                int deltaChar = (deltaLine == 0) ? (token.character - prevChar) : token.character;
+	                int deltaChar = (deltaLine == 0) ? (token.column - prevChar) : token.column;
+	                
+	                LOG.info("TokenManager.semanticTokensFull: " + token + " ==> ");
 
 	                encodedData.add(deltaLine);
 	                encodedData.add(deltaChar);
@@ -114,20 +203,13 @@ public class TokenManager {
 
 	                // Update trackers for next iteration
 	                prevLine = token.line;
-	                prevChar = token.character;
+	                prevChar = token.column;
 	            }
 
 	            return new SemanticTokens(encodedData);
 	        });
 	    }
 
-	    private List<LspToken> parseTokens(String text) {
-	        List<LspToken> tokens = new ArrayList<>();
-	        // TODO: Plug your AST parser / Lexer here. 
-	        // Example: If a keyword "class" is at Line 0, Char 5, length 5:
-	        // tokens.add(new LspToken(0, 5, 5, 3, 0)); // index 3 = "class"
-	        return tokens;
-	    }
 	
 
 }

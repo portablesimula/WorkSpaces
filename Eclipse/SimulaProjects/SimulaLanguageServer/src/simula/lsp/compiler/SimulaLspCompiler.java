@@ -49,7 +49,7 @@ public class SimulaLspCompiler {
 //	    return diagnostics;
 	    
     	// MERK: Alle meldinger legges direkte inn i SourceDocumentItem.diagnostics  ON THE FLY !!!!!
-    	sourceItem.printDiagnostics();
+		sourceItem.printAll("SimulaLspCompiler.runCompilerOrValidator: ");
     }
 
 
@@ -69,15 +69,24 @@ public class SimulaLspCompiler {
 		}
 		
 		sourceDocumentItem.setSyntaxTree(syntaxTree);
-			
+		if(Option.TESTING_WITHOUT_PSI) {
+			IO.println("======================================== BEGIN RESULT AFTER buildPsiAndSyntaxTrees ============================ ");
+			syntaxTree.print(0);
+			IO.println("======================================== ENDOF RESULT AFTER buildPsiAndSyntaxTrees ============================ ");
+		}
+		
 		StandardClass.ENVIRONMENT.doChecking();
 		Global.duringParsing = false;
 		syntaxTree.doChecking();
-		PsiTree psiTree = psiBuilder.getRoot();
-		if(Option.PSI_VERIFY) {
-			checkPsiText(sourceText, psiTree);
+		
+		if(Option.TESTING_WITHOUT_PSI) {
+		} else {
+			PsiTree psiTree = psiBuilder.getRoot();
+			if(Option.PSI_VERIFY) {
+				checkPsiText(sourceText, psiTree);
+			}
+			sourceDocumentItem.setPsiTree(psiTree);
 		}
-		sourceDocumentItem.setPsiTree(psiTree);
 	}
 	
 	private static void checkPsiText(String sourceText, PsiTree psiTree) {

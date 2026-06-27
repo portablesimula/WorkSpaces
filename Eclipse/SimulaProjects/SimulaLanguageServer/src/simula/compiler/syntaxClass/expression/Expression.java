@@ -178,17 +178,22 @@ public abstract class Expression extends SyntaxElement {
 	/// </pre>             
 	///        
 	/// @return Expression or null if no expression is found.
-	private static Expression acceptSimpleExpression(PsiBuilder psiBuilder)  {   
-		psiBuilder.startSubtree(PsiTree.Kind.simpleExpression, "SimpleExpression");
-		int level = psiBuilder.psiLevel();
+	private static Expression acceptSimpleExpression(PsiBuilder psiBuilder)  { 
+		int level = 0;
+		if(! Option.TESTING_WITHOUT_PSI) {
+			psiBuilder.startSubtree(PsiTree.Kind.simpleExpression, "SimpleExpression");
+			level = psiBuilder.psiLevel();
+		}
 		Expression expr = acceptANDTHEN(psiBuilder);
 		while(PsiParse.accept_OR_ELSE(psiBuilder)) {
 			psiBuilder.startSubtree(PsiTree.Kind.booleanExpression, "accept_OR_ELSE");
 			expr=new BooleanExpression(psiBuilder, expr, KeyWord.OR_ELSE, acceptANDTHEN(psiBuilder));
 			psiBuilder.doneSubtree(PsiTree.Kind.booleanExpression, expr);
 		}
-		psiBuilder.checkLevel(level);
-		psiBuilder.doneSubtree(PsiTree.Kind.simpleExpression, expr);
+		if(! Option.TESTING_WITHOUT_PSI) {
+			psiBuilder.checkLevel(level);
+			psiBuilder.doneSubtree(PsiTree.Kind.simpleExpression, expr);
+		}
 		return(expr);
 	}
 

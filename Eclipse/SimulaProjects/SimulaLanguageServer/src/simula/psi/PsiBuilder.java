@@ -10,6 +10,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.lsp.compiler.LspToken;
 import simula.lsp.compiler.SourceDocumentItem;
 import simula.token.SimpleString;
 
@@ -18,8 +19,10 @@ public class PsiBuilder {
 	public SourceDocumentItem sourceDocumentItem;
 	
     private SimulaLexer lexer;
-    public PsiTree psiRoot;
-    public PsiTree psiTree;
+    public PsiTree psiRoot; // TESTING_WITHOUT_PSI = false
+    public PsiTree psiTree; // TESTING_WITHOUT_PSI = false
+    public LexTokenRange astRoot;       // TESTING_WITHOUT_PSI = true
+    public LexTokenRange lexTokenRange; // TESTING_WITHOUT_PSI = true
     CharSequence sourceText;
 
 	private LexToken prevWasNEWLINE = null; // Used by PSI_VERIFY
@@ -30,14 +33,22 @@ public class PsiBuilder {
 
 	public void start(CharSequence sourceText) {
 		this.sourceText = sourceText;
-		psiTree = psiRoot = new PsiTree(null, 1, sourceText, 1, "ROOT");
-        lexer = new SimulaLexer(this);
-		int startOffset = 0;
-		int endOffset = sourceText.length();
-	    lexer.start(sourceText, startOffset, endOffset);
+		if(Option.TESTING_WITHOUT_PSI) {
+			sourceDocumentItem.tokenList = new Vector<LspToken>();
+			lexTokenRange = astRoot = new LexTokenRange(null);
+	        lexer = new SimulaLexer(this);
+		    lexer.start(sourceText);
+		} else {
+			psiTree = psiRoot = new PsiTree(null, 1, sourceText, 1, "ROOT");
+	        lexer = new SimulaLexer(this);
+			int startOffset = 0;
+			int endOffset = sourceText.length();
+		    lexer.startPsi(sourceText, startOffset, endOffset);
+		}
 	}
 	
     public PsiTree getRoot() {
+		if(Option.TESTING_WITHOUT_PSI) Util.IERR("getRoot - Skal ikke burukes");
     	return psiRoot;
     }
 
@@ -46,10 +57,12 @@ public class PsiBuilder {
     }
     
     public int psiLevel() {
+		if(Option.TESTING_WITHOUT_PSI) Util.IERR("psiLevel - Skal ikke burukes");
     	return psiTree.level();
     }
     
     public void checkLevel(int level) {
+		if(Option.TESTING_WITHOUT_PSI) Util.IERR("xxx - Skal ikke burukes");
     	if(psiTree.level() != level) {
     		Util.IERR("ERROR: CheclLevel FAILED. "+psiTree.level() + " != " + level);
 //    		Util.STOP();
@@ -63,6 +76,10 @@ public class PsiBuilder {
     /// Invariant: Lexer'parserToken is first token of construct
     /// 
     public void startSubtree(PsiTree.Kind kind, String debugName) {
+		if(Option.TESTING_WITHOUT_PSI) {
+			lexTokenRange = new LexTokenRange(lexTokenRange);//, getSourceLineNumber(), sourceText, startOffset, debugName);
+			return;
+		}
     	LexToken checkPoint = this.getCurrentParserToken();
 //		IO.println("\n\nPsiBuilder.startSubtree: "+debugName+", CHECKPOINT: "+checkPoint+" CALLED FROM: "+Util.calledFrom(3,6));
 //    	lexer.snapShot("START SubTree: "+ lexer.getCurrentLexerToken()+ " " + debugName);
@@ -86,6 +103,7 @@ public class PsiBuilder {
 	}
 		
 	public void doneSubtree(PsiTree.Kind kind, SyntaxElement syntaxElement) {
+		if(Option.TESTING_WITHOUT_PSI) return;
 //		IO.println("PsiBuilder.doneSubtree: syntaxElement="+syntaxElement);
 		Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
 		if(syntaxElement != null) syntaxElements.add(syntaxElement);
@@ -93,6 +111,21 @@ public class PsiBuilder {
 	}
 	
 	public void doneSubtree(PsiTree.Kind kind, Vector<SyntaxElement> syntaxElements) {
+		if(Option.TESTING_WITHOUT_PSI) {
+//			lexTokenRange.endOffset = lexTokenRange.getEndOffset();
+			
+//			IO.println("\nPsiBuilder.doneSubtree: lexTokenRange="+lexTokenRange);
+			IO.println("\nPsiBuilder.doneSubtree: lexTokenRange=]"+lexTokenRange.getDebugText()+'[');
+			
+			for(SyntaxElement syntaxElement:syntaxElements) {
+				IO.println("PsiBuilder.doneSubtree: syntaxElement="+syntaxElement);
+				syntaxElement.lexTokenRange = lexTokenRange;
+			}
+			lexTokenRange.syntaxElements = syntaxElements;
+
+			lexTokenRange = lexTokenRange.parent;
+			return;
+		}
 //		IO.println("\n\nPsiBuilder.doneSubtree["+psiTree.level()+':'+kind+"]: "+psiTree.edChildrenText()+" CALLED FROM: "+Util.calledFrom(3,6));
 		if(psiTree.kind != kind) {
 //			IO.println("PsiBuilder.doneSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+" "+syntaxElement.getClass().getSimpleName()+"="+syntaxElement+", CALLED FROM: "+Util.calledFrom(3,6));
@@ -104,33 +137,6 @@ public class PsiBuilder {
 		if(Option.TRACE_PSITREE_START_DONE > 0) {
 //			IO.println("PsiBuilder.doneSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+" "+syntaxElement.getClass().getSimpleName()+"="+syntaxElement+", CALLED FROM: "+Util.calledFrom(3,6));
 		}
-//		if(Option.PSI_VERIFY) {
-//			LOOP:for(SyntaxElement syntaxElement:syntaxElements) {
-//				if(syntaxElement instanceof BlockDeclaration blk) {
-//					IO.println("PsiBuilder.doneSubtree: BlockDeclaration: isMainModule=" + blk.isMainModule);
-//					IO.println("PsiBuilder.doneSubtree: blk.sourceBlockLevel: " + blk.getClass().getSimpleName() + " " + blk.sourceBlockLevel);
-//					if(blk.sourceBlockLevel == 1) {
-//						// Testing Declaration END-Condition
-////						LexToken token = this.psiTree.getLastChild();
-//						LexToken token = this.psiTree.getLastParserChild();
-//						if(token != null && token.keyWord != KeyWord.END) {
-//							psiTree.printPsiTree("PsiBuilder.doneSubtree: PSI VERIFIER FAILED");
-//							Util.IERR("PsiBuilder.doneSubtree:  Wrong termination of " + syntaxElement.getClass().getSimpleName()+" lastChild="+token+" Should be END");
-//						}
-//						break LOOP;
-//					}
-//				}
-//				if(syntaxElement instanceof Declaration) {
-//					// Testing Declaration END-Condition
-////					LexToken token = this.psiTree.getLastChild();
-//					LexToken token = this.psiTree.getLastParserChild();
-//					if(token != null && token.keyWord != KeyWord.SEMICOLON) {
-//						psiTree.printPsiTree("PsiBuilder.doneSubtree: PSI VERIFIER FAILED");
-//						Util.IERR("PsiBuilder.doneSubtree:  Wrong termination of " + syntaxElement.getClass().getSimpleName()+" lastChild="+token+" Should be ;");
-//					}
-//				}
-//			}
-//		}
 		
 		psiTree.endOffset = psiTree.getEndOffset();
 		for(SyntaxElement syntaxElement:syntaxElements) {
@@ -175,6 +181,10 @@ public class PsiBuilder {
 	}
 	
 	public void dropSubtree(PsiTree.Kind kind, String debugName) {
+		if(Option.TESTING_WITHOUT_PSI) {
+			lexTokenRange = lexTokenRange.parent;
+			return;
+		}
 //		IO.println("\n\nPsiBuilder.dropSubtree["+psiTree.level()+':'+kind+"]: "+psiTree.edChildrenText()+" CALLED FROM: "+Util.calledFrom(3,6));
 		if(psiTree.kind != kind) {
 			IO.println("PsiBuilder.dropSubtree["+psiTree.level()+':'+kind+"]: \" "+psiTree.debugName+" CALLED FROM: "+Util.calledFrom(3,6));
@@ -215,23 +225,28 @@ public class PsiBuilder {
 	}
 	
 	public void advanceLexer() {
-		psiTree.addChild(getCurrentLexerToken()); // Add 'old' current LexToken to the PsiTree
-		lexer.advance();                          // And the advance the lexer.
-		if(Option.internal.TRACE_ADVANCE_LEXER)
-			IO.println("PsiBuilder.advanceLexer: NEW CURRENT LEXTOKEN: " + getCurrentLexerToken());
-    	if(Option.PSI_VERIFY) {
-    		if(prevWasNEWLINE != null && getCurrentLexerToken().keyWord != KeyWord.EOF) {
-    			if((prevWasNEWLINE.lineNumber + 1) != (getCurrentLexerToken().lineNumber) ) {
-        			IO.println("SimulaLexer.advance: prevWasNEWLINE: " + prevWasNEWLINE);
-        			IO.println("SimulaLexer.advance: currentLexerToken: " + getCurrentLexerToken());
-            		Util.IERR("ERROR: CHECK NEWLINE FAILED. Prev Token: " + prevWasNEWLINE +", Current Token: " + getCurrentLexerToken());
-    				Util.STOP();
-    			}
-    		}
-    		if(getCurrentLexerToken().keyWord == KeyWord.NEWLINE) {
-    			prevWasNEWLINE = getCurrentLexerToken();
-    		} else prevWasNEWLINE = null;
-    	}
+		if(Option.TESTING_WITHOUT_PSI) {
+			lexTokenRange.addChild(getCurrentLexerToken()); // Add 'old' current LexToken to the AstTree
+			lexer.advance();                          // And the advance the lexer.			
+		} else {
+			psiTree.addChild(getCurrentLexerToken()); // Add 'old' current LexToken to the PsiTree
+			lexer.advance();                          // And the advance the lexer.
+			if(Option.internal.TRACE_ADVANCE_LEXER)
+				IO.println("PsiBuilder.advanceLexer: NEW CURRENT LEXTOKEN: " + getCurrentLexerToken());
+	    	if(Option.PSI_VERIFY) {
+	    		if(prevWasNEWLINE != null && getCurrentLexerToken().keyWord != KeyWord.EOF) {
+	    			if((prevWasNEWLINE.lineNumber + 1) != (getCurrentLexerToken().lineNumber) ) {
+	        			IO.println("SimulaLexer.advance: prevWasNEWLINE: " + prevWasNEWLINE);
+	        			IO.println("SimulaLexer.advance: currentLexerToken: " + getCurrentLexerToken());
+	            		Util.IERR("ERROR: CHECK NEWLINE FAILED. Prev Token: " + prevWasNEWLINE +", Current Token: " + getCurrentLexerToken());
+	    				Util.STOP();
+	    			}
+	    		}
+	    		if(getCurrentLexerToken().keyWord == KeyWord.NEWLINE) {
+	    			prevWasNEWLINE = getCurrentLexerToken();
+	    		} else prevWasNEWLINE = null;
+	    	}
+		}
 	}
 	
 	public void consume(int... keyWords) {
@@ -265,6 +280,7 @@ public class PsiBuilder {
 	}
 
 	public void	rollBackTo(LexToken prev, String debugInfo) {
+		if(Option.TESTING_WITHOUT_PSI) Util.IERR("xxx - Skal ikke burukes");
 //		IO.println("PsiBuilder.rollBackTo: "+prev);
 //		IO.println("PsiBuilder.rollBackTo: CurrentLexerToken: "+getCurrentLexerToken());
 //		IO.println("PsiBuilder.rollBackTo: LastParserChild: "+psiTree.getLastParserChild());
@@ -276,18 +292,21 @@ public class PsiBuilder {
 	}
 
 	public LexToken prevToken() {
-		LexToken prev = psiTree.getLastChild();
-		return prev;
+		if(Option.TESTING_WITHOUT_PSI) {
+			return lexer.getPrevLexerToken();
+		} else {
+			LexToken prev = psiTree.getLastChild();
+			return prev;
+		}
 	}
 
 	public LexToken prevParserToken() {
-		LexToken prev = psiTree.getLastParserChild();
-//		if(prev == null) {
-//			this.psiTree.printPsiTree("PsiBuilder.prevParserToken: CURRENT TREE");
-//			this.getRoot().printPsiTree("PsiBuilder.prevParserToken: WHOLE TREE");
-//			Util.STOP();
-//		}
-		return prev;
+		if(Option.TESTING_WITHOUT_PSI) {
+			return lexer.getPrevParserToken();
+		} else {
+			LexToken prev = psiTree.getLastParserChild();
+			return prev;
+		}
 	}
 
 	public boolean eof() {
@@ -298,9 +317,14 @@ public class PsiBuilder {
 		return lexer.getCurrentLexerToken();
 	}
 
+	public LexToken getPrevLexerToken() {
+		return lexer.getPrevLexerToken();
+	}
+
 	/// Return next 'Parser' token.
 	/// Skip Comment, Whitespace and Newline tokens.
     public LexToken getNextParserToken() {
+		if(Option.TESTING_WITHOUT_PSI) Util.IERR("xxx - Skal ikke burukes");
     	// if(DEBUG > 1) IO.println("PsiBuilder.getNextParserToken: "+currentLexerToken);
     	Util.IERR("DENNE ER IKKE BRUKT FØR - MÅ SJEKKES");
     	getCurrentParserToken();
@@ -370,6 +394,7 @@ public class PsiBuilder {
 //    }
 	
 	public void printPSI(String title) {
+		if(Option.TESTING_WITHOUT_PSI) Util.IERR("xxx - Skal ikke burukes");
 		IO.println("printPSI: BEGIN *** "+title+" ***");
 		psiRoot.printPsiTree(title);
 		IO.println("printPSI: ENDOF *** "+title+" ***");

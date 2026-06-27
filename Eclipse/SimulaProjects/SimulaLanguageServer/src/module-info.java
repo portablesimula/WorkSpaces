@@ -8,5 +8,5 @@ module Simula {
 	requires com.google.gson;
 	requires java.logging;
 	
-    exports simula.lsp.client to org.eclipse.lsp4j.jsonrpc;
+    exports simula.inline.tester to org.eclipse.lsp4j.jsonrpc;
 }

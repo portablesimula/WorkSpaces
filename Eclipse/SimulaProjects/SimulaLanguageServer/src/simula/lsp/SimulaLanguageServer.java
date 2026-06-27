@@ -4,7 +4,7 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.*;
 
 import simula.compiler.utilities.LOG;
-import simula.lsp.client.SimulaDebugClient;
+import simula.inline.tester.SimulaDebugClient;
 import simula.lsp.compiler.DocumentManager;
 import simula.lsp.compiler.SourceDocumentItem;
 
