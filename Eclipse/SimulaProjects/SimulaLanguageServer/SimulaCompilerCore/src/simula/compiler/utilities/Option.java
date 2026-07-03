@@ -17,7 +17,7 @@ import java.util.Properties;
 public final class Option {
 	public static boolean LEX_VERIFY = true;
 
-	public static boolean TESTING_WITHOUT_PSI = true;
+//	public static boolean TESTING_WITHOUT_PSI = true;
 //	public static boolean TESTING_NEW_LEXER = true;
 //	public static boolean TESTING_USE_SCANNER = true;
 	

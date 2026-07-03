@@ -8,8 +8,6 @@ import simula.token.LexToken;
 public class LexTokenRange {
 	LexTokenRange parent;
 	
-//	public LexToken firstLexToken;    // TESTING_WITHOUT_PSI
-//	public LexToken lastLexToken;     // TESTING_WITHOUT_PSI
 	Vector<LexToken> lexTokenRange;
 
 	public Vector<SyntaxElement> syntaxElements;

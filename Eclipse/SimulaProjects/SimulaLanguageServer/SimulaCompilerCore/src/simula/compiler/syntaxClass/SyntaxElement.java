@@ -96,7 +96,7 @@ public abstract class SyntaxElement {
 	
 	/// Set by PsiBuilder.doneTokenRange
 	/// The associated lexTokenRange
-	public LexTokenRange lexTokenRange; // TESTING_WITHOUT_PSI
+	public LexTokenRange lexTokenRange;
 
 	/// Controls semantic checking.
 	/// 
@@ -117,42 +117,24 @@ public abstract class SyntaxElement {
 
 	/// The first source line number
 	public LexToken getFirstLexToken() {
-//		if(Option.TESTING_WITHOUT_PSI) {
-			return lexTokenRange.getFirstLexToken();			
-//		} else {
-//			Util.IERR("");
-//			return null;
-//		}
+		return lexTokenRange.getFirstLexToken();			
 	}
 
 	/// The last source line number
 	public LexToken getLastLexToken() {
-//		if(Option.TESTING_WITHOUT_PSI) {
-			return lexTokenRange.getLastLexToken();			
-//		} else {
-//			Util.IERR("");
-//			return null;
-//		}
+		return lexTokenRange.getLastLexToken();			
 	}
 
 	/// The first source line number
 	public int firstLineNumber() {
-//		if(Option.TESTING_WITHOUT_PSI) {
-			if(lexTokenRange == null) return -99;
-			return lexTokenRange.getFirstLexToken().firstLineNumber();			
-//		} else {
-//			return psiTree.firstLineNumber();
-//		}
+		if(lexTokenRange == null) return -99;
+		return lexTokenRange.getFirstLexToken().firstLineNumber();			
 	}
 
 	/// The last source line number
 	public int lastLineNumber() {
-//		if(Option.TESTING_WITHOUT_PSI) {
-			if(lexTokenRange == null) return +99;
-			return lexTokenRange.getLastLexToken().lastLineNumber();			
-//		} else {
-//			return psiTree.lastLineNumber();
-//		}
+		if(lexTokenRange == null) return +99;
+		return lexTokenRange.getLastLexToken().lastLineNumber();			
 	}
 	
 	/// Perform semantic checking.

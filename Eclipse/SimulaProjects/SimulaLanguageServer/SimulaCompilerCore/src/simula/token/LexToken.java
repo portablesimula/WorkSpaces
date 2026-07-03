@@ -44,19 +44,24 @@ public class LexToken {
 //				Util.IERR("NEW LexToken: Illegal Token: " + this.getClass().getSimpleName()+ " " + this);
 //		}
 				
-//		if(Option.LEX_VERIFY) {
-//			if(keyWord != KeyWord.NEWLINE && this.getText().contains("\n"))
-//				Util.IERR("NEW LexToken: LEX_VERIFY FAILD: Token text contais NEWLINE: " + this);
-//			if(prevToken != null) {
-//				if(keyWord != KeyWord.EOF && startOffset != prevToken.endOffset) {
-//					System.err.println("NEW LexToken: Prev Token: " + prevToken.getClass().getSimpleName()+ " " + prevToken);
-//					System.err.println("NEW LexToken: This Token: " + this.getClass().getSimpleName()+ " " + this);
-//					Util.IERR("\"NEW LexToken: Illegal gap between tokens: ");
-//					Util.STOP();
-//				}
-//			}
-//			prevToken = (keyWord != KeyWord.EOF)? this : null;
-//		}
+		if(Option.LEX_VERIFY) {
+			if(keyWord != KeyWord.NEWLINE && this.getText().contains("\n"))
+				Util.IERR("NEW LexToken: LEX_VERIFY FAILD: Token text contais NEWLINE: " + this);
+			if(prevToken != null) {
+				if(keyWord != KeyWord.EOF && column != ( prevToken.column + prevToken.length )) {
+					System.err.println("\nNEW LexToken: Illegal gap between tokens: ");
+					System.err.println("NEW LexToken: Prev Token: " + prevToken.getClass().getSimpleName()+ " " + prevToken);
+					System.err.println("NEW LexToken: This Token: " + this.getClass().getSimpleName()+ " " + this);
+					Util.IERR("NEW LexToken: Illegal gap between tokens: ");
+					Util.STOP();
+				}
+			}
+			prevToken = (keyWord != KeyWord.NEWLINE && keyWord != KeyWord.EOF)? this : null;
+		}
+		
+//		Util.IERR("");
+//		Thread.dumpStack();
+		
 	}
 	
 	protected void TRACE_NEW_LEXTOKEN() {

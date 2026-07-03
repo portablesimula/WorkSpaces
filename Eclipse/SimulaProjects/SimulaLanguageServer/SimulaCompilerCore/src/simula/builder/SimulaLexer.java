@@ -5,6 +5,7 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.builder;
 
+import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,8 +29,9 @@ import simula.token.IntegerConst;
 /// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/parsing/SimulaScanner.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public final class SimulaLexer { // extends DefaultScanner { 
+public final class SimulaLexer {
 	
+	private SimulaBuilder simulaBuilder;
     private CharSequence sourceText;
     private int textEndOffset;
     private int currentPosition;
@@ -120,12 +122,17 @@ public final class SimulaLexer { // extends DefaultScanner {
 	/// ISO EM(EndMedia) character used to denote end-of-input
     private static final int EOF_MARK=25;
 
-    /// EOF is seen
-    public LexToken EOF;
+//    /// EOF is seen
+//    public LexToken EOF;
     
     /// Set 'true' when EOF-character ( -1 ) was read.
+    /// Set 'true' when EOF-character EOF_MARK was read.
     private boolean EOF_SEEN=false;
-    
+ 
+	public boolean eof() {
+		return EOF_SEEN;
+	}
+
 //    /// The pushBack stack
 //    private Stack<Character> puchBackStack=new Stack<Character>();
 
@@ -156,7 +163,8 @@ public final class SimulaLexer { // extends DefaultScanner {
 //		this.editorMode=editorMode;
 //		Global.sourceLineNumber=1;
 //	}
-	public SimulaLexer(final CharSequence sourceText) {
+	public SimulaLexer(final SimulaBuilder simulaBuilder, final CharSequence sourceText) {
+		this.simulaBuilder = simulaBuilder;
 		this.sourceText = sourceText;
         
        	this.sourceText = ((String) this.sourceText).replace("\r\n", "\n");
@@ -200,6 +208,9 @@ public final class SimulaLexer { // extends DefaultScanner {
     	LexToken token;
 		if(tokenQueue.size()>0) { 
 		    token=tokenQueue.remove();
+		    IO.println("POP LexToken: " + token);
+			IO.println("SimulaLexer.nextToken: currentColumn="+currentColumn+", currentPosition=" + currentPosition + ", tokenStartPos="+tokenStartPos);
+			currentColumn = token.column;
 		} else token = scanToken();
 
 		if (token != null) {
@@ -225,6 +236,11 @@ public final class SimulaLexer { // extends DefaultScanner {
 		}
 		if (Option.internal.TRACE_LEXER > 0) Util.TRACE("Item.nextToken, " + edcurrent());
 		currentLexerToken = token;
+	    IO.println("GOT LexToken: " + token);
+		IO.println("SimulaLexer.nextToken: currentColumn="+currentColumn+", currentPosition=" + currentPosition + ", tokenStartPos="+tokenStartPos);
+		
+		simulaBuilder.tokenList.add(token);
+		
 		return (token);
 	}
 	
@@ -257,25 +273,26 @@ public final class SimulaLexer { // extends DefaultScanner {
     /// @return next Token
     private LexToken scanBasic() {
     	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("SimulaScanner.scanBasic, "+edcurrent());
-    	LOOP:while(true)	{
+    	while(true)	{
     		LexToken.lineNumberBeforeScanBasic = Global.sourceLineNumber;
 
     		if(Character.isLetter(getNext())) return(scanIdentifier());
 
     		switch(current) {
+    			case EOF_MARK: return(null);
     		    case '=':
 		            if(getNext() == '=')   return(newKeyWordToken(KeyWord.EQR));
 		            if(current == '/')
 		            if(getNext() == '=')   return(newKeyWordToken(KeyWord.NER));
 		            else Util.generalError("Illegal character combination ="+(char)current);
-		            pushBackPos(1);     return(newKeyWordToken(KeyWord.EQ));
+		            pushBackPos(1);        return(newKeyWordToken(KeyWord.EQ));
 	            case '>':
 		            if(getNext() == '=')   return(newKeyWordToken(KeyWord.GE));
-		            pushBackPos(1);     return(newKeyWordToken(KeyWord.GT));
+		            pushBackPos(1);        return(newKeyWordToken(KeyWord.GT));
 	            case '<':
 	                if(getNext() == '=')   return(newKeyWordToken(KeyWord.LE));
 		            if(current == '>')     return(newKeyWordToken(KeyWord.NE));
-		            pushBackPos(1);     return(newKeyWordToken(KeyWord.LT));
+		            pushBackPos(1);        return(newKeyWordToken(KeyWord.LT));
 	            case '+':                  return(newKeyWordToken(KeyWord.PLUS));
 	            case '-':
 	            	if(getNext() == '-')   return(scanCommentToEndOfLine());
@@ -288,7 +305,7 @@ public final class SimulaLexer { // extends DefaultScanner {
 		            pushBackPos(1); 	   return(newKeyWordToken(KeyWord.DIV));
 	            case '.':
 		            if(Character.isDigit(getNext())) { return(scanDotDigit(new StringBuilder())); }
-		            pushBackPos(1);     return(newKeyWordToken(KeyWord.DOT));
+		            pushBackPos(1);        return(newKeyWordToken(KeyWord.DOT));
 	            case ',':	               return(newKeyWordToken(KeyWord.COMMA));
 	            case ':':
 		            if(getNext() == '=')                return(newKeyWordToken(KeyWord.ASSIGNVALUE));
@@ -308,8 +325,6 @@ public final class SimulaLexer { // extends DefaultScanner {
 	            case '\"': return(scanTextConstant());
 	            case '0':case '1':case '2':case '3':case '4':
 	            case '5':case '6':case '7':case '8':case '9':return(scanNumber());
-	   
-	            case EOF_MARK: return(null);
 	    	  
 //	            case '\r': if(getNext()=='\n') return (scanNewLine());
 //				    pushBackPos(1); return (scanWhiteSpace());
@@ -718,9 +733,19 @@ public final class SimulaLexer { // extends DefaultScanner {
     	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanName, "+edcurrent());
     	Util.ASSERT(Character.isLetter((char)(current)),"Expecting a Letter");
     	name.append((char)current);
-    	while ((Character.isLetter(getNext()) || Character.isDigit(current) || current == '_'))
+//    	while ((Character.isLetter(getNext()) || Character.isDigit(current) || current == '_'))
+//    		name.append((char)current);
+    	LOOP:while(true) {
+    		getNext();
+    		IO.println("SimulaLexer.scanName: GOT " + current);
+    		if(current == EOF_MARK) break LOOP;
+    		if(Character.isLetter(current)) ; // OK
+    		else if( Character.isDigit(current)) ; // OK
+    		else if( current == '_') ; // OK
+    		else break LOOP;
     		name.append((char)current);
-    	pushBackPos(1);
+    	}
+    	if(current != EOF_MARK) pushBackPos(1);
     	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanName, name="+name+",current="+edcurrent());
     	return(name.toString());
     }
@@ -1089,7 +1114,12 @@ public final class SimulaLexer { // extends DefaultScanner {
         
         if (Global.TRACE_LEXER) Util.TRACE("scanEndComment, " + edcurrent());
         int nPhrase = 0; // Number of comment phrases
-        LOOP:while (getNext() != EOF_MARK) {
+        
+//        LOOP:while (getNext() != EOF_MARK) {
+        LOOP:while (current != EOF_MARK) {
+        	getNext();
+        	if(current == EOF_MARK) break LOOP;
+        	
         	if(TESTING_SCAN_END) IO.println("LexToken.scanEndComment: current="+current+":'"+(""+(char)current).replace("\r", "\\r").replace("\n", "\\n")+"'");
             if (current == '\n') {
             	if(TESTING_SCAN_END) IO.println("LexToken.scanEndComment: GOT NEWLINE");
@@ -1171,6 +1201,7 @@ public final class SimulaLexer { // extends DefaultScanner {
                 tokenQueueAdd("scanEndComment-SEMICOLON", newKeyWordToken(tokenStartPos, KeyWord.SEMICOLON));
                 break LOOP;
             } else if (Character.isLetter(current)) {
+                IO.println("LexToken.scanEndComment: GOT letter="+current+':'+(char)current);
                 String name = scanName();
                 if(TESTING_SCAN_END) IO.println("LexToken.scanEndComment: GOT name="+name);
                 if (Util.equals(name, "end") || Util.equals(name, "else")
@@ -1242,14 +1273,22 @@ public final class SimulaLexer { // extends DefaultScanner {
     /// @return next input character
     private int getNext() {
     	if(currentPosition >= textEndOffset) {
-    		EOF_SEEN = true; current = EOF_MARK;
+    		if(EOF_SEEN) {
+    			Util.IERR("Attempt to scan beyond EOF");
+//    			throw new EOFException("");
+    			current = EOF_MARK;
+    		} else {
+    			EOF_SEEN = true; current = EOF_MARK;
+    	    	IO.println("SimulaLexer.getNext: EOF_MARK: " + current);
+    	    	Thread.dumpStack();
+    		}
     	} else {
     		current = sourceText.charAt(currentPosition++);
     	}
 //    	IO.println("SimulaLexer.getNext: " + current);
-//		IO.println("SimulaLexer.getNext(currentPosition: " + (currentPosition - 1)
-//				+ ") ==> currentPosition: " + currentPosition + " current: " + edChar((char) current)
-//				+"  CALLED FROM: " + Util.calledFrom(3, 25));
+		IO.println("SimulaLexer.getNext(currentPosition: " + (currentPosition - 1)
+				+ ") ==> currentPosition: " + currentPosition + " current: " + edChar((char) current)
+				+"  CALLED FROM: " + Util.calledFrom(3, 25));
     	return(current);
     }
 
@@ -1308,7 +1347,7 @@ public final class SimulaLexer { // extends DefaultScanner {
     /// @param value the value
     /// @return the newly created Token
 	private LexToken newWhiteSpaceToken() {
-		IO.println("SimulaLexer.newWhiteSpaceToken: currentColumn="+currentColumn+", currentPosition - tokenStartPos="+(currentPosition - tokenStartPos));
+		IO.println("\n\nSimulaLexer.newWhiteSpaceToken: currentColumn="+currentColumn+", currentPosition - tokenStartPos="+(currentPosition - tokenStartPos));
 		return new WhiteSpaceToken(currentLineNumber, sourceText, currentColumn, currentPosition - tokenStartPos, this);
 	}
     

@@ -156,7 +156,7 @@ public abstract class Statement extends SyntaxElement {
 		    case KeyWord.THIS:
 				if(Option.TRACE_ACCEPT_STATEMENT > 2) {
 					IO.println("\nStatement.acceptUnlabeledStatement: IDENTIFIER");
-					simBuilder.printPSI("Statement.acceptUnlabeledStatement: IDENTIFIER");
+//					simBuilder.printPSI("Statement.acceptUnlabeledStatement: IDENTIFIER");
 				}
 				
 				Expression expr = Expression.acceptExpression(simBuilder);

@@ -125,9 +125,7 @@ public abstract class Expression extends SyntaxElement {
 			simBuilder.doneTokenRange(expr);
 			return expr;
 		} else {
-			if(Option.TRACE_ACCEPT_EXPRESSION > 0) IO.println("Expression.acceptExpression: Level "+simBuilder.psiLevel()+" ZZZZZZZZZZZZZZZZZZZZZZZZZZ   BEGIN: ");
 			Expression expr= acceptSimpleExpression(simBuilder);
-			if(Option.TRACE_ACCEPT_EXPRESSION > 0) IO.println("Expression.acceptExpression: Level "+simBuilder.psiLevel()+" ZZZZZZZZZZZZZZZZZZZZZZZZZZ   RESULT: "+expr);
 			return expr;
 		}
 	} 
@@ -172,11 +170,7 @@ public abstract class Expression extends SyntaxElement {
 	///        
 	/// @return Expression or null if no expression is found.
 	private static Expression acceptSimpleExpression(SimulaBuilder simBuilder)  { 
-//		int level = 0;
-//		if(! Option.TESTING_WITHOUT_PSI) {
-			simBuilder.startTokenRange();
-//			level = simBuilder.psiLevel();
-//		}
+		simBuilder.startTokenRange();
 		Expression expr = acceptANDTHEN(simBuilder);
 		while(Parse.accept_OR_ELSE(simBuilder)) {
 			simBuilder.startTokenRange();

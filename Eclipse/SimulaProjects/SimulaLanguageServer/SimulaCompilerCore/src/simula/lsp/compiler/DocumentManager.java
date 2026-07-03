@@ -1,5 +1,6 @@
 package simula.lsp.compiler;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,7 +10,6 @@ import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.LOG;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.SimulaDiagnostic;
 import simula.compiler.utilities.Util;
 
@@ -24,27 +24,11 @@ public class DocumentManager {
 	private String documentUri;
 	private int version;
 	public String sourceCode;
-	
-	public ProgramModule syntaxTree; // Root of Syntax Tree
-	public List<SimulaDiagnostic> diagnostics;
-	public List<LspToken> tokenList;
+	SimulaBuilder curnretBuilder;
 	
     // Nøkkelen er filens URI (f.eks. file:///path/to/file.txt)
 //    private final ConcurrentHashMap<String, SourceDocumentItem> openDocuments = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, DocumentManager> openDocuments = new ConcurrentHashMap<>();
-
-//    public void put(String documentUri, DocumentManager document) {
-//        openDocuments.put(documentUri, document);
-//    }
-//
-//    public DocumentManager get(String documentUri) {
-//        return openDocuments.get(documentUri);
-//    }
-//
-//    public void remove(String documentUri) {
-//		if (openDocuments.containsKey(documentUri))
-//        openDocuments.remove(documentUri);
-//    }
 
     public DocumentManager(String documentUri, int version, String sourceCode) {
     	this.documentUri = documentUri;
@@ -56,56 +40,25 @@ public class DocumentManager {
     public static DocumentManager GetDocumentManager(String documentUri) {
     	return openDocuments.get(documentUri);
     }
-    
-	public void printAll(String title) {
-		printSyntaxTree(title);
-		printDiagnostics(title);
-		printTokenList(title);
-	}
-	
-	public void printSyntaxTree(String title) {
-		IO.println("======================================== BEGIN SYNTAX TREE: " + title + " ============================ ");
-		syntaxTree.print(0);
-		IO.println("======================================== ENDOF SYNTAX TREE: " + title + " ============================ ");
-	}
-
-	public void printDiagnostics(String title) {
-		LOG.info("++++++++++++++++ BEGIN DIAGNOSTICS: " + title + " ++++++++++++++++++");
-		for(SimulaDiagnostic diagnostic:diagnostics) LOG.info(diagnostic.toString());			
-		LOG.info("++++++++++++++++ ENDOF DIAGNOSTICS: " + title + " ++++++++++++++++++");
-	}
-	
-	public void printTokenList(String title) {
-		IO.println("======================================== BEGIN TOKEN LIST: " + title + " ============================ ");
-		for(LspToken token:tokenList) {
-			IO.println(""+token);
-		}
-		IO.println("======================================== ENDOF TOKEN LIST: " + title + " ============================ ");		
-	}
-
 
 	/// Get the text document's SyntaxTree.
 	public ProgramModule getSyntaxTree() {
-		return syntaxTree;
+		return curnretBuilder.syntaxTree;
 	}
 
-	/// Set the text document's SyntaxTree.
-	public void setSyntaxTree(final ProgramModule syntaxTree) {
-		this.syntaxTree = syntaxTree;
-	}
+//	/// Set the text document's SyntaxTree.
+//	public void setSyntaxTree(final ProgramModule syntaxTree) {
+//		this.syntaxTree = syntaxTree;
+//	}
 
 	/// Get the text document's diagnostics.
 	public List<SimulaDiagnostic> getDiagnostis() {
-		return diagnostics;
-	}
-
-	public void initDiagnostics() {
-		diagnostics = new Vector<SimulaDiagnostic>();
+		return curnretBuilder.diagnostics;
 	}
 	
-	public void addDiagnostic(SimulaDiagnostic diagnostic) {
-		diagnostics.add(diagnostic);
-	}
+//	public void addDiagnostic(SimulaDiagnostic diagnostic) {
+//		curnretBuilder.diagnostics.add(diagnostic);
+//	}
 
 //	/// Set the text document's diagnostics.
 //	public void setDiagnostics(final List<SimulaDiagnostic> diagnostics) {
@@ -142,14 +95,10 @@ public class DocumentManager {
 		sourceCode = text;
 	}
     
-	/**
-	 * The document open notification is sent from the client to the server to
-	 * signal newly opened text documents. The document's truth is now managed
-	 * by the client and the server must not try to read the document's truth
-	 * using the document's uri.
-	 * <p>
-	 * Registration Options: {@link org.eclipse.lsp4j.TextDocumentRegistrationOptions}
-	 */
+	/// The document open notification is sent from the client to the server to
+	/// signal newly opened text documents. The document's truth is now managed
+	/// by the client and the server must not try to read the document's truth
+	/// using the document's uri.
 //    public static void didOpen(DidOpenTextDocumentParams params, SimulaLanguageServer server) {
     public static void didOpen(final String documentUri, final int version, final String sourceCode) {
 //        public DocumentManager documentManager = DocumentManager.get(documentUri);
@@ -160,18 +109,14 @@ public class DocumentManager {
     	DocumentManager documentManager = new DocumentManager(documentUri, version, sourceCode);
     	openDocuments.put(documentUri, documentManager);
     	
-    	buildPsiAndSyntaxTrees(documentManager);
+    	documentManager.tryCreateBuilder();
 
     	LOG.info("DocumentManager.didOpen: RETURNS");
     }
     
 
-	/**
-	 * The document change notification is sent from the client to the server to
-	 * signal changes to a text document.
-	 * <p>
-	 * Registration Options: {@link org.eclipse.lsp4j.TextDocumentChangeRegistrationOptions}
-	 */
+    /// The document change notification is sent from the client to the server to
+	/// signal changes to a text document.
 //	public static void didChange(DidChangeTextDocumentParams params, SimulaLanguageServer server) {
 	public static void didChange(final String documentUri, final List<SimTextDocumentContentChangeEvent> changes) {
     	LOG.info("DocumentManager.didChange: BEGIN");
@@ -186,17 +131,13 @@ public class DocumentManager {
     	LOG.info("DocumentManager.didChange: Updated Text: " + updatedText);
     	documentManager.setText(updatedText);
     	
-    	buildPsiAndSyntaxTrees(documentManager);
+    	documentManager.tryCreateBuilder();
 
     	LOG.info("DocumentManager.didChange: RETURNS");
 	}
 
 	
-	/**
-	 * The document will save notification is sent from the client to the server before the document is actually saved.
-	 * <p>
-	 * Registration Options: {@link org.eclipse.lsp4j.TextDocumentRegistrationOptions}
-	 */
+	///The document will save notification is sent from the client to the server before the document is actually saved.
 //	public static void willSave(WillSaveTextDocumentParams params, SimulaLanguageServer server) {
 	public static void willSave(final String documentUri, final String reason) {
 //    	DocumentManager documentManager = openDocuments.get(documentUri);
@@ -234,8 +175,8 @@ public class DocumentManager {
 
 		// 3. Trigger server-side logic (e.g., Compilation, Re-indexing, Validation)
 		try {
-//			SimulaLspCompiler.runCompilerOrValidator(documentUri, fullText);
-	    	buildPsiAndSyntaxTrees(documentManager);
+//			DocumentManager.runCompilerOrValidator(documentUri, fullText);
+	    	documentManager.tryCreateBuilder();
 		} catch (Exception e) {
 			// Log your errors appropriately
 			e.printStackTrace();
@@ -261,31 +202,18 @@ public class DocumentManager {
 	}
 	
 
-	public static void buildPsiAndSyntaxTrees(DocumentManager documentManager) {
-    	LOG.info("SimulaLspCompiler.buildPsiAndSyntaxTrees: BEGIN");
-    	documentManager.initDiagnostics();
-		String sourceText = documentManager.getText();
-		SimulaBuilder simBuilder = new SimulaBuilder(documentManager);
-		ProgramModule syntaxTree = null;
+	public void tryCreateBuilder() {
+    	LOG.info("DocumentManager.tryCreateBuilder: BEGIN");
+		String sourceText = this.getText();
+		// TRY BUILD SYNTAX TREE ...
 		try {
-			simBuilder.start(sourceText);
-    		IO.println("DocumentManager.buildPsiAndSyntaxTrees: " + sourceText.replace("\n", "\\n").replace("\r", "\\r"));
-    		syntaxTree = new ProgramModule(simBuilder);
+			SimulaBuilder simBuilder = new SimulaBuilder(this);
+    		IO.println("DocumentManager.tryCreateBuilder: " + sourceText.replace("\n", "\\n").replace("\r", "\\r"));
+    		curnretBuilder = simBuilder;
 		} catch (Exception e) {
-			IO.println("DocumentManager.buildPsiAndSyntaxTrees: GOT EXCEPTION: " + e.getMessage());
+			IO.println("DocumentManager.tryCreateBuilder: GOT EXCEPTION: " + e.getMessage());
 			e.printStackTrace();
 		}
-		
-		documentManager.setSyntaxTree(syntaxTree);
-		if(Option.TESTING_WITHOUT_PSI) {
-			IO.println("======================================== BEGIN RESULT AFTER buildPsiAndSyntaxTrees ============================ ");
-			syntaxTree.print(0);
-			IO.println("======================================== ENDOF RESULT AFTER buildPsiAndSyntaxTrees ============================ ");
-		}
-		
-		StandardClass.ENVIRONMENT.doChecking();
-		Global.duringParsing = false;
-		syntaxTree.doChecking();
 	}
 
 }

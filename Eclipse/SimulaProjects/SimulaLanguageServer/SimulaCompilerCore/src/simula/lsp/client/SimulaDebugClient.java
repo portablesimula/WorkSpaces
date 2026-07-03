@@ -123,32 +123,32 @@ public class SimulaDebugClient {
 	    
 	    DocumentManager documentManager = DocumentManager.GetDocumentManager(demoUri);
 	    String updatedText = documentManager.getText();
-//	    List<LspToken> tokenList = documentManager.tokenList;
+//	    List<LexToken> tokenList = documentManager.tokenList;
 	    
-	    List<Integer> semanticTokens = TokenManager.getAllSemanticTokens(demoUri);
-	    
-	    System.out.println("SimulaDebugClient.updatedText: " + updatedText);
-//	    System.out.println("SimulaDebugClient.semanticTokens: " + semanticTokens);
-
-	    if (semanticTokens != null) {
-//	    	List<Integer> data = semanticTokens.getData();
-	    	// Process the data array here (e.g., update UI via Display.getDefault().asyncExec)
-	    	System.out.println("Received semanticTokens size: " + semanticTokens.size());
-	    	int i = 0;
-	    	while(i < semanticTokens.size()) {
-                int deltaLine = semanticTokens.get(i++);
-                int deltaChar = semanticTokens.get(i++);
-                int length = semanticTokens.get(i++);
-                int tokenTypeIndex = semanticTokens.get(i++);
-                int tokenModifiersBitmask = semanticTokens.get(i++);
-                LOG.info("SimulaDebugClient.Received: token: "
-                		+ " <== deltaLine:" + deltaLine
-                		+ ", deltaChar: " + deltaChar
-                		+ ", length:" + length
-                		+ ", type:" + tokenTypeIndex + ':' + TokenManager.edSimulaTokenType(tokenTypeIndex));
-
-	    	}
-	    }
+//	    List<Integer> semanticTokens = TokenManager.getAllSemanticTokens(demoUri);
+//	    
+//	    System.out.println("SimulaDebugClient.updatedText: " + updatedText);
+////	    System.out.println("SimulaDebugClient.semanticTokens: " + semanticTokens);
+//
+//	    if (semanticTokens != null) {
+////	    	List<Integer> data = semanticTokens.getData();
+//	    	// Process the data array here (e.g., update UI via Display.getDefault().asyncExec)
+//	    	System.out.println("Received semanticTokens size: " + semanticTokens.size());
+//	    	int i = 0;
+//	    	while(i < semanticTokens.size()) {
+//                int deltaLine = semanticTokens.get(i++);
+//                int deltaChar = semanticTokens.get(i++);
+//                int length = semanticTokens.get(i++);
+//                int tokenTypeIndex = semanticTokens.get(i++);
+//                int tokenModifiersBitmask = semanticTokens.get(i++);
+//                LOG.info("SimulaDebugClient.Received: token: "
+//                		+ " <== deltaLine:" + deltaLine
+//                		+ ", deltaChar: " + deltaChar
+//                		+ ", length:" + length
+//                		+ ", type:" + tokenTypeIndex + ':' + TokenManager.edSimulaTokenType(tokenTypeIndex));
+//
+//	    	}
+//	    }
 
 
 	}
