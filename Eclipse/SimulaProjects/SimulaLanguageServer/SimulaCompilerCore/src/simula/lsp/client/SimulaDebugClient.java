@@ -1,10 +1,8 @@
 package simula.lsp.client;
 
 import simula.compiler.utilities.Global;
-import simula.compiler.utilities.LOG;
 import simula.lsp.compiler.DocumentManager;
 import simula.lsp.compiler.SimTextDocumentContentChangeEvent;
-import simula.lsp.compiler.TokenManager;
 import simula.lsp.util.SimPosition;
 import simula.lsp.util.SimRange;
 
@@ -65,14 +63,21 @@ public class SimulaDebugClient {
 	    		+ "    ;"                                     // Line 7
 	    		+ " end";                                     // Line 8
 
-//	    String program = "class A; begin\r\n"              // Line 0
-//	    		+ "    end proc p\r\n"                        // Line 5
-//	    		+ "        endelig\r\n"                       // Line 6
-//	    		+ "    ;"                                     // Line 7
-//	    		+ " end";                                     // Line 8
+	    String program2 = "class A; begin\r\n"              // Line 0
+	    		+ "    end proc p\r\n"                        // Line 5
+	    		+ "        endelig\r\n"                       // Line 6
+	    		+ "    ;"                                     // Line 7
+	    		+ " end";                                     // Line 8
+
+	    String program3 = "class A; begin\r\n"  // Line 0
+	    		+ "    outtext(\r\n"            // Line 1
+	    		+ "       \"aaaa\"  \r\n"         // Line 2
+	    		+ "       \"bbbb\"\r\n"         // Line 3
+	    		+ "    );"                      // Line 4
+	    		+ " end:prog";                       // Line 5
 
 	    int version = 0;
-	    DocumentManager.didOpen(demoUri, version, program);
+	    DocumentManager.didOpen(demoUri, version, program3);
 	    
 	    
 	    // =======================================================

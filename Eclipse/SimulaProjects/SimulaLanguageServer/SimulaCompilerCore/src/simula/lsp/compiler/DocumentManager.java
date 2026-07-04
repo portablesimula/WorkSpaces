@@ -1,14 +1,10 @@
 package simula.lsp.compiler;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import simula.builder.SimulaBuilder;
-import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
-import simula.compiler.utilities.Global;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.SimulaDiagnostic;
 import simula.compiler.utilities.Util;

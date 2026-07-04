@@ -78,6 +78,14 @@ public final class Util {
 
 	/// Print a error message.
 	/// @param msg the message
+	public static void generalError(final int lineNumber, final String msg) {
+		String err = edLINE(": Error: " + msg);
+		nError++;
+		printError(err);
+	}
+
+	/// Print a error message.
+	/// @param msg the message
 	public static void syntaxError(final SimulaBuilder simBuilder, final String msg) {
 		syntaxError(simBuilder, simBuilder.prevParserToken(), msg);
 	}
@@ -179,6 +187,15 @@ public final class Util {
 		printError(err);
 		e.printStackTrace();
 		FORCED_EXIT();
+	}
+
+	/// Print a warning message.
+	/// @param msg the message
+	public static void warning(final int lineNumber, final String msg) {
+		String line = edLINE(": WARNING: " + msg);
+		if (Option.WARNINGS) {
+			printWarning(line);
+		}
 	}
 
 	/// Print a warning message.

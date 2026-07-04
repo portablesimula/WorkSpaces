@@ -1,9 +1,5 @@
 package simula.lsp.compiler;
 
-import simula.compiler.utilities.LOG;
-import java.util.ArrayList;
-import java.util.List;
-
 /// @author Øystein Myhre Andersen
 /// @author Google AI
 public class TokenManager {

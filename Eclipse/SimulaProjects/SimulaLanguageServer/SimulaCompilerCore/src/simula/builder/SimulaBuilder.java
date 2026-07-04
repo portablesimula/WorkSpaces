@@ -18,7 +18,7 @@ import simula.token.LexToken;
 import simula.token.SimpleString;
 
 public class SimulaBuilder {
-	private DocumentManager documentManager;
+	public DocumentManager documentManager;
     private SimulaLexer lexer;
 
 	// Builder generated data structure:
@@ -37,7 +37,7 @@ public class SimulaBuilder {
         lexer = new SimulaLexer(this, documentManager.sourceCode);
         // Do the actual Building
 		syntaxTree = new ProgramModule(this);
-		
+
     	LOG.info("SimulaBuilder: syntaxTree, tokenList and diagnostics DONE");
     	IO.println("SimulaBuilder: this.syntaxTree: "+this.syntaxTree); // Root of Syntax Tree
     	IO.println("SimulaBuilder: this.diagnostics: "+this.diagnostics);
@@ -46,14 +46,16 @@ public class SimulaBuilder {
     	printAll(" AFTER NEW SimulaBuilder: ");
 		
     	if(Option.LEX_VERIFY) {
+        	IO.println("SimulaBuilder: documentManager.sourceCode: "+documentManager.sourceCode);
     		StringBuilder sb = new StringBuilder();
     		for(LexToken token : tokenList)	sb.append(token.getText());
-    		String reconstr = sb.toString().replace("\n", "\\n");
-    		String original = documentManager.sourceCode.replace("\r", "").replace("\n", "\\n");
+    		String reconstr = sb.toString().replace("\r", "\\r").replace("\n", "\\n");
+    		String original = documentManager.sourceCode.replace("\r", "\\r").replace("\n", "\\n");
+    		int lng1 = documentManager.sourceCode.length();
     		if(! reconstr.equals(original)) {
     			LOG.error("SimulaBuilder: VERIFIER FAILED: Reconstructed text differ from original text");
-    			LOG.error("Original Text: " + original);
-    			LOG.error("Reconstr Text: " + reconstr);
+    			LOG.error("Original Text(lng:"+lng1+"): " + original);
+    			LOG.error("Reconstr Text(lng:"+sb.length()+"): " + reconstr);
     			Util.IERR("");
     		}
     	}
@@ -206,17 +208,18 @@ public class SimulaBuilder {
     /// @return resulting String
     /// 
     public String getTextString(LexToken prevToken) {
-//		LexToken nextToken = prevToken;
-//		IO.println("\n\nPsiBuilder.getTextString: nextToken: "+nextToken);
+//		Util.IERR("SJEKK DETTE");
+		LexToken nextToken = prevToken;
+		IO.println("\n\nPsiBuilder.getTextString: nextToken: "+nextToken);
 		String result = ((SimpleString)prevToken).value;
-//    	while((nextToken=getCurrentParserToken()) instanceof SimpleString str) {
     	while(getCurrentParserToken() instanceof SimpleString str) {
     		result += str.value;
-//       	IO.println("PsiBuilder.getTextString: RESULT: "+result);
-//        	IO.println("PsiBuilder.getTextString: NEXT TOKEN: "+nextToken);
+    		IO.println("PsiBuilder.getTextString: RESULT: "+result);
+        	IO.println("PsiBuilder.getTextString: NEXT TOKEN: "+nextToken);
+//    		Util.IERR("SJEKK DETTE");
         	advanceLexer();
     	}
-//    	IO.println("PsiBuilder.getTextString: RETURN TEXT: ]"+result+"[\n\n");
+    	IO.println("SimulaBuilder.getTextString: RETURN TEXT: ]"+result+"[\n\n");
     	return result;
     }
 

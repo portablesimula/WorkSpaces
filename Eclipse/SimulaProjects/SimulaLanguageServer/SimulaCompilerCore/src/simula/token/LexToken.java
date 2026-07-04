@@ -34,7 +34,9 @@ public class LexToken {
 		this.styleName = styleName;
 		
 		if(Option.LEX_VERIFY) {
-		    lexer.verifyToken(lineNumber, column, length);
+	    	if(length == 0 && keyWord == KeyWord.EOF) {
+	    		prevToken = null;
+	    	} else lexer.verifyToken(lineNumber, column, length);
 		}
 		
 		this.tokenText = edTokenText(lexer);
