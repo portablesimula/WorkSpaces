@@ -1,0 +1,16 @@
+ begin
+% --kommentar;
+		if found_error then begin
+%			outtext ("ERROR");
+		end else begin
+			outtext (
+			"ZZZ"
+			"NO ""
+			 ERRORS"
+			);
+		end;
+
+	Simulation begin
+	
+%		reactivate main at time+20.0;
+end

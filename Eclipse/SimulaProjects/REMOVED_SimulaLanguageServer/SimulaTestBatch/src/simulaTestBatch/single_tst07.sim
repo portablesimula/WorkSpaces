@@ -1,0 +1,4 @@
+L: while true do begin
+	outtext("--- NO ERRORS FOUND IN Single test 7: L: while ...");
+	terminate_program;
+end

@@ -1,0 +1,15 @@
+begin text t;
+% komment to end of line
+   comment dette
+   er en 
+   kommentar over flere linjer ;
+   begin
+      outtext( "aaa""gg"
+      "bbb"
+      "ccc" 
+      );
+   end med kommentar
+   over flere
+   linjer
+   ;
+end;

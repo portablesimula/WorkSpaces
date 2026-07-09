@@ -1,0 +1,5 @@
+begin
+   comment dette
+   er en 
+   kommentar over flere linjer ;
+end;

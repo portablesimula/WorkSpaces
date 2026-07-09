@@ -1,0 +1,43 @@
+
+% ===============================================   Main   program =============
+%  PROGRAM NAME:   SIMULA TEST NO 155
+%
+%  PURPOSE:     Test inspection in SubBlock in Precompiled inner class
+%
+%  METHOD:      Try it and see if it work as expected.
+%
+%  WRITTEN BY:  MYH
+% ==============================================================================
+external class Pre155;
+
+Pre155(155,"--- Test inspection in SubBlock in Precompiled inner class") begin
+
+	procedure ENDCOMP; goto FINI;
+
+	
+	facit(1) :- "At START";
+	facit(2) :- "BEGIN class INIT";
+	facit(3) :- "PAS2INIT.main:";
+	facit(4) :- "x.iiii=444";
+	facit(5) :- "At XXXX END";
+	facit(6) :- "At START";
+	
+	facit(6) :- "At END";
+	
+% ========================================================
+
+	trace("At START");
+
+
+	new INIT; 
+	call(x);
+	
+	ENDCOMP;
+
+	trace("IMPOSSIBLE TO BE HERE");
+
+FINI:
+	
+	trace("At END");
+
+ end

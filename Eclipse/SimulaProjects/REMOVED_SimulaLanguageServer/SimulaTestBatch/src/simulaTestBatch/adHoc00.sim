@@ -1,0 +1,9 @@
+ begin --kommentar;
+
+	Simulation begin
+	
+%		reactivate main at time+20.0;
+		xmain :- none;
+	
+%	end;
+end

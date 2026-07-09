@@ -1,0 +1,1 @@
+inspect new Simset do begin outtext("--- NO ERRORS FOUND IN Single test 6: inspect ..."); end

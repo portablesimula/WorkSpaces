@@ -1,0 +1,72 @@
+Simulation BEGIN
+   CLASS Sporveksel;
+   BEGIN
+      BOOLEAN har_pinnen;
+      REF(Head) koe;
+      koe :- NEW Head;
+   END Sporveksel;
+   
+   Process CLASS Trikk (pens1, pens2);
+   REF(Sporveksel) pens1, pens2;
+   BEGIN
+      REAL ankomsttid;
+
+      ! Ankommer pensen. Må jeg vente? ;
+      ankomsttid := Time;
+      IF NOT pens1.har_pinnen THEN Wait(pens1.koe);
+
+      ! Kan kjøre. Få med alle som venter i samme kø;
+      pens1.har_pinnen := FALSE;
+      noter_ventetid(ankomsttid, Time, pens1.koe.Cardinal);
+      IF Suc =/= NONE THEN ACTIVATE Suc AFTER Current;
+      Out;
+      Hold(120);
+
+      ! Lever pinnen og varsle motgående trikker. ;
+      pens2.har_pinnen := TRUE;
+      ACTIVATE pens2.koe.First;
+   END Trikk;
+
+   REAL sum_venting, maks_venting;
+   INTEGER antall_ventinger, maks_i_koe;
+
+   PROCEDURE noter_ventetid (Start, slutt, i_koe);
+   REAL Start, slutt;
+   INTEGER i_koe;
+   BEGIN
+      REAL tid;   tid := slutt - start;
+      sum_venting := sum_venting + tid;
+      antall_ventinger := antall_ventinger + 1;
+      IF tid > maks_venting THEN maks_venting := tid;
+      IF i_koe > maks_i_koe THEN maks_i_koe := i_koe;
+   END noter_ventetid;
+
+   ! Start simuleringen. ;
+
+   INTEGER avganger_i_timen;
+   INTEGER i, u;
+
+   REF(Sporveksel) pens_vestfra, pens_oestfra;
+   pens_vestfra :- NEW Sporveksel;
+   pens_oestfra :- NEW Sporveksel;
+   pens_oestfra.har_pinnen := TRUE;
+
+   avganger_i_timen := 12;
+   u := 2468753;
+   FOR i := 1 STEP 1 UNTIL avganger_i_timen*24 DO BEGIN 
+      ACTIVATE NEW Trikk(pens_vestfra, pens_oestfra)
+	 AT Uniform(1,24*60*60,u);
+      ACTIVATE NEW Trikk(pens_oestfra, pens_vestfra)
+	 AT Uniform(1,24*60*60,u);
+   END FOR;
+
+   ! Avslutt simuleringen etter et døgn og skriv ut resultatet. ;
+   Hold(24 * 60 * 60);   ! Ett døgn ;
+   OutText("Snitt venting: ");
+   OutFix(sum_venting/antall_ventinger, 1, 0);
+   OutText("   max: ");
+   OutInt(maks_venting, 0);
+   OutText("   max i kø: ");
+   OutInt(maks_i_koe, 0);
+   OutImage;
+END.

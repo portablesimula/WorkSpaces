@@ -1,0 +1,112 @@
+
+% ===============================================   Main   program =============
+%  PROGRAM NAME:   SIMULA TEST NO 164
+%
+%  PURPOSE:     Test Inspect when, when, otherwise (selected)
+%
+%  METHOD:      Try it and see if it work as expected.
+%
+%  WRITTEN BY:  MYH
+% ==============================================================================
+external class SimulaTest;
+
+SimulaTest(164,"--- Test Extended Text Procedures") begin
+	text array facit(0:17);
+	integer traceCase;
+   
+	procedure trace(msg); text msg; begin
+		if verbose then
+		begin outtext(msg); outimage; end;
+		if msg ne facit(traceCase) then begin
+			err("Case " & edit(traceCase));
+			outtext("Trace: """ & msg & """"); outimage;
+			outtext("Facit: """ & facit(traceCase) & """"); outimage;
+		end;
+		traceCase:=traceCase+1;
+	end;
+
+
+	integer i;
+	text t, u;
+	character c;
+	boolean b;
+	
+% ========================================================
+	
+	facit(0) :- "At START";
+	
+	facit(1) :- "t.trim  ==> t=ABCDE\fghi\JKLMN";
+	facit(2) :- "t.loadChar(4)=E";
+	facit(3) :- "t.storeChar('Z', 4)  ==> t=ABCDZ\fghi\JKLMN";
+	facit(4) :- "t.startsWith(""ABC"")  ==> true";
+	facit(5) :- "t.startsWith(""FGH"")  ==> false";
+	facit(6) :- "t.endsWith(""LMN"")  ==> true";
+	facit(7) :- "t.endsWith(""ABC"")  ==> false";
+	facit(8) :- "t.indexOf('Z')  ==> 4";
+	facit(9) :- "t.indexOf('W')  ==> -1";
+	facit(10) :- "t.replace('\','%')  ==> t=ABCDZ%fghi%JKLMN";
+	facit(11) :- "t.replaceText(""ABCD"",""XYZ"")  ==> t=XYZZ%fghi%JKLMN";
+	facit(12) :- "t.toLowerCase  ==> U=xyzz%fghi%jklmn";
+	facit(13) :- "t.toUpperCase  ==> U=XYZZ%FGHI%JKLMN";
+	facit(14) :- "t.lastIndexOf('%')  ==> 9";
+	facit(15) :- "t.indexOf('%')  ==> 9";
+	
+	facit(16) :- "At END";
+	
+% ========================================================
+
+	trace("At START");
+
+
+	t :- copy("   ABCDE\fghi\JKLMN   ");
+	
+	t :- t.trim;
+	trace("t.trim  ==> t=" & t);
+	
+	c := t.loadChar(4);
+	trace("t.loadChar(4)=" & edit(c));
+	
+	t.storeChar('Z', 4);
+	trace("t.storeChar('Z', 4)  ==> t=" & t);
+	
+	b := t.startsWith("ABC");
+	trace("t.startsWith(""ABC"")  ==> " & edit(b));
+	
+	b := t.startsWith("FGH");
+	trace("t.startsWith(""FGH"")  ==> " & edit(b));
+	
+	b := t.endsWith("LMN");
+	trace("t.endsWith(""LMN"")  ==> " & edit(b));
+	
+	b := t.endsWith("ABC");
+	trace("t.endsWith(""ABC"")  ==> " & edit(b));
+
+	i := t.indexOf('Z');
+	trace("t.indexOf('Z')  ==> " & edit(i));
+
+	i := t.indexOf('W');
+	trace("t.indexOf('W')  ==> " & edit(i));
+
+	t :- t.replace('\','%');
+	trace("t.replace('\','%')  ==> t=" & t);
+
+	t :- t.replaceText("ABCD","XYZ");
+	trace("t.replaceText(""ABCD"",""XYZ"")  ==> t=" & t);
+
+	u :- t.toLowerCase;
+	trace("t.toLowerCase  ==> U=" & u);
+
+	u :- t.toUpperCase;
+	trace("t.toUpperCase  ==> U=" & u);
+
+	i := t.lastIndexOf('%');
+	trace("t.lastIndexOf('%')  ==> " & edit(i));
+
+	t.setpos(6);
+	i := t.indexOf('%');
+	trace("t.indexOf('%')  ==> " & edit(i));
+
+
+	trace("At END");
+
+ end
