@@ -78,8 +78,8 @@ public final class LocalObject extends Expression {
 	/// @return the newly created LocalObject.
 	static Expression expectThisIdentifier() {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ThisObjectExpression, current=" + Parse.currentToken);
-		String classIdentifier = Parse.expectIdentifier();
+			Util.TRACE("Parse ThisObjectExpression, current=" + Parse.getCurrentParserToken(simBuilder));
+		String classIdentifier = Parse.expectIdentifier(simBuilder).getText();
 		Expression expr = new LocalObject(classIdentifier);
 		return(expr);
 	}

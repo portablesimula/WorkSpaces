@@ -127,7 +127,7 @@ public abstract class SyntaxClass {
 	/// Set semantic checked.
 	/// 
 	/// Should be called from all doChecking methods to signal that semantic checking is done.
-	protected void SET_SEMANTICS_CHECKED() {
+	public void SET_SEMANTICS_CHECKED() {
 		CHECKED = true;
 	}
 

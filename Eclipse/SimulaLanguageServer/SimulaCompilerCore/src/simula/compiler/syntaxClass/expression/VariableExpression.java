@@ -14,6 +14,7 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
 import java.util.Vector;
 
+import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.parsing.Parse;
@@ -127,7 +128,8 @@ public final class VariableExpression extends Expression {
 
 	/// Create a new Variable.
 	/// @param identifier the variable's identifier
-	public VariableExpression(final String identifier) {
+	public VariableExpression(final SimulaBuilder simBuilder, final String identifier) {
+		super(simBuilder);
 		this.identifier = identifier;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW Variable: " + identifier);
@@ -177,9 +179,9 @@ public final class VariableExpression extends Expression {
 	/// @return the created Variable
 	public static VariableExpression expectVariable(final String ident) {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse Variable, current=" + Parse.currentToken + ", prev=" + Parse.prevToken);
+			Util.TRACE("Parse Variable, current=" + Parse.getCurrentParserToken(simBuilder) + ", prev=" + Parse.prevToken);
 		VariableExpression variable = new VariableExpression(ident);
-		if (Parse.accept(KeyWord.BEGPAR)) {
+		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
 			variable.params = new Vector<Expression>();
 			do {
 				Expression par = acceptExpression();
@@ -189,8 +191,8 @@ public final class VariableExpression extends Expression {
 					variable.params.add(par);
 					par.backLink = variable;
 				}
-			} while (Parse.accept(KeyWord.COMMA));
-			Parse.expect(KeyWord.ENDPAR);
+			} while (Parse.accept(simBuilder, KeyWord.COMMA));
+			Parse.expect(simBuilder, KeyWord.ENDPAR);
 		}
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW Variable: " + variable);

@@ -85,16 +85,16 @@ public final class ObjectGenerator extends Expression {
 	/// @return the newly created ObjectGenerator.
 	static Expression expectNew() {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ObjectGenerator, current=" + Parse.currentToken);
-		String classIdentifier = Parse.expectIdentifier();
+			Util.TRACE("Parse ObjectGenerator, current=" + Parse.getCurrentParserToken(simBuilder));
+		String classIdentifier = Parse.expectIdentifier(simBuilder).getText();
 		Vector<Expression> params = new Vector<Expression>();
-		if (Parse.accept(KeyWord.BEGPAR)) {
+		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
 			do {
 				Expression par=acceptExpression();
 				if(par==null) Util.error("Missing class parameter");
 				else params.add(par);
-			} while (Parse.accept(KeyWord.COMMA));
-			Parse.expect(KeyWord.ENDPAR);
+			} while (Parse.accept(simBuilder, KeyWord.COMMA));
+			Parse.expect(simBuilder, KeyWord.ENDPAR);
 		}
 
 		Expression expr = new ObjectGenerator(classIdentifier, params);

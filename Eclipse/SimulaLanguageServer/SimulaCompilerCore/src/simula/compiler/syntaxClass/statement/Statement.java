@@ -69,7 +69,7 @@ public abstract class Statement extends SyntaxClass {
 	/// @return the statement
 	public static Statement acceptStatement(SimulaBuilder simBuilder) {
 		ObjectList<LabelDeclaration> labels = null;
-//		int lineNumber=Parse.currentToken.lineNumber;
+//		int lineNumber=Parse.getCurrentParserToken(simBuilder).lineNumber;
 		int lineNumber=Parse.getSourceLineNumber(simBuilder);
 		if (Option.internal.TRACE_PARSE) {
 			Util.TRACE("Statement.acceptStatement: LabeledStatement: lineNumber="+lineNumber+", current=" + Parse.getCurrentParserToken(simBuilder));//	+ ", prev=" + PsiParse.prevToken);
@@ -96,16 +96,16 @@ public abstract class Statement extends SyntaxClass {
 	/// Parse Utility: Expect an unlabeled statement.
 	/// @return the resulting statement
 	private static Statement acceptUnlabeledStatement(SimulaBuilder simBuilder) {
-//		int lineNumber=Parse.currentToken.lineNumber;
+//		int lineNumber=Parse.getCurrentParserToken(simBuilder).lineNumber;
 		int lineNumber=Parse.getSourceLineNumber(simBuilder);
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Statement.doUnlabeledStatement: lineNumber="+lineNumber+", current=" + Parse.currentToken	+ ", prev=" + Parse.prevToken);
-		switch(Parse.currentToken.getKeyWord()) {
+			Util.TRACE("Statement.doUnlabeledStatement: lineNumber="+lineNumber+", current=" + Parse.getCurrentParserToken(simBuilder)	+ ", prev=" + Parse.prevToken);
+		switch(Parse.getCurrentParserToken(simBuilder).getKeyWord()) {
 		    case KeyWord.BEGIN: Parse.nextToken(simBuilder); return (new MaybeBlockDeclaration(null).expectMaybeBlock(lineNumber));
 		    case KeyWord.IF:    Parse.nextToken(simBuilder); return (new ConditionalStatement(lineNumber));
 		    case KeyWord.GOTO:  Parse.nextToken(simBuilder); return (new GotoStatement(lineNumber));
 		    case KeyWord.GO:    Parse.nextToken(simBuilder); 
-				        if (!Parse.accept(KeyWord.TO))	Util.error("Missing 'TO' after 'GO'");
+				        if (!Parse.accept(simBuilder, KeyWord.TO))	Util.error("Missing 'TO' after 'GO'");
 				        return (new GotoStatement(lineNumber));
 		    case KeyWord.FOR:        Parse.nextToken(simBuilder); return (new ForStatement(lineNumber));
 		    case KeyWord.WHILE:      Parse.nextToken(simBuilder); return (new WhileStatement(lineNumber));
@@ -124,7 +124,7 @@ public abstract class Statement extends SyntaxClass {
 		         Expression expr = Expression.acceptExpression();
 		         if(expr!=null) {
 		        	 if(expr instanceof VariableExpression var) {
-		        		 if (Parse.accept(KeyWord.BEGIN))
+		        		 if (Parse.accept(simBuilder, KeyWord.BEGIN))
 		        			 return new BlockStatement(PrefixedBlockDeclaration.expectPrefixedBlock(var,false));
 		        	 }
 		        	 return (new StandaloneExpression(lineNumber,expr));

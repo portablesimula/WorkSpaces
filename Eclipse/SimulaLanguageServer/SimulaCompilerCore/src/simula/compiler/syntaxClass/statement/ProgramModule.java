@@ -8,7 +8,8 @@ package simula.compiler.syntaxClass.statement;
 import java.io.IOException;
 import java.util.Vector;
 
-import simula.compiler.parsing.Parse;
+import simula.builder.Parse;
+import simula.builder.SimulaBuilder;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -26,6 +27,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.token.LexToken;
 
 /// Simula Program Module.
 /// 
@@ -86,54 +88,67 @@ public final class ProgramModule extends Statement {
 	}
 
 	/// Create a new ProgramModule.
-	public ProgramModule() {
-		super(0);
-		sysin=new VariableExpression("sysin");
-		sysout=new VariableExpression("sysout");
-		try	{
+	public ProgramModule(SimulaBuilder simBuilder) {
+		super(simBuilder);
+		sysin=new VariableExpression(null, "sysin");   sysin.SET_SEMANTICS_CHECKED();
+		sysout=new VariableExpression(null, "sysout"); sysout.SET_SEMANTICS_CHECKED();
+	}
+
+//	/// Create a new ProgramModule.
+//	public ProgramModule() {
+//		super(0);
+//		sysin=new VariableExpression("sysin");
+//		sysout=new VariableExpression("sysout");
+//		try	{
+	public void doBuild() {
+//		try	{
 			if(Option.internal.TRACE_PARSE) Parse.TRACE("Parse Program");
 			CoreGlobal.setScope(StandardClass.BASICIO);		    	// BASICIO Begin
-			new ConnectionBlock(sysin, null)                     	//    Inspect sysin do
+			new ConnectionBlock(simBuilder, sysin, null)                     	//    Inspect sysin do
 			     .setClassDeclaration(StandardClass.Infile);
-			new ConnectionBlock(sysout, null)                    	//    Inspect sysout do
+			new ConnectionBlock(simBuilder, sysout, null)                    	//    Inspect sysout do
 			     .setClassDeclaration(StandardClass.Printfile);
 			CoreGlobal.getCurrentScope().sourceBlockLevel=0;
-			while(Parse.accept(KeyWord.EXTERNAL)) {
+			while(Parse.accept(simBuilder, KeyWord.EXTERNAL)) {
 				externalHead = ExternalDeclaration.expectExternalHead(StandardClass.BASICIO);					
-				Parse.expect(KeyWord.SEMICOLON);
+				Parse.expect(simBuilder, KeyWord.SEMICOLON);
 			}
 			// Now: Looking for ( program | procedure-declaration | class-declaration )
-			String ident=Parse.acceptIdentifier(simBuilder);
-			if(ident!=null) {
-				if(Parse.accept(KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(ident);
-			    else { Parse.saveCurrentToken(); mainModule = doParseProgram(); }
+//			String mayBeClassIdent = Parse.acceptIdentifier(simBuilder);
+			LexToken mayBeClassIdent=Parse.acceptIdentifier(simBuilder);
+			if(mayBeClassIdent!=null) {
+				if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, mayBeClassIdent.getText());
+			    else { Parse.saveCurrentToken(); mainModule = doParseProgram(simBuilder); }
 			}
-			else if(Parse.accept(KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(null);
+			else if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, null);
 			else {
-				Type type=Parse.acceptType();
-			    if(Parse.accept(KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(type);
-			    else mainModule = doParseProgram();
+				Type type=Parse.acceptType(simBuilder);
+			    if(Parse.accept(simBuilder, KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type);
+			    else mainModule = doParseProgram(simBuilder);
 			}
 			StandardClass.BASICIO.declarationList.add(mainModule);
 			
-			if(Parse.currentToken.keyWord != KeyWord.EOF) {
-				Util.warning("Text after Program end - starting with " + Parse.currentToken);
+//			if(Parse.getCurrentParserToken(simBuilder).keyWord != KeyWord.EOF) {
+			LexToken lastToken = Parse.getCurrentParserToken(simBuilder);
+			if(lastToken.keyWord != KeyWord.EOF) {
+				Util.warning(simBuilder, lastToken, "Text after Program end");
 			}
 			
 			if(Option.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
-		} catch(Throwable e) {
-			e.printStackTrace();
-			Util.IERR();
-		}
+//		} catch(Throwable e) {
+//			e.printStackTrace();
+//			Util.IERR();
+//		}
 	}
 	
 	/// Parse Simula Program by expecting a Statement.
 	/// @return the Program Statement.
-	private DeclarationScope doParseProgram() {
+	private DeclarationScope doParseProgram(final SimulaBuilder simBuilder) {
 		BlockDeclaration mainBlock = new MaybeBlockDeclaration(CoreGlobal.sourceName);
 		mainBlock.isMainModule = true;
 		mainBlock.declarationKind = ObjectKind.SimulaProgram;
-		Statement program = Statement.expectStatement();
+//		Statement program = Statement.expectStatement();
+		Statement program = Statement.acceptStatement(simBuilder);
 		mainBlock.statements.add(program);
 		return mainBlock;
 	}

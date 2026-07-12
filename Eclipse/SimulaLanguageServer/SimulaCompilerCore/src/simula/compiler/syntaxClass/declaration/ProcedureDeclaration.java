@@ -142,13 +142,13 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		proc.type = type;
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ProcedureDeclaration, type=" + type);
-		proc.modifyIdentifier(Parse.expectIdentifier());
-		if (Parse.accept(KeyWord.BEGPAR)) {
+		proc.modifyIdentifier(Parse.expectIdentifier(simBuilder).getText());
+		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
 			expectFormalParameterPart(proc.parameterList);
-			Parse.expect(KeyWord.SEMICOLON);
+			Parse.expect(simBuilder, KeyWord.SEMICOLON);
 			while(acceptModePart(proc.parameterList));
 			expectSpecificationPart(proc);
-		} else Parse.expect(KeyWord.SEMICOLON);
+		} else Parse.expect(simBuilder, KeyWord.SEMICOLON);
 		expectProcedureBody(proc);
 
 		proc.lastLineNumber = CoreGlobal.sourceLineNumber;
@@ -173,12 +173,12 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @param pList the parameter list
 	/// @return true: if mode-part was present.
 	private static boolean acceptModePart(Vector<Parameter> pList) {
-		if (Parse.accept(KeyWord.VALUE, KeyWord.NAME)) {
+		if (Parse.accept(simBuilder, KeyWord.VALUE, KeyWord.NAME)) {
 			int mode = (Parse.prevToken.getKeyWord() == KeyWord.VALUE)
 					? Parameter.Mode.value
 					: Parameter.Mode.name;
 			do {
-				String identifier = Parse.expectIdentifier();
+				String identifier = Parse.expectIdentifier(simBuilder).getText();
 				Parameter parameter = null;
 				for (Parameter par : pList)
 					if (Util.equals(identifier, par.identifier)) {
@@ -190,8 +190,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					parameter = new Parameter(identifier);
 				}
 				parameter.setMode(mode);
-			} while (Parse.accept(KeyWord.COMMA));
-			Parse.expect(KeyWord.SEMICOLON);
+			} while (Parse.accept(simBuilder, KeyWord.COMMA));
+			Parse.expect(simBuilder, KeyWord.SEMICOLON);
 			return(true);
 		}
 		return(false);
@@ -212,15 +212,15 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		LOOP: while(true) {
 			Type type;
 			int kind = Parameter.Kind.Simple;
-			if (Parse.accept(KeyWord.SWITCH)) {
+			if (Parse.accept(simBuilder, KeyWord.SWITCH)) {
 				type = Type.Label;
 				kind = Parameter.Kind.Procedure;
-			} else if (Parse.accept(KeyWord.LABEL))
+			} else if (Parse.accept(simBuilder, KeyWord.LABEL))
 				type = Type.Label;
 			else {
-				type = Parse.acceptType();
+				type = Parse.acceptType(simBuilder);
 				//if (type == null) return (false);
-				if (Parse.accept(KeyWord.ARRAY)) {
+				if (Parse.accept(simBuilder, KeyWord.ARRAY)) {
 					if (type == null) {
 						// See Simula Standard 5.2 -
 						// If no type is given the type real is understood.
@@ -228,11 +228,11 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					}
 					kind = Parameter.Kind.Array;
 				}
-				else if (Parse.accept(KeyWord.PROCEDURE)) kind = Parameter.Kind.Procedure;
+				else if (Parse.accept(simBuilder, KeyWord.PROCEDURE)) kind = Parameter.Kind.Procedure;
 				else if(type == null) break LOOP;
 			}
 			do {
-				String identifier = Parse.expectIdentifier();
+				String identifier = Parse.expectIdentifier(simBuilder).getText();
 				Parameter parameter = null;
 				for (Parameter par : proc.parameterList)
 					if (Util.equals(identifier,par.identifier)) { parameter = par; break; }
@@ -241,8 +241,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					parameter = new Parameter(identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
-			} while (Parse.accept(KeyWord.COMMA));
-			Parse.expect(KeyWord.SEMICOLON);
+			} while (Parse.accept(simBuilder, KeyWord.COMMA));
+			Parse.expect(simBuilder, KeyWord.SEMICOLON);
 			continue LOOP;
 		}
 		for (Parameter par : proc.parameterList) {
@@ -270,15 +270,15 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// 
 	/// @param proc the procedure
 	private static void expectProcedureBody(ProcedureDeclaration proc) {
-		if (Parse.accept(KeyWord.BEGIN)) {
+		if (Parse.accept(simBuilder, KeyWord.BEGIN)) {
 			Statement stm;
 			if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse Procedure Block");
 			while (Declaration.acceptDeclaration(proc)) {
-				Parse.accept(KeyWord.SEMICOLON);
+				Parse.accept(simBuilder, KeyWord.SEMICOLON);
 			}
 //			Vector<Statement> stmList = proc.statements;
 			ObjectList<Statement> stmList = proc.statements;
-			while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
+			while (!Parse.accept(simBuilder, KeyWord.END, KeyWord.EOF)) {
 				stm = Statement.expectStatement();
 				if (stm != null) stmList.add(stm);
 			}

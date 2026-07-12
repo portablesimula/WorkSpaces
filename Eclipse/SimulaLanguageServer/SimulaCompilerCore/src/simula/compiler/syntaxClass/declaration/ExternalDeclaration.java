@@ -127,17 +127,17 @@ public final class ExternalDeclaration extends Declaration {
 		String kind = Parse.acceptIdentifier(simBuilder);
 		if (kind != null)
 			Util.error("*** NOT IMPLEMENTED: " + "External " + kind + " Procedure");
-		Type expectedType = Parse.acceptType();
-		if (!(Parse.accept(KeyWord.CLASS) || Parse.accept(KeyWord.PROCEDURE)))
+		Type expectedType = Parse.acceptType(simBuilder);
+		if (!(Parse.accept(simBuilder, KeyWord.CLASS) || Parse.accept(simBuilder, KeyWord.PROCEDURE)))
 			Util.error("parseExternalDeclaration: Expecting CLASS or PROCEDURE");
 
 		Vector<ExternalDeclaration> externalDeclarations = new Vector<ExternalDeclaration>();
-		String identifier = Parse.expectIdentifier();
+		String identifier = Parse.expectIdentifier(simBuilder).getText();
 		LOOP: while (true) {
 			Token externalIdentifier = null;
-			if (Parse.accept(KeyWord.EQ)) {
-				externalIdentifier = Parse.currentToken;
-				Parse.expect(KeyWord.TEXTKONST);
+			if (Parse.accept(simBuilder, KeyWord.EQ)) {
+				externalIdentifier = Parse.getCurrentParserToken(simBuilder);
+				Parse.expect(simBuilder, KeyWord.TEXTKONST);
 			}
 			String extIdentitier = (externalIdentifier==null)?null:externalIdentifier.getIdentifier();
 			
@@ -159,13 +159,13 @@ public final class ExternalDeclaration extends Declaration {
 				}
 			}
 
-			if (Parse.accept(KeyWord.IS)) {
+			if (Parse.accept(simBuilder, KeyWord.IS)) {
 				Util.error("*** NOT IMPLEMENTED: " + "External non-Simula Procedure");
 				break LOOP;
 			}
-			if (!Parse.accept(KeyWord.COMMA))
+			if (!Parse.accept(simBuilder, KeyWord.COMMA))
 				break LOOP;
-			identifier = Parse.expectIdentifier();
+			identifier = Parse.expectIdentifier(simBuilder).getText();
 		}
 		return externalDeclarations;
 	}

@@ -19,11 +19,11 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
 import java.util.Vector;
 
+import simula.builder.Parse;
 import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.HiddenSpecification;
 import simula.compiler.syntaxClass.ProtectedSpecification;
 import simula.compiler.syntaxClass.Type;
@@ -170,24 +170,25 @@ public class ClassDeclaration extends BlockDeclaration {
 	public static ClassDeclaration expectClassDeclaration(final SimulaBuilder simBuilder, final String ident) {
 		ClassDeclaration cls = new ClassDeclaration(simBuilder, null);
 		cls.sourceFileName = CoreGlobal.sourceFileName;
-		cls.lineNumber = Parse.prevToken.lineNumber;
+//		cls.lineNumber = Parse.prevToken.lineNumber;
+		cls.lineNumber = simBuilder.getSourceLineNumber();
 		cls.prefix = ident;
 		cls.declaredIn.hasLocalClasses = true;
 		if (cls.prefix == null)
 			cls.prefix = StandardClass.CLASS.identifier;
-		cls.modifyIdentifier(Parse.expectIdentifier());
-		if (Parse.accept(KeyWord.BEGPAR)) {
-			expectFormalParameterPart(cls.parameterList);
-			Parse.expect(KeyWord.SEMICOLON);
-			acceptValuePart(cls.parameterList);
-			acceptParameterSpecificationPart(cls.parameterList);
+		cls.modifyIdentifier(Parse.expectIdentifier(simBuilder).getText());
+		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
+			expectFormalParameterPart(simBuilder, cls.parameterList);
+			Parse.expect(simBuilder, KeyWord.SEMICOLON);
+			acceptValuePart(simBuilder, cls.parameterList);
+			acceptParameterSpecificationPart(simBuilder, cls.parameterList);
 		} else
-			Parse.expect(KeyWord.SEMICOLON);
+			Parse.expect(simBuilder, KeyWord.SEMICOLON);
 
-		acceptProtectionPart(cls);
-		if (Parse.accept(KeyWord.VIRTUAL))
+		acceptProtectionPart(simBuilder, cls);
+		if (Parse.accept(simBuilder, KeyWord.VIRTUAL))
 			VirtualSpecification.expectVirtualPart(cls);
-		expectClassBody(cls);
+		expectClassBody(simBuilder, cls);
 		
 		cls.lastLineNumber = CoreGlobal.sourceLineNumber;
 		cls.type = Type.Ref(cls.identifier);
@@ -206,10 +207,10 @@ public class ClassDeclaration extends BlockDeclaration {
 	///              VALUE identifier-list ;
 	/// </pre>
 	/// @param pList Parameter list
-	private static void acceptValuePart(final Vector<Parameter> pList) {
-		if (Parse.accept(KeyWord.VALUE)) {
+	private static void acceptValuePart(final SimulaBuilder simBuilder, final Vector<Parameter> pList) {
+		if (Parse.accept(simBuilder, KeyWord.VALUE)) {
 			do {
-				String identifier = Parse.expectIdentifier();
+				String identifier = Parse.expectIdentifier(simBuilder).getText();
 				Parameter parameter = null;
 				for (Parameter par : pList)
 					if (Util.equals(identifier, par.identifier)) {
@@ -217,12 +218,12 @@ public class ClassDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(identifier);
+					Util.syntaxError(simBuilder, "Identifier " + identifier + " is not defined in this scope");
+					parameter = new Parameter(simBuilder, identifier);
 				}
 				parameter.setMode(Parameter.Mode.value);
-			} while (Parse.accept(KeyWord.COMMA));
-			Parse.expect(KeyWord.SEMICOLON);
+			} while (Parse.accept(simBuilder, KeyWord.COMMA));
+			Parse.expect(simBuilder, KeyWord.SEMICOLON);
 		}
 	}
 
@@ -239,14 +240,14 @@ public class ClassDeclaration extends BlockDeclaration {
 	///        class-parameter-specifier = Type | [Type] ARRAY
 	/// </pre>
 	/// @param pList the parameter list
-	private static void acceptParameterSpecificationPart(final Vector<Parameter> pList) {
+	private static void acceptParameterSpecificationPart(final SimulaBuilder simBuilder, final Vector<Parameter> pList) {
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ParameterSpecifications");
 		while (true) {
 			Type type;
 			int kind = Parameter.Kind.Simple;
-			type = Parse.acceptType();
-			if (Parse.accept(KeyWord.ARRAY)) {
+			type = Parse.acceptType(simBuilder);
+			if (Parse.accept(simBuilder, KeyWord.ARRAY)) {
 				if (type == null) {
 					// See Simula Standard 5.2 -
 					// If no type is given the type real is understood.
@@ -257,7 +258,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			if (type == null)
 				return;
 			do {
-				String identifier = Parse.expectIdentifier();
+				String identifier = Parse.expectIdentifier(simBuilder).getText();
 				Parameter parameter = null;
 				for (Parameter par : pList)
 					if (Util.equals(identifier, par.identifier)) {
@@ -265,13 +266,13 @@ public class ClassDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(identifier);
+					Util.syntaxError(simBuilder, "Identifier " + identifier + " is not defined in this scope");
+					parameter = new Parameter(simBuilder, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
-			} while (Parse.accept(KeyWord.COMMA));
+			} while (Parse.accept(simBuilder, KeyWord.COMMA));
 
-			Parse.expect(KeyWord.SEMICOLON);
+			Parse.expect(simBuilder, KeyWord.SEMICOLON);
 		}
 	}
 
@@ -292,15 +293,15 @@ public class ClassDeclaration extends BlockDeclaration {
 	///                | PROTECTED HIDDEN identifier-list
 	/// </pre>
 	/// @param cls the ClassDeclaration
-	private static void acceptProtectionPart(ClassDeclaration cls) {
+	private static void acceptProtectionPart(final SimulaBuilder simBuilder, ClassDeclaration cls) {
 		while (true) {
-			if (Parse.accept(KeyWord.HIDDEN)) {
-				if (Parse.accept(KeyWord.PROTECTED))
+			if (Parse.accept(simBuilder, KeyWord.HIDDEN)) {
+				if (Parse.accept(simBuilder, KeyWord.PROTECTED))
 					expectHiddenProtectedList(cls, true, true);
 				else
 					expectHiddenProtectedList(cls, true, false);
-			} else if (Parse.accept(KeyWord.PROTECTED)) {
-				if (Parse.accept(KeyWord.HIDDEN))
+			} else if (Parse.accept(simBuilder, KeyWord.PROTECTED)) {
+				if (Parse.accept(simBuilder, KeyWord.HIDDEN))
 					expectHiddenProtectedList(cls, true, true);
 				else
 					expectHiddenProtectedList(cls, false, true);
@@ -320,13 +321,13 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @param prtected if true, update the protected list
 	private static void expectHiddenProtectedList(final ClassDeclaration cls, final boolean hidden, final boolean prtected) {
 		do {
-			String identifier = Parse.expectIdentifier();
+			String identifier = Parse.expectIdentifier(simBuilder).getText();
 			if (hidden)
 				cls.hiddenList.add(new HiddenSpecification(cls, identifier));
 			if (prtected)
 				cls.protectedList.add(new ProtectedSpecification(cls, identifier));
-		} while (Parse.accept(KeyWord.COMMA));
-		Parse.expect(KeyWord.SEMICOLON);
+		} while (Parse.accept(simBuilder, KeyWord.COMMA));
+		Parse.expect(simBuilder, KeyWord.SEMICOLON);
 	}
 
 	// ***********************************************************************************************
@@ -350,37 +351,54 @@ public class ClassDeclaration extends BlockDeclaration {
 	///               | ; statement { ; statement } END
 	/// </pre>
 	/// @param cls the ClassDeclaration
-	private static void expectClassBody(ClassDeclaration cls) {
-		if (Parse.accept(KeyWord.BEGIN)) {
-			Statement stm;
+//	private static void expectClassBody(final SimulaBuilder simBuilder, ClassDeclaration cls) {
+//		if (Parse.accept(simBuilder, KeyWord.BEGIN)) {
+//			Statement stm;
+//			if (Option.internal.TRACE_PARSE)
+//				Parse.TRACE("Parse Block");
+//			while (Declaration.acceptDeclaration(cls)) {
+//				Parse.accept(simBuilder, KeyWord.SEMICOLON);
+//			}
+//			boolean seen = false;
+//			while (!Parse.accept(simBuilder, KeyWord.END, KeyWord.EOF)) {
+//				stm = Statement.expectStatement();
+//				if (stm != null)
+//					cls.statements.add(stm);
+//				if (Parse.accept(simBuilder, KeyWord.INNER)) {
+//					if (seen)
+//						Util.error("Max one INNER per Block");
+//					else
+//						cls.statements.add(new InnerStatement(Parse.getCurrentParserToken(simBuilder).lineNumber));
+//					seen = true;
+//				}
+//			}
+//			if (Parse.prevToken.keyWord == KeyWord.EOF) {
+//				Util.error("Illegal termination of class declaration. Missing END.");
+//			}
+//			if (!seen)
+//				cls.statements.add(new InnerStatement(Parse.getCurrentParserToken(simBuilder).lineNumber)); // Implicit INNER
+//		}
+//		else {
+//			if(Parse.getCurrentParserToken(simBuilder).keyWord != KeyWord.SEMICOLON)
+//				cls.statements.add(Statement.expectStatement());
+//			cls.statements.add(new InnerStatement(Parse.getCurrentParserToken(simBuilder).lineNumber)); // Implicit INNER
+//		}
+//	}
+	private static void expectClassBody(final SimulaBuilder simBuilder, ClassDeclaration cls) {
+		if (Parse.accept(simBuilder, KeyWord.BEGIN)) {
 			if (Option.internal.TRACE_PARSE)
 				Parse.TRACE("Parse Block");
-			while (Declaration.acceptDeclaration(cls)) {
-				Parse.accept(KeyWord.SEMICOLON);
+			
+			cls.parseBlock(simBuilder);
+			if(! cls.hasInner()) {
+//				IO.println("ClassDeclaration.expectClassBody: ADD IMPLICIT INNER");
+				cls.statements.add(new InnerStatement(simBuilder, false)); // Implicit INNER
 			}
-			boolean seen = false;
-			while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
-				stm = Statement.expectStatement();
-				if (stm != null)
-					cls.statements.add(stm);
-				if (Parse.accept(KeyWord.INNER)) {
-					if (seen)
-						Util.error("Max one INNER per Block");
-					else
-						cls.statements.add(new InnerStatement(Parse.currentToken.lineNumber));
-					seen = true;
-				}
-			}
-			if (Parse.prevToken.keyWord == KeyWord.EOF) {
-				Util.error("Illegal termination of class declaration. Missing END.");
-			}
-			if (!seen)
-				cls.statements.add(new InnerStatement(Parse.currentToken.lineNumber)); // Implicit INNER
-		}
-		else {
-			if(Parse.currentToken.keyWord != KeyWord.SEMICOLON)
-				cls.statements.add(Statement.expectStatement());
-			cls.statements.add(new InnerStatement(Parse.currentToken.lineNumber)); // Implicit INNER
+		} else {
+			if(Parse.getCurrentParserToken(simBuilder).keyWord != KeyWord.SEMICOLON)
+				cls.statements.add(Statement.acceptStatement(simBuilder));
+			if(! cls.hasInner())
+				cls.statements.add(new InnerStatement(simBuilder, false)); // Implicit INNER
 		}
 	}
 

@@ -49,7 +49,7 @@ public final class StandaloneExpression extends Statement {
 		super(line);
 		this.expression = expression;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": StandaloneExpression: "+this);
-		while (Parse.accept(KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) { 
+		while (Parse.accept(simBuilder, KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) { 
 			this.expression = new AssignmentOperation(this.expression, Parse.prevToken.getKeyWord(),expectStandaloneExpression());
 		}		
 	}
@@ -64,7 +64,7 @@ public final class StandaloneExpression extends Statement {
 	/// @return the resulting StandaloneExpression
 	private static Expression expectStandaloneExpression() { 
 		Expression retExpr=Expression.expectExpression();
-		while (Parse.accept(KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) {
+		while (Parse.accept(simBuilder, KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) {
 			int opr=Parse.prevToken.getKeyWord();
 			retExpr=new AssignmentOperation(retExpr,opr,expectStandaloneExpression());
 		}

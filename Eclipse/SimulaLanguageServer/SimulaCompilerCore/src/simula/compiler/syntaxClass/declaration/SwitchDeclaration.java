@@ -53,9 +53,9 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		super(ident,ObjectKind.Procedure);
 		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse SwitchDeclaration");
 		this.type = Type.Label;
-		Parse.expect(KeyWord.ASSIGNVALUE);
+		Parse.expect(simBuilder, KeyWord.ASSIGNVALUE);
 		do { switchList.add(Expression.expectExpression());
-		} while (Parse.accept(KeyWord.COMMA));
+		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse SwitchDeclaration(3), switchList=" + switchList);
 		new Parameter("_SW", Type.Integer, Parameter.Kind.Simple).into(parameterList);
 		CoreGlobal.setScope(declaredIn);

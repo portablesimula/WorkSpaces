@@ -146,7 +146,7 @@ public final class ConnectionStatement extends Statement {
 
 		boolean hasDoPart=false;
 		boolean hasWhenPart=false;
-		if (Parse.accept(KeyWord.DO)) {
+		if (Parse.accept(simBuilder, KeyWord.DO)) {
 			hasDoPart = true;
 			ConnectionBlock connectionBlock = new ConnectionBlock(inspectedVariable, null);
 			DeclarationScope prevScope = CoreGlobal.getCurrentScope();
@@ -157,9 +157,9 @@ public final class ConnectionStatement extends Statement {
 			connectionPart.add(new ConnectionDoPart(this,connectionBlock, statement));
 			connectionBlock.end();
 		} else {
-			while (Parse.accept(KeyWord.WHEN)) {
-				String classIdentifier = Parse.expectIdentifier();
-				Parse.expect(KeyWord.DO);
+			while (Parse.accept(simBuilder, KeyWord.WHEN)) {
+				String classIdentifier = Parse.expectIdentifier(simBuilder).getText();
+				Parse.expect(simBuilder, KeyWord.DO);
 				ConnectionBlock connectionBlock = new ConnectionBlock(inspectedVariable, classIdentifier);
 				hasWhenPart = true;
 				Statement statement = Statement.expectStatement();
@@ -169,7 +169,7 @@ public final class ConnectionStatement extends Statement {
 		}
 		if(!(hasDoPart | hasWhenPart)) Util.error("Incomplete Inspect statement: "+objectExpression);
 		Statement otherwise = null;
-		if (Parse.accept(KeyWord.OTHERWISE)) otherwise = Statement.expectStatement();
+		if (Parse.accept(simBuilder, KeyWord.OTHERWISE)) otherwise = Statement.expectStatement();
 		this.otherwise=otherwise;
 		this.hasWhenPart=hasWhenPart;
 		if (Option.internal.TRACE_PARSE)

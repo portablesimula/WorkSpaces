@@ -13,6 +13,8 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
+
+import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -47,8 +49,8 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// Create a new Label Declaration.
 	/// 
 	/// @param identifier label identifier
-	public LabelDeclaration(final String identifier) {
-		super(Type.Label, identifier);
+	public LabelDeclaration(final SimulaBuilder simBuilder, final String identifier) {
+		super(simBuilder, Type.Label, identifier);
 		this.externalIdent = "_LABEL_" + identifier;
 		this.declarationKind = ObjectKind.LabelDeclaration;
 	}

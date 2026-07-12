@@ -55,14 +55,14 @@ public final class ConditionalStatement extends Statement {
 	ConditionalStatement(final int line) {
 		super(line);
 		condition = Expression.expectExpression();
-		Parse.expect(KeyWord.THEN);
+		Parse.expect(simBuilder, KeyWord.THEN);
 		Statement elseStatement = null;
-		if (Parse.accept(KeyWord.ELSE)) {
-			thenStatement = new DummyStatement(Parse.currentToken.lineNumber);
+		if (Parse.accept(simBuilder, KeyWord.ELSE)) {
+			thenStatement = new DummyStatement(Parse.getCurrentParserToken(simBuilder).lineNumber);
 			elseStatement = Statement.expectStatement();
 		} else {
 		    thenStatement = Statement.expectStatement();
-		    if (Parse.accept(KeyWord.ELSE)) {
+		    if (Parse.accept(simBuilder, KeyWord.ELSE)) {
 			    elseStatement = Statement.expectStatement();
 		    }
 		}

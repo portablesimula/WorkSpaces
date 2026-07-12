@@ -126,7 +126,7 @@ public final class Parameter extends Declaration {
 	void into(final Vector<Parameter> parameterList) {
 		for (Parameter par : parameterList)
 			if (Util.equals(par.identifier, this.identifier)) {
-				Util.error("Parameter already defined: " + identifier);
+				Util.syntaxError(simBuilder, "Parameter already defined: " + identifier);
 				return;
 			}
 		parameterList.add(this);
@@ -150,7 +150,7 @@ public final class Parameter extends Declaration {
 	/// @param mode the new mode
 	void setMode(final int mode) {
 		if (this.mode != 0)
-			Util.error("Parameter " + identifier + " is already specified by " + this.mode);
+			Util.syntaxError(simBuilder, "Parameter " + identifier + " is already specified by " + this.mode);
 		this.mode = mode;
 	}
 
@@ -176,14 +176,14 @@ public final class Parameter extends Declaration {
 			return;
 		CoreGlobal.sourceLineNumber = lineNumber;
 		if (kind == 0) {
-			Util.error("Parameter " + identifier + " is not specified -- assumed Simple Integer");
+			Util.semanticError(this.declaredIn, "Parameter " + identifier + " is not specified -- assumed Simple Integer");
 			kind = Kind.Simple;
 			type = Type.Integer;
 		}
 		if (type != null)
 			type.doChecking(CoreGlobal.getCurrentScope().declaredIn);
 		if (!legalTransmitionMode())
-			Util.error("Illegal transmission mode: " + mode + ' ' + kind + ' ' + identifier + " by " + edMode(mode) + " is not allowed");
+			Util.semanticError(this, "Illegal transmission mode: " + mode + ' ' + kind + ' ' + identifier + " by " + edMode(mode) + " is not allowed");
 		SET_SEMANTICS_CHECKED();
 	}
 

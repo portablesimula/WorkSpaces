@@ -157,14 +157,14 @@ public final class ForStatement extends Statement {
 		super(line);
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ForStatement");
-		controlVariable = new VariableExpression(Parse.expectIdentifier());
-		if (!Parse.accept(KeyWord.ASSIGNVALUE))
-			Parse.expect(KeyWord.ASSIGNREF);
+		controlVariable = new VariableExpression(Parse.expectIdentifier(simBuilder).getText());
+		if (!Parse.accept(simBuilder, KeyWord.ASSIGNVALUE))
+			Parse.expect(simBuilder, KeyWord.ASSIGNREF);
 		assignmentOperator = Parse.prevToken.getKeyWord();
 		do {
 			forList.add(expectForListElement());
-		} while (Parse.accept(KeyWord.COMMA));
-		Parse.expect(KeyWord.DO);
+		} while (Parse.accept(simBuilder, KeyWord.COMMA));
+		Parse.expect(simBuilder, KeyWord.DO);
 		Statement doStatement = Statement.expectStatement();
 		if (doStatement == null) {
 			Util.error("No statement following DO in For statement");
@@ -181,11 +181,11 @@ public final class ForStatement extends Statement {
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ForListElement");
 		Expression expr1 = Expression.expectExpression();
-		if (Parse.accept(KeyWord.WHILE))
+		if (Parse.accept(simBuilder, KeyWord.WHILE))
 			return (new ForWhileElement(this, expr1, Expression.expectExpression()));
-		if (Parse.accept(KeyWord.STEP)) {
+		if (Parse.accept(simBuilder, KeyWord.STEP)) {
 			Expression expr2 = Expression.expectExpression();
-			Parse.expect(KeyWord.UNTIL);
+			Parse.expect(simBuilder, KeyWord.UNTIL);
 			return (new StepUntilElement(this, expr1, expr2, Expression.expectExpression()));
 		} else
 			return (new ForListElement(this, expr1));

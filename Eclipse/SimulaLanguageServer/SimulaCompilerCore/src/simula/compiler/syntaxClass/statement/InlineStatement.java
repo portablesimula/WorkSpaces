@@ -6,6 +6,8 @@
 package simula.compiler.syntaxClass.statement;
 
 import java.lang.classfile.CodeBuilder;
+
+import simula.builder.SimulaBuilder;
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.RTS;
@@ -33,8 +35,8 @@ public final class InlineStatement extends Statement {
 	
 	/// Create a new InlineStatement.
 	/// @param kind the kind code string.
-	public InlineStatement(String kind) {
-		super(1);
+	public InlineStatement(final SimulaBuilder simBuilder, String kind) {
+		super(simBuilder);
 		this.kind = kind;
 	}
 

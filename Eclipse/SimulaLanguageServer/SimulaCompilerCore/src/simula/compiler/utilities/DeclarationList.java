@@ -17,7 +17,7 @@ import simula.compiler.syntaxClass.declaration.Declaration;
 /// This is a utility class to hold local declaration lists in declaration scopes.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/DeclarationList.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/DeclarationList.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 @SuppressWarnings("serial")
@@ -32,12 +32,20 @@ public final class DeclarationList extends Vector<Declaration> {
 		this.identifier=identifier;
 	}
 	
+	public int getLineNumber() {
+		return firstElement().firstLineNumber();
+	}
+	
+	public int lastLineNumber() {
+		return lastElement().lastLineNumber();
+	}
+	
 	/// Find a declaration in this DeclarationList
-	/// @param identifier declaration identifier
+	/// @param identifier2 declaration identifier
 	/// @return the resulting Declaration
-	public Declaration find(String identifier) {
+	public Declaration find(String identifier2) {
 		for(Declaration d:this)
-			if(d.identifier.equals(identifier)) return(d);
+			if(d.identifier.equals(identifier2)) return(d);
 		return(null);
 	}
 	
@@ -46,7 +54,8 @@ public final class DeclarationList extends Vector<Declaration> {
 	public boolean add(Declaration dcl) {
 		Declaration d=find(dcl.identifier);
 		if(d!=null) {
-			Util.warning("Multiple declarations with the same name: "+dcl.identifier);
+			Util.warning(dcl, "Multiple declarations with the same name: "+dcl.identifier);
+			Util.warning(d, "Multiple declarations with the same name: "+dcl.identifier);
 			return(false);			
 		}
 		super.addElement(dcl);
@@ -56,8 +65,9 @@ public final class DeclarationList extends Vector<Declaration> {
 	/// Utility print method.
 	/// @param title the title
 	public void print(String title) {
-		Util.println("DeclarationList: "+identifier+" -- "+title);
+		Util.println("BEGIN DeclarationList: "+identifier+" -- "+title);
 		for(Declaration decl:this) Util.println(decl.toString());
+		Util.println("ENDOF: DeclarationList: "+identifier+" -- "+title);
 	}
 	
 	// ***********************************************************************************************

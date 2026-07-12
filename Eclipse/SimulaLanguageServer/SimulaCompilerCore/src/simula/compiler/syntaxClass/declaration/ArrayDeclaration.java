@@ -18,12 +18,15 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import simula.builder.Parse;
+import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
+import simula.compiler.syntaxClass.declaration.ArrayDeclaration.BoundPair;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.TypeConversion;
@@ -114,8 +117,8 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param identifier the array identifier
 	/// @param type the array type
 	/// @param boundPairList The list of BoundPair
-	private ArrayDeclaration(final String identifier, final Type type, final Vector<BoundPair> boundPairList) {
-		super(identifier);
+	private ArrayDeclaration(final SimulaBuilder simBuilder, final String identifier, final Type type, final Vector<BoundPair> boundPairList) {
+		super(simBuilder, identifier);
 		this.declarationKind = ObjectKind.ArrayDeclaration;
 		this.type = type;
 		this.boundPairList = boundPairList;
@@ -142,35 +145,35 @@ public final class ArrayDeclaration extends Declaration {
 	/// 
 	/// @param type            the array's type
 	/// @param declarationList the given declaration list
-	static void expectArrayDeclaration(final Type type, final DeclarationList declarationList) {
+	static Vector<SyntaxClass> expectArrayDeclaration(final SimulaBuilder simBuilder, final Type type) {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ArrayDeclaration, type=" + type + ", current=" + Parse.currentToken);
+			Util.TRACE("Parse ArrayDeclaration, type=" + type + ", current=" + Parse.getCurrentParserToken(simBuilder));
 		do {
 			if (Option.internal.TRACE_PARSE)
 				Parse.TRACE("Parse ArraySegment");
 			// IdentifierList = Identifier { , Identifier }
 			Vector<String> identList = new Vector<String>();
 			do {
-				identList.add(Parse.expectIdentifier());
-			} while (Parse.accept(KeyWord.COMMA));
-			Parse.expect(KeyWord.BEGPAR);
+				identList.add(Parse.expectIdentifier(simBuilder).getText());
+			} while (Parse.accept(simBuilder, KeyWord.COMMA));
+			Parse.expect(simBuilder, KeyWord.BEGPAR);
 			// BoundPairList = BoundPair { , BoundPair }
 			if (Option.internal.TRACE_PARSE)
 				Parse.TRACE("Parse BoundPairList");
 			Vector<BoundPair> boundPairList = new Vector<BoundPair>();
 			do {
 				Expression LB = Expression.expectExpression();
-				Parse.expect(KeyWord.COLON);
+				Parse.expect(simBuilder, KeyWord.COLON);
 				Expression UB = Expression.expectExpression();
 				boundPairList.add(new BoundPair(LB, UB));
-			} while (Parse.accept(KeyWord.COMMA));
-			Parse.expect(KeyWord.ENDPAR);
+			} while (Parse.accept(simBuilder, KeyWord.COMMA));
+			Parse.expect(simBuilder, KeyWord.ENDPAR);
 			for (Enumeration<String> e = identList.elements(); e.hasMoreElements();) {
 				String identifier = e.nextElement();
-				declarationList.add(new ArrayDeclaration(identifier.toString(), type, boundPairList));
+				declarationList.add(new ArrayDeclaration(simBuilder, identifier.toString(), type, boundPairList));
 			}
 			
-		} while (Parse.accept(KeyWord.COMMA));
+		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 	}
 
 	/// Utility Class to hold a BoundPair.

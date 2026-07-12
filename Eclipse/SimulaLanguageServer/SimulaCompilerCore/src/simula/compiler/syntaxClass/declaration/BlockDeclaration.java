@@ -14,19 +14,22 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Stack;
 import java.util.Vector;
 
+import simula.builder.Parse;
 import simula.builder.SimulaBuilder;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.CoreGlobal;
+import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.token.LexToken;
 
 /// Block Declaration.
 /// 
@@ -119,11 +122,66 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// 
 	/// Precondition: BEGPAR is already read.
 	/// @param pList the parameter list
-	protected static void expectFormalParameterPart(final Vector<Parameter> pList) {
+	protected static void expectFormalParameterPart(final SimulaBuilder simBuilder, final Vector<Parameter> pList) {
 		do { // ParameterPart = Parameter ; { Parameter ; }
-			new Parameter(Parse.expectIdentifier()).into(pList);
-		} while (Parse.accept(KeyWord.COMMA));
-		Parse.expect(KeyWord.ENDPAR);
+			new Parameter(simBuilder, Parse.expectIdentifier(simBuilder).edText()).into(pList);
+		} while (Parse.accept(simBuilder, KeyWord.COMMA));
+		Parse.expect(simBuilder, KeyWord.ENDPAR);
+	}
+
+	// ***********************************************************************************************
+	// *** Parsing: parseBlock
+	// ***********************************************************************************************
+	protected void parseBlock(final SimulaBuilder simBuilder) {
+		// NOTE: As a consequence of Simula Standard:
+		// 
+		// MaybeBlock = begin [ declaration { ; declaration } ; ] statement { ; statement } end
+		//
+		// class-body = begin [ declaration { ; declaration } ; ] statement { ; statement } end
+		//            | begin [ declaration { ; declaration } ; ] { statement ; } { label : } inner end
+		//            | begin [ declaration { ; declaration } ; ] { statement ; } { label : } inner ; statement { ; statement } end
+		//
+		// Suppose: STM = statement | { label : } inner
+		//
+		// ==> all-blocks = begin { declaration ; } STM { ; STM } end
+		//
+		// where inner occurs at most once within a class body
+		//
+		// Solution: Statement.expectStatement is extended to accept inner as a unlabeled statement.
+		//           With the parameter 'allowInner == true'
+		//   
+		
+		/// Repeatedly parse a declaration and add it to the given BlockDeclaration's' declaration list.
+		/// Continue until there are no more declarations.
+		simBuilder.startTokenRange();
+		DeclarationList declarationList=this.declarationList;
+		Vector<SyntaxClass> declarations = null;
+		while( (declarations = Declaration.acceptDeclaration(simBuilder)) != null) {
+			for(SyntaxClass decl:declarations) {
+				if(! (decl instanceof ExternalDeclaration)) {
+					// ExternalDeclaration should not be added to the declaration list.
+					declarationList.add((Declaration)decl);
+				}
+			}
+			Parse.expect(simBuilder, KeyWord.SEMICOLON);
+			simBuilder.doneTokenRange(declarations);
+			simBuilder.startTokenRange();
+		}
+		simBuilder.dropTokenRange();
+		
+		LOOP:while(true) {
+			LexToken token = Parse.acceptParserToken(simBuilder, KeyWord.END, KeyWord.EOF);
+//	        IO.println("BlockDeclaration.parseBlock: TESTING token: " + token);
+	        if(token != null) {
+		        if(token.keyWord == KeyWord.EOF)
+		        	Util.syntaxError(simBuilder, token, "Missing final block end");
+	        	break LOOP;
+	        }
+			Statement stm = Statement.acceptStatement(simBuilder);
+			if (stm != null) statements.add(stm);
+			Parse.accept(simBuilder, KeyWord.SEMICOLON);
+//		        IO.println("BlockDeclaration.parseBlock: TESTING stm: " + stm);
+		}
 	}
 
 	// ***********************************************************************************************

@@ -109,32 +109,32 @@ public final class SwitchStatement extends Statement {
 	SwitchStatement(int line) {
 		super(line);
 		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse SwitchStatement: line="+line);
-		Parse.expect(KeyWord.BEGPAR);
+		Parse.expect(simBuilder, KeyWord.BEGPAR);
 		lowKey = Expression.expectExpression();
-		Parse.expect(KeyWord.COLON);
+		Parse.expect(simBuilder, KeyWord.COLON);
 		hiKey = Expression.expectExpression();
-		Parse.expect(KeyWord.ENDPAR);
+		Parse.expect(simBuilder, KeyWord.ENDPAR);
 		switchKey = Expression.expectExpression();
 		switchKey.backLink=this;
-		Parse.expect(KeyWord.BEGIN);
+		Parse.expect(simBuilder, KeyWord.BEGIN);
 		has_NONE_case=false;
-		while (Parse.accept(KeyWord.WHEN)) {
+		while (Parse.accept(simBuilder, KeyWord.WHEN)) {
 			Vector<SwitchInterval> caseKeyList=new Vector<SwitchInterval>();
-			if (Parse.accept(KeyWord.NONE)) {
+			if (Parse.accept(simBuilder, KeyWord.NONE)) {
 				caseKeyList.add(null);
 				if(has_NONE_case) Util.error("NONE Case is already used");
 				has_NONE_case=true;
 			}
 			else {
 				caseKeyList.add(expectCasePair());
-				while(Parse.accept(KeyWord.COMMA)) caseKeyList.add(expectCasePair());
+				while(Parse.accept(simBuilder, KeyWord.COMMA)) caseKeyList.add(expectCasePair());
 			}
-			Parse.expect(KeyWord.DO);
+			Parse.expect(simBuilder, KeyWord.DO);
 			Statement statement = Statement.expectStatement();
-			Parse.accept(KeyWord.SEMICOLON);
+			Parse.accept(simBuilder, KeyWord.SEMICOLON);
 			switchCases.add(new SwitchWhenPart(caseKeyList, statement));
 		}
-		Parse.expect(KeyWord.END);
+		Parse.expect(simBuilder, KeyWord.END);
 		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber+": SwitchStatement: "+this);
 	}
 
@@ -143,7 +143,7 @@ public final class SwitchStatement extends Statement {
 	private SwitchInterval expectCasePair() {
 		Expression lowCase=Expression.expectExpression();
 		Expression hiCase=null;
-		if(Parse.accept(KeyWord.COLON)) hiCase=Expression.expectExpression();
+		if(Parse.accept(simBuilder, KeyWord.COLON)) hiCase=Expression.expectExpression();
 		return(new SwitchInterval(lowCase,hiCase));
 	}
 

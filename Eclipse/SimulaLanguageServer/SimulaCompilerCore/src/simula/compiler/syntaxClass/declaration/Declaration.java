@@ -9,8 +9,8 @@ import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.CodeBuilder;
 import java.util.Vector;
 
+import simula.builder.Parse;
 import simula.builder.SimulaBuilder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.ProtectedSpecification;
 import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
@@ -19,6 +19,7 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.token.LexToken;
 
 /// Declaration.
 ///  
@@ -122,63 +123,128 @@ public abstract class Declaration extends SyntaxClass {
 			}
 		}
 		if (error)
-			Util.error(identifier + " is alrerady defined in " + declaredIn.identifier);
+			Util.syntaxError(simBuilder, identifier + " is alrerady defined in " + declaredIn.identifier);
 		else if (warning)
-			Util.warning(identifier + " is alrerady defined in " + declaredIn.identifier);
+			Util.warning(simBuilder, identifier + " is alrerady defined in " + declaredIn.identifier);
 	}
 
 	/// Parse a declaration and add it to the given declaration list.
 	/// @param enclosure the owning block.
 	/// @return true if a declaration was found, false otherwise
-	protected static boolean acceptDeclaration(final BlockDeclaration enclosure) {
+//	protected static boolean acceptDeclaration(final BlockDeclaration enclosure) {
+//		if (Option.internal.TRACE_PARSE)
+//			Parse.TRACE("Parse Declaration");
+//		DeclarationList declarationList=enclosure.declarationList;
+//		String prefix = Parse.acceptIdentifier(simBuilder);
+//		if (prefix != null) {
+//			if (Parse.accept(simBuilder, KeyWord.CLASS))
+//				declarationList.add(ClassDeclaration.expectClassDeclaration(prefix));
+//			else {
+//				Parse.saveCurrentToken(); // Identifier is NOT a class prefix.
+//				return (false);
+//			}
+//		} else if (Parse.accept(simBuilder, KeyWord.ARRAY))
+//			ArrayDeclaration.expectArrayDeclaration(Type.Real, declarationList); // Default type real for arrays
+//		else if (Parse.accept(simBuilder, KeyWord.PROCEDURE))
+//			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(null));
+//		else if (Parse.accept(simBuilder, KeyWord.PRIOR)) {
+//			Util.warning("Keyword 'prior' ignored - prior procedure is not implemented");
+//			Type type = Parse.acceptType(simBuilder);
+//			Parse.expect(simBuilder, KeyWord.PROCEDURE);
+//			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(type));
+//		} else if (Parse.accept(simBuilder, KeyWord.CLASS))
+//			declarationList.add(ClassDeclaration.expectClassDeclaration(null));
+//		else if (Parse.accept(simBuilder, KeyWord.SWITCH)) {
+//			String ident = Parse.acceptIdentifier(simBuilder);
+//			if (ident == null) {
+//				// Switch Statement
+//				Parse.saveCurrentToken();
+//				return (false);
+//			}
+//			declarationList.add(new SwitchDeclaration(ident));
+//		} else if (Parse.accept(simBuilder, KeyWord.EXTERNAL))
+//			ExternalDeclaration.expectExternalHead(enclosure);
+//		else {
+//			Type type = Parse.acceptType(simBuilder);
+//			if (type == null)
+//				return (false);
+//			if (Parse.accept(simBuilder, KeyWord.PROCEDURE))
+//				declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(type));
+//			else if (Parse.accept(simBuilder, KeyWord.ARRAY))
+//				ArrayDeclaration.expectArrayDeclaration(type, declarationList);
+//			else 
+//				SimpleVariableDeclaration.expectSimpleVariable(type, declarationList);
+//			
+//			if (Option.internal.TRACE_PARSE)
+//				Parse.TRACE("Parse Declaration(2)");
+//		}
+//		return (true);
+//	}
+
+	/// Parse a declaration and add it to the given declaration list.
+	/// @param enclosure the owning block.
+	/// @return true if a declaration was found, false otherwise
+//	protected static boolean acceptDeclaration(final PsiBuilder simBuilder, final BlockDeclaration enclosure) {
+	protected static Vector<SyntaxClass> acceptDeclaration(final SimulaBuilder simBuilder) {
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse Declaration");
-		DeclarationList declarationList=enclosure.declarationList;
-		String prefix = Parse.acceptIdentifier(simBuilder);
-		if (prefix != null) {
-			if (Parse.accept(KeyWord.CLASS))
-				declarationList.add(ClassDeclaration.expectClassDeclaration(prefix));
-			else {
-				Parse.saveCurrentToken(); // Identifier is NOT a class prefix.
-				return (false);
+		Declaration decl = null;
+		IO.println("Declaration.acceptDeclaration: BEFORE acceptIdentifier");
+		LexToken maybePrefix = Parse.acceptIdentifier(simBuilder);
+		IO.println("Declaration.acceptDeclaration: AFTER acceptIdentifier");
+		if (maybePrefix != null) {
+			IO.println("Declaration.acceptDeclaration: maybePrefix="+maybePrefix);
+			if (Parse.accept(simBuilder, KeyWord.CLASS)) {
+				IO.println("Declaration.acceptDeclaration: CLASS");
+				decl = ClassDeclaration.expectClassDeclaration(simBuilder, maybePrefix.edText());
+			} else {
+				IO.println("Declaration.acceptDeclaration: NOT CLASS");
+				
+				Parse.saveCurrentToken(simBuilder); // Identifier is NOT a class prefix.
+				return null;
 			}
-		} else if (Parse.accept(KeyWord.ARRAY))
-			ArrayDeclaration.expectArrayDeclaration(Type.Real, declarationList); // Default type real for arrays
-		else if (Parse.accept(KeyWord.PROCEDURE))
-			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(null));
-		else if (Parse.accept(KeyWord.PRIOR)) {
-			Util.warning("Keyword 'prior' ignored - prior procedure is not implemented");
-			Type type = Parse.acceptType();
-			Parse.expect(KeyWord.PROCEDURE);
-			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(type));
-		} else if (Parse.accept(KeyWord.CLASS))
-			declarationList.add(ClassDeclaration.expectClassDeclaration(null));
-		else if (Parse.accept(KeyWord.SWITCH)) {
-			String ident = Parse.acceptIdentifier(simBuilder);
+		} else if (Parse.accept(simBuilder, KeyWord.ARRAY))
+			return ArrayDeclaration.expectArrayDeclaration(simBuilder, Type.Real); // Default type real for arrays
+		else if (Parse.accept(simBuilder, KeyWord.PROCEDURE))
+			decl = ProcedureDeclaration.expectProcedureDeclaration(simBuilder, null);
+		else if (Parse.accept(simBuilder, KeyWord.PRIOR)) {
+			Util.warning(simBuilder, "Keyword 'prior' ignored - prior procedure is not implemented");
+			Type type = Parse.acceptType(simBuilder);
+			Parse.expect(simBuilder, KeyWord.PROCEDURE);
+			decl = ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type);
+		} else if (Parse.accept(simBuilder, KeyWord.CLASS))
+			decl = ClassDeclaration.expectClassDeclaration(simBuilder, null);
+		else if (Parse.accept(simBuilder, KeyWord.SWITCH)) {
+			LexToken ident = Parse.acceptIdentifier(simBuilder);
 			if (ident == null) {
 				// Switch Statement
-				Parse.saveCurrentToken();
-				return (false);
+				return null;
 			}
-			declarationList.add(new SwitchDeclaration(ident));
-		} else if (Parse.accept(KeyWord.EXTERNAL))
-			ExternalDeclaration.expectExternalHead(enclosure);
-		else {
-			Type type = Parse.acceptType();
-			if (type == null)
-				return (false);
-			if (Parse.accept(KeyWord.PROCEDURE))
-				declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(type));
-			else if (Parse.accept(KeyWord.ARRAY))
-				ArrayDeclaration.expectArrayDeclaration(type, declarationList);
+			decl = new SwitchDeclaration(simBuilder, ident.edText());
+		} else if (Parse.accept(simBuilder, KeyWord.EXTERNAL)) {
+			Vector<SyntaxElement> ext = ExternalDeclaration.expectExternalDeclaration(simBuilder);	
+			return ext;
+		} else {
+			Type type = Parse.acceptType(simBuilder);
+			if (type == null) return null;
+			
+			if (Parse.accept(simBuilder, KeyWord.PROCEDURE)) {
+				decl = ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type);
+			}
+			else if (Parse.accept(simBuilder, KeyWord.ARRAY)) {
+				return ArrayDeclaration.expectArrayDeclaration(simBuilder, type);
+			}
 			else 
-				SimpleVariableDeclaration.expectSimpleVariable(type, declarationList);
+				return SimpleVariableDeclaration.expectSimpleVariable(simBuilder, type);
 			
 			if (Option.internal.TRACE_PARSE)
 				Parse.TRACE("Parse Declaration(2)");
 		}
-		return (true);
+		Vector<SyntaxElement> declarations = new Vector<SyntaxElement>();
+		declarations.add(decl);
+		return declarations;
 	}
+
 
 	// ***********************************************************************************************
 	// *** Utility: isCompatibleClasses -- Used by IS/IN/QUA-checking and Inspect WHEN

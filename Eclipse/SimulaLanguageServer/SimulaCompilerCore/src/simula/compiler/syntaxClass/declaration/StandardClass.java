@@ -903,8 +903,8 @@ public final class StandardClass extends ClassDeclaration {
 		Simulation.addStandardClass(Process);  // Declared in Simulation
 		Process.detachUsed=true;
 		Process.statements1=new ObjectList<Statement>();
-		Process.statements1.add(new InlineStatement("detach")); // Statements before inner 
-		Process.statements.add(new InlineStatement("terminate")); // Statements after inner 				
+		Process.statements1.add(new InlineStatement(null, "detach")); // Statements before inner 
+		Process.statements.add(new InlineStatement(null, "terminate")); // Statements after inner 				
 		//	    ref(EVENT_NOTICE) EVENT;
 		//	    Boolean TERMINATED_;
 		//	    Boolean procedure idle;
@@ -941,10 +941,10 @@ public final class StandardClass extends ClassDeclaration {
 	private static void initCatchingErrors() { 
 		CatchingErrors=new StandardClass("CLASS","CatchingErrors");
 		ENVIRONMENT.addStandardClass(CatchingErrors);  // Declared in ENVIRONMENT
-		CatchingErrors.virtualSpecList.add(new VirtualSpecification("onError",null,VirtualSpecification.Kind.Procedure,CatchingErrors.prefixLevel(),null));
+		CatchingErrors.virtualSpecList.add(new VirtualSpecification(null, "onError",null,VirtualSpecification.Kind.Procedure,CatchingErrors.prefixLevel(),null));
 		CatchingErrors.statements1=new ObjectList<Statement>();
-		CatchingErrors.statements1.add(new InlineStatement("try")); // Statements before inner 
-		CatchingErrors.statements.add(new InlineStatement("catch")); // Statements after inner 				
+		CatchingErrors.statements1.add(new InlineStatement(null, "try")); // Statements before inner 
+		CatchingErrors.statements.add(new InlineStatement(null, "catch")); // Statements after inner 				
 	}  
 
 	

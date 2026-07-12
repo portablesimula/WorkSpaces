@@ -108,8 +108,8 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse MayBeBlock");
 		while (Declaration.acceptDeclaration(this))
-			Parse.expect(KeyWord.SEMICOLON);
-		while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
+			Parse.expect(simBuilder, KeyWord.SEMICOLON);
+		while (!Parse.accept(simBuilder, KeyWord.END, KeyWord.EOF)) {
 			Statement stm = Statement.expectStatement();
 			if (stm != null) statements.add(stm);
 		}

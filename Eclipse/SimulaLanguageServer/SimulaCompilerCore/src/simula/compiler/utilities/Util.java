@@ -5,19 +5,23 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.utilities;
 
-import java.awt.Color;
 import java.io.InputStream;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
+
+import simula.Option;
+import simula.builder.SimulaBuilder;
+import simula.compiler.syntaxClass.SyntaxClass;
+import simula.lsp.util.SimPosition;
+import simula.lsp.util.SimRange;
+import simula.token.LexToken;
 
 /// A set of all static Utility Methods
 /// 
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/Util.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/Util.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class Util { 
@@ -32,47 +36,154 @@ public final class Util {
         return(javaID);
 	}
 
-	/// Pop up a message box.
-	/// @param msg the message
-	public static void popUpMessage(final Object msg) {
-		Util.optionDialog(msg,"Message",JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE, "OK");
-	}
 	
-	/// Pop up an error message box.
-	/// @param msg the error message
-	public static void popUpError(final String msg) {
-		int res=Util.optionDialog(msg+"\nDo you want to continue ?","Error",JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, "Yes", "No");
-		if(res!=JOptionPane.YES_OPTION) System.exit(0);
-	}
-
-	/// Brings up an option dialog.
-	/// @param msg the message to display
-	/// @param title the title string for the dialog
-	/// @param optionType an integer designating the options available on the dialog
-	/// @param messageType an integer designating the kind of message this is
-	/// @param option an array of objects indicating the possible choices the user can make
-	/// @return an integer indicating the option chosen by the user, or CLOSED_OPTION if the user closed the dialog
-	public static int optionDialog(final Object msg, final String title, final int optionType, final int messageType, final String... option) {
-		Object OptionPaneBackground = UIManager.get("OptionPane.background");
-		Object PanelBackground = UIManager.get("Panel.background");
-		UIManager.put("OptionPane.background", Color.WHITE);
-		UIManager.put("Panel.background", Color.WHITE);
-		int answer = JOptionPane.showOptionDialog(null, msg, title, optionType, messageType, CoreGlobal.sIcon, option, option[0]);
-		// IO.println("doClose.saveDialog: answer="+answer);
-		UIManager.put("OptionPane.background", OptionPaneBackground);
-		UIManager.put("Panel.background", PanelBackground);
-		return (answer);
+	public static String calledFrom(int startIndex, int endIndex) {
+		StackTraceElement[] elt = Thread.currentThread().getStackTrace();
+		StringBuilder sb = new StringBuilder();
+		int n = Math.min(elt.length, endIndex);
+		String sep ="";
+		for(int i=startIndex;i<n;i++) {
+			String methodName = elt[i].getMethodName();
+//			String className = elt[i].getClassName();
+			String fileName = elt[i].getFileName();
+			String className = fileName.replace(".java", "");
+			int line = elt[i].getLineNumber();
+			
+			String ref = "(" + fileName + ':' + line + ')';
+			
+//			sb.append(sep).append(className).append('.').append(methodName).append("[line ").append(line).append(']').append(elt[i]); sep=",  ";
+			sb.append(sep).append(className).append('.').append(methodName).append(ref); sep=",  ";
+//			sb.append(sep).append(elt[i]); sep=",";
+		}
+		return sb.toString();
 	}
 
 	/// Number of error messages.
 	public static int nError;
 
+//	/// Print a error message.
+//	/// @param msg the message
+//	public static void error(final String msg) {
+//		String err = edLINE(": OLD_Error: " + msg);
+//		nError++;
+//		printError(err);
+//	}
+
 	/// Print a error message.
 	/// @param msg the message
-	public static void error(final String msg) {
-		String err = edLINE(": Error: " + msg);
-		nError++;
-		printError(err);
+	public static void generalWarning(final String msg) {
+		LOG.error("General Error: " + msg);
+//		simBuilder.addDiagnostic(diagnostic); // TODO: DETTE MÅ RETTES - 
+	}
+
+	/// Print a error message.
+	/// @param msg the message
+	public static void generalWarning(final int lineNumber, final String msg) {
+		LOG.error("Line " + lineNumber + ": General Error: " + msg);
+//		simBuilder.addDiagnostic(diagnostic); // TODO: DETTE MÅ RETTES - 
+	}
+
+	/// Print a warning message.
+	/// @param msg the message
+	public static void warning(final SimulaBuilder simBuilder, final String msg) {
+		warning(simBuilder, simBuilder.prevParserToken(), msg);
+	}
+
+	/// Print a warning message.
+	/// @param msg the message
+	public static void warning(final SimulaBuilder simBuilder, final LexToken token, final String msg) {
+        if(Option.LEX_VERIFY) {
+        // SJEKK AT SimPosition er inne på linja !!!
+        if(token.keyWord == KeyWord.NEWLINE) // CRLF or LF ==> ERROR
+        	Util.IERR("Util.warning: Warning not inside text line");
+        }
+        SimPosition start = new SimPosition(token.lineNumber, token.column);
+        SimPosition end = new SimPosition(token.lineNumber, token.column + token.length);
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new SimRange(start, end), msg);
+		
+		LOG.warning(diagnostic.toString());
+		simBuilder.addDiagnostic(diagnostic);
+	}
+
+	/// Print a warning message.
+	/// @param msg the message
+	public static void warning(final SyntaxClass elt, final String msg) {
+        LexToken first = elt.getFirstLexToken();
+        LexToken last = elt.getLastLexToken();
+        
+        SimPosition start = new SimPosition(first.lineNumber, first.column);
+        SimPosition end = new SimPosition(last.lineNumber, last.column + last.length);
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new SimRange(start, end), msg);
+
+		LOG.warning(diagnostic.toString());
+		elt.simBuilder.addDiagnostic(diagnostic);
+	}
+
+
+	/// Report an error message to the SimulaCoreClient.
+	/// @param msg the message
+	public static void generalError(final String msg) {
+		CoreGlobal.simulaCoreClient.error("General Error: " + msg);
+	}
+
+	/// Report an error message to the SimulaCoreClient.
+	/// @param msg the message
+	public static void generalError(final int lineNumber, final String msg) {
+		CoreGlobal.simulaCoreClient.error("Line " + lineNumber + ": General Error: " + msg);
+	}
+	
+	/// Print a error message.
+	/// @param msg the message
+	public static void syntaxError(final SimulaBuilder simBuilder, final String msg) {
+		syntaxError(simBuilder, simBuilder.prevParserToken(), msg);
+	}
+	
+	public static void syntaxError(final SimulaBuilder simBuilder, final LexToken token, final String msg) {
+        if(Option.LEX_VERIFY) {
+        // SJEKK AT SimPosition er inne på linja !!!
+        if(token.keyWord == KeyWord.NEWLINE) // CRLF or LF ==> ERROR
+        	Util.IERR("Util.warning: Error not inside text line");
+        }
+        SimPosition start = new SimPosition(token.lineNumber, token.column);
+        SimPosition end = new SimPosition(token.lineNumber, token.column + token.length);
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new SimRange(start, end), msg);
+		
+		LOG.error(diagnostic.toString());
+		
+		Util.IERR("Util.SyntaxError: ");
+		
+		simBuilder.addDiagnostic(diagnostic);
+	}
+	
+	public static void semanticError(final SyntaxClass elt, final String msg) {
+        LexToken first = elt.getFirstLexToken();
+        LexToken last = elt.getLastLexToken();
+        
+        SimPosition start = new SimPosition(first.lineNumber, first.column);
+        SimPosition end = new SimPosition(last.lineNumber, last.column + last.length);
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new SimRange(start, end), msg);
+		
+		LOG.error(diagnostic.toString());
+		elt.simBuilder.addDiagnostic(diagnostic);
+	}
+	
+	/// Error during Code generation:
+	public static void codingError(final SyntaxClass elt, final String msg) {
+        LexToken first = elt.getFirstLexToken();
+        LexToken last = elt.getLastLexToken();
+        
+        SimPosition start = new SimPosition(first.lineNumber, first.column);
+        SimPosition end = new SimPosition(last.lineNumber, last.column + last.length);
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new SimRange(start, end), msg);
+		
+		LOG.error(diagnostic.toString());
+		elt.simBuilder.addDiagnostic(diagnostic);
+	}
+
+	/// Exit with Thread.dumpStack
+	public static void STOP() {
+		Thread.dumpStack();
+		System.exit(-1);;
 	}
 
 	/// Print the internal error message: IMPOSSIBLE.
@@ -83,9 +194,7 @@ public final class Util {
 	/// Print a internal error message.
 	/// @param msg the message
 	public static void IERR(final String msg) {
-		String err = edLINE(": Internal error - " + msg);
-		nError++;
-		printError(err);
+		LOG.error("ERROR: Internal error - " + msg);
 		Thread.dumpStack();
 		FORCED_EXIT();
 	}
@@ -93,43 +202,32 @@ public final class Util {
 	/// Perform FORCED EXIT.
 	private static void FORCED_EXIT() {
 		IO.println("FORCED EXIT");
-		if (CoreGlobal.console == null) System.exit(-1);
+		System.exit(-1);
 	}
 
 	/// Print a internal error message.
 	/// @param msg the message
 	/// @param e any Throwable
 	public static void IERR(final String msg,final Throwable e) {
-		String err = edLINE(": Internal error - " + msg +"  "+ e);
-		nError++;
-		printError(err);
+		LOG.error("ERROR: Internal error - " + msg +"\nCaused by:");
 		e.printStackTrace();
 		FORCED_EXIT();
 	}
-
-	/// Print a warning message.
-	/// @param msg the message
-	public static void warning(final String msg) {
-		String line = edLINE(": WARNING: " + msg);
-		if (Option.WARNINGS) {
-			printWarning(line);
-		}
-	}
 	
-	/// Edit a line with source line number etc.
-	/// @param s the line string
-	/// @return the resulting string
-	private static String edLINE(String s) {		
-		String line = "LINE " + CoreGlobal.sourceLineNumber + s;
-		if(CoreGlobal.insertName!=null) line = CoreGlobal.insertName + ':' + line;
-		if(CoreGlobal.getCurrentScope() != null) {
-			if(CoreGlobal.getCurrentScope().sourceFileName!=null) {
-				String sourceName = getBaseName(CoreGlobal.getCurrentScope().sourceFileName);
-				line = sourceName + ':' + line;
-			}
-		}
-		return(line);
-	}
+//	/// Edit a line with source line number etc.
+//	/// @param s the line string
+//	/// @return the resulting string
+//	private static String edLINE(String s) {		
+//		String line = "LINE " + Global.sourceLineNumber + s;
+//		if(Global.insertName!=null) line = Global.insertName + ':' + line;
+//		if(Global.getCurrentScope() != null) {
+//			if(Global.getCurrentScope().sourceFileName!=null) {
+//				String sourceName = getBaseName(Global.getCurrentScope().sourceFileName);
+//				line = sourceName + ':' + line;
+//			}
+//		}
+//		return(line);
+//	}
 	
 	/// Return the base name part of a File Name
 	/// @param fileName a File Name.
@@ -172,28 +270,30 @@ public final class Util {
 	/// Print a string.
 	/// @param s the string
 	public static void println(final String s) {
-		if (CoreGlobal.console != null) {
-			String u = s.replace('\r', (char) 0);
-			u = u.replace('\n', (char) 0);
-			CoreGlobal.console.write(u + '\n');
-		}
-		else IO.println(s);
+//		if (Global.console != null) {
+//			String u = s.replace('\r', (char) 0);
+//			u = u.replace('\n', (char) 0);
+//			Global.console.write(u + '\n');
+//		} else
+			IO.println(s);
 	}  
 
 	/// Print a error message.
 	/// @param s the message
 	public static void printError(final String s) {
 		String u = s.replace('\r', (char) 0);
-		if (CoreGlobal.console != null)	CoreGlobal.console.writeError(u + '\n');
-		else System.err.println(u);
+//		if (Global.console != null)	Global.console.writeError(u + '\n');
+//		else
+			System.err.println(u);
 	}  
 
 	/// Print a warning message.
 	/// @param s the message
 	public static void printWarning(final String s) {
 		String u = s.replace('\r', (char) 0);
-		if (CoreGlobal.console != null)	CoreGlobal.console.writeWarning(u + '\n');
-		else System.err.println(u);
+//		if (Global.console != null)	Global.console.writeWarning(u + '\n');
+//		else
+			System.err.println(u);
 	}  
 
     //*******************************************************************************
@@ -246,7 +346,7 @@ public final class Util {
 			 return(s1.equals(s2));			
 		else return(s1.equalsIgnoreCase(s2));
 	}
-	
+
     //*******************************************************************************
     //*** IPOW - Integer Power: b ** x
     //*******************************************************************************
@@ -254,19 +354,19 @@ public final class Util {
 	/// @param base argument base
 	/// @param x argument x
 	/// @return Returns the value of 'base' raised to the power of 'x'
-	public static int IPOW(final long base, long x) {
+	public static int IPOW(final SimulaBuilder simBuilder, final long base, long x) {
 		if (x == 0) {
 			if (base == 0)
-				error("Exponentiation: " + base + " ** " + x + "  Result is undefined.");
+				syntaxError(simBuilder, "Exponentiation: " + base + " ** " + x + "  Result is undefined.");
 			return (1); // any ** 0 ==> 1
 		} else if (x < 0)
-			error("Exponentiation: " + base + " ** " + x + "  Result is undefined.");
+			syntaxError(simBuilder, "Exponentiation: " + base + " ** " + x + "  Result is undefined.");
 		else if (base == 0)
 			return (0); // 0 ** non_zero ==> 0
 		
 		long res=(long) Math.pow((double)base,(double)x);
 		if(res > Integer.MAX_VALUE || res < Integer.MIN_VALUE)
-			error("Arithmetic overflow: "+base+" ** "+x+" ==> "+res
+			syntaxError(simBuilder, "Arithmetic overflow: "+base+" ** "+x+" ==> "+res
 					+" which is outside integer value range["+Integer.MIN_VALUE+':'+Integer.MAX_VALUE+']');
 		return((int)res);
 	}
@@ -315,19 +415,19 @@ public final class Util {
 		try {
 			Process process = processBuilder.start();		
 			InputStream output = process.getInputStream();  // Process' output
-			if (CoreGlobal.console != null) {
-				while (process.isAlive()) {
-					while (output.available() > 0) {
-						CoreGlobal.console.write("" + (char) output.read());
-					}
-				}
-			} else {
+//			if (Global.console != null) {
+//				while (process.isAlive()) {
+//					while (output.available() > 0) {
+//						Global.console.write("" + (char) output.read());
+//					}
+//				}
+//			} else {
 				while (process.isAlive()) {
 					while (output.available() > 0) {
 						System.out.append((char) output.read());
 					}
 				}
-			}
+//			}
 			return (process.exitValue());
 
 		} catch(Exception e) {
@@ -353,8 +453,7 @@ public final class Util {
 	/// @param codeBuilder the codeBuilder to use.
 	/// @param lineNumber the line number
 	public static void buildLineNumber(CodeBuilder codeBuilder, int lineNumber) {
-		codeBuilder.lineNumber(lineNumber);
+		if(lineNumber > 0) codeBuilder.lineNumber(lineNumber);
 	}
-
   
 }

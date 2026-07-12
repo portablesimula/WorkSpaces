@@ -34,6 +34,10 @@ import simula.editor.RTOption;
 /// @author Øystein Myhre Andersen
 public final class CoreGlobal {
 
+	public static boolean TRACE_LEXER = false;
+	public static final boolean CaseSensitive = false;
+	public static boolean TRACE_COMMENTS = false;
+
 	public static SimulaCoreClient simulaCoreClient;
 
 	/// The Simula release identification.
@@ -164,18 +168,18 @@ public final class CoreGlobal {
 		duringSTM_Coding = false;
 		externalJarFiles = new Vector<File>();
 		StandardClass.INITIATE();
-		String SIMULA_HOME = getSimulaProperty("simula.home", null);
-		if (SIMULA_HOME != null) {
-			String SIMULA_VERSION = getSimulaProperty("simula.version", null);
-			if (SIMULA_VERSION != null) {
-				try {
-					File simdir = new File(SIMULA_HOME, SIMULA_VERSION);
-					favicon = new ImageIcon(new File(simdir, "icons/favicon.png").toString());
-					simIcon = new ImageIcon(new File(simdir, "icons/sim2.png").toString());
-					sIcon = new ImageIcon(new File(simdir, "icons/sim.png").toString());
-				} catch(Exception e) {}
-			}
-		}
+//		String SIMULA_HOME = getSimulaProperty("simula.home", null);
+//		if (SIMULA_HOME != null) {
+//			String SIMULA_VERSION = getSimulaProperty("simula.version", null);
+//			if (SIMULA_VERSION != null) {
+//				try {
+//					File simdir = new File(SIMULA_HOME, SIMULA_VERSION);
+//					favicon = new ImageIcon(new File(simdir, "icons/favicon.png").toString());
+//					simIcon = new ImageIcon(new File(simdir, "icons/sim2.png").toString());
+//					sIcon = new ImageIcon(new File(simdir, "icons/sim.png").toString());
+//				} catch(Exception e) {}
+//			}
+//		}
 	}
 
 	/// The declaration scope stack.

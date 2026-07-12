@@ -106,12 +106,12 @@ public final class ActivationStatement extends Statement {
 		object1 = Expression.expectExpression();
 		object1.backLink = this;
 		code = ActivationCode.direct;
-		if (Parse.accept(KeyWord.AT) || Parse.accept(KeyWord.DELAY)) {
+		if (Parse.accept(simBuilder, KeyWord.AT) || Parse.accept(simBuilder, KeyWord.DELAY)) {
 			code = (Parse.prevToken.getKeyWord() == KeyWord.AT) ? ActivationCode.at : ActivationCode.delay;
 			time = Expression.expectExpression();
 			time.backLink = this;
-			if (Parse.accept(KeyWord.PRIOR)) prior = true;
-		} else if (Parse.accept(KeyWord.BEFORE) || Parse.accept(KeyWord.AFTER)) {
+			if (Parse.accept(simBuilder, KeyWord.PRIOR)) prior = true;
+		} else if (Parse.accept(simBuilder, KeyWord.BEFORE) || Parse.accept(simBuilder, KeyWord.AFTER)) {
 			code = (Parse.prevToken.getKeyWord() == KeyWord.BEFORE) ? ActivationCode.before : ActivationCode.after;
 			object2 = Expression.expectExpression();
 			object2.backLink = this;

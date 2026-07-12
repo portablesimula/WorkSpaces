@@ -105,10 +105,10 @@ public abstract class Expression extends SyntaxClass {
 	/// </pre>
 	/// @return Expression or null if no expression is found.
 	public static Expression acceptExpression() {
-		if(Parse.accept(KeyWord.IF)) {
+		if(Parse.accept(simBuilder, KeyWord.IF)) {
 			Expression condition=acceptExpression();
-			Parse.expect(KeyWord.THEN); Expression thenExpression=acceptSimpleExpression();
-			Parse.expect(KeyWord.ELSE); Expression elseExpression=acceptExpression();
+			Parse.expect(simBuilder, KeyWord.THEN); Expression thenExpression=acceptSimpleExpression();
+			Parse.expect(simBuilder, KeyWord.ELSE); Expression elseExpression=acceptExpression();
 			Expression expr=new ConditionalExpression(Type.Boolean,condition,thenExpression,elseExpression);
 			if(Option.internal.TRACE_PARSE) Util.TRACE("Expression: ParseExpression, result="+expr);
 			return(expr);
@@ -148,7 +148,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return Expression or null if no expression is found.
 	private static Expression acceptSimpleExpression()  {   
 		Expression expr = acceptANDTHEN();
-		while(Parse.accept(KeyWord.OR_ELSE))  {
+		while(Parse.accept(simBuilder, KeyWord.OR_ELSE))  {
 			expr=new BooleanExpression(expr,KeyWord.OR_ELSE,acceptANDTHEN());
 		}
 		return(expr);
@@ -161,7 +161,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression acceptANDTHEN() {
 		Expression expr = acceptEQV();
-		while(Parse.accept(KeyWord.AND_THEN))
+		while(Parse.accept(simBuilder, KeyWord.AND_THEN))
 			expr=new BooleanExpression(expr,KeyWord.AND_THEN,acceptEQV());
 		return(expr);
 	}
@@ -173,7 +173,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression acceptEQV() { 
 		Expression expr=acceptIMP();
-		while(Parse.accept(KeyWord.EQV))
+		while(Parse.accept(simBuilder, KeyWord.EQV))
 			expr=new BooleanExpression(expr,KeyWord.EQV,acceptIMP());
 		return(expr);
 	}
@@ -185,7 +185,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression acceptIMP() {
 		Expression expr=acceptOR();
-		while(Parse.accept(KeyWord.IMP))
+		while(Parse.accept(simBuilder, KeyWord.IMP))
 			expr=new BooleanExpression(expr,KeyWord.IMP,acceptOR());
 		return(expr);
 	}
@@ -197,7 +197,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression acceptOR() {
 		Expression expr=acceptAND();
-		while(Parse.accept(KeyWord.OR))
+		while(Parse.accept(simBuilder, KeyWord.OR))
 			expr=new BooleanExpression(expr,KeyWord.OR,acceptAND());
 		return(expr);
 	}
@@ -209,7 +209,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression acceptAND() {
 		Expression expr=acceptNOT();
-		while(Parse.accept(KeyWord.AND))
+		while(Parse.accept(simBuilder, KeyWord.AND))
 			expr=new BooleanExpression(expr,KeyWord.AND,acceptNOT());
 		return(expr);
 	}
@@ -221,7 +221,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression  acceptNOT() {
 		Expression expr;
-		if(Parse.accept(KeyWord.NOT)) {
+		if(Parse.accept(simBuilder, KeyWord.NOT)) {
 			expr=UnaryOperation.create(KeyWord.NOT,acceptTEXTCONC());
 		} else expr = acceptTEXTCONC();
 		return(expr);
@@ -234,7 +234,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression acceptTEXTCONC() {
 		Expression expr=acceptRelation();
-		while(Parse.accept(KeyWord.CONC))
+		while(Parse.accept(simBuilder, KeyWord.CONC))
 			expr=new TextExpression(expr,acceptRelation());
 		return(expr);
 	}
@@ -261,7 +261,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression acceptAdditiveOperation() {
 		Expression expr=acceptUNIMULDIV();
-		while(Parse.accept(KeyWord.PLUS,KeyWord.MINUS)) { 
+		while(Parse.accept(simBuilder, KeyWord.PLUS,KeyWord.MINUS)) { 
 			int opr=Parse.prevToken.getKeyWord();
 			expr=ArithmeticExpression.create(expr,opr,acceptMULDIV());
 		}
@@ -275,7 +275,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression acceptUNIMULDIV() {
 		Expression expr;
-		if(Parse.accept(KeyWord.PLUS,KeyWord.MINUS)) {
+		if(Parse.accept(simBuilder, KeyWord.PLUS,KeyWord.MINUS)) {
 			int opr=Parse.prevToken.getKeyWord();
 			if(opr==KeyWord.PLUS) expr=acceptMULDIV();
 			else expr=UnaryOperation.create(opr,acceptMULDIV());
@@ -290,7 +290,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression acceptMULDIV() {
 		Expression expr=acceptEXPON();
-		while(Parse.accept(KeyWord.MUL,KeyWord.DIV,KeyWord.INTDIV)) {
+		while(Parse.accept(simBuilder, KeyWord.MUL,KeyWord.DIV,KeyWord.INTDIV)) {
 			int opr=Parse.prevToken.getKeyWord();
 			expr=ArithmeticExpression.create(expr,opr,acceptEXPON());
 		}
@@ -304,7 +304,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return an expression
 	private static Expression acceptEXPON() {
 		Expression expr=acceptBASICEXPR();
-		while(Parse.accept(KeyWord.EXP))
+		while(Parse.accept(simBuilder, KeyWord.EXP))
 			expr=ArithmeticExpression.create(expr,KeyWord.EXP,acceptBASICEXPR());
 		return(expr);
 	}
@@ -333,16 +333,16 @@ public abstract class Expression extends SyntaxClass {
 		// Merk: Alt som kan stå foran et postfix (DOT, IS, IN og QUA) må være et BASICEXPR
 		if(Option.internal.TRACE_PARSE) Parse.TRACE("Expression: acceptExpression");
 		Expression expr=null;
-		if(Parse.accept(KeyWord.BEGPAR)) { expr = acceptExpression(); Parse.expect(KeyWord.ENDPAR); }
-		else if(Parse.accept(KeyWord.INTEGERKONST)) expr = new Constant(Type.Integer,Parse.prevToken.getValue());
-		else if(Parse.accept(KeyWord.REALKONST)) expr = Constant.createRealType(Parse.prevToken.getValue());
-		else if(Parse.accept(KeyWord.BOOLEANKONST)) expr = new Constant(Type.Boolean,Parse.prevToken.getValue());
-		else if(Parse.accept(KeyWord.CHARACTERKONST)) expr = new Constant(Type.Character,Parse.prevToken.getValue());
-		else if(Parse.accept(KeyWord.TEXTKONST)) expr = new Constant(Type.Text,Parse.prevToken.getValue());
-		else if(Parse.accept(KeyWord.NONE)) expr = new Constant(Type.Ref,null);
-		else if(Parse.accept(KeyWord.NOTEXT)) expr = new Constant(Type.Text,null);
-		else if(Parse.accept(KeyWord.NEW)) expr =ObjectGenerator.expectNew();
-		else if(Parse.accept(KeyWord.THIS)) expr =LocalObject.expectThisIdentifier(); 
+		if(Parse.accept(simBuilder, KeyWord.BEGPAR)) { expr = acceptExpression(); Parse.expect(simBuilder, KeyWord.ENDPAR); }
+		else if(Parse.accept(simBuilder, KeyWord.INTEGERKONST)) expr = new Constant(Type.Integer,Parse.prevToken.getValue());
+		else if(Parse.accept(simBuilder, KeyWord.REALKONST)) expr = Constant.createRealType(Parse.prevToken.getValue());
+		else if(Parse.accept(simBuilder, KeyWord.BOOLEANKONST)) expr = new Constant(Type.Boolean,Parse.prevToken.getValue());
+		else if(Parse.accept(simBuilder, KeyWord.CHARACTERKONST)) expr = new Constant(Type.Character,Parse.prevToken.getValue());
+		else if(Parse.accept(simBuilder, KeyWord.TEXTKONST)) expr = new Constant(Type.Text,Parse.prevToken.getValue());
+		else if(Parse.accept(simBuilder, KeyWord.NONE)) expr = new Constant(Type.Ref,null);
+		else if(Parse.accept(simBuilder, KeyWord.NOTEXT)) expr = new Constant(Type.Text,null);
+		else if(Parse.accept(simBuilder, KeyWord.NEW)) expr =ObjectGenerator.expectNew();
+		else if(Parse.accept(simBuilder, KeyWord.THIS)) expr =LocalObject.expectThisIdentifier(); 
 		else { String ident=Parse.acceptIdentifier(simBuilder);
 			if(ident!=null) expr=VariableExpression.expectVariable(ident);
 			else {
@@ -357,7 +357,7 @@ public abstract class Expression extends SyntaxClass {
 			if (opr == KeyWord.DOT ) 
 				expr=new RemoteVariable(expr,expectVariable());
 			else {  // opr == IS or opr == IN or opr == QUA.  Then a class identifier must follow.
-				String classIdentifier=Parse.expectIdentifier();
+				String classIdentifier=Parse.expectIdentifier(simBuilder).getText();
 				if(opr==KeyWord.QUA)
 					expr=new QualifiedObject(expr,classIdentifier);
 				else expr=new ObjectRelation(expr,opr,classIdentifier);
@@ -376,7 +376,7 @@ public abstract class Expression extends SyntaxClass {
 	/// @return the created Variable
 	private static VariableExpression expectVariable() { 
 		// An identifier, possibly followed by arguments in parentheses.
-		String ident=Parse.expectIdentifier();
+		String ident=Parse.expectIdentifier(simBuilder).getText();
 		return(VariableExpression.expectVariable(ident));
 	}
 

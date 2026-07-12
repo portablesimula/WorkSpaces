@@ -12,10 +12,11 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 
+import simula.builder.Parse;
+import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.HiddenSpecification;
 import simula.compiler.syntaxClass.ProcedureSpecification;
 import simula.compiler.syntaxClass.ProtectedSpecification;
@@ -80,8 +81,8 @@ public final class VirtualSpecification extends Declaration {
 	/// @param kind the vitual Kind
 	/// @param prefixLevel the prefix level of the class with this virtual specification
 	/// @param procedureSpec the ProcedureSpecification or null if not present
-	VirtualSpecification(final String identifier, final Type type, final int kind, final int prefixLevel, final ProcedureSpecification procedureSpec) {
-		super(identifier);
+	VirtualSpecification(final SimulaBuilder simBuilder, final String identifier, final Type type, final int kind, final int prefixLevel, final ProcedureSpecification procedureSpec) {
+		super(simBuilder, identifier);
 		this.declarationKind = ObjectKind.VirtualSpecification;
 		this.externalIdent = identifier;
 		this.type = type;
@@ -108,33 +109,33 @@ public final class VirtualSpecification extends Declaration {
 	/// Precondition: VIRTUAL  is already read.
 	/// @param cls the ClassDeclaration
 	static void expectVirtualPart(final ClassDeclaration cls) {
-		Parse.expect(KeyWord.COLON);
+		Parse.expect(simBuilder, KeyWord.COLON);
 		LOOP: while (true) {
 			Type type;
-			if (Parse.accept(KeyWord.SWITCH)) {
+			if (Parse.accept(simBuilder, KeyWord.SWITCH)) {
 				expectIdentifierList(cls, Type.Label, Kind.Switch);
-			} else if (Parse.accept(KeyWord.LABEL)) {
+			} else if (Parse.accept(simBuilder, KeyWord.LABEL)) {
 				expectIdentifierList(cls, Type.Label, Kind.Label);
 			} else {
-				type = Parse.acceptType();
-				if (!Parse.accept(KeyWord.PROCEDURE))
+				type = Parse.acceptType(simBuilder);
+				if (!Parse.accept(simBuilder, KeyWord.PROCEDURE))
 					break LOOP;
 
-				String identifier = Parse.expectIdentifier();
+				String identifier = Parse.expectIdentifier(simBuilder).getText();
 				ProcedureSpecification procedureSpec = null;
-				if (Parse.accept(KeyWord.IS)) {
+				if (Parse.accept(simBuilder, KeyWord.IS)) {
 					if(type != null) Util.error("An IS-specified virtual procedure can have its type only after IS.");
-					type = Parse.acceptType();
-					Parse.expect(KeyWord.PROCEDURE);
+					type = Parse.acceptType(simBuilder);
+					Parse.expect(simBuilder, KeyWord.PROCEDURE);
 					procedureSpec = ProcedureSpecification.expectProcedureSpecification(type);						
 					cls.virtualSpecList
 							.add(new VirtualSpecification(identifier, type, Kind.Procedure, cls.prefixLevel(), procedureSpec));
 				} else {
 					cls.virtualSpecList.add(new VirtualSpecification(identifier, type, Kind.Procedure, cls.prefixLevel(), null));
-					if (Parse.accept(KeyWord.COMMA))
+					if (Parse.accept(simBuilder, KeyWord.COMMA))
 						expectIdentifierList(cls, type, Kind.Procedure);
 					else
-						Parse.expect(KeyWord.SEMICOLON);
+						Parse.expect(simBuilder, KeyWord.SEMICOLON);
 				}
 			}
 		}
@@ -152,10 +153,10 @@ public final class VirtualSpecification extends Declaration {
 	/// @param kind the specifiers kind
 	private static void expectIdentifierList(final ClassDeclaration cls, final Type type, final int kind) {
 		do {
-			String identifier = Parse.expectIdentifier();
+			String identifier = Parse.expectIdentifier(simBuilder).getText();
 			cls.virtualSpecList.add(new VirtualSpecification(identifier, type, kind, cls.prefixLevel(), null));
-		} while (Parse.accept(KeyWord.COMMA));
-		Parse.expect(KeyWord.SEMICOLON);
+		} while (Parse.accept(simBuilder, KeyWord.COMMA));
+		Parse.expect(simBuilder, KeyWord.SEMICOLON);
 	}
 
 	@Override

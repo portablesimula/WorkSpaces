@@ -8,6 +8,8 @@ package simula.compiler.syntaxClass.declaration;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.ClassDesc;
+
+import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -64,8 +66,9 @@ public final class ConnectionBlock extends DeclarationScope {
 	/// Create a new ConnectionBlock.
 	/// @param inspectedVariable   the inspected variable
 	/// @param whenClassIdentifier the when class identifier
-	public ConnectionBlock(final VariableExpression inspectedVariable, final String whenClassIdentifier) {
-		super("Connection block at line " + (CoreGlobal.sourceLineNumber - 1));
+	public ConnectionBlock(final SimulaBuilder simBuilder, final VariableExpression inspectedVariable, final String whenClassIdentifier) {
+//		super("Connection block at line " + (Global.sourceLineNumber - 1));
+		super(simBuilder, "Inspect " + inspectedVariable);
 		declarationKind = ObjectKind.ConnectionBlock;
 		this.inspectedVariable = inspectedVariable;
 		this.whenClassIdentifier = whenClassIdentifier;
