@@ -1,4 +1,4 @@
-package simula.lsp.compiler;
+package simula;
 
 import simula.lsp.util.SimRange;
 

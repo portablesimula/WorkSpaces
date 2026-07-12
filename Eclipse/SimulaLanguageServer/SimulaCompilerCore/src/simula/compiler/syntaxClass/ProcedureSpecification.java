@@ -6,18 +6,14 @@
 package simula.compiler.syntaxClass;
 
 import java.io.IOException;
-
-import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.Parameter;
 import simula.compiler.syntaxClass.declaration.ProcedureDeclaration;
 import simula.compiler.utilities.CoreGlobal;
-import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectList;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Procedure Specification.
@@ -56,12 +52,12 @@ import simula.compiler.utilities.Util;
 ///             identifier-list = identifier { , identifier }
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/ProcedureSpecification.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/ProcedureSpecification.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen
-public final class ProcedureSpecification extends SyntaxElement {
+public final class ProcedureSpecification extends SyntaxClass {
 	
 	/// The procedure identifier.
 	private String identifier;
@@ -79,8 +75,7 @@ public final class ProcedureSpecification extends SyntaxElement {
 	/// @param identifier procedure-identifier
 	/// @param type procedure's type or null
 	/// @param pList the parameter lList
-	public ProcedureSpecification(final SimulaBuilder simBuilder, final String identifier, final Type type, final ObjectList<Parameter> pList) {
-		super(simBuilder);
+	public ProcedureSpecification(final String identifier, final Type type, final ObjectList<Parameter> pList) {
 		this.identifier = identifier;
 		this.type = type;
 		this.parameterList = pList;
@@ -108,15 +103,12 @@ public final class ProcedureSpecification extends SyntaxElement {
 	/// Precondition:  [ type ] PROCEDURE  is already read.
 	/// @param type procedure's type
 	/// @return a newly created ProcedureSpecification
-	public static ProcedureSpecification expectProcedureSpecification(final SimulaBuilder simBuilder, final Type type) {
-//		IO.println("\n\nProcedureSpecification.expectProcedureSpecification: BEFORE expectProcedureDeclaration");
-		ProcedureDeclaration block = ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type);
-//		IO.println("\n\nProcedureSpecification.expectProcedureSpecification: AFTER expectProcedureDeclaration: "+block);
-		Parse.expect(simBuilder, KeyWord.SEMICOLON); // TODO: DENNE ER NY !
+	public static ProcedureSpecification expectProcedureSpecification(final Type type) {
+		ProcedureDeclaration block = ProcedureDeclaration.expectProcedureDeclaration(type);
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("END ProcedureSpecification: " + block);
 		CoreGlobal.setScope(block.declaredIn);
-		ProcedureSpecification procedureSpecification = new ProcedureSpecification(simBuilder, block.identifier, type, block.parameterList);
+		ProcedureSpecification procedureSpecification = new ProcedureSpecification(block.identifier, type, block.parameterList);
 		return (procedureSpecification);
 	}
 
@@ -128,7 +120,7 @@ public final class ProcedureSpecification extends SyntaxElement {
 	/// @param scope the DeclarationScope
 	public void doChecking(final DeclarationScope scope) {
 		if (type != null)
-			type.doChecking(scope, this);
+			type.doChecking(scope);
 		// Check parameters
 		if (parameterList != null) {
 			for (Parameter par : parameterList)
@@ -150,7 +142,6 @@ public final class ProcedureSpecification extends SyntaxElement {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public ProcedureSpecification() {
-		super(null);
 	}
 
 	/// Write a ProcedureSpecification.

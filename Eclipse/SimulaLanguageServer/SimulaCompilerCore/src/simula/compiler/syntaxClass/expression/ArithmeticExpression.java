@@ -9,15 +9,14 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.MethodTypeDesc;
 
-import simula.Option;
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 
@@ -89,7 +88,7 @@ import simula.compiler.utilities.Util;
 ///   It is always evaluated in long real and the result is converted to the appropriate type. 
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/ArithmeticExpression.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/ArithmeticExpression.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Simula Standard
@@ -109,17 +108,16 @@ public final class ArithmeticExpression extends Expression {
 	/// @param lhs left hand side
 	/// @param opr arithmetic operation
 	/// @param rhs right hand side
-	private ArithmeticExpression(final SimulaBuilder simBuilder, final Expression lhs, final int opr, final Expression rhs) {
-		super(simBuilder);
+	private ArithmeticExpression(final Expression lhs, final int opr, final Expression rhs) {
 		this.opr = opr;
 		if (lhs == null) {
-			Util.syntaxError(simBuilder, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression(simBuilder);
+			Util.error("Missing operand before " + KeyWord.edit(opr));
+			this.lhs = new VariableExpression("UNKNOWN_");
 		} else
 			this.lhs = lhs;
 		if (rhs == null) {
-			Util.syntaxError(simBuilder, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression(simBuilder);
+			Util.error("Missing operand after " + KeyWord.edit(opr));
+			this.rhs = new VariableExpression("UNKNOWN_");
 		} else
 			this.rhs = rhs;
 		this.lhs.backLink = this.rhs.backLink = this;
@@ -130,40 +128,41 @@ public final class ArithmeticExpression extends Expression {
 	/// @param opr the arithmetic operation
 	/// @param rhs the right hand side
 	/// @return the newly created ArithmeticExpression
-	static Expression create(final SimulaBuilder simBuilder, final Expression lhs, final int opr, final Expression rhs) {
+	static Expression create(final Expression lhs, final int opr, final Expression rhs) {
 		try { // Try to Compile-time Evaluate this expression
 			Number lhn = lhs.getNumber();
 			if (lhn != null) {
 				Number rhn = rhs.getNumber();
 				if (rhn != null)
-					return (Constant.evaluate(simBuilder, lhn, opr, rhn));
+					return (Constant.evaluate(lhn, opr, rhn));
 			}
 		} catch (Exception e) {
-			Util.syntaxError(simBuilder, "Arithmetic overflow: " + lhs + ' ' + KeyWord.edit(opr) + ' ' + rhs + "   " + e);
+			Util.error("Arithmetic overflow: " + lhs + ' ' + KeyWord.edit(opr) + ' ' + rhs + "   " + e);
 			e.printStackTrace();
 		}
-		return (new ArithmeticExpression(simBuilder, lhs, opr, rhs));
+		return (new ArithmeticExpression(lhs, opr, rhs));
 	}
 
-//	@Override
-//	public Expression evaluate(final PsiBuilder simBuilder) {
-//		// Try to Compile-time Evaluate this expression
-//		Number lhn = lhs.getNumber();
-//		if (lhn != null) {
-//			Number rhn = rhs.getNumber();
-//			if (rhn != null)
-//				return (Constant.evaluate(simBuilder, lhn, opr, rhn));
-//		}
-//		return (this);
-//	}
+	@Override
+	public Expression evaluate() {
+		// Try to Compile-time Evaluate this expression
+		Number lhn = lhs.getNumber();
+		if (lhn != null) {
+			Number rhn = rhs.getNumber();
+			if (rhn != null)
+				return (Constant.evaluate(lhn, opr, rhn));
+		}
+		return (this);
+	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		if (Option.internal.TRACE_CHECKER)
-			Util.TRACE("BEGIN ArithmeticOperation" + toString() + ".doChecking - Current Scope Chain: "	+ CoreGlobal.getCurrentScope().edScopeChain());
+			Util.TRACE("BEGIN ArithmeticOperation" + toString() + ".doChecking - Current Scope Chain: "
+					+ CoreGlobal.getCurrentScope().edScopeChain());
 		switch (opr) {
 			case KeyWord.PLUS, KeyWord.MINUS, KeyWord.MUL -> {
 				// ArithmeticExpression
@@ -174,8 +173,8 @@ public final class ArithmeticExpression extends Expression {
 				this.type = Type.arithmeticTypeConversion(type1, type2);
 				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
 				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);
-//				if (this.type == null)
-//					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
+				if (this.type == null)
+					Util.error("Incompatible types in binary operation: " + toString());
 			}
 			case KeyWord.DIV -> { // Real Division
 				// The operator / denotes real division.
@@ -190,14 +189,14 @@ public final class ArithmeticExpression extends Expression {
 					this.type = Type.Real;
 				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
 				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);
-//				if (this.type == null)
-//					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
+				if (this.type == null)
+					Util.error("Incompatible types in binary operation: " + toString());
 			}
 			case KeyWord.INTDIV -> { // Integer Division
 				lhs.doChecking();
 				rhs.doChecking();
 				if ((lhs.type.keyWord != Type.T_INTEGER) || (rhs.type.keyWord != Type.T_INTEGER))
-					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
+					Util.error("Incompatible types in binary operation: " + toString());
 				this.type = Type.Integer;
 				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
 				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);
@@ -227,7 +226,7 @@ public final class ArithmeticExpression extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if(opr == KeyWord.EXP) {
 			// Real:     r2=((float)(Math.pow(((double)(r1)),((double)(e)))));
@@ -330,17 +329,15 @@ public final class ArithmeticExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ArithmeticExpression() {
-		super(null);
-	}
+	private ArithmeticExpression() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeArithmeticExpression: " + this);
 		oupt.writeKind(ObjectKind.ArithmeticExpression);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -357,11 +354,11 @@ public final class ArithmeticExpression extends Expression {
 	public static ArithmeticExpression readObject(AttributeInputStream inpt) throws IOException {
 		ArithmeticExpression expr = new ArithmeticExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxElement
-		expr.astData = readAstData(inpt);
+		// *** SyntaxClass
+		expr.lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxClass) inpt.readObj();
 		// *** ArithmeticExpression
 		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();

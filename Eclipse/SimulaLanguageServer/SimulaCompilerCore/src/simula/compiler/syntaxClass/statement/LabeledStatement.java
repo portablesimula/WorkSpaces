@@ -7,9 +7,6 @@ package simula.compiler.syntaxClass.statement;
 
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
-
-import simula.Option;
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -17,6 +14,7 @@ import simula.compiler.syntaxClass.declaration.LabelDeclaration;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Labeled Statement.
@@ -31,7 +29,7 @@ import simula.compiler.utilities.Util;
 ///  
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/LabeledStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/LabeledStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -47,12 +45,11 @@ public final class LabeledStatement extends Statement {
 	/// @param line the source line number
 	/// @param labels the label identifiers
 	/// @param statement the labeled statement
-//	LabeledStatement(final int line,final ObjectList<LabelDeclaration> labels,final Statement statement) {
-	LabeledStatement(final SimulaBuilder simBuilder, final ObjectList<LabelDeclaration> labels, final Statement statement) {
-		super(simBuilder);
+	LabeledStatement(final int line,final ObjectList<LabelDeclaration> labels,final Statement statement) {
+		super(line);
 		this.labels = labels;
 		this.statement = statement;
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": LabeledStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": LabeledStatement: "+this);
 	}
 
 	@Override
@@ -67,7 +64,7 @@ public final class LabeledStatement extends Statement {
 
 	@Override
 	public void doJavaCoding() {
-		CoreGlobal.sourceLineNumber=firstLineNumber();
+		CoreGlobal.sourceLineNumber=lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code("{");
 		for (LabelDeclaration decl:labels) {
@@ -85,7 +82,7 @@ public final class LabeledStatement extends Statement {
 
 	@Override
 	public void buildByteCode(CodeBuilder codeBuilder) {
-		CoreGlobal.sourceLineNumber=firstLineNumber();
+		CoreGlobal.sourceLineNumber=lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		for (LabelDeclaration lab:labels)
 			lab.doBind(codeBuilder); // Bind Label
@@ -103,14 +100,7 @@ public final class LabeledStatement extends Statement {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		boolean first = true;
-		for(LabelDeclaration lab:labels) {
-			if(! first) sb.append("Line").append(lab.firstLineNumber()).append(": "); first = false;
-			sb.append(lab.identifier).append(": ");
-		}
-		
-		return sb.toString() + statement;
+		return ("" + labels + ':');
 	}
 
 	// ***********************************************************************************************
@@ -118,7 +108,7 @@ public final class LabeledStatement extends Statement {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private LabeledStatement() {
-		super(null);
+		super(0);
 	}
 
 	@Override
@@ -126,8 +116,8 @@ public final class LabeledStatement extends Statement {
 		Util.TRACE_OUTPUT("writeLabeledStatement: " + this);
 		oupt.writeKind(ObjectKind.LabeledStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** LabeledStatement
 		oupt.writeObj(statement);
 		oupt.writeObjectList(labels);
@@ -141,8 +131,8 @@ public final class LabeledStatement extends Statement {
 	public static LabeledStatement readObject(AttributeInputStream inpt) throws IOException {
 		LabeledStatement stm = new LabeledStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		// *** SyntaxClass
+		stm.lineNumber = inpt.readShort();
 		// *** LabeledStatement
 		stm.statement = (Statement) inpt.readObj();
 		stm.labels = (ObjectList<LabelDeclaration>) inpt.readObjectList();

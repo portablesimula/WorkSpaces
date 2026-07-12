@@ -13,7 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Vector;
 
-import simula.Exports;
+import client.TestBatchClient;
+import simula.SimulaCoreExports;
 import simula.Option;
 //import simula.editor.RTOption;
 
@@ -97,8 +98,9 @@ public final class RunSingleClassTest {
 //		names.add("AdHoc_SimulaTest.sim"); // Simula TestBatch Framework
 //		names.add("adHoc00.sim"); // For ad'hoc testing
 //		names.add("adHoc01.sim"); // For ad'hoc testing
-		names.add("adHoc02.sim"); // For ad'hoc testing
+//		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
+		names.add("adHoc10.sim"); // For ad'hoc testing
 		
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
@@ -340,14 +342,14 @@ public final class RunSingleClassTest {
 //				CoreGlobal.simulaRtsLib=new File(simulaDir,"bin"); // To use Eclipse Project's simula.runtime
 ////			Global.extLib="C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin";
 
-				Exports.initiate("simulaTestBatch");
+				SimulaCoreExports.initiate(new TestBatchClient(), "simulaTestBatch");
 //				URI uri = new URI(sourceFileName);
 				String uri = fileName;
 				int version = 1;
 		        try {
 		            String content = Files.readString(Path.of(fileName));
 //		            content = content.replace("\r\n", "\n");
-		    	    Exports.didOpen(uri, version, content);
+		    	    SimulaCoreExports.didOpen(uri, version, content);
 		        } catch (IOException e) {
 		            e.printStackTrace();
 		        }

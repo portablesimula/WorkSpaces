@@ -9,18 +9,17 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
-import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// While Statement.
@@ -33,7 +32,7 @@ import simula.compiler.utilities.Util;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/WhileStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/WhileStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -47,31 +46,29 @@ public final class WhileStatement extends Statement {
 
 	/// Create a new WhileStatement.
 	/// @param line the source line number
-	WhileStatement(final SimulaBuilder simBuilder) {
-		super(simBuilder);
-		simBuilder.consume(KeyWord.WHILE); //  (add it to 'current tree')
-
-//		if (Option.internal.TRACE_PARSE)
-//			Util.TRACE("Parse WhileStatement: line="+line+", current=" + PsiParse.currentLexToken(simBuilder));
-		condition = Expression.expectExpression(simBuilder, "while");
-		Parse.expect(simBuilder, KeyWord.DO);
-		doStatement = Statement.acceptStatement(simBuilder);
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+firstLineNumber()+": WhileStatement: "+this);
+	WhileStatement(int line) {
+		super(line);
+		if (Option.internal.TRACE_PARSE)
+			Util.TRACE("Parse WhileStatement: line="+line+", current=" + Parse.currentToken);
+		condition = Expression.expectExpression();
+		Parse.expect(KeyWord.DO);
+		doStatement = Statement.expectStatement();
+		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber+": WhileStatement: "+this);
 	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber=firstLineNumber();
+		CoreGlobal.sourceLineNumber=lineNumber;
 		condition.doChecking(); condition.backLink=this;
-		if (condition.type == null || condition.type.keyWord != Type.T_BOOLEAN) Util.semanticError(this, "While condition is not Boolean");
+		if (condition.type == null || condition.type.keyWord != Type.T_BOOLEAN) Util.error("While condition is not Boolean");
 		doStatement.doChecking();
 		SET_SEMANTICS_CHECKED();
 	}
 
 	@Override
 	public void doJavaCoding() {
-		CoreGlobal.sourceLineNumber=firstLineNumber();
+		CoreGlobal.sourceLineNumber=lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code("while(" + condition.toJavaCode() + ") {");
 		doStatement.doJavaCoding();
@@ -117,7 +114,7 @@ public final class WhileStatement extends Statement {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private WhileStatement() {
-		super(null);
+		super(0);
 	}
 
 	@Override
@@ -125,8 +122,8 @@ public final class WhileStatement extends Statement {
 		Util.TRACE_OUTPUT("writeWhileStatement: " + this);
 		oupt.writeKind(ObjectKind.WhileStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** WhileStatement
 		oupt.writeObj(condition);
 		oupt.writeObj(doStatement);
@@ -139,8 +136,8 @@ public final class WhileStatement extends Statement {
 	public static WhileStatement readObject(AttributeInputStream inpt) throws IOException {
 		WhileStatement stm = new WhileStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		// *** SyntaxClass
+		stm.lineNumber = inpt.readShort();
 		// *** WhileStatement
 		stm.condition  = (Expression) inpt.readObj();
 		stm.doStatement = (Statement) inpt.readObj();

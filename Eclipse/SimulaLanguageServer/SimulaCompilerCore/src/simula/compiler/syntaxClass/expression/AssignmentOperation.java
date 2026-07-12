@@ -9,15 +9,11 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
-
-import simula.Option;
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ArrayDeclaration;
-import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.Parameter;
 import simula.compiler.syntaxClass.declaration.ProcedureDeclaration;
@@ -27,8 +23,8 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.token.LexToken;
 
 /// Assignment Operation.
 /// 
@@ -42,7 +38,7 @@ import simula.token.LexToken;
 /// 	assignment-operator =  :=  |  :-
 ///   
 /// </pre>
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/AssignmentOperation.java">
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/AssignmentOperation.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -65,64 +61,41 @@ public final class AssignmentOperation extends Expression {
 	/// @param lhs the left hand side
 	/// @param opr the operation
 	/// @param rhs the right hand side
-	public AssignmentOperation(final SimulaBuilder simBuilder, final Expression lhs, final int opr, final Expression rhs) {
-		super(simBuilder);
+	public AssignmentOperation(final Expression lhs, final int opr, final Expression rhs) {
 		this.lhs = lhs;
 		this.opr = opr;
 		this.rhs = rhs;
 		if (this.lhs == null) {
-			Util.syntaxError(simBuilder, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression(simBuilder);
+			Util.error("Missing operand before " + KeyWord.edit(opr));
+			this.lhs = new VariableExpression("UNKNOWN_");
 		}
 		if (this.rhs == null) {
-			Util.syntaxError(simBuilder, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression(simBuilder);
+			Util.error("Missing operand after " + KeyWord.edit(opr));
+			this.rhs = new VariableExpression("UNKNOWN_");
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
-	}
-
-	@Override
-	public int firstLineNumber() {
-//		if(psiTree != null) return psiTree.firstLineNumber();
-		LexToken token = lexTokenRange.getFirstLexToken();
-		if(token != null) return token.firstLineNumber();
-		return lhs.firstLineNumber();
-	}
-
-	@Override
-	public int lastLineNumber() {
-		LexToken token = lexTokenRange.getLastLexToken();
-		if(token != null) return token.lastLineNumber();
-		return rhs.lastLineNumber();
 	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN Assignment" + toString() + ".doChecking - Current Scope Chain: "
 					+ CoreGlobal.getCurrentScope().edScopeChain());
 		lhs.doChecking();
 		Type toType = lhs.type;
-		if(toType == null) toType = Type.Undef;
-//		IO.println("AssignmentOperation.doChecking: lhs="+lhs.getClass().getSimpleName()+"  "+lhs);
 		if (lhs instanceof VariableExpression var) {
 			Meaning meaning = var.getMeaning();
-//			IO.println("AssignmentOperation.doChecking: meaning.declaredAs="+meaning.declaredAs.getClass().getSimpleName()+"  "+meaning.declaredAs);
-			switch(meaning.declaredAs) {
-				case SimpleVariableDeclaration dcl -> { if (dcl.isConstant()) Util.semanticError(var, "Assignment to Constant: '" + lhs + "' is Illegal"); }
-				case ClassDeclaration cls -> { Util.semanticError(lhs, "Can't assign to Class Identifier: " + cls.identifier); }
-				default -> {} // NOTHING
+			if (meaning.declaredAs instanceof SimpleVariableDeclaration dcl) {
+				if (dcl.isConstant())
+					Util.error("Assignment to Constant: '" + lhs + "' is Illegal");
 			}
+		} else {
+			if (lhs.getWriteableVariable() == null)
+				Util.error("Can't assign to " + lhs);
 		}
-//		else {
-			if (lhs.getWriteableVariable() == null) {
-				Util.semanticError(lhs, "Can't assign to " + lhs);
-			}
-//			else IO.println("AssignmentOperation.doChecking: lhs.getWriteableVariable="+lhs.getWriteableVariable().getClass().getSimpleName() + "  " + lhs.getWriteableVariable());
-//		}
 		rhs.doChecking();
 		Type fromType = rhs.type;
 		if(toType.keyWord == Type.T_UNDEF) {
@@ -133,7 +106,7 @@ public final class AssignmentOperation extends Expression {
 		rhs = (Expression) TypeConversion.testAndCreate(toType, rhs);
 		this.type = toType;
 		if (this.type == null)
-			Util.semanticError(rhs, "doAssignmentChecking: Illegal types: " + toType + " := " + fromType);
+			Util.error("doAssignmentChecking: Illegal types: " + toType + " := " + fromType);
 		SET_SEMANTICS_CHECKED();
 	}
 
@@ -242,6 +215,7 @@ public final class AssignmentOperation extends Expression {
 	/// Build Java ByteCode.
 	@Override
 	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+		setLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.textValueAssignment)
 			 buildTextValueAssignment(codeBuilder);
@@ -462,6 +436,7 @@ public final class AssignmentOperation extends Expression {
 		if(this.backLink == null) codeBuilder.pop();
 	}
 
+
 	@Override
 	public String toString() {
 		return ("(" + lhs + ' ' + KeyWord.edit(opr) + ' ' + rhs + ")");
@@ -471,17 +446,15 @@ public final class AssignmentOperation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private AssignmentOperation() {
-		super(null);
-	}
+	private AssignmentOperation() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeAssignmentOperation: " + this);
 		oupt.writeKind(ObjectKind.AssignmentOperation);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -498,11 +471,11 @@ public final class AssignmentOperation extends Expression {
 	public static AssignmentOperation readObject(AttributeInputStream inpt) throws IOException {
 		AssignmentOperation expr = new AssignmentOperation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxElement
-		expr.astData = readAstData(inpt);
+		// *** SyntaxClass
+		expr.lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxClass) inpt.readObj();
 		// *** AssignmentOperation
 		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();

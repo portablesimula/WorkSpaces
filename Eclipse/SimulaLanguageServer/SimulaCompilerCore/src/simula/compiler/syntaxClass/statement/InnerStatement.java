@@ -7,16 +7,13 @@ package simula.compiler.syntaxClass.statement;
 
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
-
-import simula.Option;
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.utilities.CoreGlobal;
-import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Inner Statement.
@@ -29,7 +26,7 @@ import simula.compiler.utilities.Util;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/InnerStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/InnerStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -37,34 +34,29 @@ public final class InnerStatement extends Statement {
 
 	/// Create a new InnerStatement.
 	/// @param line the source line number
-	public InnerStatement(final SimulaBuilder simBuilder, boolean explicit) {
-		super(simBuilder);
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": InnerStatement: "+this);
-//		IO.println("NEW InnerStatement: Line "+firstLineNumber()+": InnerStatement: "+this+ "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-//		Thread.dumpStack();
-		
-		if(explicit) simBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
-		
+	 public InnerStatement(final int line) {
+		super(line);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": InnerStatement: "+this);
+//		ClassDeclaration cls=(ClassDeclaration)Global.getCurrentScope();
+//		cls.statements1 = cls.statements;
+//		cls.statements = new ObjectList<Statement>();
 		if(CoreGlobal.getCurrentScope() instanceof ClassDeclaration cls) {
-			if(cls.statements1 != null) {
-				Util.semanticError(this, "Multiple Inner Statements");
-			} else {
-				cls.statements1 = cls.statements;
-				cls.statements = new ObjectList<Statement>();
-			}
-		} else Util.semanticError(this, "Missplaced Inner Statement");
+//			ClassDeclaration cls=(ClassDeclaration)Global.getCurrentScope();
+			cls.statements1 = cls.statements;
+			cls.statements = new ObjectList<Statement>();
+		} else Util.error("Missplaced Inner");
 	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber=firstLineNumber();
+		CoreGlobal.sourceLineNumber=lineNumber;
 		SET_SEMANTICS_CHECKED();
 	}
 	
 	@Override
 	public void doJavaCoding() {
-		CoreGlobal.sourceLineNumber=firstLineNumber();
+		CoreGlobal.sourceLineNumber=lineNumber;
 		// No code !
 	}
 
@@ -86,7 +78,7 @@ public final class InnerStatement extends Statement {
 
 	@Override
 	public String toString() {
-		return "INNER";
+		return ("INNER");
 	}
 
 	// ***********************************************************************************************
@@ -94,7 +86,7 @@ public final class InnerStatement extends Statement {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public InnerStatement() {
-		super(null);
+		super(0);
 	}
 
 	@Override
@@ -102,8 +94,8 @@ public final class InnerStatement extends Statement {
 		Util.TRACE_OUTPUT("writeInnerStatement: " + this);
 		oupt.writeKind(ObjectKind.InnerStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 	}
 
 	/// Read and return an InnerStatement object.
@@ -113,8 +105,8 @@ public final class InnerStatement extends Statement {
 	public static InnerStatement readObject(AttributeInputStream inpt) throws IOException {
 		InnerStatement stm = new InnerStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		// *** SyntaxClass
+		stm.lineNumber = inpt.readShort();
 		Util.TRACE_INPUT("InnerStatement: " + stm);
 		return(stm);
 	}	

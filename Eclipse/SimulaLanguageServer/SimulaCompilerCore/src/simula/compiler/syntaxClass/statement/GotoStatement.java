@@ -7,10 +7,6 @@ package simula.compiler.syntaxClass.statement;
 
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
-
-import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -19,9 +15,9 @@ import simula.compiler.syntaxClass.declaration.Parameter;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.CoreGlobal;
-import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 
@@ -44,7 +40,7 @@ import simula.compiler.utilities.Util;
 /// Sect. 6.1 Goto Statement
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/GotoStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/GotoStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -55,33 +51,25 @@ public final class GotoStatement extends Statement {
 
 	/// Create a new GotoStatement.
 	/// @param line source line
-	GotoStatement(final SimulaBuilder simBuilder, final int keyWord) {
-		super(simBuilder);
-		simBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to 'current tree')
-		if(keyWord != KeyWord.GOTO) {
-	        if (!Parse.accept(simBuilder, KeyWord.TO))
-	        	Util.syntaxError(simBuilder, "Missing 'TO' after 'GO'");
-		}
-		label = Expression.expectExpression(simBuilder, "designational");
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+this.firstLineNumber()+": GotoStatement: "+this);
+	GotoStatement(final int line) {
+		super(line);
+		label = Expression.expectExpression();
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+this.lineNumber+": GotoStatement: "+this);
 	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
 		label.doChecking();
-		IF_TEST:if (label.type == null) {
-			if(label.type.keyWord == Type.T_LABEL) break IF_TEST;
-			if(label.type.keyWord == Type.T_UNDEF) break IF_TEST;
-			Util.semanticError(this, "Goto " + label + ", " + label + " is not a Label");
-		}
+		if (label.type == null || label.type.keyWord != Type.T_LABEL)
+			Util.error("Goto " + label + ", " + label + " is not a Label");
 		label.backLink = this; // To ensure _RESULT from functions
 		SET_SEMANTICS_CHECKED();
 	}
 
 	@Override
 	public void doJavaCoding() {
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
   		Type type = label.type;
 		Util.ASSERT(type.keyWord == Type.T_LABEL, "Invariant");
@@ -116,7 +104,7 @@ public final class GotoStatement extends Statement {
 
 	@Override
 	public String toString() {
-		return "GOTO " + label;
+		return ("GOTO " + label);
 	}
 
 	// ***********************************************************************************************
@@ -124,7 +112,7 @@ public final class GotoStatement extends Statement {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public GotoStatement() {
-		super(null);
+		super(0);
 	}
 
 	@Override
@@ -132,8 +120,8 @@ public final class GotoStatement extends Statement {
 		Util.TRACE_OUTPUT("writeGotoStatement: " + this);
 		oupt.writeKind(ObjectKind.GotoStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** GotoStatement
 		oupt.writeObj(label);
 	}
@@ -145,8 +133,8 @@ public final class GotoStatement extends Statement {
 	public static GotoStatement readObject(AttributeInputStream inpt) throws IOException {
 		GotoStatement stm = new GotoStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		// *** SyntaxClass
+		stm.lineNumber = inpt.readShort();
 		// *** GotoStatement
 		stm.label = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("GotoStatement: " + stm);

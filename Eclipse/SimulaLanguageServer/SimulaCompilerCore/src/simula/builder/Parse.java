@@ -61,6 +61,10 @@ public class Parse {
 //
 //		nextToken();
 	}
+	
+    public static int getSourceLineNumber(final SimulaBuilder simBuilder) {
+    	return simBuilder.getSourceLineNumber();
+    }
 
 	public static LexToken prevToken(final SimulaBuilder simBuilder) {
 		return simBuilder.prevToken();
@@ -83,6 +87,11 @@ public class Parse {
 	/// Return the Parser current Token.
 	public static LexToken getCurrentParserToken(final SimulaBuilder simBuilder) {
         return simBuilder.getCurrentParserToken();
+	}
+
+	/// Save current Token
+	public static void saveCurrentToken(final SimulaBuilder simBuilder) {
+		simBuilder.saveCurrentToken();
 	}
 	
 	/// Advance to next Token.
@@ -302,6 +311,11 @@ public class Parse {
 	/// @param msg a message
 	public static void TRACE(final String msg) {
 		LOG.info(msg);
+	}
+
+	public static void saveCurrentToken() {
+		// TODO Auto-generated method stub
+		Util.IERR("NY: MÅ SKRIVES");
 	}
 
 }

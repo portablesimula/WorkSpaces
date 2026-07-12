@@ -20,11 +20,10 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.HiddenSpecification;
 import simula.compiler.syntaxClass.ProtectedSpecification;
 import simula.compiler.syntaxClass.Type;
@@ -40,6 +39,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Simula Class Declaration.
@@ -100,7 +100,7 @@ import simula.compiler.utilities.Util;
 /// This class is prefix to StandardClass and PrefixedBlockDeclaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/ClassDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/ClassDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -125,10 +125,6 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// Possible statements before inner.
 	/// If this is non-null then 'statements' contains the statements after inner
 	public ObjectList<Statement> statements1; // Statement code before inner
-	
-	/// Returns true iff this class has an explicit inner statement
-	/// @return true iff this class has an explicit inner statement
-	public boolean hasInner() {	return statements1 != null;	}
 
 	/// Class Prefix in case of a SubClass or Prefixed Block.
 	public String prefix;
@@ -174,32 +170,33 @@ public class ClassDeclaration extends BlockDeclaration {
 	public static ClassDeclaration expectClassDeclaration(final SimulaBuilder simBuilder, final String ident) {
 		ClassDeclaration cls = new ClassDeclaration(simBuilder, null);
 		cls.sourceFileName = CoreGlobal.sourceFileName;
+		cls.lineNumber = Parse.prevToken.lineNumber;
 		cls.prefix = ident;
 		cls.declaredIn.hasLocalClasses = true;
 		if (cls.prefix == null)
 			cls.prefix = StandardClass.CLASS.identifier;
-		cls.modifyIdentifier(Parse.expectIdentifier(simBuilder, "PsiTextPanel.styleNameClassIdent").edText());
-		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
-			expectFormalParameterPart(simBuilder, cls.parameterList);
-			Parse.expect(simBuilder, KeyWord.SEMICOLON);
-			acceptValuePart(simBuilder, cls.parameterList);
-			acceptParameterSpecificationPart(simBuilder, cls.parameterList);
+		cls.modifyIdentifier(Parse.expectIdentifier());
+		if (Parse.accept(KeyWord.BEGPAR)) {
+			expectFormalParameterPart(cls.parameterList);
+			Parse.expect(KeyWord.SEMICOLON);
+			acceptValuePart(cls.parameterList);
+			acceptParameterSpecificationPart(cls.parameterList);
 		} else
-			Parse.expect(simBuilder, KeyWord.SEMICOLON);
+			Parse.expect(KeyWord.SEMICOLON);
 
-		acceptProtectionPart(simBuilder, cls);
-		if (Parse.accept(simBuilder, KeyWord.VIRTUAL))
-			VirtualSpecification.expectVirtualPart(simBuilder, cls);
-		expectClassBody(simBuilder, cls);
+		acceptProtectionPart(cls);
+		if (Parse.accept(KeyWord.VIRTUAL))
+			VirtualSpecification.expectVirtualPart(cls);
+		expectClassBody(cls);
 		
+		cls.lastLineNumber = CoreGlobal.sourceLineNumber;
 		cls.type = Type.Ref(cls.identifier);
 		if (Option.internal.TRACE_PARSE)
-			Parse.TRACE("Line " + cls.firstLineNumber() + ": ClassDeclaration: " + cls);
+			Parse.TRACE("Line " + cls.lineNumber + ": ClassDeclaration: " + cls);
 		CoreGlobal.setScope(cls.declaredIn);
-
 		return (cls);
 	}
-
+	
 	// ***********************************************************************************************
 	// *** PARSING: acceptValuePart
 	// ***********************************************************************************************
@@ -209,10 +206,10 @@ public class ClassDeclaration extends BlockDeclaration {
 	///              VALUE identifier-list ;
 	/// </pre>
 	/// @param pList Parameter list
-	private static void acceptValuePart(final SimulaBuilder simBuilder, final Vector<Parameter> pList) {
-		if (Parse.accept(simBuilder, KeyWord.VALUE)) {
+	private static void acceptValuePart(final Vector<Parameter> pList) {
+		if (Parse.accept(KeyWord.VALUE)) {
 			do {
-				String identifier = Parse.expectIdentifier(simBuilder).edText();
+				String identifier = Parse.expectIdentifier();
 				Parameter parameter = null;
 				for (Parameter par : pList)
 					if (Util.equals(identifier, par.identifier)) {
@@ -220,12 +217,12 @@ public class ClassDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.syntaxError(simBuilder, "Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(simBuilder, identifier);
+					Util.error("Identifier " + identifier + " is not defined in this scope");
+					parameter = new Parameter(identifier);
 				}
 				parameter.setMode(Parameter.Mode.value);
-			} while (Parse.accept(simBuilder, KeyWord.COMMA));
-			Parse.expect(simBuilder, KeyWord.SEMICOLON);
+			} while (Parse.accept(KeyWord.COMMA));
+			Parse.expect(KeyWord.SEMICOLON);
 		}
 	}
 
@@ -242,14 +239,14 @@ public class ClassDeclaration extends BlockDeclaration {
 	///        class-parameter-specifier = Type | [Type] ARRAY
 	/// </pre>
 	/// @param pList the parameter list
-	private static void acceptParameterSpecificationPart(final SimulaBuilder simBuilder, final Vector<Parameter> pList) {
+	private static void acceptParameterSpecificationPart(final Vector<Parameter> pList) {
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ParameterSpecifications");
 		while (true) {
 			Type type;
 			int kind = Parameter.Kind.Simple;
-			type = Parse.acceptType(simBuilder);
-			if (Parse.accept(simBuilder, KeyWord.ARRAY)) {
+			type = Parse.acceptType();
+			if (Parse.accept(KeyWord.ARRAY)) {
 				if (type == null) {
 					// See Simula Standard 5.2 -
 					// If no type is given the type real is understood.
@@ -260,7 +257,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			if (type == null)
 				return;
 			do {
-				String identifier = Parse.expectIdentifier(simBuilder).edText();
+				String identifier = Parse.expectIdentifier();
 				Parameter parameter = null;
 				for (Parameter par : pList)
 					if (Util.equals(identifier, par.identifier)) {
@@ -268,15 +265,16 @@ public class ClassDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.syntaxError(simBuilder, "Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(simBuilder, identifier);
+					Util.error("Identifier " + identifier + " is not defined in this scope");
+					parameter = new Parameter(identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
-			} while (Parse.accept(simBuilder, KeyWord.COMMA));
+			} while (Parse.accept(KeyWord.COMMA));
 
-			Parse.expect(simBuilder, KeyWord.SEMICOLON);
+			Parse.expect(KeyWord.SEMICOLON);
 		}
 	}
+
 
 	// ***********************************************************************************************
 	// *** PARSING: acceptProtectionPart
@@ -294,23 +292,23 @@ public class ClassDeclaration extends BlockDeclaration {
 	///                | PROTECTED HIDDEN identifier-list
 	/// </pre>
 	/// @param cls the ClassDeclaration
-	private static void acceptProtectionPart(final SimulaBuilder simBuilder, ClassDeclaration cls) {
+	private static void acceptProtectionPart(ClassDeclaration cls) {
 		while (true) {
-			if (Parse.accept(simBuilder, KeyWord.HIDDEN)) {
-				if (Parse.accept(simBuilder, KeyWord.PROTECTED))
-					expectHiddenProtectedList(simBuilder, cls, true, true);
+			if (Parse.accept(KeyWord.HIDDEN)) {
+				if (Parse.accept(KeyWord.PROTECTED))
+					expectHiddenProtectedList(cls, true, true);
 				else
-					expectHiddenProtectedList(simBuilder, cls, true, false);
-			} else if (Parse.accept(simBuilder, KeyWord.PROTECTED)) {
-				if (Parse.accept(simBuilder, KeyWord.HIDDEN))
-					expectHiddenProtectedList(simBuilder, cls, true, true);
+					expectHiddenProtectedList(cls, true, false);
+			} else if (Parse.accept(KeyWord.PROTECTED)) {
+				if (Parse.accept(KeyWord.HIDDEN))
+					expectHiddenProtectedList(cls, true, true);
 				else
-					expectHiddenProtectedList(simBuilder, cls, false, true);
+					expectHiddenProtectedList(cls, false, true);
 			} else
 				break;
 		}	
 	}
-
+	
 	/// Parse Utility: Expect Hidden Protected list.
 	/// <pre>
 	/// Syntax:
@@ -320,15 +318,15 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @param cls the ClassDeclaration
 	/// @param hidden if true, update the hidden list
 	/// @param prtected if true, update the protected list
-	private static void expectHiddenProtectedList(final SimulaBuilder simBuilder, final ClassDeclaration cls, final boolean hidden, final boolean prtected) {
+	private static void expectHiddenProtectedList(final ClassDeclaration cls, final boolean hidden, final boolean prtected) {
 		do {
-			String identifier = Parse.expectIdentifier(simBuilder).edText();
+			String identifier = Parse.expectIdentifier();
 			if (hidden)
-				cls.hiddenList.add(new HiddenSpecification(simBuilder, cls, identifier));
+				cls.hiddenList.add(new HiddenSpecification(cls, identifier));
 			if (prtected)
-				cls.protectedList.add(new ProtectedSpecification(simBuilder, cls, identifier));
-		} while (Parse.accept(simBuilder, KeyWord.COMMA));
-		Parse.expect(simBuilder, KeyWord.SEMICOLON);
+				cls.protectedList.add(new ProtectedSpecification(cls, identifier));
+		} while (Parse.accept(KeyWord.COMMA));
+		Parse.expect(KeyWord.SEMICOLON);
 	}
 
 	// ***********************************************************************************************
@@ -352,21 +350,37 @@ public class ClassDeclaration extends BlockDeclaration {
 	///               | ; statement { ; statement } END
 	/// </pre>
 	/// @param cls the ClassDeclaration
-	private static void expectClassBody(final SimulaBuilder simBuilder, ClassDeclaration cls) {
-		if (Parse.accept(simBuilder, KeyWord.BEGIN)) {
+	private static void expectClassBody(ClassDeclaration cls) {
+		if (Parse.accept(KeyWord.BEGIN)) {
+			Statement stm;
 			if (Option.internal.TRACE_PARSE)
 				Parse.TRACE("Parse Block");
-			
-			cls.parseBlock(simBuilder);
-			if(! cls.hasInner()) {
-//				IO.println("ClassDeclaration.expectClassBody: ADD IMPLICIT INNER");
-				cls.statements.add(new InnerStatement(simBuilder, false)); // Implicit INNER
+			while (Declaration.acceptDeclaration(cls)) {
+				Parse.accept(KeyWord.SEMICOLON);
 			}
-		} else {
-			if(Parse.getCurrentParserToken(simBuilder).keyWord != KeyWord.SEMICOLON)
-				cls.statements.add(Statement.acceptStatement(simBuilder));
-			if(! cls.hasInner())
-				cls.statements.add(new InnerStatement(simBuilder, false)); // Implicit INNER
+			boolean seen = false;
+			while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
+				stm = Statement.expectStatement();
+				if (stm != null)
+					cls.statements.add(stm);
+				if (Parse.accept(KeyWord.INNER)) {
+					if (seen)
+						Util.error("Max one INNER per Block");
+					else
+						cls.statements.add(new InnerStatement(Parse.currentToken.lineNumber));
+					seen = true;
+				}
+			}
+			if (Parse.prevToken.keyWord == KeyWord.EOF) {
+				Util.error("Illegal termination of class declaration. Missing END.");
+			}
+			if (!seen)
+				cls.statements.add(new InnerStatement(Parse.currentToken.lineNumber)); // Implicit INNER
+		}
+		else {
+			if(Parse.currentToken.keyWord != KeyWord.SEMICOLON)
+				cls.statements.add(Statement.expectStatement());
+			cls.statements.add(new InnerStatement(Parse.currentToken.lineNumber)); // Implicit INNER
 		}
 	}
 
@@ -404,28 +418,22 @@ public class ClassDeclaration extends BlockDeclaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		CoreGlobal.enterScope(this);
 		if(Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ClassDeclaration("+this.identifier+").doChecking");
-//		IO.println("ClassDeclaration("+this.identifier+").doChecking");
 		
 		if (hasRealPrefix()) {
 			prefixClass = getPrefixClass();
-//			IO.println("ClassDecleration.doChecking: prefixClass: " + prefixClass );
-			if(prefixClass == null) {
-				Util.semanticError(this, "Prefix " + prefix + " is not a Class");
-			} else {
-				prefixClass.doChecking();
-				if (prefixClass.declarationKind != ObjectKind.StandardClass) {
-					if (sourceBlockLevel != prefixClass.sourceBlockLevel)
-						Util.warning(this, "Subclass on a deeper block level not allowed.");
-				}
+			prefixClass.doChecking();
+			if (prefixClass.declarationKind != ObjectKind.StandardClass) {
+				if (sourceBlockLevel != prefixClass.sourceBlockLevel)
+					Util.warning("Subclass on a deeper block level not allowed.");
 			}
 		}
 		LabelList.accumLabelList(this);
 		
-		if(type != null) type.doChecking(declaredIn, this);
+		if(type != null) type.doChecking(declaredIn);
 		int prfx = prefixLevel();
 		for (Parameter par : this.parameterList)
 			par.setExternalIdentifier(prfx);
@@ -691,21 +699,19 @@ public class ClassDeclaration extends BlockDeclaration {
 		
 		Meaning meaning = declaredIn.findMeaning(prefix);
 		if (meaning == null)
-//			Util.error("Undefined prefix: " + prefix);
-			return null;
+			Util.error("Undefined prefix: " + prefix);
 		Declaration decl = meaning.declaredAs;
 		if (decl == this) {
-			Util.semanticError(this, "Class prefix chain loops: " + identifier);
-			return null;
+			Util.error("Class prefix chain loops: " + identifier);
 		}
 		if (decl instanceof ClassDeclaration cls) {
 			prefixClass = cls;
 			return (cls);
 		}
-//		Util.error("Prefix " + prefix + " is not a Class but " + decl.getClass().getSimpleName()
-//				+ " Declared in " + this.sourceFileName + " at line " + decl.firstLineNumber());
-//		printStaticChain("",0);
-		return null;
+		Util.error("Prefix " + prefix + " is not a Class but " + decl.getClass().getSimpleName()
+				+ " Declared in " + this.sourceFileName + " at line " + decl.lineNumber);
+		printStaticChain("",0);
+		return (null);
 	}
 
 	// ***********************************************************************************************
@@ -806,7 +812,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			if(Option.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);	
 			return;
 		}
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
 		CoreGlobal.enterScope(this);
 			labelList.setLabelIdexes();
@@ -815,7 +821,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			line = line + " extends " + getPrefixClass().getJavaIdentifier();
 			JavaSourceFileCoder.code(line + " {");
 			JavaSourceFileCoder.debug("// ClassDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
-					+ ", PrefixLevel=" + prefixLevel() + ", firstLine=" + firstLineNumber() + ", lastLine=" + lastLineNumber()
+					+ ", PrefixLevel=" + prefixLevel() + ", firstLine=" + lineNumber + ", lastLine=" + lastLineNumber
 					+ ", hasLocalClasses=" + ((hasLocalClasses) ? "true" : "false") + ", System="
 					+ ((isQPSystemBlock()) ? "true" : "false") + ", detachUsed=" + ((detachUsed) ? "true" : "false"));
 			if (isQPSystemBlock())
@@ -1207,7 +1213,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	
 	@Override
 	public void buildDeclaration(ClassBuilder classBuilder, BlockDeclaration encloser) {
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		try {
 			this.createJavaClassFile();
 		} catch (IOException e) {
@@ -1217,7 +1223,7 @@ public class ClassDeclaration extends BlockDeclaration {
 
 	@Override
 	public void buildInitAttribute(CodeBuilder codeBuilder) {
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 	}
 
 	// ***********************************************************************************************
@@ -1242,7 +1248,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			if(this instanceof PrefixedBlockDeclaration)
 				buildMethod_CatchingErrors_TRY_CATCH(codeBuilder, begScope, endScope);
 			else {
-				Util.codingError(this, "It is not allowed to declare a subclass of StandardClass CatchingErrors");
+				Util.error("It is not allowed to declare a subclass of StandardClass CatchingErrors");
 				buildStatementsBeforeInner(codeBuilder);
 				buildStatementsAfterInner(codeBuilder);
 			}
@@ -1309,18 +1315,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			if (prfx != null) prfx.buildStatementsBeforeInner(codeBuilder);
 		}
 		if(statements1 != null) for (Statement stm : statements1) {
-			if(!(stm instanceof DummyStatement)) {
-				int lno = stm.firstLineNumber();
-//				if(lno < 0) {
-//					Util.IERR("ClassDeclaration.buildStatementsBeforeInner: Illegal LNO: "+lno+" "+stm.getClass().getSimpleName()+" "+stm);
-//				}
-//				Util.buildLineNumber(codeBuilder,lno);
-				if(lno > 0) {
-					Util.buildLineNumber(codeBuilder,lno);
-//				} else {
-//					Util.warning("ClassDeclaration.buildStatementsBeforeInner: Illegal LNO: "+lno+" "+stm.getClass().getSimpleName()+" "+stm);
-				}
-			}
+			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.lineNumber);
 			stm.buildByteCode(codeBuilder);
 		}
 	}
@@ -1332,7 +1327,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @param codeBuilder the codeBuilder to use.
 	private void buildStatementsAfterInner(CodeBuilder codeBuilder) {
 		for (Statement stm : statements){
-			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.firstLineNumber());
+			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.lineNumber);
 			stm.buildByteCode(codeBuilder);
 		}
 		if (hasRealPrefix()) {
@@ -1412,8 +1407,8 @@ public class ClassDeclaration extends BlockDeclaration {
 		oupt.writeString(identifier);
 		oupt.writeShort(OBJECT_SEQU);
 		
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		
 		// *** Declaration
 		//oupt.writeString(identifier);
@@ -1454,9 +1449,9 @@ public class ClassDeclaration extends BlockDeclaration {
 		cls.declarationKind = ObjectKind.Class;
 		cls.OBJECT_SEQU = inpt.readSEQU(cls);
 		
-		// *** SyntaxElement
-		cls.astData = readAstData(inpt);
-		
+		// *** SyntaxClass
+		cls.lineNumber = inpt.readShort();
+
 		// *** Declaration
 		//identifier = inpt.readString();
 		cls.externalIdent = inpt.readString();

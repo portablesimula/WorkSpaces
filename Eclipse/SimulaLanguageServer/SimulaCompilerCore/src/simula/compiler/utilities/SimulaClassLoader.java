@@ -9,10 +9,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Vector;
 
+import simula.runtime.RTS_EndProgram;
+
 /// SimulaClassLoader.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/SimulaClassLoader.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/SimulaClassLoader.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public class SimulaClassLoader extends ClassLoader {
@@ -70,7 +72,7 @@ public class SimulaClassLoader extends ClassLoader {
 		} catch (InvocationTargetException e) {
 			Throwable cause = e.getCause();
 			if(TESTING)	IO.println("SimulaClassLoader.runClass: EXCEPTION-2 AFTER INVOKE cause = " + cause + ", clazz = " + clazz);
-//			if(cause instanceof RTS_EndProgram) ; // OK
+			if(cause instanceof RTS_EndProgram) ; // OK
 			else if(cause instanceof RuntimeException err) throw err;
 			else Util.IERR("SimulaClassLoader.runClass: EXCEPTION AFTER INVOKE cause = "+cause);
 		}

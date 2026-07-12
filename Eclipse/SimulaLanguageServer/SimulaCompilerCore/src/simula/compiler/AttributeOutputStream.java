@@ -9,7 +9,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
@@ -18,7 +18,7 @@ import simula.compiler.utilities.Util;
 
 /// Attribute output stream.
 /// 
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/AttributeOutputStream.java"><b>Source File</b></a>.
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/AttributeOutputStream.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public class AttributeOutputStream {
@@ -117,7 +117,7 @@ public class AttributeOutputStream {
 	/// Writes a Object to the underlying DataOutputStream.
 	/// @param obj a Object to be written.
 	/// @throws IOException if an I/O error occurs.
-    public void writeObj(SyntaxElement obj) throws IOException {
+    public void writeObj(SyntaxClass obj) throws IOException {
 		if(obj == null) {
 			if(TRACE) IO.println("AttributeOutputStream.writeObj: null");
 			writeKind(ObjectKind.NULL);

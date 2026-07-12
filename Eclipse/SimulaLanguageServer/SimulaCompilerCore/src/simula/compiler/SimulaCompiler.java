@@ -8,23 +8,20 @@ package simula.compiler;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.net.URI;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Vector;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
-import simula.Option;
+import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.transform.ClassFileTransform;
 import simula.compiler.utilities.CoreGlobal;
-import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.SimulaClassLoader;
 import simula.compiler.utilities.Util;
-import simula.lsp.compiler.DocumentManager;
+import simula.editor.RTOption;
 
 /// The Simula Compiler.
 /// 
@@ -49,13 +46,13 @@ import simula.lsp.compiler.DocumentManager;
 /// 			- Run the loaded program
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/SimulaCompiler.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/SimulaCompiler.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class SimulaCompiler {
 	
 	/// The Reader in case of SimulaEditor.
-	private Reader reader;
+	final private Reader reader;
 
 	/// The ProgramModule.
 	private ProgramModule programModule;
@@ -64,21 +61,28 @@ public final class SimulaCompiler {
 	private File outputJarFile;
 
 //	/// Create a new SimulaCompiler.
-//	/// @param sourceFileName the source file name
-//	public SimulaCompiler(final String sourceFileName) {
-//		this(sourceFileName, null);
+//	/// @param inputFileName the source file name
+//	public SimulaCompiler(final String inputFileName) {
+//		this(inputFileName, null);
 //	}
 
 	/// Create a new SimulaCompiler.
 	/// @param inputFileName the source file name
 	/// @param reader        Reader in case of SimulaEditor
 	public SimulaCompiler(final String inputFileName, final Reader reader) {
-		IO.println("NEW SimulaCompiler(final String sourceFileName, final Reader reader)");
 		CoreGlobal.initiate();
+//		if (pReader == null) {
+//			try {
+//				File file = new File(inputFileName);
+//				pReader = new InputStreamReader(new FileInputStream(file), Global._CHARSET);
+//			} catch (IOException e) {
+//				Util.error("can't open " + inputFileName + ", reason: " + e);
+//			}
+//		}
 		this.reader = reader;
 		if(Option.verbose) Util.println("Input Source File: " + inputFileName);
 		if (!inputFileName.toLowerCase().endsWith(".sim"))
-			Util.generalWarning("Simula source file should, by convention be extended by .sim: " + inputFileName);
+			Util.warning("Simula source file should, by convention be extended by .sim: " + inputFileName);
 
 		File inputFile = new File(inputFileName);
 
@@ -89,75 +93,6 @@ public final class SimulaCompiler {
 		
 		if (Option.internal.TRACING)
 			Util.println("Compiling: \"" + inputFileName + "\"");
-
-		if (CoreGlobal.outputDir == null) {
-			CoreGlobal.trySetOutputDir(new File(CoreGlobal.sourceFileDir, "bin"));
-		}
-
-		// Get Temp Directory:
-		CoreGlobal.simulaTempDir = CoreGlobal.getTempFileDir("simula/");
-		deleteTempFiles(CoreGlobal.simulaTempDir);
-
-		// Create Temp .java-Files Directory:
-		File javatmp = Option.internal.keepJava;
-		if (javatmp == null)
-			javatmp = CoreGlobal.simulaTempDir;
-		File tmpJavaDir = new File(javatmp, "src/" + CoreGlobal.packetName);
-		tmpJavaDir.mkdirs();
-		CoreGlobal.tempJavaFileDir = tmpJavaDir;
-
-		// Create Temp .class-Files Directory:
-		File tmpClassDir = new File(CoreGlobal.simulaTempDir, "classes");
-		tmpClassDir.mkdirs();
-		CoreGlobal.tempClassFileDir = tmpClassDir;
-
-		File desktop = new File(System.getProperty("user.home"), "Desktop");
-		if (Option.verbose) {
-			// https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html
-			Util.println("------------  SIMULA ENVIRONMENT SUMMARY  ------------");
-			Util.println("Simula Properties    " + CoreGlobal.simulaPropertiesFile);
-			Util.println("Simula Home          " + CoreGlobal.simulaHome);
-			Util.println("Simula Home (prev)   " + CoreGlobal.getSimulaProperty("simula.home", null));
-			Util.println("Java Home            " + System.getProperty("java.home"));
-			Util.println("User Home            " + System.getProperty("user.home"));
-			Util.println("Working Directory    " + System.getProperty("user.dir"));
-			String s = (desktop.exists()) ? "true " : "false";
-			Util.println("Desktop Exists=" + s + " " + desktop.toString());
-			Util.println("Java Class Path      " + System.getProperty("java.class.path"));
-			Util.println("Java Class Version   " + System.getProperty("java.class.version"));
-			Util.println("Java Version         " + System.getProperty("java.version"));
-			Util.println("Java VM Spec Version " + System.getProperty("java.vm.specification.version"));
-			Util.println("Java Vendor          " + System.getProperty("java.vendor"));
-			Util.println("OS name              " + System.getProperty("os.name"));
-			Util.println("OS architecture      " + System.getProperty("os.arch"));
-			Util.println("OS version           " + System.getProperty("os.version"));
-			Util.println("file.encoding        " + System.getProperty("file.encoding"));
-			Util.println("defaultCharset       " + Charset.defaultCharset());
-			Util.println("compilerMode         " + Option.compilerMode);
-
-			// This will list the current system properties
-			// System.getProperties().list(System.out);
-
-		}
-	}
-	public SimulaCompiler(final String sourceFileName) {
-		IO.println("NEW SimulaCompiler(final String sourceFileName)");
-//		Global.initiate();
-//		this.reader = reader;
-		
-		if(Option.verbose) Util.println("Input Source File: " + sourceFileName);
-		if (!sourceFileName.toLowerCase().endsWith(".sim"))
-			Util.generalWarning("Simula source file should, by convention be extended by .sim: " + sourceFileName);
-
-		File inputFile = new File(sourceFileName);
-
-		CoreGlobal.sourceFileName = inputFile.getName();
-		CoreGlobal.sourceName = Util.getBaseName(inputFile.getName());
-		CoreGlobal.sourceFileDir = inputFile.getParentFile();
-		if(CoreGlobal.sourceFileDir == null) CoreGlobal.sourceFileDir = new File(System.getProperty("user.dir"));
-		
-		if (Option.internal.TRACING)
-			Util.println("Compiling: \"" + sourceFileName + "\"");
 
 		if (CoreGlobal.outputDir == null) {
 			CoreGlobal.trySetOutputDir(new File(CoreGlobal.sourceFileDir, "bin"));
@@ -268,17 +203,7 @@ public final class SimulaCompiler {
 
 	/// Do Compile
 	/// @throws IOException when it fails
-//	public void doCompile() throws IOException {
 	public void doCompile() throws IOException {
-		IO.println("SimulaTestBatch: SimulaCompiler.doCompile");
-		throw new IOException("ZZZZZZ");
-	}
-	
-	/// Do Compile
-	/// @throws IOException when it fails
-//	public void doCompile() throws IOException {
-	public void doCompile(ProgramModule programModule) throws IOException {
-		this.programModule = programModule;
 		if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + CoreGlobal.sourceName + ": Start Simula Compiler");
 		Util.nError = 0;
 		if (!Util.isJavaIdentifier(CoreGlobal.sourceName)) {
@@ -288,42 +213,24 @@ public final class SimulaCompiler {
 					+ CoreGlobal.sourceName);
 		}
 		
-		if(CoreGlobal.jarFileBuilder == null) {
-	   		if(Option.compilerMode != Option.CompilerMode.simulaClassLoader) {
-				CoreGlobal.jarFileBuilder = new JarFileBuilder();
-			}
+   		if(Option.compilerMode != Option.CompilerMode.simulaClassLoader) {
+			CoreGlobal.jarFileBuilder = new JarFileBuilder();
 		}
 		
 		// ***************************************************************
 		// *** Scanning and Parsing
 		// ***************************************************************
 		CoreGlobal.javaSourceFileCoders = new Vector<JavaSourceFileCoder>();
-//		Parse.initiateParser(reader);
-		
-//		Util.IERR("DETTE MÅ RETTES");
-//		programModule = new ProgramModule(null);
-//		Util.IERR("DETTE MÅ RETTES");
-//		Global.programModule = programModule;
-		
-//		programModule = Global.currentModule.programModule;
-		
-//		IO.println("SimulaCompiler.doCompile: mainModule"+programModule.mainModule);
-//		IO.println("SimulaCompiler.doCompile: mainModule"+programModule.mainModule.declaredIn);
-//		IO.println("SimulaCompiler.doCompile: mainModule"+programModule.mainModule.declaredIn.declaredIn);
-//		Option.internal.TRACE_FIND_MEANING = 1;
-//		Meaning meaning = programModule.mainModule.findMeaning("sysin");
-//		IO.println("SimulaCompiler.doCompile: meaning="+meaning);
-//		Option.internal.TRACE_FIND_MEANING = 0;
-//		Util.STOP();
-
-		
+		Parse.initiateParser(reader);
+		programModule = new ProgramModule();
+		CoreGlobal.programModule = programModule;
 		if (Option.internal.TRACING) {
 			Util.println("END Parsing, resulting Program: \"" + programModule + "\"");
 			if (Option.internal.TRACE_PARSE && programModule != null)
 				programModule.print(0);
 		}
 		if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + CoreGlobal.sourceName + ": Parsing completed");
-//		Parse.close();
+		Parse.close();
 		CoreGlobal.duringParsing = false;
 		if(Option.internal.PRINT_SYNTAX_TREE > 1) {
 			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Parsing ================");
@@ -341,8 +248,7 @@ public final class SimulaCompiler {
    		if(Option.compilerMode == Option.CompilerMode.simulaClassLoader) {
 			if (!programModule.isExecutable()) {
 				// Separate Compilation
-				if(CoreGlobal.jarFileBuilder == null)
-					CoreGlobal.jarFileBuilder = new JarFileBuilder();
+				CoreGlobal.jarFileBuilder = new JarFileBuilder();
 				CoreGlobal.jarFileBuilder.open(programModule);
 			} else {
 				CoreGlobal.simulaClassLoader = new SimulaClassLoader();
@@ -472,11 +378,7 @@ public final class SimulaCompiler {
 //			cmds.add("-userDir");
 //			cmds.add(Global.outputDir.getParentFile().getAbsolutePath());
 		}
-		
-		Util.IERR("SJEKK DETTE");
-		//RTOption.addRTArguments(cmds);
-		
-		
+		RTOption.addRTArguments(cmds);
 		if(Option.noPopup) {
 			cmds.add("-noPopup");			
 		}
@@ -537,9 +439,8 @@ public final class SimulaCompiler {
 		boolean rtsExist = rtsLib.exists();
 		boolean rtsCread = rtsLib.canRead();
 		if (!(rtsExist && rtsCread)) {
-			Util.IERR("DETTE MÅ RETTES");
-//			Util.popUpError("Unable to access the Runtime System at:" + "\n" + rtsLib
-//					+ "\nCheck the installation and consider" + "\nto Download it again.\n");
+			Util.popUpError("Unable to access the Runtime System at:" + "\n" + rtsLib
+					+ "\nCheck the installation and consider" + "\nto Download it again.\n");
 		}
 		if (Option.internal.DEBUGGING) {
 			Util.println(
@@ -571,7 +472,7 @@ public final class SimulaCompiler {
 			exitValue = callJavaSystemCompiler(compiler, classPath);
 			msg = "System";
 			if (exitValue != 0) {
-				Util.generalError("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
+				Util.error("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
 				msg = "Commandline"; // Try use CommandLine Compiler
 				exitValue = callJavacCompiler(classPath);
 			}
@@ -585,7 +486,7 @@ public final class SimulaCompiler {
 		}
 		if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + CoreGlobal.sourceName + ": Class Files Generated - From Java Source");
 		if (exitValue != 0) {
-			Util.generalError("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
+			Util.error("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
 			Util.println("\nCompiler terminated after error(s) during Java Compilation");
 			return;
 		}

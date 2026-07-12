@@ -1,0 +1,4 @@
+class SimulaTest(n,title); integer n; text title;
+begin
+	sysout.setpos(1);
+end;

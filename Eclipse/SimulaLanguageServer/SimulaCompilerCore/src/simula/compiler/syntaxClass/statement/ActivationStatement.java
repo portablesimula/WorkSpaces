@@ -7,12 +7,9 @@ package simula.compiler.syntaxClass.statement;
 
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
-
-import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
+import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.expression.Expression;
@@ -21,9 +18,10 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
+import simula.compiler.utilities.Token;
 import simula.compiler.utilities.Util;
-import simula.token.LexToken;
 
 /// Activation Statement.
 /// 
@@ -64,7 +62,7 @@ import simula.token.LexToken;
 /// See runtime module RTS_Simulation for details.  
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ActivationStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ActivationStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -100,27 +98,25 @@ public final class ActivationStatement extends Statement {
 
 	/// Create a new ActivationStatement.
 	/// @param line the source line number
-	ActivationStatement(final SimulaBuilder simBuilder) {
-		super(simBuilder);
-		LexToken activator = Parse.getCurrentParserToken(simBuilder);
-		REAC = activator.keyWord == KeyWord.REACTIVATE;
-		simBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to 'current tree')
+	ActivationStatement(final int line) {
+		super(line);
+		Token activator = Parse.prevToken;
+		REAC = activator.getKeyWord() == KeyWord.REACTIVATE;
 		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse ActivationStatement");
-		object1 = Expression.expectExpression(simBuilder, "process");
+		object1 = Expression.expectExpression();
 		object1.backLink = this;
 		code = ActivationCode.direct;
-		LexToken prevToken = Parse.getCurrentParserToken(simBuilder);
-		if (Parse.accept(simBuilder, KeyWord.AT) || Parse.accept(simBuilder, KeyWord.DELAY)) {
-			code = (prevToken.keyWord == KeyWord.AT) ? ActivationCode.at : ActivationCode.delay;
-			time = Expression.expectExpression(simBuilder, "at/delay");
+		if (Parse.accept(KeyWord.AT) || Parse.accept(KeyWord.DELAY)) {
+			code = (Parse.prevToken.getKeyWord() == KeyWord.AT) ? ActivationCode.at : ActivationCode.delay;
+			time = Expression.expectExpression();
 			time.backLink = this;
-			if (Parse.accept(simBuilder, KeyWord.PRIOR)) prior = true;
-		} else if (Parse.accept(simBuilder, KeyWord.BEFORE) || Parse.accept(simBuilder, KeyWord.AFTER)) {
-			code = (prevToken.keyWord == KeyWord.BEFORE) ? ActivationCode.before : ActivationCode.after;
-			object2 = Expression.expectExpression(simBuilder, "before/after");
+			if (Parse.accept(KeyWord.PRIOR)) prior = true;
+		} else if (Parse.accept(KeyWord.BEFORE) || Parse.accept(KeyWord.AFTER)) {
+			code = (Parse.prevToken.getKeyWord() == KeyWord.BEFORE) ? ActivationCode.before : ActivationCode.after;
+			object2 = Expression.expectExpression();
 			object2.backLink = this;
 		}
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": ActivationStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": ActivationStatement: "+this);
 	}
 
 	@Override
@@ -301,29 +297,26 @@ public final class ActivationStatement extends Statement {
 		if (prior) pri = " PRIOR";
 		String activator = ((REAC) ? "REACTIVATE " : "ACTIVATE ") + object1;
 		switch (code) {
-		    case at, delay:     activator += " " + code + ' ' + time + pri; break;
-		    case before, after: activator += " " + code + ' ' + object2; break;
-		    default:
+		    case at, delay:     return (activator + ' ' + code + ' ' + time + pri);
+		    case before, after: return (activator + ' ' + code + ' ' + object2);
+		    case direct:
+		    default: return (activator);
 		}
-		return activator;
-
 	}
 
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ActivationStatement() {
-		super(null);
-	}
+	private ActivationStatement() { super(0); }
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeActivationStatement: " + this);
 		oupt.writeKind(ObjectKind.ActivationStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** ActivationStatement
 		oupt.writeBoolean(REAC);
 		oupt.writeObj(object1);
@@ -339,8 +332,8 @@ public final class ActivationStatement extends Statement {
 	public static ActivationStatement readObject(AttributeInputStream inpt) throws IOException {
 		ActivationStatement stm = new ActivationStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		// *** SyntaxClass
+		stm.lineNumber = inpt.readShort();
 		// *** ActivationStatement
 		stm.REAC = inpt.readBoolean();
 		stm.object1 = (Expression) inpt.readObj();

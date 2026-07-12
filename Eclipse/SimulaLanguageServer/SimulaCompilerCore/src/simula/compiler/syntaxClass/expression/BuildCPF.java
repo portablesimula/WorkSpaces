@@ -7,7 +7,7 @@ package simula.compiler.syntaxClass.expression;
 
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.Parameter;
@@ -20,7 +20,7 @@ import simula.compiler.utilities.Util;
 /// Coding Utilities: Build Call Procedure Formal (CPF).
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/BuildCPF.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/BuildCPF.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -36,7 +36,7 @@ public abstract class BuildCPF {
 	/// @param codeBuilder the CodeBuilder
 	static void formal(final VariableExpression variable,final Parameter par,CodeBuilder codeBuilder) {
 		//return("<IDENT>.CPF().setPar(4).setpar(3.14)._ENT()");
-		SyntaxElement backLink = variable.backLink;
+		SyntaxClass backLink = variable.backLink;
 		if(backLink instanceof RemoteVariable rem) backLink = rem.backLink;
 		Declaration decl=variable.meaning.declaredAs;
 		if(decl.type != null && backLink != null) {
@@ -86,11 +86,7 @@ public abstract class BuildCPF {
 					Declaration decl=var.meaning.declaredAs;
 					if(decl instanceof StandardProcedure) {
 						if(Util.equals(decl.identifier, "sourceline")) {
-//							actualParameter=new Constant(Type.Integer,actualParameter.firstLineNumber());
-//							actualParameter=new Constant(null, Type.Integer, decl.firstLineNumber());
-							int lno = var.firstLineNumber();
-							if(lno <= 0) Util.IERR("BuildCPF.buildCPF: Illegal lineNumber: " + lno + " for argument " + decl);
-							actualParameter=new Constant(null, Type.Integer, lno);
+							actualParameter=new Constant(Type.Integer,actualParameter.lineNumber);
 							actualParameter.doChecking();
 						}
 					}
@@ -121,7 +117,7 @@ public abstract class BuildCPF {
 	/// @param variable the variable
 	/// @param codeBuilder the codeBuilder to use.
 	static void maybeBuildLoad_RESULT(VariableExpression variable, CodeBuilder codeBuilder) {
-		SyntaxElement backLink = variable.backLink;
+		SyntaxClass backLink = variable.backLink;
 		if(backLink instanceof RemoteVariable rem) backLink = rem.backLink;
 		Declaration proc=variable.meaning.declaredAs;
 		if(proc.type != null && backLink != null) {

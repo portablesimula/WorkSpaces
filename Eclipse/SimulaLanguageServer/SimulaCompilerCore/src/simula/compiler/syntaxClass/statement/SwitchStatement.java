@@ -12,18 +12,17 @@ import java.lang.classfile.instruction.SwitchCase;
 import java.util.List;
 import java.util.Vector;
 
-import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.TypeConversion;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Switch Statement.
@@ -75,7 +74,7 @@ import simula.compiler.utilities.Util;
 ///   
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/SwitchStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/SwitchStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -107,51 +106,44 @@ public final class SwitchStatement extends Statement {
 
 	/// Create a new SwitchStatement.
 	/// @param line the source line number
-	SwitchStatement(final SimulaBuilder simBuilder) {
-		super(simBuilder);
-		simBuilder.consume(KeyWord.SWITCH); //  (add it to 'current tree')
-
-//		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);
-		Parse.expect(simBuilder, KeyWord.BEGPAR);
-		lowKey = Expression.expectExpression(simBuilder, "lowkey");
-		Parse.expect(simBuilder, KeyWord.COLON);
-		hiKey = Expression.expectExpression(simBuilder, "hikey");
-		Parse.expect(simBuilder, KeyWord.ENDPAR);
-		switchKey = Expression.expectExpression(simBuilder, "switch");
+	SwitchStatement(int line) {
+		super(line);
+		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse SwitchStatement: line="+line);
+		Parse.expect(KeyWord.BEGPAR);
+		lowKey = Expression.expectExpression();
+		Parse.expect(KeyWord.COLON);
+		hiKey = Expression.expectExpression();
+		Parse.expect(KeyWord.ENDPAR);
+		switchKey = Expression.expectExpression();
 		switchKey.backLink=this;
-		Parse.expect(simBuilder, KeyWord.BEGIN);
+		Parse.expect(KeyWord.BEGIN);
 		has_NONE_case=false;
-		while (Parse.accept(simBuilder, KeyWord.WHEN)) {
+		while (Parse.accept(KeyWord.WHEN)) {
 			Vector<SwitchInterval> caseKeyList=new Vector<SwitchInterval>();
-			if (Parse.accept(simBuilder, KeyWord.NONE)) {
+			if (Parse.accept(KeyWord.NONE)) {
 				caseKeyList.add(null);
-				if(has_NONE_case) Util.syntaxError(simBuilder, "NONE Case is already used");
+				if(has_NONE_case) Util.error("NONE Case is already used");
 				has_NONE_case=true;
 			}
 			else {
-				caseKeyList.add(expectCasePair(simBuilder));
-				while(Parse.accept(simBuilder, KeyWord.COMMA)) caseKeyList.add(expectCasePair(simBuilder));
+				caseKeyList.add(expectCasePair());
+				while(Parse.accept(KeyWord.COMMA)) caseKeyList.add(expectCasePair());
 			}
-			Parse.expect(simBuilder, KeyWord.DO);
-			
-			simBuilder.startTokenRange();
-			Statement statement = Statement.acceptStatement(simBuilder);
-			simBuilder.doneTokenRange(statement);
-			
-			Parse.accept(simBuilder, KeyWord.SEMICOLON);
-			SwitchWhenPart whenPart = new SwitchWhenPart(caseKeyList, statement);
-			switchCases.add(whenPart);
+			Parse.expect(KeyWord.DO);
+			Statement statement = Statement.expectStatement();
+			Parse.accept(KeyWord.SEMICOLON);
+			switchCases.add(new SwitchWhenPart(caseKeyList, statement));
 		}
-		Parse.expect(simBuilder, KeyWord.END);
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+firstLineNumber()+": SwitchStatement: "+this);
+		Parse.expect(KeyWord.END);
+		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+lineNumber+": SwitchStatement: "+this);
 	}
 
 	/// Parse Utility: Expect case pair.
 	/// @return the resulting SwitchInterval
-	private SwitchInterval expectCasePair(final SimulaBuilder simBuilder) {
-		Expression lowCase=Expression.expectExpression(simBuilder, "case");
+	private SwitchInterval expectCasePair() {
+		Expression lowCase=Expression.expectExpression();
 		Expression hiCase=null;
-		if(Parse.accept(simBuilder, KeyWord.COLON)) hiCase=Expression.expectExpression(simBuilder, "hicase");
+		if(Parse.accept(KeyWord.COLON)) hiCase=Expression.expectExpression();
 		return(new SwitchInterval(lowCase,hiCase));
 	}
 
@@ -309,7 +301,7 @@ public final class SwitchStatement extends Statement {
 	@Override
     public void doChecking() {
     	if(IS_SEMANTICS_CHECKED()) return;
-    	CoreGlobal.sourceLineNumber=firstLineNumber();
+    	CoreGlobal.sourceLineNumber=lineNumber;
     	if(Option.internal.TRACE_CHECKER) Util.TRACE("BEGIN SwitchStatement("+toString()+").doChecking - Current Scope Chain: "+CoreGlobal.getCurrentScope().edScopeChain());    
     	lowKey.doChecking(); hiKey.doChecking();
     	switchKey.doChecking();
@@ -331,7 +323,7 @@ public final class SwitchStatement extends Statement {
 	
 	@Override
     public void doJavaCoding() {
-    	CoreGlobal.sourceLineNumber=firstLineNumber();
+    	CoreGlobal.sourceLineNumber=lineNumber;
 	    ASSERT_SEMANTICS_CHECKED();
 	    StringBuilder sb=new StringBuilder();
 	    sb.append("if(").append(switchKey.toJavaCode()).append("<").append(lowKey.toJavaCode());
@@ -413,7 +405,7 @@ public final class SwitchStatement extends Statement {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private SwitchStatement() {
-		super(null);
+		super(0);
 	}
 
 	@Override
@@ -421,8 +413,8 @@ public final class SwitchStatement extends Statement {
 		Util.TRACE_OUTPUT("writeSwitchStatement: " + this);
 		oupt.writeKind(ObjectKind.SwitchStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** SwitchStatement
 		oupt.writeObj(lowKey);
 		oupt.writeObj(hiKey);
@@ -436,8 +428,8 @@ public final class SwitchStatement extends Statement {
 	public static SwitchStatement readObject(AttributeInputStream inpt) throws IOException {
 		SwitchStatement stm = new SwitchStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		// *** SyntaxClass
+		stm.lineNumber = inpt.readShort();
 		stm.lowKey = (Expression) inpt.readObj();
 		stm.hiKey = (Expression) inpt.readObj();
 		stm.switchKey = (Expression) inpt.readObj();

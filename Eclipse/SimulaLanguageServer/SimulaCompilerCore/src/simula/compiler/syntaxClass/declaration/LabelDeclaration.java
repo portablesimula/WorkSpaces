@@ -13,8 +13,6 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
-
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -30,7 +28,7 @@ import simula.compiler.utilities.Util;
 /// Label Declaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/LabelDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/LabelDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -49,8 +47,8 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// Create a new Label Declaration.
 	/// 
 	/// @param identifier label identifier
-	public LabelDeclaration(final SimulaBuilder simBuilder, final String identifier) {
-		super(simBuilder, Type.Label, identifier);
+	public LabelDeclaration(final String identifier) {
+		super(Type.Label, identifier);
 		this.externalIdent = "_LABEL_" + identifier;
 		this.declarationKind = ObjectKind.LabelDeclaration;
 	}
@@ -59,16 +57,16 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		DeclarationScope declaredIn = CoreGlobal.getCurrentScope();
 		this.externalIdent = "_LABEL_" + declaredIn.externalIdent + '_' + identifier + '_' + declaredIn.prefixLevel();
-		type.doChecking(declaredIn, this);
+		type.doChecking(declaredIn);
 		VirtualSpecification virtSpec = VirtualSpecification.getVirtualSpecification(this);
 		if (virtSpec == null) {
 			// Label attributes are implicit specified 'protected'
 			if (declaredIn.declarationKind == ObjectKind.Class)
 				((ClassDeclaration) declaredIn).protectedList
-						.add(new ProtectedSpecification(null, (ClassDeclaration) declaredIn, identifier));
+						.add(new ProtectedSpecification((ClassDeclaration) declaredIn, identifier));
 		} else {
 			// This Label is a Virtual Match
 			ClassDeclaration decl = (ClassDeclaration) declaredIn;
@@ -81,7 +79,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// Declare a local Label.
 	/// @param encloser the BlockDeclaration to update.
 	public void declareLocalLabel(BlockDeclaration encloser) {
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		String ident = getJavaIdentifier();
 		int prefixLevel=0;
 		if(movedTo != null) {
@@ -217,7 +215,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 			.ldc(codeBuilder.constantPool().stringEntry(identifier))
 			.invokespecial(RTS.CD.RTS_LABEL, "<init>", MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_RTObject;IILjava/lang/String;)V"));
 	}
-
+	
 	@Override
 	public String toString() {
 		String comment = "DeclaredIn: "+declaredIn.identifier;
@@ -228,12 +226,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
-	public LabelDeclaration(final String identifier) {
-		super(null, Type.Label, identifier);
-		this.externalIdent = "_LABEL_" + identifier;
-		this.declarationKind = ObjectKind.LabelDeclaration;
-	}
-
+	
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeLabelDeclaration: " + identifier);
@@ -241,8 +234,8 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		oupt.writeString(identifier);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -267,8 +260,8 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		LabelDeclaration lab = new LabelDeclaration(identifier);
 		lab.OBJECT_SEQU = inpt.readSEQU(lab);
 
-		// *** SyntaxElement
-		lab.astData = readAstData(inpt);
+		// *** SyntaxClass
+		lab.lineNumber = inpt.readShort();
 
 		// *** Declaration
 		lab.identifier = inpt.readString();

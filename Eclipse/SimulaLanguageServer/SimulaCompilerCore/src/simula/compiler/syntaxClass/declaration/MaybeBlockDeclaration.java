@@ -15,12 +15,10 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
 
-import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.statement.BlockStatement;
 import simula.compiler.syntaxClass.statement.DummyStatement;
 import simula.compiler.syntaxClass.statement.Statement;
@@ -33,6 +31,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Maybe Block Declaration. I.e: CompoundStatement or SubBlock depends on
@@ -51,7 +50,7 @@ import simula.compiler.utilities.Util;
 /// </pre>
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/MaybeBlockDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/MaybeBlockDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -63,12 +62,11 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Create a new MaybeBlockDeclaration, i.e. CompoundStatement or SubBlock.
 	/// @param identifier block identifier
-	public MaybeBlockDeclaration(final SimulaBuilder simBuilder, final String identifier) {
-		super(simBuilder, identifier);
+	public MaybeBlockDeclaration(final String identifier) {
+		super(identifier);
 		if(identifier != null)
 			modifyIdentifier(identifier);
-//		else modifyIdentifier("Block" + firstLineNumber());
-		else modifyIdentifier("Block" + simBuilder.getSourceLineNumber());
+		else modifyIdentifier("Block" + lineNumber);
 	}
 
 //	// ***********************************************************************************************
@@ -105,22 +103,19 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	/// Pre-condition: BEGIN is already read.
 	/// @param line source line number
 	/// @return a BlockStatement
-	private static int SEQU = 1;
-	public BlockStatement expectMaybeBlock(SimulaBuilder simBuilder) {
+	public BlockStatement expectMaybeBlock(int line) {
+		this.lineNumber=line;
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse MayBeBlock");
-		
-		String debugName = "MaybeBlockDeclaration: "+(SEQU++);
-		
-		int lno = simBuilder.getSourceLineNumber();
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN "+debugName);
-		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("BlockStatement expectMaybeBlock: BEGIN " + debugName);
-
-		simBuilder.consume(KeyWord.BEGIN); // consume BEGIN (add it to 'current tree')
-
-		parseBlock(simBuilder);
-
-//		IO.println("MaybeBlockDeclaration.expectMaybeBlock: GOT END or EOF");
+		while (Declaration.acceptDeclaration(this))
+			Parse.expect(KeyWord.SEMICOLON);
+		while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
+			Statement stm = Statement.expectStatement();
+			if (stm != null) statements.add(stm);
+		}
+		if (Parse.prevToken.keyWord == KeyWord.EOF) {
+			Util.error("Illegal termination of block. Missing END.");
+		}		
 		if (declarationKind != ObjectKind.SimulaProgram) {
 			if (!declarationList.isEmpty()) {
 				declarationKind = ObjectKind.SubBlock;
@@ -130,12 +125,10 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 					moveLabelsFrom(this); // Label is also declaration
 			}
 		}
-		BlockStatement block = new BlockStatement(simBuilder, this, debugName);
-		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("MaybeBlockDeclaration.expectMaybeBlock: ENDOF " + debugName + "  " + block);
+		this.lastLineNumber = CoreGlobal.sourceLineNumber;
+		BlockStatement blk = new BlockStatement(this);
 		CoreGlobal.setScope(declaredIn);
-		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line " + simBuilder.getSourceLineNumber() + ": DONE "+debugName+" started at line: " + lno + ": " + this);
-		return (block);
+		return (blk);
 	}
 
 	/// Utility: Moves labels from the givent block.
@@ -169,7 +162,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		CoreGlobal.enterScope(this);
 			LabelList.accumLabelList(this);
 			for (Declaration dcl : declarationList)	dcl.doChecking();
@@ -227,7 +220,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Java Coding utility: Code compound statement
 	private void doCompoundStatementCoding() {
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		Util.ASSERT(declarationList.isEmpty(), "Invariant");
 		Util.ASSERT(labelList == null || labelList.declaredLabelSize() == 0, "Invariant");
@@ -248,7 +241,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Java Coding utility: Code sub-block
 	private void doSubBlockCoding() {
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
 		CoreGlobal.enterScope(this);
@@ -258,7 +251,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 			JavaSourceFileCoder.code("@SuppressWarnings(\"unchecked\")");
 			JavaSourceFileCoder.code("public final class " + getJavaIdentifier() + " extends RTS_BASICIO" + " {");
 			JavaSourceFileCoder.debug("// SubBlock: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel() + ", firstLine="
-					+ firstLineNumber() + ", lastLine=" + lastLineNumber() + ", hasLocalClasses="
+					+ lineNumber + ", lastLine=" + lastLineNumber + ", hasLocalClasses="
 					+ ((hasLocalClasses) ? "true" : "false") + ", System=" + ((isQPSystemBlock()) ? "true" : "false"));
 			if (isQPSystemBlock())
 				JavaSourceFileCoder.code("public boolean isQPSystemBlock() { return(true); }");
@@ -415,7 +408,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 
 	@Override
 	public void buildByteCode(CodeBuilder codeBuilder) {
-		CoreGlobal.sourceLineNumber=firstLineNumber();
+		CoreGlobal.sourceLineNumber=lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		if (declarationKind == ObjectKind.CompoundStatement) {
 			build_STMS(codeBuilder);
@@ -471,17 +464,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	/// @param codeBuilder the codeBuilder to use.
 	private void build_STMS(CodeBuilder codeBuilder) {
 		for (Statement stm : statements) {
-			if(!(stm instanceof DummyStatement)) {
-				
-				if(stm.firstLineNumber() < 0) { // TODO: TESTING
-					IO.println("MaybeBlockDeclaration.build_STMS: stm="+stm.getClass().getSimpleName()+" "+stm+" LINE:"+stm.firstLineNumber());
-					if(stm instanceof BlockStatement bst) {
-						IO.println("MaybeBlockDeclaration.build_STMS: bst="+bst.getClass().getSimpleName()+" "+bst+" LINE:"+bst.firstLineNumber());
-					}
-				}
-				
-				Util.buildLineNumber(codeBuilder,stm.firstLineNumber());
-			}
+			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.lineNumber);
 			stm.buildByteCode(codeBuilder);
 		}
 	}
@@ -516,11 +499,10 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		printDeclarationList(indent+1);
 		printStatementList(indent+1);
 	}
-	
+
 	@Override
 	public String toString() {
-//		return identifier + '[' + externalIdent + "] Kind=" + declarationKind;
-		return identifier + '[' + externalIdent + "]";
+		return identifier + '[' + externalIdent + "] Kind=" + declarationKind;
 	}
 
 	// ***********************************************************************************************
@@ -528,7 +510,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 
 	/// Default constructor used by Attribute File I/O
-	public MaybeBlockDeclaration() { super(null, null); }
+	public MaybeBlockDeclaration() { super(null); }
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -536,8 +518,8 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -570,8 +552,8 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		MaybeBlockDeclaration blk = new MaybeBlockDeclaration();
 		blk.declarationKind = declarationKind;
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
-		// *** SyntaxElement
-		blk.astData = readAstData(inpt);
+		// *** SyntaxClass
+		blk.lineNumber = inpt.readShort();
 
 		// *** Declaration
 		blk.identifier = inpt.readString();

@@ -8,13 +8,10 @@ package simula.compiler.syntaxClass.expression;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
-
-import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.parsing.Parse;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.ConnectionBlock;
@@ -23,6 +20,7 @@ import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// LocalObject i.e. This class expression.
@@ -48,7 +46,7 @@ import simula.compiler.utilities.Util;
 /// containing its declaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/LocalObject.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/LocalObject.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Simula Standard
@@ -69,8 +67,7 @@ public final class LocalObject extends Expression {
 
 	/// Create a new LocalObject
 	/// @param ident class-identifier
-	private LocalObject(final SimulaBuilder simBuilder, final String ident) {
-		super(simBuilder);
+	private LocalObject(final String ident) {
 		this.classIdentifier = ident;
 		this.type=Type.Ref(classIdentifier);
 		if (Option.internal.TRACE_PARSE)
@@ -79,24 +76,24 @@ public final class LocalObject extends Expression {
 
 	/// Expect Identifier following THIS.
 	/// @return the newly created LocalObject.
-	static Expression expectThisIdentifier(SimulaBuilder simBuilder) {
+	static Expression expectThisIdentifier() {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ThisObjectExpression, current=" + Parse.currentLexToken(simBuilder));
-		String classIdentifier = Parse.expectIdentifier(simBuilder).edText();
-		Expression expr = new LocalObject(simBuilder, classIdentifier);
+			Util.TRACE("Parse ThisObjectExpression, current=" + Parse.currentToken);
+		String classIdentifier = Parse.expectIdentifier();
+		Expression expr = new LocalObject(classIdentifier);
 		return(expr);
 	}
 
 	@Override
 	public void doChecking() { 
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber=firstLineNumber();
+		CoreGlobal.sourceLineNumber=lineNumber;
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN LocalObject(" + toString()+").doChecking - Current Scope Chain: "+CoreGlobal.getCurrentScope().edScopeChain());
 		Meaning meaning=CoreGlobal.getCurrentScope().findMeaning(classIdentifier);
 		Declaration decl = meaning.declaredAs;
 		if (decl instanceof ClassDeclaration cdecl) classDeclaration=cdecl;
-		else Util.semanticError(this, "LocalObject("+this+") "+classIdentifier+" is not a class");
+		else Util.error("LocalObject("+this+") "+classIdentifier+" is not a class");
 		findThis();
 		SET_SEMANTICS_CHECKED();
 	}
@@ -129,7 +126,7 @@ public final class LocalObject extends Expression {
 			}
 			thisScope=thisScope.declaredIn;
 		}
-		Util.semanticError(this, "This "+classIdentifier+" -- Is not on static chain.");
+		Util.error("This "+classIdentifier+" -- Is not on static chain.");
 	}
 
 	// Returns true if this expression may be used as a statement.
@@ -150,8 +147,7 @@ public final class LocalObject extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
-//		setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		DeclarationScope.buildCTX2(ctxDiff,codeBuilder);
 		if (thisScope instanceof ConnectionBlock connectionBlock) {
@@ -178,7 +174,6 @@ public final class LocalObject extends Expression {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public LocalObject() {
-		super(null);
 	}
 
 	@Override
@@ -186,8 +181,8 @@ public final class LocalObject extends Expression {
 		Util.TRACE_OUTPUT("writeLocalObject: " + this);
 		oupt.writeKind(ObjectKind.LocalObject);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -202,11 +197,11 @@ public final class LocalObject extends Expression {
 	public static LocalObject readObject(AttributeInputStream inpt) throws IOException {
 		LocalObject expr = new LocalObject();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxElement
-		expr.astData = readAstData(inpt);
+		// *** SyntaxClass
+		expr.lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxClass) inpt.readObj();
 		// *** LocalObject
 		expr.classIdentifier = inpt.readString();
 		Util.TRACE_INPUT("readLocalObject: " + expr);

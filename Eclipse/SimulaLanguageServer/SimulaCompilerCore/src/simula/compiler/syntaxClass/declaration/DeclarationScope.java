@@ -12,14 +12,14 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
 
-import simula.Option;
-import simula.builder.SimulaBuilder;
 import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.RTS;
+import simula.builder.SimulaBuilder;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Declaration Scope.
@@ -28,7 +28,7 @@ import simula.compiler.utilities.Util;
 /// of ClassDeclaration, ProcedureDeclaration and MaybeBlockDeclaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/DeclarationScope.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/DeclarationScope.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -68,9 +68,9 @@ public abstract class DeclarationScope extends Declaration  {
 	}
 	
 	/// Modify the identifier of this class, procedure, ...
-	/// @param identifier the new identifier
-	public void modifyIdentifier(final String identifier) {
-		this.identifier = identifier;
+	/// @param newIdentifier the new identifier
+	public void modifyIdentifier(final String newIdentifier) {
+		this.identifier = newIdentifier;
 		checkAlreadyDefined();
 		if (declarationKind == ObjectKind.ContextFreeMethod) externalIdent = this.identifier;
 		else if (declarationKind == ObjectKind.MemberMethod) externalIdent = this.identifier;
@@ -151,21 +151,14 @@ public abstract class DeclarationScope extends Declaration  {
 	/// @return the resulting Meaning
 	public Meaning findMeaning(final String identifier) {
 		Meaning meaning = findVisibleAttributeMeaning(identifier);
-		if (meaning == null && declaredIn != null) {
-//			IO.println("DeclarationScope.findMeaning: Looking for "+identifier+" in "+declaredIn);
+		if (meaning == null && declaredIn != null)
 			meaning = declaredIn.findMeaning(identifier);
-		}
 		
 		if (meaning == null) {
-//			if (!Global.duringParsing) {
-//				IO.println("DeclarationScope.findMeaning: Undefined variable: " + identifier);
-//				Util.error("Undefined variable: " + identifier);
-//			}
-			if(Option.CaseSensitive) {
-				Option.WARNINGS = true;
-				Util.warning("Undefined variable: " + identifier + "  Could be because Option.CaseSensitive == true");
+			if (!CoreGlobal.duringParsing) {
+				Util.error("Undefined variable: " + identifier);
 			}
-			UndefinedDeclaration undef = new UndefinedDeclaration(null, identifier);
+			UndefinedDeclaration undef = new UndefinedDeclaration(identifier);
 			meaning = new Meaning(undef, this); // Error Recovery
 		}
 		return (meaning);
@@ -353,7 +346,7 @@ public abstract class DeclarationScope extends Declaration  {
 		for(Declaration d:declarationList) d.printTree(indent,this);
 		if(labelList != null) for(LabelDeclaration d:labelList.getDeclaredLabels()) d.printTree(indent,this);
 	}
-
+	
 	/// Debug utility: edScope
 	/// @return edited scope String
 	public String edScope() {

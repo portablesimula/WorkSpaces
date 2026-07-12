@@ -13,17 +13,15 @@ import java.lang.constant.ConstantDescs;
 import java.util.List;
 import java.util.Vector;
 
-import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.ProtectedSpecification;
-import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 
@@ -39,7 +37,7 @@ import simula.compiler.utilities.Util;
 ///     switch-list = designational-expression { , designational-expression }
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/SwitchDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/SwitchDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -51,22 +49,16 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 
 	/// Create a new SwitchDeclaration.
 	/// @param ident switch identifier
-	public SwitchDeclaration(SimulaBuilder simBuilder, final String ident) {
-		super(simBuilder, ident, ObjectKind.Procedure);
-		Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
-		syntaxElements.add(this);
-		if (Option.internal.TRACE_PARSE)
-			Parse.TRACE("Parse SwitchDeclaration");
+	public SwitchDeclaration(final String ident) {
+		super(ident,ObjectKind.Procedure);
+		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse SwitchDeclaration");
 		this.type = Type.Label;
-		Parse.expect(simBuilder, KeyWord.ASSIGNVALUE);
-		do { switchList.add(Expression.expectExpression(simBuilder, "designational"));
-		} while (Parse.accept(simBuilder, KeyWord.COMMA));
-		if (Option.internal.TRACE_PARSE)
-			Parse.TRACE("Parse SwitchDeclaration(3), switchList=" + switchList);
-		new Parameter(simBuilder, "_SW", Type.Integer, Parameter.Kind.Simple).into(parameterList);
+		Parse.expect(KeyWord.ASSIGNVALUE);
+		do { switchList.add(Expression.expectExpression());
+		} while (Parse.accept(KeyWord.COMMA));
+		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse SwitchDeclaration(3), switchList=" + switchList);
+		new Parameter("_SW", Type.Integer, Parameter.Kind.Simple).into(parameterList);
 		CoreGlobal.setScope(declaredIn);
-
-		for(Expression expr:switchList) syntaxElements.add(expr);
 	}
 
 	@Override
@@ -74,15 +66,14 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		super.doChecking();
 		for (Expression expr : switchList) {
 			expr.doChecking();
-//			if(expr.type.keyWord != Type.T_LABEL) Util.semanticError(this, "Switch element "+expr+" is not a Label");
-			if(! Type.checkType(expr, Type.T_LABEL)) Util.semanticError(expr, "Switch element "+expr+" is not a Label");
+			if(expr.type.keyWord != Type.T_LABEL) Util.error("Switch element "+expr+" is not a Label");
 			expr.backLink = this; // To ensure _RESULT from functions
 		}
 		VirtualSpecification virtSpec=VirtualSpecification.getVirtualSpecification(this);
 		if(virtSpec==null) {
 			// Switch attributes are implicit specified 'protected'
 			if(declaredIn.declarationKind==ObjectKind.Class)
-				((ClassDeclaration)declaredIn).protectedList.add(new ProtectedSpecification(null, (ClassDeclaration)CoreGlobal.getCurrentScope(),identifier));
+				((ClassDeclaration)declaredIn).protectedList.add(new ProtectedSpecification((ClassDeclaration)CoreGlobal.getCurrentScope(),identifier));
 		}
 	}
 

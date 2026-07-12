@@ -6,8 +6,6 @@
 package simula.compiler.syntaxClass;
 
 import java.io.IOException;
-
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -26,10 +24,10 @@ import simula.compiler.utilities.Util;
 ///         | protected hidden identifier-list
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/ProtectedSpecification.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/ProtectedSpecification.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public final class ProtectedSpecification extends SyntaxElement {
+public final class ProtectedSpecification extends SyntaxClass {
 	
 	/// The protected identifier.
 	public String identifier;
@@ -43,8 +41,7 @@ public final class ProtectedSpecification extends SyntaxElement {
     /// Create a new ProtectedSpecification.
     /// @param definedIn the class it is defined in
     /// @param identifier the protected identifier
-	public ProtectedSpecification(final SimulaBuilder simBuilder, final ClassDeclaration definedIn,final String identifier) {
-		super(simBuilder);
+	public ProtectedSpecification(final ClassDeclaration definedIn,final String identifier) {
 		this.definedIn=definedIn;
 		this.identifier=identifier;
 	}
@@ -71,11 +68,11 @@ public final class ProtectedSpecification extends SyntaxElement {
 	public void doChecking() {
 		Declaration attribute=getAttribute();
 		if(attribute!=null) attribute.isProtected=this;
-		else Util.semanticError(this, "No Attribute "+identifier+" match 'protected' specification: "+this);
+		else Util.error("No Attribute "+identifier+" match 'protected' specification: "+this);
 		VirtualSpecification virtSpec=VirtualSpecification.getVirtualSpecification(attribute);
 		if(virtSpec!=null) {
 			if( virtSpec.declaredIn != attribute.declaredIn )
-				Util.semanticError(this, "A virtual attribute may only be specified protected in the class heading in which the virtual specification occurs.");
+				Util.error("A virtual attribute may only be specified protected in the class heading in which the virtual specification occurs.");
 		}
 		// Virtual specification together with Attribute definition.
 		VirtualSpecification vir=getVirtualSpecification();
@@ -85,9 +82,9 @@ public final class ProtectedSpecification extends SyntaxElement {
 
 	@Override
 	public void printTree(final int indent, final Object head) {
-		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
+		IO.println(SyntaxClass.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
-
+	
 	@Override
 	public String toString()
 	{ StringBuilder s=new StringBuilder();
@@ -108,17 +105,15 @@ public final class ProtectedSpecification extends SyntaxElement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ProtectedSpecification() {
-		super(null);
-	}
+	private ProtectedSpecification() {}
 	
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeProtectedSpecification: " + identifier);
 		oupt.writeKind(ObjectKind.ProtectedSpecification);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** ProtectedSpecification
 		oupt.writeString(identifier);
 		oupt.writeObj(definedIn);
@@ -131,8 +126,8 @@ public final class ProtectedSpecification extends SyntaxElement {
 	public static ProtectedSpecification readObject(AttributeInputStream inpt) throws IOException {
 		ProtectedSpecification spec = new ProtectedSpecification();
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
-		// *** SyntaxElement
-		spec.astData = readAstData(inpt);
+		// *** SyntaxClass
+		spec.lineNumber = inpt.readShort();
 		// *** ProtectedSpecification
 		spec.identifier = inpt.readString();
 		spec.definedIn = (ClassDeclaration) inpt.readObj();

@@ -8,9 +8,8 @@ package simula.compiler.syntaxClass.expression;
 import java.lang.classfile.CodeBuilder;
 
 import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.parsing.Parse;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.Declaration;
@@ -18,12 +17,8 @@ import simula.compiler.syntaxClass.declaration.SimpleVariableDeclaration;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.token.CharacterConst;
-import simula.token.IntegerConst;
-import simula.token.LexToken;
-import simula.token.LongRealConst;
-import simula.token.RealConst;
 
 /// Expression.
 /// 
@@ -83,51 +78,41 @@ import simula.token.RealConst;
 ///   
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/Expression.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/Expression.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen
 /// @author Stein Krogdahl
-public abstract class Expression extends SyntaxElement {
+public abstract class Expression extends SyntaxClass {
 
 	/// The type
 	public Type type = null;
 	
 	/// This Expression is part of  backLink Expression/Statement.
-	public SyntaxElement backLink;
+	public SyntaxClass backLink;
 
 	/// Expression.
 	public Expression(final SimulaBuilder simBuilder){
 		super(simBuilder);
 	}
 
+
 	/// Accept expression.
 	/// <pre>
 	/// Expression  =  SimpleExpression
 	/// 	        |  IF  BooleanExpression  THEN  SimpleExpression  ELSE  Expression
 	/// </pre>
-	/// 
-	/// NOTE: Possible start of an expression. MUST start a LexTokenRange !
-	/// 
 	/// @return Expression or null if no expression is found.
-	public static Expression acceptExpression(SimulaBuilder simBuilder) {
-		if(Parse.accept(simBuilder, KeyWord.IF)) {
-			Expression condition=acceptExpression(simBuilder);
-			Parse.expect(simBuilder, KeyWord.THEN);
-				simBuilder.startTokenRange();
-				Expression thenExpression=acceptSimpleExpression(simBuilder);
-			Parse.expect(simBuilder, KeyWord.ELSE);
-				Expression elseExpression=acceptExpression(simBuilder);
-			Expression expr=new ConditionalExpression(simBuilder, Type.Boolean, condition, thenExpression, elseExpression);
+	public static Expression acceptExpression() {
+		if(Parse.accept(KeyWord.IF)) {
+			Expression condition=acceptExpression();
+			Parse.expect(KeyWord.THEN); Expression thenExpression=acceptSimpleExpression();
+			Parse.expect(KeyWord.ELSE); Expression elseExpression=acceptExpression();
+			Expression expr=new ConditionalExpression(Type.Boolean,condition,thenExpression,elseExpression);
 			if(Option.internal.TRACE_PARSE) Util.TRACE("Expression: ParseExpression, result="+expr);
-//			if(true) throw new RuntimeException("Expression.acceptExpression: NOT IMPL: "+expr);
-			simBuilder.doneTokenRange(expr);
-			return expr;
-		} else {
-			Expression expr= acceptSimpleExpression(simBuilder);
-			return expr;
-		}
+			return(expr);
+		} else return(acceptSimpleExpression());
 	} 
 	
 	/// Expect expression.
@@ -136,20 +121,12 @@ public abstract class Expression extends SyntaxElement {
 	/// 	        |  IF  BooleanExpression  THEN  SimpleExpression  ELSE  Expression
 	/// </pre>
 	/// If no expression is found an error message is printed.
-	/// @return Expression or 'MissingExpression' if no expression is found.
-	public static Expression expectExpression(SimulaBuilder simBuilder, String kind) {
-//		IO.println("Expression.expectExpression: BEGIN");
-		Expression expr=acceptExpression(simBuilder);
-		if(expr==null) {
-//			Util.syntaxError(simBuilder, "Expecting Expression");
-			expr = new MissingExpression(simBuilder);
-			Util.semanticError(expr, "Expecting " + kind + " Expression");
-		}
-//		IO.println("Expression.expectExpression: END: expr="+expr);
+	/// @return Expression or null if no expression is found.
+	public static Expression expectExpression() {
+		Expression expr=acceptExpression();
+		if(expr==null) Util.error("Expecting Expression");
 		return(expr);
 	}
-	
-	
 
 	/// Parse simple expression.
 	/// <pre>
@@ -162,20 +139,17 @@ public abstract class Expression extends SyntaxElement {
 	///  BooleanSecondary  =  [ NOT ]  BooleanPrimary
 	///  BooleanPrimary    =  TextPrimary  { & TextPrimary }
 	///  TextPrimary       =  SimpleArithmeticExpression  [ RelationOperator  SimpleArithmeticExpression ]
-	///  	RelationOperator  =  <  |  <=  |  =  |  >=  |  >  |  <> |  ==  |  =/=
-	///  	SimpleArithmeticExpression  =  [ + | - ]  Term  {  ( + | - )  Term }
-	///  		Term    =  Factor  {  (* | / | // )  Factor }
-	///  			Factor  =  BasicExpression  { **  BasicExpression }
+	///       RelationOperator  =  <  |  <=  |  =  |  >=  |  >  |  <> |  ==  |  =/=
+	///  SimpleArithmeticExpression  =  [ + | - ]  Term  {  ( + | - )  Term }
+	///  Term    =  Factor  {  (/// | / | // )  Factor }
+	///  Factor  =  BasicExpression  { **  BasicExpression }
 	/// </pre>             
 	///        
 	/// @return Expression or null if no expression is found.
-	private static Expression acceptSimpleExpression(SimulaBuilder simBuilder)  { 
-		simBuilder.startTokenRange();
-		Expression expr = acceptANDTHEN(simBuilder);
-		while(Parse.accept_OR_ELSE(simBuilder)) {
-			simBuilder.startTokenRange();
-			expr=new BooleanExpression(simBuilder, expr, KeyWord.OR_ELSE, acceptANDTHEN(simBuilder));
-			simBuilder.doneTokenRange(expr);
+	private static Expression acceptSimpleExpression()  {   
+		Expression expr = acceptANDTHEN();
+		while(Parse.accept(KeyWord.OR_ELSE))  {
+			expr=new BooleanExpression(expr,KeyWord.OR_ELSE,acceptANDTHEN());
 		}
 		return(expr);
 	}
@@ -185,13 +159,10 @@ public abstract class Expression extends SyntaxElement {
 	/// BooleanTertiary =  Equivalence  { AND THEN  Equivalence }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptANDTHEN(SimulaBuilder simBuilder) {
-		Expression expr = acceptEQV(simBuilder);
-		while(Parse.accept_AND_THEN(simBuilder)) {
-			simBuilder.startTokenRange();
-			expr=new BooleanExpression(simBuilder, expr, KeyWord.AND_THEN, acceptEQV(simBuilder));
-			simBuilder.doneTokenRange(expr);
-		}
+	private static Expression acceptANDTHEN() {
+		Expression expr = acceptEQV();
+		while(Parse.accept(KeyWord.AND_THEN))
+			expr=new BooleanExpression(expr,KeyWord.AND_THEN,acceptEQV());
 		return(expr);
 	}
 
@@ -200,13 +171,10 @@ public abstract class Expression extends SyntaxElement {
 	/// Equivalence  =  Implication  { EQV  Implication }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptEQV(SimulaBuilder simBuilder) { 
-		Expression expr=acceptIMP(simBuilder);
-		while(Parse.accept(simBuilder, KeyWord.EQV)) {
-			simBuilder.startTokenRange();
-			expr=new BooleanExpression(simBuilder, expr, KeyWord.EQV, acceptIMP(simBuilder));
-			simBuilder.doneTokenRange(expr);
-		}
+	private static Expression acceptEQV() { 
+		Expression expr=acceptIMP();
+		while(Parse.accept(KeyWord.EQV))
+			expr=new BooleanExpression(expr,KeyWord.EQV,acceptIMP());
 		return(expr);
 	}
 
@@ -215,13 +183,10 @@ public abstract class Expression extends SyntaxElement {
 	/// Implication =  BooleanTerm  { IMP  BooleanTerm }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptIMP(SimulaBuilder simBuilder) {
-		Expression expr=acceptOR(simBuilder);
-		while(Parse.accept(simBuilder, KeyWord.IMP)) {
-			simBuilder.startTokenRange();
-			expr=new BooleanExpression(simBuilder, expr, KeyWord.IMP, acceptOR(simBuilder));
-			simBuilder.doneTokenRange(expr);
-		}
+	private static Expression acceptIMP() {
+		Expression expr=acceptOR();
+		while(Parse.accept(KeyWord.IMP))
+			expr=new BooleanExpression(expr,KeyWord.IMP,acceptOR());
 		return(expr);
 	}
 
@@ -230,13 +195,10 @@ public abstract class Expression extends SyntaxElement {
 	/// BooleanTerm  =  BooleanFactor  { OR  BooleanFactor }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptOR(SimulaBuilder simBuilder) {
-		Expression expr=acceptAND(simBuilder);
-		while(Parse.accept_OR_ONLY(simBuilder)) {
-			simBuilder.startTokenRange();
-			expr=new BooleanExpression(simBuilder, expr, KeyWord.OR, acceptAND(simBuilder));
-			simBuilder.doneTokenRange(expr);
-		}
+	private static Expression acceptOR() {
+		Expression expr=acceptAND();
+		while(Parse.accept(KeyWord.OR))
+			expr=new BooleanExpression(expr,KeyWord.OR,acceptAND());
 		return(expr);
 	}
 
@@ -245,13 +207,10 @@ public abstract class Expression extends SyntaxElement {
 	/// BooleanFactor =  BooleanSecondary  { AND  BooleanSecondary }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptAND(SimulaBuilder simBuilder) {
-		Expression expr=acceptNOT(simBuilder);
-		while(Parse.accept_AND_ONLY(simBuilder)) {
-			simBuilder.startTokenRange();
-			expr=new BooleanExpression(simBuilder, expr, KeyWord.AND, acceptNOT(simBuilder));
-			simBuilder.doneTokenRange(expr);
-		}
+	private static Expression acceptAND() {
+		Expression expr=acceptNOT();
+		while(Parse.accept(KeyWord.AND))
+			expr=new BooleanExpression(expr,KeyWord.AND,acceptNOT());
 		return(expr);
 	}
 
@@ -260,15 +219,11 @@ public abstract class Expression extends SyntaxElement {
 	/// BooleanSecondary  =  [ NOT ]  BooleanPrimary
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptNOT(SimulaBuilder simBuilder) {
+	private static Expression  acceptNOT() {
 		Expression expr;
-		if(Parse.accept(simBuilder, KeyWord.NOT)) {
-			simBuilder.startTokenRange();
-			expr = UnaryOperation.create(simBuilder, KeyWord.NOT, acceptTEXTCONC(simBuilder));
-			simBuilder.doneTokenRange(expr);
-		} else {
-			expr = acceptTEXTCONC(simBuilder);
-		}
+		if(Parse.accept(KeyWord.NOT)) {
+			expr=UnaryOperation.create(KeyWord.NOT,acceptTEXTCONC());
+		} else expr = acceptTEXTCONC();
 		return(expr);
 	}
 
@@ -277,13 +232,10 @@ public abstract class Expression extends SyntaxElement {
 	/// BooleanPrimary  =  TextPrimary  { & TextPrimary }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptTEXTCONC(SimulaBuilder simBuilder) {
-		Expression expr=acceptRelation(simBuilder);
-		while(Parse.accept(simBuilder, KeyWord.AMPERSAND)) {
-			simBuilder.startTokenRange();
-			expr=new TextExpression(simBuilder, expr, acceptRelation(simBuilder));
-			simBuilder.doneTokenRange(expr);
-		}
+	private static Expression acceptTEXTCONC() {
+		Expression expr=acceptRelation();
+		while(Parse.accept(KeyWord.CONC))
+			expr=new TextExpression(expr,acceptRelation());
 		return(expr);
 	}
 
@@ -293,14 +245,11 @@ public abstract class Expression extends SyntaxElement {
 	///    RelationOperator  =  <  |  <=  |  =  |  >=  |  >  |  <> |  ==  |  =/=
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptRelation(SimulaBuilder simBuilder) {
-		Expression expr = acceptAdditiveOperation(simBuilder);
-		LexToken prevToken = null;
-		if((prevToken = Parse.acceptRelationalOperator(simBuilder)) != null)   { 
-			simBuilder.startTokenRange();
-			int opr = prevToken.keyWord;
-			expr = new RelationalOperation(simBuilder, expr, opr, acceptAdditiveOperation(simBuilder));
-			simBuilder.doneTokenRange(expr);
+	private static Expression acceptRelation() {   // Metode-form      
+		Expression expr = acceptAdditiveOperation();
+		if(Parse.acceptRelationalOperator())   { 
+			int opr=Parse.prevToken.getKeyWord();
+			expr=new RelationalOperation(expr,opr,acceptAdditiveOperation());
 		}
 		return(expr);
 	}
@@ -310,14 +259,11 @@ public abstract class Expression extends SyntaxElement {
 	/// SimpleArithmeticExpression  =  UnaryTerm  {  ( + | - )  Term }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptAdditiveOperation(SimulaBuilder simBuilder) {
-		Expression expr=acceptUNIMULDIV(simBuilder);
-		LexToken accepted = null;
-		while( (accepted = Parse.acceptParserToken(simBuilder, KeyWord.PLUS,KeyWord.MINUS)) != null) { 
-			simBuilder.startTokenRange();
-			int opr=accepted.keyWord;
-			expr=ArithmeticExpression.create(simBuilder, expr, opr, acceptMULDIV(simBuilder));
-			simBuilder.doneTokenRange(expr);
+	private static Expression acceptAdditiveOperation() {
+		Expression expr=acceptUNIMULDIV();
+		while(Parse.accept(KeyWord.PLUS,KeyWord.MINUS)) { 
+			int opr=Parse.prevToken.getKeyWord();
+			expr=ArithmeticExpression.create(expr,opr,acceptMULDIV());
 		}
 		return(expr);
 	}
@@ -327,20 +273,13 @@ public abstract class Expression extends SyntaxElement {
 	/// UnaryTerm  =  [ + | - ]  Term
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptUNIMULDIV(SimulaBuilder simBuilder) {
+	private static Expression acceptUNIMULDIV() {
 		Expression expr;
-		LexToken prevToken = null;
-		if((prevToken = Parse.acceptParserToken(simBuilder, KeyWord.PLUS,KeyWord.MINUS)) != null) {
-			int opr=prevToken.keyWord;
-			if(opr==KeyWord.PLUS) expr=acceptMULDIV(simBuilder);
-			else {
-				simBuilder.startTokenRange();
-				expr=UnaryOperation.create(simBuilder, opr,acceptMULDIV(simBuilder));
-				simBuilder.doneTokenRange(expr);
-			}
-		} else {
-			expr = acceptMULDIV(simBuilder);
-		}
+		if(Parse.accept(KeyWord.PLUS,KeyWord.MINUS)) {
+			int opr=Parse.prevToken.getKeyWord();
+			if(opr==KeyWord.PLUS) expr=acceptMULDIV();
+			else expr=UnaryOperation.create(opr,acceptMULDIV());
+		} else expr = acceptMULDIV();
 		return(expr);
 	}
 
@@ -349,14 +288,11 @@ public abstract class Expression extends SyntaxElement {
 	/// Term  =  Factor  {  ( * | / | // )  Factor }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptMULDIV(SimulaBuilder simBuilder) {
-		Expression expr=acceptEXPON(simBuilder);
-		LexToken accepted = null;
-		while((accepted = Parse.acceptParserToken(simBuilder, KeyWord.MUL,KeyWord.DIV,KeyWord.INTDIV)) != null) {
-			int opr = accepted.keyWord;
-			simBuilder.startTokenRange();
-			expr = ArithmeticExpression.create(simBuilder, expr, opr, acceptEXPON(simBuilder));
-			simBuilder.doneTokenRange(expr);
+	private static Expression acceptMULDIV() {
+		Expression expr=acceptEXPON();
+		while(Parse.accept(KeyWord.MUL,KeyWord.DIV,KeyWord.INTDIV)) {
+			int opr=Parse.prevToken.getKeyWord();
+			expr=ArithmeticExpression.create(expr,opr,acceptEXPON());
 		}
 		return(expr);
 	}
@@ -366,13 +302,10 @@ public abstract class Expression extends SyntaxElement {
 	/// Factor  =  BasicExpression  { **  BasicExpression }
 	/// </pre>
 	/// @return an expression
-	private static Expression acceptEXPON(SimulaBuilder simBuilder) {
-		Expression expr=acceptBASICEXPR(simBuilder);
-		while(Parse.accept(simBuilder, KeyWord.EXP)) {
-			simBuilder.startTokenRange();
-			expr = ArithmeticExpression.create(simBuilder, expr, KeyWord.EXP, acceptBASICEXPR(simBuilder));
-			simBuilder.doneTokenRange(expr);
-		}
+	private static Expression acceptEXPON() {
+		Expression expr=acceptBASICEXPR();
+		while(Parse.accept(KeyWord.EXP))
+			expr=ArithmeticExpression.create(expr,KeyWord.EXP,acceptBASICEXPR());
 		return(expr);
 	}
 
@@ -395,58 +328,42 @@ public abstract class Expression extends SyntaxElement {
 	/// 		SubscriptedVariable  =  Identifier  "("  Expression  {  ,  Expression  }  ")"
 	/// </pre>
 	/// @return Expression or null if no expression is found.
-	private static Expression acceptBASICEXPR(SimulaBuilder simBuilder) {
+	private static Expression acceptBASICEXPR() {
 		// Dette er vel kanskje det samme som “primary”?
 		// Merk: Alt som kan stå foran et postfix (DOT, IS, IN og QUA) må være et BASICEXPR
 		if(Option.internal.TRACE_PARSE) Parse.TRACE("Expression: acceptExpression");
 		Expression expr=null;
-		LexToken prevToken = Parse.getCurrentParserToken(simBuilder);
-		if(Parse.accept(simBuilder, KeyWord.BEGPAR)) { expr = acceptExpression(simBuilder); Parse.expect(simBuilder, KeyWord.ENDPAR); }
-		else if(Parse.accept(simBuilder, KeyWord.INTEGERKONST)) expr = new Constant(simBuilder, Type.Integer,((IntegerConst)prevToken).value);
-		else if(Parse.accept(simBuilder, KeyWord.REALKONST)) expr = Constant.createRealType(simBuilder, ((RealConst)prevToken).value);
-		else if(Parse.accept(simBuilder, KeyWord.LONGREALKONST)) expr = Constant.createLongRealType(simBuilder, ((LongRealConst)prevToken).value);
-
-//		else if(PsiParse.accept(simBuilder, KeyWord.BOOLEANKONST)) expr = new Constant(Type.Boolean,((IntegerConst)prevToken).value);
-		else if(Parse.accept(simBuilder, KeyWord.TRUE)) expr = new Constant(simBuilder, Type.Boolean,true);
-		else if(Parse.accept(simBuilder, KeyWord.FALSE)) expr = new Constant(simBuilder, Type.Boolean,false);
-
-		else if(Parse.accept(simBuilder, KeyWord.CHARACTERKONST)) expr = new Constant(simBuilder, Type.Character,((CharacterConst)prevToken).value);
-		else if(Parse.accept(simBuilder, KeyWord.TEXTKONST)) expr = new Constant(simBuilder, Type.Text,simBuilder.getTextString(prevToken));
-		else if(Parse.accept(simBuilder, KeyWord.NONE)) expr = new Constant(simBuilder, Type.Ref,null);
-		else if(Parse.accept(simBuilder, KeyWord.NOTEXT)) expr = new Constant(simBuilder, Type.Text,null);
-		else if(Parse.accept(simBuilder, KeyWord.NEW)) expr = ObjectGenerator.expectNew(simBuilder);
-		else if(Parse.accept(simBuilder, KeyWord.THIS)) expr = LocalObject.expectThisIdentifier(simBuilder); 
-		else {
-			LexToken prevToken2 = Parse.getCurrentParserToken(simBuilder) ;
-//			String ident = PsiParse.acceptIdentifier(simBuilder).getText();
-			LexToken token = Parse.acceptIdentifier(simBuilder);
-			String ident = (token != null)? token.edText() : null;
-			if(ident != null) {
-				expr=VariableExpression.expectVariable(simBuilder, ident);
-			} else {
-//				if(Option.internal.TRACE_PARSE) PsiParse.TRACE("Expression: acceptBASICEXPR returns: NULL, prevKeyword="+PsiParse.prevToken.getKeyWord());
-				if(prevToken2.keyWord == KeyWord.SEMICOLON) Parse.skipMisplacedCurrentSymbol(simBuilder); // Ad'Hoc
+		if(Parse.accept(KeyWord.BEGPAR)) { expr = acceptExpression(); Parse.expect(KeyWord.ENDPAR); }
+		else if(Parse.accept(KeyWord.INTEGERKONST)) expr = new Constant(Type.Integer,Parse.prevToken.getValue());
+		else if(Parse.accept(KeyWord.REALKONST)) expr = Constant.createRealType(Parse.prevToken.getValue());
+		else if(Parse.accept(KeyWord.BOOLEANKONST)) expr = new Constant(Type.Boolean,Parse.prevToken.getValue());
+		else if(Parse.accept(KeyWord.CHARACTERKONST)) expr = new Constant(Type.Character,Parse.prevToken.getValue());
+		else if(Parse.accept(KeyWord.TEXTKONST)) expr = new Constant(Type.Text,Parse.prevToken.getValue());
+		else if(Parse.accept(KeyWord.NONE)) expr = new Constant(Type.Ref,null);
+		else if(Parse.accept(KeyWord.NOTEXT)) expr = new Constant(Type.Text,null);
+		else if(Parse.accept(KeyWord.NEW)) expr =ObjectGenerator.expectNew();
+		else if(Parse.accept(KeyWord.THIS)) expr =LocalObject.expectThisIdentifier(); 
+		else { String ident=Parse.acceptIdentifier(simBuilder);
+			if(ident!=null) expr=VariableExpression.expectVariable(ident);
+			else {
+				if(Option.internal.TRACE_PARSE) Parse.TRACE("Expression: acceptBASICEXPR returns: NULL, prevKeyword="+Parse.prevToken.getKeyWord());
+				if(Parse.prevToken.getKeyWord()==KeyWord.SEMICOLON) Parse.skipMisplacedCurrentSymbol(); // Ad'Hoc
 				return(null);
 			}
 		}
-		simBuilder.startTokenRange();
 		// Then there can be a sequence of postfixes, which builds a tree “upwards to the right”
-		while ((prevToken = Parse.acceptPostfixOprator(simBuilder)) != null) {
-			int opr = prevToken.keyWord; // opr == DOT || opr== IS || opr == IN || opr == QUA
+		while (Parse.acceptPostfixOprator()) {
+			int opr=Parse.prevToken.getKeyWord(); // opr == DOT || opr== IS || opr == IN || opr == QUA
 			if (opr == KeyWord.DOT ) 
-				expr=new RemoteVariable(simBuilder, expr, expectVariable(simBuilder));
+				expr=new RemoteVariable(expr,expectVariable());
 			else {  // opr == IS or opr == IN or opr == QUA.  Then a class identifier must follow.
-//				String classIdentifier=PsiParse.acceptIdentifier(simBuilder).getText();
-				String classIdentifier=Parse.acceptIdentifier(simBuilder).edText();
+				String classIdentifier=Parse.expectIdentifier();
 				if(opr==KeyWord.QUA)
-					expr=new QualifiedObject(simBuilder, expr, classIdentifier);
-				else expr=new ObjectRelation(simBuilder, expr, opr, classIdentifier);
+					expr=new QualifiedObject(expr,classIdentifier);
+				else expr=new ObjectRelation(expr,opr,classIdentifier);
 			}
-			simBuilder.doneTokenRange(expr);
-			simBuilder.startTokenRange();
 		}
-		simBuilder.dropTokenRange();
-//		if(Option.internal.TRACE_PARSE) PsiParse.TRACE("Expression: acceptBasicExpression returns: "+expr);
+		if(Option.internal.TRACE_PARSE) Parse.TRACE("Expression: acceptBasicExpression returns: "+expr);
 		return(expr);
 	}
   
@@ -457,12 +374,12 @@ public abstract class Expression extends SyntaxElement {
 	/// </pre>
 	/// NOTE: That a SubscriptedVariable may be an subscripted array or a function designator.
 	/// @return the created Variable
-	private static VariableExpression expectVariable(SimulaBuilder simBuilder) { 
+	private static VariableExpression expectVariable() { 
 		// An identifier, possibly followed by arguments in parentheses.
-//		String ident=PsiParse.acceptIdentifier(simBuilder).getText();
-		String ident=Parse.acceptIdentifier(simBuilder).edText();
-		return(VariableExpression.expectVariable(simBuilder, ident));
+		String ident=Parse.expectIdentifier();
+		return(VariableExpression.expectVariable(ident));
 	}
+
 
 	/// Get a writeable variable.
 	/// 
@@ -477,7 +394,7 @@ public abstract class Expression extends SyntaxElement {
 		String refIdent=expr.type.getRefIdent();
 		Declaration objDecl = CoreGlobal.getCurrentScope().findMeaning(refIdent).declaredAs;
 		if(objDecl instanceof ClassDeclaration cls)	return(cls);
-		Util.semanticError(expr, "Illegal ref(" + refIdent + "): " + refIdent + " is not a class");
+		Util.error("Illegal ref(" + refIdent + "): " + refIdent + " is not a class");
 		return(null);
 	}
 
@@ -487,6 +404,7 @@ public abstract class Expression extends SyntaxElement {
 	public static ClassDeclaration getQualification(final String classIdentifier) {
 		Declaration classDecl=CoreGlobal.getCurrentScope().findMeaning(classIdentifier).declaredAs;
 		if(classDecl instanceof ClassDeclaration cls) return(cls);
+		Util.error("Illegal: " + classIdentifier + " is not a class");
 		return(null);
 	}
 
@@ -497,18 +415,15 @@ public abstract class Expression extends SyntaxElement {
 	public static boolean checkCompatibility(final Expression simpleObjectExpression,final String classIdentifier) {
 		ClassDeclaration objDecl=getQualification(simpleObjectExpression);
 		ClassDeclaration quaDecl=getQualification(classIdentifier);
-		if(quaDecl == null) {
-//			Util.semanticError(simpleObjectExpression, "Illegal: " + classIdentifier + " is not a class");
-		} else {
-			if(quaDecl==objDecl) ; // Nothing: Util.warning("Unneccessary QUA/IS/IN "+ classIdentifier);
-			else if(!(objDecl.isCompatibleClasses(quaDecl))) return(false);
-		}
+		if(quaDecl==objDecl) ; // Nothing: Util.warning("Unneccessary QUA/IS/IN "+ classIdentifier);
+		else if(quaDecl==null) Util.error("Illegal QUA -- " + classIdentifier + " is not a class");
+		else if(!(objDecl.isCompatibleClasses(quaDecl))) return(false);
 		return(true);
 	}
 
-//	/// Try to Compile-time Evaluate this expression
-//	/// @return the resulting evaluated expression
-//	public Expression evaluate(final PsiBuilder simBuilder) { return(this); }
+	/// Try to Compile-time Evaluate this expression
+	/// @return the resulting evaluated expression
+	public Expression evaluate() { return(this); }
 
 	/// Returns true if this expression may be used as a statement.
 	/// @return true if this expression may be used as a statement

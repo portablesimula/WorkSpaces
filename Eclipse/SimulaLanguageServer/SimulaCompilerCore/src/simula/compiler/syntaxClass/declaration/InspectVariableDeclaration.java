@@ -13,20 +13,19 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
 
-import simula.Option;
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.statement.ConnectionStatement;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// InspectVariable Declaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/InspectVariableDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/InspectVariableDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -47,8 +46,8 @@ public class InspectVariableDeclaration extends Declaration {
 	/// @param identifier the variable identifier
 	/// @param connectionScope the connectionScope
 	/// @param connectionStatement the connectionStatement
-	public InspectVariableDeclaration(final SimulaBuilder simBuilder, final Type type, final String identifier,final DeclarationScope connectionScope, final ConnectionStatement connectionStatement) {
-		super(simBuilder, identifier);
+	public InspectVariableDeclaration(final Type type, final String identifier,final DeclarationScope connectionScope, final ConnectionStatement connectionStatement) {
+		super(identifier);
 		this.declarationKind = ObjectKind.InspectVariableDeclaration;
 		this.type = type;
 		this.connectionScope = connectionScope;
@@ -58,7 +57,7 @@ public class InspectVariableDeclaration extends Declaration {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ConnectionStatement(" + toString() + ").doChecking - Current Scope Chain: " + CoreGlobal.getCurrentScope().edScopeChain());
 		connectionStatement.doChecking();
@@ -128,7 +127,7 @@ public class InspectVariableDeclaration extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public InspectVariableDeclaration() {
-		super(null, null);
+		super(null);
 		this.declarationKind = ObjectKind.InspectVariableDeclaration;
 	}
 
@@ -138,8 +137,8 @@ public class InspectVariableDeclaration extends Declaration {
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -160,8 +159,8 @@ public class InspectVariableDeclaration extends Declaration {
 		InspectVariableDeclaration var = new InspectVariableDeclaration();
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
-		// *** SyntaxElement
-		var.astData = readAstData(inpt);
+		// *** SyntaxClass
+		var.lineNumber = inpt.readShort();
 
 		// *** Declaration
 		var.identifier = inpt.readString();

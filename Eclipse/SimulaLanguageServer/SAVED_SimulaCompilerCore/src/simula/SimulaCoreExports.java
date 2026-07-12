@@ -1,6 +1,5 @@
 package simula;
 
-import java.io.File;
 import java.util.List;
 
 import simula.compiler.utilities.CoreGlobal;
@@ -8,19 +7,19 @@ import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.SimulaDiagnostic;
 import simula.compiler.utilities.Util;
 import simula.lsp.compiler.DocumentManager;
-import simula.lsp.compiler.SimTextDocumentContentChangeEvent;
 import simula.lsp.compiler.TokenManager;
 import simula.token.LexToken;
 
-public class Exports {
+public class SimulaCoreExports {
 	
-	public static void initiate(String packetName) {
+	public static void initiate(SimulaCoreClient client, String packetName) {
 		// Remove time, date, and headers from Logger output.
 		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
 
 		CoreGlobal.initiate();
+		CoreGlobal.simulaCoreClient = client;
 //		CoreGlobal.packetName="simulaTestBatch";
-		CoreGlobal.packetName="packetName";
+		CoreGlobal.packetName = packetName;
 
 //		Option.internal.keepJava=userDir; // Generated .java Source is then found in Eclipse Package simulaTestBatch
 //		CoreGlobal.simulaRtsLib=new File(simulaDir,"bin"); // To use Eclipse Project's simula.runtime

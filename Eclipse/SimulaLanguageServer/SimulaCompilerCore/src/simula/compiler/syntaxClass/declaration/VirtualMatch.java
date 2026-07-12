@@ -10,16 +10,15 @@ import java.lang.classfile.ClassFile;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.MethodTypeDesc;
 
-import simula.builder.SimulaBuilder;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 
 /// Virtual match.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/VirtualMatch.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/VirtualMatch.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -34,8 +33,8 @@ public final class VirtualMatch extends Declaration {
 	/// Create a new VirtualMatch.
 	/// @param virtualSpec the virtual specification
 	/// @param match a matching ProcedureDeclaration
-	VirtualMatch(final SimulaBuilder simBuilder, final VirtualSpecification virtualSpec, final ProcedureDeclaration match) {
-		super(simBuilder, virtualSpec.identifier);
+	VirtualMatch(final VirtualSpecification virtualSpec, final ProcedureDeclaration match) {
+		super(virtualSpec.identifier);
 		this.declarationKind = ObjectKind.VirtualMatch;
 		// NOTE: Called during Checking
 		this.virtualSpec = virtualSpec;
@@ -71,7 +70,7 @@ public final class VirtualMatch extends Declaration {
 
 	@Override
 	public void printTree(final int indent, final Object head) {
-		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
+		IO.println(SyntaxClass.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
 
 	@Override

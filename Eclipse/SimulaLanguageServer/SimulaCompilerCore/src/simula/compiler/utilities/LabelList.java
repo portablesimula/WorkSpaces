@@ -14,10 +14,9 @@ import java.lang.classfile.instruction.SwitchCase;
 import java.util.List;
 import java.util.Vector;
 
-import simula.Option;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
@@ -26,7 +25,7 @@ import simula.compiler.syntaxClass.declaration.LabelDeclaration;
 /// A list of LabelDeclarations.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/LabelList.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/LabelList.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -237,9 +236,9 @@ public class LabelList {
 	/// @param owner the BlockDeclaration owning this LabelList
 	public void printTree(final int indent, final BlockDeclaration owner) {
 		if(Option.internal.PRINT_SYNTAX_TREE > 2) {
-			IO.println(SyntaxElement.edIndent(indent)+this);
+			IO.println(SyntaxClass.edIndent(indent)+this);
 		} else {
-			IO.println(SyntaxElement.edIndent(indent) + "LabelList with " + (declaredLabels.size()) + " DeclaredLabels ...");
+			IO.println(SyntaxClass.edIndent(indent) + "LabelList with " + (declaredLabels.size()) + " DeclaredLabels ...");
 		}
 	}
 	
@@ -251,14 +250,14 @@ public class LabelList {
 		System.out.print("*** DeclaredLabels:");
 		if(declaredLabelSize() > 0) {
 			for(LabelDeclaration lab:getDeclaredLabels()) {
-				System.out.print(" " + lab.identifier + '[' + lab.declaredIn.externalIdent + ':' + lab.index + ']' + "atLine:" + lab.firstLineNumber());
+				System.out.print(" " + lab.identifier + '[' + lab.declaredIn.externalIdent + ':' + lab.index + ']' + "atLine:" + lab.lineNumber);
 			}
 			IO.println("");
 		} else IO.println(" NONE");
 		System.out.print("*** AccumLabels:   ");
 		if(accumLabelSize() > 0) {
 			for(LabelDeclaration lab:getAccumLabels()) {
-				System.out.print(" " + lab.identifier + '[' + lab.declaredIn.externalIdent + ':' + lab.index + ']' + "atLine:" + lab.firstLineNumber());
+				System.out.print(" " + lab.identifier + '[' + lab.declaredIn.externalIdent + ':' + lab.index + ']' + "atLine:" + lab.lineNumber);
 			}
 			IO.println("");
 		} else IO.println(" NONE");
@@ -277,7 +276,7 @@ public class LabelList {
 		if(declaredLabelSize() > 0) {
 			for(LabelDeclaration lab:declaredLabels) {
 				s = s + sep + lab.identifier + '[' + lab.declaredIn.externalIdent + ':' + lab.index + ']';				
-				s = s + "atLine:" + lab.firstLineNumber();
+				s = s + "atLine:" + lab.lineNumber;
 				sep = " ";
 			}
 		} else s = s + " With no labels";

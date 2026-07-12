@@ -9,22 +9,22 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.MethodTypeDesc;
 
-import simula.Option;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.OverLoad;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.Type.ConversionKind;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 
 /// Type Conversion.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/TypeConversion.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/TypeConversion.java">
 /// <b>Source File</b></a>.
 public final class TypeConversion extends Expression {
 	
@@ -35,7 +35,6 @@ public final class TypeConversion extends Expression {
 	/// @param type the new type
 	/// @param expression the expression
 	public TypeConversion(final Type type,final Expression expression) {
-		super(null);
 		this.type=type;
 		this.expression = expression; expression.backLink=this;
 	    this.doChecking();
@@ -101,7 +100,7 @@ public final class TypeConversion extends Expression {
 			int rhsBL=(fromType!=null && fromType.declaredIn!=null)?fromType.declaredIn.getRTBlockLevel() : 0;
 			int lhsBL=(toType!=null && toType.declaredIn!=null)?toType.declaredIn.getRTBlockLevel() : 0;
 			if(rhsBL != 0 && lhsBL != 0 && rhsBL != lhsBL) {
-				Util.semanticError(expression, "Incompatible types: "+expression+" of type "+expression.type+" can't be converted to "+toType);
+				Util.error("Incompatible types: "+expression+" of type "+expression.type+" can't be converted to "+toType);
 			}
 		}
 		if (testCastNeccessary(toType, expression)) {
@@ -116,7 +115,7 @@ public final class TypeConversion extends Expression {
 					case Type.T_LONG_REAL: val=val.doubleValue(); break;
 					default: Util.IERR();
 				}
-				Constant c=new Constant(null, toType, val); c.doChecking();
+				Constant c=new Constant(toType,val); c.doChecking();
 				return(c);
 			}
 			if(Option.compilerMode != Option.CompilerMode.viaJavaSource) {
@@ -132,10 +131,9 @@ public final class TypeConversion extends Expression {
 	/// Java coding utility: Test if a Type Cast is necessary.
 	/// @param toType the desired type
 	/// @param expression the expression
-	/// @return true: a type cast is necessary
+	/// @return piece of Java source code
 	private static boolean testCastNeccessary(Type toType,final Expression expression) {
-		if (toType == null)	return false;
-		if(expression instanceof MissingExpression) return false;
+		if (toType == null)	return (false);
 		if(Option.compilerMode != Option.CompilerMode.viaJavaSource) {
 			if(toType instanceof OverLoad otp) {
 				if(!otp.contains(expression.type)) {
@@ -145,7 +143,7 @@ public final class TypeConversion extends Expression {
 		}
 		Type fromType = expression.type;
 		if(fromType==null) {
-//			Util.semanticError(expression, "Expression "+expression+" has no type - can't be converted to "+toType);
+			Util.error("Expression "+expression+" has no type - can't be converted to "+toType);
 //			Thread.dumpStack();
 			return(false);
 		}
@@ -155,8 +153,7 @@ public final class TypeConversion extends Expression {
 			case ConvertValue:
 			case ConvertRef:		return (true);
 			case Illegal:
-				if(expression.type != Type.Undef)
-					Util.semanticError(expression, "TypeConversion: Illegal cast: (" + toType + ") " + expression);
+				Util.error("TypeConversion: Illegal cast: (" + toType + ") " + expression);
 			default: return (false);
 		}
 	}
@@ -171,11 +168,11 @@ public final class TypeConversion extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		type.doChecking(CoreGlobal.getCurrentScope(), expression);
+		type.doChecking(CoreGlobal.getCurrentScope());
 		expression.doChecking();
 		Type type = expression.type;
 		if (type.isConvertableTo(this.type).equals(Type.ConversionKind.Illegal))
-			Util.semanticError(this, "Illegal Type Conversion " + type + " ==> " + this.type);
+			Util.error("Illegal Type Conversion " + type + " ==> " + this.type);
 		SET_SEMANTICS_CHECKED();
 	}
 
@@ -199,7 +196,7 @@ public final class TypeConversion extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		expression.buildEvaluation(null,codeBuilder);
 		Type fromType = expression.type;
@@ -242,6 +239,7 @@ public final class TypeConversion extends Expression {
 		}
 	}
 
+
 	@Override
 	public String toString() {
 		return ("((" + type + ")(" + expression + "))");
@@ -252,17 +250,15 @@ public final class TypeConversion extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private TypeConversion() {
-		super(null);
-	}
+	private TypeConversion() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeTypeConversion: " + this);
 		oupt.writeKind(ObjectKind.TypeConversion);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -277,11 +273,11 @@ public final class TypeConversion extends Expression {
 	public static TypeConversion readObject(AttributeInputStream inpt) throws IOException {
 		TypeConversion expr = new TypeConversion();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxElement
-		expr.astData = readAstData(inpt);
+		// *** SyntaxClass
+		expr.lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxClass) inpt.readObj();
 		// *** TypeConversion
 		expr.expression = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("readTypeConversion: " + expr);

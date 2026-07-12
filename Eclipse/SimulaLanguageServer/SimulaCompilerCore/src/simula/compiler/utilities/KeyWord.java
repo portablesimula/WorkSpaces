@@ -8,7 +8,7 @@ package simula.compiler.utilities;
 /// The Simula Keywords and some additional symbols.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/KeyWord.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/KeyWord.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public class KeyWord {
@@ -24,8 +24,8 @@ public class KeyWord {
 	/** Simula Keyword */ public final static int BOOLEAN      = 8;
 	/** Simula Keyword */ public final static int CHARACTER    = 9;
 	/** Simula Keyword */ public final static int CLASS        = 10;
-	/** Simula Keyword */ public final static int COMMENT_KEY  = 11;
-	/** Simula Keyword */ public final static int AMPERSAND    = 12;
+	/** Simula Keyword */ public final static int COMMENT      = 11;
+	/** Simula Keyword */ public final static int CONC         = 12;
 	/** Simula Keyword */ public final static int DELAY        = 13;
 	/** Simula Keyword */ public final static int DO           = 14;
 	/** Simula Keyword */ public final static int ELSE         = 15;
@@ -97,23 +97,18 @@ public class KeyWord {
 	/** Other Symbol */ public final static int DIV            = 80;
 	/** Other Symbol */ public final static int INTDIV         = 81;
 	/** Other Symbol */ public final static int EXP            = 82;
-	
-	/** Other Symbol */ public final static int OR_ELSE        = 83;
-	/** Other Symbol */ public final static int AND_THEN       = 84;
-	/** Other Symbol */ public final static int DOT            = 85;
-	/** Other Symbol */ public final static int NEWLINE        = 86;
-	/** Other Symbol */ public final static int STRING         = 87;
-	/** Other Symbol */ public final static int EOF	           = 88;
-	/** Other Symbol */ public final static int WHITESPACES    = 89;
-	/** Other Symbol */ public final static int IDENTIFIER     = 90;
-	/** Other Symbol */ public final static int BOOLEANKONST   = 91;
-	/** Other Symbol */ public final static int INTEGERKONST   = 92;
-	/** Other Symbol */ public final static int CHARACTERKONST = 93;
-	/** Other Symbol */ public final static int REALKONST      = 94;
-	/** Other Symbol */ public final static int LONGREALKONST  = 95;
-	/** Other Symbol */ public final static int TEXTKONST      = 96;
-	/** Other Symbol */ public final static int COMMENT_TEXT   = 97;
-	/** Other Symbol */ public final static int BAD_CHARACTERS = 98;
+	/** Other Symbol */ public final static int IDENTIFIER     = 83;
+	/** Other Symbol */ public final static int BOOLEANKONST   = 84;
+	/** Other Symbol */ public final static int INTEGERKONST   = 85;
+	/** Other Symbol */ public final static int CHARACTERKONST = 86;
+	/** Other Symbol */ public final static int REALKONST      = 87;
+	/** Other Symbol */ public final static int TEXTKONST      = 88;
+	/** Other Symbol */ public final static int OR_ELSE        = 89;
+	/** Other Symbol */ public final static int AND_THEN       = 90;
+	/** Other Symbol */ public final static int DOT            = 91;
+	/** Other Symbol */ public final static int NEWLINE        = 92;
+	/** Other Symbol */ public final static int STRING         = 93;
+	/** Other Symbol */ public final static int EOF	           = 94;
 
 	/// Returns the corresponding String.
 	/// @param key the argument key.
@@ -130,8 +125,8 @@ public class KeyWord {
 			case BOOLEAN    : return("BOOLEAN");
 			case CHARACTER  : return("CHARACTER");
 			case CLASS      : return("CLASS");
-			case COMMENT_KEY: return("COMMENT");
-			case AMPERSAND  : return("AMPERSAND");
+			case COMMENT    : return("COMMENT");
+			case CONC       : return("CONC");
 			case DELAY      : return("DELAY");
 			case DO         : return("DO");
 			case ELSE       : return("ELSE");
@@ -208,18 +203,15 @@ public class KeyWord {
 			case INTEGERKONST:   return("INTEGERKONST");
 			case CHARACTERKONST: return("CHARACTERKONST");
 			case REALKONST:      return("REALKONST");
-			case LONGREALKONST:  return("LONGREALKONST");
 			case TEXTKONST:      return("TEXTKONST");
-			case COMMENT_TEXT:   return("COMMENT_TEXT");
 			case OR_ELSE:        return("OR_ELSE");
 			case AND_THEN:       return("AND_THEN");
 			case DOT:            return("DOT");
 			case NEWLINE:        return("NEWLINE");
 			case STRING:         return("STRING");
-			case WHITESPACES:    return("WHITESPACES");
 			case EOF:            return("EOF");
 		}
-		return("Unknown KeyWord:" + key);
+		return("Unknown:"+key);
 	}
 	
 	/// Returns the corresponding Java code.
@@ -256,6 +248,6 @@ public class KeyWord {
 		case DOT: return (".");
 		default: return (edit(key));
 		}
-	}
+ }
 
 }

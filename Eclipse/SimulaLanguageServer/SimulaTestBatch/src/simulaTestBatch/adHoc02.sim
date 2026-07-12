@@ -1,3 +1,18 @@
-begin
-   
-end program
+begin text t;
+%select abd
+% komment to end of line
+   comment dette
+   er en 
+   kommentar over flere linjer ;
+   begin
+      outtext( "aaa""gg"
+      -- kommentar inne i texz
+      "bbb"
+%     kommentar-2 inne i text
+      "ccc" 
+      );
+   end med kommentar
+   over flere
+   linjer
+   ;
+end;

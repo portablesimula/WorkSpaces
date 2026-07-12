@@ -1,11 +1,11 @@
 package simula.builder;
 
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 
 public class SyntaxTree {
-	SyntaxElement rootClass;
+	SyntaxClass rootClass;
 	
-	public SyntaxTree(SyntaxElement rootClass) {
+	public SyntaxTree(SyntaxClass rootClass) {
 		this.rootClass = rootClass;
 	}
 

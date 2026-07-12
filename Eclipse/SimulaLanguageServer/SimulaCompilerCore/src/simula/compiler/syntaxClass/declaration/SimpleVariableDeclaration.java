@@ -15,19 +15,21 @@ import java.lang.constant.ClassDesc;
 import java.util.Vector;
 
 import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.parsing.Parse;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.TypeConversion;
+import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Simple Variable Declaration.
@@ -52,7 +54,7 @@ import simula.compiler.utilities.Util;
 ///   
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/SimpleVariableDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/SimpleVariableDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -111,13 +113,12 @@ public class SimpleVariableDeclaration extends Declaration {
 	///        |  identifier  "="  text-expression
 	///   
 	/// </pre>
-	/// Precondition: Type  is already read.
-	/// Endcondition: The terminating semicolon is read.
-	/// @param type the variable type
+	/// Precodition: Type  is already read.
+	/// @param type            the variable type
 	/// @param declarationList the declaration list to update
-	static Vector<SyntaxElement> expectSimpleVariable(final SimulaBuilder simBuilder, final Type type) {
+	static Vector<SyntaxClass> expectSimpleVariable(final SimulaBuilder simBuilder, final Type type) {
 		// identifier-list = identifier { , identifier }
-		Vector<SyntaxElement> declarations = new Vector<SyntaxElement>();
+		Vector<SyntaxClass> declarations = new Vector<SyntaxClass>();
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse IdentifierList");
 		do {
@@ -130,14 +131,12 @@ public class SimpleVariableDeclaration extends Declaration {
 		return declarations;
 	}
 
-
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
-		
-		type.doChecking(CoreGlobal.getCurrentScope(), this);
+		CoreGlobal.sourceLineNumber = lineNumber;
+		type.doChecking(CoreGlobal.getCurrentScope());
 		if (constantElement != null) {
 			constantElement.doChecking();
 			constantElement = TypeConversion.testAndCreate(type, constantElement);
@@ -171,7 +170,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		if (this.isConstant())
 			modifier = modifier + "final ";
 		if (constantElement != null) {
-//			constantElement = TypeConversion.testAndCreate(type, constantElement.evaluate(null));
+			constantElement = TypeConversion.testAndCreate(type, constantElement.evaluate());
 			constantElement.doChecking();
 			if (constantElement instanceof Constant) {
 				String value = constantElement.toJavaCode();
@@ -232,12 +231,9 @@ public class SimpleVariableDeclaration extends Declaration {
 
 	@Override
 	public String toString() {
-//		String s = identifier + " Type=" + type;
-//		if (constantElement != null)
-//			s = s + ", constantElement=" + constantElement.toString();
-		String s = type + " " + identifier;
+		String s = identifier + " Type=" + type;
 		if (constantElement != null)
-			s = s + "=" + constantElement.toString();
+			s = s + ", constantElement=" + constantElement.toString();
 		return (s);
 	}
 
@@ -246,7 +242,7 @@ public class SimpleVariableDeclaration extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public SimpleVariableDeclaration() {
-		super(null, null);
+		super(null);
 		this.declarationKind = ObjectKind.SimpleVariableDeclaration;
 	}
 
@@ -256,8 +252,8 @@ public class SimpleVariableDeclaration extends Declaration {
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -278,8 +274,8 @@ public class SimpleVariableDeclaration extends Declaration {
 		SimpleVariableDeclaration var = new SimpleVariableDeclaration();
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
-		// *** SyntaxElement
-		var.astData = readAstData(inpt);
+		// *** SyntaxClass
+		var.lineNumber = inpt.readShort();
 
 		// *** Declaration
 		var.identifier = inpt.readString();

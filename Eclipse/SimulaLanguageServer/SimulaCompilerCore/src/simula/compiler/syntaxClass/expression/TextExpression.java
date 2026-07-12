@@ -7,15 +7,13 @@ package simula.compiler.syntaxClass.expression;
 
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
-
-import simula.Option;
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
-import simula.compiler.utilities.Global;
+import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 
@@ -79,7 +77,7 @@ import simula.compiler.utilities.Util;
 /// "T1 & (T2.sub(1,2)) & (T3.main)" are equivalent.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/TextExpression.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/TextExpression.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Simula Standard
@@ -95,16 +93,16 @@ public final class TextExpression extends Expression {
 	/// Create a new TextExpression
 	/// @param lhs left hand side
 	/// @param rhs rigth hand side
-	TextExpression(final SimulaBuilder simBuilder, final Expression lhs, final Expression rhs) {
-		super(simBuilder);
-		this.lhs = lhs; this.rhs = rhs;
+	TextExpression(final Expression lhs, final Expression rhs) {
+		this.lhs = lhs;
+		this.rhs = rhs;
 		if (this.lhs == null) {
-			Util.syntaxError(simBuilder, "Missing operand before &");
-			this.lhs = new MissingExpression(simBuilder);
+			Util.error("Missing operand before &");
+			this.lhs = new VariableExpression("UNKNOWN_");
 		}
 		if (this.rhs == null) {
-			Util.syntaxError(simBuilder, "Missing operand after &");
-			this.rhs = new MissingExpression(simBuilder);
+			Util.error("Missing operand after &");
+			this.rhs = new VariableExpression("UNKNOWN_");
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
@@ -112,15 +110,14 @@ public final class TextExpression extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED()) return;
-		Global.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		if (Option.internal.TRACE_CHECKER)
-			Util.TRACE("BEGIN TextOperation" + toString() + ".doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());
+			Util.TRACE("BEGIN TextOperation" + toString() + ".doChecking - Current Scope Chain: " + CoreGlobal.getCurrentScope().edScopeChain());
 		// TEXT & TEXT
 		lhs.doChecking();
 		rhs.doChecking();
 		if (lhs.type.keyWord != Type.T_TEXT || rhs.type.keyWord != Type.T_TEXT) {
-			if(lhs.type != Type.Undef && rhs.type != Type.Undef)
-				Util.semanticError(this, "Operand Type to Text Concatenation(&) is not Text: "+lhs.type+" & "+rhs.type);
+			Util.error("Operand Type to Text Concatenation(&) is not Text: "+lhs.type+" & "+rhs.type);
 		}
 		this.type = Type.Text;
 		if (Option.internal.TRACE_CHECKER)
@@ -142,7 +139,7 @@ public final class TextExpression extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		codeBuilder.aload(0);
 		lhs.buildEvaluation(null,codeBuilder);
@@ -159,17 +156,15 @@ public final class TextExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private TextExpression() {
-		super(null);
-	}
+	private TextExpression() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeTextExpression: " + this);
 		oupt.writeKind(ObjectKind.TextExpression);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -185,11 +180,11 @@ public final class TextExpression extends Expression {
 	public static TextExpression readObject(AttributeInputStream inpt) throws IOException {
 		TextExpression expr = new TextExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxElement
-		expr.astData = readAstData(inpt);
+		// *** SyntaxClass
+		expr.lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxClass) inpt.readObj();
 		// *** TextExpression
 		expr.lhs = (Expression) inpt.readObj();
 		expr.rhs = (Expression) inpt.readObj();

@@ -16,8 +16,6 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
-
-import simula.Option;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.RemoteVariable;
@@ -28,12 +26,13 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Thunk Declaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/Thunk.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/Thunk.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -48,7 +47,7 @@ public final class Thunk extends DeclarationScope {
 	/// @param kind the kind code
 	/// @param expr the Thunk expression.
 	private Thunk(int kind,Expression expr) {
-		super(expr.simBuilder, CoreGlobal.sourceName + "$THUNK$" + (++OBJECT_SEQU));
+		super(CoreGlobal.sourceName + "$THUNK$" + (++OBJECT_SEQU));
 		this.declarationKind = ObjectKind.Thunk;
 		this.kind = kind;
 		this.expr = expr;
@@ -450,7 +449,7 @@ public final class Thunk extends DeclarationScope {
 			} else Util.IERR();
 			
 			
-		} else Util.codingError(apar, "Illegal Procedure Expression as Actual Parameter: " + apar);
+		} else Util.error("Illegal Procedure Expression as Actual Parameter: " + apar);
 	}
 
 

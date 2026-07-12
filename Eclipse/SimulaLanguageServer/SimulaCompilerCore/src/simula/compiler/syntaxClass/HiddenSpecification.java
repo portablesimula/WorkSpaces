@@ -6,9 +6,6 @@
 package simula.compiler.syntaxClass;
 
 import java.io.IOException;
-
-import simula.builder.SimulaBuilder;
-import simula.builder.SyntaxTree;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -25,10 +22,10 @@ import simula.compiler.utilities.Util;
 ///         | protected hidden identifier-list
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/HiddenSpecification.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/HiddenSpecification.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public final class HiddenSpecification extends SyntaxElement {
+public final class HiddenSpecification extends SyntaxClass {
 
 	/// The hidden identifier.
 	public String identifier;
@@ -50,8 +47,7 @@ public final class HiddenSpecification extends SyntaxElement {
 	/// Create a new HiddenSpecification.
 	/// @param definedIn  the class where Hidden is specified
 	/// @param identifier the hidden identifier
-	public HiddenSpecification(final SimulaBuilder simBuilder, final ClassDeclaration definedIn, final String identifier) {
-		super(simBuilder);
+	public HiddenSpecification(final ClassDeclaration definedIn, final String identifier) {
 		this.definedIn = definedIn;
 		this.identifier = identifier;
 	}
@@ -86,7 +82,7 @@ public final class HiddenSpecification extends SyntaxElement {
 			}
 			scope = scope.getPrefixClass();
 		}
-		Util.semanticError(this, identifier + " is specified HIDDEN without being PROTECTED");
+		Util.error(identifier + " is specified HIDDEN without being PROTECTED");
 		return (null);
 	}
 
@@ -112,7 +108,7 @@ public final class HiddenSpecification extends SyntaxElement {
 
 	@Override
 	public void printTree(final int indent, final Object head) {
-		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
+		IO.println(SyntaxClass.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
 
 	@Override
@@ -136,17 +132,15 @@ public final class HiddenSpecification extends SyntaxElement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private HiddenSpecification() {
-		super(null);
-	}
+	private HiddenSpecification() {}
 	
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeHiddenSpecification: " + identifier);
 		oupt.writeKind(ObjectKind.HiddenSpecification);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** HiddenSpecification
 		oupt.writeString(identifier);
 		oupt.writeObj(definedIn);
@@ -159,10 +153,8 @@ public final class HiddenSpecification extends SyntaxElement {
 	public static HiddenSpecification readObject(AttributeInputStream inpt) throws IOException {
 		HiddenSpecification spec = new HiddenSpecification();
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
-		// *** SyntaxElement
-//		spec.astData = readAstData(inpt);
-		spec.astData = readAstData(inpt);
-
+		// *** SyntaxClass
+		spec.lineNumber = inpt.readShort();
 		// *** HiddenSpecification
 		spec.identifier = inpt.readString();
 		spec.definedIn = (ClassDeclaration) inpt.readObj();

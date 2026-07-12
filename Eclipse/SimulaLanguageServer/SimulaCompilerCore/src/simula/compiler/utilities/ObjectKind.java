@@ -8,7 +8,7 @@ package simula.compiler.utilities;
 /// Object Kind Codes.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/ObjectKind.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/ObjectKind.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -81,9 +81,6 @@ public final class ObjectKind {
 
 	/** Null */						public static final int NULL = 0;
 	/** Object Reference */			public static final int ObjectReference = 60;
-	/** StandardProcedure */		public static final int StandardProcedure = 61;
-	/** MissingExpression */		public static final int MissingExpression = 62;
-	
 
 	/** Max Value */				public static final int MAX_VALUE = 63;
 
@@ -157,8 +154,6 @@ public final class ObjectKind {
 			case TypeConversion:			return "TypeConversion";
 			case UnaryOperation:			return "UnaryOperation";
 			case VariableExpression:		return "VariableExpression";
-
-			case StandardProcedure:			return "StandardProcedure";
 
 		}
 		Util.IERR();

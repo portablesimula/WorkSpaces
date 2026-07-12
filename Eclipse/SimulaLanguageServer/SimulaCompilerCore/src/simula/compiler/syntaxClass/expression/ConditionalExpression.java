@@ -9,14 +9,13 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
-import simula.Option;
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Conditional Expression.
@@ -30,7 +29,7 @@ import simula.compiler.utilities.Util;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/ConditionalExpression.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/ConditionalExpression.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -50,8 +49,7 @@ public final class ConditionalExpression extends Expression {
 	/// @param condition the condition
 	/// @param thenExpression then branch expression
 	/// @param elseExpression else branch expression
-	ConditionalExpression(final SimulaBuilder simBuilder, final Type type, final Expression condition, final Expression thenExpression, final Expression elseExpression) {
-		super(simBuilder);
+	ConditionalExpression(final Type type, final Expression condition, final Expression thenExpression, final Expression elseExpression) {
 		this.condition = condition;
 		this.thenExpression = thenExpression; thenExpression.backLink=this;
 		this.elseExpression = elseExpression; elseExpression.backLink=this;
@@ -62,39 +60,21 @@ public final class ConditionalExpression extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber=firstLineNumber();
+		CoreGlobal.sourceLineNumber=lineNumber;
 		condition.doChecking();
 		condition.backLink=this; // To ensure _RESULT from functions
-		if(! Type.checkType(condition, Type.T_BOOLEAN)) {
-			Util.semanticError(this, "ConditionalExpression: Condition is not a boolean (rather " + condition.type + ")");
-		}
+		Type cType = condition.type;
+		if (cType.keyWord != Type.T_BOOLEAN)
+			Util.error("ConditionalExpression: Condition is not a boolean (rather " + cType + ")");
 		thenExpression.doChecking();
 		elseExpression.doChecking();
-		Type expectedType=commonTypeConversion(thenExpression.type,elseExpression.type);
+		Type expectedType=Type.commonTypeConversion(thenExpression.type,elseExpression.type);
 		thenExpression = TypeConversion.testAndCreate(expectedType, thenExpression);
 		elseExpression = TypeConversion.testAndCreate(expectedType, elseExpression);
 		thenExpression.doChecking(); // In case TypeConversion was added
 		elseExpression.doChecking(); // In case TypeConversion was added
 		this.type=expectedType;
 		SET_SEMANTICS_CHECKED();
-	}
-  
-	/// Returns the type to which both types can be converted.
-	/// @param type1 argument
-	/// @param type2 argument
-	/// @return the resulting Type
-	private Type commonTypeConversion(final Type type1,final Type type2) {
-		if(type1.equals(type2)) return(type1);
-		Type atype=Type.arithmeticTypeConversion(type1,type2);
-		if(atype!=null) return(atype);
-		if(type1.isReferenceType() && type2.isReferenceType()) {
-			if(type1.isSubReferenceOf(type2)) return(type2);
-		    if(type2.isSubReferenceOf(type1)) return(type1);
-		    Util.semanticError(this, "Incompatible types: "+type1+", "+type2);
-		    return(type1);
-		}
-		Util.semanticError(this, "Incompatible types: "+type1+", "+type2);
-		return(null);
 	}
 
 	// Returns true if this expression may be used as a statement.
@@ -113,7 +93,7 @@ public final class ConditionalExpression extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		condition.buildEvaluation(null,codeBuilder);
 		Label elseLabel = codeBuilder.newLabel();
@@ -139,17 +119,15 @@ public final class ConditionalExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ConditionalExpression() {
-		super(null);
-	}
+	private ConditionalExpression() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeConditionalExpression: " + this);
 		oupt.writeKind(ObjectKind.ConditionalExpression);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -166,11 +144,11 @@ public final class ConditionalExpression extends Expression {
 	public static ConditionalExpression readObject(AttributeInputStream inpt) throws IOException {
 		ConditionalExpression expr = new ConditionalExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxElement
-		expr.astData = readAstData(inpt);
+		// *** SyntaxClass
+		expr.lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxClass) inpt.readObj();
 		// *** ConditionalExpression
 		expr.condition = (Expression) inpt.readObj();
 		expr.thenExpression = (Expression) inpt.readObj();

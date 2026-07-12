@@ -8,9 +8,6 @@ package simula.compiler.syntaxClass.declaration;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.ClassDesc;
-
-import simula.Option;
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -25,6 +22,7 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Connection Block.
@@ -38,7 +36,7 @@ import simula.compiler.utilities.Util;
 /// See Simula Standard 4.8 Connection statement.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/ConnectionBlock.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/ConnectionBlock.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -66,9 +64,8 @@ public final class ConnectionBlock extends DeclarationScope {
 	/// Create a new ConnectionBlock.
 	/// @param inspectedVariable   the inspected variable
 	/// @param whenClassIdentifier the when class identifier
-	public ConnectionBlock(final SimulaBuilder simBuilder, final VariableExpression inspectedVariable, final String whenClassIdentifier) {
-//		super("Connection block at line " + (Global.sourceLineNumber - 1));
-		super(simBuilder, "Inspect " + inspectedVariable);
+	public ConnectionBlock(final VariableExpression inspectedVariable, final String whenClassIdentifier) {
+		super("Connection block at line " + (CoreGlobal.sourceLineNumber - 1));
 		declarationKind = ObjectKind.ConnectionBlock;
 		this.inspectedVariable = inspectedVariable;
 		this.whenClassIdentifier = whenClassIdentifier;
@@ -117,8 +114,8 @@ public final class ConnectionBlock extends DeclarationScope {
 			result = declaredIn.findMeaning(identifier);
 		}
 		if (result == null) {
-//			Util.error("Undefined variable: " + identifier);
-			UndefinedDeclaration undef = new UndefinedDeclaration(null, identifier);
+			Util.error("Undefined variable: " + identifier);
+			UndefinedDeclaration undef = new UndefinedDeclaration(identifier);
 			result = new Meaning(undef, this); // Error Recovery
 		}
 		return (result);
@@ -151,7 +148,7 @@ public final class ConnectionBlock extends DeclarationScope {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		CoreGlobal.enterScope(this);
 		if (whenClassIdentifier != null) {
 			Meaning meaning = findMeaning(whenClassIdentifier);
@@ -172,7 +169,7 @@ public final class ConnectionBlock extends DeclarationScope {
 
 	@Override
 	public void doJavaCoding() {
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		CoreGlobal.enterScope(this);
 		JavaSourceFileCoder.code("{");
@@ -215,7 +212,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		Util.println(spc + beg);
 		for (Declaration decl : declarationList)
 			decl.print(indent + 1);
-		if(statement != null) statement.print(indent + 1);
+		statement.print(indent + 1);
 		Util.println(spc + "end[" + edScopeChain() + ']');
 	}
 
@@ -235,8 +232,7 @@ public final class ConnectionBlock extends DeclarationScope {
 
 	@Override
 	public String toString() {
-//		return ("ConnectionBlock: Inspect(" + inspectedVariable + ") do " + statement);
-		return ("ConnectionBlock: " + inspectedVariable);
+		return ("ConnectionBlock: Inspect(" + inspectedVariable + ") do " + statement);
 	}
 
 	@Override
@@ -250,7 +246,7 @@ public final class ConnectionBlock extends DeclarationScope {
 	/// Default constructor used by Attribute File I/O
 	/// @param identifier the block identifier.
 	public ConnectionBlock(String identifier) {
-		super(null, identifier);
+		super(identifier);
 		declarationKind = ObjectKind.ConnectionBlock;
 	}
 
@@ -261,8 +257,8 @@ public final class ConnectionBlock extends DeclarationScope {
 		oupt.writeString(identifier);
 		oupt.writeShort(OBJECT_SEQU);
 		
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		
 		// *** Declaration
 		//oupt.writeString(identifier);
@@ -294,8 +290,8 @@ public final class ConnectionBlock extends DeclarationScope {
 		ConnectionBlock blk = new ConnectionBlock(identifier);
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
 		
-		// *** SyntaxElement
-		blk.astData = readAstData(inpt);
+		// *** SyntaxClass
+		blk.lineNumber = inpt.readShort();
 
 		// *** Declaration
 		//blk.identifier = inpt.readString();

@@ -10,8 +10,6 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.MethodTypeDesc;
-
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -32,7 +30,7 @@ import simula.compiler.utilities.Util;
 /// Utility class: For-list Step until element.
 ///
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/StepUntilElement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/StepUntilElement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -48,25 +46,28 @@ public class StepUntilElement extends ForListElement {
 	/// @param expr1 The first expression
 	/// @param expr2 The second expression
 	/// @param expr3 The third expression
-	public StepUntilElement(final SimulaBuilder simBuilder, final ForStatement forStatement, final Expression expr1, final Expression expr2, final Expression expr3) {
-		super(simBuilder, forStatement, expr1);
+	public StepUntilElement(final ForStatement forStatement, final Expression expr1, final Expression expr2, final Expression expr3) {
+		super(forStatement, expr1);
 		this.expr2 = expr2;
 		this.expr3 = expr3;
+		if (expr1 == null)
+			Util.error("Missing expression before 'step' in ForStatement");
+		if (expr2 == null)
+			Util.error("Missing expression after 'step' in ForStatement");
+		if (expr3 == null)
+			Util.error("Missing expression after 'until' in ForStatement");
 	}
 
 	@Override
 	public void doChecking() {
 		expr1.doChecking();
 		expr1 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr1);
-//		expr1.doChecking();
-		expr1.backLink = forStatement; // To ensure _RESULT from functions
 		expr2.doChecking();
 		expr2 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr2);
-//		expr2.doChecking();
-		expr2.backLink = forStatement; // To ensure _RESULT from functions
 		expr3.doChecking();
 		expr3 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr3);
-//		expr3.doChecking();
+		expr1.backLink = forStatement; // To ensure _RESULT from functions
+		expr2.backLink = forStatement; // To ensure _RESULT from functions
 		expr3.backLink = forStatement; // To ensure _RESULT from functions
 	}
 
@@ -366,8 +367,8 @@ public class StepUntilElement extends ForListElement {
 		Util.TRACE_OUTPUT("StepUntilElement: " + this);
 		oupt.writeKind(ObjectKind.StepUntilElement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** ForListElement
 		oupt.writeObj(forStatement);
 		oupt.writeObj(expr1);
@@ -382,8 +383,8 @@ public class StepUntilElement extends ForListElement {
 	public static StepUntilElement readObject(AttributeInputStream inpt) throws IOException {
 		StepUntilElement elt = new StepUntilElement();
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
-		// *** SyntaxElement
-		elt.astData = readAstData(inpt);
+		// *** SyntaxClass
+		elt.lineNumber = inpt.readShort();
 		// *** ForListElement
 		elt.forStatement = (ForStatement) inpt.readObj();
 		elt.expr1 = (Expression) inpt.readObj();

@@ -2,7 +2,7 @@ package simula.builder;
 
 import java.util.Vector;
 
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.token.LexToken;
 
 public class LexTokenRange {
@@ -10,7 +10,7 @@ public class LexTokenRange {
 	
 	Vector<LexToken> lexTokenRange;
 
-	public Vector<SyntaxElement> syntaxElements;
+	public Vector<SyntaxClass> SyntaxClasss;
 	
 	public LexTokenRange(LexTokenRange parent) {
 		this.parent = parent;

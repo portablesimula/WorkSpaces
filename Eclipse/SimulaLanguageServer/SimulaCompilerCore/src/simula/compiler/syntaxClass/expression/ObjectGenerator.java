@@ -12,21 +12,19 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
 import java.util.Vector;
 
-import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.parsing.Parse;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.Parameter;
-import simula.compiler.syntaxClass.declaration.UndefinedDeclaration;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 
@@ -49,7 +47,7 @@ import simula.compiler.utilities.Util;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/ObjectGenerator.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/ObjectGenerator.java"><b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen
@@ -70,8 +68,7 @@ public final class ObjectGenerator extends Expression {
 	/// Create a new ObjectGenerator.
 	/// @param ident class-identifier
 	/// @param params the actual parameters
-	private ObjectGenerator(final SimulaBuilder simBuilder, final String ident,final Vector<Expression> params) {
-		super(simBuilder);
+	private ObjectGenerator(final String ident,final Vector<Expression> params) {
 		this.classIdentifier = ident;
 		this.type = Type.Ref(classIdentifier);
 		this.params = params;
@@ -86,49 +83,46 @@ public final class ObjectGenerator extends Expression {
 	///         =  "("  actual-parameter  {  ,  actual-parameter  }  ")"
 	/// </pre>
 	/// @return the newly created ObjectGenerator.
-	static Expression expectNew(SimulaBuilder simBuilder) {
+	static Expression expectNew() {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ObjectGenerator, current=" + Parse.currentLexToken(simBuilder));
-		String classIdentifier = Parse.expectIdentifier(simBuilder).edText();
+			Util.TRACE("Parse ObjectGenerator, current=" + Parse.currentToken);
+		String classIdentifier = Parse.expectIdentifier();
 		Vector<Expression> params = new Vector<Expression>();
-		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
+		if (Parse.accept(KeyWord.BEGPAR)) {
 			do {
-				Expression par=acceptExpression(simBuilder);
-				if(par==null) Util.syntaxError(simBuilder, "Missing class parameter");
+				Expression par=acceptExpression();
+				if(par==null) Util.error("Missing class parameter");
 				else params.add(par);
-			} while (Parse.accept(simBuilder, KeyWord.COMMA));
-			Parse.expect(simBuilder, KeyWord.ENDPAR);
+			} while (Parse.accept(KeyWord.COMMA));
+			Parse.expect(KeyWord.ENDPAR);
 		}
 
-		Expression expr = new ObjectGenerator(simBuilder, classIdentifier, params);
+		Expression expr = new ObjectGenerator(classIdentifier, params);
 		return (expr);
 	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ObjectGenerator(" + classIdentifier + ").doChecking - Current Scope Chain: " + CoreGlobal.getCurrentScope().edScopeChain());
 		meaning = CoreGlobal.getCurrentScope().findMeaning(classIdentifier);
-		if (meaning.declaredAs instanceof UndefinedDeclaration) {
-			Util.semanticError(this, "Undefined class identifier: " + classIdentifier);
-//			meaning = new Meaning(null, null); // Error Recovery: No Meaning
+		if (meaning == null) {
+			Util.error("Undefined class identifier: " + classIdentifier);
+			meaning = new Meaning(null, null); // Error Recovery: No Meaning
 		}
 		if (!(meaning.declaredAs instanceof ClassDeclaration)) {
-			Util.semanticError(this, "NEW " + classIdentifier + ": Not a Class");
-			SET_SEMANTICS_CHECKED();
+			Util.error("NEW " + classIdentifier + ": Not a Class");
 			return;
 		}
 		ClassDeclaration cls = (ClassDeclaration) meaning.declaredAs;
 		// Check parameters
 		Iterator<Parameter> formalIterator = cls.parameterIterator();
 		Iterator<Expression> actualIterator = params.iterator();
-		LOOP: while (actualIterator.hasNext()) {
-			if (!formalIterator.hasNext()) {
-				Util.semanticError(this, "Wrong number of parameters to Class " + cls.identifier);
-				break LOOP;
-			}
+		while (actualIterator.hasNext()) {
+			if (!formalIterator.hasNext())
+				Util.error("Wrong number of parameters to " + cls);
 			Declaration formalParameter = formalIterator.next();
 			Type formalType = formalParameter.type;
 			if (Option.internal.TRACE_CHECKER)
@@ -145,7 +139,7 @@ public final class ObjectGenerator extends Expression {
 
 		}
 		if (formalIterator.hasNext())
-			Util.semanticError(this, "Missing parameter '"+formalIterator.next().identifier+"' to Class " + cls.identifier);
+			Util.error("Missing parameter("+formalIterator.next()+") to " + cls);
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("END ObjectGenerator(" + classIdentifier + ").doChecking: type=" + type);
 		SET_SEMANTICS_CHECKED();
@@ -195,7 +189,7 @@ public final class ObjectGenerator extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		//  new adHoc03_A((_CUR))._STM();
 		//
@@ -251,6 +245,7 @@ public final class ObjectGenerator extends Expression {
 		else codeBuilder.checkcast(CD_cls);
 	}
 
+
 	@Override
 	public String toString() {
 		return (("NEW " + classIdentifier + params).replace('[', '(').replace(']', ')'));
@@ -260,17 +255,15 @@ public final class ObjectGenerator extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ObjectGenerator() {
-		super(null);
-	}
+	private ObjectGenerator() {	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("ObjectGenerator: "+this);
 		oupt.writeKind(ObjectKind.ObjectGenerator);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -291,11 +284,11 @@ public final class ObjectGenerator extends Expression {
 	public static ObjectGenerator readObject(AttributeInputStream inpt) throws IOException {
 		ObjectGenerator gen = new ObjectGenerator();
 		gen.OBJECT_SEQU = inpt.readSEQU(gen);
-		// *** SyntaxElement
-		gen.astData = readAstData(inpt);
+		// *** SyntaxClass
+		gen.lineNumber = inpt.readShort();
 		// *** Expression
 		gen.type = inpt.readType();
-		gen.backLink = (SyntaxElement) inpt.readObj();
+		gen.backLink = (SyntaxClass) inpt.readObj();
 		// *** ObjectGenerator
 		gen.classIdentifier = inpt.readString();
 		int n = inpt.readShort();

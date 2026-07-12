@@ -8,8 +8,6 @@ package simula.compiler.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import simula.Option;
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -20,8 +18,8 @@ import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.token.LexToken;
 
 /// BlockStatement.
 /// <pre>
@@ -45,32 +43,24 @@ import simula.token.LexToken;
 ///               | BEGIN statement { ; statement } END
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/BlockStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/BlockStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen
 public final class BlockStatement extends Statement {
-//	public String debugName;
 	
 	/// The associated block declaration.
 	public BlockDeclaration blockDeclaration;
 
-//	private static int SEQU = 1;
 	/// Create a new BlockStatement.
 	/// @param blockDeclaration the BlockDeclaration
-	public BlockStatement(final SimulaBuilder simBuilder, final BlockDeclaration blockDeclaration, String debugName1) {
-		super(simBuilder);
-//		debugName = "ZZZ_BlockStatement: "+SEQU++;
+	public BlockStatement(final BlockDeclaration blockDeclaration) {
+		super(blockDeclaration.lineNumber);
 		this.blockDeclaration = blockDeclaration;
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": BlockStatement: "+this);
-//		IO.println("NEW BlockStatement: " + debugName + '[' + debugName1 + ']');
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": BlockStatement: "+this);
 	}
 	
-	public String psiKind() {
-		return ObjectKind.edit(blockDeclaration.declarationKind);
-	}
-
 	/// Check if this BlockStatement is a CompoundStatement.
 	/// @return true if this BlockStatement is a CompoundStatement
 	boolean isCompoundStatement() {
@@ -92,7 +82,7 @@ public final class BlockStatement extends Statement {
 	
 	@Override
 	public void doJavaCoding() {
-		CoreGlobal.sourceLineNumber=firstLineNumber();
+		CoreGlobal.sourceLineNumber=lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		if(blockDeclaration.declarationKind!=ObjectKind.CompoundStatement) {
 			String staticLink=blockDeclaration.declaredIn.edCTX();
@@ -120,7 +110,7 @@ public final class BlockStatement extends Statement {
 
 	@Override
 	public void buildByteCode(CodeBuilder codeBuilder) {
-		CoreGlobal.sourceLineNumber=firstLineNumber();
+		CoreGlobal.sourceLineNumber=lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		blockDeclaration.buildByteCode(codeBuilder);
 	}
@@ -134,28 +124,10 @@ public final class BlockStatement extends Statement {
 	public void printTree(final int indent, final Object head) {
 		blockDeclaration.printTree(indent,head);
 	}
-	
-	@Override
-	public int firstLineNumber() {
-//		IO.println("BlockStatement.firstLineNumber: psiTree: "+getPsiTree());
-//		if(getPsiTree() != null) return getPsiTree().firstLineNumber();
-		LexToken token = lexTokenRange.getFirstLexToken();
-		if(token != null) return token.firstLineNumber();
-		return -15;
-	}
-	
-	@Override
-	public int lastLineNumber() {
-//		IO.println("BlockStatement.lastLineNumber: psiTree: "+getPsiTree());
-//		if(getPsiTree() != null) return getPsiTree().lastLineNumber();
-		LexToken token = lexTokenRange.getLastLexToken();
-		if(token != null) return token.lastLineNumber();
-		return -16;
-	}
 
 	@Override
 	public String toString() {
-		return blockDeclaration.identifier;
+		return ("BLOCK " + blockDeclaration);
 	}
 
 	// ***********************************************************************************************
@@ -163,17 +135,15 @@ public final class BlockStatement extends Statement {
 	// ***********************************************************************************************
 
 	/// Default constructor used by Attribute File I/O
-	private BlockStatement() {
-		super(null);
-	}
+	private BlockStatement() { super(0); }
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeBlockStatement: " + this);
 		oupt.writeKind(ObjectKind.BlockStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** BlockStatement
 		oupt.writeObj(blockDeclaration);
 	}
@@ -185,8 +155,8 @@ public final class BlockStatement extends Statement {
 	public static BlockStatement readObject(AttributeInputStream inpt) throws IOException {
 		BlockStatement stm = new BlockStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		// *** SyntaxClass
+		stm.lineNumber = inpt.readShort();
 		// *** BlockStatement
 		stm.blockDeclaration = (BlockDeclaration) inpt.readObj();
 

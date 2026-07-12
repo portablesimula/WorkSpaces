@@ -8,20 +8,19 @@ package simula.compiler.syntaxClass.declaration;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
 
-import simula.Option;
 import simula.compiler.syntaxClass.OverLoad;
 import simula.compiler.syntaxClass.ProcedureSpecification;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.utilities.CoreGlobal;
-import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Standard Procedure.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/StandardProcedure.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/StandardProcedure.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -41,10 +40,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 	/// @param type the procedure's type
 	/// @param ident the procedure identifier
 	StandardProcedure(DeclarationScope declaredIn,int kind,Type type, String ident) {
-		super(null, ident,kind); this.declaredIn = declaredIn; this.type = type;
-//		this.declarationKind = ObjectKind.StandardProcedure;
-//		this.CHECKED = true;
-	}
+		super(null, ident,kind); this.declaredIn = declaredIn; this.type = type; }
 
 	/// Create a new StandardProcedure with parameters.
 	/// @param declaredIn the enclosing scope
@@ -73,7 +69,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 	public void doChecking() {
 		if(IS_SEMANTICS_CHECKED()) return;
 		CoreGlobal.enterScope(this);
-		CoreGlobal.sourceLineNumber=firstLineNumber();
+		CoreGlobal.sourceLineNumber=lineNumber;
 		CoreGlobal.exitScope();
 		if(Option.internal.TRACE_CHECKER) Util.TRACE("END StandardProcedure("+toString()+").doChecking - Result type="+this.type);
 		SET_SEMANTICS_CHECKED();
@@ -142,7 +138,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 				}
 				default -> Util.IERR(""+c);
 			}
-			Parameter par = new Parameter(null, "_p"+(pos-1), pType, Parameter.Kind.Simple);
+			Parameter par = new Parameter("_p"+(pos-1), pType, Parameter.Kind.Simple);
 			pList.add(par);
 		}
 		char c = mtd.charAt(pos++);
@@ -162,7 +158,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 			default -> Util.IERR(""+c);
 		}
 		
-		return(new ProcedureSpecification(null, identifier, type, pList)); 
+		return(new ProcedureSpecification(identifier, type, pList)); 
 	}
 	
 	/// Get MethodTypeDesc
@@ -215,7 +211,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 		String id=identifier;
 		if(id.equalsIgnoreCase("detach") | id.equalsIgnoreCase("call") | id.equalsIgnoreCase("resume")) {
 			// Push extra parameter 'sourceLineNumber'
-			Parameter lno=new Parameter(null, id,Type.Integer,Parameter.Kind.Simple);
+			Parameter lno=new Parameter(id,Type.Integer,Parameter.Kind.Simple);
 			sb.append(lno.type.toJVMType());
 		}
 		sb.append(')');

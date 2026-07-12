@@ -11,13 +11,10 @@ import java.lang.classfile.Label;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
-
-import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -30,9 +27,9 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
-import simula.token.LexToken;
 
 /// For Statement.
 /// 
@@ -135,7 +132,7 @@ import simula.token.LexToken;
 ///           }
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ForStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ForStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -156,59 +153,56 @@ public final class ForStatement extends Statement {
 
 	/// Create a new ForStatement.
 	/// @param line the source line number
-	ForStatement(final SimulaBuilder simBuilder) {
-		super(simBuilder);
-		simBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
-
+	ForStatement(final int line) {
+		super(line);
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ForStatement");
-		controlVariable = new VariableExpression(simBuilder, Parse.expectIdentifier(simBuilder).edText());
-		LexToken prevToken = Parse.getCurrentParserToken(simBuilder);
-		if (!Parse.accept(simBuilder, KeyWord.ASSIGNVALUE))
-			Parse.expect(simBuilder, KeyWord.ASSIGNREF);
-		assignmentOperator = prevToken.keyWord;
+		controlVariable = new VariableExpression(Parse.expectIdentifier());
+		if (!Parse.accept(KeyWord.ASSIGNVALUE))
+			Parse.expect(KeyWord.ASSIGNREF);
+		assignmentOperator = Parse.prevToken.getKeyWord();
 		do {
-			forList.add(expectForListElement(simBuilder));
-		} while (Parse.accept(simBuilder, KeyWord.COMMA));
-		Parse.expect(simBuilder, KeyWord.DO);
-		Statement doStatement = Statement.acceptStatement(simBuilder);
+			forList.add(expectForListElement());
+		} while (Parse.accept(KeyWord.COMMA));
+		Parse.expect(KeyWord.DO);
+		Statement doStatement = Statement.expectStatement();
 		if (doStatement == null) {
-			Util.syntaxError(simBuilder, "No statement following DO in For statement");
-			doStatement = DummyStatement.ofImplicit(simBuilder);
+			Util.error("No statement following DO in For statement");
+			doStatement = new DummyStatement(line);
 		}
 		this.doStatement = doStatement;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line " + this.firstLineNumber() + ": ForStatement: " + this);
+			Util.TRACE("Line " + this.lineNumber + ": ForStatement: " + this);
 	}
 
 	/// Parse a for-list element.
 	/// @return the resulting ForListElement
-	private ForListElement expectForListElement(SimulaBuilder simBuilder) {
+	private ForListElement expectForListElement() {
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ForListElement");
-		Expression expr1 = Expression.expectExpression(simBuilder, "for list");
-		if (Parse.accept(simBuilder, KeyWord.WHILE))
-			return (new ForWhileElement(simBuilder, this, expr1, Expression.expectExpression(simBuilder, "for while")));
-		if (Parse.accept(simBuilder, KeyWord.STEP)) {
-			Expression expr2 = Expression.expectExpression(simBuilder, "for step");
-			Parse.expect(simBuilder, KeyWord.UNTIL);
-			return (new StepUntilElement(simBuilder, this, expr1, expr2, Expression.expectExpression(simBuilder, "for until")));
+		Expression expr1 = Expression.expectExpression();
+		if (Parse.accept(KeyWord.WHILE))
+			return (new ForWhileElement(this, expr1, Expression.expectExpression()));
+		if (Parse.accept(KeyWord.STEP)) {
+			Expression expr2 = Expression.expectExpression();
+			Parse.expect(KeyWord.UNTIL);
+			return (new StepUntilElement(this, expr1, expr2, Expression.expectExpression()));
 		} else
-			return (new ForListElement(simBuilder, this, expr1));
+			return (new ForListElement(this, expr1));
 	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		controlVariable.doChecking();
 		Declaration decl = controlVariable.meaning.declaredAs;
 		if (decl instanceof Parameter par && par.mode == Parameter.Mode.name)
-			Util.semanticError(this, "For-Statement's Controled Variable(" + controlVariable + ") can't be a formal parameter by Name");
+			Util.error("For-Statement's Controled Variable(" + controlVariable + ") can't be a formal parameter by Name");
 		Type type = controlVariable.type;
 		if (type.keyWord != Type.T_TEXT && assignmentOperator == KeyWord.ASSIGNVALUE && type.isReferenceType())
-			Util.semanticError(this, "Illegal For-Statement with object value assignment ( := )");
+			Util.error("Illegal For-Statement with object value assignment ( := )");
 		Iterator<ForListElement> iterator = forList.iterator();
 		while (iterator.hasNext()) {
 			iterator.next().doChecking();
@@ -237,14 +231,14 @@ public final class ForStatement extends Statement {
 		//      // Statements ...
 		// }
 		// ------------------------------------------------------------
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		boolean refType = controlVariable.type.isReferenceType();
-		String CB = "CB_" + firstLineNumber();
+		String CB = "CB_" + lineNumber;
 		JavaSourceFileCoder.code("for(boolean " + CB + ":new FOR_List(");
 		char del = ' ';
 		for (ForListElement elt : forList) {
-			String classIdent = (refType) ? elt.expr1.type.getJavaRefIdent(elt.expr1) : "Number";
+			String classIdent = (refType) ? elt.expr1.type.getJavaRefIdent() : "Number";
 			switch(elt.expr1.type.keyWord) {
 				case Type.T_CHARACTER -> classIdent = "Character"; // AD'HOC
 				case Type.T_BOOLEAN -> classIdent = "Boolean"; // AD'HOC
@@ -293,6 +287,30 @@ public final class ForStatement extends Statement {
 	}
 
 	@Override
+	public void print(final int indent) {
+		String spc = edIndent(indent);
+		String fl = forList.toString().replace('[', ' ').replace(']', ' ');
+		Util.println(spc + "FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + "DO");
+		if (doStatement != null)
+			doStatement.print(indent);
+	}
+
+	@Override
+	public void printTree(final int indent, final Object head) {
+		String fl = forList.toString().replace('[', ' ').replace(']', ' ');
+		IO.println(edTreeIndent(indent)+"FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + " DO ");
+		doStatement.printTree(indent+1,this);
+	}
+
+	@Override
+	public String toString() {
+		String fl = forList.toString().replace('[', ' ').replace(']', ' ');
+		return ("FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + " DO " + doStatement);
+	}
+
+
+
+	@Override
 	public void buildByteCode(CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if (forList.size() == 1) {
@@ -313,7 +331,7 @@ public final class ForStatement extends Statement {
 		//      // Statements ...
 		// }
 		// ------------------------------------------------------------
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		
 		codeBuilder
@@ -360,35 +378,12 @@ public final class ForStatement extends Statement {
 			.labelBinding(endLabel);
 	}
 
-	@Override
-	public void print(final int indent) {
-		String spc = edIndent(indent);
-		String fl = forList.toString().replace('[', ' ').replace(']', ' ');
-		Util.println(spc + "FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + "DO");
-		if (doStatement != null)
-			doStatement.print(indent);
-	}
-
-	@Override
-	public void printTree(final int indent, final Object head) {
-		String fl = forList.toString().replace('[', ' ').replace(']', ' ');
-		IO.println(edTreeIndent(indent)+"FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + " DO ");
-		doStatement.printTree(indent+1,this);
-	}
-	
-	@Override
-	public String toString() {
-		String fl = forList.toString().replace('[', ' ').replace(']', ' ');
-//		return ("FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + " DO " + doStatement);
-		return "FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + " DO " + doStatement;
-	}
-
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private ForStatement() {
-		super(null);
+		super(0);
 	}
 
 	@Override
@@ -396,8 +391,8 @@ public final class ForStatement extends Statement {
 		Util.TRACE_OUTPUT("writeForStatement: " + this);
 		oupt.writeKind(ObjectKind.ForStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** ForStatement
 		oupt.writeObj(controlVariable);
 		oupt.writeShort(assignmentOperator);
@@ -413,8 +408,8 @@ public final class ForStatement extends Statement {
 	public static ForStatement readObject(AttributeInputStream inpt) throws IOException {
 		ForStatement stm = new ForStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		// *** SyntaxClass
+		stm.lineNumber = inpt.readShort();
 		// *** ForStatement
 		stm.controlVariable = (VariableExpression) inpt.readObj();
 		stm.assignmentOperator = inpt.readShort();

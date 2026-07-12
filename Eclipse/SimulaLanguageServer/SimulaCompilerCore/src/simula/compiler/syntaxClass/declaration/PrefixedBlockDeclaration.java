@@ -12,13 +12,10 @@ import java.lang.classfile.attribute.SourceFileAttribute;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
-
-import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.HiddenSpecification;
 import simula.compiler.syntaxClass.ProtectedSpecification;
 import simula.compiler.syntaxClass.expression.Expression;
@@ -29,8 +26,10 @@ import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LabelList;
+import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Prefixed Block Declaration.
@@ -57,14 +56,16 @@ import simula.compiler.utilities.Util;
 /// </pre>
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/PrefixedBlockDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/PrefixedBlockDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen
 public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	
+	/**
 	/// The block prefix.
+	 */
 	public VariableExpression blockPrefix;
 
 	// ***********************************************************************************************
@@ -72,11 +73,11 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// ***********************************************************************************************
 	/// PrefixedBlock.
 	/// @param isMainModule true: this is the main module.
-	private PrefixedBlockDeclaration(final SimulaBuilder simBuilder, final boolean isMainModule) {
-		super(simBuilder, null);
-//		if(isMainModule)
-//			modifyIdentifier(Global.sourceName);
-//		else modifyIdentifier("PBLK" + firstLineNumber());
+	private PrefixedBlockDeclaration(boolean isMainModule) {
+		super(null);
+		if(isMainModule)
+			modifyIdentifier(CoreGlobal.sourceName);
+		else modifyIdentifier("PBLK" + lineNumber);
 	}
 
 	// ***********************************************************************************************
@@ -86,20 +87,25 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	/// @param blockPrefix the block prefix
 	/// @param isMainModule true if main module
 	/// @return the resulting PrefixedBlockDeclaration
-	public static PrefixedBlockDeclaration expectPrefixedBlock(final SimulaBuilder simBuilder, final VariableExpression blockPrefix,boolean isMainModule) {
-		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(simBuilder, isMainModule);
+	public static PrefixedBlockDeclaration expectPrefixedBlock(final VariableExpression blockPrefix,boolean isMainModule) {
+		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(isMainModule);
+		block.lineNumber=Parse.prevToken.lineNumber;
 		block.declarationKind=ObjectKind.PrefixedBlock;
 		Util.ASSERT(blockPrefix != null,"blockPrefix == null");
 		block.blockPrefix = blockPrefix;
 		block.prefix = blockPrefix.identifier;
 		block.isMainModule=isMainModule;
-		String ID = (isMainModule)? CoreGlobal.sourceName : block.prefix + "Begin";
-		block.modifyIdentifier(ID);
 		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse PrefixedBlock");
-		
-		block.parseBlock(simBuilder);
-		
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+block.firstLineNumber()+": PrefixedBlockDeclaration: "+block);
+		while (Declaration.acceptDeclaration(block)) Parse.accept(KeyWord.SEMICOLON);
+		while (!Parse.accept(KeyWord.END, KeyWord.EOF)) {
+			Statement stm = Statement.expectStatement();
+			if (stm != null) block.statements.add(stm);
+		}
+		if (Parse.prevToken.keyWord == KeyWord.EOF) {
+			Util.error("Illegal termination of prefixed block. Missing END.");
+		}
+		block.lastLineNumber = CoreGlobal.sourceLineNumber;
+		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+block.lineNumber+": PrefixedBlockDeclaration: "+block);
 		CoreGlobal.setScope(block.declaredIn);
 		return block;
 	}
@@ -110,17 +116,11 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		CoreGlobal.enterScope(this.declaredIn);
 			blockPrefix.doChecking();
 			prefix = blockPrefix.identifier;
-//			getPrefixClass().doChecking();
-			prefixClass = getPrefixClass();
-			if(prefixClass == null) {
-				Util.semanticError(this, "Prefix " + prefix + " is not a Class");
-			} else {
-				prefixClass.doChecking();
-			}
+			getPrefixClass().doChecking();
 			LabelList.accumLabelList(this);
 		CoreGlobal.exitScope();
 		
@@ -141,7 +141,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// ***********************************************************************************************
 	@Override
 	public void doJavaCoding() {
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(Option.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);	
@@ -159,7 +159,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 			else line = line + " extends RTS_BASICIO";
 			JavaSourceFileCoder.code(line + " {");
 			JavaSourceFileCoder.debug("// PrefixedBlockDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
-					+ ", firstLine=" + firstLineNumber() + ", lastLine=" + lastLineNumber() + ", hasLocalClasses="
+					+ ", firstLine=" + lineNumber + ", lastLine=" + lastLineNumber + ", hasLocalClasses="
 					+ ((hasLocalClasses) ? "true" : "false") + ", System=" + ((isQPSystemBlock()) ? "true" : "false")
 					+ ", detachUsed=" + ((detachUsed) ? "true" : "false"));
 			if (isQPSystemBlock())
@@ -214,7 +214,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	
 	@Override
 	public void buildByteCode(CodeBuilder codeBuilder) {
-		CoreGlobal.sourceLineNumber=firstLineNumber();
+		CoreGlobal.sourceLineNumber=lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(Option.verbose)
@@ -355,7 +355,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// ***********************************************************************************************
 	/// Private Constructor used by Attribute File I/O.
 	private PrefixedBlockDeclaration() {
-		super(null, null);
+		super(null);
 	}
 
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -363,8 +363,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		oupt.writeKind(declarationKind); // Mark: This is a PrefixedBlockDeclaration
 		oupt.writeString(identifier);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		
 		// *** Declaration
 		//oupt.writeString(identifier);
@@ -405,8 +405,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		pbl.identifier = (String) inpt.readString();
 		pbl.declarationKind = ObjectKind.Class;
 		pbl.OBJECT_SEQU = inpt.readSEQU(pbl);
-		// *** SyntaxElement
-		pbl.astData = readAstData(inpt);
+		// *** SyntaxClass
+		pbl.lineNumber = inpt.readShort();
 
 		// *** Declaration
 		//pbl.identifier = inpt.readString();

@@ -8,16 +8,14 @@ package simula.compiler.syntaxClass.expression;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
-
-import simula.Option;
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 
@@ -42,7 +40,7 @@ import simula.compiler.utilities.Util;
 ///         reference-comparator =  == | =/= 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/RelationalOperation.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/RelationalOperation.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -61,17 +59,18 @@ public final class RelationalOperation extends Expression {
 	/// @param lhs the left hand side
 	/// @param opr the relation
 	/// @param rhs the right hand side
-	RelationalOperation(final SimulaBuilder simBuilder, final Expression lhs,final int opr,final Expression rhs) {
-		super(simBuilder);
+	RelationalOperation(final Expression lhs,final int opr,final Expression rhs) {
 		this.type = Type.Boolean;
-		this.lhs = lhs; this.opr = opr; this.rhs = rhs;
+		this.lhs = lhs;
+		this.opr = opr;
+		this.rhs = rhs;
 		if (this.lhs == null) {
-			Util.semanticError(this, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression(simBuilder);
+			Util.error("Missing operand before " + KeyWord.edit(opr));
+			this.lhs = new VariableExpression("UNKNOWN_");
 		}
 		if (this.rhs == null) {
-			Util.semanticError(this, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression(simBuilder);
+			Util.error("Missing operand after " + KeyWord.edit(opr));
+			this.rhs = new VariableExpression("UNKNOWN_");
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
@@ -79,40 +78,36 @@ public final class RelationalOperation extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN RelationalOperation" + toString() + ".doChecking - Current Scope Chain: "	+ CoreGlobal.getCurrentScope().edScopeChain());
 		lhs.doChecking();
 		rhs.doChecking();
 		Type type1 = lhs.type;
 		Type type2 = rhs.type;
-		if(type1.keyWord != Type.T_UNDEF && type2.keyWord != Type.T_UNDEF) {
-			this.type = Type.Boolean;
-			switch (opr) {
-			case KeyWord.LT, KeyWord.LE, KeyWord.EQ, KeyWord.NE, KeyWord.GE, KeyWord.GT: {
-				if (type1.keyWord == Type.T_TEXT      && type2.keyWord == Type.T_TEXT) break;
-				if (type1.keyWord == Type.T_CHARACTER && type2.keyWord == Type.T_CHARACTER) break;
-				if (type1.keyWord == Type.T_BOOLEAN   && type2.keyWord == Type.T_BOOLEAN) break;
-				// Arithmetic Relation
-				Type atype = Type.arithmeticTypeConversion(type1, type2);
-				if (atype == null) {
-					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
-					Util.semanticError(this, "RelationalOperation: Illegal types: " + type1 + " " + opr + " " + type2);
-				}
-				lhs = (Expression) TypeConversion.testAndCreate(atype, lhs);
-				rhs = (Expression) TypeConversion.testAndCreate(atype, rhs);
-				break;
-			}
-			case KeyWord.EQR: case KeyWord.NER: {
-				// Object =/= Object or Object == Object
-				if ((!type1.isReferenceType()) || (!type2.isReferenceType()))
-					Util.semanticError(this, "RelationalOperation: Illegal types: " + type1 + " " + opr + " " + type2);
-				break;
-			}
-			default:
-				Util.IERR();
-				this.type = rhs.type;
-			}
+		this.type = Type.Boolean;
+		switch (opr) {
+		case KeyWord.LT, KeyWord.LE, KeyWord.EQ, KeyWord.NE, KeyWord.GE, KeyWord.GT: {
+			if (type1.keyWord == Type.T_TEXT      && type2.keyWord == Type.T_TEXT) break;
+			if (type1.keyWord == Type.T_CHARACTER && type2.keyWord == Type.T_CHARACTER) break;
+			if (type1.keyWord == Type.T_BOOLEAN   && type2.keyWord == Type.T_BOOLEAN) break;
+			// Arithmetic Relation
+			Type atype = Type.arithmeticTypeConversion(type1, type2);
+			if (atype == null)
+				Util.error("Incompatible types in binary operation: " + toString());
+			lhs = (Expression) TypeConversion.testAndCreate(atype, lhs);
+			rhs = (Expression) TypeConversion.testAndCreate(atype, rhs);
+			break;
+		}
+		case KeyWord.EQR: case KeyWord.NER: {
+			// Object =/= Object or Object == Object
+			if ((!type1.isReferenceType()) || (!type2.isReferenceType()))
+				Util.error("RelationalOperation: Illegal types: " + type1 + " " + opr + " " + type2);
+			break;
+		}
+		default:
+			Util.IERR();
+			this.type = rhs.type;
 		}
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("END RelationalOperation" + toString() + ".doChecking - Result type=" + this.type);
@@ -183,7 +178,7 @@ public final class RelationalOperation extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if(lhs.type.keyWord == Type.T_TEXT) {
 			buildTextRelation(codeBuilder);
@@ -254,6 +249,7 @@ public final class RelationalOperation extends Expression {
 		RTS.buildInvokeTextRel(opr, codeBuilder);
 	}
 
+
 	@Override
 	public String toString() {
 		return ("(" + lhs + ' ' + KeyWord.edit(opr) + ' ' + rhs + ")");
@@ -263,17 +259,15 @@ public final class RelationalOperation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private RelationalOperation() {
-		super(null);
-	}
+	private RelationalOperation() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeRelationalOperation: " + this);
 		oupt.writeKind(ObjectKind.RelationalOperation);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -290,11 +284,11 @@ public final class RelationalOperation extends Expression {
 	public static RelationalOperation readObject(AttributeInputStream inpt) throws IOException {
 		RelationalOperation expr = new RelationalOperation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxElement
-		expr.astData = readAstData(inpt);
+		// *** SyntaxClass
+		expr.lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxClass) inpt.readObj();
 		// *** RelationalOperation
 		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();

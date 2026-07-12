@@ -13,7 +13,6 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
 
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.Type;
@@ -24,7 +23,7 @@ import simula.compiler.utilities.Util;
 /// Undefined Declaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/UndefinedDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/UndefinedDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -34,8 +33,8 @@ public class UndefinedDeclaration extends Declaration {
 	/// Create a new UndefinedDeclaration.
 	/// 
 	/// @param identifier the variable identifier
-	public UndefinedDeclaration(final SimulaBuilder simBuilder, final String identifier) {
-		super(simBuilder, identifier);
+	public UndefinedDeclaration(final String identifier) {
+		super(identifier);
 		this.declarationKind = ObjectKind.UndefinedDeclaration;
 		this.type = Type.Undef;
 	}
@@ -44,8 +43,8 @@ public class UndefinedDeclaration extends Declaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
-		if(type != null) type.doChecking(CoreGlobal.getCurrentScope(), this);
+		CoreGlobal.sourceLineNumber = lineNumber;
+		if(type != null) type.doChecking(CoreGlobal.getCurrentScope());
 		
 		SET_SEMANTICS_CHECKED();
 	}
@@ -117,7 +116,7 @@ public class UndefinedDeclaration extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public UndefinedDeclaration() {
-		super(null, null);
+		super(null);
 		this.declarationKind = ObjectKind.SimpleVariableDeclaration;
 	}
 
@@ -127,8 +126,8 @@ public class UndefinedDeclaration extends Declaration {
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -149,8 +148,8 @@ public class UndefinedDeclaration extends Declaration {
 		UndefinedDeclaration var = new UndefinedDeclaration();
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
-		// *** SyntaxElement
-		var.astData = readAstData(inpt);
+		// *** SyntaxClass
+		var.lineNumber = inpt.readShort();
 
 		// *** Declaration
 		var.identifier = inpt.readString();

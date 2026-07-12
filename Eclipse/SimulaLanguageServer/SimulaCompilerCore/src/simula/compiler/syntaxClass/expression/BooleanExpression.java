@@ -9,15 +9,14 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
-import simula.Option;
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Boolean expressions.
@@ -99,7 +98,7 @@ import simula.compiler.utilities.Util;
 /// operand alone.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/BooleanExpression.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/BooleanExpression.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Simula Standard
@@ -119,16 +118,17 @@ public final class BooleanExpression extends Expression {
 	/// @param lhs left hand side
 	/// @param opr Boolean operation
 	/// @param rhs right hand side
-	BooleanExpression(final SimulaBuilder simBuilder, Expression lhs, int opr, Expression rhs) {
-		super(simBuilder);
-		this.lhs = lhs; this.opr = opr; this.rhs = rhs;
+	BooleanExpression(Expression lhs, int opr, Expression rhs) {
+		this.lhs = lhs;
+		this.opr = opr;
+		this.rhs = rhs;
 		if (this.lhs == null) {
-			Util.syntaxError(simBuilder, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression(simBuilder);
+			Util.error("Missing operand before " + KeyWord.edit(opr));
+			this.lhs = new VariableExpression("UNKNOWN_");
 		}
 		if (this.rhs == null) {
-			Util.syntaxError(simBuilder, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression(simBuilder);
+			Util.error("Missing operand after " + KeyWord.edit(opr));
+			this.rhs = new VariableExpression("UNKNOWN_");
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
@@ -136,7 +136,7 @@ public final class BooleanExpression extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN BooleanOperation" + toString() + ".doChecking - Current Scope Chain: " + CoreGlobal.getCurrentScope().edScopeChain());
 		switch (opr) {
@@ -150,7 +150,7 @@ public final class BooleanExpression extends Expression {
 				&&  (type2 != null && type2.keyWord == Type.T_BOOLEAN) )
 					this.type = Type.Boolean;
 				if (this.type == null)
-					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
+					Util.error("Incompatible types in binary operation: " + toString());
 				break;
 		    }
 		    default: Util.IERR();
@@ -182,7 +182,7 @@ public final class BooleanExpression extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		switch(opr) {
 			case KeyWord.AND:
@@ -256,17 +256,15 @@ public final class BooleanExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private BooleanExpression() {
-		super(null);
-	}
+	private BooleanExpression() {}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeBooleanExpression: " + this);
 		oupt.writeKind(ObjectKind.BooleanExpression);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -283,11 +281,11 @@ public final class BooleanExpression extends Expression {
 	public static BooleanExpression readObject(AttributeInputStream inpt) throws IOException {
 		BooleanExpression expr = new BooleanExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxElement
-		expr.astData = readAstData(inpt);
+		// *** SyntaxClass
+		expr.lineNumber = inpt.readShort();
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxClass) inpt.readObj();
 		// *** BooleanExpression
 		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();

@@ -19,7 +19,7 @@ import java.util.Vector;
 import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.RemoteVariable;
@@ -34,7 +34,7 @@ import simula.compiler.utilities.Util;
 /// A parameter models class and procedure parameters.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/Parameter.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/Parameter.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -123,10 +123,10 @@ public final class Parameter extends Declaration {
 	// ***********************************************************************************************
 	/// Add this parameter to the given parameter list.
 	/// @param parameterList the given parameter list
-	public void into(final Vector<Parameter> parameterList) {
+	void into(final Vector<Parameter> parameterList) {
 		for (Parameter par : parameterList)
 			if (Util.equals(par.identifier, this.identifier)) {
-				Util.syntaxError(simBuilder, "Parameter already defined: " + identifier);
+				Util.error("Parameter already defined: " + identifier);
 				return;
 			}
 		parameterList.add(this);
@@ -150,7 +150,7 @@ public final class Parameter extends Declaration {
 	/// @param mode the new mode
 	void setMode(final int mode) {
 		if (this.mode != 0)
-			Util.syntaxError(simBuilder, "Parameter " + identifier + " is already specified by " + this.mode);
+			Util.error("Parameter " + identifier + " is already specified by " + this.mode);
 		this.mode = mode;
 	}
 
@@ -174,16 +174,16 @@ public final class Parameter extends Declaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		if (kind == 0) {
-			Util.semanticError(this.declaredIn, "Parameter " + identifier + " is not specified -- assumed Simple Integer");
+			Util.error("Parameter " + identifier + " is not specified -- assumed Simple Integer");
 			kind = Kind.Simple;
 			type = Type.Integer;
 		}
 		if (type != null)
-			type.doChecking(CoreGlobal.getCurrentScope().declaredIn, this);
+			type.doChecking(CoreGlobal.getCurrentScope().declaredIn);
 		if (!legalTransmitionMode())
-			Util.semanticError(this, "Illegal transmission mode: " + mode + ' ' + kind + ' ' + identifier + " by " + edMode(mode) + " is not allowed");
+			Util.error("Illegal transmission mode: " + mode + ' ' + kind + ' ' + identifier + " by " + edMode(mode) + " is not allowed");
 		SET_SEMANTICS_CHECKED();
 	}
 
@@ -463,7 +463,7 @@ public final class Parameter extends Declaration {
 	public void printTree(final int indent, final Object head) {
 		IO.println(edTreeIndent(indent)+this);
 	}
-
+	
 	@Override
 	public String toString() {
 		String s = "";
@@ -508,7 +508,7 @@ public final class Parameter extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static SyntaxElement readObject(AttributeInputStream inpt) throws IOException {
+	public static SyntaxClass readObject(AttributeInputStream inpt) throws IOException {
 		Parameter par = new Parameter();
 		par.OBJECT_SEQU = inpt.readSEQU(par);
 		// *** Parameter

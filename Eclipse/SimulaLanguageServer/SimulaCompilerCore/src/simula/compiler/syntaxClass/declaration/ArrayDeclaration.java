@@ -18,22 +18,22 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import simula.builder.SimulaBuilder;
-import simula.Option;
-import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.parsing.Parse;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.TypeConversion;
 import simula.compiler.syntaxClass.expression.VariableExpression;
+import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 
@@ -96,7 +96,7 @@ import simula.compiler.utilities.Util;
 ///           array  a,b,c(7:n,2:m), s(-2:10)            ! any value of n or m legal;
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/ArrayDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/ArrayDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -114,8 +114,8 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param identifier the array identifier
 	/// @param type the array type
 	/// @param boundPairList The list of BoundPair
-	private ArrayDeclaration(final SimulaBuilder simBuilder, final String identifier, final Type type, final Vector<BoundPair> boundPairList) {
-		super(simBuilder, identifier);
+	private ArrayDeclaration(final String identifier, final Type type, final Vector<BoundPair> boundPairList) {
+		super(identifier);
 		this.declarationKind = ObjectKind.ArrayDeclaration;
 		this.type = type;
 		this.boundPairList = boundPairList;
@@ -142,42 +142,35 @@ public final class ArrayDeclaration extends Declaration {
 	/// 
 	/// @param type            the array's type
 	/// @param declarationList the given declaration list
-	static Vector<SyntaxElement> expectArrayDeclaration(final SimulaBuilder simBuilder, final Type type) {
+	static void expectArrayDeclaration(final Type type, final DeclarationList declarationList) {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ArrayDeclaration, type=" + type + ", current=" + Parse.getCurrentParserToken(simBuilder));
-		// IdentifierList = Identifier { , Identifier }
-		Vector<BoundPair> boundPairList = null;
-		Vector<SyntaxElement> declarations = new Vector<SyntaxElement>();
+			Util.TRACE("Parse ArrayDeclaration, type=" + type + ", current=" + Parse.currentToken);
 		do {
 			if (Option.internal.TRACE_PARSE)
 				Parse.TRACE("Parse ArraySegment");
+			// IdentifierList = Identifier { , Identifier }
 			Vector<String> identList = new Vector<String>();
 			do {
-				identList.add(Parse.expectIdentifier(simBuilder).edText());
-			} while (Parse.accept(simBuilder, KeyWord.COMMA));
-			Parse.expect(simBuilder, KeyWord.BEGPAR);
-			simBuilder.setParsingBoundPairList(true);
+				identList.add(Parse.expectIdentifier());
+			} while (Parse.accept(KeyWord.COMMA));
+			Parse.expect(KeyWord.BEGPAR);
 			// BoundPairList = BoundPair { , BoundPair }
 			if (Option.internal.TRACE_PARSE)
 				Parse.TRACE("Parse BoundPairList");
-			boundPairList = new Vector<BoundPair>();
+			Vector<BoundPair> boundPairList = new Vector<BoundPair>();
 			do {
-				Expression LB = Expression.expectExpression(simBuilder, "lowerbound");
-				Parse.expect(simBuilder, KeyWord.COLON);
-				Expression UB = Expression.expectExpression(simBuilder, "upperbound");
+				Expression LB = Expression.expectExpression();
+				Parse.expect(KeyWord.COLON);
+				Expression UB = Expression.expectExpression();
 				boundPairList.add(new BoundPair(LB, UB));
-			} while (Parse.accept(simBuilder, KeyWord.COMMA));
-			Parse.expect(simBuilder, KeyWord.ENDPAR);
-			simBuilder.setParsingBoundPairList(false);
+			} while (Parse.accept(KeyWord.COMMA));
+			Parse.expect(KeyWord.ENDPAR);
 			for (Enumeration<String> e = identList.elements(); e.hasMoreElements();) {
 				String identifier = e.nextElement();
-				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(simBuilder, identifier, type, boundPairList);
-//				IO.println("ArrayDecleration.expectArrayDeclaration: NEW "+arrayDeclaration);
-				declarations.add(arrayDeclaration);
-			}				
+				declarationList.add(new ArrayDeclaration(identifier.toString(), type, boundPairList));
+			}
 			
-		} while (Parse.accept(simBuilder, KeyWord.COMMA));
-		return declarations;
+		} while (Parse.accept(KeyWord.COMMA));
 	}
 
 	/// Utility Class to hold a BoundPair.
@@ -218,10 +211,10 @@ public final class ArrayDeclaration extends Declaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		if (type == null)
 			type = Type.Real;
-		type.doChecking(declaredIn, this);
+		type.doChecking(declaredIn);
 		if (boundPairList != null)
 			for (BoundPair it : boundPairList)
 				it.doChecking();
@@ -230,7 +223,7 @@ public final class ArrayDeclaration extends Declaration {
 
 	@Override
 	public void doJavaCoding() {
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		// --------------------------------------------------------------------
 		// public RTS_REAL_ARRAY rTab=null;
@@ -242,7 +235,7 @@ public final class ArrayDeclaration extends Declaration {
 
 	@Override
 	public void doDeclarationCoding() {
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		// --------------------------------------------------------------------
 		// integer array A(1:4,4:6,6:12);
@@ -266,7 +259,7 @@ public final class ArrayDeclaration extends Declaration {
 	
 	@Override
 	public void buildDeclaration(ClassBuilder classBuilder, BlockDeclaration encloser) {
-		CoreGlobal.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = lineNumber;
 		ASSERT_SEMANTICS_CHECKED();
 		classBuilder.withField(identifier, RTS.CD.RTS_ARRAY(type), fieldBuilder -> {
 			fieldBuilder
@@ -531,22 +524,15 @@ public final class ArrayDeclaration extends Declaration {
 
 	@Override
 	public void printTree(final int indent, final Object head) {
-		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
+		IO.println(SyntaxClass.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		if(type != null) sb.append(type).append(' ');
-		sb.append("ARRAY ").append(identifier).append('(');
-		boolean first = true;
-		for(BoundPair boundPair:boundPairList) {
-			if(!first) sb.append(',');
-			first = false;
-			sb.append(boundPair.LB).append(':').append(boundPair.UB);
-		}		
-		sb.append(')');
-		return (sb.toString());
+		String s = "ARRAY " + identifier;
+		if (type != null)
+			s = type.toString() + " " + s;
+		return (s);
 	}
 
 	// ***********************************************************************************************
@@ -554,7 +540,7 @@ public final class ArrayDeclaration extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public ArrayDeclaration() {
-		super(null, null);
+		super(null);
 		this.declarationKind = ObjectKind.ArrayDeclaration;
 	}
 
@@ -564,8 +550,8 @@ public final class ArrayDeclaration extends Declaration {
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 
 		// *** Declaration
 		oupt.writeString(identifier);
@@ -588,8 +574,8 @@ public final class ArrayDeclaration extends Declaration {
 		ArrayDeclaration arr = new ArrayDeclaration();
 		arr.OBJECT_SEQU = inpt.readSEQU(arr);
 
-		// *** SyntaxElement
-		arr.astData = readAstData(inpt);
+		// *** SyntaxClass
+		arr.lineNumber = inpt.readShort();
 
 		// *** Declaration
 		arr.identifier = inpt.readString();

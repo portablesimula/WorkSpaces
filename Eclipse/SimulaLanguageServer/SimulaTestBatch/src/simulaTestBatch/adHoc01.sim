@@ -5,7 +5,9 @@ begin text t;
    kommentar over flere linjer ;
    begin
       outtext( "aaa""gg"
+      comment KOMMENTAR-1 inne i en TEXZ;
       "bbb"
+      ! KOMMENTAR-2 inne i en TEXZ;
       "ccc" 
       );
    end med kommentar

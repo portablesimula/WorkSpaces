@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Vector;
 
 import simula.Option;
-import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.syntaxClass.SyntaxClass;
 import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.CoreGlobal;
@@ -13,6 +13,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.SimulaDiagnostic;
 import simula.compiler.utilities.Util;
+import simula.exception.EOTException;
 import simula.lsp.compiler.DocumentManager;
 import simula.token.LexToken;
 import simula.token.SimpleString;
@@ -29,6 +30,7 @@ public class SimulaBuilder {
     private LexTokenRange lexTokenRange;
 
 	public SimulaBuilder(DocumentManager documentManager) {
+		boolean builderTerminateNormally = false;
 		this.documentManager = documentManager;
     	// INIT:
     	this.diagnostics = new ArrayList<>();
@@ -36,7 +38,15 @@ public class SimulaBuilder {
 		lexTokenRange = new LexTokenRange(null);
         lexer = new SimulaLexer(this, documentManager.sourceCode);
         // Do the actual Building
-		syntaxTree = new ProgramModule(this);
+    	syntaxTree = new ProgramModule(this);
+        try {
+        	syntaxTree.doBuild();
+        	builderTerminateNormally = true;
+        } catch(EOTException e) {
+			System.err.println("SimulaBuilder: GOT EXCEPTION: " + e.getMessage());
+//			e.printStackTrace();
+			lexer.flush();
+        }
 
     	LOG.info("SimulaBuilder: syntaxTree, tokenList and diagnostics DONE");
     	IO.println("SimulaBuilder: this.syntaxTree: "+this.syntaxTree); // Root of Syntax Tree
@@ -60,11 +70,15 @@ public class SimulaBuilder {
     		}
     	}
     	
-		Util.IERR("STOP HER INTILL VIDERE");	
+//		Util.IERR("STOP HER INTILL VIDERE");	
+		if(builderTerminateNormally) {	
+			StandardClass.ENVIRONMENT.doChecking();
+			CoreGlobal.duringParsing = false;
+			this.syntaxTree.doChecking();
+		} else {
 			
-		StandardClass.ENVIRONMENT.doChecking();
-		CoreGlobal.duringParsing = false;
-		this.syntaxTree.doChecking();
+		}
+		Util.IERR("STOP HER INTILL VIDERE");	
 	}
 	
 	public void addDiagnostic(SimulaDiagnostic diagnostic) {
@@ -86,21 +100,21 @@ public class SimulaBuilder {
     	lexTokenRange = new LexTokenRange(lexTokenRange);//, getSourceLineNumber(), sourceText, startOffset, debugName);
 	}
 		
-	public void doneTokenRange(SyntaxElement syntaxElement) {
-//		IO.println("PsiBuilder.doneTokenRange: syntaxElement="+syntaxElement);
-		Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
-		if(syntaxElement != null) syntaxElements.add(syntaxElement);
-		doneTokenRange(syntaxElements);
+	public void doneTokenRange(SyntaxClass SyntaxClass) {
+//		IO.println("PsiBuilder.doneTokenRange: SyntaxClass="+SyntaxClass);
+		Vector<SyntaxClass> SyntaxClasss = new Vector<SyntaxClass>();
+		if(SyntaxClass != null) SyntaxClasss.add(SyntaxClass);
+		doneTokenRange(SyntaxClasss);
 	}
 	
-	public void doneTokenRange(Vector<SyntaxElement> syntaxElements) {
+	public void doneTokenRange(Vector<SyntaxClass> SyntaxClasss) {
 //		IO.println("\nPsiBuilder.doneTokenRange: lexTokenRange=]"+lexTokenRange.getDebugText()+'[');
 		
-		for(SyntaxElement syntaxElement:syntaxElements) {
-//			IO.println("PsiBuilder.doneTokenRange: syntaxElement="+syntaxElement);
-			syntaxElement.lexTokenRange = lexTokenRange;
+		for(SyntaxClass SyntaxClass:SyntaxClasss) {
+//			IO.println("PsiBuilder.doneTokenRange: SyntaxClass="+SyntaxClass);
+			SyntaxClass.lexTokenRange = lexTokenRange;
 		}
-		lexTokenRange.syntaxElements = syntaxElements;
+		lexTokenRange.SyntaxClasss = SyntaxClasss;
 
 		lexTokenRange = lexTokenRange.parent;
 	}
@@ -152,12 +166,18 @@ public class SimulaBuilder {
 //		lexer.rollBackToBefore(prev, debugInfo);
 	}
 
+	
 	public LexToken prevToken() {
 		return lexer.getPrevLexerToken();
 	}
 
 	public LexToken prevParserToken() {
 		return lexer.getPrevParserToken();
+	}
+
+	/// Save current Token
+	public void saveCurrentToken() {
+		lexer.saveCurrentToken();
 	}
 
 	public boolean eof() {
@@ -233,7 +253,7 @@ public class SimulaBuilder {
 	
 	public void printSyntaxTree(String title) {
 		IO.println("======================================== BEGIN SYNTAX TREE: " + title + " ============================ ");
-		syntaxTree.print(0);
+		if(syntaxTree.mainModule != null) syntaxTree.print(0);
 		IO.println("======================================== ENDOF SYNTAX TREE: " + title + " ============================ ");
 	}
 

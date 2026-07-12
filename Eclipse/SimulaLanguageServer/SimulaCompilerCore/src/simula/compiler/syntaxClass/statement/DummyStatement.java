@@ -8,12 +8,12 @@ package simula.compiler.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
+import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Dummy Statement.
@@ -26,7 +26,7 @@ import simula.compiler.utilities.Util;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/DummyStatement.java"><b>Source File
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/DummyStatement.java"><b>Source File
 /// </b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -35,23 +35,9 @@ public final class DummyStatement extends Statement {
 	
 	/// Create a new DummyStatement.
 	/// @param line the source line number
-//	private DummyStatement(final int line) {
-//		super(line);
-//		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": DummyStatement: "+this);
-//	}
-	private DummyStatement(final SimulaBuilder simBuilder) {
-		super(simBuilder);
-	}
-
-	public static DummyStatement ofExplicit(final SimulaBuilder simBuilder) {
-		simBuilder.consume(KeyWord.SEMICOLON); //  (add it to 'current tree')
-		DummyStatement dummyStatement = new DummyStatement(simBuilder);		
-		return dummyStatement;
-	}
-
-	public static DummyStatement ofImplicit(final SimulaBuilder simBuilder) {
-		DummyStatement dummyStatement = new DummyStatement(simBuilder);		
-		return dummyStatement;
+	DummyStatement(final int line) {
+		super(line);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": DummyStatement: "+this);
 	}
 
 	@Override
@@ -81,22 +67,22 @@ public final class DummyStatement extends Statement {
 
 	@Override
 	public String toString() {
-		return ";";
+		return ("DUMMY at Line "+lineNumber+" in "+CoreGlobal.getCurrentScope().identifier);
 	}
 
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-//	private DummyStatement() { super(0); }
+	private DummyStatement() { super(0); }
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeDummyStatement: " + this);
 		oupt.writeKind(ObjectKind.DummyStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxElement
-		writeAstData(oupt);
+		// *** SyntaxClass
+		oupt.writeShort(lineNumber);
 	}
 
 	/// Read and return a DummyStatement object.
@@ -104,10 +90,10 @@ public final class DummyStatement extends Statement {
 	/// @return the DummyStatement object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static DummyStatement readObject(AttributeInputStream inpt) throws IOException {
-		DummyStatement stm = new DummyStatement(null);
+		DummyStatement stm = new DummyStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		// *** SyntaxClass
+		stm.lineNumber = inpt.readShort();
 		Util.TRACE_INPUT("DummyStatement: " + stm);
 		return(stm);
 	}
