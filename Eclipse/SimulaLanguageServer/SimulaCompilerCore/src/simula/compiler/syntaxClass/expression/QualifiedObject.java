@@ -8,14 +8,15 @@ package simula.compiler.syntaxClass.expression;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
+import simula.Option;
+import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Qualified Object
@@ -54,7 +55,7 @@ import simula.compiler.utilities.Util;
 /// match exists, it is that of the virtual specification.
 /// </ul>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/QualifiedObject.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/QualifiedObject.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -73,7 +74,8 @@ public final class QualifiedObject extends Expression {
 	/// Create a new QualifiedObject
 	/// @param lhs left hand side
 	/// @param classIdentifier class identifier
-	QualifiedObject(final Expression lhs, final String classIdentifier) {
+	QualifiedObject(final SimulaBuilder simBuilder, final Expression lhs, final String classIdentifier) {
+		super(simBuilder);
 		this.lhs = lhs;
 		this.classIdentifier = classIdentifier;
 		lhs.backLink = this;
@@ -82,13 +84,16 @@ public final class QualifiedObject extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN QualifiedObject" + toString() + ".doChecking - Current Scope Chain: "	+ CoreGlobal.getCurrentScope().edScopeChain());
 		classDeclaration = getQualification(classIdentifier);
+		if(classDeclaration == null)
+			Util.semanticError(this, "Undefined cast because " + classIdentifier + " is not a class");
+
 		lhs.doChecking();
 		if (!checkCompatibility(lhs, classIdentifier))
-			Util.error("Illegal Object Expression: " + lhs + " is not compatible with " + classIdentifier);
+			Util.semanticError(this, "Illegal Object Expression: " + lhs + " is not compatible with " + classIdentifier);
 		this.type = new Type(classIdentifier);
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("END QualifiedObject" + toString() + ".doChecking - Result type=" + this.type);
@@ -109,7 +114,7 @@ public final class QualifiedObject extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		lhs.buildEvaluation(null,codeBuilder);
 		codeBuilder.checkcast(classDeclaration.getClassDesc());
@@ -124,15 +129,17 @@ public final class QualifiedObject extends Expression {
 	// *** Externalization
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private QualifiedObject() {}
+	private QualifiedObject() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeQualifiedObject: " + this);
 		oupt.writeKind(ObjectKind.QualifiedObject);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -148,11 +155,11 @@ public final class QualifiedObject extends Expression {
 	public static QualifiedObject readObject(AttributeInputStream inpt) throws IOException {
 		QualifiedObject expr = new QualifiedObject();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxClass
-		expr.lineNumber = inpt.readShort();
+		// *** SyntaxElement
+		expr.astData = readAstData(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxClass) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** QualifiedObject
 		expr.lhs = (Expression) inpt.readObj();
 		expr.classIdentifier = inpt.readString();

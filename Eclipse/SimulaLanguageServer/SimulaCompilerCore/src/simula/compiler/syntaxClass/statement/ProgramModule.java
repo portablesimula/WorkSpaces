@@ -8,8 +8,10 @@ package simula.compiler.syntaxClass.statement;
 import java.io.IOException;
 import java.util.Vector;
 
-import simula.builder.Parse;
 import simula.builder.SimulaBuilder;
+import simula.Option;
+import simula.builder.Parse;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -25,14 +27,14 @@ import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 import simula.token.LexToken;
 
 /// Simula Program Module.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ProgramModule.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ProgramModule.java">
 /// <b>Source File</b></a>.
 /// 
 /// <pre>
@@ -65,11 +67,11 @@ public final class ProgramModule extends Statement {
 	public DeclarationScope mainModule;
 
 	/// The external head
-	public Vector<ExternalDeclaration> externalHead;
+	public Vector<SyntaxElement> externalHead;
 
 	/// Returns the mainModule identifier.
 	/// @return the mainModule identifier
-	public String getIdentifier() { return(mainModule.identifier); }
+	public Identifier getIdentifier() { return(mainModule.identifier); }
 
 	/// Returns the relative file name.
 	/// @return the relative file name
@@ -89,36 +91,49 @@ public final class ProgramModule extends Statement {
 
 	/// Create a new ProgramModule.
 	public ProgramModule(SimulaBuilder simBuilder) {
-		super(simBuilder);
-		sysin=new VariableExpression(null, "sysin");   sysin.SET_SEMANTICS_CHECKED();
-		sysout=new VariableExpression(null, "sysout"); sysout.SET_SEMANTICS_CHECKED();
+		super(simBuilder, simBuilder.getCurrentParserToken());
+		sysin=new VariableExpression(null, null, new Identifier("sysin"));   sysin.SET_SEMANTICS_CHECKED();
+		sysout=new VariableExpression(null, null, new Identifier("sysout")); sysout.SET_SEMANTICS_CHECKED();
 	}
-
-//	/// Create a new ProgramModule.
-//	public ProgramModule() {
-//		super(0);
-//		sysin=new VariableExpression("sysin");
-//		sysout=new VariableExpression("sysout");
-//		try	{
+	
 	public void doBuild() {
 //		try	{
 			if(Option.internal.TRACE_PARSE) Parse.TRACE("Parse Program");
 			CoreGlobal.setScope(StandardClass.BASICIO);		    	// BASICIO Begin
-			new ConnectionBlock(simBuilder, sysin, null)                     	//    Inspect sysin do
+			new ConnectionBlock(null, null, sysin, null)            //    Inspect sysin do
 			     .setClassDeclaration(StandardClass.Infile);
-			new ConnectionBlock(simBuilder, sysout, null)                    	//    Inspect sysout do
+			new ConnectionBlock(null, null, sysout, null)           //    Inspect sysout do
 			     .setClassDeclaration(StandardClass.Printfile);
 			CoreGlobal.getCurrentScope().sourceBlockLevel=0;
+			
+			simBuilder.startTokenRange("ProgramModule.MayBeEXTERNAL", simBuilder.getCurrentParserToken());
+			
 			while(Parse.accept(simBuilder, KeyWord.EXTERNAL)) {
-				externalHead = ExternalDeclaration.expectExternalHead(StandardClass.BASICIO);					
+//				externalHead = ExternalDeclaration.expectExternalDeclaration(simBuilder, StandardClass.BASICIO);		
+				Vector<SyntaxElement> external = ExternalDeclaration.expectExternalDeclaration(simBuilder);	
+				if(externalHead == null) externalHead = new Vector<SyntaxElement>();
+				externalHead.addAll(external);
 				Parse.expect(simBuilder, KeyWord.SEMICOLON);
+				simBuilder.doneTokenRange(external);
+				simBuilder.startTokenRange("ProgramModule.EXTERNAL+", simBuilder.getCurrentParserToken());
 			}
+			simBuilder.dropTokenRange();
+			
 			// Now: Looking for ( program | procedure-declaration | class-declaration )
-//			String mayBeClassIdent = Parse.acceptIdentifier(simBuilder);
+			
+			
+			simBuilder.startTokenRange("ProgramModule.MaybeClass", simBuilder.getCurrentParserToken());
+//			LexToken mayBeClassIdent=Parse.acceptIdentifier(simBuilder);
 			LexToken mayBeClassIdent=Parse.acceptIdentifier(simBuilder);
 			if(mayBeClassIdent!=null) {
-				if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, mayBeClassIdent.getText());
-			    else { Parse.saveCurrentToken(); mainModule = doParseProgram(simBuilder); }
+				if(Parse.accept(simBuilder, KeyWord.CLASS)) {
+					mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, mayBeClassIdent);
+				}
+			    else {
+					simBuilder.dropTokenRange();
+					simBuilder.startTokenRange("ProgramModule.PROGRAM", simBuilder.getCurrentParserToken());
+			    	mainModule = doParseProgram(simBuilder);
+			    }
 			}
 			else if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, null);
 			else {
@@ -126,12 +141,26 @@ public final class ProgramModule extends Statement {
 			    if(Parse.accept(simBuilder, KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type);
 			    else mainModule = doParseProgram(simBuilder);
 			}
+			simBuilder.doneTokenRange(mainModule);
+			
+			
 			StandardClass.BASICIO.declarationList.add(mainModule);
 			
-//			if(Parse.getCurrentParserToken(simBuilder).keyWord != KeyWord.EOF) {
-			LexToken lastToken = Parse.getCurrentParserToken(simBuilder);
-			if(lastToken.keyWord != KeyWord.EOF) {
-				Util.warning(simBuilder, lastToken, "Text after Program end");
+			LexToken token = Parse.getCurrentParserToken(simBuilder);
+			if(token != null && token.keyWord != KeyWord.EOF) {
+//				simBuilder.startTokenRange("ProgramModule.TAIL",token);
+//				Comment dum = new Comment(simBuilder);
+				while(!simBuilder.eof()) simBuilder.getNextParserToken(); // consume tokens  (add it to 'current tree')
+//				simBuilder.doneTokenRange(dum);
+				
+				IO.println("NEW ProgramModule - NOTE: FINN EN ANNEN MÅTE Å GJØRE DETTE PÅ");
+				
+//				IO.println("NEW ProgramModule: TextAfterEnd: \"" + dum.psiTree.getText().replace("\n", "\\n") + '"');
+//				String textAfterEnd = dum.getPsiTree().getText().replaceAll("\\s+", ""); // Remove WhiteSpaces			
+//				IO.println("NEW ProgramModule: TextAfterEnd: \"" + textAfterEnd + '"');
+//				simBuilder.psiRoot.printTree("");
+//				if(! textAfterEnd.equals(";")) Util.warning("Text after Program end: \"" + textAfterEnd + '"');
+//				Util.IERR();
 			}
 			
 			if(Option.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
@@ -144,18 +173,21 @@ public final class ProgramModule extends Statement {
 	/// Parse Simula Program by expecting a Statement.
 	/// @return the Program Statement.
 	private DeclarationScope doParseProgram(final SimulaBuilder simBuilder) {
-		BlockDeclaration mainBlock = new MaybeBlockDeclaration(CoreGlobal.sourceName);
+//		BlockDeclaration mainBlock = new MaybeBlockDeclaration(simBuilder, "MainBlock: " + Global.sourceName);
+		BlockDeclaration mainBlock = new MaybeBlockDeclaration(simBuilder, simBuilder.getCurrentParserToken(), new Identifier(CoreGlobal.sourceName));
+		
 		mainBlock.isMainModule = true;
 		mainBlock.declarationKind = ObjectKind.SimulaProgram;
-//		Statement program = Statement.expectStatement();
 		Statement program = Statement.acceptStatement(simBuilder);
 		mainBlock.statements.add(program);
+//		simBuilder.getRoot().printPsiTree("DONE ProgramModule.doParseProgram");
 		return mainBlock;
 	}
 
 	@Override
 	public void doChecking() {
 		if(IS_SEMANTICS_CHECKED()) return;
+		CoreGlobal.enterScope(mainModule);
 		sysin.doChecking();
 		sysout.doChecking();
 		mainModule.doChecking();
@@ -168,7 +200,7 @@ public final class ProgramModule extends Statement {
 	/// Create Java ClassFile.
 	/// @throws IOException if something went wrong
 	public void createJavaClassFile() throws IOException {
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		mainModule.createJavaClassFile();
 	}
 
@@ -188,6 +220,8 @@ public final class ProgramModule extends Statement {
 	}
 	
 	@Override
-	public String toString() { return((mainModule==null)?"":""+mainModule.identifier); }
+	public String toString() {
+		return (mainModule==null)?"MAIN":mainModule.identifier.value;
+	}
 	
 }

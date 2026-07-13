@@ -12,15 +12,17 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
 
+import simula.Option;
+import simula.builder.SimulaBuilder;
 import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.RTS;
-import simula.builder.SimulaBuilder;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
+import simula.token.LexToken;
 
 /// Declaration Scope.
 /// 
@@ -28,7 +30,7 @@ import simula.compiler.utilities.Util;
 /// of ClassDeclaration, ProcedureDeclaration and MaybeBlockDeclaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/DeclarationScope.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/DeclarationScope.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -58,8 +60,8 @@ public abstract class DeclarationScope extends Declaration  {
 	/// Create a new DeclarationScope.
 	/// 
 	/// @param ident scope identifier
-	protected DeclarationScope(final SimulaBuilder simBuilder, final String ident) {
-		super(simBuilder, ident);
+	protected DeclarationScope(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier ident) {
+		super(simBuilder, firstParserToken, ident);
 		declarationList = new DeclarationList(getClass().getSimpleName() + ':' + ident + ":Line=" + CoreGlobal.sourceLineNumber);
 		declaredIn = CoreGlobal.getCurrentScope();
 		CoreGlobal.setScope(this);
@@ -68,12 +70,12 @@ public abstract class DeclarationScope extends Declaration  {
 	}
 	
 	/// Modify the identifier of this class, procedure, ...
-	/// @param newIdentifier the new identifier
-	public void modifyIdentifier(final String newIdentifier) {
-		this.identifier = newIdentifier;
+	/// @param identifier the new identifier
+	public void modifyIdentifier(final Identifier identifier) {
+		this.identifier = identifier;
 		checkAlreadyDefined();
-		if (declarationKind == ObjectKind.ContextFreeMethod) externalIdent = this.identifier;
-		else if (declarationKind == ObjectKind.MemberMethod) externalIdent = this.identifier;
+		if (declarationKind == ObjectKind.ContextFreeMethod) externalIdent = this.identifier.value;
+		else if (declarationKind == ObjectKind.MemberMethod) externalIdent = this.identifier.value;
 		else if (externalIdent == null)	externalIdent = edJavaClassName();
 	}
 
@@ -89,9 +91,9 @@ public abstract class DeclarationScope extends Declaration  {
 			if ((scope instanceof BlockDeclaration) && !(scope instanceof StandardClass)
 					&& !(scope instanceof StandardProcedure)) {
 				if (id == null)
-					id = scope.identifier;
+					id = scope.identifier.value;
 				else
-					id = scope.identifier + '_' + id;
+					id = scope.identifier.value + '_' + id;
 			}
 			scope = scope.declaredIn;
 		}
@@ -116,7 +118,7 @@ public abstract class DeclarationScope extends Declaration  {
 	public String scopeID() {
 		if (getRTBlockLevel() > 1)
 			return (declaredIn.scopeID() + '.' + identifier);
-		return identifier;
+		return identifier.value;
 	}
 
 	// ***********************************************************************************************
@@ -137,7 +139,7 @@ public abstract class DeclarationScope extends Declaration  {
 	/// 
 	/// @param ident attribute identifier
 	/// @return the resulting Meaning
-	public Meaning findVisibleAttributeMeaning(final String ident) {
+	public Meaning findVisibleAttributeMeaning(final Identifier ident) {
 		Util.IERR("DeclarationScope.findVisibleAttributeMeaning: SHOULD BEEN REDEFINED: " + identifier + " IN " + this.getClass().getSimpleName());
 		return null;
 	}
@@ -149,16 +151,23 @@ public abstract class DeclarationScope extends Declaration  {
 	/// 
 	/// @param identifier declared identifier
 	/// @return the resulting Meaning
-	public Meaning findMeaning(final String identifier) {
+	public Meaning findMeaning(final Identifier identifier) {
 		Meaning meaning = findVisibleAttributeMeaning(identifier);
-		if (meaning == null && declaredIn != null)
+		if (meaning == null && declaredIn != null) {
+//			IO.println("DeclarationScope.findMeaning: Looking for "+identifier+" in "+declaredIn);
 			meaning = declaredIn.findMeaning(identifier);
+		}
 		
 		if (meaning == null) {
-			if (!CoreGlobal.duringParsing) {
-				Util.error("Undefined variable: " + identifier);
+//			if (!Global.duringParsing) {
+//				IO.println("DeclarationScope.findMeaning: Undefined variable: " + identifier);
+//				Util.error("Undefined variable: " + identifier);
+//			}
+			if(Option.CaseSensitive) {
+				Option.WARNINGS = true;
+				Util.warning(this, "Undefined variable: " + identifier + "  Could be because Option.CaseSensitive == true");
 			}
-			UndefinedDeclaration undef = new UndefinedDeclaration(identifier);
+			UndefinedDeclaration undef = new UndefinedDeclaration(null, identifier);
 			meaning = new Meaning(undef, this); // Error Recovery
 		}
 		return (meaning);
@@ -308,9 +317,9 @@ public abstract class DeclarationScope extends Declaration  {
 	/// @return edited scope chain
 	public String edScopeChain() {
 		if (declaredIn == null)
-			return (identifier);
+			return (identifier.value);
 		String encName = declaredIn.edScopeChain();
-		return (identifier + '.' + encName);
+		return (identifier.value + '.' + encName);
 	}
 
 	// ***********************************************************************************************
@@ -346,7 +355,7 @@ public abstract class DeclarationScope extends Declaration  {
 		for(Declaration d:declarationList) d.printTree(indent,this);
 		if(labelList != null) for(LabelDeclaration d:labelList.getDeclaredLabels()) d.printTree(indent,this);
 	}
-	
+
 	/// Debug utility: edScope
 	/// @return edited scope String
 	public String edScope() {

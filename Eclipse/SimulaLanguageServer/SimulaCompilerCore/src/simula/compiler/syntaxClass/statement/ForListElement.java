@@ -9,10 +9,12 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.MethodTypeDesc;
 
+import simula.Option;
+import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.Parameter;
@@ -23,7 +25,6 @@ import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 
@@ -33,11 +34,11 @@ import simula.compiler.utilities.Util;
 /// Utility class ForListElement implementing a single value element.
 ///
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ForListElement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ForListElement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public class ForListElement extends SyntaxClass {
+public class ForListElement extends SyntaxElement {
 	/// The For-statement.
 	ForStatement forStatement;
 
@@ -47,7 +48,8 @@ public class ForListElement extends SyntaxClass {
 	/// Create a new ForListElement.
 	/// @param forStatement the ForStatement
 	/// @param expr1 The first expression
-	public ForListElement(final ForStatement forStatement, final Expression expr1) {
+	public ForListElement(final SimulaBuilder simBuilder, final ForStatement forStatement, final Expression expr1) {
+		super(simBuilder);
 		this.forStatement = forStatement;
 		this.expr1 = expr1;
 		if (Option.internal.TRACE_PARSE)
@@ -61,7 +63,7 @@ public class ForListElement extends SyntaxClass {
 					+ CoreGlobal.getCurrentScope().edScopeChain());
 		expr1.doChecking();
 		expr1 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr1);
-		expr1.doChecking();
+//		expr1.doChecking();
 		expr1.backLink = forStatement; // To ensure _RESULT from functions
 	}
 
@@ -156,15 +158,17 @@ public class ForListElement extends SyntaxClass {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	protected ForListElement() {}
+	protected ForListElement() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("ForListElement: " + this);
 		oupt.writeKind(ObjectKind.ForListElement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 		// *** ForListElement
 		oupt.writeObj(forStatement);
 		oupt.writeObj(expr1);
@@ -177,8 +181,8 @@ public class ForListElement extends SyntaxClass {
 	public static ForListElement readObject(AttributeInputStream inpt) throws IOException {
 		ForListElement elt = new ForListElement();
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
-		// *** SyntaxClass
-		elt.lineNumber = inpt.readShort();
+		// *** SyntaxElement
+		elt.astData = readAstData(inpt);
 		// *** ForListElement
 		elt.forStatement = (ForStatement) inpt.readObj();
 		elt.expr1 = (Expression) inpt.readObj();

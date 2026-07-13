@@ -20,7 +20,7 @@ import simula.token.LongRealConst;
 import simula.token.RealConst;
 import simula.token.SimpleString;
 import simula.token.WhiteSpaceToken;
-import simula.token.IdentifierToken;
+import simula.token.Identifier;
 import simula.token.IntegerConst;
 
 /// The Simula Scanner.
@@ -128,41 +128,52 @@ public final class SimulaLexer {
 		currentLineNumber = 0;
        	update_LineStartPos_List();
 		CoreGlobal.sourceLineNumber=1;
-		nextToken();
+//		nextToken();+
 	}
 
 
-	public LexToken getPrevLexerToken() {
-        if(Option.internal.TRACE_LEXER > 1) IO.println("SimulaLexer.getPrevLexerToken: "+prevLexerToken);
-        return prevLexerToken;
-    }
+//	private LexToken getPrevLexerToken() {
+//        if(Option.internal.TRACE_LEXER > 1) IO.println("SimulaLexer.getPrevLexerToken: "+prevLexerToken);
+//        return prevLexerToken;
+//    }
+//
+//	private LexToken getCurrentLexerToken() {
+//        if(Option.internal.TRACE_LEXER > 1) IO.println("SimulaLexer.getCurrentLexerToken: "+currentLexerToken);
+//        return currentLexerToken;
+//    }
 
-	public LexToken getPrevParserToken() {
-        if(Option.internal.TRACE_LEXER > 1) IO.println("SimulaLexer.getPrevParserToken: "+prevParserToken);
-        return prevParserToken;
-    }
-
-	public LexToken getCurrentLexerToken() {
-        if(Option.internal.TRACE_LEXER > 1) IO.println("SimulaLexer.getCurrentLexerToken: "+currentLexerToken);
-        return currentLexerToken;
-    }
-	
-	/// The saved Token used by 'saveCurrentToken'
-	private LexToken savedToken;
-
-	/// Save current Token
-	public void saveCurrentToken() {
-		IO.println("SimulaLexer.saveCurrentToken: "+currentLexerToken+", prevParserToken="+prevParserToken);
-//		if (savedToken != null) Util.IERR("SimulaLexer.saveCurrentToken: Already called");
-//		savedToken = currentLexerToken;
-//		currentLexerToken = prevParserToken;
-//		prevParserToken = null;
-		tokenQueue.add(prevParserToken);
-//		tokenQueue.add(currentLexerToken);
-		currentLexerToken = prevParserToken;
-    	IO.println("SimulaLexer.saveCurrentToken: tokenQueue: " + tokenQueue);
-    	Util.STOP();
+	/// Return next 'Parser' token.
+	/// Skip Comment, Whitespace and Newline tokens.
+	public LexToken getNextParserToken() {
+//		lexer.nextToken();                               // And then advance the lexer.				
+//		lexer.getNextParserToken();                      // And then advance the lexer.				
+        while(true) {
+    		LexToken token = nextToken();
+    		if(token == null) {
+    			token = getEOFToken();
+    		}
+        	if(token.isParserToken()) return token;
+		}
 	}
+
+//	/// Return current 'Parser' token.
+//	/// Skip Comment, Whitespace and Newline tokens.
+//    public LexToken getCurrentParserToken() {
+//    	// if(DEBUG > 1) IO.println("PsiBuilder.getCurrentParserToken: "+currentLexerToken);
+//        while(true) {
+//    		LexToken token = currentLexerToken;
+//    		if(token == null) {
+//    			token = getEOFToken();
+//    		}
+//        	if(token.isParserToken()) return token;
+//        	getNextParserToken();
+//		}
+//    }
+//
+//	public LexToken getPrevParserToken() {
+//        if(Option.internal.TRACE_LEXER > 1) IO.println("SimulaLexer.getPrevParserToken: "+prevParserToken);
+//        return prevParserToken;
+//    }
 
     //********************************************************************************
     //**	                                                                 nextToken 
@@ -180,10 +191,7 @@ public final class SimulaLexer {
     	tokenStartPos = nextPos;
     	
     	LexToken token;
-    	if(savedToken != null) {
-    		token = savedToken;
-    		savedToken = null;
-    	} else if(tokenQueue.size()>0) { 
+    	if(tokenQueue.size()>0) { 
 		    token=tokenQueue.remove();
 		    IO.println("POP LexToken: " + token);
 //			IO.println("SimulaLexer.nextToken: currentColumn="+currentColumn+", nextPos=" + nextPos + ", tokenStartPos="+tokenStartPos);
@@ -1675,7 +1683,7 @@ public final class SimulaLexer {
     /// @param ident the Token's identifier
     /// @return an identifier Token
     private LexToken identifierToken(final String ident) {
-    	return new IdentifierToken(currentLineNumber, sourceText, currentColumn, nextPos - tokenStartPos, this);
+    	return new Identifier(currentLineNumber, sourceText, currentColumn, nextPos - tokenStartPos, this);
     }
 
 	/// Utility: Edit current character.

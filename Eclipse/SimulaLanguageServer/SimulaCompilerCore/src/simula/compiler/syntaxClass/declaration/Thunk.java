@@ -16,6 +16,8 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
+
+import simula.Option;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.RemoteVariable;
@@ -26,13 +28,13 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Thunk Declaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/Thunk.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/Thunk.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -47,7 +49,7 @@ public final class Thunk extends DeclarationScope {
 	/// @param kind the kind code
 	/// @param expr the Thunk expression.
 	private Thunk(int kind,Expression expr) {
-		super(CoreGlobal.sourceName + "$THUNK$" + (++OBJECT_SEQU));
+		super(expr.simBuilder, expr.firstParserToken, new Identifier(CoreGlobal.sourceName + "$THUNK$" + (++OBJECT_SEQU)));
 		this.declarationKind = ObjectKind.Thunk;
 		this.kind = kind;
 		this.expr = expr;
@@ -61,7 +63,7 @@ public final class Thunk extends DeclarationScope {
 	// *** Utility: findVisibleAttributeMeaning
 	// ***********************************************************************************************
 	@Override
-	public Meaning findVisibleAttributeMeaning(final String ident) {
+	public Meaning findVisibleAttributeMeaning(final Identifier ident) {
 		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("BEGIN Checking Thunk for "+ident+" ================================== "+identifier+" ==================================");
 
 		Meaning meaning = declaredIn.findVisibleAttributeMeaning(ident);
@@ -289,8 +291,8 @@ public final class Thunk extends DeclarationScope {
 			String ident=null;
 			if(declaredAs instanceof SimpleVariableDeclaration var) ident=var.getFieldIdentifier();
 			else if(declaredAs instanceof Parameter par)            ident=par.getFieldIdentifier();
-			else if(declaredAs instanceof ArrayDeclaration arr)     ident=arr.identifier;
-			else if(declaredAs instanceof ProcedureDeclaration pro) ident=pro.identifier;
+			else if(declaredAs instanceof ArrayDeclaration arr)     ident=arr.identifier.value;
+			else if(declaredAs instanceof ProcedureDeclaration pro) ident=pro.identifier.value;
 			else Util.IERR();
 
 			if(nameParameter != null) {
@@ -449,7 +451,7 @@ public final class Thunk extends DeclarationScope {
 			} else Util.IERR();
 			
 			
-		} else Util.error("Illegal Procedure Expression as Actual Parameter: " + apar);
+		} else Util.codingError(apar, "Illegal Procedure Expression as Actual Parameter: " + apar);
 	}
 
 

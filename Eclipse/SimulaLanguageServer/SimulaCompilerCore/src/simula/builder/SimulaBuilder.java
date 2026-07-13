@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Vector;
 
 import simula.Option;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.CoreGlobal;
@@ -21,6 +21,11 @@ import simula.token.SimpleString;
 public class SimulaBuilder {
 	public DocumentManager documentManager;
     private SimulaLexer lexer;
+	
+    private LexToken prevParserToken;
+    private LexToken currentParserToken;
+	/// The saved Token used by 'saveCurrentToken'
+	private LexToken savedToken;
 
 	// Builder generated data structure:
 	public ProgramModule syntaxTree; // Root of Syntax Tree
@@ -38,6 +43,7 @@ public class SimulaBuilder {
 		lexTokenRange = new LexTokenRange(null);
         lexer = new SimulaLexer(this, documentManager.sourceCode);
         // Do the actual Building
+        getNextParserToken();
     	syntaxTree = new ProgramModule(this);
         try {
         	syntaxTree.doBuild();
@@ -95,37 +101,45 @@ public class SimulaBuilder {
     /// 
     /// Invariant: Lexer'parserToken is first token of construct
     /// 
+    public void startTokenRange() {}
+    public void startTokenRange(String debugName) {}
 //    public void startTokenRange(PsiTree.Kind kind, String debugName) {
-    public void startTokenRange() {
-    	lexTokenRange = new LexTokenRange(lexTokenRange);//, getSourceLineNumber(), sourceText, startOffset, debugName);
+    public void startTokenRange(String debugName,LexToken first) {
+//    	LexToken first = this.prevParserToken;
+//    	LexToken first = this.currentParserToken;
+    	IO.println("SimulaBuilder.startTokenRange: " + debugName + ", first=" + first);
+    	lexTokenRange = new LexTokenRange(lexTokenRange);
+    	lexTokenRange.addChild(first);
+	}
+    public void startTokenRange(LexToken first) {
+//    	LexToken first = this.prevParserToken;
+//    	LexToken first = this.currentParserToken;
+    	IO.println("SimulaBuilder.startTokenRange: " + ", first=" + first + Util.calledFrom(3, 25));
+    	lexTokenRange = new LexTokenRange(lexTokenRange);
+    	lexTokenRange.addChild(first);
 	}
 		
-	public void doneTokenRange(SyntaxClass SyntaxClass) {
-//		IO.println("PsiBuilder.doneTokenRange: SyntaxClass="+SyntaxClass);
-		Vector<SyntaxClass> SyntaxClasss = new Vector<SyntaxClass>();
-		if(SyntaxClass != null) SyntaxClasss.add(SyntaxClass);
-		doneTokenRange(SyntaxClasss);
+	public void doneTokenRange(SyntaxElement syntaxElement) {
+		IO.println("PsiBuilder.doneTokenRange: syntaxElement="+syntaxElement);
+//		Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
+//		if(syntaxElement != null) syntaxElements.add(syntaxElement);
+//		doneTokenRange(syntaxElements);
 	}
 	
-	public void doneTokenRange(Vector<SyntaxClass> SyntaxClasss) {
-//		IO.println("\nPsiBuilder.doneTokenRange: lexTokenRange=]"+lexTokenRange.getDebugText()+'[');
+	public void doneTokenRange(Vector<SyntaxElement> syntaxElements) {
+		IO.println("\nPsiBuilder.doneTokenRange: lexTokenRange=]"+lexTokenRange.getDebugText()+'[');
 		
-		for(SyntaxClass SyntaxClass:SyntaxClasss) {
-//			IO.println("PsiBuilder.doneTokenRange: SyntaxClass="+SyntaxClass);
-			SyntaxClass.lexTokenRange = lexTokenRange;
+		for(SyntaxElement syntaxElement:syntaxElements) {
+			IO.println("PsiBuilder.doneTokenRange: syntaxElement="+syntaxElement);
+			syntaxElement.lexTokenRange = lexTokenRange;
 		}
-		lexTokenRange.SyntaxClasss = SyntaxClasss;
+		lexTokenRange.syntaxElements = syntaxElements;
 
 		lexTokenRange = lexTokenRange.parent;
 	}
 	
 	public void dropTokenRange() {
-		lexTokenRange = lexTokenRange.parent;
-	}
-	
-	public void advanceLexer() {
-		lexTokenRange.addChild(getCurrentLexerToken()); // Add 'old' current LexToken to the AstTree
-		lexer.nextToken();                              // And then advance the lexer.				
+//		lexTokenRange = lexTokenRange.parent;
 	}
 	
 	public void consume(int... keyWords) {
@@ -151,7 +165,7 @@ public class SimulaBuilder {
 //		if(lexToken != getCurrentLexerToken()) Util.STOP();
 //		psiTree.addChild(lexToken);
 //		lexer.advance();
-		advanceLexer();
+		getNextParserToken();
 	}
 
 	public void	rollBackTo(LexToken prev, String debugInfo) {
@@ -166,18 +180,46 @@ public class SimulaBuilder {
 //		lexer.rollBackToBefore(prev, debugInfo);
 	}
 
-	
-	public LexToken prevToken() {
-		return lexer.getPrevLexerToken();
+//	public LexToken prevToken() {
+//		return lexer.getPrevLexerToken();
+//	}
+
+//	public LexToken prevParserToken() {
+//		return lexer.getPrevParserToken();
+//	}
+
+	/// Return next 'Parser' token.
+	/// Skip Comment, Whitespace and Newline tokens.
+	public LexToken getNextParserToken() {
+		prevParserToken = currentParserToken;
+//		lexTokenRange.addChild(currentParserToken);      // Add 'old' current LexToken to the lexTokenRange
+    	if(savedToken != null) {
+    		currentParserToken = savedToken;
+    		savedToken = null;
+    	} else currentParserToken = lexer.getNextParserToken(); // And then advance the lexer.	
+    	return currentParserToken;
 	}
 
-	public LexToken prevParserToken() {
-		return lexer.getPrevParserToken();
-	}
+	/// Return previous 'Parser' token.
+	/// Skip Comment, Whitespace and Newline tokens.
+    public LexToken getPrevParserToken() {
+    	return prevParserToken;
+    }
+
+	/// Return current 'Parser' token.
+	/// Skip Comment, Whitespace and Newline tokens.
+    public LexToken getCurrentParserToken() {
+    	return currentParserToken;
+    }
 
 	/// Save current Token
 	public void saveCurrentToken() {
-		lexer.saveCurrentToken();
+		IO.println("SimulaLexer.saveCurrentToken: "+currentParserToken+", prevParserToken="+prevParserToken);
+		if (savedToken != null) Util.IERR("SimulaLexer.saveCurrentToken: Already called");
+		savedToken = getCurrentParserToken();
+		currentParserToken = prevParserToken;
+		prevParserToken = null;
+//    	Util.STOP();
 	}
 
 	public boolean eof() {
@@ -185,38 +227,13 @@ public class SimulaBuilder {
 		return lexer.eof();
 	}
 
-	public LexToken getCurrentLexerToken() {
-		return lexer.getCurrentLexerToken();
-	}
-
-	public LexToken getPrevLexerToken() {
-		return lexer.getPrevLexerToken();
-	}
-
-	/// Return next 'Parser' token.
-	/// Skip Comment, Whitespace and Newline tokens.
-    public LexToken getNextParserToken() {
-    	Util.IERR("xxx - Skal ikke burukes");
-    	// if(DEBUG > 1) IO.println("PsiBuilder.getNextParserToken: "+currentLexerToken);
-    	Util.IERR("DENNE ER IKKE BRUKT FØR - MÅ SJEKKES");
-    	getCurrentParserToken();
-    	advanceLexer();
-    	return getCurrentParserToken();
-    }
-
-	/// Return current 'Parser' token.
-	/// Skip Comment, Whitespace and Newline tokens.
-    public LexToken getCurrentParserToken() {
-    	// if(DEBUG > 1) IO.println("PsiBuilder.getCurrentParserToken: "+currentLexerToken);
-        while(true) {
-    		LexToken token = getCurrentLexerToken();
-    		if(token == null) {
-    			token = lexer.getEOFToken();
-    		}
-        	if(token.isParserToken()) return token;
-        	advanceLexer();
-		}
-    }
+//	public LexToken getCurrentLexerToken() {
+//		return lexer.getCurrentLexerToken();
+//	}
+//
+//	public LexToken getPrevLexerToken() {
+//		return lexer.getPrevLexerToken();
+//	}
     
     /// Get text string, possibly concatenated.
     /// 
@@ -237,7 +254,7 @@ public class SimulaBuilder {
     		IO.println("PsiBuilder.getTextString: RESULT: "+result);
         	IO.println("PsiBuilder.getTextString: NEXT TOKEN: "+nextToken);
 //    		Util.IERR("SJEKK DETTE");
-        	advanceLexer();
+        	getNextParserToken();
     	}
     	IO.println("SimulaBuilder.getTextString: RETURN TEXT: ]"+result+"[\n\n");
     	return result;

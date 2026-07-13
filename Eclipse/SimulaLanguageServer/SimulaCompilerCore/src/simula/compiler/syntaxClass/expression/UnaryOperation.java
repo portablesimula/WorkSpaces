@@ -9,14 +9,15 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
+import simula.Option;
+import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Unary Operation.
@@ -29,7 +30,7 @@ import simula.compiler.utilities.Util;
 ///   
 ///      unary-operator = NOT | + | -
 /// </pre>
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/UnaryOperation.java">
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/UnaryOperation.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -44,12 +45,12 @@ public final class UnaryOperation extends Expression {
 	/// Create a new UnaryOperation.
 	/// @param oprator the unary operator.
 	/// @param operand the operand Expression
-	private UnaryOperation(final int oprator,final Expression operand) {
-		this.oprator = oprator;
-		this.operand = operand;
+	private UnaryOperation(final SimulaBuilder simBuilder, final int oprator,final Expression operand) {
+		super(simBuilder);
+		this.oprator = oprator; this.operand = operand;
 		if(this.operand==null)
-		{ Util.error("Missing operand after unary "+KeyWord.edit(oprator));
-		  this.operand=new VariableExpression("UNKNOWN_");
+		{ Util.syntaxError(simBuilder, "Missing operand after unary "+KeyWord.edit(oprator));
+		  this.operand=new MissingExpression(simBuilder);
 		}
 		this.operand.backLink=this;
 	}
@@ -58,34 +59,34 @@ public final class UnaryOperation extends Expression {
 	/// @param oprator the unary operator.
 	/// @param operand the operand Expression
 	/// @return the newly created UnaryOperation
-	static Expression create(final int oprator,final Expression operand) {
+	static Expression create(final SimulaBuilder simBuilder, final int oprator,final Expression operand) {
 		if (oprator == KeyWord.PLUS || oprator == KeyWord.MINUS) {
 			try { // Try to Compile-time Evaluate this expression
 				Number rhn=operand.getNumber();
 				if(rhn!=null) {
-					return(Constant.evaluate(oprator,rhn));
+					return(Constant.evaluate(simBuilder, oprator, rhn));
 				}  
 			} catch(Exception e) {}
 		}
-		return(new UnaryOperation(oprator,operand));
+		return(new UnaryOperation(simBuilder, oprator, operand));
 	}
 	
-	@Override
-	public Expression evaluate() {
-		// Try to Compile-time Evaluate this expression
-		if (oprator == KeyWord.PLUS || oprator == KeyWord.MINUS) {
-			Number rhn=operand.getNumber();
-			if(rhn!=null) {
-				return(Constant.evaluate(oprator,rhn));
-			}  
-		}
-		return(this);
-	}
+//	@Override
+//	public Expression evaluate(final PsiBuilder simBuilder) {
+//		// Try to Compile-time Evaluate this expression
+//		if (oprator == KeyWord.PLUS || oprator == KeyWord.MINUS) {
+//			Number rhn=operand.getNumber();
+//			if(rhn!=null) {
+//				return(Constant.evaluate(null, oprator,rhn));
+//			}  
+//		}
+//		return(this);
+//	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber=lineNumber;
+		CoreGlobal.sourceLineNumber=firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN UnaryOperation" + toString() + ".doChecking - Current Scope Chain: " + CoreGlobal.getCurrentScope().edScopeChain());
 		operand.doChecking();
@@ -106,7 +107,7 @@ public final class UnaryOperation extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		operand.buildEvaluation(null,codeBuilder);
 		if (oprator == KeyWord.PLUS) ; // NOTHING
@@ -156,15 +157,17 @@ public final class UnaryOperation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private UnaryOperation() {}
+	private UnaryOperation() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeUnaryOperation: " + this);
 		oupt.writeKind(ObjectKind.UnaryOperation);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -180,11 +183,11 @@ public final class UnaryOperation extends Expression {
 	public static UnaryOperation readObject(AttributeInputStream inpt) throws IOException {
 		UnaryOperation expr = new UnaryOperation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		// *** SyntaxClass
-		expr.lineNumber = inpt.readShort();
+		// *** SyntaxElement
+		expr.astData = readAstData(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxClass) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** UnaryOperation
 		expr.oprator = inpt.readShort();
 		expr.operand = (Expression) inpt.readObj();

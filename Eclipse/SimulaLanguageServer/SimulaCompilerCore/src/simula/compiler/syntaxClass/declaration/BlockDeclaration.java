@@ -14,21 +14,22 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Stack;
 import java.util.Vector;
 
-import simula.builder.Parse;
 import simula.builder.SimulaBuilder;
+import simula.Option;
+import simula.builder.Parse;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.RTS;
-import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.DeclarationList;
+import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 import simula.token.LexToken;
 
 /// Block Declaration.
@@ -38,7 +39,7 @@ import simula.token.LexToken;
 /// It contains a number of useful fields and methods common to its subclasses.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/BlockDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/BlockDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -50,8 +51,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// The statements belonging to this block.
 	public ObjectList<Statement> statements = new ObjectList<Statement>();
 
-	/// Last source line number
-	public int lastLineNumber;
+//	/// Last source line number
+//	public int lastLineNumber;
 	
 	/// If true; all member methods are independent of context
 	public boolean isContextFree;
@@ -99,8 +100,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// 
 	/// Used by expectMaybeBlock, i.e. CompoundStatement, SubBlock or PrefixedBlock.
 	/// @param identifier the given identifier
-	protected BlockDeclaration(final SimulaBuilder simBuilder, String identifier) {
-		super(simBuilder, identifier);
+	protected BlockDeclaration(final SimulaBuilder simBuilder, LexToken firstParserToken, Identifier identifier) {
+		super(simBuilder, firstParserToken, identifier);
 	}
 
 	/// Create a new BlockDeclaration.
@@ -108,8 +109,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// This constructor is only used by ClassDeclaration. ProcedureDeclaration and MaybeBlockDeclaration.
 	/// @param identifier the block identifier
 	/// @param declarationKind the declaration kind
-	private BlockDeclaration(final SimulaBuilder simBuilder, final String identifier,final int declarationKind) {
-		super(simBuilder, identifier);
+	private BlockDeclaration(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier identifier,final int declarationKind) {
+		super(simBuilder, firstParserToken, identifier);
 		this.declarationKind = declarationKind;
 	}
 	
@@ -122,9 +123,9 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// 
 	/// Precondition: BEGPAR is already read.
 	/// @param pList the parameter list
-	protected static void expectFormalParameterPart(final SimulaBuilder simBuilder, final Vector<Parameter> pList) {
+	protected static void expectFormalParameterPart(final SimulaBuilder simBuilder, LexToken firstParserToken, final Vector<Parameter> pList) {
 		do { // ParameterPart = Parameter ; { Parameter ; }
-			new Parameter(simBuilder, Parse.expectIdentifier(simBuilder).edText()).into(pList);
+			new Parameter(simBuilder, firstParserToken, Parse.expectIdentifier(simBuilder).edText()).into(pList);
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		Parse.expect(simBuilder, KeyWord.ENDPAR);
 	}
@@ -153,11 +154,11 @@ public abstract class BlockDeclaration extends DeclarationScope {
 		
 		/// Repeatedly parse a declaration and add it to the given BlockDeclaration's' declaration list.
 		/// Continue until there are no more declarations.
-		simBuilder.startTokenRange();
+		simBuilder.startTokenRange("Block.Declaration: ", simBuilder.getCurrentParserToken());
 		DeclarationList declarationList=this.declarationList;
-		Vector<SyntaxClass> declarations = null;
+		Vector<SyntaxElement> declarations = null;
 		while( (declarations = Declaration.acceptDeclaration(simBuilder)) != null) {
-			for(SyntaxClass decl:declarations) {
+			for(SyntaxElement decl:declarations) {
 				if(! (decl instanceof ExternalDeclaration)) {
 					// ExternalDeclaration should not be added to the declaration list.
 					declarationList.add((Declaration)decl);
@@ -165,7 +166,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 			}
 			Parse.expect(simBuilder, KeyWord.SEMICOLON);
 			simBuilder.doneTokenRange(declarations);
-			simBuilder.startTokenRange();
+			simBuilder.startTokenRange("Block.Declaration: +", simBuilder.getCurrentParserToken());
 		}
 		simBuilder.dropTokenRange();
 		
@@ -183,7 +184,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 //		        IO.println("BlockDeclaration.parseBlock: TESTING stm: " + stm);
 		}
 	}
-
+	
 	// ***********************************************************************************************
 	// *** Coding: isBlockWithLocalClasses
 	// ***********************************************************************************************
@@ -580,7 +581,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 			IO.println(edTreeIndent(indent) + ' ' + this.identifier + ' ' + (statements.size()) + " Statements ...");
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return ("" + identifier + '[' + externalIdent + "] ObjectKind=" + declarationKind);

@@ -7,24 +7,27 @@ package simula.compiler.syntaxClass.statement;
 
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
+
+import simula.Option;
+import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
+import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.ConnectionBlock;
 import simula.compiler.syntaxClass.expression.AssignmentOperation;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Utility class to hold the single Connection do-part.
 ///
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ConnectionDoPart.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ConnectionDoPart.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public class ConnectionDoPart extends SyntaxClass {
+public class ConnectionDoPart extends SyntaxElement {
 	
 	/// The associated connection statement.
 	ConnectionStatement connectionStatement;
@@ -36,7 +39,8 @@ public class ConnectionDoPart extends SyntaxClass {
 	/// @param connectionStatement The owner.
 	/// @param connectionBlock The associated connection block
 	/// @param statement the statement after DO
-	ConnectionDoPart(final ConnectionStatement connectionStatement, final ConnectionBlock connectionBlock,final Statement statement) {
+	ConnectionDoPart(final SimulaBuilder simBuilder, final ConnectionStatement connectionStatement, final ConnectionBlock connectionBlock,final Statement statement) {
+		super(simBuilder);
 		this.connectionStatement = connectionStatement;
 		this.connectionBlock = connectionBlock; // this.statement=statement;
 		connectionBlock.setStatement(statement);
@@ -48,9 +52,16 @@ public class ConnectionDoPart extends SyntaxClass {
 	public void doChecking() {
 		Type type = connectionStatement.inspectVariableDeclaration.type;
 		String refIdentifier = type.getRefIdent();
-		if (refIdentifier == null)
-			Util.error("The Variable " + connectionStatement.inspectedVariable + " is not ref() type");
-		connectionBlock.setClassDeclaration(AssignmentOperation.getQualification(refIdentifier));
+		if (refIdentifier == null) {
+			Util.semanticError(this, "The Variable " + connectionStatement.inspectedVariable + " is not ref() type");
+		}
+		ClassDeclaration classDeclaration = AssignmentOperation.getQualification(refIdentifier);
+		if(classDeclaration != null) {
+			connectionBlock.setClassDeclaration(classDeclaration);
+		} else {
+			Util.semanticError(this, "Illegal: " + refIdentifier + " is not a class");			
+		}
+		
 		connectionBlock.doChecking();
 		SET_SEMANTICS_CHECKED();
 	}
@@ -87,15 +98,17 @@ public class ConnectionDoPart extends SyntaxClass {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	protected ConnectionDoPart() {}
+	protected ConnectionDoPart() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeDoPart: " + this);
 		oupt.writeKind(ObjectKind.ConnectionDoPart);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 		// *** ConnectionDoPart
 		oupt.writeObj(connectionStatement);
 		oupt.writeObj(connectionBlock);
@@ -108,8 +121,8 @@ public class ConnectionDoPart extends SyntaxClass {
 	public static ConnectionDoPart readObject(AttributeInputStream inpt) throws IOException {
 		ConnectionDoPart dop = new ConnectionDoPart();
 		dop.OBJECT_SEQU = inpt.readSEQU(dop);
-		// *** SyntaxClass
-		dop.lineNumber = inpt.readShort();
+		// *** SyntaxElement
+		dop.astData = readAstData(inpt);
 		// *** ConnectionDoPart
 		dop.connectionStatement = (ConnectionStatement) inpt.readObj();
 		dop.connectionBlock = (ConnectionBlock) inpt.readObj();

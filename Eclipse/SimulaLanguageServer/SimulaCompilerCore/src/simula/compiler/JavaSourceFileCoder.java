@@ -13,16 +13,16 @@ import java.io.Writer;
 import java.util.Date;
 import java.util.Vector;
 
+import simula.Option;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Java source-file coder.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/JavaSourceFileCoder.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/JavaSourceFileCoder.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen 
 public final class JavaSourceFileCoder {
@@ -130,7 +130,7 @@ public final class JavaSourceFileCoder {
 	/// @param line the code line string
 	/// @param modid module identifier
 	private void write(final int sourceLineNumber, final String line, final String modid) {
-		Util.ASSERT(sourceLineNumber > 0, "Invariant");
+//		Util.ASSERT(sourceLineNumber > 0, "Invariant: sourceLineNumber="+sourceLineNumber);
 		try {
 			currentJavaLineNumber++;
 			if (prevLineNumber != sourceLineNumber) {
@@ -196,7 +196,7 @@ public final class JavaSourceFileCoder {
 
 	/// Output program info. I.e. identifier and lineMap.
 	public void codeProgramInfo() {
-		appendLine(currentJavaLineNumber, blockDeclaration.lastLineNumber);
+		appendLine(currentJavaLineNumber, blockDeclaration.lastLineNumber());
 		// public static RTS_PROGINFO _INFO=new
 		// RTS_PROGINFO("file.sim","MainProgram",1,4,12,5,14,12,32,14,37,16);
 		StringBuilder s = new StringBuilder();

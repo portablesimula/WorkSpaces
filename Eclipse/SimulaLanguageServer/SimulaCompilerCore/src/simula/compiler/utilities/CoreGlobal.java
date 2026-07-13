@@ -7,7 +7,6 @@ package simula.compiler.utilities;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayDeque;
 import java.util.LinkedList;
@@ -16,41 +15,30 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.jar.JarFile;
 
-import javax.swing.ImageIcon;
-
 import simula.compiler.JavaSourceFileCoder;
 import simula.SimulaCoreClient;
 import simula.compiler.JarFileBuilder;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.StandardClass;
-import simula.compiler.syntaxClass.statement.ProgramModule;
-import simula.editor.RTOption;
 
 /// Global Variables.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/Global.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/Global.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class CoreGlobal {
-
+    
 	public static boolean TRACE_LEXER = false;
 	public static final boolean CaseSensitive = false;
 	public static boolean TRACE_COMMENTS = false;
-
+	
 	public static SimulaCoreClient simulaCoreClient;
 
 	/// The Simula release identification.
 	/// 
 	/// NOTE: When updating release id, change version in SimulaExtractor and RuntimeSystem
 	public static final String simulaReleaseID = "Simula-2.0";
-	
-	/// The Simula favicon
-	public static ImageIcon favicon;
-	/// A Simula icon
-	public static ImageIcon simIcon;
-	/// A small Simula icon
-	static ImageIcon sIcon;
 
 	/// The Simula Home directory.
 	public static File simulaHome;
@@ -81,9 +69,7 @@ public final class CoreGlobal {
 	
 	/// The insert name.
 	public static String insertName;
-	
-	/// The programModule.
-	public static ProgramModule programModule;
+
 	
 	/// Where to find the Simula Runtime System.
 	public static File simulaRtsLib; // The simula runtime system
@@ -146,9 +132,6 @@ public final class CoreGlobal {
 	/// The set of Java SourceFile Coders.
 	public static Vector<JavaSourceFileCoder> javaSourceFileCoders;
 
-	/// The console
-	public static ConsolePanel console;
-
 	/// The Jar files queued for later inclusion.
 	/// See: JarFileBuilder for details.
 	public static LinkedList<JarFile> includeQueue;
@@ -158,6 +141,8 @@ public final class CoreGlobal {
 
 	/// Initiate Global variables.
 	public static void initiate() {
+//    	currentModule = null;
+//    	moduleMap = new HashMap<>();
 		Object_SEQU = 8001;
 		jarFileBuilder = null;
 		simulaClassLoader = null;
@@ -177,9 +162,13 @@ public final class CoreGlobal {
 //					favicon = new ImageIcon(new File(simdir, "icons/favicon.png").toString());
 //					simIcon = new ImageIcon(new File(simdir, "icons/sim2.png").toString());
 //					sIcon = new ImageIcon(new File(simdir, "icons/sim.png").toString());
+//					simulaIcon = new ImageIcon(new File(simdir, "icons/simula.png").toString());
 //				} catch(Exception e) {}
 //			}
 //		}
+//    	Palette.init();
+    	IO.println("Global.initiate completed");
+//    	Thread.dumpStack();
 	}
 
 	/// The declaration scope stack.
@@ -268,7 +257,7 @@ public final class CoreGlobal {
 		try {
 			simulaProperties.loadFromXML(new FileInputStream(simulaPropertiesFile));
 		} catch (Exception e) {
-			Util.popUpError("Can't load: " + simulaPropertiesFile + "\nGot error: " + e);
+			Util.IERR("Can't load: " + simulaPropertiesFile + "\nGot error: " + e);
 //			Thread.dumpStack();
 		}
 		simulaHome = new File(simulaProperties.getProperty("simula.home"));
@@ -290,48 +279,48 @@ public final class CoreGlobal {
 
 	/// Load Workspace properties.
 	public static void loadUserSettings() {
-		simulaUserSettings = new Properties();
-		String USER_HOME = System.getProperty("user.home");
-		File simulaPropertiesDir = new File(USER_HOME, ".simula");
-//		simulaUserSettingsFile = new File(simulaPropertiesDir, "workspaces.xml");
-		simulaUserSettingsFile = new File(simulaPropertiesDir, "settings.xml");
-		workspaces = new ArrayDeque<File>();
-		if (simulaUserSettingsFile.exists()) {
-			try {
-				loadProperties();
-				Option.getCompilerOptions(simulaProperties);
-				simulaUserSettings.loadFromXML(new FileInputStream(simulaUserSettingsFile));
-				
-				Option.getCompilerOptions(simulaUserSettings);
-				RTOption.getRuntimeOptions(simulaUserSettings);
-				
-				String ext = simulaUserSettings.getProperty("simula.extLib", null);
-				// Util.println("Global.loadUserSettings: extLib="+ext);
-				if (ext != null)
-					CoreGlobal.extLib = new File(ext);
-				String count = simulaUserSettings.getProperty("simula.workspace.count","0");
-//				IO.println("Global.loadSPortEditorProperties: count="+count);
-				int n =  Integer.decode(count).intValue();
-				for(int i=0;i<n;i++) {
-					String ws = simulaUserSettings.getProperty("simula.workspace." + (i+1));
-//					IO.println("Global.loadSPortEditorProperties: workspace="+ws);
-					if(ws != null) {
-						File workspace = new File(ws);
-						if(workspace.exists()) workspaces.add(new File(ws));
-					}
-				}
-				
-				Option.editorUIScale = simulaUserSettings.getProperty("simula.editor.UIScale", "1.0");
-
-			} catch (Exception e) {
-				e.printStackTrace();
-				Util.popUpError("Can't load: " + simulaUserSettingsFile + "\nGot error: " + e);
-			}
-		}
-		if (workspaces.isEmpty()) {
-			workspaces.add(CoreGlobal.sampleSourceDir);
-		}
-		currentWorkspace = workspaces.getFirst();
+//		simulaUserSettings = new Properties();
+//		String USER_HOME = System.getProperty("user.home");
+//		File simulaPropertiesDir = new File(USER_HOME, ".simula");
+////		simulaUserSettingsFile = new File(simulaPropertiesDir, "workspaces.xml");
+//		simulaUserSettingsFile = new File(simulaPropertiesDir, "settings.xml");
+//		workspaces = new ArrayDeque<File>();
+//		if (simulaUserSettingsFile.exists()) {
+//			try {
+//				loadProperties();
+//				Option.getCompilerOptions(simulaProperties);
+//				simulaUserSettings.loadFromXML(new FileInputStream(simulaUserSettingsFile));
+//				
+//				Option.getCompilerOptions(simulaUserSettings);
+//				RTOption.getRuntimeOptions(simulaUserSettings);
+//				
+//				String ext = simulaUserSettings.getProperty("simula.extLib", null);
+//				// Util.println("Global.loadUserSettings: extLib="+ext);
+//				if (ext != null)
+//					Global.extLib = new File(ext);
+//				String count = simulaUserSettings.getProperty("simula.workspace.count","0");
+////				IO.println("Global.loadSPortEditorProperties: count="+count);
+//				int n =  Integer.decode(count).intValue();
+//				for(int i=0;i<n;i++) {
+//					String ws = simulaUserSettings.getProperty("simula.workspace." + (i+1));
+////					IO.println("Global.loadSPortEditorProperties: workspace="+ws);
+//					if(ws != null) {
+//						File workspace = new File(ws);
+//						if(workspace.exists()) workspaces.add(new File(ws));
+//					}
+//				}
+//				
+//				Option.editorUIScale = simulaUserSettings.getProperty("simula.editor.UIScale", "1.0");
+//
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				Util.popUpError("Can't load: " + simulaUserSettingsFile + "\nGot error: " + e);
+//			}
+//		}
+//		if (workspaces.isEmpty()) {
+//			workspaces.add(Global.sampleSourceDir);
+//		}
+//		currentWorkspace = workspaces.getFirst();
 	}
 
 	/// Set current Workspace.
@@ -346,23 +335,23 @@ public final class CoreGlobal {
 
 	/// Store Workspace properties.
 	public static void storeWorkspaceProperties() {
-		simulaUserSettings = new Properties();
-		Option.setCompilerOptions(simulaUserSettings);
-		RTOption.setRuntimeOptions(simulaUserSettings);
-		if (CoreGlobal.extLib != null)
-			simulaUserSettings.setProperty("simula.extLib", CoreGlobal.extLib.toString());
-		simulaUserSettings.setProperty("simula.workspace.count", ""+workspaces.size());
-		int i = 1;
-		for (File ws : workspaces) {
-			simulaUserSettings.setProperty("simula.workspace." + (i++), ws.toString());
-		}
-		CoreGlobal.currentWorkspace = workspaces.getFirst();
-		simulaUserSettingsFile.getParentFile().mkdirs();
-		try {
-			simulaUserSettings.storeToXML(new FileOutputStream(simulaUserSettingsFile), "Simula Editor Properties");
-		} catch (Exception e) {
-			Util.IERR();
-		}
+//		simulaUserSettings = new Properties();
+//		Option.setCompilerOptions(simulaUserSettings);
+//		RTOption.setRuntimeOptions(simulaUserSettings);
+//		if (Global.extLib != null)
+//			simulaUserSettings.setProperty("simula.extLib", Global.extLib.toString());
+//		simulaUserSettings.setProperty("simula.workspace.count", ""+workspaces.size());
+//		int i = 1;
+//		for (File ws : workspaces) {
+//			simulaUserSettings.setProperty("simula.workspace." + (i++), ws.toString());
+//		}
+//		Global.currentWorkspace = workspaces.getFirst();
+//		simulaUserSettingsFile.getParentFile().mkdirs();
+//		try {
+//			simulaUserSettings.storeToXML(new FileOutputStream(simulaUserSettingsFile), "Simula Editor Properties");
+//		} catch (Exception e) {
+//			Util.IERR();
+//		}
 	}
 
 }

@@ -52,7 +52,7 @@ public final class DeclarationList extends Vector<Declaration> {
 	/// Add a declaration to this list.
 	@Override
 	public boolean add(Declaration dcl) {
-		Declaration d=find(dcl.identifier);
+		Declaration d=find(dcl.identifier.value);
 		if(d!=null) {
 			Util.warning(dcl, "Multiple declarations with the same name: "+dcl.identifier);
 			Util.warning(d, "Multiple declarations with the same name: "+dcl.identifier);
@@ -78,7 +78,7 @@ public final class DeclarationList extends Vector<Declaration> {
 	/// @param oupt the AttributeOutputStream to write to.
 	/// @throws IOException if something went wrong.
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
-		oupt.writeString(identifier);
+		oupt.writeIdentifier(identifier);
 		oupt.writeShort(this.size());
 		for(Declaration dcl:this) oupt.writeObj(dcl);
 	}

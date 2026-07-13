@@ -70,6 +70,10 @@ public class LexToken {
 		
 	}
 	
+	public LexToken(int keyWord) {
+		this.keyWord = keyWord;
+	}
+
 	protected void TRACE_NEW_LEXTOKEN() {
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 1) {
 			IO.println("NEW LexToken: "+this);

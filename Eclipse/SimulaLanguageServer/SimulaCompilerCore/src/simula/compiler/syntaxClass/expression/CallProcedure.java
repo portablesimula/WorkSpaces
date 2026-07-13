@@ -8,7 +8,7 @@ package simula.compiler.syntaxClass.expression;
 import java.util.Iterator;
 
 import simula.compiler.syntaxClass.ProcedureSpecification;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ArrayDeclaration;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
@@ -26,7 +26,7 @@ import simula.compiler.utilities.Util;
 /// Java Coding Utilities: Call Procedure
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/CallProcedure.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/CallProcedure.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -65,7 +65,7 @@ public final class CallProcedure {
 	/// @param func Function Designator, may be subscripted
 	/// @param backLink if not null, this procedure call is part of the backLink Expression/Statement.
 	/// @return piece of Java source code
-	static String remote(final Expression obj,final ProcedureDeclaration procedure,final VariableExpression func,final SyntaxClass backLink) {
+	static String remote(final Expression obj,final ProcedureDeclaration procedure,final VariableExpression func,final SyntaxElement backLink) {
 		if(procedure.myVirtual!=null) {
 			// Call Remote Virtual Procedure
 			return(remoteVirtual(obj,func,procedure.myVirtual.virtualSpec));
@@ -243,7 +243,7 @@ public final class CallProcedure {
 	private static String codeCPF(final String ident,final VariableExpression variable,final ProcedureSpecification procedureSpec) {
 		if(! variable.hasArguments()) {
 			if(procedureSpec != null && procedureSpec.parameterList.size() > 0)
-				Util.error("Missing parameter(s) to " + variable.identifier);
+				Util.codingError(variable, "Missing parameter(s) to " + variable.identifier);
 		}
 		StringBuilder s=new StringBuilder();
 		if(procedureSpec!=null) s.append(codeCSVP(ident,variable,procedureSpec));
@@ -259,8 +259,12 @@ public final class CallProcedure {
 						Declaration decl=var.meaning.declaredAs;
 						if(decl instanceof StandardProcedure) {
 							if(Util.equals(decl.identifier, "sourceline")) {
-								actualParameter=new Constant(Type.Integer,CoreGlobal.sourceLineNumber);
-								actualParameter.doChecking();
+//								actualParameter=new Constant(Type.Integer,Global.sourceLineNumber);
+//								actualParameter=new Constant(null, Type.Integer, decl.firstLineNumber());
+								int lno = var.firstLineNumber();
+								if(lno <= 0) Util.IERR("CallProcedure.codeCPF: Illegal lineNumber: " + lno);
+								actualParameter=new Constant(null, Type.Integer, lno);
+							actualParameter.doChecking();
 							}
 						}
 						switch(decl.declarationKind) {
@@ -356,10 +360,10 @@ public final class CallProcedure {
 				if (formalParameter.nDim > 0) {
 					int aDim = getNdim(actualParameter);
 					if (aDim < 1)
-						Util.warning("Parameter Array " + actualParameter
+						Util.warning(variable, "Parameter Array " + actualParameter
 								+ " remains unchecked. Java or Runtime errors may occur");
 					else if (aDim != formalParameter.nDim)
-						Util.error("Parameter Array " + actualParameter + " has wrong number of dimensions");
+						Util.codingError(variable, "Parameter Array " + actualParameter + " has wrong number of dimensions");
 				}
 				if (prevPar)
 					s.append(',');
@@ -571,7 +575,7 @@ public final class CallProcedure {
 			} else Util.IERR("Flere sånne(2) tilfeller ???  QUAL="+decl.getClass().getSimpleName());
 			String procIdent = var.meaning.declaredAs.getJavaIdentifier();
 			return("new RTS_PRCQNT(" + staticLink + "," + procIdent + ".class)");
-		} else Util.error("Illegal Procedure Expression as Actual Parameter: " + apar);
+		} else Util.codingError(apar, "Illegal Procedure Expression as Actual Parameter: " + apar);
 	    return("UNKNOWN"); // Error recovery
 	}
 

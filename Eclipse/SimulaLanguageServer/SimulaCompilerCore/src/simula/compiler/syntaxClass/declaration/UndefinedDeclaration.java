@@ -13,17 +13,19 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
 
+import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Undefined Declaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/UndefinedDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/UndefinedDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -33,8 +35,8 @@ public class UndefinedDeclaration extends Declaration {
 	/// Create a new UndefinedDeclaration.
 	/// 
 	/// @param identifier the variable identifier
-	public UndefinedDeclaration(final String identifier) {
-		super(identifier);
+	public UndefinedDeclaration(final SimulaBuilder simBuilder, final Identifier identifier) {
+		super(simBuilder, identifier, identifier);
 		this.declarationKind = ObjectKind.UndefinedDeclaration;
 		this.type = Type.Undef;
 	}
@@ -43,8 +45,8 @@ public class UndefinedDeclaration extends Declaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = lineNumber;
-		if(type != null) type.doChecking(CoreGlobal.getCurrentScope());
+		CoreGlobal.sourceLineNumber = firstLineNumber();
+		if(type != null) type.doChecking(CoreGlobal.getCurrentScope(), this);
 		
 		SET_SEMANTICS_CHECKED();
 	}
@@ -116,7 +118,7 @@ public class UndefinedDeclaration extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public UndefinedDeclaration() {
-		super(null);
+		super(null, null, null);
 		this.declarationKind = ObjectKind.SimpleVariableDeclaration;
 	}
 
@@ -126,11 +128,11 @@ public class UndefinedDeclaration extends Declaration {
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 
 		// *** Declaration
-		oupt.writeString(identifier);
+		oupt.writeIdentifier(identifier);
 		oupt.writeString(externalIdent);
 		oupt.writeType(type);// Declaration
 		oupt.writeObj(declaredIn);// Declaration
@@ -148,11 +150,11 @@ public class UndefinedDeclaration extends Declaration {
 		UndefinedDeclaration var = new UndefinedDeclaration();
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
-		// *** SyntaxClass
-		var.lineNumber = inpt.readShort();
+		// *** SyntaxElement
+		var.astData = readAstData(inpt);
 
 		// *** Declaration
-		var.identifier = inpt.readString();
+		var.identifier = inpt.readIdentifier();
 		var.externalIdent = inpt.readString();
 		var.type = inpt.readType();
 		var.declaredIn = (DeclarationScope) inpt.readObj();

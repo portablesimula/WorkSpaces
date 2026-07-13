@@ -11,6 +11,8 @@ import java.lang.classfile.Label;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.MethodTypeDesc;
 
+import simula.Option;
+import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -23,7 +25,6 @@ import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 
@@ -33,7 +34,7 @@ import simula.compiler.utilities.Util;
 /// Utility class: For-list While element.
 ///
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ForWhileElement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ForWhileElement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -46,8 +47,8 @@ public class ForWhileElement extends ForListElement {
 	/// @param forStatement the ForStatement
 	/// @param expr1 first expression 
 	/// @param expr2 second expression
-	public ForWhileElement(final ForStatement forStatement, final Expression expr1, final Expression expr2) {
-		super(forStatement, expr1);
+	public ForWhileElement(final SimulaBuilder simBuilder, final ForStatement forStatement, final Expression expr1, final Expression expr2) {
+		super(simBuilder, forStatement, expr1);
 		this.expr2 = expr2;
 	}
 
@@ -56,13 +57,15 @@ public class ForWhileElement extends ForListElement {
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN WhileElement(" + this + ").doChecking - Current Scope Chain: " + CoreGlobal.getCurrentScope().edScopeChain());
 		expr1.doChecking();
+		expr1 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr1);
+//		expr1.doChecking();
+		expr1.backLink = forStatement; // To ensure _RESULT from functions
 		expr2.doChecking();
 		expr2.backLink = forStatement; // To ensure _RESULT from functions
-		if (expr2.type == null || expr2.type.keyWord != Type.T_BOOLEAN)
-			Util.error("While condition is not Boolean but " + expr2.type);				
-		expr1 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr1);
-		expr1.backLink = forStatement; // To ensure _RESULT from functions
-//		expr2.backLink = forStatement; // To ensure _RESULT from functions
+//		if (expr2.type == null || expr2.type.keyWord != Type.T_BOOLEAN)
+		if(! Type.checkType(expr2, Type.T_BOOLEAN)) {
+			Util.semanticError(this, "While condition is not Boolean but " + expr2.type);	
+		}
 	}
 
 	@Override
@@ -152,8 +155,8 @@ public class ForWhileElement extends ForListElement {
 		Util.TRACE_OUTPUT("ForWhileElement: " + this);
 		oupt.writeKind(ObjectKind.ForWhileElement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 		// *** ForListElement
 		oupt.writeObj(forStatement);
 		oupt.writeObj(expr1);
@@ -167,8 +170,8 @@ public class ForWhileElement extends ForListElement {
 	public static ForWhileElement readObject(AttributeInputStream inpt) throws IOException {
 		ForWhileElement elt = new ForWhileElement();
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
-		// *** SyntaxClass
-		elt.lineNumber = inpt.readShort();
+		// *** SyntaxElement
+		elt.astData = readAstData(inpt);
 		// *** ForListElement
 		elt.forStatement = (ForStatement) inpt.readObj();
 		elt.expr1 = (Expression) inpt.readObj();

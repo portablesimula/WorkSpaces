@@ -6,11 +6,15 @@
 package simula.compiler.syntaxClass;
 
 import java.io.IOException;
+
+import simula.builder.SimulaBuilder;
+import simula.builder.SyntaxTree;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Hidden Specification.
 /// <pre>
@@ -22,13 +26,13 @@ import simula.compiler.utilities.Util;
 ///         | protected hidden identifier-list
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/HiddenSpecification.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/HiddenSpecification.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public final class HiddenSpecification extends SyntaxClass {
+public final class HiddenSpecification extends SyntaxElement {
 
 	/// The hidden identifier.
-	public String identifier;
+	public Identifier identifier;
 
 	/// The class in which this HiddenSpecification occur.
 	ClassDeclaration definedIn;
@@ -47,7 +51,8 @@ public final class HiddenSpecification extends SyntaxClass {
 	/// Create a new HiddenSpecification.
 	/// @param definedIn  the class where Hidden is specified
 	/// @param identifier the hidden identifier
-	public HiddenSpecification(final ClassDeclaration definedIn, final String identifier) {
+	public HiddenSpecification(final SimulaBuilder simBuilder, final ClassDeclaration definedIn, final Identifier identifier) {
+		super(simBuilder, identifier);
 		this.definedIn = definedIn;
 		this.identifier = identifier;
 	}
@@ -82,7 +87,7 @@ public final class HiddenSpecification extends SyntaxClass {
 			}
 			scope = scope.getPrefixClass();
 		}
-		Util.error(identifier + " is specified HIDDEN without being PROTECTED");
+		Util.semanticError(this, identifier + " is specified HIDDEN without being PROTECTED");
 		return (null);
 	}
 
@@ -99,7 +104,7 @@ public final class HiddenSpecification extends SyntaxClass {
 	/// @param scope the given scope
 	/// @param ident the given ident
 	/// @return the resulting HiddenSpecification
-	private static HiddenSpecification findHidden(final ClassDeclaration scope, final String ident) {
+	private static HiddenSpecification findHidden(final ClassDeclaration scope, final Identifier ident) {
 		for (HiddenSpecification hdn : scope.hiddenList)
 			if (Util.equals(ident, hdn.identifier))
 				return (hdn);
@@ -108,7 +113,7 @@ public final class HiddenSpecification extends SyntaxClass {
 
 	@Override
 	public void printTree(final int indent, final Object head) {
-		IO.println(SyntaxClass.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
+		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
 
 	@Override
@@ -132,17 +137,19 @@ public final class HiddenSpecification extends SyntaxClass {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private HiddenSpecification() {}
+	private HiddenSpecification() {
+		super(null);
+	}
 	
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeHiddenSpecification: " + identifier);
 		oupt.writeKind(ObjectKind.HiddenSpecification);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 		// *** HiddenSpecification
-		oupt.writeString(identifier);
+		oupt.writeIdentifier(identifier);
 		oupt.writeObj(definedIn);
 	}
 
@@ -153,10 +160,12 @@ public final class HiddenSpecification extends SyntaxClass {
 	public static HiddenSpecification readObject(AttributeInputStream inpt) throws IOException {
 		HiddenSpecification spec = new HiddenSpecification();
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
-		// *** SyntaxClass
-		spec.lineNumber = inpt.readShort();
+		// *** SyntaxElement
+//		spec.astData = readAstData(inpt);
+		spec.astData = readAstData(inpt);
+
 		// *** HiddenSpecification
-		spec.identifier = inpt.readString();
+		spec.identifier = inpt.readIdentifier();
 		spec.definedIn = (ClassDeclaration) inpt.readObj();
 		Util.TRACE_INPUT("HiddenSpecification: " + spec.identifier);
 		return(spec);

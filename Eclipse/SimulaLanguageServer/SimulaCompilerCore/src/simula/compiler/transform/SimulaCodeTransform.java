@@ -19,7 +19,7 @@ import java.lang.classfile.instruction.InvokeInstruction;
 import java.lang.classfile.instruction.LabelTarget;
 import java.lang.classfile.instruction.SwitchCase;
 
-import simula.compiler.utilities.Option;
+import simula.Option;
 import simula.compiler.utilities.Util;
 
 /// Simula .class file transformer.
@@ -68,7 +68,7 @@ import simula.compiler.utilities.Util;
 /// </pre>
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/transform/SimulaCodeTransform.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/transform/SimulaCodeTransform.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen

@@ -5,10 +5,12 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass;
 
+import simula.token.Identifier;
+
 /// Utility class OverLoad.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/OverLoad.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/OverLoad.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class OverLoad extends Type {
@@ -19,7 +21,7 @@ public final class OverLoad extends Type {
 	/// Create a new OverLoad type list.
 	/// @param type the types
 	public OverLoad(final Type... type)	{
-		super("OverLoad");
+		super(new Identifier("OverLoad"));
 		this.type=type;
 	}
 	

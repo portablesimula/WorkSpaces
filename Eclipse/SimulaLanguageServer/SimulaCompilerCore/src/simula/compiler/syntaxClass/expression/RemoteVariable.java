@@ -10,9 +10,11 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 
+import simula.Option;
+import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ArrayDeclaration;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
@@ -26,7 +28,6 @@ import simula.compiler.syntaxClass.declaration.VirtualSpecification;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 
@@ -40,7 +41,7 @@ import simula.compiler.utilities.Util;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/RemoteVariable.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/RemoteVariable.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -70,7 +71,8 @@ public final class RemoteVariable extends Expression {
 	/// Create a new RemoteVariable
 	/// @param obj object expression
 	/// @param var the variable
-	RemoteVariable(final Expression obj, final VariableExpression var) {
+	RemoteVariable(final SimulaBuilder simBuilder, final Expression obj, final VariableExpression var) {
+		super(simBuilder);
 		this.obj = obj;
 		this.var = var;
 		obj.backLink = var.backLink = this;
@@ -84,7 +86,7 @@ public final class RemoteVariable extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN RemoteVariable" + toString() + ".doChecking - Current Scope Chain: " + CoreGlobal.getCurrentScope().edScopeChain());
 		this.type = doRemoteChecking(obj, var);
@@ -97,26 +99,26 @@ public final class RemoteVariable extends Expression {
 	/// @param attr remote attribute
 	/// @return the attribute's type
 	private Type doRemoteChecking(final Expression obj, final Expression attr) {
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		Type result;
 		obj.doChecking();
 		Type objType = obj.type;
 		if(objType == null) {
-			Util.error("doRemoteChecking: Object Expression (" + obj + ") has no type");
+			Util.semanticError(obj, "doRemoteChecking: Object Expression (" + obj + ") has no type");
 			return Type.Undef;
 		}
 		if (objType.keyWord == Type.T_TEXT)
 			return (doRemoteTextChecking(obj, attr));
 
-		objType.doChecking(CoreGlobal.getCurrentScope()); // Nødvendig hvis TypeDeclaration er nedenfor
+		objType.doChecking(CoreGlobal.getCurrentScope(), obj); // Nødvendig hvis TypeDeclaration er nedenfor
 		ClassDeclaration qual = objType.getQual();
 		if (qual == null) {
 			if(objType.keyWord != Type.T_UNDEF)
-				Util.error("doRemoteChecking: Object Expression (" + obj + ") is not a ref() type rather " + objType);
+				Util.semanticError(obj, "doRemoteChecking: Object Expression (" + obj + ") is not a ref() type rather " + objType);
 		} else if (qual.hasLocalClasses) {
 			if (Option.EXTENSIONS)
 				 Util.warning("Illegal remote access into object of class with local classes.");
-			else Util.error("Illegal remote access into object of class with local classes.");
+			else Util.semanticError(obj, "Illegal remote access into object of class with local classes.");
 		}
 
 		if (attr instanceof VariableExpression var) {
@@ -125,8 +127,8 @@ public final class RemoteVariable extends Expression {
 			if(qual!=null) remoteAttribute = qual.findRemoteAttributeMeaning(ident);
 			if (remoteAttribute == null) {
 				if(objType.keyWord != Type.T_UNDEF)
-					Util.error("RemoteVariable.doRemoteChecking: " + ident + " is not an attribute of "	+ objType.getRefIdent());
-				UndefinedDeclaration undef = new UndefinedDeclaration(ident);
+					Util.semanticError(obj, "RemoteVariable.doRemoteChecking: " + ident + " is not an attribute of "	+ objType.getRefIdent());
+				UndefinedDeclaration undef = new UndefinedDeclaration(null, ident);
 				remoteAttribute = new Meaning(undef, CoreGlobal.getCurrentScope()); // Error Recovery
 			}
 			var.setRemotelyAccessed(remoteAttribute);
@@ -149,7 +151,7 @@ public final class RemoteVariable extends Expression {
 				return (result);
 			}
 		} else {
-			Util.error("Illegal attribute(" + attr + ") in remote access");
+			Util.semanticError(obj, "Illegal attribute(" + attr + ") in remote access");
 			result = attr.type;
 		}
 		return (result);
@@ -163,15 +165,18 @@ public final class RemoteVariable extends Expression {
 		Type result;
 		if (attr instanceof VariableExpression var) { // Covers FunctionDesignator and SubscriptedVariable since they are subclasses
 			String ident = var.identifier;
-			Meaning remote = StandardClass.typeText.findMeaning(ident);
-			if (remote == null)
-				Util.error("RemoteVariable.doRemoteTextChecking: " + ident + " is not a Text attribute");
-			var.setRemotelyAccessed(remote);
-			callRemoteProcedure = (ProcedureDeclaration) remote.declaredAs;
-			result = remote.declaredAs.type;
+			Meaning meaning = StandardClass.typeText.findMeaning(ident);
+//			IO.println("RemoteVatiable.doRemoteTextChecking: meaning=" + meaning.declaredAs.getClass().getSimpleName());
+			if (meaning.declaredAs instanceof UndefinedDeclaration) {
+				Util.semanticError(obj, "RemoteVariable.doRemoteTextChecking: " + ident + " is not a Text attribute");
+				return Type.Undef;
+			}
+			var.setRemotelyAccessed(meaning);
+			callRemoteProcedure = (ProcedureDeclaration) meaning.declaredAs;
+			result = meaning.declaredAs.type;
 
 		} else {
-			Util.error("Illegal attribute(" + attr + ") in remote access");
+			Util.semanticError(obj, "Illegal attribute(" + attr + ") in remote access");
 			result = attr.type;
 		}
 		return (result);
@@ -243,7 +248,7 @@ public final class RemoteVariable extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if(obj.type.keyWord == Type.T_TEXT) {
 			callStandardTextProcedure(obj, (StandardProcedure)callRemoteProcedure, var, backLink, codeBuilder);
@@ -298,15 +303,17 @@ public final class RemoteVariable extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private RemoteVariable() {}
+	private RemoteVariable() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeRemoteVariable: " + this);
 		oupt.writeKind(ObjectKind.RemoteVariable);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -322,11 +329,11 @@ public final class RemoteVariable extends Expression {
 	public static RemoteVariable readObject(AttributeInputStream inpt) throws IOException {
 		RemoteVariable rem = new RemoteVariable();
 		rem.OBJECT_SEQU = inpt.readSEQU(rem);
-		// *** SyntaxClass
-		rem.lineNumber = inpt.readShort();
-		// *** SyntaxClass
+		// *** SyntaxElement
+		rem.astData = readAstData(inpt);
+		// *** SyntaxElement
 		rem.type = inpt.readType();
-		rem.backLink = (SyntaxClass) inpt.readObj();
+		rem.backLink = (SyntaxElement) inpt.readObj();
 		// *** RemoteVariable
 		rem.obj = (Expression) inpt.readObj();
 		rem.var = (VariableExpression) inpt.readObj();

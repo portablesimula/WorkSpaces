@@ -27,18 +27,18 @@ import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
+import simula.Option;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.ClassHierarchy;
 import simula.compiler.utilities.CoreGlobal;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.SimulaClassLoader;
 import simula.compiler.utilities.Util;
 
 /// Utilities to build and manipulate jarFiles.
 ///
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/JarFileBuilder.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/JarFileBuilder.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public class JarFileBuilder {
@@ -68,28 +68,28 @@ public class JarFileBuilder {
 	}
 	
 	/// Open the JarFileBuilder.
-	/// @param program the relevant ProgramModule
+	/// @param programModule the relevant ProgramModule
 	/// @throws IOException if something went wrong
-	public void open(final ProgramModule program) throws IOException {
-		if(TESTING) IO.println("JarFileBuilder.open: " + program);
+	public void open(final ProgramModule programModule) throws IOException {
+		if(TESTING) IO.println("JarFileBuilder.open: " + programModule);
 		if(jarOutputStream != null) Util.IERR();
-		this.programModule = program;
+		this.programModule = programModule;
 		if (Option.internal.TRACING)
 			Util.println("BEGIN Create .jar File");
-		outputJarFile = new File(CoreGlobal.outputDir, program.getIdentifier() + ".jar");
+		outputJarFile = new File(CoreGlobal.outputDir, programModule.getIdentifier() + ".jar");
 		outputJarFile.getParentFile().mkdirs();
 		Manifest manifest = new Manifest();
-		mainEntry = CoreGlobal.packetName + '/' + program.getIdentifier();
+		mainEntry = CoreGlobal.packetName + '/' + programModule.getIdentifier();
 		mainEntry = mainEntry.replace('/', '.');
 		if (Option.internal.TRACING)
 			Util.println("Output " + outputJarFile + " MANIFEST'mainEntry=\"" + mainEntry + "\"");
 		manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
 		manifest.getMainAttributes().putValue("Created-By", CoreGlobal.simulaReleaseID + " (Portable Simula)");
-		if (program.isExecutable()) {
+		if (programModule.isExecutable()) {
 			manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, mainEntry);
 //			manifest.getMainAttributes().put(Attributes.Name.CLASS_PATH, ".");
 		} else {
-			String relativeAttributeFileName = program.getRelativeAttributeFileName();
+			String relativeAttributeFileName = programModule.getRelativeAttributeFileName();
 			if (relativeAttributeFileName != null)
 				manifest.getMainAttributes().putValue("SIMULA-INFO", relativeAttributeFileName);
 		}
@@ -250,7 +250,7 @@ public class JarFileBuilder {
 	/// Find the .jar file containing an external class or procedure.
 	/// @param identifier class or procedure identifier
 	/// @param externalIdentifier the external identifier if any
-	/// @return the resulting File
+	/// @return the resulting File or null
 	public static File findJarFile(final String identifier, final String externalIdentifier) {
 		File jarFile = null;
 		try {
@@ -258,22 +258,28 @@ public class JarFileBuilder {
 				// If present search extLib
 				if (CoreGlobal.extLib != null) {
 					jarFile = new File(CoreGlobal.extLib, identifier + ".jar");
-					if (jarFile.exists())
+					if (jarFile.exists()) {
+//						IO.println("JarFileBuilder.findJarFile: FOUND in extlib: " + jarFile);
 						return (jarFile);
+					}
+//					IO.println("JarFileBuilder.findJarFile: NOT FOUND in extlib: " + jarFile);
 				}
 				jarFile = new File(CoreGlobal.outputDir, identifier + ".jar");
-				if (jarFile.exists())
+				if (jarFile.exists()) {
+//					IO.println("JarFileBuilder.findJarFile: FOUND in outputDir: " + jarFile);
 					return (jarFile);
+				}
+//				IO.println("JarFileBuilder.findJarFile: NOT FOUND in outputDir: " + jarFile);
 			} else {
 				jarFile = new File(externalIdentifier);
-				if (jarFile.exists())
+				if (jarFile.exists()) {
+//					IO.println("JarFileBuilder.findJarFile: FOUND using externalIdentifier: " + jarFile);
 					return (jarFile);
+				}
+//				IO.println("JarFileBuilder.findJarFile: NOT FOUND using externalIdentifier: " + jarFile);
 			}
-		} catch (Exception e) {
-			Util.IERR("Can't find attribute file: " + jarFile, e);
-		}
-		Util.error("Can't find attribute file: " + identifier + '[' + externalIdentifier + ']');
-		return (null);
+		} catch (Exception e) {}
+		return null;
 	}
 
 	/// Add the jarFile to the includeQueue.
@@ -411,7 +417,7 @@ public class JarFileBuilder {
 	public static void listJarFile(final File file) {
 		Util.println("---------  LIST .jar File: " + file + "  ---------");
 		if (!(file.exists() && file.canRead())) {
-			Util.error("Can't read .jar file: " + file);
+			Util.generalError("Can't read .jar file: " + file);
 			return;
 		}
 		JarFile jarFile = null;

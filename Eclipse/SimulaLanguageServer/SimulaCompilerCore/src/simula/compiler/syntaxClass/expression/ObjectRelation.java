@@ -7,15 +7,17 @@ package simula.compiler.syntaxClass.expression;
 
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
+
+import simula.Option;
+import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 
@@ -66,7 +68,7 @@ import simula.compiler.utilities.Util;
 /// match exists, it is that of the virtual specification.
 /// </ul>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/ObjectRelation.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/ObjectRelation.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -90,7 +92,8 @@ public final class ObjectRelation extends Expression {
 	/// @param lhs left hand side
 	/// @param opr the operation: IN or IS
 	/// @param classIdentifier the right hand class identifier
-	ObjectRelation(final Expression lhs, final int opr, final String classIdentifier) {
+	ObjectRelation(final SimulaBuilder simBuilder, final Expression lhs, final int opr, final String classIdentifier) {
+		super(simBuilder);
 		this.lhs = lhs;
 		this.opr = opr;
 		this.classIdentifier = classIdentifier;
@@ -101,10 +104,13 @@ public final class ObjectRelation extends Expression {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ObjectRelation" + toString() + ".doChecking - Current Scope Chain: " + CoreGlobal.getCurrentScope().edScopeChain());
 		classDeclaration = getQualification(classIdentifier);
+		if(classDeclaration == null) {
+			Util.semanticError(this, "Illegal Object relation IS/IN: " + classIdentifier + " is not a class");
+		}
 		// Object IS ClassIdentifier | Object IN ClassIdentifier
 		lhs.doChecking();
 		Type type1 = lhs.type;
@@ -143,7 +149,7 @@ public final class ObjectRelation extends Expression {
 
 	@Override
 	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
-		setLineNumber();
+//		setLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if(opr == KeyWord.IS) {
 			lhs.buildEvaluation(null,codeBuilder);
@@ -163,15 +169,17 @@ public final class ObjectRelation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ObjectRelation() {}
+	private ObjectRelation() {
+		super(null);
+	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("writeObjectRelation: " + this);
 		oupt.writeKind(ObjectKind.ObjectRelation);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -188,9 +196,9 @@ public final class ObjectRelation extends Expression {
 	public static ObjectRelation readObject(AttributeInputStream inpt) throws IOException {
 		ObjectRelation expr = new ObjectRelation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		expr.lineNumber = inpt.readShort();
+		expr.astData = readAstData(inpt);
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxClass) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();
 		expr.classIdentifier = inpt.readString();

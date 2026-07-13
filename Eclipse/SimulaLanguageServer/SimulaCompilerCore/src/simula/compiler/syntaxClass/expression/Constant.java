@@ -13,13 +13,14 @@ import java.lang.constant.MethodTypeDesc;
 import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.token.LexToken;
 
 /// Constant.
 /// 
@@ -32,11 +33,11 @@ import simula.compiler.utilities.Util;
 ///   Constant = unsigned-number | string | character-constant | NONE | NOTEXT
 ///   
 /// </pre>
-/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/expression/Constant.java">
+/// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/expression/Constant.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-/// @see simula.compiler.parsing.SimulaScanner
+/// @see simula.builder.SimulaLexer
 public final class Constant extends Expression {
 	
 	/// The constant's value
@@ -46,7 +47,9 @@ public final class Constant extends Expression {
 	/// @param type the constant's type
 	/// @param value the constant's value
 	public Constant(final SimulaBuilder simBuilder, final Type type,final Object value) {
-		super(simBuilder);
+		super(simBuilder, (simBuilder == null)?null : simBuilder.getCurrentParserToken());
+		IO.println("NEW Constant: "+value+", ");
+		Thread.dumpStack();
 		this.type=type;
 		this.value = value;
 	}
@@ -56,6 +59,14 @@ public final class Constant extends Expression {
 	/// @return the resulting Constant
     static Constant createRealType(final SimulaBuilder simBuilder, final float value) {
     	Type type=Type.Real;
+    	return(new Constant(simBuilder, type,value));
+    }
+	
+	/// Create a long real type Constant.
+	/// @param value a long real type value
+	/// @return the resulting Constant
+    static Constant createLongRealType(final SimulaBuilder simBuilder, final double value) {
+    	Type type = Type.LongReal;
     	return(new Constant(simBuilder, type,value));
     }
     
@@ -116,11 +127,11 @@ public final class Constant extends Expression {
 	        		case KeyWord.MINUS  -> result=lhn.longValue() - rhn.longValue();
 	        		case KeyWord.MUL    -> result=lhn.longValue() * rhn.longValue();
 	        		case KeyWord.INTDIV -> result=lhn.longValue() / rhn.longValue();
-	        		case KeyWord.EXP    -> result=Util.IPOW(lhn.longValue(),rhn.longValue());
+	        		case KeyWord.EXP    -> result=Util.IPOW(simBuilder, lhn.longValue(),rhn.longValue());
 	        		default     -> Util.IERR();
 				}
 				if(result.longValue() > Integer.MAX_VALUE || result.longValue() < Integer.MIN_VALUE)
-					Util.error("Arithmetic overflow: "+lhn+' '+KeyWord.edit(opr)+' '+rhn);
+					Util.syntaxError(simBuilder, "Arithmetic overflow: "+lhn+' '+KeyWord.edit(opr)+' '+rhn);
 				result=(int) result.longValue();
 			}
 			case Type.T_REAL -> {
@@ -149,8 +160,8 @@ public final class Constant extends Expression {
 	@Override
     public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber=lineNumber;
-		this.type.doChecking(CoreGlobal.getCurrentScope());
+		CoreGlobal.sourceLineNumber=firstLineNumber();
+		this.type.doChecking(CoreGlobal.getCurrentScope(), this);
 		SET_SEMANTICS_CHECKED();
 	}
 
@@ -172,6 +183,8 @@ public final class Constant extends Expression {
 				return "new RTS_TXT(\""+val+"\")";
 			}
 			case Type.T_CHARACTER -> {
+//				IO.println("Constant.toJavaCode: "+value.getClass().getSimpleName()+"  "+value);
+//				char charValue=((Character)value).charValue();
 				char charValue=((Character)value).charValue();
 				if(charValue=='\\') return("'\\\\'");
 				int intValue=(int)charValue;
@@ -225,7 +238,7 @@ public final class Constant extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	setLineNumber();
+	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
 		//ASSERT_SEMANTICS_CHECKED(); // ØM: Ad'Hoc
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
 		if(this.value==null)
@@ -299,7 +312,8 @@ public final class Constant extends Expression {
 	@Override
 	public String toString() {
 		if(type != null && type.keyWord == Type.T_TEXT) return("\""+value+'"');
-		return("Constant type="+type+", value="+value);
+//		return("Constant(" + type + ':' + value + ')');
+		return ""+value;
 	}
 
 	
@@ -308,7 +322,7 @@ public final class Constant extends Expression {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private Constant() {
-		super(null);
+		super(null, null);
 	}
 
 	@Override
@@ -316,8 +330,8 @@ public final class Constant extends Expression {
 		Util.TRACE_OUTPUT("Constant: "+type+' '+value);
 		oupt.writeKind(ObjectKind.Constant);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -332,11 +346,11 @@ public final class Constant extends Expression {
 	public static Constant readObject(AttributeInputStream inpt) throws IOException {
 		Constant cnst = new Constant();
 		cnst.OBJECT_SEQU = inpt.readSEQU(cnst);
-		// *** SyntaxClass
-		cnst.lineNumber = inpt.readShort();
+		// *** SyntaxElement
+		cnst.astData = readAstData(inpt);
 		// *** Expression
 		cnst.type = inpt.readType();
-		cnst.backLink = (SyntaxClass) inpt.readObj();
+		cnst.backLink = (SyntaxElement) inpt.readObj();
 		// *** Constant
 		cnst.value=inpt.readConstant();
 		Util.TRACE_INPUT("Constant: "+cnst);

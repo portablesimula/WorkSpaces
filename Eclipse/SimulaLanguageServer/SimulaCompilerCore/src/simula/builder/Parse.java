@@ -6,6 +6,7 @@ import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 import simula.token.LexToken;
 
 
@@ -61,10 +62,6 @@ public class Parse {
 //
 //		nextToken();
 	}
-	
-    public static int getSourceLineNumber(final SimulaBuilder simBuilder) {
-    	return simBuilder.getSourceLineNumber();
-    }
 
 	public static LexToken prevToken(final SimulaBuilder simBuilder) {
 		return simBuilder.prevToken();
@@ -74,17 +71,17 @@ public class Parse {
 		return simBuilder.prevParserToken();
 	}
 
-	/// Return the current Token.
-	public static LexToken currentLexToken(final SimulaBuilder simBuilder) {
-        return (LexToken)simBuilder.getCurrentLexerToken();
-	}
+//	/// Return the current Token.
+//	public static LexToken currentLexToken(final SimulaBuilder simBuilder) {
+//        return (LexToken)simBuilder.getCurrentLexerToken();
+//	}
+//
+//	/// Return the prev Token.
+//	public static LexToken getPrevLexToken(final SimulaBuilder simBuilder) {
+//        return (LexToken)simBuilder.getPrevLexerToken();
+//	}
 
-	/// Return the prev Token.
-	public static LexToken getPrevLexToken(final SimulaBuilder simBuilder) {
-        return (LexToken)simBuilder.getPrevLexerToken();
-	}
-
-	/// Return the Parser current Token.
+	/// Return the current Parser Token.
 	public static LexToken getCurrentParserToken(final SimulaBuilder simBuilder) {
         return simBuilder.getCurrentParserToken();
 	}
@@ -96,7 +93,7 @@ public class Parse {
 	
 	/// Advance to next Token.
 	public static void nextToken(final SimulaBuilder simBuilder) {
-		simBuilder.advanceLexer();
+		simBuilder.getNextParserToken();
 	}
 
 	/// Expect the given KeyWord.
@@ -109,7 +106,7 @@ public class Parse {
 			return (true);
 		}
 		Util.syntaxError(simBuilder, simBuilder.getCurrentParserToken(), 
-				"Got symbol '" + Parse.currentLexToken(simBuilder).edText() + "' while expecting KeyWord " + KeyWord.edit(key).toLowerCase());
+				"Got symbol '" + Parse.getCurrentParserToken(simBuilder).edText() + "' while expecting KeyWord " + KeyWord.edit(key).toLowerCase());
 		return (false);
 	}
 
@@ -145,7 +142,7 @@ public class Parse {
 			return true;
 		}
 		if(accept(simBuilder, KeyWord.AND)) {
-			LexToken prv = simBuilder.getCurrentLexerToken();
+			LexToken prv = simBuilder.getCurrentParserToken();
 //			IO.println("PsiParse.accept_AND_THEN: MAYBE AND THEN prv="+prv);
 			if(accept(simBuilder, KeyWord.THEN)) {
 //				IO.println("PsiParse.accept_AND_THEN: GOT: AND THEN prv="+prv);
@@ -160,7 +157,7 @@ public class Parse {
 	public static boolean accept_AND_ONLY(final SimulaBuilder simBuilder) {
 //		Util.IERR("WARNING: SKAL FLYTTES TIL LEXER: accept_AND_ONLY");
 //		IO.println("\nPsiParse.accept_AND_THEN: BEGIN ======================================================================");
-		LexToken prv = simBuilder.getCurrentLexerToken();
+		LexToken prv = simBuilder.getCurrentParserToken();
 		if(accept(simBuilder, KeyWord.AND)) {
 //			IO.println("PsiParse.accept_AND_ONLY: MAYBE AND THEN prv="+prv);
 			if(accept(simBuilder, KeyWord.THEN)) {
@@ -182,7 +179,7 @@ public class Parse {
 			return true;
 		}
 		if(accept(simBuilder, KeyWord.OR)) {
-			LexToken prv = simBuilder.getCurrentLexerToken();
+			LexToken prv = simBuilder.getCurrentParserToken();
 //			IO.println("PsiParse.accept_OR_ELSE: MAYBE OR ELSE prv="+prv);
 			if(accept(simBuilder, KeyWord.ELSE)) {
 //				IO.println("PsiParse.accept_OR_ELSE: GOT: OR ELSE prv="+prv);
@@ -197,7 +194,7 @@ public class Parse {
 	public static boolean accept_OR_ONLY(final SimulaBuilder simBuilder) {
 //		Util.IERR("WARNING: SKAL FLYTTES TIL LEXER: accept_OR_ONLY");
 //		IO.println("\nPsiParse.accept_OR_THEN: BEGIN ======================================================================");
-		LexToken prv = simBuilder.getCurrentLexerToken();
+		LexToken prv = simBuilder.getCurrentParserToken();
 		if(accept(simBuilder, KeyWord.OR)) {
 //			IO.println("PsiParse.accept_OR_ONLY: MAYBE OR ELSE prv="+prv);
 			if(accept(simBuilder, KeyWord.ELSE)) {
@@ -217,42 +214,32 @@ public class Parse {
 		Util.syntaxError(simBuilder, "Misplaced symbol: "+Parse.currentLexToken(simBuilder)+" -- Ignored");
 		nextToken(simBuilder);
 	}
-
-	/// Skip until the given symbol.
-	public static LexToken skipUntil(final SimulaBuilder simBuilder, int keyWord) {
-		LexToken token = null;
-		do { nextToken(simBuilder);
-			 token = simBuilder.getCurrentLexerToken();
-		} while (token.keyWord != keyWord);
-		simBuilder.advanceLexer();
-		return token;
-	}
 	
 	/// Test to accept an identifier.
 	/// @return the identifier or null
-	public static LexToken acceptIdentifier(final SimulaBuilder simBuilder, String styleName) {
-		LexToken token = Parse.acceptParserToken(simBuilder, KeyWord.IDENTIFIER);
+	public static Identifier acceptIdentifier(final SimulaBuilder simBuilder, String styleName) {
+		Identifier token = (Identifier) Parse.acceptParserToken(simBuilder, KeyWord.IDENTIFIER);
 		token.styleName = styleName;
 		return (token);
 	}
 
-	public static LexToken acceptIdentifier(final SimulaBuilder simBuilder) {
-		LexToken token = Parse.acceptParserToken(simBuilder, KeyWord.IDENTIFIER);
-		return (token);
+	public static Identifier acceptIdentifier(final SimulaBuilder simBuilder) {
+		Identifier token = (Identifier) Parse.acceptParserToken(simBuilder, KeyWord.IDENTIFIER);
+		return token;
 	}
 	
 	/// Test to expect an identifier.
 	/// 
 	/// If failing to do so, an error is printed.
 	/// @return the identifier or null
-	public static LexToken expectIdentifier(final SimulaBuilder simBuilder, String styleName) {
-        LexToken ident = acceptIdentifier(simBuilder, styleName);
-		return (ident);
+	public static Identifier expectIdentifier(final SimulaBuilder simBuilder, String styleName) {
+        Identifier ident = acceptIdentifier(simBuilder, styleName);
+		return ident;
 	} 
 	
-	public static LexToken expectIdentifier(final SimulaBuilder simBuilder) {
-        LexToken ident = acceptIdentifier(simBuilder);
-		return (ident);
+	public static Identifier expectIdentifier(final SimulaBuilder simBuilder) {
+        Identifier ident = acceptIdentifier(simBuilder);
+		return ident;
 	}  
 
 	/// Test to accept a Type.
@@ -311,11 +298,6 @@ public class Parse {
 	/// @param msg a message
 	public static void TRACE(final String msg) {
 		LOG.info(msg);
-	}
-
-	public static void saveCurrentToken() {
-		// TODO Auto-generated method stub
-		Util.IERR("NY: MÅ SKRIVES");
 	}
 
 }

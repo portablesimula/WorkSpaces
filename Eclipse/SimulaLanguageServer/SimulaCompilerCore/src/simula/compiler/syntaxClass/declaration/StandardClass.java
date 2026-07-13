@@ -9,10 +9,12 @@ import simula.compiler.utilities.ClassHierarchy;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 import java.lang.constant.ClassDesc;
+
+import simula.Option;
 import simula.compiler.syntaxClass.OverLoad;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
@@ -22,13 +24,13 @@ import simula.compiler.syntaxClass.statement.Statement;
 /// Standard Class.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/StandardClass.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/StandardClass.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public final class StandardClass extends ClassDeclaration {
 	public String edJavaClassName() {
-		return (identifier);
+		return (identifier.value);
 	}
 
 	/// The type text.
@@ -941,7 +943,7 @@ public final class StandardClass extends ClassDeclaration {
 	private static void initCatchingErrors() { 
 		CatchingErrors=new StandardClass("CLASS","CatchingErrors");
 		ENVIRONMENT.addStandardClass(CatchingErrors);  // Declared in ENVIRONMENT
-		CatchingErrors.virtualSpecList.add(new VirtualSpecification(null, "onError",null,VirtualSpecification.Kind.Procedure,CatchingErrors.prefixLevel(),null));
+		CatchingErrors.virtualSpecList.add(new VirtualSpecification(null, new Identifier("onError"), null, VirtualSpecification.Kind.Procedure,CatchingErrors.prefixLevel(),null));
 		CatchingErrors.statements1=new ObjectList<Statement>();
 		CatchingErrors.statements1.add(new InlineStatement(null, "try")); // Statements before inner 
 		CatchingErrors.statements.add(new InlineStatement(null, "catch")); // Statements after inner 				
@@ -1106,10 +1108,11 @@ public final class StandardClass extends ClassDeclaration {
 	/// Create a new StandardClass.
 	/// @param className the class's name
 	private StandardClass(String className) {
-		super(null, className);
+		super(null, null, new Identifier(className));
 		this.externalIdent = "RTS_"+className;
 		this.declarationKind=ObjectKind.StandardClass;
 		this.type=Type.Ref(className);
+		SET_SEMANTICS_CHECKED();
 	}
 
 	/// Create a new StandardClass.
@@ -1117,12 +1120,13 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param className the class's name
 	private StandardClass(String prefix,String className) {
 		this(className);
-		this.prefix=prefix;
+		this.prefix = new Identifier(prefix);
 		if(Option.compilerMode == Option.CompilerMode.simulaClassLoader) {
 			ClassDesc CD_ThisClass = ClassDesc.of("simula.runtime.RTS_" + className); 
 			ClassDesc CD_SuperClass = ClassDesc.of("simula.runtime.RTS_" + prefix); 
 			ClassHierarchy.addClassToSuperClass(CD_ThisClass, CD_SuperClass);
 		}
+		SET_SEMANTICS_CHECKED();
 	}
 
 	/// Create a new StandardClass.
@@ -1132,6 +1136,7 @@ public final class StandardClass extends ClassDeclaration {
 	private StandardClass(String prefix,String className,Parameter... param) {
 		this(prefix,className);
 		for(int i=0;i<param.length;i++) param[i].into(parameterList);
+		SET_SEMANTICS_CHECKED();
 	}
 	
 	@Override
@@ -1144,7 +1149,7 @@ public final class StandardClass extends ClassDeclaration {
 	// ******************************************************************
 
 	@Override
-	public Meaning findVisibleAttributeMeaning(String ident) {
+	public Meaning findVisibleAttributeMeaning(Identifier ident) {
 		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("BEGIN Checking Standard Class "+identifier+" for "+ident+" ================================== "+identifier+" ==================================");
 		for(Declaration declaration:declarationList) {
 			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Local "+declaration.identifier);
@@ -1163,7 +1168,7 @@ public final class StandardClass extends ClassDeclaration {
 	@Override
 	public Meaning findRemoteAttributeMeaning(String ident) {
 		for(Declaration declaration:declarationList)
-			if(Util.equals(ident, declaration.identifier))
+			if(Util.equals(ident, declaration.identifier.value))
 				return(new Meaning(declaration,this));
 		ClassDeclaration prfx=getPrefixClass();
 		if(prfx!=null) return(prfx.findRemoteAttributeMeaning(ident));
@@ -1178,16 +1183,16 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param ident the identifier
 	/// @param type  the type
 	/// @return the newly created Parameter
-	private static Parameter parameter(String ident,Type type)	{
-		return(new Parameter(null, ident,type,Parameter.Kind.Simple)); }
+	private static Parameter parameter(String ident, Type type)	{
+		return new Parameter(null, null, new Identifier(ident), type,Parameter.Kind.Simple); }
 
 	/// Create a new Parameter.
 	/// @param ident the identifier
 	/// @param type  the type
 	/// @param kind  the parameter kind
 	/// @return the newly created Parameter
-	private static Parameter parameter(String ident,Type type,int kind)	{
-		return(new Parameter(null, ident,type,kind)); }
+	private static Parameter parameter(String ident, Type type, int kind)	{
+		return new Parameter(null, null, new Identifier(ident), type, kind); }
 
 	/// Create a new Parameter.
 	/// @param ident the identifier
@@ -1195,8 +1200,8 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param kind  the parameter kind
 	/// @param nDim  number of dimensions for arrays
 	/// @return the newly created Parameter
-	private static Parameter parameter(String ident,Type type,int kind,int nDim)	{
-		return(new Parameter(null, ident,type,kind,nDim)); }
+	private static Parameter parameter(String ident, Type type, int kind, int nDim)	{
+		return new Parameter(null, null, new Identifier(ident), type, kind, nDim); }
 
 	/// Create a new Parameter.
 	/// @param ident the identifier
@@ -1204,7 +1209,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param type  the type
 	/// @return the newly created Parameter
 	private static Parameter parameter(String ident,int mode,Type type) {
-		Parameter spec=new Parameter(null, ident,type,Parameter.Kind.Simple);
+		Parameter spec = new Parameter(null, null, new Identifier(ident),type,Parameter.Kind.Simple);
 		spec.setMode(mode); return(spec);
 	}
 
@@ -1215,7 +1220,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param type  the type
 	/// @return the newly created Parameter
 	private static Parameter parameter(String ident,int kind, int mode,Type type) {
-		Parameter spec=new Parameter(null, ident,type,kind);
+		Parameter spec=new Parameter(null, null, new Identifier(ident),type,kind);
 		spec.setMode(mode); return(spec);
 	}
 
@@ -1235,30 +1240,30 @@ public final class StandardClass extends ClassDeclaration {
 	/// Create and add a new standard attribute.
 	/// @param type the attribute type
 	/// @param ident the attribute identifier
-	private void addStandardAttribute(Type type,String ident) {
-		declarationList.add(new SimpleVariableDeclaration(null, type, ident)); }
+	private void addStandardAttribute(Type type, String ident) {
+		declarationList.add(new SimpleVariableDeclaration(null, null, type, new Identifier(ident))); }
 
 	/// Create and add a new constant standard attribute.
 	/// @param type the attribute type
 	/// @param ident the attribute identifier
 	/// @param value the constant integer value
-	private void addStandardAttribute(Type type,String ident,Number value) {
-		declarationList.add(new SimpleVariableDeclaration(null, type, ident, true, new Constant(null, type, value))); }
+	private void addStandardAttribute(Type type, String ident, Number value) {
+		declarationList.add(new SimpleVariableDeclaration(null, null, type, new Identifier(ident), true, new Constant(null, type,value))); }
 
 	/// Create and add a new StandardProcedure.
 	/// @param kind the declaration kind
 	/// @param type the procedure's type
 	/// @param ident the procedure identifier
-	private void addStandardProcedure(int kind,Type type,String ident) {
-		declarationList.add(new StandardProcedure(this,kind,type,ident)); }
+	private void addStandardProcedure(int kind, Type type, String ident) {
+		declarationList.add(new StandardProcedure(this, kind, type, ident)); }
 
 	/// Create and add a new StandardProcedure.
 	/// @param kind the declaration kind
 	/// @param type the procedure's type
 	/// @param ident the procedure identifier
 	/// @param param the parameters
-	private void addStandardProcedure(int kind,Type type,String ident,Parameter... param) {
-		declarationList.add(new StandardProcedure(this,kind,type,ident,param)); }
+	private void addStandardProcedure(int kind, Type type, String ident, Parameter... param) {
+		declarationList.add(new StandardProcedure(this, kind, type, ident, param)); }
 
 	/// Create and add a new StandardProcedure.
 	/// @param kind the declaration kind
@@ -1266,8 +1271,8 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param type the procedure's type
 	/// @param ident the procedure identifier
 	/// @param param the parameters
-	private void addStandardProcedure(int kind,String[] mtdSet,Type type,String ident,Parameter... param) {
-		declarationList.add(new StandardProcedure(this,kind,mtdSet,type,ident,param)); }
+	private void addStandardProcedure(int kind, String[] mtdSet, Type type, String ident, Parameter... param) {
+		declarationList.add(new StandardProcedure(this, kind, mtdSet, type, ident, param)); }
 
 	// ***********************************************************************************************
 	// *** ClassFile coding Utility: getClassDesc   -- Defined in DeclarationScope
@@ -1282,7 +1287,7 @@ public final class StandardClass extends ClassDeclaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public StandardClass() {
-		super(null, null);
+		super(null, null, null);
 	}
 
 

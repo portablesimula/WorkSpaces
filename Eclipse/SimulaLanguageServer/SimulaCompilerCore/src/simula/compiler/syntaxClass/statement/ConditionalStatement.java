@@ -9,16 +9,17 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
+import simula.builder.SimulaBuilder;
+import simula.Option;
+import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Conditional Statement.
@@ -34,7 +35,7 @@ import simula.compiler.utilities.Util;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ConditionalStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ConditionalStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -52,22 +53,28 @@ public final class ConditionalStatement extends Statement {
 
 	/// Create a new ConditionalStatement.
 	/// @param line the source line number
-	ConditionalStatement(final int line) {
-		super(line);
-		condition = Expression.expectExpression();
+	ConditionalStatement(SimulaBuilder simBuilder) {
+		super(simBuilder, simBuilder.getCurrentParserToken());
+		int lno = simBuilder.getSourceLineNumber();
+//		IO.println("NEW ConditionalStatement: "+simBuilder.getSourceLineNumber());
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN IfStatement: ");
+		simBuilder.consume(KeyWord.IF); //  (add it to 'current tree')
+
+		condition = Expression.expectExpression(simBuilder, "if-condition");
 		Parse.expect(simBuilder, KeyWord.THEN);
 		Statement elseStatement = null;
 		if (Parse.accept(simBuilder, KeyWord.ELSE)) {
-			thenStatement = new DummyStatement(Parse.getCurrentParserToken(simBuilder).lineNumber);
-			elseStatement = Statement.expectStatement();
+			thenStatement = DummyStatement.ofImplicit(simBuilder);
+			elseStatement = Statement.acceptStatement(simBuilder);
 		} else {
-		    thenStatement = Statement.expectStatement();
+		    thenStatement = Statement.acceptStatement(simBuilder);
 		    if (Parse.accept(simBuilder, KeyWord.ELSE)) {
-			    elseStatement = Statement.expectStatement();
+			    elseStatement = Statement.acceptStatement(simBuilder);
 		    }
 		}
 		this.elseStatement=elseStatement;
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+lineNumber+": IfStatement: "+this);
+		if (Option.internal.TRACE_PARSE)
+			Util.TRACE("Line " + simBuilder.getSourceLineNumber() + ": DONE IfStatement started at line: " + lno + ": " + this);
 	}
 
 	@Override
@@ -90,8 +97,10 @@ public final class ConditionalStatement extends Statement {
 //		IO.println("ConditionalStatement.doChecking: " + condition.getClass().getSimpleName() + "  " + this);
 		condition.doChecking();
 		condition.backLink=this; // To ensure _RESULT from functions
-		if (condition.type == null || condition.type.keyWord != Type.T_BOOLEAN)
-			Util.error("ConditionalStatement.doChecking: Condition is not of Type Boolean, but: " + condition.type);
+		if (condition.type == null || condition.type.keyWord != Type.T_BOOLEAN) {
+			if(condition.type != Type.Undef )
+				Util.semanticError(this, "ConditionalStatement.doChecking: Condition is not of Type Boolean, but: " + condition.type);
+		}
 		thenStatement.doChecking();
 		if (elseStatement != null) {
 			elseStatement.doChecking();
@@ -101,7 +110,7 @@ public final class ConditionalStatement extends Statement {
 	
 	@Override
 	public void doJavaCoding() {
-		CoreGlobal.sourceLineNumber=lineNumber;
+		CoreGlobal.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code("if(_VALUE(" + condition.toJavaCode() + ")) {");
 		thenStatement.doJavaCoding();
@@ -141,8 +150,7 @@ public final class ConditionalStatement extends Statement {
 
 	@Override
 	public String toString() {
-		return ("IF " + condition + " THEN " + thenStatement + " ELSE "
-				+ elseStatement + ';');
+		return "IF " + condition + " THEN " + thenStatement + " ELSE "	+ elseStatement + ';';
 	}
 	
 
@@ -151,7 +159,7 @@ public final class ConditionalStatement extends Statement {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private ConditionalStatement() {
-		super(0);
+		super(null);
 	}
 
 	@Override
@@ -159,8 +167,8 @@ public final class ConditionalStatement extends Statement {
 		Util.TRACE_OUTPUT("writeConditionalStatement: " + this);
 		oupt.writeKind(ObjectKind.ConditionalStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 		// *** ConditionalStatement
 		oupt.writeObj(condition);
 		oupt.writeObj(thenStatement);
@@ -174,8 +182,8 @@ public final class ConditionalStatement extends Statement {
 	public static ConditionalStatement readObject(AttributeInputStream inpt) throws IOException {
 		ConditionalStatement stm = new ConditionalStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxClass
-		stm.lineNumber = inpt.readShort();
+		// *** SyntaxElement
+		stm.astData = readAstData(inpt);
 		// *** ConditionalStatement
 		stm.condition = (Expression) inpt.readObj();
 		stm.thenStatement = (Statement) inpt.readObj();

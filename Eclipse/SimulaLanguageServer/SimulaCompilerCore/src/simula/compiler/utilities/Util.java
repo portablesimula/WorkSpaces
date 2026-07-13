@@ -14,9 +14,10 @@ import java.util.Vector;
 
 import simula.Option;
 import simula.builder.SimulaBuilder;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.lsp.util.SimPosition;
 import simula.lsp.util.SimRange;
+import simula.token.Identifier;
 import simula.token.LexToken;
 
 /// A set of all static Utility Methods
@@ -86,7 +87,7 @@ public final class Util {
 	/// Print a warning message.
 	/// @param msg the message
 	public static void warning(final SimulaBuilder simBuilder, final String msg) {
-		warning(simBuilder, simBuilder.prevParserToken(), msg);
+		warning(simBuilder, simBuilder.getPrevParserToken(), msg);
 	}
 
 	/// Print a warning message.
@@ -107,7 +108,7 @@ public final class Util {
 
 	/// Print a warning message.
 	/// @param msg the message
-	public static void warning(final SyntaxClass elt, final String msg) {
+	public static void warning(final SyntaxElement elt, final String msg) {
         LexToken first = elt.getFirstLexToken();
         LexToken last = elt.getLastLexToken();
         
@@ -135,7 +136,7 @@ public final class Util {
 	/// Print a error message.
 	/// @param msg the message
 	public static void syntaxError(final SimulaBuilder simBuilder, final String msg) {
-		syntaxError(simBuilder, simBuilder.prevParserToken(), msg);
+		syntaxError(simBuilder, simBuilder.getPrevParserToken(), msg);
 	}
 	
 	public static void syntaxError(final SimulaBuilder simBuilder, final LexToken token, final String msg) {
@@ -150,12 +151,12 @@ public final class Util {
 		
 		LOG.error(diagnostic.toString());
 		
-		Util.IERR("Util.SyntaxError: ");
+//		Util.IERR("Util.SyntaxError: ");
 		
 		simBuilder.addDiagnostic(diagnostic);
 	}
 	
-	public static void semanticError(final SyntaxClass elt, final String msg) {
+	public static void semanticError(final SyntaxElement elt, final String msg) {
         LexToken first = elt.getFirstLexToken();
         LexToken last = elt.getLastLexToken();
         
@@ -168,7 +169,7 @@ public final class Util {
 	}
 	
 	/// Error during Code generation:
-	public static void codingError(final SyntaxClass elt, final String msg) {
+	public static void codingError(final SyntaxElement elt, final String msg) {
         LexToken first = elt.getFirstLexToken();
         LexToken last = elt.getLastLexToken();
         
@@ -334,6 +335,17 @@ public final class Util {
 		return(sb.toString());
 	}
   
+    //*******************************************************************************
+    //*** 
+    //*******************************************************************************
+	/// Returns true if the two specified strings are equal to one another.
+	/// @param s1 argument string
+	/// @param s2 argument string
+	/// @return true if the two specified strings are equal to one another
+	public static boolean equals(Identifier id1,Identifier id2) {
+		return equals(id1.value, id2.value);
+	}
+	  
     //*******************************************************************************
     //*** 
     //*******************************************************************************

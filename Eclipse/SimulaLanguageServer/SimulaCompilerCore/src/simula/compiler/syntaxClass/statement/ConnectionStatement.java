@@ -11,10 +11,13 @@ import java.lang.classfile.Label;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
+
+import simula.builder.SimulaBuilder;
+import simula.Option;
+import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.syntaxClass.declaration.ConnectionBlock;
@@ -28,7 +31,6 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Connection Statement.
@@ -81,7 +83,7 @@ import simula.compiler.utilities.Util;
 /// 
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ConnectionStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ConnectionStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -122,16 +124,18 @@ public final class ConnectionStatement extends Statement {
 	/// 
 	/// Pre-Condition: INSPECT  is already read.
 	/// @param line the source line number
-	ConnectionStatement(final int line) {
-		super(line);
+	ConnectionStatement(final SimulaBuilder simBuilder) {
+		super(simBuilder);
+		simBuilder.consume(KeyWord.INSPECT); //  (add it to 'current tree')
+
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ConnectionStatement");
-		objectExpression = Expression.expectExpression();
+		objectExpression = Expression.expectExpression(simBuilder, "connected object");
 		objectExpression.backLink = this;
-		String ident = "_inspect_" + lineNumber + '_' + (SEQUX++);
-		inspectedVariable = new VariableExpression(ident);
+		String ident = "_inspect_" + firstLineNumber() + '_' + (SEQUX++);
+		inspectedVariable = new VariableExpression(simBuilder, ident);
 		DeclarationScope scope = CoreGlobal.getCurrentScope();
-		inspectVariableDeclaration = new InspectVariableDeclaration(Type.Ref("RTObject"), ident, scope, this);
+		inspectVariableDeclaration = new InspectVariableDeclaration(simBuilder, Type.Ref("RTObject"), ident, scope, this);
 		
 		LOOP: while (scope instanceof ConnectionBlock
 				|| (scope instanceof MaybeBlockDeclaration && scope.declarationList.size() == 0 )) {
@@ -148,43 +152,49 @@ public final class ConnectionStatement extends Statement {
 		boolean hasWhenPart=false;
 		if (Parse.accept(simBuilder, KeyWord.DO)) {
 			hasDoPart = true;
-			ConnectionBlock connectionBlock = new ConnectionBlock(inspectedVariable, null);
+			ConnectionBlock connectionBlock = new ConnectionBlock(simBuilder, inspectedVariable, null);
 			DeclarationScope prevScope = CoreGlobal.getCurrentScope();
 			CoreGlobal.setScope(connectionBlock);
-			Statement statement = Statement.expectStatement();
+			Statement statement = Statement.acceptStatement(simBuilder);
 			CoreGlobal.setScope(prevScope);
 			
-			connectionPart.add(new ConnectionDoPart(this,connectionBlock, statement));
+			connectionPart.add(new ConnectionDoPart(simBuilder, this,connectionBlock, statement));
 			connectionBlock.end();
 		} else {
+			simBuilder.startTokenRange();
 			while (Parse.accept(simBuilder, KeyWord.WHEN)) {
-				String classIdentifier = Parse.expectIdentifier(simBuilder).getText();
+				String classIdentifier = Parse.expectIdentifier(simBuilder).edText();
 				Parse.expect(simBuilder, KeyWord.DO);
-				ConnectionBlock connectionBlock = new ConnectionBlock(inspectedVariable, classIdentifier);
+				ConnectionBlock connectionBlock = new ConnectionBlock(simBuilder, inspectedVariable, classIdentifier);
 				hasWhenPart = true;
-				Statement statement = Statement.expectStatement();
-				connectionPart.add(new ConnectionWhenPart(this,classIdentifier, connectionBlock, statement));
+				Statement statement = Statement.acceptStatement(simBuilder);
+				ConnectionWhenPart whenPart = new ConnectionWhenPart(simBuilder, this,classIdentifier, connectionBlock, statement);
+				simBuilder.doneTokenRange(whenPart);
+				simBuilder.startTokenRange();
+				connectionPart.add(whenPart);
 				connectionBlock.end();
 			}
+			simBuilder.dropTokenRange();
+
 		}
-		if(!(hasDoPart | hasWhenPart)) Util.error("Incomplete Inspect statement: "+objectExpression);
+		if(!(hasDoPart | hasWhenPart)) Util.syntaxError(simBuilder, "Incomplete Inspect statement: "+objectExpression + ", missing DO or WHEN");
 		Statement otherwise = null;
-		if (Parse.accept(simBuilder, KeyWord.OTHERWISE)) otherwise = Statement.expectStatement();
+		if (Parse.accept(simBuilder, KeyWord.OTHERWISE)) otherwise = Statement.acceptStatement(simBuilder);
 		this.otherwise=otherwise;
 		this.hasWhenPart=hasWhenPart;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line "+this.lineNumber+": ConnectionStatement: "+this);
+			Util.TRACE("Line "+this.firstLineNumber()+": ConnectionStatement: "+this);
 	}
 
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ConnectionStatement(" + toString() + ").doChecking - Current Scope Chain: " + CoreGlobal.getCurrentScope().edScopeChain());		
 		objectExpression.doChecking();
 		Type exprType = objectExpression.type;
-		exprType.doChecking(CoreGlobal.getCurrentScope());
+		exprType.doChecking(CoreGlobal.getCurrentScope(), this);
 		inspectVariableDeclaration.type = exprType;
 		inspectedVariable.type = exprType;
 		inspectedVariable.doChecking();
@@ -199,11 +209,13 @@ public final class ConnectionStatement extends Statement {
 
 	@Override
 	public void doJavaCoding() {
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
+//		IO.println("ConnectionStatement.doJavaCoding: "+Global.sourceLineNumber);
 		ASSERT_SEMANTICS_CHECKED();
 		JavaSourceFileCoder.code("{");
 		JavaSourceFileCoder.debug("// BEGIN INSPECTION ");
-		Expression assignment = new AssignmentOperation(inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
+		Expression assignment = new AssignmentOperation(null, inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
+//		Expression assignment = new AssignmentOperation(this.psiTree, inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
 		assignment.doChecking();
 		JavaSourceFileCoder.code(assignment.toJavaCode() + ';');
 		if (!hasWhenPart) JavaSourceFileCoder.code("if(" + inspectedVariable.toJavaCode() + "!=null) {","INSPECT " + inspectedVariable);
@@ -279,7 +291,7 @@ public final class ConnectionStatement extends Statement {
 	@Override
 	public String toString() {
 		String otherwisePart = (otherwise == null)?"":" OTHERWISE " + otherwise;
-		return ("INSPECT " + inspectedVariable + " " + connectionPart + otherwisePart);
+		return "INSPECT " + inspectedVariable + " " + connectionPart + otherwisePart;
 	}
 
 	// ***********************************************************************************************
@@ -287,7 +299,7 @@ public final class ConnectionStatement extends Statement {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private ConnectionStatement() {
-		super(0);
+		super(null);
 	}
 
 	@Override
@@ -295,8 +307,8 @@ public final class ConnectionStatement extends Statement {
 		Util.TRACE_OUTPUT("writeConnectionStatement: " + this);
 		oupt.writeKind(ObjectKind.ConnectionStatement);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 		// *** ConnectionStatement
 		oupt.writeObj(objectExpression);
 		oupt.writeObj(inspectedVariable);
@@ -314,8 +326,8 @@ public final class ConnectionStatement extends Statement {
 	public static ConnectionStatement readObject(AttributeInputStream inpt) throws IOException {
 		ConnectionStatement stm = new ConnectionStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
-		// *** SyntaxClass
-		stm.lineNumber = inpt.readShort();
+		// *** SyntaxElement
+		stm.astData = readAstData(inpt);
 		// *** ConnectionStatement
 		stm.objectExpression = (Expression) inpt.readObj();
 		stm.inspectedVariable = (VariableExpression) inpt.readObj();

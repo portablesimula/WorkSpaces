@@ -13,7 +13,7 @@ import java.util.TreeSet;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 
 import java.util.Vector;
 
@@ -61,7 +61,7 @@ import java.util.Vector;
 ///
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/ClassHierarchy.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/ClassHierarchy.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
 public abstract class ClassHierarchy {
@@ -178,7 +178,7 @@ public abstract class ClassHierarchy {
 		/// Utility method: print.
 		/// @param indent the indentation.
 		void print(int indent) {
-			IO.println(SyntaxClass.edIndent(indent) + this.name);
+			IO.println(SyntaxElement.edIndent(indent) + this.name);
 			for(Node child:children) child.print(indent + 1);
 		}
 

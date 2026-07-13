@@ -19,7 +19,7 @@ import java.util.Vector;
 import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.syntaxClass.expression.RemoteVariable;
@@ -28,13 +28,15 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
+import simula.token.LexToken;
 	
 /// Parameter Declaration.
 /// 
 /// A parameter models class and procedure parameters.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/Parameter.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/Parameter.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -93,8 +95,8 @@ public final class Parameter extends Declaration {
 
 	/// Create a new Parameter.
 	/// @param identifier parameter identifier
-	public Parameter(final SimulaBuilder simBuilder, final String identifier) {
-		super(simBuilder, identifier);
+	public Parameter(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier identifier) {
+		super(simBuilder, firstParserToken, identifier);
 		this.declarationKind = ObjectKind.Parameter;
 	}
 
@@ -102,8 +104,8 @@ public final class Parameter extends Declaration {
 	/// @param identifier parameter identifier
 	/// @param type parameter type
 	/// @param kind parameter kind
-	Parameter(final SimulaBuilder simBuilder, final String identifier, final Type type, final int kind) {
-		this(simBuilder, identifier);
+	Parameter(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier identifier, final Type type, final int kind) {
+		this(simBuilder, firstParserToken, identifier);
 		this.type = type;
 		this.kind = kind;
 	}
@@ -113,8 +115,8 @@ public final class Parameter extends Declaration {
 	/// @param type parameter type
 	/// @param kind parameter kind
 	/// @param nDim parameter's number of dimension in case of array kind.
-	public Parameter(final SimulaBuilder simBuilder, final String identifier, final Type type, final int kind, final int nDim) {
-		this(simBuilder, identifier, type, kind);
+	public Parameter(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier identifier, final Type type, final int kind, final int nDim) {
+		this(simBuilder, firstParserToken, identifier, type, kind);
 		this.nDim = nDim;
 	}
 
@@ -123,7 +125,7 @@ public final class Parameter extends Declaration {
 	// ***********************************************************************************************
 	/// Add this parameter to the given parameter list.
 	/// @param parameterList the given parameter list
-	void into(final Vector<Parameter> parameterList) {
+	public void into(final Vector<Parameter> parameterList) {
 		for (Parameter par : parameterList)
 			if (Util.equals(par.identifier, this.identifier)) {
 				Util.syntaxError(simBuilder, "Parameter already defined: " + identifier);
@@ -174,14 +176,14 @@ public final class Parameter extends Declaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		if (kind == 0) {
 			Util.semanticError(this.declaredIn, "Parameter " + identifier + " is not specified -- assumed Simple Integer");
 			kind = Kind.Simple;
 			type = Type.Integer;
 		}
 		if (type != null)
-			type.doChecking(CoreGlobal.getCurrentScope().declaredIn);
+			type.doChecking(CoreGlobal.getCurrentScope().declaredIn, this);
 		if (!legalTransmitionMode())
 			Util.semanticError(this, "Illegal transmission mode: " + mode + ' ' + kind + ' ' + identifier + " by " + edMode(mode) + " is not allowed");
 		SET_SEMANTICS_CHECKED();
@@ -463,7 +465,7 @@ public final class Parameter extends Declaration {
 	public void printTree(final int indent, final Object head) {
 		IO.println(edTreeIndent(indent)+this);
 	}
-	
+
 	@Override
 	public String toString() {
 		String s = "";
@@ -487,7 +489,7 @@ public final class Parameter extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private Parameter() {
-		super(null, null);
+		super(null, null, null);
 		this.declarationKind = ObjectKind.Parameter;
 	}
 	
@@ -497,7 +499,7 @@ public final class Parameter extends Declaration {
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** Parameter
-		oupt.writeString(identifier);
+		oupt.writeIdentifier(identifier);
 		oupt.writeString(externalIdent);
 		oupt.writeType(type);
 		oupt.writeShort(kind);
@@ -508,11 +510,11 @@ public final class Parameter extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static SyntaxClass readObject(AttributeInputStream inpt) throws IOException {
+	public static SyntaxElement readObject(AttributeInputStream inpt) throws IOException {
 		Parameter par = new Parameter();
 		par.OBJECT_SEQU = inpt.readSEQU(par);
 		// *** Parameter
-		par.identifier = inpt.readString();
+		par.identifier = inpt.readIdentifier();
 		par.externalIdent = inpt.readString();
 		par.type = inpt.readType();
 		par.kind = inpt.readShort();

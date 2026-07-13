@@ -23,7 +23,7 @@ import simula.compiler.utilities.Util;
 /// </pre>
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/InlineStatement.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/InlineStatement.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -36,19 +36,20 @@ public final class InlineStatement extends Statement {
 	/// Create a new InlineStatement.
 	/// @param kind the kind code string.
 	public InlineStatement(final SimulaBuilder simBuilder, String kind) {
-		super(simBuilder);
+		super(simBuilder, null);
 		this.kind = kind;
-	}
-
-	@Override
-	public void doChecking() {
-		if (IS_SEMANTICS_CHECKED())	return;
 		SET_SEMANTICS_CHECKED();
 	}
 
 	@Override
+	public void doChecking() {
+//		if (IS_SEMANTICS_CHECKED())	return;
+//		SET_SEMANTICS_CHECKED();
+	}
+
+	@Override
 	public void doJavaCoding() {
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if(kind.equalsIgnoreCase("detach")) JavaSourceFileCoder.code("detach();","Process'detach");
 		else if(kind.equalsIgnoreCase("terminate")) JavaSourceFileCoder.code("terminate();","Process'terminate");
@@ -59,7 +60,7 @@ public final class InlineStatement extends Statement {
 
 	@Override
 	public void buildByteCode(CodeBuilder codeBuilder) {
-		CoreGlobal.sourceLineNumber=lineNumber;
+		CoreGlobal.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if(kind.equalsIgnoreCase("detach")) {
 			codeBuilder.aload(0);

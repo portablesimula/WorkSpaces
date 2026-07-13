@@ -9,16 +9,16 @@ import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.CodeBuilder;
 import java.util.Vector;
 
-import simula.builder.Parse;
 import simula.builder.SimulaBuilder;
+import simula.Option;
+import simula.builder.Parse;
 import simula.compiler.syntaxClass.ProtectedSpecification;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
-import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 import simula.token.LexToken;
 
 /// Declaration.
@@ -39,11 +39,11 @@ import simula.token.LexToken;
 /// SimpleVariableDeclaration, VirtualSpecification, VirtualMatch, ArrayDeclaration
 ///  
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/Declaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/Declaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public abstract class Declaration extends SyntaxClass {
+public abstract class Declaration extends SyntaxElement {
 
 	/// The type
 	public Type type = null;
@@ -52,7 +52,7 @@ public abstract class Declaration extends SyntaxClass {
 	public ProtectedSpecification isProtected; // Set during Checking
 
 	/// Simula Identifier from Source Text
-	public String identifier;
+	public Identifier identifier;
 
 	/// External Identifier set by doChecking
 	public String externalIdent;
@@ -69,10 +69,10 @@ public abstract class Declaration extends SyntaxClass {
 	// ***********************************************************************************************
 	/// Create a new Declaration.
 	/// @param identifier the given identifier
-	protected Declaration(final SimulaBuilder simBuilder, final String identifier) {
-		super(simBuilder);
+	protected Declaration(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier identifier) {
+		super(simBuilder, firstParserToken);
 		this.identifier = identifier;
-		this.externalIdent = identifier; // May be overwritten
+		if(identifier != null) this.externalIdent = identifier.value; // May be overwritten
 		declaredIn = CoreGlobal.getCurrentScope();
 		checkAlreadyDefined();
 	}
@@ -131,61 +131,8 @@ public abstract class Declaration extends SyntaxClass {
 	/// Parse a declaration and add it to the given declaration list.
 	/// @param enclosure the owning block.
 	/// @return true if a declaration was found, false otherwise
-//	protected static boolean acceptDeclaration(final BlockDeclaration enclosure) {
-//		if (Option.internal.TRACE_PARSE)
-//			Parse.TRACE("Parse Declaration");
-//		DeclarationList declarationList=enclosure.declarationList;
-//		String prefix = Parse.acceptIdentifier(simBuilder);
-//		if (prefix != null) {
-//			if (Parse.accept(simBuilder, KeyWord.CLASS))
-//				declarationList.add(ClassDeclaration.expectClassDeclaration(prefix));
-//			else {
-//				Parse.saveCurrentToken(); // Identifier is NOT a class prefix.
-//				return (false);
-//			}
-//		} else if (Parse.accept(simBuilder, KeyWord.ARRAY))
-//			ArrayDeclaration.expectArrayDeclaration(Type.Real, declarationList); // Default type real for arrays
-//		else if (Parse.accept(simBuilder, KeyWord.PROCEDURE))
-//			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(null));
-//		else if (Parse.accept(simBuilder, KeyWord.PRIOR)) {
-//			Util.warning("Keyword 'prior' ignored - prior procedure is not implemented");
-//			Type type = Parse.acceptType(simBuilder);
-//			Parse.expect(simBuilder, KeyWord.PROCEDURE);
-//			declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(type));
-//		} else if (Parse.accept(simBuilder, KeyWord.CLASS))
-//			declarationList.add(ClassDeclaration.expectClassDeclaration(null));
-//		else if (Parse.accept(simBuilder, KeyWord.SWITCH)) {
-//			String ident = Parse.acceptIdentifier(simBuilder);
-//			if (ident == null) {
-//				// Switch Statement
-//				Parse.saveCurrentToken();
-//				return (false);
-//			}
-//			declarationList.add(new SwitchDeclaration(ident));
-//		} else if (Parse.accept(simBuilder, KeyWord.EXTERNAL))
-//			ExternalDeclaration.expectExternalHead(enclosure);
-//		else {
-//			Type type = Parse.acceptType(simBuilder);
-//			if (type == null)
-//				return (false);
-//			if (Parse.accept(simBuilder, KeyWord.PROCEDURE))
-//				declarationList.add(ProcedureDeclaration.expectProcedureDeclaration(type));
-//			else if (Parse.accept(simBuilder, KeyWord.ARRAY))
-//				ArrayDeclaration.expectArrayDeclaration(type, declarationList);
-//			else 
-//				SimpleVariableDeclaration.expectSimpleVariable(type, declarationList);
-//			
-//			if (Option.internal.TRACE_PARSE)
-//				Parse.TRACE("Parse Declaration(2)");
-//		}
-//		return (true);
-//	}
-
-	/// Parse a declaration and add it to the given declaration list.
-	/// @param enclosure the owning block.
-	/// @return true if a declaration was found, false otherwise
 //	protected static boolean acceptDeclaration(final PsiBuilder simBuilder, final BlockDeclaration enclosure) {
-	protected static Vector<SyntaxClass> acceptDeclaration(final SimulaBuilder simBuilder) {
+	protected static Vector<SyntaxElement> acceptDeclaration(final SimulaBuilder simBuilder) {
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse Declaration");
 		Declaration decl = null;
@@ -196,7 +143,7 @@ public abstract class Declaration extends SyntaxClass {
 			IO.println("Declaration.acceptDeclaration: maybePrefix="+maybePrefix);
 			if (Parse.accept(simBuilder, KeyWord.CLASS)) {
 				IO.println("Declaration.acceptDeclaration: CLASS");
-				decl = ClassDeclaration.expectClassDeclaration(simBuilder, maybePrefix.edText());
+				decl = ClassDeclaration.expectClassDeclaration(simBuilder, maybePrefix);
 			} else {
 				IO.println("Declaration.acceptDeclaration: NOT CLASS");
 				
@@ -225,6 +172,7 @@ public abstract class Declaration extends SyntaxClass {
 			Vector<SyntaxElement> ext = ExternalDeclaration.expectExternalDeclaration(simBuilder);	
 			return ext;
 		} else {
+			LexToken firstToken = simBuilder.getCurrentParserToken();
 			Type type = Parse.acceptType(simBuilder);
 			if (type == null) return null;
 			
@@ -235,7 +183,7 @@ public abstract class Declaration extends SyntaxClass {
 				return ArrayDeclaration.expectArrayDeclaration(simBuilder, type);
 			}
 			else 
-				return SimpleVariableDeclaration.expectSimpleVariable(simBuilder, type);
+				return SimpleVariableDeclaration.expectSimpleVariable(simBuilder, firstToken, type);
 			
 			if (Option.internal.TRACE_PARSE)
 				Parse.TRACE("Parse Declaration(2)");
@@ -245,7 +193,11 @@ public abstract class Declaration extends SyntaxClass {
 		return declarations;
 	}
 
-
+	public BlockDeclaration getEnclosingBlock() {
+		DeclarationScope enc = this.declaredIn;
+		while(! (enc instanceof BlockDeclaration)) enc = enc.declaredIn;
+		return (BlockDeclaration) enc;
+	}
 	// ***********************************************************************************************
 	// *** Utility: isCompatibleClasses -- Used by IS/IN/QUA-checking and Inspect WHEN
 	// ***********************************************************************************************
@@ -254,9 +206,9 @@ public abstract class Declaration extends SyntaxClass {
 	/// @return the resulting boolean value
 	public boolean isCompatibleClasses(final Declaration other) {
 		if (!(this instanceof ClassDeclaration))
-			Util.error("" + this + " is not a class");
+			Util.semanticError(this, "" + this + " is not a class");
 		if (!(other instanceof ClassDeclaration))
-			Util.error("" + other + " is not a class");
+			Util.semanticError(other, "" + other + " is not a class");
 
 		if (((ClassDeclaration) this).isSubClassOf((ClassDeclaration) other))
 			return (true);
@@ -280,14 +232,14 @@ public abstract class Declaration extends SyntaxClass {
 	/// Output Java ByteCode. Build init code for an Attribute.
 	/// @param codeBuilder the codeBuilder to use.
 	public void buildInitAttribute(CodeBuilder codeBuilder) {
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		Util.IERR("Method buildInitAttribute need a redefinition in "+this.getClass().getSimpleName());
 	}
 
 	/// Output Java ByteCode. Build declaration code for an Attribute.
 	/// @param codeBuilder the codeBuilder to use.
 	public void buildDeclarationCode(CodeBuilder codeBuilder) {
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		// Default: No code
 	}
 	

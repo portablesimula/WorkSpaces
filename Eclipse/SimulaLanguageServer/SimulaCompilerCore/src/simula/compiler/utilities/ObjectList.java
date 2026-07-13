@@ -10,12 +10,12 @@ import java.util.Vector;
 
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.syntaxClass.SyntaxClass;
+import simula.compiler.syntaxClass.SyntaxElement;
 
 /// Utility class to hold a list of objects.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/utilities/ObjectList.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/ObjectList.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -31,6 +31,7 @@ public class ObjectList<E> extends Vector<E> {
 		return super.add((E) obj);
 	}
 	
+	
 	/// Write an ObjectList to a AttributeOutputStream.
 	/// @param list the list to be written.
 	/// @param oupt the AttributeOutputStream to write to.
@@ -38,7 +39,7 @@ public class ObjectList<E> extends Vector<E> {
 	public static void write(ObjectList<?> list, AttributeOutputStream oupt) throws IOException {
 		if(list != null) {
 			oupt.writeShort(list.size());
-			for(Object stm:list) oupt.writeObj((SyntaxClass) stm);
+			for(Object stm:list) oupt.writeObj((SyntaxElement) stm);
 		} else oupt.writeShort(-1);
 	}
 

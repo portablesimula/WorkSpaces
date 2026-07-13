@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Vector;
 
 import simula.builder.SimulaBuilder;
+import simula.Option;
+import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.parsing.Parse;
-import simula.compiler.syntaxClass.Type;
+import simula.compiler.JavaSourceFileCoder;import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.statement.DummyStatement;
 import simula.compiler.syntaxClass.statement.Statement;
@@ -42,8 +42,9 @@ import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
+import simula.token.LexToken;
 
 /// Procedure Declaration.
 /// <pre>
@@ -83,7 +84,7 @@ import simula.compiler.utilities.Util;
 /// This class is prefix to StandardProcedure and SwitchDeclaration.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/ProcedureDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/ProcedureDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -109,8 +110,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// Create a new ProcedureDeclaration.
 	/// @param identifier procedure identifier
 	/// @param declarationKind procedure or switch
-	protected ProcedureDeclaration(final SimulaBuilder simBuilder, final String identifier,final int declarationKind) {
-		super(simBuilder, identifier);
+	protected ProcedureDeclaration(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier identifier,final int declarationKind) {
+		super(simBuilder, firstParserToken, identifier);
 		this.declarationKind = declarationKind;
 	}
 
@@ -129,6 +130,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	///                = procedure-identifier [ formal-parameter-part ; [ mode-part ] specification-part ] 
 	///                
 	///            procedure-identifier = identifier
+	/// 
+	/// 		   procedure-body = statement
 	/// </pre>
 	/// 
 	/// Precondition: [ type ] PROCEDURE is already read.
@@ -136,28 +139,32 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @param type procedure's type
 	/// @return a newly created ProcedureDeclaration
 	public static ProcedureDeclaration expectProcedureDeclaration(final SimulaBuilder simBuilder, final Type type) {
-		ProcedureDeclaration proc = new ProcedureDeclaration(simBuilder, null, ObjectKind.Procedure);
+		ProcedureDeclaration proc = new ProcedureDeclaration(simBuilder, simBuilder.getPrevParserToken(), null, ObjectKind.Procedure);
 		proc.sourceFileName = CoreGlobal.sourceFileName;
-		proc.lineNumber=Parse.prevToken.lineNumber;
+//		proc.OLD_lineNumber = simBuilder.getSourceLineNumber();
 		proc.type = type;
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ProcedureDeclaration, type=" + type);
-		proc.modifyIdentifier(Parse.expectIdentifier(simBuilder).getText());
+//		proc.modifyIdentifier(PsiParse.expectIdentifier(simBuilder, PsiTextPanel.styleNameProcedure).edText());
+		proc.modifyIdentifier(Parse.expectIdentifier(simBuilder, "PsiTextPanel.styleNameProcedure"));
+//		IO.println("ProcedureDeclaration.expectProcedureDeclaration: "+proc.identifier);
 		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
-			expectFormalParameterPart(proc.parameterList);
+			expectFormalParameterPart(simBuilder, proc.parameterList);
 			Parse.expect(simBuilder, KeyWord.SEMICOLON);
-			while(acceptModePart(proc.parameterList));
-			expectSpecificationPart(proc);
+			while(acceptModePart(simBuilder, proc.parameterList));
+			expectSpecificationPart(simBuilder, proc);
 		} else Parse.expect(simBuilder, KeyWord.SEMICOLON);
-		expectProcedureBody(proc);
+//		IO.println("ProcedureDeclaration.expectProcedureDeclaration: BEFORE PARSE PROCEDURE BLOCK");
+		expectProcedureBody(simBuilder, proc);
 
-		proc.lastLineNumber = CoreGlobal.sourceLineNumber;
+//		proc.lastLineNumber = Global.sourceLineNumber;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line "+proc.lineNumber+": ProcedureDeclaration: "+proc);
+			Util.TRACE("Line "+proc.firstLineNumber()+": ProcedureDeclaration: "+proc);
 		CoreGlobal.setScope(proc.declaredIn);
+		
 		return (proc);
 	}
-	
+
 	/// Parse Utility: Accept mode-part and set matching parameter's mode.
 	/// <pre>
 	///   mode-part
@@ -172,13 +179,15 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// </pre>
 	/// @param pList the parameter list
 	/// @return true: if mode-part was present.
-	private static boolean acceptModePart(Vector<Parameter> pList) {
+	private static boolean acceptModePart(SimulaBuilder simBuilder, Vector<Parameter> pList) {
+		LexToken prevToken = Parse.getCurrentParserToken(simBuilder);
 		if (Parse.accept(simBuilder, KeyWord.VALUE, KeyWord.NAME)) {
-			int mode = (Parse.prevToken.getKeyWord() == KeyWord.VALUE)
+//			IO.println("ProcedureDeclaration.acceptModePart: BEGIN VALUE/NAME");
+			int mode = (prevToken.keyWord == KeyWord.VALUE)
 					? Parameter.Mode.value
 					: Parameter.Mode.name;
 			do {
-				String identifier = Parse.expectIdentifier(simBuilder).getText();
+				String identifier = Parse.expectIdentifier(simBuilder).edText();
 				Parameter parameter = null;
 				for (Parameter par : pList)
 					if (Util.equals(identifier, par.identifier)) {
@@ -186,17 +195,18 @@ public class ProcedureDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(identifier);
+					Util.syntaxError(simBuilder, "Identifier " + identifier + " is not defined in this scope");
+					parameter = new Parameter(simBuilder, identifier);
 				}
 				parameter.setMode(mode);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
+//			IO.println("ProcedureDeclaration.acceptModePart: END VALUE/NAME - Expect SEMICOLON");
 			Parse.expect(simBuilder, KeyWord.SEMICOLON);
 			return(true);
 		}
 		return(false);
 	}
-	
+
 	/// Parse Utility: Accept Procedure Parameter specification-part updating Parameter's type and kind.
 	/// <pre>
 	/// Syntax:
@@ -207,8 +217,9 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	///        specifier = Type | [Type] ARRAY | [Type] PROCEDURE ] | LABEL | SWITCH
 	/// </pre>
 	/// @param proc the procedure declaration
-	private static void expectSpecificationPart(ProcedureDeclaration proc) {
-		if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse ParameterSpecifications");
+	private static void expectSpecificationPart(SimulaBuilder simBuilder, ProcedureDeclaration proc) {
+		if (Option.internal.TRACE_PARSE)
+			Parse.TRACE("Parse ParameterSpecifications");
 		LOOP: while(true) {
 			Type type;
 			int kind = Parameter.Kind.Simple;
@@ -232,16 +243,17 @@ public class ProcedureDeclaration extends BlockDeclaration {
 				else if(type == null) break LOOP;
 			}
 			do {
-				String identifier = Parse.expectIdentifier(simBuilder).getText();
+				String identifier = Parse.expectIdentifier(simBuilder).edText();
 				Parameter parameter = null;
 				for (Parameter par : proc.parameterList)
 					if (Util.equals(identifier,par.identifier)) { parameter = par; break; }
 				if (parameter == null) {
-					Util.error("Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(identifier);
+					Util.syntaxError(simBuilder, "Identifier " + identifier + " is not defined in this scope");
+					parameter = new Parameter(simBuilder, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
+//			IO.println("ProcedureDeclaration.expectSpecificationPart: END TYPE Identifiers - Expect SEMICOLON");
 			Parse.expect(simBuilder, KeyWord.SEMICOLON);
 			continue LOOP;
 		}
@@ -255,7 +267,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 				case Parameter.Kind.Simple:
 				default:
 					if (par.type == null)
-						Util.error("Missing specification of parameter: " + par.identifier);
+						Util.syntaxError(simBuilder, "Missing specification of parameter: " + par.identifier);
 				}
 		}
 	}
@@ -269,24 +281,28 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// </pre>
 	/// 
 	/// @param proc the procedure
-	private static void expectProcedureBody(ProcedureDeclaration proc) {
+	private static void expectProcedureBody(SimulaBuilder simBuilder, ProcedureDeclaration proc) {
 		if (Parse.accept(simBuilder, KeyWord.BEGIN)) {
-			Statement stm;
-			if (Option.internal.TRACE_PARSE)	Parse.TRACE("Parse Procedure Block");
-			while (Declaration.acceptDeclaration(proc)) {
-				Parse.accept(simBuilder, KeyWord.SEMICOLON);
-			}
-//			Vector<Statement> stmList = proc.statements;
-			ObjectList<Statement> stmList = proc.statements;
-			while (!Parse.accept(simBuilder, KeyWord.END, KeyWord.EOF)) {
-				stm = Statement.expectStatement();
-				if (stm != null) stmList.add(stm);
-			}
-			if (Parse.prevToken.keyWord == KeyWord.EOF) {
-				Util.error("Illegal termination of procedure declaration. Missing END.");
+//			IO.println("ProcedureDeclaration.expectProcedureBody: START PARSE PROCEDURE BLOCK");
+			if (Option.internal.TRACE_PARSE)
+				Parse.TRACE("Parse Procedure Block");
+			
+			proc.parseBlock(simBuilder);
+
+			if (Parse.prevToken(simBuilder).keyWord == KeyWord.EOF) {
+				Util.syntaxError(simBuilder, "Illegal termination of procedure declaration. Missing END.");
 			}
 		}
-		else proc.statements.add(Statement.expectStatement());
+		else {
+//			IO.println("ProcedureDeclaration.expectProcedureBody: START PARSE PROCEDURE BODY STATEMENT");
+			LexToken token =simBuilder.getCurrentParserToken();
+//			IO.println("ProcedureDeclaration.expectProcedureBody: token: " + token);
+			if(token.keyWord != KeyWord.SEMICOLON) {
+				Statement stm = Statement.acceptStatement(simBuilder);
+				proc.statements.add(stm);
+			}
+//			IO.println("ProcedureDeclaration.expectProcedureBody: END PARSE PROCEDURE BODY STATEMENT");
+		}
 	}
 
 	// ***********************************************************************************************
@@ -296,11 +312,11 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		CoreGlobal.enterScope(this);
 			LabelList.accumLabelList(this);
 			if(type != null) {
-				this.result = new SimpleVariableDeclaration(type, "_RESULT");
+				this.result = new SimpleVariableDeclaration(null, type, "_RESULT");
 				declarationList.add(result);
 			}
 			int prfx = 0;// prefixLevel();
@@ -313,19 +329,19 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			if (virtualSpec != null) {
 				// This Procedure is a Virtual Match
 				if(! Type.equalsOrSubordinate(virtualSpec.type, this.type))
-					Util.error("Virtual match has wrong type " + type + ", specified as " + virtualSpec.type);
+					Util.semanticError(this, "Virtual match has wrong type " + type + ", specified as " + virtualSpec.type);
 				if(virtualSpec.procedureSpec != null) {
 					ObjectList<Parameter> list1 = this.parameterList;
 					ObjectList<Parameter> list2 = virtualSpec.procedureSpec.parameterList;
 					if(list1.size() != list2.size()) {
-						Util.error("Virtual match has wrong number of parameters " + list1.size() + ". Specified with " + list2.size());	
+						Util.semanticError(this, "Virtual match has wrong number of parameters " + list1.size() + ". Specified with " + list2.size());	
 					} else {
 						for(int i=0;i<list1.size();i++)
 							if(! list1.get(i).equals(list2.get(i)))
-								Util.error("Virtual match has wrong heading. Parameter " + (i+1) + " does not match the specification");	
+								Util.semanticError(this, "Virtual match has wrong heading. Parameter " + (i+1) + " does not match the specification");	
 					}
 				} 
-				myVirtual = new VirtualMatch(virtualSpec, this);
+				myVirtual = new VirtualMatch(simBuilder, virtualSpec, this);
 				ClassDeclaration decl = (ClassDeclaration) declaredIn;
 				decl.virtualMatchList.add(myVirtual);
 				if (decl == virtualSpec.declaredIn) virtualSpec.hasDefaultMatch = true;
@@ -408,7 +424,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Generate java source code for this Procedure.
 	private void doProcedureCoding() {
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(Option.verbose) IO.println("Skip  doProcedureCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
@@ -420,7 +436,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			JavaSourceFileCoder.code("@SuppressWarnings(\"unchecked\")");
 			JavaSourceFileCoder.code("public final class " + getJavaIdentifier() + " extends RTS_PROCEDURE {");
 			JavaSourceFileCoder.debug("// ProcedureDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
-						+ ", firstLine=" + lineNumber + ", lastLine=" + lastLineNumber + ", hasLocalClasses="
+						+ ", firstLine=" + firstLineNumber() + ", lastLine=" + lastLineNumber() + ", hasLocalClasses="
 						+ ((hasLocalClasses) ? "true" : "false") + ", System=" + ((isQPSystemBlock()) ? "true" : "false"));
 			if (isQPSystemBlock())
 				JavaSourceFileCoder.code("public boolean isQPSystemBlock() { return(true); }");
@@ -964,7 +980,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		
 	@Override
 	public void buildDeclaration(ClassBuilder classBuilder, BlockDeclaration encloser) {
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		try {
 			this.createJavaClassFile();
 		} catch (IOException e) {
@@ -974,7 +990,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 
 	@Override
 	public void buildInitAttribute(CodeBuilder codeBuilder) {
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		// NOTHING
 	}
 
@@ -988,7 +1004,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		labelContextStack.push(labelContext);
 		labelContext = this;
 		for (Statement stm : statements) {
-			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.lineNumber);
+			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.firstLineNumber());
 			stm.buildByteCode(codeBuilder);
 		}
 		labelContext = labelContextStack.pop();
@@ -1047,7 +1063,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	@Override
 	public String toString() {
 		StringBuilder s = new StringBuilder();
-		s.append(identifier).append("[externalIdent=").append(externalIdent).append("] Kind=")
+		if(type != null) s.append(type.toString()).append(" ");
+		s.append("procedure ").append(identifier).append("[externalIdent=").append(externalIdent).append("] Kind=")
 		.append(declarationKind).append(", QUAL=").append(this.getClass().getSimpleName()).append(", HashCode=").append(hashCode());
 		if (isProtected != null) {
 			s.append(", Protected by ").append(isProtected.identifier);
@@ -1067,11 +1084,11 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("BEGIN Write ProcedureDeclaration: "+identifier);
 		oupt.writeKind(declarationKind); // Mark: This is a ProcedureDeclaration
-		oupt.writeString(identifier);
+		oupt.writeIdentifier(identifier);
 		oupt.writeShort(OBJECT_SEQU);
 		
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 
 		// *** Declaration
 		oupt.writeString(externalIdent);
@@ -1097,8 +1114,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		ProcedureDeclaration pro = new ProcedureDeclaration(null, identifier, ObjectKind.Procedure);
 		pro.OBJECT_SEQU = inpt.readSEQU(pro);
 
-		// *** SyntaxClass
-		pro.lineNumber = inpt.readShort();
+		// *** SyntaxElement
+		pro.astData = readAstData(inpt);
 
 		// *** Declaration
 		pro.externalIdent = inpt.readString();
@@ -1112,7 +1129,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		pro.parameterList = (ObjectList<Parameter>) inpt.readObjectList();
 
 		pro.isPreCompiledFromFile = inpt.jarFileName;
-		Util.TRACE_INPUT("END Read ProcedureDeclaration: Procedure "+identifier+", Declared in: "+pro.declaredIn);
+//		Util.TRACE_INPUT("END Read ProcedureDeclaration: Procedure "+identifier+", Declared in: "+pro.declaredIn);
+		Util.TRACE_INPUT("END Read ProcedureDeclaration: "+pro+", Declared in: "+pro.declaredIn);
 		CoreGlobal.setScope(pro.declaredIn);
 		return(pro);
 	}

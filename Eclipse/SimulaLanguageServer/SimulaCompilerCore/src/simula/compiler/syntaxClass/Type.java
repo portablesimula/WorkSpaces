@@ -11,17 +11,24 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 
+import simula.Option;
+import simula.builder.SyntaxTree;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.ConnectionBlock;
 import simula.compiler.syntaxClass.declaration.Declaration;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.Parameter;
 import simula.compiler.syntaxClass.declaration.StandardClass;
+import simula.compiler.syntaxClass.declaration.UndefinedDeclaration;
+import simula.compiler.syntaxClass.expression.Expression;
+import simula.compiler.syntaxClass.expression.MissingExpression;
+import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.CoreGlobal;
+import simula.compiler.utilities.Html;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Utility class Type.
 /// <pre>
@@ -48,16 +55,16 @@ import simula.compiler.utilities.Util;
 ///                    qualification = class-identifier
 /// </pre>
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/Type.java"><b>Source File</b></a>.
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/Type.java"><b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
-public class Type extends SyntaxClass {
+public class Type extends SyntaxElement {
 
 	/// The keyWord attribute
 	public int keyWord;
 	
 	/// The Class Identifier in case of ref(classIdent)
-	public String classIdent;
+	public Identifier classIdent;
 	
 	/// Qual in case of ref(Qual) type. Set by doChecking
 	protected ClassDeclaration qual;   // Qual in case of ref(Qual) type; Set by doChecking below
@@ -94,7 +101,8 @@ public class Type extends SyntaxClass {
 	/// Simula's Ref(classIdent) type
 	/// @param classIdent the class name
 	/// @return a new ref(classIdent) type.
-	public static final Type Ref(String classIdent) { return (new Type(Type.T_REF,classIdent)); }
+	public static final Type Ref(Identifier classIdent) { return (new Type(Type.T_REF,classIdent)); }
+	public static final Type Ref(String classIdent) { return (new Type(Type.T_REF,new Identifier(classIdent))); }
 	
 
 	// **************************************************************************************************
@@ -104,23 +112,27 @@ public class Type extends SyntaxClass {
 	/// Create a new simple Type with the given keyWord
 	/// @param keyWord the given keyWord
 	private Type(int keyWord) {
-		super(null);
+		super(null, null);
 		this.keyWord = keyWord;
 	}
 	
 	/// Create a new simple Type with the given keyWord and classIdent
 	/// @param keyWord the given keyWord
 	/// @param classIdent the given class identifier
-	public Type(int keyWord, String classIdent) {
-		super(null);
-		if(classIdent != null && !Option.CaseSensitive) classIdent = classIdent.toUpperCase();
+	public Type(int keyWord, Identifier classIdent) {
+		super(null, null);
+		if(classIdent != null && !Option.CaseSensitive) classIdent.value = classIdent.value.toUpperCase();
 		this.keyWord = keyWord;
 		this.classIdent = classIdent;
+		if(classIdent != null) {
+			if(classIdent.value.startsWith("<HTML>")) Util.STOP();
+			if(classIdent.value.startsWith("IDENTIFIER[")) Util.STOP();
+		}
 	}
 
 	/// Create a new ref(classIdent) type.
 	/// @param classIdent the class name
-	public Type(String classIdent) {
+	public Type(Identifier classIdent) {
 		this(T_REF,classIdent);
 	}
 	
@@ -128,10 +140,13 @@ public class Type extends SyntaxClass {
 	/// @param tp the given Type
 	/// @param declaredIn the ConnectionBlock
 	public Type(Type tp,ConnectionBlock declaredIn) {
-		super(null);
+		super(null, null);
 		this.keyWord = tp.keyWord;
 		this.classIdent = tp.classIdent;
-		
+		if(classIdent != null) {
+			if(classIdent.value.startsWith("<HTML>")) Util.STOP();
+			if(classIdent.value.startsWith("IDENTIFIER[")) Util.STOP();
+		}
 		this.qual = tp.qual;
 		this.declaredIn = declaredIn;
 	}
@@ -175,17 +190,21 @@ public class Type extends SyntaxClass {
 	
 	/// Returns the ref-identifier or null.
 	/// @return the ref-identifier or null
-	public String getRefIdent() {
+	public Identifier getRefIdent() {
 		if(keyWord == Type.T_REF) return(classIdent);
 		return(null); 
 	}
   
-	/// Returns the Java ref-identifier or null.
-	/// @return the Java ref-identifier or null
 	public String getJavaRefIdent() {
+		return getJavaRefIdent(null);
+	}
+	/// Returns the Java ref-identifier or null.
+	/// @param elt the syntax element containing the type
+	/// @return the Java ref-identifier or null
+	public String getJavaRefIdent(final SyntaxElement elt) {
 		if(keyWord == Type.T_REF) {
 			if(classIdent == null) return("RTS_RTObject");
-			if(!IS_SEMANTICS_CHECKED()) this.doChecking(CoreGlobal.getCurrentScope());
+			if(!IS_SEMANTICS_CHECKED()) this.doChecking(CoreGlobal.getCurrentScope(), elt);
 			if(qual==null) return("UNKNOWN");
 			return(qual.getJavaIdentifier());
 		}
@@ -194,16 +213,24 @@ public class Type extends SyntaxClass {
 	
 	/// Perform semantic checking in the given scope.
 	/// @param scope the given scope
-	public void doChecking(final DeclarationScope scope) {
+	/// @param elt the syntax element containing the type
+	public void doChecking(final DeclarationScope scope, final SyntaxElement elt) {
 		if(qual!=null) SET_SEMANTICS_CHECKED(); // This Ref-Type is read from attribute file
 		if(IS_SEMANTICS_CHECKED()) return;
 		CoreGlobal.enterScope(scope);
-		String refIdent=getRefIdent();
+		Identifier refIdent=getRefIdent();
 		if(refIdent!=null) {
-			if(!refIdent.equals("RTS_LABEL") && !refIdent.equals("_UNKNOWN")) {
+			if(!refIdent.value.equals("RTS_LABEL") && !refIdent.value.equals("_UNKNOWN")) {
 				Declaration decl=scope.findMeaning(refIdent).declaredAs;
 			    if(decl instanceof ClassDeclaration cdecl) qual=cdecl;
-			    else Util.error("Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class");
+//			    else Util.generalError("Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class");
+//			    else Util.semanticError(scope, "Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class");
+			    else {
+			    	String err = "Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class";
+			    	if(elt != null)
+			    		 Util.semanticError(elt, err);
+				    else Util.generalError(err);
+			    }
 			}
 		}
 		CoreGlobal.exitScope();
@@ -242,6 +269,23 @@ public class Type extends SyntaxClass {
 	/// @return true if this type is ref type
 	public boolean isRefClassType() {
 		if(keyWord == Type.T_REF) return(true);
+		return false;
+	}
+	
+	/// Return true if the expression is of the given type.
+	/// The following expressions are treated as of any type:
+	/// - the expression 'MissingExpression'.
+	/// - an expression with no meaning.
+	/// - an undeclared Variable
+	public static boolean checkType(Expression expr, int keyWord) {
+		if(expr.type == null) return true;
+		if(expr.type.keyWord == keyWord) return true;
+		if(expr instanceof MissingExpression) return true;
+		if(expr instanceof VariableExpression var) {
+			IO.println("ConditionalExpression.doChecking: var.meaning: " + var.meaning);
+			if(var.meaning == null) return true;
+			if(var.meaning.declaredAs instanceof UndefinedDeclaration) return true;
+		}
 		return false;
 	}
   
@@ -288,8 +332,8 @@ public class Type extends SyntaxClass {
     /// @param other the other type
     /// @return true if the condition holds
 	public boolean isSubReferenceOf(final Type other) {
-		String thisRef=this.getRefIdent();   // May be null for NONE
-		String otherRef=other.getRefIdent(); // May be null for NONE
+		Identifier thisRef=this.getRefIdent();   // May be null for NONE
+		Identifier otherRef=other.getRefIdent(); // May be null for NONE
 		boolean result;		
 		if(otherRef==null) result=false;     // No ref is a super-reference of NONE
 		else if(thisRef==null) result=true;  // Any ref is a sub-reference of NONE
@@ -310,24 +354,6 @@ public class Type extends SyntaxClass {
 		if(type1.isSubReferenceOf(type2)) return(type2);
 	    if(type2.isSubReferenceOf(type1)) return(type1);
 		return(type1);
-	}
-  
-	/// Returns the type to which both types can be converted.
-	/// @param type1 argument
-	/// @param type2 argument
-	/// @return the resulting Type
-	public static Type commonTypeConversion(final Type type1,final Type type2) {
-		if(type1.equals(type2)) return(type1);
-		Type atype=arithmeticTypeConversion(type1,type2);
-		if(atype!=null) return(atype);
-		if(type1.isReferenceType() && type2.isReferenceType()) {
-			if(type1.isSubReferenceOf(type2)) return(type2);
-		    if(type2.isSubReferenceOf(type1)) return(type1);
-		    Util.error("Incompatible types: "+type1+", "+type2);
-		    return(type1);
-		}
-		Util.error("Incompatible types: "+type1+", "+type2);
-		return(null);
 	}
 	
 	/// Returns the most dominant type.
@@ -675,9 +701,11 @@ public class Type extends SyntaxClass {
 		}
 	}
 
+
 	@Override
 	public String toString() {
 		switch(keyWord) {
+			case T_UNDEF:		return "UNDEFINED";
 			case T_INTEGER:		return "Integer";
 			case T_REAL:		return "Real";
 			case T_LONG_REAL:	return "Long Real";

@@ -14,13 +14,14 @@ import java.lang.classfile.ClassModel;
 import java.lang.classfile.ClassTransform;
 import java.lang.classfile.ClassFile;
 import java.lang.classfile.MethodModel;
-import simula.compiler.utilities.Option;
+
+import simula.Option;
 import simula.compiler.utilities.Util;
 
 /// ClassFileTransform.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/transform/ClassFileTransform.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/transform/ClassFileTransform.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen

@@ -8,17 +8,21 @@ package simula.compiler.syntaxClass.declaration;
 import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
+
+import simula.builder.SimulaBuilder;
+import simula.builder.Parse;
 import simula.compiler.AttributeFileIO;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JarFileBuilder;
-import simula.compiler.parsing.Parse;
+import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Token;
 import simula.compiler.utilities.Util;
+import simula.token.LexToken;
+import simula.token.SimpleString;
 
 /// External Declaration.
 /// <pre>
@@ -88,7 +92,7 @@ import simula.compiler.utilities.Util;
 /// a formal procedure.
 ///  
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/ExternalDeclaration.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/ExternalDeclaration.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author SIMULA Standards Group
@@ -98,99 +102,151 @@ public final class ExternalDeclaration extends Declaration {
 	/// Create a new ExternalDeclaration.
 	/// @param identifier the identifier.
 	/// @param extIdentitier the external identifier.
-	private ExternalDeclaration(String identifier,String extIdentitier) {
-		super(identifier);
+	private ExternalDeclaration(final SimulaBuilder simBuilder, String identifier,String extIdentitier) {
+		super(simBuilder, identifier);
 		this.declarationKind = ObjectKind.ExternalDeclaration;
 		this.externalIdent = extIdentitier;
 	}
 	
 	/// Private Constructor used by Attribute File I/O.
 	private ExternalDeclaration() {
-		super(null);
+		super(null, null);
 		this.declarationKind = ObjectKind.ExternalDeclaration;
 	}
 
 	/// Parse an external declaration updating a declaration list.
 	/// <pre>
 	///    external-head = external-declaration ; { external-declaration ; }
+	/// 
 	///       external-class-declaration
 	///            =  EXTERNAL  CLASS  external-list
 	///        
 	///       external-procedure-declaration
 	///            = EXTERNAL [ kind ] [ type ] PROCEDURE external-list
 	///            | EXTERNAL kind PROCEDURE external-item  IS procedure-declaration
+	/// 
+	///			 external-list = external-item { , external-item }
+	/// 
+	/// 			external-item = identifier [ = external-identification ]
+	/// 
+	/// 				external-identification = string
 	/// </pre>
 	/// Precondition: EXTERNAL  is already read.
 	/// @param enclosure the BlockDeclaration which is updated
 	/// @return a Vector of ExternalDeclaration
-	public static Vector<ExternalDeclaration> expectExternalHead(final BlockDeclaration enclosure) {
-		String kind = Parse.acceptIdentifier(simBuilder);
+	public static Vector<SyntaxElement> expectExternalDeclaration(final SimulaBuilder simBuilder) {
+		LexToken kind = Parse.acceptIdentifier(simBuilder);
 		if (kind != null)
-			Util.error("*** NOT IMPLEMENTED: " + "External " + kind + " Procedure");
+			Util.syntaxError(simBuilder, "*** NOT IMPLEMENTED: " + "External " + kind + " Procedure");
 		Type expectedType = Parse.acceptType(simBuilder);
-		if (!(Parse.accept(simBuilder, KeyWord.CLASS) || Parse.accept(simBuilder, KeyWord.PROCEDURE)))
-			Util.error("parseExternalDeclaration: Expecting CLASS or PROCEDURE");
+//		if (!(PsiParse.accept(simBuilder, KeyWord.CLASS) || PsiParse.accept(simBuilder, KeyWord.PROCEDURE)))
+		if (!(Parse.accept(simBuilder, KeyWord.CLASS, KeyWord.PROCEDURE)))
+//			Util.syntaxError(simBuilder.getCurrentParserToken(), "parseExternalDeclaration: Expecting CLASS or PROCEDURE");
+			Util.syntaxError(simBuilder, "parseExternalDeclaration: Expecting CLASS or PROCEDURE");
 
-		Vector<ExternalDeclaration> externalDeclarations = new Vector<ExternalDeclaration>();
-		String identifier = Parse.expectIdentifier(simBuilder).getText();
+		Vector<SyntaxElement> declarations = new Vector<SyntaxElement>();
+		String identifier = Parse.expectIdentifier(simBuilder).edText();
 		LOOP: while (true) {
-			Token externalIdentifier = null;
+//			IO.println("ExternalDeclaration.expectExternalDeclaration: identifier=" + identifier);
+			String externalIdentifier = null;
 			if (Parse.accept(simBuilder, KeyWord.EQ)) {
-				externalIdentifier = Parse.getCurrentParserToken(simBuilder);
-				Parse.expect(simBuilder, KeyWord.TEXTKONST);
+//				externalIdentifier = Parse.currentToken;
+//				Parse.expect(KeyWord.TEXTKONST);
+				LexToken token = Parse.getCurrentParserToken(simBuilder);
+//				IO.println("ExternalDeclaration.expectExternalDeclaration: " + token.getClass().getSimpleName());
+				if(token instanceof SimpleString xident) {
+					externalIdentifier = xident.value;
+					IO.println("ExternalDeclaration.expectExternalDeclaration: extIdentifier" + externalIdentifier);
+				} else {
+					Util.syntaxError(simBuilder, token, "Expecting external identifier string");
+				}
+				simBuilder.getNextParserToken();
 			}
-			String extIdentitier = (externalIdentifier==null)?null:externalIdentifier.getIdentifier();
-			
-			ExternalDeclaration externalDeclaration = new ExternalDeclaration(identifier,extIdentitier);
-			externalDeclarations.add(externalDeclaration);
-			
-			File jarFile = JarFileBuilder.findJarFile(identifier, extIdentitier);
+			ExternalDeclaration externalDeclaration = new ExternalDeclaration(simBuilder, identifier, externalIdentifier);
+			externalDeclaration.type = expectedType;
+			declarations.add(externalDeclaration);
+//			IO.println("ExternalDeclaration.expectExternalDeclaration: externalDeclaration" + externalDeclaration);
+
+			File jarFile = JarFileBuilder.findJarFile(identifier, externalIdentifier);
+			if(jarFile == null) {
+				Util.syntaxError(simBuilder, "Can't find attribute file: " + identifier + '[' + externalIdentifier + ']');
+			}
 			if (jarFile != null) {
-				if(checkJarFiles(jarFile)) {
-					Type moduleType = AttributeFileIO.readAttributeFile(identifier, jarFile, enclosure);
+				if(AttributeFileIO.checkJarFiles(jarFile)) {
+					DeclarationScope scope = CoreGlobal.getCurrentScope();
+					Type moduleType = AttributeFileIO.readAttributeFile(simBuilder, identifier, jarFile, scope.getEnclosingBlock());
 					if(moduleType == null) {
-						if (expectedType != null) Util.error("Missing external type: "+expectedType);
+						if (expectedType != null) Util.syntaxError(simBuilder, "Missing external type: "+expectedType);
 					} else if(expectedType == null) {
 						// NOTHING
 					} else if (!moduleType.equals(expectedType)) {
 						if (expectedType != null)
-							Util.error("Wrong external type: "+moduleType+". Expected type: "+expectedType);
+							Util.syntaxError(simBuilder, "Wrong external type: "+moduleType+". Expected type: "+expectedType);
 					}
 				}
 			}
 
 			if (Parse.accept(simBuilder, KeyWord.IS)) {
-				Util.error("*** NOT IMPLEMENTED: " + "External non-Simula Procedure");
+				Util.syntaxError(simBuilder, "*** NOT IMPLEMENTED: " + "External non-Simula Procedure");
 				break LOOP;
 			}
 			if (!Parse.accept(simBuilder, KeyWord.COMMA))
 				break LOOP;
-			identifier = Parse.expectIdentifier(simBuilder).getText();
+			identifier = Parse.expectIdentifier(simBuilder).edText();
 		}
-		return externalDeclarations;
+
+		return declarations;
 	}
 
-	/// Check if the jarFile is already included.
-	/// @param jarFile the jarFile.
-	/// @return false: if the jarFile is already included.
-	private static boolean checkJarFiles(File jarFile) {
-		for(File f:CoreGlobal.externalJarFiles) if(f.equals(jarFile)) {
-			Util.warning("External already included: "+jarFile.getName());
-			return(false);
-		}
-		return true;
-	}
 
-	/// Read external Attribute file.
-	public void readExternalAttributeFile() {
-		File jarFile = JarFileBuilder.findJarFile(identifier, externalIdent);
-		if (jarFile != null) {
-			if(checkJarFiles(jarFile)) {
-				BlockDeclaration enclosure = StandardClass.BASICIO;
-				AttributeFileIO.readAttributeFile(identifier, jarFile, enclosure);
+	@Override
+	public void doChecking() {
+		if (IS_SEMANTICS_CHECKED())
+			return;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
+		DeclarationScope declaredIn = CoreGlobal.getCurrentScope();
+		// ...
+		
+		IO.println("\n\nExternalDeclaration.doChecking: " + this);
+		IO.println("ExternalDeclaration.doChecking: +++++++++++++++++ BASICIO ++++++++++++++++++++++");
+//		StandardClass.BASICIO.printTree(0, decl);
+		for(Declaration memb:StandardClass.BASICIO.declarationList) {
+			IO.println("ExternalDeclaration.doChecking: " + memb);
+		}
+		IO.println("ExternalDeclaration.doChecking: +++++++++++++++++ CURRENT SCOPE "+CoreGlobal.getCurrentScope().identifier +" ++++++++++++++++++++++");
+		for(Declaration z:CoreGlobal.getCurrentScope().declarationList) {
+			IO.println("ExternalDeclaration.doChecking: " + z);
+			if(z instanceof ExternalDeclaration ext) {
+				
 			}
-		}		
+		}
+
+		
+		IO.println("ExternalDeclaration.doChecking: " + this);
+		SET_SEMANTICS_CHECKED();
 	}
+
+//	/// Check if the jarFile is already included.
+//	/// @param jarFile the jarFile.
+//	/// @return false: if the jarFile is already included.
+//	private static boolean checkJarFiles(File jarFile) {
+//		for(File f:Global.externalJarFiles) if(f.equals(jarFile)) {
+//			Util.warning("External already included: "+jarFile.getName());
+//			return(false);
+//		}
+//		return true;
+//	}
+//
+//	/// Read external Attribute file.
+//	public void readExternalAttributeFile() {
+//		File jarFile = JarFileBuilder.findJarFile(identifier, externalIdent);
+//		if (jarFile != null) {
+//			if(checkJarFiles(jarFile)) {
+//				BlockDeclaration enclosure = StandardClass.BASICIO;
+//				AttributeFileIO.readAttributeFile(identifier, jarFile, enclosure);
+//			}
+//		}		
+//	}
 
 
 	public String toString() {
@@ -208,11 +264,11 @@ public final class ExternalDeclaration extends Declaration {
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 
 		// *** Declaration
-		oupt.writeString(identifier);
+		oupt.writeIdentifier(identifier);
 		oupt.writeString(externalIdent);
 		oupt.writeType(type);// Declaration
 	}
@@ -225,11 +281,11 @@ public final class ExternalDeclaration extends Declaration {
 		ExternalDeclaration ext = new ExternalDeclaration();
 		ext.OBJECT_SEQU = inpt.readSEQU(ext);
 
-		// *** SyntaxClass
-		ext.lineNumber = inpt.readShort();
+		// *** SyntaxElement
+		ext.astData = readAstData(inpt);
 
 		// *** Declaration
-		ext.identifier = inpt.readString();
+		ext.identifier = inpt.readIdentifier();
 		ext.externalIdent = inpt.readString();
 		ext.type = inpt.readType();
 

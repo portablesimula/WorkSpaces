@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
+import simula.Option;
+import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
@@ -17,13 +19,12 @@ import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.ConnectionBlock;
 import simula.compiler.syntaxClass.expression.AssignmentOperation;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 
 /// Utility class to hold a when-part.
 ///
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/statement/ConnectionWhenPart.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/statement/ConnectionWhenPart.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -44,8 +45,8 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 	/// @param classIdentifier the WHEN class-identifier
 	/// @param connectionBlock The associated connection block
 	/// @param statement the statement after DO
-	public ConnectionWhenPart(final ConnectionStatement connectionStatement, final String classIdentifier,final ConnectionBlock connectionBlock,final Statement statement) {
-		super(connectionStatement, connectionBlock, statement);
+	public ConnectionWhenPart(final SimulaBuilder simBuilder, final ConnectionStatement connectionStatement, final String classIdentifier,final ConnectionBlock connectionBlock,final Statement statement) {
+		super(simBuilder, connectionStatement, connectionBlock, statement);
 		this.classIdentifier = classIdentifier;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW ConnectionDoPart: " + toString());
@@ -57,10 +58,11 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 			Type type = connectionStatement.inspectVariableDeclaration.type;
 			classIdentifier = type.getRefIdent();
 			if (classIdentifier == null)
-				Util.error("The Variable " + connectionStatement.inspectedVariable + " is not ref() type");
+				Util.semanticError(this, "The Variable " + connectionStatement.inspectedVariable + " is not ref() type");
 		}
 		if (classIdentifier != null) {
 			classDeclaration = AssignmentOperation.getQualification(classIdentifier);
+			if(classDeclaration == null) Util.semanticError(this, "Illegal WHEN part: " + classIdentifier + " is not a class");
 			connectionBlock.setClassDeclaration(classDeclaration);
 		}
 		if (!AssignmentOperation.checkCompatibility(connectionStatement.objectExpression, classIdentifier)) {
@@ -120,8 +122,8 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 		Util.TRACE_OUTPUT("writeWhenPart: " + this);
 		oupt.writeKind(ObjectKind.ConnectionWhenPart);
 		oupt.writeShort(OBJECT_SEQU);
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 		// *** ConnectionWhenPart
 		oupt.writeString(classIdentifier);
 		oupt.writeObj(connectionStatement);
@@ -135,8 +137,8 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 	public static ConnectionDoPart readObject(AttributeInputStream inpt) throws IOException {
 		ConnectionWhenPart whn = new ConnectionWhenPart();
 		whn.OBJECT_SEQU = inpt.readSEQU(whn);
-		// *** SyntaxClass
-		whn.lineNumber = inpt.readShort();
+		// *** SyntaxElement
+		whn.astData = readAstData(inpt);
 		// *** ConnectionDoPart
 		whn.classIdentifier = inpt.readString();
 		whn.connectionStatement = (ConnectionStatement) inpt.readObj();

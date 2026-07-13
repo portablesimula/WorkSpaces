@@ -21,7 +21,7 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/SimulaCompilerCore">
+	<classpathentry combineaccessrules="false" kind="src" path="/SIM2BASED_SimulaCompilerCore">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>

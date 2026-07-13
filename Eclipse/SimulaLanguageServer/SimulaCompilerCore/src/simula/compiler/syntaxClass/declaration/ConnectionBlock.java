@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.ClassDesc;
 
+import simula.Option;
 import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
@@ -24,8 +25,9 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
+import simula.token.LexToken;
 
 /// Connection Block.
 /// 
@@ -38,7 +40,7 @@ import simula.compiler.utilities.Util;
 /// See Simula Standard 4.8 Connection statement.
 /// 
 /// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaCompiler2/Simula/src/simula/compiler/syntaxClass/declaration/ConnectionBlock.java">
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/syntaxClass/declaration/ConnectionBlock.java">
 /// <b>Source File</b></a>.
 /// 
 /// @author Øystein Myhre Andersen
@@ -66,14 +68,14 @@ public final class ConnectionBlock extends DeclarationScope {
 	/// Create a new ConnectionBlock.
 	/// @param inspectedVariable   the inspected variable
 	/// @param whenClassIdentifier the when class identifier
-	public ConnectionBlock(final SimulaBuilder simBuilder, final VariableExpression inspectedVariable, final String whenClassIdentifier) {
+	public ConnectionBlock(final SimulaBuilder simBuilder, LexToken firstParserToken, final VariableExpression inspectedVariable, final String whenClassIdentifier) {
 //		super("Connection block at line " + (Global.sourceLineNumber - 1));
-		super(simBuilder, "Inspect " + inspectedVariable);
+		super(simBuilder, firstParserToken, new Identifier("Inspect " + inspectedVariable));
 		declarationKind = ObjectKind.ConnectionBlock;
 		this.inspectedVariable = inspectedVariable;
 		this.whenClassIdentifier = whenClassIdentifier;
 		// Set External Identifier
-		externalIdent = inspectedVariable.identifier;
+		externalIdent = inspectedVariable.identifier.value;
 	}
 
 	/// Get inspected variable.
@@ -117,8 +119,8 @@ public final class ConnectionBlock extends DeclarationScope {
 			result = declaredIn.findMeaning(identifier);
 		}
 		if (result == null) {
-			Util.error("Undefined variable: " + identifier);
-			UndefinedDeclaration undef = new UndefinedDeclaration(identifier);
+//			Util.error("Undefined variable: " + identifier);
+			UndefinedDeclaration undef = new UndefinedDeclaration(null, identifier);
 			result = new Meaning(undef, this); // Error Recovery
 		}
 		return (result);
@@ -128,7 +130,7 @@ public final class ConnectionBlock extends DeclarationScope {
 	// *** Utility: findVisibleAttributeMeaning
 	// ***********************************************************************************************
 	@Override
-	public Meaning findVisibleAttributeMeaning(final String ident) {
+	public Meaning findVisibleAttributeMeaning(final Identifier ident) {
 		if(Option.internal.TRACE_FIND_MEANING>0)
 			Util.println("BEGIN Checking ConnectionBlock for "+ident+" ================================== "+identifier+" ==================================");
 		for (Declaration declaration : declarationList) {
@@ -151,7 +153,7 @@ public final class ConnectionBlock extends DeclarationScope {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		CoreGlobal.enterScope(this);
 		if (whenClassIdentifier != null) {
 			Meaning meaning = findMeaning(whenClassIdentifier);
@@ -172,7 +174,7 @@ public final class ConnectionBlock extends DeclarationScope {
 
 	@Override
 	public void doJavaCoding() {
-		CoreGlobal.sourceLineNumber = lineNumber;
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		CoreGlobal.enterScope(this);
 		JavaSourceFileCoder.code("{");
@@ -215,7 +217,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		Util.println(spc + beg);
 		for (Declaration decl : declarationList)
 			decl.print(indent + 1);
-		statement.print(indent + 1);
+		if(statement != null) statement.print(indent + 1);
 		Util.println(spc + "end[" + edScopeChain() + ']');
 	}
 
@@ -235,7 +237,8 @@ public final class ConnectionBlock extends DeclarationScope {
 
 	@Override
 	public String toString() {
-		return ("ConnectionBlock: Inspect(" + inspectedVariable + ") do " + statement);
+//		return ("ConnectionBlock: Inspect(" + inspectedVariable + ") do " + statement);
+		return ("ConnectionBlock: " + inspectedVariable);
 	}
 
 	@Override
@@ -249,7 +252,7 @@ public final class ConnectionBlock extends DeclarationScope {
 	/// Default constructor used by Attribute File I/O
 	/// @param identifier the block identifier.
 	public ConnectionBlock(String identifier) {
-		super(identifier);
+		super(null, identifier);
 		declarationKind = ObjectKind.ConnectionBlock;
 	}
 
@@ -257,14 +260,14 @@ public final class ConnectionBlock extends DeclarationScope {
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
 		Util.TRACE_OUTPUT("BEGIN Write ConnectionBlock: "+identifier);
 		oupt.writeKind(declarationKind); // Mark: This is a ConnectionBlock
-		oupt.writeString(identifier);
+		oupt.writeIdentifier(identifier);
 		oupt.writeShort(OBJECT_SEQU);
 		
-		// *** SyntaxClass
-		oupt.writeShort(lineNumber);
+		// *** SyntaxElement
+		writeAstData(oupt);
 		
 		// *** Declaration
-		//oupt.writeString(identifier);
+		//oupt.writeIdentifier(identifier);
 		oupt.writeString(externalIdent);
 		oupt.writeType(type);
 		oupt.writeObj(declaredIn);
@@ -293,11 +296,11 @@ public final class ConnectionBlock extends DeclarationScope {
 		ConnectionBlock blk = new ConnectionBlock(identifier);
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
 		
-		// *** SyntaxClass
-		blk.lineNumber = inpt.readShort();
+		// *** SyntaxElement
+		blk.astData = readAstData(inpt);
 
 		// *** Declaration
-		//blk.identifier = inpt.readString();
+		//blk.identifier = inpt.readIdentifier();
 		blk.externalIdent = inpt.readString();
 		blk.type = inpt.readType();
 		blk.declaredIn = (DeclarationScope) inpt.readObj();
