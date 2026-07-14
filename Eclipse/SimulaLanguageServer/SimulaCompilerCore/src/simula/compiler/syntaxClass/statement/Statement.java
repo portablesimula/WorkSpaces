@@ -23,6 +23,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 import simula.token.LexToken;
 
 /// Statement.
@@ -59,8 +60,8 @@ import simula.token.LexToken;
 public abstract class Statement extends SyntaxElement {
 	
 	/// Create a new Statement.
-	protected Statement(final SimulaBuilder simBuilder, LexToken firstParserToken) {
-		super(simBuilder, firstParserToken);
+	protected Statement(final SimulaBuilder simBuilder) {
+		super(simBuilder);
 	}
 	
 	/// Parse a statement.
@@ -72,14 +73,13 @@ public abstract class Statement extends SyntaxElement {
 			Util.TRACE("Statement.acceptStatement: LabeledStatement: lineNumber="+lineNumber+", current=" + Parse.getCurrentParserToken(simBuilder));//	+ ", prev=" + PsiParse.prevToken);
 		}
 		IO.println("Statement.acceptStatement: LabeledStatement: current=" + Parse.getCurrentParserToken(simBuilder));//	+ ", prev=" + PsiParse.prevToken);
-		simBuilder.startTokenRange("Statement: ");
 		Statement statement = null;
-		LexToken mayBeLabel = Parse.acceptIdentifier(simBuilder);
+		Identifier mayBeLabel = Parse.acceptIdentifier(simBuilder);
 		LOOP:while (mayBeLabel != null) {
 //			IO.println("\n\nStatement.acceptStatement: MAYBE LABEL IDENTIFIER: " + mayBeLabel);
 			if(Parse.accept(simBuilder, KeyWord.COLON)) {
 				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
-				LabelDeclaration label = new LabelDeclaration(simBuilder, mayBeLabel.edText());
+				LabelDeclaration label = new LabelDeclaration(simBuilder, mayBeLabel);
 				labels.add(label);
 				DeclarationScope scope = CoreGlobal.getCurrentScope();
 				if(scope.labelList == null) scope.labelList = new LabelList(scope); 
@@ -87,22 +87,20 @@ public abstract class Statement extends SyntaxElement {
 			} else break LOOP;
 			mayBeLabel = Parse.acceptIdentifier(simBuilder);
 		}
+		
+		if(mayBeLabel != null) {
+			// Got identifier without colon. PushBack the identifier
+			Parse.saveCurrentToken(simBuilder);
+		}
+		statement = acceptUnlabeledStatement(simBuilder);
+		
 		if (labels != null) {
 //			IO.println("Statement.acceptStatement: LABELS: " + labels);
 //			IO.println("Statement.acceptStatement: prevParserToken: " + simBuilder.prevParserToken());
-			if(mayBeLabel != null) {
-				simBuilder.rollBackTo(simBuilder.getPrevParserToken(), "RollBack to Statement after labels start");
-//				IO.println("Statement.acceptStatement: ROLLBACK DONE: ");	
-			}
-			statement = acceptUnlabeledStatement(simBuilder);
 			statement = new LabeledStatement(simBuilder, labels, statement);
 //			IO.println("Statement.acceptStatement: DONE LabeledStatement: " + statement);				
-			simBuilder.doneTokenRange(statement);
-		} else {
-			simBuilder.dropTokenRange();
-			statement = acceptUnlabeledStatement(simBuilder);
 		}
-//		IO.println("Statement.acceptStatement: DONE: " + statement);
+		IO.println("Statement.acceptStatement: DONE: " + statement);
 		return (statement);
 	}
 
@@ -124,7 +122,7 @@ public abstract class Statement extends SyntaxElement {
 //				simBuilder.getRoot().printPsiTree("============================ startTokenRange: ACCEPT UnlabeledStatement");
 //				Util.STOP();
 
-				MaybeBlockDeclaration block = new MaybeBlockDeclaration(simBuilder, simBuilder.getCurrentParserToken(), null);
+				MaybeBlockDeclaration block = new MaybeBlockDeclaration(simBuilder, null);
 				block.expectMaybeBlock(simBuilder);
 				statement = new BlockStatement(simBuilder, block, "Statement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
 				break;

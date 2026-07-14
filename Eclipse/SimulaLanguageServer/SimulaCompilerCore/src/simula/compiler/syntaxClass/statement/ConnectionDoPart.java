@@ -19,6 +19,7 @@ import simula.compiler.syntaxClass.declaration.ConnectionBlock;
 import simula.compiler.syntaxClass.expression.AssignmentOperation;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Utility class to hold the single Connection do-part.
 ///
@@ -51,7 +52,7 @@ public class ConnectionDoPart extends SyntaxElement {
 	/// Perform semantic checking.
 	public void doChecking() {
 		Type type = connectionStatement.inspectVariableDeclaration.type;
-		String refIdentifier = type.getRefIdent();
+		Identifier refIdentifier = type.getRefIdent();
 		if (refIdentifier == null) {
 			Util.semanticError(this, "The Variable " + connectionStatement.inspectedVariable + " is not ref() type");
 		}

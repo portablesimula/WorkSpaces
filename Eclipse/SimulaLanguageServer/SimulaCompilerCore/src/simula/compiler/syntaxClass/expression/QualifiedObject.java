@@ -18,6 +18,7 @@ import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Qualified Object
 /// 
@@ -66,7 +67,7 @@ public final class QualifiedObject extends Expression {
 	private Expression lhs;
 	
 	/// The right hand class identifier.
-	private String classIdentifier;
+	private Identifier classIdentifier;
 	
 	/// The right hand class declaration. Set by doChecking.
 	ClassDeclaration classDeclaration; // Set by doChecking
@@ -74,7 +75,7 @@ public final class QualifiedObject extends Expression {
 	/// Create a new QualifiedObject
 	/// @param lhs left hand side
 	/// @param classIdentifier class identifier
-	QualifiedObject(final SimulaBuilder simBuilder, final Expression lhs, final String classIdentifier) {
+	QualifiedObject(final SimulaBuilder simBuilder, final Expression lhs, final Identifier classIdentifier) {
 		super(simBuilder);
 		this.lhs = lhs;
 		this.classIdentifier = classIdentifier;
@@ -145,7 +146,7 @@ public final class QualifiedObject extends Expression {
 		oupt.writeObj(backLink);
 		// *** QualifiedObject
 		oupt.writeObj(lhs);
-		oupt.writeString(classIdentifier);
+		oupt.writeIdentifier(classIdentifier);
 	}
 	
 	/// Read and return a QualifiedObject object.
@@ -162,7 +163,7 @@ public final class QualifiedObject extends Expression {
 		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** QualifiedObject
 		expr.lhs = (Expression) inpt.readObj();
-		expr.classIdentifier = inpt.readString();
+		expr.classIdentifier = inpt.readIdentifier();
 		Util.TRACE_INPUT("readQualifiedObject: " + expr);
 		return(expr);
 	}

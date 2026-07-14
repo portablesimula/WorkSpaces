@@ -81,20 +81,18 @@ public final class AssignmentOperation extends Expression {
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
 
-	@Override
-	public int firstLineNumber() {
-//		if(psiTree != null) return psiTree.firstLineNumber();
-		LexToken token = lexTokenRange.getFirstLexToken();
-		if(token != null) return token.firstLineNumber();
-		return lhs.firstLineNumber();
-	}
-
-	@Override
-	public int lastLineNumber() {
-		LexToken token = lexTokenRange.getLastLexToken();
-		if(token != null) return token.lastLineNumber();
-		return rhs.lastLineNumber();
-	}
+//	@Override public int firstLineNumber() {
+////		if(psiTree != null) return psiTree.firstLineNumber();
+//		LexToken token = lexTokenRange.getFirstLexToken();
+//		if(token != null) return token.firstLineNumber();
+//		return lhs.firstLineNumber();
+//	}
+//
+//	@Override public int lastLineNumber() {
+//		LexToken token = lexTokenRange.getLastLexToken();
+//		if(token != null) return token.lastLineNumber();
+//		return rhs.lastLineNumber();
+//	}
 
 	@Override
 	public void doChecking() {

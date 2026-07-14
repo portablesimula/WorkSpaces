@@ -5,6 +5,7 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.utilities;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
@@ -230,10 +231,12 @@ public final class Util {
 //		return(line);
 //	}
 	
-	/// Return the base name part of a File Name
+	/// Return the base name part of an URI
 	/// @param fileName a File Name.
-	/// @return the base name part of a File Name
-	public static String getBaseName(final String fileName) {
+	/// @return the base name part of an URI
+	public static String getBaseName(final String uri) {
+    	File file = new File(uri);
+    	String fileName = file.getName();
 		int p=fileName.lastIndexOf(".");
 		return (p > 0)? fileName.substring(0, p) : fileName;
 	}

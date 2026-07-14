@@ -131,8 +131,8 @@ public final class VariableExpression extends Expression {
 
 	/// Create a new Variable.
 	/// @param identifier the variable's identifier
-	public VariableExpression(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier identifier) {
-		super(simBuilder, firstParserToken);
+	public VariableExpression(final SimulaBuilder simBuilder, final Identifier identifier) {
+		super(simBuilder);
 		this.identifier = identifier;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW Variable: " + identifier);
@@ -183,7 +183,7 @@ public final class VariableExpression extends Expression {
 	public static VariableExpression expectVariable(final SimulaBuilder simBuilder, final Identifier identifier) {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse Variable: current=" + Parse.getCurrentParserToken(simBuilder));
-		VariableExpression variable = new VariableExpression(simBuilder, identifier, identifier);
+		VariableExpression variable = new VariableExpression(simBuilder, identifier);
 		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
 //			IO.println("VariableExpression.expectVariable: GOT BEGPAR");
 			variable.params = new Vector<Expression>();
@@ -609,7 +609,7 @@ public final class VariableExpression extends Expression {
 	
 			case ObjectKind.ContextFreeMethod:
 				// Standard Library Procedure
-				if (Util.equals(identifier, "sourceline")) {
+				if (Util.equals(identifier.value, "sourceline")) {
 					int lno = this.firstLineNumber();
 					if(lno <= 0) Util.IERR("VariableExpressiopn.editVariable: Illegal lineNumber: " + lno);
 					return "" + lno;
@@ -750,7 +750,7 @@ public final class VariableExpression extends Expression {
 				buildIdentifierAccess(false,codeBuilder);
 				if (this.hasArguments())
 					 arr.arrayGetElement(this, false, codeBuilder);
-				else codeBuilder.getfield(pool.fieldRefEntry(arr.declaredIn.getClassDesc(), arr.identifier, ArrayDeclaration.getClassDesc(type)));
+				else codeBuilder.getfield(pool.fieldRefEntry(arr.declaredIn.getClassDesc(), arr.identifier.value, ArrayDeclaration.getClassDesc(type)));
 				break;
 
 			case ObjectKind.Class:
@@ -777,7 +777,7 @@ public final class VariableExpression extends Expression {
 				break;
 
 			case ObjectKind.ContextFreeMethod:
-				if (Util.equals(identifier, "sourceline")) {
+				if (Util.equals(identifier.value, "sourceline")) {
 					int lno = this.firstLineNumber();
 					if(lno <= 0) Util.IERR("VariableExpressiopn.buildEvaluation: Illegal lineNumber: " + lno);
 					Constant.buildIntConst(codeBuilder, lno);

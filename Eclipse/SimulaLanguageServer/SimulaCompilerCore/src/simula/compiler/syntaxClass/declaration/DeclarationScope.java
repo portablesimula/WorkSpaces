@@ -22,7 +22,6 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
 import simula.token.Identifier;
-import simula.token.LexToken;
 
 /// Declaration Scope.
 /// 
@@ -60,8 +59,8 @@ public abstract class DeclarationScope extends Declaration  {
 	/// Create a new DeclarationScope.
 	/// 
 	/// @param ident scope identifier
-	protected DeclarationScope(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier ident) {
-		super(simBuilder, firstParserToken, ident);
+	protected DeclarationScope(final SimulaBuilder simBuilder, final Identifier ident) {
+		super(simBuilder, ident);
 		declarationList = new DeclarationList(getClass().getSimpleName() + ':' + ident + ":Line=" + CoreGlobal.sourceLineNumber);
 		declaredIn = CoreGlobal.getCurrentScope();
 		CoreGlobal.setScope(this);
@@ -180,7 +179,7 @@ public abstract class DeclarationScope extends Declaration  {
 	/// 
 	/// @param identifier declared label identifier
 	/// @return the resulting Meaning
-	public Meaning findLabelMeaning(final String identifier) {
+	public Meaning findLabelMeaning(final Identifier identifier) {
 		for (LabelDeclaration dcl : labelList.getDeclaredLabels())
 			if (Util.equals(dcl.identifier, identifier))
 				return (new Meaning(dcl, this, this, false));
@@ -199,7 +198,7 @@ public abstract class DeclarationScope extends Declaration  {
 	/// Follow Static Chain Looking for a Procedure named 'identifier'
 	/// @param identifier the procedure identifier
 	/// @return the resulting ProcedureDeclaration
-	public ProcedureDeclaration findProcedure(final String identifier) {
+	public ProcedureDeclaration findProcedure(final Identifier identifier) {
 		DeclarationScope scope = this;
 		while (scope != null) {
 			if (Util.equals(identifier, scope.identifier)) {

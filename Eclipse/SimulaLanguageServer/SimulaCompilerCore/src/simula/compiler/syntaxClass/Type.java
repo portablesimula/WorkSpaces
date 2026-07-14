@@ -112,7 +112,7 @@ public class Type extends SyntaxElement {
 	/// Create a new simple Type with the given keyWord
 	/// @param keyWord the given keyWord
 	private Type(int keyWord) {
-		super(null, null);
+		super(null);
 		this.keyWord = keyWord;
 	}
 	
@@ -120,7 +120,7 @@ public class Type extends SyntaxElement {
 	/// @param keyWord the given keyWord
 	/// @param classIdent the given class identifier
 	public Type(int keyWord, Identifier classIdent) {
-		super(null, null);
+		super(null);
 		if(classIdent != null && !Option.CaseSensitive) classIdent.value = classIdent.value.toUpperCase();
 		this.keyWord = keyWord;
 		this.classIdent = classIdent;
@@ -140,7 +140,7 @@ public class Type extends SyntaxElement {
 	/// @param tp the given Type
 	/// @param declaredIn the ConnectionBlock
 	public Type(Type tp,ConnectionBlock declaredIn) {
-		super(null, null);
+		super(null);
 		this.keyWord = tp.keyWord;
 		this.classIdent = tp.classIdent;
 		if(classIdent != null) {
@@ -184,7 +184,7 @@ public class Type extends SyntaxElement {
 		if (this.classIdent == null) return (false);
 		if (other.classIdent == null) return (false);
 //		if (!this.classIdent.equals(other.classIdent)) return (false);
-		if (!this.classIdent.equalsIgnoreCase(other.classIdent)) return (false);
+		if (!this.classIdent.value.equalsIgnoreCase(other.classIdent.value)) return (false);
 		return (true);
 	}
 	

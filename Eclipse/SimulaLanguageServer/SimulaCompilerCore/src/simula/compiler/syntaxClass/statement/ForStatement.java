@@ -162,7 +162,7 @@ public final class ForStatement extends Statement {
 
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ForStatement");
-		controlVariable = new VariableExpression(simBuilder, Parse.expectIdentifier(simBuilder).edText());
+		controlVariable = new VariableExpression(simBuilder, Parse.expectIdentifier(simBuilder));
 		LexToken prevToken = Parse.getCurrentParserToken(simBuilder);
 		if (!Parse.accept(simBuilder, KeyWord.ASSIGNVALUE))
 			Parse.expect(simBuilder, KeyWord.ASSIGNREF);

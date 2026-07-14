@@ -99,8 +99,8 @@ public abstract class Expression extends SyntaxElement {
 	public SyntaxElement backLink;
 
 	/// Expression.
-	public Expression(final SimulaBuilder simBuilder, LexToken firstParserToken){
-		super(simBuilder, firstParserToken);
+	public Expression(final SimulaBuilder simBuilder){
+		super(simBuilder);
 	}
 
 	/// Accept expression.
@@ -419,12 +419,9 @@ public abstract class Expression extends SyntaxElement {
 		else if(Parse.accept(simBuilder, KeyWord.THIS)) expr = LocalObject.expectThisIdentifier(simBuilder); 
 		else {
 			LexToken prevToken2 = Parse.getCurrentParserToken(simBuilder) ;
-//			String ident = PsiParse.acceptIdentifier(simBuilder).getText();
-			Identifier identToken = Parse.acceptIdentifier(simBuilder);
-			String ident = (identToken != null)? identToken.edText() : null;
+			Identifier ident = Parse.acceptIdentifier(simBuilder);
 			if(ident != null) {
-//				expr=VariableExpression.expectVariable(simBuilder, ident);
-				expr=VariableExpression.expectVariable(simBuilder, identToken);
+				expr=VariableExpression.expectVariable(simBuilder, ident);
 			} else {
 //				if(Option.internal.TRACE_PARSE) PsiParse.TRACE("Expression: acceptBASICEXPR returns: NULL, prevKeyword="+PsiParse.prevToken.getKeyWord());
 				if(prevToken2.keyWord == KeyWord.SEMICOLON) Parse.skipMisplacedCurrentSymbol(simBuilder); // Ad'Hoc
@@ -439,7 +436,7 @@ public abstract class Expression extends SyntaxElement {
 				expr=new RemoteVariable(simBuilder, expr, expectVariable(simBuilder));
 			else {  // opr == IS or opr == IN or opr == QUA.  Then a class identifier must follow.
 //				String classIdentifier=PsiParse.acceptIdentifier(simBuilder).getText();
-				String classIdentifier=Parse.acceptIdentifier(simBuilder).edText();
+				Identifier classIdentifier=Parse.acceptIdentifier(simBuilder);
 				if(opr==KeyWord.QUA)
 					expr=new QualifiedObject(simBuilder, expr, classIdentifier);
 				else expr=new ObjectRelation(simBuilder, expr, opr, classIdentifier);
@@ -463,8 +460,8 @@ public abstract class Expression extends SyntaxElement {
 		// An identifier, possibly followed by arguments in parentheses.
 //		String ident=PsiParse.acceptIdentifier(simBuilder).getText();
 //		String ident=Parse.acceptIdentifier(simBuilder).edText();
-		LexToken identToken = Parse.acceptIdentifier(simBuilder);
-		return(VariableExpression.expectVariable(simBuilder, identToken));
+		Identifier ident = Parse.acceptIdentifier(simBuilder);
+		return(VariableExpression.expectVariable(simBuilder, ident));
 	}
 
 	/// Get a writeable variable.
@@ -477,7 +474,7 @@ public abstract class Expression extends SyntaxElement {
 	/// @param expr simpleObjectExpression
 	/// @return  the qualification of the given simpleObjectExpression
 	private static ClassDeclaration getQualification(final Expression expr) {
-		String refIdent=expr.type.getRefIdent();
+		Identifier refIdent=expr.type.getRefIdent();
 		Declaration objDecl = CoreGlobal.getCurrentScope().findMeaning(refIdent).declaredAs;
 		if(objDecl instanceof ClassDeclaration cls)	return(cls);
 		Util.semanticError(expr, "Illegal ref(" + refIdent + "): " + refIdent + " is not a class");
@@ -487,7 +484,7 @@ public abstract class Expression extends SyntaxElement {
 	/// Get qualification.
 	/// @param classIdentifier a class identifier
 	/// @return the ClassDeclaration with same identifier
-	public static ClassDeclaration getQualification(final String classIdentifier) {
+	public static ClassDeclaration getQualification(final Identifier classIdentifier) {
 		Declaration classDecl=CoreGlobal.getCurrentScope().findMeaning(classIdentifier).declaredAs;
 		if(classDecl instanceof ClassDeclaration cls) return(cls);
 		return(null);
@@ -497,7 +494,7 @@ public abstract class Expression extends SyntaxElement {
 	/// @param simpleObjectExpression a simple object expression
 	/// @param classIdentifier a class identifier
 	/// @return true if compatible, otherwise false
-	public static boolean checkCompatibility(final Expression simpleObjectExpression,final String classIdentifier) {
+	public static boolean checkCompatibility(final Expression simpleObjectExpression,final Identifier classIdentifier) {
 		ClassDeclaration objDecl=getQualification(simpleObjectExpression);
 		ClassDeclaration quaDecl=getQualification(classIdentifier);
 		if(quaDecl == null) {

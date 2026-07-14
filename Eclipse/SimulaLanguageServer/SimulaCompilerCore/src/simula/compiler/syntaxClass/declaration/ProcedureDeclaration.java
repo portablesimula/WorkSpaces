@@ -110,8 +110,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// Create a new ProcedureDeclaration.
 	/// @param identifier procedure identifier
 	/// @param declarationKind procedure or switch
-	protected ProcedureDeclaration(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier identifier,final int declarationKind) {
-		super(simBuilder, firstParserToken, identifier);
+	protected ProcedureDeclaration(final SimulaBuilder simBuilder, final Identifier identifier,final int declarationKind) {
+		super(simBuilder, identifier);
 		this.declarationKind = declarationKind;
 	}
 
@@ -139,7 +139,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @param type procedure's type
 	/// @return a newly created ProcedureDeclaration
 	public static ProcedureDeclaration expectProcedureDeclaration(final SimulaBuilder simBuilder, final Type type) {
-		ProcedureDeclaration proc = new ProcedureDeclaration(simBuilder, simBuilder.getPrevParserToken(), null, ObjectKind.Procedure);
+		ProcedureDeclaration proc = new ProcedureDeclaration(simBuilder, null, ObjectKind.Procedure);
 		proc.sourceFileName = CoreGlobal.sourceFileName;
 //		proc.OLD_lineNumber = simBuilder.getSourceLineNumber();
 		proc.type = type;
@@ -187,7 +187,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					? Parameter.Mode.value
 					: Parameter.Mode.name;
 			do {
-				String identifier = Parse.expectIdentifier(simBuilder).edText();
+				Identifier identifier = Parse.expectIdentifier(simBuilder);
 				Parameter parameter = null;
 				for (Parameter par : pList)
 					if (Util.equals(identifier, par.identifier)) {
@@ -243,7 +243,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 				else if(type == null) break LOOP;
 			}
 			do {
-				String identifier = Parse.expectIdentifier(simBuilder).edText();
+				Identifier identifier = Parse.expectIdentifier(simBuilder);
 				Parameter parameter = null;
 				for (Parameter par : proc.parameterList)
 					if (Util.equals(identifier,par.identifier)) { parameter = par; break; }
@@ -289,7 +289,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			
 			proc.parseBlock(simBuilder);
 
-			if (Parse.prevToken(simBuilder).keyWord == KeyWord.EOF) {
+			if (Parse.getPrevParserToken(simBuilder).keyWord == KeyWord.EOF) {
 				Util.syntaxError(simBuilder, "Illegal termination of procedure declaration. Missing END.");
 			}
 		}
@@ -316,7 +316,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		CoreGlobal.enterScope(this);
 			LabelList.accumLabelList(this);
 			if(type != null) {
-				this.result = new SimpleVariableDeclaration(null, type, "_RESULT");
+				this.result = new SimpleVariableDeclaration(null, type, new Identifier("_RESULT"));
 				declarationList.add(result);
 			}
 			int prfx = 0;// prefixLevel();
@@ -354,7 +354,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	// *** Utility: findVisibleAttributeMeaning
 	// ***********************************************************************************************
 	@Override
-	public Meaning findVisibleAttributeMeaning(final String ident) {
+	public Meaning findVisibleAttributeMeaning(final Identifier ident) {
 		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("BEGIN Checking Procedure for "+ident+" ================================== "+identifier+" ==================================");
 		for (Declaration declaration : declarationList) {
 			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Local "+declaration);
@@ -1110,7 +1110,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
 	public static ProcedureDeclaration readObject(AttributeInputStream inpt) throws IOException {
-		String identifier = inpt.readString();
+		Identifier identifier = inpt.readIdentifier();
 		ProcedureDeclaration pro = new ProcedureDeclaration(null, identifier, ObjectKind.Procedure);
 		pro.OBJECT_SEQU = inpt.readSEQU(pro);
 

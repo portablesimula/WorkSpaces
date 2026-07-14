@@ -24,6 +24,7 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// LocalObject i.e. This class expression.
 /// 
@@ -56,7 +57,7 @@ import simula.compiler.utilities.Util;
 public final class LocalObject extends Expression {
 	
 	/// The class identifier.
-	private String classIdentifier;
+	private Identifier classIdentifier;
 	
 	/// The class declaration. Set by doChecking.
 	ClassDeclaration classDeclaration; // Set by doChecking
@@ -69,7 +70,7 @@ public final class LocalObject extends Expression {
 
 	/// Create a new LocalObject
 	/// @param ident class-identifier
-	private LocalObject(final SimulaBuilder simBuilder, final String ident) {
+	private LocalObject(final SimulaBuilder simBuilder, final Identifier ident) {
 		super(simBuilder);
 		this.classIdentifier = ident;
 		this.type=Type.Ref(classIdentifier);
@@ -81,8 +82,8 @@ public final class LocalObject extends Expression {
 	/// @return the newly created LocalObject.
 	static Expression expectThisIdentifier(SimulaBuilder simBuilder) {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ThisObjectExpression, current=" + Parse.currentLexToken(simBuilder));
-		String classIdentifier = Parse.expectIdentifier(simBuilder).edText();
+			Util.TRACE("Parse ThisObjectExpression, current=" + Parse.getCurrentParserToken(simBuilder));
+		Identifier classIdentifier = Parse.expectIdentifier(simBuilder);
 		Expression expr = new LocalObject(simBuilder, classIdentifier);
 		return(expr);
 	}
@@ -192,7 +193,7 @@ public final class LocalObject extends Expression {
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
 		// *** LocalObject
-		oupt.writeString(classIdentifier);
+		oupt.writeIdentifier(classIdentifier);
 	}
 	
 	/// Read and return an object.
@@ -208,7 +209,7 @@ public final class LocalObject extends Expression {
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** LocalObject
-		expr.classIdentifier = inpt.readString();
+		expr.classIdentifier = inpt.readIdentifier();
 		Util.TRACE_INPUT("readLocalObject: " + expr);
 		return(expr);
 	}

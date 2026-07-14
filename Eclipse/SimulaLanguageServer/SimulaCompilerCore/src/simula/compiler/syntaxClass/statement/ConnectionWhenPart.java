@@ -20,6 +20,7 @@ import simula.compiler.syntaxClass.declaration.ConnectionBlock;
 import simula.compiler.syntaxClass.expression.AssignmentOperation;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Utility class to hold a when-part.
 ///
@@ -30,7 +31,7 @@ import simula.compiler.utilities.Util;
 /// @author Øystein Myhre Andersen
 public final class ConnectionWhenPart extends ConnectionDoPart {
 	///  The WHEN class-identifier
-	String classIdentifier;
+	Identifier classIdentifier;
 	
 	/// The class declaration correspondig to the class identifier.
 	/// Set during checking.
@@ -45,7 +46,7 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 	/// @param classIdentifier the WHEN class-identifier
 	/// @param connectionBlock The associated connection block
 	/// @param statement the statement after DO
-	public ConnectionWhenPart(final SimulaBuilder simBuilder, final ConnectionStatement connectionStatement, final String classIdentifier,final ConnectionBlock connectionBlock,final Statement statement) {
+	public ConnectionWhenPart(final SimulaBuilder simBuilder, final ConnectionStatement connectionStatement, final Identifier classIdentifier,final ConnectionBlock connectionBlock,final Statement statement) {
 		super(simBuilder, connectionStatement, connectionBlock, statement);
 		this.classIdentifier = classIdentifier;
 		if (Option.internal.TRACE_PARSE)
@@ -66,7 +67,7 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 			connectionBlock.setClassDeclaration(classDeclaration);
 		}
 		if (!AssignmentOperation.checkCompatibility(connectionStatement.objectExpression, classIdentifier)) {
-			Util.warning("Impossible When Part: " + connectionStatement.objectExpression + " is not compatible with " + classIdentifier);
+			Util.warning(connectionStatement, "Impossible When Part: " + connectionStatement.objectExpression + " is not compatible with " + classIdentifier);
 			impossibleWhenPart = true;
 		}
 		connectionBlock.doChecking();
@@ -125,7 +126,7 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 		// *** SyntaxElement
 		writeAstData(oupt);
 		// *** ConnectionWhenPart
-		oupt.writeString(classIdentifier);
+		oupt.writeIdentifier(classIdentifier);
 		oupt.writeObj(connectionStatement);
 		oupt.writeObj(connectionBlock);
 	}
@@ -140,7 +141,7 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 		// *** SyntaxElement
 		whn.astData = readAstData(inpt);
 		// *** ConnectionDoPart
-		whn.classIdentifier = inpt.readString();
+		whn.classIdentifier = inpt.readIdentifier();
 		whn.connectionStatement = (ConnectionStatement) inpt.readObj();
 		whn.connectionBlock = (ConnectionBlock) inpt.readObj();
 		Util.TRACE_INPUT("ConnectionDoPart: " + whn);

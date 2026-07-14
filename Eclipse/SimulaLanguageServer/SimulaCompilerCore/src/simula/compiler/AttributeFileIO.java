@@ -96,7 +96,7 @@ public final class AttributeFileIO {
 	/// @return the module type
 	public static Type readAttributeFile(final SimulaBuilder simBuilder,final String identifier, final File file, final BlockDeclaration enclosure) {
 		Type moduleType = null;
-		Util.warning("Separate Compiled Module is read from: \"" + file + "\"");
+		Util.generalWarning("Separate Compiled Module is read from: \"" + file + "\"");
 		if (!(file.exists() && file.canRead())) {
 			Util.generalError("Can't read attribute file: " + file);
 			return (null);
@@ -121,12 +121,12 @@ public final class AttributeFileIO {
 
 			Declaration d=declarationList.find(module.identifier);
 			if(d!=null) {
-				Util.warning("Multiple declarations with the same name: "+module+" and "+d);
+				Util.generalWarning("Multiple declarations with the same name: "+module+" and "+d);
 			} else {
 				declarationList.add(module);
 				if (Option.verbose)
 					IO.println("***       Read External " + ObjectKind.edit(module.declarationKind) + ' ' + module.identifier
-							+ '[' + module.externalIdent + ']' +"  ==>  "+declarationList.identifier);
+							+ '[' + module.externalIdent + ']' +"  ==>  "+declarationList.debugName);
 			}
     			
 	   		if(Option.compilerMode == Option.CompilerMode.simulaClassLoader) {
@@ -142,7 +142,7 @@ public final class AttributeFileIO {
 
 		} catch (IOException e) {
 			Util.generalError("Unable to read Attribute File: " + file + " caused by: " + e);
-			Util.warning("It may be necessary to recompile '" + identifier + "'");
+			Util.generalWarning("It may be necessary to recompile '" + identifier + "'");
 			Util.IERR("Caused by:", e);
 		}
 		return (moduleType);
@@ -153,7 +153,7 @@ public final class AttributeFileIO {
 	/// @return false: if the jarFile is already included.
 	public static boolean checkJarFiles(File jarFile) {
 		for(File f:CoreGlobal.externalJarFiles) if(f.equals(jarFile)) {
-			Util.warning("External already included: "+jarFile.getName());
+			Util.generalWarning("External already included: "+jarFile.getName());
 			return(false);
 		}
 		return true;
@@ -178,13 +178,13 @@ public final class AttributeFileIO {
 //			xdecl.readExternalAttributeFile();
 			/// Read external Attribute file.
 //			public void readExternalAttributeFile() {
-				File jarFile = JarFileBuilder.findJarFile(xdecl.identifier, xdecl.externalIdent);
+				File jarFile = JarFileBuilder.findJarFile(xdecl.identifier.value, xdecl.externalIdent);
 				if (jarFile == null) {
 					Util.syntaxError(simBuilder, "Can't find attribute file: " + xdecl.identifier + '[' + xdecl.externalIdent + ']');
 				} else {
 					if(checkJarFiles(jarFile)) {
 						BlockDeclaration enclosure = StandardClass.BASICIO;
-						AttributeFileIO.readAttributeFile(simBuilder, xdecl.identifier, jarFile, enclosure);
+						AttributeFileIO.readAttributeFile(simBuilder, xdecl.identifier.value, jarFile, enclosure);
 					}
 				}		
 //			}

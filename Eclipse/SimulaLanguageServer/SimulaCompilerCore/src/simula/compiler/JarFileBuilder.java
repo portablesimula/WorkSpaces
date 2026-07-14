@@ -144,9 +144,9 @@ public class JarFileBuilder {
 			File rtsHome = new File(CoreGlobal.simulaRtsLib, "simula/runtime");
 			add(false, rtsHome, CoreGlobal.simulaRtsLib.toString().length());
 		} else {
-			String id = programModule.getIdentifier();
+			String id = programModule.getIdentifier().value;
 			String kind = (programModule.mainModule instanceof ClassDeclaration) ? "Class " : "Procedure ";
-			Util.warning("No execution - Separate Compiled " + kind + id + " is written to: \"" + outputJarFile + "\"");
+			Util.generalWarning("No execution - Separate Compiled " + kind + id + " is written to: \"" + outputJarFile + "\"");
 		}
         
         jarOutputStream.close();

@@ -26,6 +26,7 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Label Declaration.
 /// 
@@ -49,7 +50,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// Create a new Label Declaration.
 	/// 
 	/// @param identifier label identifier
-	public LabelDeclaration(final SimulaBuilder simBuilder, final String identifier) {
+	public LabelDeclaration(final SimulaBuilder simBuilder, final Identifier identifier) {
 		super(simBuilder, Type.Label, identifier);
 		this.externalIdent = "_LABEL_" + identifier;
 		this.declarationKind = ObjectKind.LabelDeclaration;
@@ -125,7 +126,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// @param encloser the owner.
 	/// @return true: if this label is the last label in the owner's label list.
 	private boolean isLatestVirtualLabel(DeclarationScope encloser) {
-		LabelDeclaration last = encloser.labelList.getLastDeclaredLabel(this.identifier);
+		LabelDeclaration last = encloser.labelList.getLastDeclaredLabel(this.identifier.value);
 		if(this.index == last.index) {
 			return true;
 		}
@@ -158,7 +159,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 			.aload(0); // this
 		Constant.buildIntConst(codeBuilder, prefixLevel);
 		Constant.buildIntConst(codeBuilder, index);
-		codeBuilder.ldc(pool.stringEntry(this.identifier));
+		codeBuilder.ldc(pool.stringEntry(this.identifier.value));
 		codeBuilder
 			.invokespecial(RTS.CD.RTS_LABEL, "<init>", MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_RTObject;IILjava/lang/String;)V"))
 			.areturn();
@@ -214,7 +215,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		Constant.buildIntConst(codeBuilder, prefixLevel);
 		Constant.buildIntConst(codeBuilder, index);
 		codeBuilder
-			.ldc(codeBuilder.constantPool().stringEntry(identifier))
+			.ldc(codeBuilder.constantPool().stringEntry(identifier.value))
 			.invokespecial(RTS.CD.RTS_LABEL, "<init>", MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_RTObject;IILjava/lang/String;)V"));
 	}
 
@@ -228,7 +229,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
-	public LabelDeclaration(final String identifier) {
+	public LabelDeclaration(final Identifier identifier) {
 		super(null, Type.Label, identifier);
 		this.externalIdent = "_LABEL_" + identifier;
 		this.declarationKind = ObjectKind.LabelDeclaration;
@@ -263,7 +264,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static LabelDeclaration readObject(AttributeInputStream inpt) throws IOException {
-		String identifier = inpt.readString();
+		Identifier identifier = inpt.readIdentifier();
 		LabelDeclaration lab = new LabelDeclaration(identifier);
 		lab.OBJECT_SEQU = inpt.readSEQU(lab);
 

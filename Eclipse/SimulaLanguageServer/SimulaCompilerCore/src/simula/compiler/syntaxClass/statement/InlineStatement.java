@@ -36,7 +36,7 @@ public final class InlineStatement extends Statement {
 	/// Create a new InlineStatement.
 	/// @param kind the kind code string.
 	public InlineStatement(final SimulaBuilder simBuilder, String kind) {
-		super(simBuilder, null);
+		super(simBuilder);
 		this.kind = kind;
 		SET_SEMANTICS_CHECKED();
 	}

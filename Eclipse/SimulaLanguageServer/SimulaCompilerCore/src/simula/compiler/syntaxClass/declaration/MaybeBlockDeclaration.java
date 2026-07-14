@@ -65,8 +65,8 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Create a new MaybeBlockDeclaration, i.e. CompoundStatement or SubBlock.
 	/// @param identifier block identifier
-	public MaybeBlockDeclaration(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier identifier) {
-		super(simBuilder, firstParserToken, identifier);
+	public MaybeBlockDeclaration(final SimulaBuilder simBuilder, final Identifier identifier) {
+		super(simBuilder, identifier);
 		if(identifier != null)
 			modifyIdentifier(identifier);
 //		else modifyIdentifier("Block" + firstLineNumber());

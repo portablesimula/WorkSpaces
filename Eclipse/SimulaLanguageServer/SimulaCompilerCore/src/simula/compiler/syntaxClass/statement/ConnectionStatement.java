@@ -32,6 +32,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Connection Statement.
 /// 
@@ -132,7 +133,7 @@ public final class ConnectionStatement extends Statement {
 			Parse.TRACE("Parse ConnectionStatement");
 		objectExpression = Expression.expectExpression(simBuilder, "connected object");
 		objectExpression.backLink = this;
-		String ident = "_inspect_" + firstLineNumber() + '_' + (SEQUX++);
+		Identifier ident = new Identifier("_inspect_" + firstLineNumber() + '_' + (SEQUX++));
 		inspectedVariable = new VariableExpression(simBuilder, ident);
 		DeclarationScope scope = CoreGlobal.getCurrentScope();
 		inspectVariableDeclaration = new InspectVariableDeclaration(simBuilder, Type.Ref("RTObject"), ident, scope, this);
@@ -163,7 +164,7 @@ public final class ConnectionStatement extends Statement {
 		} else {
 			simBuilder.startTokenRange();
 			while (Parse.accept(simBuilder, KeyWord.WHEN)) {
-				String classIdentifier = Parse.expectIdentifier(simBuilder).edText();
+				Identifier classIdentifier = Parse.expectIdentifier(simBuilder);
 				Parse.expect(simBuilder, KeyWord.DO);
 				ConnectionBlock connectionBlock = new ConnectionBlock(simBuilder, inspectedVariable, classIdentifier);
 				hasWhenPart = true;
@@ -202,7 +203,7 @@ public final class ConnectionStatement extends Statement {
 		for(ConnectionDoPart part:connectionPart) part.doChecking();
 		if (otherwise != null) otherwise.doChecking();
 		
-		inspectedVariable.identifier = inspectVariableDeclaration.getFieldIdentifier();
+		inspectedVariable.identifier = new Identifier(inspectVariableDeclaration.getFieldIdentifier());
 		inspectVariableDeclaration.identifier = inspectedVariable.identifier;
 		SET_SEMANTICS_CHECKED();
 	}
@@ -240,7 +241,7 @@ public final class ConnectionStatement extends Statement {
 		codeBuilder.aload(0);
 		objectExpression.buildEvaluation(null,codeBuilder);
 		ClassDesc CD_type=inspectedVariable.type.toClassDesc();
-		FieldRefEntry FRE=pool.fieldRefEntry(BlockDeclaration.currentClassDesc(),inspectedVariable.identifier, CD_type);
+		FieldRefEntry FRE=pool.fieldRefEntry(BlockDeclaration.currentClassDesc(),inspectedVariable.identifier.value, CD_type);
 		codeBuilder.putfield(FRE);
 		
 		if (!hasWhenPart) {

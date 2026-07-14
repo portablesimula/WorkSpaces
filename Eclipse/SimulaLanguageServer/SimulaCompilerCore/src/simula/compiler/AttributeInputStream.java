@@ -125,7 +125,7 @@ public class AttributeInputStream {
 	    	if(TRACE) IO.println("AttributeInputStream.readType: null");
 			return null;
 		}
-		String classIdent = readString();
+		Identifier classIdent = readIdentifier();
 		Type type = new Type(keyWord,classIdent);			
     	if(TRACE) IO.println("AttributeInputStream.readType: "+type);
     	return type;

@@ -52,7 +52,7 @@ public final class HiddenSpecification extends SyntaxElement {
 	/// @param definedIn  the class where Hidden is specified
 	/// @param identifier the hidden identifier
 	public HiddenSpecification(final SimulaBuilder simBuilder, final ClassDeclaration definedIn, final Identifier identifier) {
-		super(simBuilder, identifier);
+		super(simBuilder);
 		this.definedIn = definedIn;
 		this.identifier = identifier;
 	}

@@ -42,7 +42,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 	/// @param type the procedure's type
 	/// @param ident the procedure identifier
 	StandardProcedure(DeclarationScope declaredIn,int kind,Type type, String ident) {
-		super(null, null, new Identifier(ident), kind); this.declaredIn = declaredIn; this.type = type;
+		super(null, new Identifier(ident), kind); this.declaredIn = declaredIn; this.type = type;
 //		this.declarationKind = ObjectKind.StandardProcedure;
 //		this.CHECKED = true;
 	}
@@ -143,7 +143,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 				}
 				default -> Util.IERR(""+c);
 			}
-			Parameter par = new Parameter(null, null, new Identifier("_p"+(pos-1)), pType, Parameter.Kind.Simple);
+			Parameter par = new Parameter(null, new Identifier("_p"+(pos-1)), pType, Parameter.Kind.Simple);
 			pList.add(par);
 		}
 		char c = mtd.charAt(pos++);
@@ -216,7 +216,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 		Identifier id=identifier;
 		if(id.value.equalsIgnoreCase("detach") | id.value.equalsIgnoreCase("call") | id.value.equalsIgnoreCase("resume")) {
 			// Push extra parameter 'sourceLineNumber'
-			Parameter lno=new Parameter(null, null, id, Type.Integer, Parameter.Kind.Simple);
+			Parameter lno=new Parameter(null, id, Type.Integer, Parameter.Kind.Simple);
 			sb.append(lno.type.toJVMType());
 		}
 		sb.append(')');

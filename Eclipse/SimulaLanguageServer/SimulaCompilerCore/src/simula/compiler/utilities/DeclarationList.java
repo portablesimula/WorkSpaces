@@ -11,6 +11,7 @@ import java.util.Vector;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.declaration.Declaration;
+import simula.token.Identifier;
 
 /// Declaration List.
 /// 
@@ -24,12 +25,12 @@ import simula.compiler.syntaxClass.declaration.Declaration;
 public final class DeclarationList extends Vector<Declaration> {
 	
 	/// Identifier.
-	public final String identifier;
+	public final String debugName;
 
 	/// Create a new DeclarationList.
-	/// @param identifier the given identifier
-	public DeclarationList(String identifier) {
-		this.identifier=identifier;
+	/// @param debugName the given debugName
+	public DeclarationList(String debugName) {
+		this.debugName=debugName;
 	}
 	
 	public int getLineNumber() {
@@ -43,7 +44,7 @@ public final class DeclarationList extends Vector<Declaration> {
 	/// Find a declaration in this DeclarationList
 	/// @param identifier2 declaration identifier
 	/// @return the resulting Declaration
-	public Declaration find(String identifier2) {
+	public Declaration find(Identifier identifier2) {
 		for(Declaration d:this)
 			if(d.identifier.equals(identifier2)) return(d);
 		return(null);
@@ -52,7 +53,7 @@ public final class DeclarationList extends Vector<Declaration> {
 	/// Add a declaration to this list.
 	@Override
 	public boolean add(Declaration dcl) {
-		Declaration d=find(dcl.identifier.value);
+		Declaration d=find(dcl.identifier);
 		if(d!=null) {
 			Util.warning(dcl, "Multiple declarations with the same name: "+dcl.identifier);
 			Util.warning(d, "Multiple declarations with the same name: "+dcl.identifier);
@@ -65,9 +66,9 @@ public final class DeclarationList extends Vector<Declaration> {
 	/// Utility print method.
 	/// @param title the title
 	public void print(String title) {
-		Util.println("BEGIN DeclarationList: "+identifier+" -- "+title);
+		Util.println("BEGIN DeclarationList: "+debugName+" -- "+title);
 		for(Declaration decl:this) Util.println(decl.toString());
-		Util.println("ENDOF: DeclarationList: "+identifier+" -- "+title);
+		Util.println("ENDOF: DeclarationList: "+debugName+" -- "+title);
 	}
 	
 	// ***********************************************************************************************
@@ -78,7 +79,7 @@ public final class DeclarationList extends Vector<Declaration> {
 	/// @param oupt the AttributeOutputStream to write to.
 	/// @throws IOException if something went wrong.
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
-		oupt.writeIdentifier(identifier);
+		oupt.writeString(debugName);
 		oupt.writeShort(this.size());
 		for(Declaration dcl:this) oupt.writeObj(dcl);
 	}

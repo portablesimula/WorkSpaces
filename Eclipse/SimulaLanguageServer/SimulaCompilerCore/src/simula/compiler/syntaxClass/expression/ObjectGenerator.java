@@ -29,6 +29,7 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// ObjectGenerator i.e. new Object expression.
 /// 
@@ -56,7 +57,7 @@ import simula.compiler.utilities.Util;
 public final class ObjectGenerator extends Expression {
 	
 	/// The class-identifier
-	private String classIdentifier;
+	private Identifier classIdentifier;
 	
 	/// The semantic meaning 
 	Meaning meaning;
@@ -70,7 +71,7 @@ public final class ObjectGenerator extends Expression {
 	/// Create a new ObjectGenerator.
 	/// @param ident class-identifier
 	/// @param params the actual parameters
-	private ObjectGenerator(final SimulaBuilder simBuilder, final String ident,final Vector<Expression> params) {
+	private ObjectGenerator(final SimulaBuilder simBuilder, final Identifier ident,final Vector<Expression> params) {
 		super(simBuilder);
 		this.classIdentifier = ident;
 		this.type = Type.Ref(classIdentifier);
@@ -88,8 +89,8 @@ public final class ObjectGenerator extends Expression {
 	/// @return the newly created ObjectGenerator.
 	static Expression expectNew(SimulaBuilder simBuilder) {
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Parse ObjectGenerator, current=" + Parse.currentLexToken(simBuilder));
-		String classIdentifier = Parse.expectIdentifier(simBuilder).edText();
+			Util.TRACE("Parse ObjectGenerator, current=" + Parse.getCurrentParserToken(simBuilder));
+		Identifier classIdentifier = Parse.expectIdentifier(simBuilder);
 		Vector<Expression> params = new Vector<Expression>();
 		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
 			do {
@@ -275,7 +276,7 @@ public final class ObjectGenerator extends Expression {
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
 		// *** ObjectGenerator
-		oupt.writeString(classIdentifier);
+		oupt.writeIdentifier(classIdentifier);
 		if(params == null) {
 			oupt.writeShort(-1);			
 		} else {
@@ -297,7 +298,7 @@ public final class ObjectGenerator extends Expression {
 		gen.type = inpt.readType();
 		gen.backLink = (SyntaxElement) inpt.readObj();
 		// *** ObjectGenerator
-		gen.classIdentifier = inpt.readString();
+		gen.classIdentifier = inpt.readIdentifier();
 		int n = inpt.readShort();
 		if(n >= 0) {
 			gen.params = new Vector<Expression>();

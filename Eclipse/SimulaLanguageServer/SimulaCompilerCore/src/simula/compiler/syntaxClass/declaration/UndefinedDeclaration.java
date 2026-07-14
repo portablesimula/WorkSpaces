@@ -36,7 +36,7 @@ public class UndefinedDeclaration extends Declaration {
 	/// 
 	/// @param identifier the variable identifier
 	public UndefinedDeclaration(final SimulaBuilder simBuilder, final Identifier identifier) {
-		super(simBuilder, identifier, identifier);
+		super(simBuilder, identifier);
 		this.declarationKind = ObjectKind.UndefinedDeclaration;
 		this.type = Type.Undef;
 	}
@@ -118,7 +118,7 @@ public class UndefinedDeclaration extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public UndefinedDeclaration() {
-		super(null, null, null);
+		super(null, null);
 		this.declarationKind = ObjectKind.SimpleVariableDeclaration;
 	}
 

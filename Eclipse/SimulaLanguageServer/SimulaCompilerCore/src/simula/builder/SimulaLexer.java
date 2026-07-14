@@ -103,17 +103,18 @@ public final class SimulaLexer {
     /// The selector array.
     public static boolean selector[]=new boolean[256];
 
-	/// The depth of nested parentheses (round brackets).
-	/// 
 	/// NOTE: An initial "-" in array upper bound may follow directly after : (cf. 1.3).
 	/// 
-	/// The scanner will treat ":-" within parentheses as two
+	/// The scanner will treat ":-" within BoundPairList as two
 	/// separate symbols ":" and "-" thus solving this ambiguity in the syntax.
 	/// 
 	/// This variable is used to cover such situations.
-	private int pardepth = 0;
-
-	
+//	private int pardepth = 0;
+    private boolean parsingBoundPairList;
+    
+	public void setParsingBoundPairList(boolean parsingBoundPairList) {
+		this.parsingBoundPairList = parsingBoundPairList;
+	}
 	
 	
 	/// Constructs a new SimulaScanner that produces Items scanned from the specified source.
@@ -323,11 +324,12 @@ public final class SimulaLexer {
 	            case ',':	               return(newKeyWordToken(KeyWord.COMMA));
 	            case ':':
 		            if(getNext() == '=')                return(newKeyWordToken(KeyWord.ASSIGNVALUE));
-		            if(current == '-' && pardepth == 0) return(newKeyWordToken(KeyWord.ASSIGNREF));
+//		            if(current == '-' && pardepth == 0) return(newKeyWordToken(KeyWord.ASSIGNREF));
+                    if(current == '-' && !parsingBoundPairList) return newKeyWordToken(KeyWord.ASSIGNREF);
 		            pushBackPos(1);                  return(newKeyWordToken(KeyWord.COLON));
-	            case ';':	pardepth=0; return(newKeyWordToken(KeyWord.SEMICOLON));
-	            case '(':	pardepth++; return(newKeyWordToken(KeyWord.BEGPAR));
-	            case ')':	pardepth--; return(newKeyWordToken(KeyWord.ENDPAR));
+	            case ';':	return(newKeyWordToken(KeyWord.SEMICOLON));
+	            case '(':	return(newKeyWordToken(KeyWord.BEGPAR));
+	            case ')':	return(newKeyWordToken(KeyWord.ENDPAR));
 	            case '[':	return(newKeyWordToken(KeyWord.BEGBRACKET));
 	            case ']':	return(newKeyWordToken(KeyWord.ENDBRACKET));
 	            case '&':

@@ -84,7 +84,7 @@ public final class VirtualSpecification extends Declaration {
 	/// @param prefixLevel the prefix level of the class with this virtual specification
 	/// @param procedureSpec the ProcedureSpecification or null if not present
 	VirtualSpecification(final SimulaBuilder simBuilder, final Identifier identifier, final Type type, final int kind, final int prefixLevel, final ProcedureSpecification procedureSpec) {
-		super(simBuilder, identifier, identifier);
+		super(simBuilder, identifier);
 		this.declarationKind = ObjectKind.VirtualSpecification;
 		this.externalIdent = identifier.value;
 		this.type = type;
@@ -283,7 +283,7 @@ public final class VirtualSpecification extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private VirtualSpecification() {
-		super(null, null, null);
+		super(null, null);
 		this.declarationKind = ObjectKind.VirtualSpecification;
 	}
 	

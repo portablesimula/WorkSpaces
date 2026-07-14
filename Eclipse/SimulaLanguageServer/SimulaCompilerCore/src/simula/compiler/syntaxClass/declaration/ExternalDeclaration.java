@@ -21,6 +21,7 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 import simula.token.LexToken;
 import simula.token.SimpleString;
 
@@ -102,7 +103,7 @@ public final class ExternalDeclaration extends Declaration {
 	/// Create a new ExternalDeclaration.
 	/// @param identifier the identifier.
 	/// @param extIdentitier the external identifier.
-	private ExternalDeclaration(final SimulaBuilder simBuilder, String identifier,String extIdentitier) {
+	private ExternalDeclaration(final SimulaBuilder simBuilder, Identifier identifier,String extIdentitier) {
 		super(simBuilder, identifier);
 		this.declarationKind = ObjectKind.ExternalDeclaration;
 		this.externalIdent = extIdentitier;
@@ -145,7 +146,7 @@ public final class ExternalDeclaration extends Declaration {
 			Util.syntaxError(simBuilder, "parseExternalDeclaration: Expecting CLASS or PROCEDURE");
 
 		Vector<SyntaxElement> declarations = new Vector<SyntaxElement>();
-		String identifier = Parse.expectIdentifier(simBuilder).edText();
+		Identifier identifier = Parse.expectIdentifier(simBuilder);
 		LOOP: while (true) {
 //			IO.println("ExternalDeclaration.expectExternalDeclaration: identifier=" + identifier);
 			String externalIdentifier = null;
@@ -167,14 +168,14 @@ public final class ExternalDeclaration extends Declaration {
 			declarations.add(externalDeclaration);
 //			IO.println("ExternalDeclaration.expectExternalDeclaration: externalDeclaration" + externalDeclaration);
 
-			File jarFile = JarFileBuilder.findJarFile(identifier, externalIdentifier);
+			File jarFile = JarFileBuilder.findJarFile(identifier.value, externalIdentifier);
 			if(jarFile == null) {
 				Util.syntaxError(simBuilder, "Can't find attribute file: " + identifier + '[' + externalIdentifier + ']');
 			}
 			if (jarFile != null) {
 				if(AttributeFileIO.checkJarFiles(jarFile)) {
 					DeclarationScope scope = CoreGlobal.getCurrentScope();
-					Type moduleType = AttributeFileIO.readAttributeFile(simBuilder, identifier, jarFile, scope.getEnclosingBlock());
+					Type moduleType = AttributeFileIO.readAttributeFile(simBuilder, identifier.value, jarFile, scope.getEnclosingBlock());
 					if(moduleType == null) {
 						if (expectedType != null) Util.syntaxError(simBuilder, "Missing external type: "+expectedType);
 					} else if(expectedType == null) {
@@ -192,7 +193,7 @@ public final class ExternalDeclaration extends Declaration {
 			}
 			if (!Parse.accept(simBuilder, KeyWord.COMMA))
 				break LOOP;
-			identifier = Parse.expectIdentifier(simBuilder).edText();
+			identifier = Parse.expectIdentifier(simBuilder);
 		}
 
 		return declarations;

@@ -20,6 +20,7 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Object relations IS and IN.
 /// 
@@ -82,7 +83,7 @@ public final class ObjectRelation extends Expression {
 	private int opr; 
 	
 	/// The right hand class identifier.
-	private String classIdentifier;
+	private Identifier classIdentifier;
 	
 	/// The class declaration.
 	/// Set by doChecking.
@@ -92,7 +93,7 @@ public final class ObjectRelation extends Expression {
 	/// @param lhs left hand side
 	/// @param opr the operation: IN or IS
 	/// @param classIdentifier the right hand class identifier
-	ObjectRelation(final SimulaBuilder simBuilder, final Expression lhs, final int opr, final String classIdentifier) {
+	ObjectRelation(final SimulaBuilder simBuilder, final Expression lhs, final int opr, final Identifier classIdentifier) {
 		super(simBuilder);
 		this.lhs = lhs;
 		this.opr = opr;
@@ -114,9 +115,9 @@ public final class ObjectRelation extends Expression {
 		// Object IS ClassIdentifier | Object IN ClassIdentifier
 		lhs.doChecking();
 		Type type1 = lhs.type;
-		String refIdent = type1.getRefIdent();
+		Identifier refIdent = type1.getRefIdent();
 		if (refIdent == null)
-			Util.warning("NONE IS/IN " + classIdentifier + " -- Rewrite program");
+			Util.warning(this, "NONE IS/IN " + classIdentifier + " -- Rewrite program");
 		this.type = Type.Boolean;
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("END ObjectRelation" + toString() + ".doChecking - Result type=" + this.type);
@@ -133,7 +134,7 @@ public final class ObjectRelation extends Expression {
 	@Override
 	public String toJavaCode() {
 		ASSERT_SEMANTICS_CHECKED();
-		String refIdent = lhs.type.getRefIdent();
+		Identifier refIdent = lhs.type.getRefIdent();
 		if (refIdent == null) return ("false"); // NONE IS/IN Any is always FALSE
 		if (opr == KeyWord.IN) {
 			if (!checkCompatibility(lhs, classIdentifier)) return ("false"); // warning("IN is always FALSE
@@ -186,7 +187,7 @@ public final class ObjectRelation extends Expression {
 		// *** ArithmeticExpression
 		oupt.writeObj(lhs);
 		oupt.writeShort(opr);
-		oupt.writeString(classIdentifier);
+		oupt.writeIdentifier(classIdentifier);
 	}
 	
 	/// Read and return a ObjectRelation object.
@@ -201,7 +202,7 @@ public final class ObjectRelation extends Expression {
 		expr.backLink = (SyntaxElement) inpt.readObj();
 		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();
-		expr.classIdentifier = inpt.readString();
+		expr.classIdentifier = inpt.readIdentifier();
 		Util.TRACE_INPUT("readObjectRelation: " + expr);
 		return(expr);
 	}

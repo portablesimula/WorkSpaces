@@ -70,8 +70,8 @@ public class SimpleVariableDeclaration extends Declaration {
 	/// 
 	/// @param type       the variable type
 	/// @param identifier the variable identifier
-	public SimpleVariableDeclaration(final SimulaBuilder simBuilder, LexToken firstParserToken, final Type type, final Identifier identifier) {
-		super(simBuilder, firstParserToken, identifier);
+	public SimpleVariableDeclaration(final SimulaBuilder simBuilder, final Type type, final Identifier identifier) {
+		super(simBuilder, identifier);
 		this.declarationKind = ObjectKind.SimpleVariableDeclaration;
 		this.type = type;
 	}
@@ -81,8 +81,8 @@ public class SimpleVariableDeclaration extends Declaration {
 	/// @param identifier      the variable identifier
 	/// @param constant        the constant indicator
 	/// @param constantElement a constant initial value
-	SimpleVariableDeclaration(final SimulaBuilder simBuilder, LexToken firstParserToken, final Type type, final Identifier identifier, final boolean constant, final Constant constantElement) {
-		this(simBuilder, firstParserToken, type, identifier);
+	SimpleVariableDeclaration(final SimulaBuilder simBuilder, final Type type, final Identifier identifier, final boolean constant, final Constant constantElement) {
+		this(simBuilder, type, identifier);
 		this.constant = constant;
 		this.constantElement = constantElement;
 	}
@@ -117,14 +117,14 @@ public class SimpleVariableDeclaration extends Declaration {
 	/// Endcondition: The terminating semicolon is read.
 	/// @param type the variable type
 	/// @param declarationList the declaration list to update
-	static Vector<SyntaxElement> expectSimpleVariable(final SimulaBuilder simBuilder, LexToken firstParserToken, final Type type) {
+	static Vector<SyntaxElement> expectSimpleVariable(final SimulaBuilder simBuilder, final Type type) {
 		// identifier-list = identifier { , identifier }
 		Vector<SyntaxElement> declarations = new Vector<SyntaxElement>();
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse IdentifierList");
 		do {
 			Identifier ident = Parse.expectIdentifier(simBuilder);
-			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(simBuilder, firstParserToken, type, ident);
+			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(simBuilder, type, ident);
 			if (Parse.accept(simBuilder, KeyWord.EQ))
 				typeDeclaration.constantElement = Expression.expectExpression(simBuilder, "constant");
 			declarations.add(typeDeclaration);
@@ -248,7 +248,7 @@ public class SimpleVariableDeclaration extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public SimpleVariableDeclaration() {
-		super(null, null, null);
+		super(null, null);
 		this.declarationKind = ObjectKind.SimpleVariableDeclaration;
 	}
 

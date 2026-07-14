@@ -21,6 +21,7 @@ public class DocumentManager {
 
 	private String documentUri;
 	private int version;
+	public String sourceName;
 	public String sourceCode;
 	SimulaBuilder currentBuilder;
 	
@@ -32,6 +33,7 @@ public class DocumentManager {
     	this.documentUri = documentUri;
     	this.version = version;
     	this.sourceCode = sourceCode;
+    	this.sourceName = Util.getBaseName(documentUri);
     }
 
     /// Debug Utility

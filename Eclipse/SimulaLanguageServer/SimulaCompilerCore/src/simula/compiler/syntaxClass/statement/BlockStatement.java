@@ -60,7 +60,7 @@ public final class BlockStatement extends Statement {
 	/// Create a new BlockStatement.
 	/// @param blockDeclaration the BlockDeclaration
 	public BlockStatement(final SimulaBuilder simBuilder, final BlockDeclaration blockDeclaration, String debugName1) {
-		super(simBuilder, blockDeclaration.firstParserToken);
+		super(simBuilder);
 //		debugName = "ZZZ_BlockStatement: "+SEQU++;
 		this.blockDeclaration = blockDeclaration;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": BlockStatement: "+this);
@@ -135,23 +135,21 @@ public final class BlockStatement extends Statement {
 		blockDeclaration.printTree(indent,head);
 	}
 	
-	@Override
-	public int firstLineNumber() {
-//		IO.println("BlockStatement.firstLineNumber: psiTree: "+getPsiTree());
-//		if(getPsiTree() != null) return getPsiTree().firstLineNumber();
-		LexToken token = lexTokenRange.getFirstLexToken();
-		if(token != null) return token.firstLineNumber();
-		return -15;
-	}
-	
-	@Override
-	public int lastLineNumber() {
-//		IO.println("BlockStatement.lastLineNumber: psiTree: "+getPsiTree());
-//		if(getPsiTree() != null) return getPsiTree().lastLineNumber();
-		LexToken token = lexTokenRange.getLastLexToken();
-		if(token != null) return token.lastLineNumber();
-		return -16;
-	}
+//	@Override public int firstLineNumber() {
+////		IO.println("BlockStatement.firstLineNumber: psiTree: "+getPsiTree());
+////		if(getPsiTree() != null) return getPsiTree().firstLineNumber();
+//		LexToken token = lexTokenRange.getFirstLexToken();
+//		if(token != null) return token.firstLineNumber();
+//		return -15;
+//	}
+//	
+//	@Override public int lastLineNumber() {
+////		IO.println("BlockStatement.lastLineNumber: psiTree: "+getPsiTree());
+////		if(getPsiTree() != null) return getPsiTree().lastLineNumber();
+//		LexToken token = lexTokenRange.getLastLexToken();
+//		if(token != null) return token.lastLineNumber();
+//		return -16;
+//	}
 
 	@Override
 	public String toString() {

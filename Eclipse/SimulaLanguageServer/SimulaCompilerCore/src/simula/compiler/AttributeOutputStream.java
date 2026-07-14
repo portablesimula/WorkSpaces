@@ -58,7 +58,7 @@ public class AttributeOutputStream {
 			oupt.writeByte(0);
 		else {
 			oupt.writeByte(type.keyWord);
-			writeString(type.classIdent);
+			writeIdentifier(type.classIdent);
 		}
 	}
 	

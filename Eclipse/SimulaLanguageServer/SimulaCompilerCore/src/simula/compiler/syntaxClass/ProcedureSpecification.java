@@ -81,7 +81,7 @@ public final class ProcedureSpecification extends SyntaxElement {
 	/// @param type procedure's type or null
 	/// @param pList the parameter lList
 	public ProcedureSpecification(final SimulaBuilder simBuilder, final Identifier identifier, final Type type, final ObjectList<Parameter> pList) {
-		super(simBuilder, identifier);
+		super(simBuilder);
 		this.identifier = identifier;
 		this.type = type;
 		this.parameterList = pList;
@@ -164,7 +164,7 @@ public final class ProcedureSpecification extends SyntaxElement {
 		} else {
 			Util.TRACE_OUTPUT("BEGIN Write ProcedureSpecification: " + spec.identifier);
 			oupt.writeBoolean(true);
-			oupt.writeString(spec.identifier);
+			oupt.writeIdentifier(spec.identifier);
 			oupt.writeType(spec.type);
 			oupt.writeObjectList(spec.parameterList);
 		}

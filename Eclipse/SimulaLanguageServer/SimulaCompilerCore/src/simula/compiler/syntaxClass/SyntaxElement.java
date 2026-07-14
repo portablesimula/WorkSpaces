@@ -113,11 +113,12 @@ public abstract class SyntaxElement {
 	public int OBJECT_SEQU;
 	
 	/// Create a new SyntaxElement.
-	protected SyntaxElement(SimulaBuilder simBuilder, LexToken firstParserToken) {
+	protected SyntaxElement(SimulaBuilder simBuilder) {
 //		OLD_lineNumber = Global.sourceLineNumber;
 		this.simBuilder= simBuilder;
-		this.firstParserToken = firstParserToken;
-		this.lastParserToken = firstParserToken;
+		if(simBuilder != null) {
+			this.firstParserToken = this.lastParserToken = simBuilder.getCurrentParserToken();
+		}
 	}
 
 	/// The first source line number

@@ -14,7 +14,7 @@ import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
-import simula.compiler.utilities.Global;
+import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
@@ -112,9 +112,9 @@ public final class TextExpression extends Expression {
 	@Override
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED()) return;
-		Global.sourceLineNumber = firstLineNumber();
+		CoreGlobal.sourceLineNumber = firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
-			Util.TRACE("BEGIN TextOperation" + toString() + ".doChecking - Current Scope Chain: " + Global.getCurrentScope().edScopeChain());
+			Util.TRACE("BEGIN TextOperation" + toString() + ".doChecking - Current Scope Chain: " + CoreGlobal.getCurrentScope().edScopeChain());
 		// TEXT & TEXT
 		lhs.doChecking();
 		rhs.doChecking();

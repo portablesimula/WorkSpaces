@@ -91,18 +91,18 @@ public final class ProgramModule extends Statement {
 
 	/// Create a new ProgramModule.
 	public ProgramModule(SimulaBuilder simBuilder) {
-		super(simBuilder, simBuilder.getCurrentParserToken());
-		sysin=new VariableExpression(null, null, new Identifier("sysin"));   sysin.SET_SEMANTICS_CHECKED();
-		sysout=new VariableExpression(null, null, new Identifier("sysout")); sysout.SET_SEMANTICS_CHECKED();
+		super(simBuilder);
+		sysin = new  VariableExpression(null, new Identifier("sysin"));  sysin.SET_SEMANTICS_CHECKED();
+		sysout = new VariableExpression(null, new Identifier("sysout")); sysout.SET_SEMANTICS_CHECKED();
 	}
 	
 	public void doBuild() {
 //		try	{
 			if(Option.internal.TRACE_PARSE) Parse.TRACE("Parse Program");
-			CoreGlobal.setScope(StandardClass.BASICIO);		    	// BASICIO Begin
-			new ConnectionBlock(null, null, sysin, null)            //    Inspect sysin do
+			CoreGlobal.setScope(StandardClass.BASICIO);		  // BASICIO Begin
+			new ConnectionBlock(null, sysin, null)            //    Inspect sysin do
 			     .setClassDeclaration(StandardClass.Infile);
-			new ConnectionBlock(null, null, sysout, null)           //    Inspect sysout do
+			new ConnectionBlock(null, sysout, null)           //    Inspect sysout do
 			     .setClassDeclaration(StandardClass.Printfile);
 			CoreGlobal.getCurrentScope().sourceBlockLevel=0;
 			
@@ -123,8 +123,7 @@ public final class ProgramModule extends Statement {
 			
 			
 			simBuilder.startTokenRange("ProgramModule.MaybeClass", simBuilder.getCurrentParserToken());
-//			LexToken mayBeClassIdent=Parse.acceptIdentifier(simBuilder);
-			LexToken mayBeClassIdent=Parse.acceptIdentifier(simBuilder);
+			Identifier mayBeClassIdent = Parse.acceptIdentifier(simBuilder);
 			if(mayBeClassIdent!=null) {
 				if(Parse.accept(simBuilder, KeyWord.CLASS)) {
 					mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, mayBeClassIdent);
@@ -174,7 +173,8 @@ public final class ProgramModule extends Statement {
 	/// @return the Program Statement.
 	private DeclarationScope doParseProgram(final SimulaBuilder simBuilder) {
 //		BlockDeclaration mainBlock = new MaybeBlockDeclaration(simBuilder, "MainBlock: " + Global.sourceName);
-		BlockDeclaration mainBlock = new MaybeBlockDeclaration(simBuilder, simBuilder.getCurrentParserToken(), new Identifier(CoreGlobal.sourceName));
+		String sourceName = simBuilder.documentManager.sourceName;
+		BlockDeclaration mainBlock = new MaybeBlockDeclaration(simBuilder, new Identifier(sourceName));
 		
 		mainBlock.isMainModule = true;
 		mainBlock.declarationKind = ObjectKind.SimulaProgram;

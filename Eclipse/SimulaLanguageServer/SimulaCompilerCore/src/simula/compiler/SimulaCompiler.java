@@ -8,10 +8,7 @@ package simula.compiler;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.net.URI;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Vector;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -20,11 +17,9 @@ import simula.Option;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.transform.ClassFileTransform;
 import simula.compiler.utilities.CoreGlobal;
-import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.SimulaClassLoader;
 import simula.compiler.utilities.Util;
-import simula.lsp.compiler.DocumentManager;
 
 /// The Simula Compiler.
 /// 
@@ -83,7 +78,7 @@ public final class SimulaCompiler {
 		File inputFile = new File(inputFileName);
 
 		CoreGlobal.sourceFileName = inputFile.getName();
-		CoreGlobal.sourceName = Util.getBaseName(inputFile.getName());
+		CoreGlobal.sourceName = Util.getBaseName(inputFileName);
 		CoreGlobal.sourceFileDir = inputFile.getParentFile();
 		if(CoreGlobal.sourceFileDir == null) CoreGlobal.sourceFileDir = new File(System.getProperty("user.dir"));
 		
@@ -152,7 +147,7 @@ public final class SimulaCompiler {
 		File inputFile = new File(sourceFileName);
 
 		CoreGlobal.sourceFileName = inputFile.getName();
-		CoreGlobal.sourceName = Util.getBaseName(inputFile.getName());
+		CoreGlobal.sourceName = Util.getBaseName(sourceFileName);
 		CoreGlobal.sourceFileDir = inputFile.getParentFile();
 		if(CoreGlobal.sourceFileDir == null) CoreGlobal.sourceFileDir = new File(System.getProperty("user.dir"));
 		
@@ -284,7 +279,7 @@ public final class SimulaCompiler {
 		if (!Util.isJavaIdentifier(CoreGlobal.sourceName)) {
 			String sourceName = CoreGlobal.sourceName;
 			CoreGlobal.sourceName = Util.makeJavaIdentifier(sourceName);
-			Util.warning("The source file name '" + sourceName + "' is not a legal class identifier. Modified to: "
+			Util.warning(programModule, "The source file name '" + sourceName + "' is not a legal class identifier. Modified to: "
 					+ CoreGlobal.sourceName);
 		}
 		
@@ -680,7 +675,7 @@ public final class SimulaCompiler {
 				}
 			}
 		} else {
-			Util.warning("Option.internal.keepJava set: No ByteCode Engineering is performed");
+			Util.generalWarning("Option.internal.keepJava set: No ByteCode Engineering is performed");
 		}
 	}
 

@@ -121,11 +121,11 @@ public final class CallProcedure {
 		ProcedureDeclaration procedure = (ProcedureDeclaration) meaning.declaredAs;
 		String params=edProcedureParameters(variable,null,procedure);
 		if(meaning.declaredAs instanceof StandardProcedure)	{
-		    if(Util.equals(variable.identifier, "detach")) {
+		    if(Util.equals(variable.identifier.value, "detach")) {
 		    	params="("+CoreGlobal.sourceLineNumber+')';
 		    }
-		    else if(Util.equals(variable.identifier, "call")  
-		          | Util.equals(variable.identifier, "resume") 	) {
+		    else if(Util.equals(variable.identifier.value, "call")  
+		          | Util.equals(variable.identifier.value, "resume") 	) {
 		    	params=params.substring(0,params.length()-1);
 		    	params=params+","+CoreGlobal.sourceLineNumber+')';
 		    }
@@ -258,7 +258,7 @@ public final class CallProcedure {
 					if((actualParameter instanceof VariableExpression var) && !var.hasArguments()) {
 						Declaration decl=var.meaning.declaredAs;
 						if(decl instanceof StandardProcedure) {
-							if(Util.equals(decl.identifier, "sourceline")) {
+							if(Util.equals(decl.identifier.value, "sourceline")) {
 //								actualParameter=new Constant(Type.Integer,Global.sourceLineNumber);
 //								actualParameter=new Constant(null, Type.Integer, decl.firstLineNumber());
 								int lno = var.firstLineNumber();

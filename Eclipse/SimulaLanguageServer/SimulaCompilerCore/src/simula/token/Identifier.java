@@ -3,6 +3,7 @@ package simula.token;
 import simula.Option;
 import simula.builder.SimulaLexer;
 import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.Util;
 import simula.lsp.compiler.TokenManager;
 
 public class Identifier extends LexToken {
@@ -13,16 +14,34 @@ public class Identifier extends LexToken {
 		super(tokenStartLine, sourceText, column, length, KeyWord.IDENTIFIER, lexer);
 		this.value = this.edTokenText(lexer);
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();
+		if(value == null) Util.IERR("");
 	}
 	
 	public Identifier(String value) {
 		super(KeyWord.IDENTIFIER);
 		this.value = value;
+		if(value == null) Util.IERR("");
 	}
 
 	@Override
 	public String edText() {
 		return value;
+	}
+	
+	public boolean equals(Identifier other) {
+		return this.value.equals(other.value);
+	}
+	
+	public boolean equals(String other) {
+		return this.value.equals(other);
+	}
+	
+	public boolean equalsIgnoreCase(Identifier other) {
+		return this.value.equalsIgnoreCase(other.value);
+	}
+	
+	public boolean equalsIgnoreCase(String other) {
+		return this.value.equalsIgnoreCase(other);
 	}
 
 	public int getLspTokenType() {

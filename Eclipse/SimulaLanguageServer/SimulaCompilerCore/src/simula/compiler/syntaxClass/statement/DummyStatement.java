@@ -40,7 +40,7 @@ public final class DummyStatement extends Statement {
 //		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": DummyStatement: "+this);
 //	}
 	private DummyStatement(final SimulaBuilder simBuilder) {
-		super(simBuilder, simBuilder.getCurrentParserToken());
+		super(simBuilder);
 	}
 
 	public static DummyStatement ofExplicit(final SimulaBuilder simBuilder) {

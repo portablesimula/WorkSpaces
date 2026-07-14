@@ -100,8 +100,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// 
 	/// Used by expectMaybeBlock, i.e. CompoundStatement, SubBlock or PrefixedBlock.
 	/// @param identifier the given identifier
-	protected BlockDeclaration(final SimulaBuilder simBuilder, LexToken firstParserToken, Identifier identifier) {
-		super(simBuilder, firstParserToken, identifier);
+	protected BlockDeclaration(final SimulaBuilder simBuilder, Identifier identifier) {
+		super(simBuilder, identifier);
 	}
 
 	/// Create a new BlockDeclaration.
@@ -109,8 +109,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// This constructor is only used by ClassDeclaration. ProcedureDeclaration and MaybeBlockDeclaration.
 	/// @param identifier the block identifier
 	/// @param declarationKind the declaration kind
-	private BlockDeclaration(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier identifier,final int declarationKind) {
-		super(simBuilder, firstParserToken, identifier);
+	private BlockDeclaration(final SimulaBuilder simBuilder, final Identifier identifier,final int declarationKind) {
+		super(simBuilder, identifier);
 		this.declarationKind = declarationKind;
 	}
 	
@@ -123,9 +123,9 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// 
 	/// Precondition: BEGPAR is already read.
 	/// @param pList the parameter list
-	protected static void expectFormalParameterPart(final SimulaBuilder simBuilder, LexToken firstParserToken, final Vector<Parameter> pList) {
+	protected static void expectFormalParameterPart(final SimulaBuilder simBuilder, final Vector<Parameter> pList) {
 		do { // ParameterPart = Parameter ; { Parameter ; }
-			new Parameter(simBuilder, firstParserToken, Parse.expectIdentifier(simBuilder).edText()).into(pList);
+			new Parameter(simBuilder, Parse.expectIdentifier(simBuilder)).into(pList);
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		Parse.expect(simBuilder, KeyWord.ENDPAR);
 	}

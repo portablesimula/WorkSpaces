@@ -51,7 +51,7 @@ public final class StandaloneExpression extends Statement {
 //	StandaloneExpression(final PsiBuilder simBuilder, final int line,final Expression expression) {
 //		super(line);
 	StandaloneExpression(final SimulaBuilder simBuilder, final Expression expression) {
-		super(simBuilder, expression.firstParserToken);
+		super(simBuilder);
 //		IO.println("\nNEW StandaloneExpression: expr="+expression);
 //		simBuilder.printPSI("NEW StandaloneExpression: expr="+expression);
 		this.lastParserToken = expression.lastParserToken;

@@ -35,7 +35,7 @@ public final class VirtualMatch extends Declaration {
 	/// @param virtualSpec the virtual specification
 	/// @param match a matching ProcedureDeclaration
 	VirtualMatch(final SimulaBuilder simBuilder, final VirtualSpecification virtualSpec, final ProcedureDeclaration match) {
-		super(simBuilder, virtualSpec.identifier, virtualSpec.identifier);
+		super(simBuilder, virtualSpec.identifier);
 		this.declarationKind = ObjectKind.VirtualMatch;
 		// NOTE: Called during Checking
 		this.virtualSpec = virtualSpec;

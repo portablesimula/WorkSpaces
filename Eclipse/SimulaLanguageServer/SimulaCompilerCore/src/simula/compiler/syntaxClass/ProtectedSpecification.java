@@ -45,7 +45,7 @@ public final class ProtectedSpecification extends SyntaxElement {
     /// @param definedIn the class it is defined in
     /// @param identifier the protected identifier
 	public ProtectedSpecification(final SimulaBuilder simBuilder, final ClassDeclaration definedIn,final Identifier identifier) {
-		super(simBuilder, identifier);
+		super(simBuilder);
 		this.definedIn=definedIn;
 		this.identifier=identifier;
 	}

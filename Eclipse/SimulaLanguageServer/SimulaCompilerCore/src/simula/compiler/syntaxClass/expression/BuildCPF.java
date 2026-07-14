@@ -85,7 +85,7 @@ public abstract class BuildCPF {
 				if((actualParameter instanceof VariableExpression var) && !var.hasArguments()) {
 					Declaration decl=var.meaning.declaredAs;
 					if(decl instanceof StandardProcedure) {
-						if(Util.equals(decl.identifier, "sourceline")) {
+						if(Util.equals(decl.identifier.value, "sourceline")) {
 //							actualParameter=new Constant(Type.Integer,actualParameter.firstLineNumber());
 //							actualParameter=new Constant(null, Type.Integer, decl.firstLineNumber());
 							int lno = var.firstLineNumber();

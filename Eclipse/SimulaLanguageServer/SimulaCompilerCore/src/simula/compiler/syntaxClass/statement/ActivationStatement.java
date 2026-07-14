@@ -23,6 +23,7 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 import simula.token.LexToken;
 
 /// Activation Statement.
@@ -153,7 +154,7 @@ public final class ActivationStatement extends Statement {
 	/// @return the resulting Java source code
 	private String edActivateDirect() {
 		String obj1 = (object1 == null) ? "null" : "(RTS_Process)"+object1.toJavaCode();
-		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning("ActivateDirect");
+		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateDirect"));
 		String staticLink = activate1.edQualifiedStaticLink();
 		return (staticLink + ".ActivateDirect(" + REAC + ',' + obj1 + ')');
 	}
@@ -162,7 +163,7 @@ public final class ActivationStatement extends Statement {
 	/// @return the resulting Java source code
 	private String edActivateAt() {
 		String obj1 = (object1 == null) ? "null" : "(RTS_Process)"+object1.toJavaCode();
-		String staticLink = CoreGlobal.getCurrentScope().findMeaning("ActivateAt").edQualifiedStaticLink();
+		String staticLink = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateAt")).edQualifiedStaticLink();
 		return (staticLink + ".ActivateAt(" + REAC + ',' + obj1 + ',' + time.toJavaCode() + ',' + prior + ')');
 	}
 
@@ -170,7 +171,7 @@ public final class ActivationStatement extends Statement {
 	/// @return the resulting Java source code
 	private String edActivateDelay() {
 		String obj1 = (object1 == null) ? "null" : "(RTS_Process)"+object1.toJavaCode();
-		String staticLink = CoreGlobal.getCurrentScope().findMeaning("ActivateDelay").edQualifiedStaticLink();
+		String staticLink = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateDelay")).edQualifiedStaticLink();
 		return (staticLink + ".ActivateDelay(" + REAC + ',' + obj1 + ',' + time.toJavaCode() + ',' + prior + ')');
 	}
 
@@ -179,7 +180,7 @@ public final class ActivationStatement extends Statement {
 	private String edActivateBefore() {
 		String obj1 = (object1 == null) ? "null" : "(RTS_Process)"+object1.toJavaCode();
 		String obj2 = (object2 == null) ? "null" : "(RTS_Process)"+object2.toJavaCode();
-		Meaning activate3 = CoreGlobal.getCurrentScope().findMeaning("ActivateBefore");
+		Meaning activate3 = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateBefore"));
 		String staticLink = activate3.edQualifiedStaticLink();
 		return (staticLink + ".ActivateBefore(" + REAC + ',' + obj1 + ',' + obj2 + ')');
 	}
@@ -189,7 +190,7 @@ public final class ActivationStatement extends Statement {
 	private String edActivateAfter() {
 		String obj1 = (object1 == null) ? "null" : "(RTS_Process)"+object1.toJavaCode();
 		String obj2 = (object2 == null) ? "null" : "(RTS_Process)"+object2.toJavaCode();
-		Meaning activate3 = CoreGlobal.getCurrentScope().findMeaning("ActivateAfter");
+		Meaning activate3 = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateAfter"));
 		String staticLink = activate3.edQualifiedStaticLink();
 		return (staticLink + ".ActivateAfter(" + REAC + ',' + obj1 + ',' + obj2 + ')');
 	}
@@ -226,7 +227,7 @@ public final class ActivationStatement extends Statement {
 //        7: aload_0
 //        8: getfield      #7                  // Field bil1_2:LsimulaTestPrograms/adHoc000_Car;
 //       11: invokevirtual #51                 // Method ActivateDirect:(ZLsimula/runtime/RTS_Process;)V
-		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning("ActivateDirect");
+		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateDirect"));
 		activate1.buildQualifiedStaticLink(codeBuilder);
 		Constant.buildIntConst(codeBuilder, REAC);
 		object1.buildEvaluation(null, codeBuilder);
@@ -244,7 +245,7 @@ public final class ActivationStatement extends Statement {
 //        40: ldc2_w        #66                 // double 7.449999809265137d
 //        43: iconst_0
 //        44: invokevirtual #68                 // Method ActivateAt:(ZLsimula/runtime/RTS_Process;DZ)V
-		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning("ActivateAt");
+		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateAt"));
 		activate1.buildQualifiedStaticLink(codeBuilder);
 		Constant.buildIntConst(codeBuilder, REAC);
 		object1.buildEvaluation(null, codeBuilder);
@@ -256,7 +257,7 @@ public final class ActivationStatement extends Statement {
 	/// ClassFile coding utility: Build (Re)Activate Process DELAY ...
 	/// @param codeBuilder the codeBuilder to use.
 	private void buildActivateDelay(CodeBuilder codeBuilder) {
-		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning("ActivateDelay");
+		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateDelay"));
 		activate1.buildQualifiedStaticLink(codeBuilder);
 		Constant.buildIntConst(codeBuilder, REAC);
 		object1.buildEvaluation(null, codeBuilder);
@@ -268,7 +269,7 @@ public final class ActivationStatement extends Statement {
 	/// ClassFile coding utility: Build (Re)Activate Process BEFORE ...
 	/// @param codeBuilder the codeBuilder to use.
 	private void buildActivateBefore(CodeBuilder codeBuilder) {
-		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning("ActivateBefore");
+		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateBefore"));
 		activate1.buildQualifiedStaticLink(codeBuilder);
 		Constant.buildIntConst(codeBuilder, REAC);
 		object1.buildEvaluation(null, codeBuilder);
@@ -279,7 +280,7 @@ public final class ActivationStatement extends Statement {
 	/// ClassFile coding utility: Build (Re)Activate Process AFTER ...
 	/// @param codeBuilder the codeBuilder to use.
 	private void buildActivateAfter(CodeBuilder codeBuilder) {
-		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning("ActivateAfter");
+		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateAfter"));
 		activate1.buildQualifiedStaticLink(codeBuilder);
 		Constant.buildIntConst(codeBuilder, REAC);
 		object1.buildEvaluation(null, codeBuilder);

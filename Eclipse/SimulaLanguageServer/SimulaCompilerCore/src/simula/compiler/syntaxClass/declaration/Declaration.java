@@ -19,7 +19,6 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Util;
 import simula.token.Identifier;
-import simula.token.LexToken;
 
 /// Declaration.
 ///  
@@ -69,8 +68,8 @@ public abstract class Declaration extends SyntaxElement {
 	// ***********************************************************************************************
 	/// Create a new Declaration.
 	/// @param identifier the given identifier
-	protected Declaration(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier identifier) {
-		super(simBuilder, firstParserToken);
+	protected Declaration(final SimulaBuilder simBuilder, final Identifier identifier) {
+		super(simBuilder);
 		this.identifier = identifier;
 		if(identifier != null) this.externalIdent = identifier.value; // May be overwritten
 		declaredIn = CoreGlobal.getCurrentScope();
@@ -137,7 +136,7 @@ public abstract class Declaration extends SyntaxElement {
 			Parse.TRACE("Parse Declaration");
 		Declaration decl = null;
 		IO.println("Declaration.acceptDeclaration: BEFORE acceptIdentifier");
-		LexToken maybePrefix = Parse.acceptIdentifier(simBuilder);
+		Identifier maybePrefix = Parse.acceptIdentifier(simBuilder);
 		IO.println("Declaration.acceptDeclaration: AFTER acceptIdentifier");
 		if (maybePrefix != null) {
 			IO.println("Declaration.acceptDeclaration: maybePrefix="+maybePrefix);
@@ -162,17 +161,16 @@ public abstract class Declaration extends SyntaxElement {
 		} else if (Parse.accept(simBuilder, KeyWord.CLASS))
 			decl = ClassDeclaration.expectClassDeclaration(simBuilder, null);
 		else if (Parse.accept(simBuilder, KeyWord.SWITCH)) {
-			LexToken ident = Parse.acceptIdentifier(simBuilder);
+			Identifier ident = Parse.acceptIdentifier(simBuilder);
 			if (ident == null) {
 				// Switch Statement
 				return null;
 			}
-			decl = new SwitchDeclaration(simBuilder, ident.edText());
+			decl = new SwitchDeclaration(simBuilder, ident);
 		} else if (Parse.accept(simBuilder, KeyWord.EXTERNAL)) {
 			Vector<SyntaxElement> ext = ExternalDeclaration.expectExternalDeclaration(simBuilder);	
 			return ext;
 		} else {
-			LexToken firstToken = simBuilder.getCurrentParserToken();
 			Type type = Parse.acceptType(simBuilder);
 			if (type == null) return null;
 			
@@ -183,7 +181,7 @@ public abstract class Declaration extends SyntaxElement {
 				return ArrayDeclaration.expectArrayDeclaration(simBuilder, type);
 			}
 			else 
-				return SimpleVariableDeclaration.expectSimpleVariable(simBuilder, firstToken, type);
+				return SimpleVariableDeclaration.expectSimpleVariable(simBuilder, type);
 			
 			if (Option.internal.TRACE_PARSE)
 				Parse.TRACE("Parse Declaration(2)");

@@ -1108,7 +1108,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// Create a new StandardClass.
 	/// @param className the class's name
 	private StandardClass(String className) {
-		super(null, null, new Identifier(className));
+		super(null, new Identifier(className));
 		this.externalIdent = "RTS_"+className;
 		this.declarationKind=ObjectKind.StandardClass;
 		this.type=Type.Ref(className);
@@ -1166,9 +1166,9 @@ public final class StandardClass extends ClassDeclaration {
 	}
 
 	@Override
-	public Meaning findRemoteAttributeMeaning(String ident) {
+	public Meaning findRemoteAttributeMeaning(Identifier ident) {
 		for(Declaration declaration:declarationList)
-			if(Util.equals(ident, declaration.identifier.value))
+			if(Util.equals(ident, declaration.identifier))
 				return(new Meaning(declaration,this));
 		ClassDeclaration prfx=getPrefixClass();
 		if(prfx!=null) return(prfx.findRemoteAttributeMeaning(ident));
@@ -1184,7 +1184,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param type  the type
 	/// @return the newly created Parameter
 	private static Parameter parameter(String ident, Type type)	{
-		return new Parameter(null, null, new Identifier(ident), type,Parameter.Kind.Simple); }
+		return new Parameter(null, new Identifier(ident), type,Parameter.Kind.Simple); }
 
 	/// Create a new Parameter.
 	/// @param ident the identifier
@@ -1192,7 +1192,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param kind  the parameter kind
 	/// @return the newly created Parameter
 	private static Parameter parameter(String ident, Type type, int kind)	{
-		return new Parameter(null, null, new Identifier(ident), type, kind); }
+		return new Parameter(null, new Identifier(ident), type, kind); }
 
 	/// Create a new Parameter.
 	/// @param ident the identifier
@@ -1201,7 +1201,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param nDim  number of dimensions for arrays
 	/// @return the newly created Parameter
 	private static Parameter parameter(String ident, Type type, int kind, int nDim)	{
-		return new Parameter(null, null, new Identifier(ident), type, kind, nDim); }
+		return new Parameter(null, new Identifier(ident), type, kind, nDim); }
 
 	/// Create a new Parameter.
 	/// @param ident the identifier
@@ -1209,7 +1209,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param type  the type
 	/// @return the newly created Parameter
 	private static Parameter parameter(String ident,int mode,Type type) {
-		Parameter spec = new Parameter(null, null, new Identifier(ident),type,Parameter.Kind.Simple);
+		Parameter spec = new Parameter(null, new Identifier(ident),type,Parameter.Kind.Simple);
 		spec.setMode(mode); return(spec);
 	}
 
@@ -1220,7 +1220,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param type  the type
 	/// @return the newly created Parameter
 	private static Parameter parameter(String ident,int kind, int mode,Type type) {
-		Parameter spec=new Parameter(null, null, new Identifier(ident),type,kind);
+		Parameter spec=new Parameter(null, new Identifier(ident),type,kind);
 		spec.setMode(mode); return(spec);
 	}
 
@@ -1241,14 +1241,14 @@ public final class StandardClass extends ClassDeclaration {
 	/// @param type the attribute type
 	/// @param ident the attribute identifier
 	private void addStandardAttribute(Type type, String ident) {
-		declarationList.add(new SimpleVariableDeclaration(null, null, type, new Identifier(ident))); }
+		declarationList.add(new SimpleVariableDeclaration(null, type, new Identifier(ident))); }
 
 	/// Create and add a new constant standard attribute.
 	/// @param type the attribute type
 	/// @param ident the attribute identifier
 	/// @param value the constant integer value
 	private void addStandardAttribute(Type type, String ident, Number value) {
-		declarationList.add(new SimpleVariableDeclaration(null, null, type, new Identifier(ident), true, new Constant(null, type,value))); }
+		declarationList.add(new SimpleVariableDeclaration(null, type, new Identifier(ident), true, new Constant(null, type,value))); }
 
 	/// Create and add a new StandardProcedure.
 	/// @param kind the declaration kind
@@ -1287,7 +1287,7 @@ public final class StandardClass extends ClassDeclaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public StandardClass() {
-		super(null, null, null);
+		super(null, null);
 	}
 
 

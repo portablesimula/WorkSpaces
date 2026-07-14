@@ -38,7 +38,7 @@ public final class InnerStatement extends Statement {
 	/// Create a new InnerStatement.
 	/// @param line the source line number
 	public InnerStatement(final SimulaBuilder simBuilder, boolean explicit) {
-		super(simBuilder, simBuilder.getCurrentParserToken());
+		super(simBuilder);
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": InnerStatement: "+this);
 //		IO.println("NEW InnerStatement: Line "+firstLineNumber()+": InnerStatement: "+this+ "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 //		Thread.dumpStack();

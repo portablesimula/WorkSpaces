@@ -29,7 +29,6 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.token.Identifier;
-import simula.token.LexToken;
 	
 /// Parameter Declaration.
 /// 
@@ -95,8 +94,8 @@ public final class Parameter extends Declaration {
 
 	/// Create a new Parameter.
 	/// @param identifier parameter identifier
-	public Parameter(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier identifier) {
-		super(simBuilder, firstParserToken, identifier);
+	public Parameter(final SimulaBuilder simBuilder, final Identifier identifier) {
+		super(simBuilder, identifier);
 		this.declarationKind = ObjectKind.Parameter;
 	}
 
@@ -104,8 +103,8 @@ public final class Parameter extends Declaration {
 	/// @param identifier parameter identifier
 	/// @param type parameter type
 	/// @param kind parameter kind
-	Parameter(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier identifier, final Type type, final int kind) {
-		this(simBuilder, firstParserToken, identifier);
+	Parameter(final SimulaBuilder simBuilder, final Identifier identifier, final Type type, final int kind) {
+		this(simBuilder, identifier);
 		this.type = type;
 		this.kind = kind;
 	}
@@ -115,8 +114,8 @@ public final class Parameter extends Declaration {
 	/// @param type parameter type
 	/// @param kind parameter kind
 	/// @param nDim parameter's number of dimension in case of array kind.
-	public Parameter(final SimulaBuilder simBuilder, LexToken firstParserToken, final Identifier identifier, final Type type, final int kind, final int nDim) {
-		this(simBuilder, firstParserToken, identifier, type, kind);
+	public Parameter(final SimulaBuilder simBuilder, final Identifier identifier, final Type type, final int kind, final int nDim) {
+		this(simBuilder, identifier, type, kind);
 		this.nDim = nDim;
 	}
 
@@ -489,7 +488,7 @@ public final class Parameter extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private Parameter() {
-		super(null, null, null);
+		super(null, null);
 		this.declarationKind = ObjectKind.Parameter;
 	}
 	

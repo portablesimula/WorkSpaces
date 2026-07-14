@@ -20,7 +20,6 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
-import simula.token.LexToken;
 
 /// Constant.
 /// 
@@ -47,9 +46,7 @@ public final class Constant extends Expression {
 	/// @param type the constant's type
 	/// @param value the constant's value
 	public Constant(final SimulaBuilder simBuilder, final Type type,final Object value) {
-		super(simBuilder, (simBuilder == null)?null : simBuilder.getCurrentParserToken());
-		IO.println("NEW Constant: "+value+", ");
-		Thread.dumpStack();
+		super(simBuilder);
 		this.type=type;
 		this.value = value;
 	}
@@ -322,7 +319,7 @@ public final class Constant extends Expression {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	private Constant() {
-		super(null, null);
+		super(null);
 	}
 
 	@Override

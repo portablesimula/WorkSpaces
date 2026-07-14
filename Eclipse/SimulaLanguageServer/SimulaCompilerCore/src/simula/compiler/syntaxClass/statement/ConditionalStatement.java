@@ -54,7 +54,7 @@ public final class ConditionalStatement extends Statement {
 	/// Create a new ConditionalStatement.
 	/// @param line the source line number
 	ConditionalStatement(SimulaBuilder simBuilder) {
-		super(simBuilder, simBuilder.getCurrentParserToken());
+		super(simBuilder);
 		int lno = simBuilder.getSourceLineNumber();
 //		IO.println("NEW ConditionalStatement: "+simBuilder.getSourceLineNumber());
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN IfStatement: ");

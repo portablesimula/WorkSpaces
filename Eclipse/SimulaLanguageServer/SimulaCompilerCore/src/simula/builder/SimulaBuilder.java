@@ -102,7 +102,13 @@ public class SimulaBuilder {
     /// Invariant: Lexer'parserToken is first token of construct
     /// 
     public void startTokenRange() {}
-    public void startTokenRange(String debugName) {}
+    public void startTokenRange(String debugName) {
+//    	LexToken first = this.prevParserToken;
+    	LexToken first = this.currentParserToken;
+    	IO.println("SimulaBuilder.startTokenRange: " + debugName + ", first=" + first);
+    	
+    	
+    }
 //    public void startTokenRange(PsiTree.Kind kind, String debugName) {
     public void startTokenRange(String debugName,LexToken first) {
 //    	LexToken first = this.prevParserToken;
@@ -166,6 +172,10 @@ public class SimulaBuilder {
 //		psiTree.addChild(lexToken);
 //		lexer.advance();
 		getNextParserToken();
+	}
+	
+	public void setParsingBoundPairList(boolean parsingBoundPairList) {
+		lexer.setParsingBoundPairList(parsingBoundPairList);
 	}
 
 	public void	rollBackTo(LexToken prev, String debugInfo) {

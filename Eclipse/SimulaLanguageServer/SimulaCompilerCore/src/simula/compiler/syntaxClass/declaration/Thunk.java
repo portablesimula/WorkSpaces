@@ -49,7 +49,7 @@ public final class Thunk extends DeclarationScope {
 	/// @param kind the kind code
 	/// @param expr the Thunk expression.
 	private Thunk(int kind,Expression expr) {
-		super(expr.simBuilder, expr.firstParserToken, new Identifier(CoreGlobal.sourceName + "$THUNK$" + (++OBJECT_SEQU)));
+		super(expr.simBuilder, new Identifier(CoreGlobal.sourceName + "$THUNK$" + (++OBJECT_SEQU)));
 		this.declarationKind = ObjectKind.Thunk;
 		this.kind = kind;
 		this.expr = expr;

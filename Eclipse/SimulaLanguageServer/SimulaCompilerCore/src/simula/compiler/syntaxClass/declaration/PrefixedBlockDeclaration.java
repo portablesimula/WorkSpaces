@@ -32,6 +32,7 @@ import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Prefixed Block Declaration.
 /// <pre>
@@ -94,7 +95,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		block.prefix = blockPrefix.identifier;
 		block.isMainModule=isMainModule;
 		String ID = (isMainModule)? CoreGlobal.sourceName : block.prefix + "Begin";
-		block.modifyIdentifier(ID);
+		block.modifyIdentifier(new Identifier(ID));
 		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse PrefixedBlock");
 		
 		block.parseBlock(simBuilder);
@@ -383,7 +384,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		oupt.writeObjectList(statements);
 		
 		// *** ClassDeclaration
-		oupt.writeString(prefix);
+		oupt.writeIdentifier(prefix);
 		oupt.writeBoolean(detachUsed);
 		oupt.writeObjectList(parameterList);
 		oupt.writeObjectList(virtualSpecList);
@@ -402,7 +403,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	@SuppressWarnings("unchecked")
 	public static PrefixedBlockDeclaration readObject(AttributeInputStream inpt) throws IOException {
 		PrefixedBlockDeclaration pbl = new PrefixedBlockDeclaration();
-		pbl.identifier = (String) inpt.readString();
+		pbl.identifier = inpt.readIdentifier();
 		pbl.declarationKind = ObjectKind.Class;
 		pbl.OBJECT_SEQU = inpt.readSEQU(pbl);
 		// *** SyntaxElement
@@ -424,7 +425,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		pbl.statements = (ObjectList<Statement>) inpt.readObjectList();
 		
 		// *** ClassDeclaration
-		pbl.prefix = inpt.readString();
+		pbl.prefix = inpt.readIdentifier();
 		pbl.detachUsed = inpt.readBoolean();
 		pbl.parameterList = (ObjectList<Parameter>) inpt.readObjectList();
 		pbl.virtualSpecList = (ObjectList<VirtualSpecification>) inpt.readObjectList();

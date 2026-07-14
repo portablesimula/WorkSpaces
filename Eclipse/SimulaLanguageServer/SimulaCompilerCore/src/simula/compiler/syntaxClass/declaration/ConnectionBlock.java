@@ -49,7 +49,7 @@ public final class ConnectionBlock extends DeclarationScope {
 	public Statement statement;
 	
 	/// When clause class identifier.
-	private String whenClassIdentifier;
+	private Identifier whenClassIdentifier;
 	
 	/// When clause class Declaration. Set during checking.
 	private Declaration whenClassDeclaration; // Set during checking
@@ -68,9 +68,9 @@ public final class ConnectionBlock extends DeclarationScope {
 	/// Create a new ConnectionBlock.
 	/// @param inspectedVariable   the inspected variable
 	/// @param whenClassIdentifier the when class identifier
-	public ConnectionBlock(final SimulaBuilder simBuilder, LexToken firstParserToken, final VariableExpression inspectedVariable, final String whenClassIdentifier) {
+	public ConnectionBlock(final SimulaBuilder simBuilder, final VariableExpression inspectedVariable, final Identifier whenClassIdentifier) {
 //		super("Connection block at line " + (Global.sourceLineNumber - 1));
-		super(simBuilder, firstParserToken, new Identifier("Inspect " + inspectedVariable));
+		super(simBuilder, new Identifier("Inspect " + inspectedVariable));
 		declarationKind = ObjectKind.ConnectionBlock;
 		this.inspectedVariable = inspectedVariable;
 		this.whenClassIdentifier = whenClassIdentifier;
@@ -107,7 +107,7 @@ public final class ConnectionBlock extends DeclarationScope {
 	}
 
 	@Override
-	public Meaning findMeaning(final String identifier) {
+	public Meaning findMeaning(final Identifier identifier) {
 		if (classDeclaration == null && CoreGlobal.duringParsing)
 			return (null); // Still in Pass1(Parser)
 		Meaning result = null;
@@ -251,7 +251,7 @@ public final class ConnectionBlock extends DeclarationScope {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	/// @param identifier the block identifier.
-	public ConnectionBlock(String identifier) {
+	public ConnectionBlock(Identifier identifier) {
 		super(null, identifier);
 		declarationKind = ObjectKind.ConnectionBlock;
 	}
@@ -281,7 +281,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		
 		// *** ConnectionBlock
 		oupt.writeObj(statement);
-		oupt.writeString(whenClassIdentifier);
+		oupt.writeIdentifier(whenClassIdentifier);
 		oupt.writeObj(inspectedVariable);
 
 		Util.TRACE_OUTPUT("END Write ConnectionBlock: "+identifier);
@@ -292,7 +292,7 @@ public final class ConnectionBlock extends DeclarationScope {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static ConnectionBlock readObject(AttributeInputStream inpt) throws IOException {
-		String identifier = inpt.readString();
+		Identifier identifier = inpt.readIdentifier();
 		ConnectionBlock blk = new ConnectionBlock(identifier);
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
 		
@@ -313,7 +313,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		
 		// *** ConnectionBlock
 		blk.statement = (Statement) inpt.readObj();
-		blk.whenClassIdentifier = inpt.readString();
+		blk.whenClassIdentifier = inpt.readIdentifier();
 		blk.inspectedVariable = (VariableExpression) inpt.readObj();
 
 		blk.isPreCompiledFromFile = inpt.jarFileName;

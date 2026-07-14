@@ -22,6 +22,7 @@ import simula.compiler.syntaxClass.statement.ConnectionStatement;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// InspectVariable Declaration.
 /// 
@@ -47,7 +48,7 @@ public class InspectVariableDeclaration extends Declaration {
 	/// @param identifier the variable identifier
 	/// @param connectionScope the connectionScope
 	/// @param connectionStatement the connectionStatement
-	public InspectVariableDeclaration(final SimulaBuilder simBuilder, final Type type, final String identifier,final DeclarationScope connectionScope, final ConnectionStatement connectionStatement) {
+	public InspectVariableDeclaration(final SimulaBuilder simBuilder, final Type type, final Identifier identifier,final DeclarationScope connectionScope, final ConnectionStatement connectionStatement) {
 		super(simBuilder, identifier);
 		this.declarationKind = ObjectKind.InspectVariableDeclaration;
 		this.type = type;

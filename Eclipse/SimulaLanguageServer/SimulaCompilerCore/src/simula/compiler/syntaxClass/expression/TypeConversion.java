@@ -20,6 +20,7 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Type Conversion.
 /// 
@@ -96,7 +97,7 @@ public final class TypeConversion extends Expression {
 	/// @return the resulting expression
 	public static Expression testAndCreate(final Type toType,final Expression expression) {
 		Type fromType=expression.type;
-		String qual=(fromType==null)?null:fromType.getRefIdent();
+		Identifier qual=(fromType==null)?null:fromType.getRefIdent();
 		if(qual != null) {
 			int rhsBL=(fromType!=null && fromType.declaredIn!=null)?fromType.declaredIn.getRTBlockLevel() : 0;
 			int lhsBL=(toType!=null && toType.declaredIn!=null)?toType.declaredIn.getRTBlockLevel() : 0;

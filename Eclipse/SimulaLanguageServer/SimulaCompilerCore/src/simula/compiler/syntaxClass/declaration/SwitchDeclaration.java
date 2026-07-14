@@ -53,7 +53,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 	/// Create a new SwitchDeclaration.
 	/// @param ident switch identifier
 	public SwitchDeclaration(SimulaBuilder simBuilder, final Identifier ident) {
-		super(simBuilder, simBuilder.getPrevParserToken(), ident, ObjectKind.Procedure);
+		super(simBuilder, ident, ObjectKind.Procedure);
 		Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
 		syntaxElements.add(this);
 		if (Option.internal.TRACE_PARSE)
@@ -64,7 +64,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse SwitchDeclaration(3), switchList=" + switchList);
-		new Parameter(simBuilder, simBuilder.getPrevParserToken(), new Identifier("_SW"), Type.Integer, Parameter.Kind.Simple).into(parameterList);
+		new Parameter(simBuilder, new Identifier("_SW"), Type.Integer, Parameter.Kind.Simple).into(parameterList);
 		CoreGlobal.setScope(declaredIn);
 
 		for(Expression expr:switchList) syntaxElements.add(expr);

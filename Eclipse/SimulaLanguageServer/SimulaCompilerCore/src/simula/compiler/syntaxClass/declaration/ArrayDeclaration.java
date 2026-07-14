@@ -36,6 +36,7 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Array Declaration.
 /// 
@@ -114,7 +115,7 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param identifier the array identifier
 	/// @param type the array type
 	/// @param boundPairList The list of BoundPair
-	private ArrayDeclaration(final SimulaBuilder simBuilder, final String identifier, final Type type, final Vector<BoundPair> boundPairList) {
+	private ArrayDeclaration(final SimulaBuilder simBuilder, final Identifier identifier, final Type type, final Vector<BoundPair> boundPairList) {
 		super(simBuilder, identifier);
 		this.declarationKind = ObjectKind.ArrayDeclaration;
 		this.type = type;
@@ -151,9 +152,9 @@ public final class ArrayDeclaration extends Declaration {
 		do {
 			if (Option.internal.TRACE_PARSE)
 				Parse.TRACE("Parse ArraySegment");
-			Vector<String> identList = new Vector<String>();
+			Vector<Identifier> identList = new Vector<>();
 			do {
-				identList.add(Parse.expectIdentifier(simBuilder).edText());
+				identList.add(Parse.expectIdentifier(simBuilder));
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
 			Parse.expect(simBuilder, KeyWord.BEGPAR);
 			simBuilder.setParsingBoundPairList(true);
@@ -169,8 +170,8 @@ public final class ArrayDeclaration extends Declaration {
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
 			Parse.expect(simBuilder, KeyWord.ENDPAR);
 			simBuilder.setParsingBoundPairList(false);
-			for (Enumeration<String> e = identList.elements(); e.hasMoreElements();) {
-				String identifier = e.nextElement();
+			for (Enumeration<Identifier> e = identList.elements(); e.hasMoreElements();) {
+				Identifier identifier = e.nextElement();
 				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(simBuilder, identifier, type, boundPairList);
 //				IO.println("ArrayDecleration.expectArrayDeclaration: NEW "+arrayDeclaration);
 				declarations.add(arrayDeclaration);
@@ -268,7 +269,7 @@ public final class ArrayDeclaration extends Declaration {
 	public void buildDeclaration(ClassBuilder classBuilder, BlockDeclaration encloser) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
-		classBuilder.withField(identifier, RTS.CD.RTS_ARRAY(type), fieldBuilder -> {
+		classBuilder.withField(identifier.value, RTS.CD.RTS_ARRAY(type), fieldBuilder -> {
 			fieldBuilder
 				.withFlags(ClassFile.ACC_PUBLIC)
 				.with(SignatureAttribute.of(type.toArrayClassSignature()));
@@ -372,7 +373,7 @@ public final class ArrayDeclaration extends Declaration {
 		}
 		codeBuilder
 			.invokespecial(CD_ArrayType, "<init>", MethodTypeDesc.ofDescriptor("([Lsimula/runtime/RTS_BOUNDS;)V"))
-			.putfield(pool.fieldRefEntry(BlockDeclaration.currentClassDesc(),identifier, CD_ArrayType));
+			.putfield(pool.fieldRefEntry(BlockDeclaration.currentClassDesc(),identifier.value, CD_ArrayType));
 	}
 
 	// ********************************************************************************************

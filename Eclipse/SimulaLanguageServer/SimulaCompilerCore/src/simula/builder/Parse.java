@@ -63,23 +63,9 @@ public class Parse {
 //		nextToken();
 	}
 
-	public static LexToken prevToken(final SimulaBuilder simBuilder) {
-		return simBuilder.prevToken();
+	public static LexToken getPrevParserToken(final SimulaBuilder simBuilder) {
+		return simBuilder.getPrevParserToken();
 	}
-
-	public static LexToken prevParserToken(final SimulaBuilder simBuilder) {
-		return simBuilder.prevParserToken();
-	}
-
-//	/// Return the current Token.
-//	public static LexToken currentLexToken(final SimulaBuilder simBuilder) {
-//        return (LexToken)simBuilder.getCurrentLexerToken();
-//	}
-//
-//	/// Return the prev Token.
-//	public static LexToken getPrevLexToken(final SimulaBuilder simBuilder) {
-//        return (LexToken)simBuilder.getPrevLexerToken();
-//	}
 
 	/// Return the current Parser Token.
 	public static LexToken getCurrentParserToken(final SimulaBuilder simBuilder) {
@@ -211,7 +197,7 @@ public class Parse {
 
 	/// Skip misplaced current symbol.
 	public static void skipMisplacedCurrentSymbol(final SimulaBuilder simBuilder) {
-		Util.syntaxError(simBuilder, "Misplaced symbol: "+Parse.currentLexToken(simBuilder)+" -- Ignored");
+		Util.syntaxError(simBuilder, "Misplaced symbol: "+Parse.getCurrentParserToken(simBuilder)+" -- Ignored");
 		nextToken(simBuilder);
 	}
 	

@@ -147,8 +147,8 @@ public class ClassDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Create a new ClassDeclaration.
 	/// @param identifier the given identifier
-	protected ClassDeclaration(final SimulaBuilder simBuilder, LexToken firstParserToken, Identifier identifier) {
-		super(simBuilder, firstParserToken, identifier);
+	protected ClassDeclaration(final SimulaBuilder simBuilder, Identifier identifier) {
+		super(simBuilder, identifier);
 		this.declarationKind = ObjectKind.Class;
 	}
 
@@ -171,30 +171,29 @@ public class ClassDeclaration extends BlockDeclaration {
 	///               class-body
 	/// 
 	/// </pre>
-	/// pre-Condition: First token is identToken or SimBuilder.prevParserToken
 	/// @param prefix class identifier
 	/// @return the resulting ClassDeclaration
 //	public static ClassDeclaration expectClassDeclaration(final SimulaBuilder simBuilder, final String ident) {
-	public static ClassDeclaration expectClassDeclaration(final SimulaBuilder simBuilder, final LexToken identToken) {
+	public static ClassDeclaration expectClassDeclaration(final SimulaBuilder simBuilder, final Identifier identifier) {
 		boolean TESTING = true;
 		if(TESTING) {
 			LexToken prev = simBuilder.getPrevParserToken();
-			IO.println("ClassDeclaration.expectClassDeclaration: identToken: "+identToken);
+			IO.println("ClassDeclaration.expectClassDeclaration: identifier: "+identifier);
 			IO.println("ClassDeclaration.expectClassDeclaration: prev: "+prev);
-			if(identToken == null) {
+			if(identifier == null) {
 				if(prev.keyWord != KeyWord.CLASS) Util.IERR("Pre-Condition FAILED: "+prev);
 			}
 		}
-		LexToken first = (identToken != null)? identToken : simBuilder.getPrevParserToken();
-		ClassDeclaration cls = new ClassDeclaration(simBuilder, first, null);
+//		LexToken first = (identifier != null)? identifier : simBuilder.getPrevParserToken();
+		ClassDeclaration cls = new ClassDeclaration(simBuilder, null);
 		cls.sourceFileName = CoreGlobal.sourceFileName;
-		if(identToken != null) cls.prefix = identToken.edText();
+		if(identifier != null) cls.prefix = identifier;
 		cls.declaredIn.hasLocalClasses = true;
 		if (cls.prefix == null)
 			cls.prefix = StandardClass.CLASS.identifier;
-		cls.modifyIdentifier(Parse.expectIdentifier(simBuilder, "PsiTextPanel.styleNameClassIdent").edText());
+		cls.modifyIdentifier(Parse.expectIdentifier(simBuilder, "PsiTextPanel.styleNameClassIdent"));
 		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
-			expectFormalParameterPart(simBuilder, simBuilder.getCurrentParserToken(), cls.parameterList);
+			expectFormalParameterPart(simBuilder, cls.parameterList);
 			Parse.expect(simBuilder, KeyWord.SEMICOLON);
 			acceptValuePart(simBuilder, cls.parameterList);
 			acceptParameterSpecificationPart(simBuilder, cls.parameterList);
@@ -226,7 +225,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	private static void acceptValuePart(final SimulaBuilder simBuilder, final Vector<Parameter> pList) {
 		if (Parse.accept(simBuilder, KeyWord.VALUE)) {
 			do {
-				String identifier = Parse.expectIdentifier(simBuilder).edText();
+				Identifier identifier = Parse.expectIdentifier(simBuilder);
 				Parameter parameter = null;
 				for (Parameter par : pList)
 					if (Util.equals(identifier, par.identifier)) {
@@ -235,7 +234,7 @@ public class ClassDeclaration extends BlockDeclaration {
 					}
 				if (parameter == null) {
 					Util.syntaxError(simBuilder, "Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(simBuilder, simBuilder.getCurrentParserToken(), identifier);
+					parameter = new Parameter(simBuilder, identifier);
 				}
 				parameter.setMode(Parameter.Mode.value);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
@@ -274,7 +273,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			if (type == null)
 				return;
 			do {
-				String identifier = Parse.expectIdentifier(simBuilder).edText();
+				Identifier identifier = Parse.expectIdentifier(simBuilder);
 				Parameter parameter = null;
 				for (Parameter par : pList)
 					if (Util.equals(identifier, par.identifier)) {
@@ -283,7 +282,7 @@ public class ClassDeclaration extends BlockDeclaration {
 					}
 				if (parameter == null) {
 					Util.syntaxError(simBuilder, "Identifier " + identifier + " is not defined in this scope");
-					parameter = new Parameter(simBuilder, simBuilder.getCurrentParserToken(), identifier);
+					parameter = new Parameter(simBuilder, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
@@ -336,7 +335,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @param prtected if true, update the protected list
 	private static void expectHiddenProtectedList(final SimulaBuilder simBuilder, final ClassDeclaration cls, final boolean hidden, final boolean prtected) {
 		do {
-			String identifier = Parse.expectIdentifier(simBuilder).edText();
+			Identifier identifier = Parse.expectIdentifier(simBuilder);
 			if (hidden)
 				cls.hiddenList.add(new HiddenSpecification(simBuilder, cls, identifier));
 			if (prtected)
@@ -560,7 +559,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// Utility: Search Declaration-list for a procedure named 'ident'
 	/// @param ident argument
 	/// @return a ProcedureDeclaration when it was found, otherwise null
-	ProcedureDeclaration findLocalProcedure(final String ident) {
+	ProcedureDeclaration findLocalProcedure(final Identifier ident) {
 		for (Declaration decl : declarationList)
 			if (Util.equals(ident, decl.identifier)) {
 				if (decl instanceof ProcedureDeclaration proc)
@@ -576,7 +575,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// Find Remote Attribute's Meaning.
 	/// @param ident attribute identifier
 	/// @return the resulting Meaning
-	public Meaning findRemoteAttributeMeaning(final String ident) {
+	public Meaning findRemoteAttributeMeaning(final Identifier ident) {
 		boolean behindProtected = false;
 		ClassDeclaration scope = this;
 		Declaration decl = scope.findLocalAttribute(ident);
@@ -1446,7 +1445,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		oupt.writeObjectList(statements);
 		
 		// *** ClassDeclaration
-		oupt.writeString(prefix);
+		oupt.writeIdentifier(prefix);
 		oupt.writeBoolean(detachUsed);
 		oupt.writeObjectList(parameterList);
 		oupt.writeObjectList(virtualSpecList);
@@ -1462,7 +1461,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
 	public static ClassDeclaration readObject(AttributeInputStream inpt) throws IOException {
-		String identifier = (String) inpt.readString();
+		Identifier identifier = inpt.readIdentifier();
 		ClassDeclaration cls = new ClassDeclaration(null, identifier);
 		Util.TRACE_INPUT("BEGIN Read ClassDeclaration: " + identifier + ", Declared in: " + cls.declaredIn);
 		cls.declarationKind = ObjectKind.Class;
@@ -1487,7 +1486,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		cls.statements = (ObjectList<Statement>) inpt.readObjectList();
 		
 		// *** ClassDeclaration
-		cls.prefix = inpt.readString();
+		cls.prefix = inpt.readIdentifier();
 		cls.detachUsed = inpt.readBoolean();
 		cls.parameterList = (ObjectList<Parameter>) inpt.readObjectList();
 		cls.virtualSpecList = (ObjectList<VirtualSpecification>) inpt.readObjectList();

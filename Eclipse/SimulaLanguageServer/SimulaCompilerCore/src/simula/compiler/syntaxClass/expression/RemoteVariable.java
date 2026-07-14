@@ -30,6 +30,7 @@ import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.token.Identifier;
 
 /// Remote Variable.
 /// 
@@ -117,12 +118,12 @@ public final class RemoteVariable extends Expression {
 				Util.semanticError(obj, "doRemoteChecking: Object Expression (" + obj + ") is not a ref() type rather " + objType);
 		} else if (qual.hasLocalClasses) {
 			if (Option.EXTENSIONS)
-				 Util.warning("Illegal remote access into object of class with local classes.");
+				 Util.warning(obj, "Illegal remote access into object of class with local classes.");
 			else Util.semanticError(obj, "Illegal remote access into object of class with local classes.");
 		}
 
 		if (attr instanceof VariableExpression var) {
-			String ident = var.identifier;
+			Identifier ident = var.identifier;
 			qual = objType.getQual();
 			if(qual!=null) remoteAttribute = qual.findRemoteAttributeMeaning(ident);
 			if (remoteAttribute == null) {
@@ -164,7 +165,7 @@ public final class RemoteVariable extends Expression {
 	private Type doRemoteTextChecking(final Expression obj, final Expression attr) {
 		Type result;
 		if (attr instanceof VariableExpression var) { // Covers FunctionDesignator and SubscriptedVariable since they are subclasses
-			String ident = var.identifier;
+			Identifier ident = var.identifier;
 			Meaning meaning = StandardClass.typeText.findMeaning(ident);
 //			IO.println("RemoteVatiable.doRemoteTextChecking: meaning=" + meaning.declaredAs.getClass().getSimpleName());
 			if (meaning.declaredAs instanceof UndefinedDeclaration) {
@@ -288,7 +289,7 @@ public final class RemoteVariable extends Expression {
 			for(Expression expr:variable.checkedParams)
 				expr.buildEvaluation(null,codeBuilder);
 
-		codeBuilder.invokestatic(RTS.CD.RTS_TXT, pro.identifier, pro.getMethodTypeDesc(beforeDot,variable.checkedParams));
+		codeBuilder.invokestatic(RTS.CD.RTS_TXT, pro.identifier.value, pro.getMethodTypeDesc(beforeDot,variable.checkedParams));
 		if(pro.type != null && backLink == null) {
 			codeBuilder.pop();
 		}

@@ -8,6 +8,8 @@ package simula;
 import java.io.File;
 import java.util.Properties;
 
+import simula.compiler.utilities.Util;
+
 /// Compile Time Options.
 /// 
 /// Link to GitHub: <a href=

@@ -112,7 +112,7 @@ public class LabelList {
 		if(n > 0) {
 			for(int i=n-1;i>=0;i--) {
 				LabelDeclaration lab = declaredLabels.get(i);
-				if(lab.identifier.equalsIgnoreCase(ident)) return lab;
+				if(lab.identifier.value.equalsIgnoreCase(ident)) return lab;
 			}
 		}
 		return null;
