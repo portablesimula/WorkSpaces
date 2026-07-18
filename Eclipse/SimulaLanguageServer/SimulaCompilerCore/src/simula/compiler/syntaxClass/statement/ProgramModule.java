@@ -28,6 +28,7 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.lsp.compiler.DocumentManager;
 import simula.token.Identifier;
 import simula.token.LexToken;
 
@@ -76,8 +77,8 @@ public final class ProgramModule extends Statement {
 	/// Returns the relative file name.
 	/// @return the relative file name
 	public String getRelativeAttributeFileName() {
-		if(mainModule.declarationKind==ObjectKind.Class) return(CoreGlobal.packetName+"/CLASS.AF");
-		if(mainModule.declarationKind==ObjectKind.Procedure) return(CoreGlobal.packetName+"/PROCEDURE.AF");
+		if(mainModule.declarationKind==ObjectKind.Class) return(Option.packetName+"/CLASS.AF");
+		if(mainModule.declarationKind==ObjectKind.Procedure) return(Option.packetName+"/PROCEDURE.AF");
 		else return(null);
 	}
 	  
@@ -106,31 +107,23 @@ public final class ProgramModule extends Statement {
 			     .setClassDeclaration(StandardClass.Printfile);
 			CoreGlobal.getCurrentScope().sourceBlockLevel=0;
 			
-			simBuilder.startTokenRange("ProgramModule.MayBeEXTERNAL", simBuilder.getCurrentParserToken());
-			
 			while(Parse.accept(simBuilder, KeyWord.EXTERNAL)) {
 //				externalHead = ExternalDeclaration.expectExternalDeclaration(simBuilder, StandardClass.BASICIO);		
 				Vector<SyntaxElement> external = ExternalDeclaration.expectExternalDeclaration(simBuilder);	
 				if(externalHead == null) externalHead = new Vector<SyntaxElement>();
 				externalHead.addAll(external);
 				Parse.expect(simBuilder, KeyWord.SEMICOLON);
-				simBuilder.doneTokenRange(external);
-				simBuilder.startTokenRange("ProgramModule.EXTERNAL+", simBuilder.getCurrentParserToken());
 			}
-			simBuilder.dropTokenRange();
 			
 			// Now: Looking for ( program | procedure-declaration | class-declaration )
 			
 			
-			simBuilder.startTokenRange("ProgramModule.MaybeClass", simBuilder.getCurrentParserToken());
 			Identifier mayBeClassIdent = Parse.acceptIdentifier(simBuilder);
 			if(mayBeClassIdent!=null) {
 				if(Parse.accept(simBuilder, KeyWord.CLASS)) {
 					mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, mayBeClassIdent);
 				}
 			    else {
-					simBuilder.dropTokenRange();
-					simBuilder.startTokenRange("ProgramModule.PROGRAM", simBuilder.getCurrentParserToken());
 			    	mainModule = doParseProgram(simBuilder);
 			    }
 			}
@@ -140,17 +133,12 @@ public final class ProgramModule extends Statement {
 			    if(Parse.accept(simBuilder, KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type);
 			    else mainModule = doParseProgram(simBuilder);
 			}
-			simBuilder.doneTokenRange(mainModule);
-			
 			
 			StandardClass.BASICIO.declarationList.add(mainModule);
 			
 			LexToken token = Parse.getCurrentParserToken(simBuilder);
 			if(token != null && token.keyWord != KeyWord.EOF) {
-//				simBuilder.startTokenRange("ProgramModule.TAIL",token);
-//				Comment dum = new Comment(simBuilder);
 				while(!simBuilder.eof()) simBuilder.getNextParserToken(); // consume tokens  (add it to 'current tree')
-//				simBuilder.doneTokenRange(dum);
 				
 				IO.println("NEW ProgramModule - NOTE: FINN EN ANNEN MÅTE Å GJØRE DETTE PÅ");
 				

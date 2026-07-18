@@ -108,7 +108,7 @@ public final class ConnectionBlock extends DeclarationScope {
 
 	@Override
 	public Meaning findMeaning(final Identifier identifier) {
-		if (classDeclaration == null && CoreGlobal.duringParsing)
+		if (classDeclaration == null && simBuilder.duringParsing)
 			return (null); // Still in Pass1(Parser)
 		Meaning result = null;
 		if (classDeclaration != null)

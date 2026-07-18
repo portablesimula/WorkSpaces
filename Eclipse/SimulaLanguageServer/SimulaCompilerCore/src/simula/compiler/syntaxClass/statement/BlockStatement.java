@@ -135,22 +135,6 @@ public final class BlockStatement extends Statement {
 		blockDeclaration.printTree(indent,head);
 	}
 	
-//	@Override public int firstLineNumber() {
-////		IO.println("BlockStatement.firstLineNumber: psiTree: "+getPsiTree());
-////		if(getPsiTree() != null) return getPsiTree().firstLineNumber();
-//		LexToken token = lexTokenRange.getFirstLexToken();
-//		if(token != null) return token.firstLineNumber();
-//		return -15;
-//	}
-//	
-//	@Override public int lastLineNumber() {
-////		IO.println("BlockStatement.lastLineNumber: psiTree: "+getPsiTree());
-////		if(getPsiTree() != null) return getPsiTree().lastLineNumber();
-//		LexToken token = lexTokenRange.getLastLexToken();
-//		if(token != null) return token.lastLineNumber();
-//		return -16;
-//	}
-
 	@Override
 	public String toString() {
 		return blockDeclaration.identifier.value;

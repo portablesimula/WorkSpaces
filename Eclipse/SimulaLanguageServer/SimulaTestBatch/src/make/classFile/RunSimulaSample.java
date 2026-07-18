@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import simula.compiler.SourceModule;
 import simula.Option;
-import simula.compiler.SimulaCompiler;
+import simula.compiler.REMOVE_SimulaCompiler;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.Util;
 
@@ -84,7 +84,7 @@ public final class RunSimulaSample {
 		try {
 			CoreGlobal.initiate();
 	    	new SourceModule(new File(fileName));
-			new SimulaCompiler(fileName).doCompile(CoreGlobal.currentModule.getSyntaxTree());
+			new REMOVE_SimulaCompiler(fileName).doCompile(CoreGlobal.currentModule.getSyntaxTree());
 		} catch (IOException e) {
 			Util.generalError("can't open " + fileName + ", reason: " + e);
 		}

@@ -1,14 +1,19 @@
 package simula.lsp.compiler;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import simula.Args;
+import simula.Option;
 import simula.SimTextDocumentContentChangeEvent;
 import simula.builder.SimulaBuilder;
 import simula.compiler.syntaxClass.statement.ProgramModule;
+import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.SimulaDiagnostic;
 import simula.compiler.utilities.Util;
+import simula.exception.EOTException;
 import simula.token.LexToken;
 
 /// Vi må lagre innholdet til dokumentene som er åpne i editoren.
@@ -19,41 +24,55 @@ import simula.token.LexToken;
 /// @author Google AI
 public class DocumentManager {
 
-	private String documentUri;
-	private int version;
-	public String sourceName;
-	public String sourceCode;
-	SimulaBuilder currentBuilder;
+	final public String documentUri;
+	final public File sourceFileDir;
+	final public int documentVersion;
+	final public String sourceName; // The source file name without .sim
+	final public String sourceCode;
+	public SimulaBuilder simBuilder;
 	
     // Nøkkelen er filens URI (f.eks. file:///path/to/file.txt)
 //    private final ConcurrentHashMap<String, SourceDocumentItem> openDocuments = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, DocumentManager> openDocuments = new ConcurrentHashMap<>();
 
-    public DocumentManager(String documentUri, int version, String sourceCode) {
+    public DocumentManager(String documentUri, int documentVersion, String sourceCode) {
     	this.documentUri = documentUri;
-    	this.version = version;
+    	this.sourceFileDir = new File(documentUri).getParentFile();
+    	this.documentVersion = documentVersion;
     	this.sourceCode = sourceCode;
-    	this.sourceName = Util.getBaseName(documentUri);
+    	this.sourceName = getSourceName(documentUri);
+    	
+    	CoreGlobal.sourceFileName = documentUri;
+    }
+    
+    private String getSourceName(String documentUri) {
+    	String sourceName = Util.getBaseName(documentUri);
+		if (!Util.isJavaIdentifier(sourceName)) {
+			String prevName = sourceName;
+			sourceName = Util.makeJavaIdentifier(sourceName);
+			Util.generalWarning("The source file name '" + prevName + "' is not a legal class identifier. Modified to: " + this.sourceName);
+		}
+    	return sourceName;
     }
 
     /// Debug Utility
-    public static DocumentManager GetDocumentManager(String documentUri) {
+    public static DocumentManager getDocumentManager(String documentUri)  {
     	return openDocuments.get(documentUri);
     }
 
 	/// Get the text document's Token List.
 	public List<LexToken> getTokenList() {
-		return currentBuilder.tokenList;
+		return simBuilder.tokenList;
 	}
 
 	/// Get the text document's getDiagnostic List.
 	public List<SimulaDiagnostic> getDiagnostics() {
-		return currentBuilder.diagnostics;
+		return simBuilder.diagnostics;
 	}
 
 	/// Get the text document's SyntaxTree.
 	public ProgramModule getSyntaxTree() {
-		return currentBuilder.syntaxTree;
+		return simBuilder.syntaxTree;
 	}
 
 //	/// Set the text document's SyntaxTree.
@@ -63,11 +82,11 @@ public class DocumentManager {
 
 	/// Get the text document's diagnostics.
 	public List<SimulaDiagnostic> getDiagnostis() {
-		return currentBuilder.diagnostics;
+		return simBuilder.diagnostics;
 	}
 	
 //	public void addDiagnostic(SimulaDiagnostic diagnostic) {
-//		currentBuilder.diagnostics.add(diagnostic);
+//		simBuilder.diagnostics.add(diagnostic);
 //	}
 
 //	/// Set the text document's diagnostics.
@@ -207,15 +226,46 @@ public class DocumentManager {
 	public void tryCreateBuilder() {
     	LOG.info("DocumentManager.tryCreateBuilder: BEGIN");
 		String sourceText = this.getText();
+		SimulaBuilder newSimBuilder = new SimulaBuilder(this);
 		// TRY BUILD SYNTAX TREE ...
 		try {
-			SimulaBuilder simBuilder = new SimulaBuilder(this);
+			newSimBuilder.doBuilding();
     		IO.println("DocumentManager.tryCreateBuilder: " + sourceText.replace("\n", "\\n").replace("\r", "\\r"));
-    		currentBuilder = simBuilder;
+    		simBuilder = newSimBuilder;
 		} catch (Exception e) {
 			IO.println("DocumentManager.tryCreateBuilder: GOT EXCEPTION: " + e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+	// ***************************************************************
+	// *** Semantic Checker
+	// ***************************************************************
+	public void semanticChacker() {
+		ProgramModule  programModule = this.getSyntaxTree();
+		if (Option.internal.TRACING)
+			Util.println("BEGIN Semantic Checker");
+		CoreGlobal.duringChecking = true;
+		programModule.doChecking();
+		if (Option.internal.TRACING) {
+			Util.println("END Semantic Checker: \"" + programModule + "\"");
+			if (Option.internal.TRACE_CHECKER_OUTPUT && programModule != null)
+				programModule.print(0);
+		}
+		if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + CoreGlobal.sourceName + ": Semantic Checker completed");
+		CoreGlobal.duringChecking = false;
+		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
+			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");
+			programModule.printTree(1,this);
+		}
+		
+		if (Util.nError > 0) {
+			String msg="Compiler terminate " + CoreGlobal.sourceName + " after " + Util.nError + " errors during semantic checking";
+			Util.println(msg);
+//			Thread.dumpStack();
+			throw new RuntimeException(msg);
+		}
+		
 	}
 
 }

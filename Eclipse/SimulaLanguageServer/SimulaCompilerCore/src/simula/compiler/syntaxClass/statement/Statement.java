@@ -104,9 +104,7 @@ public abstract class Statement extends SyntaxElement {
 		return (statement);
 	}
 
-	/// Invariant: All Statement handlers starts with 'startTokenRange' and ends with 'doneTokenRange'.
 	private static Statement acceptUnlabeledStatement(SimulaBuilder simBuilder) {
-		simBuilder.startTokenRange("UnlabeledStatement: ");
 		LexToken simToken = Parse.getCurrentParserToken(simBuilder);
 		if(Option.TRACE_ACCEPT_STATEMENT > 1) IO.println("\nStatement.acceptUnlabeledStatement: "+simToken);
 		Statement statement = null;
@@ -118,9 +116,6 @@ public abstract class Statement extends SyntaxElement {
 				// case KeyWord.BEGIN: PsiParse.nextToken(); return (new MaybeBlockDeclaration(null).expectMaybeBlock(lineNumber));
 				if(Option.TRACE_ACCEPT_STATEMENT > 1)
 					IO.println("\nStatement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
-					
-//				simBuilder.getRoot().printPsiTree("============================ startTokenRange: ACCEPT UnlabeledStatement");
-//				Util.STOP();
 
 				MaybeBlockDeclaration block = new MaybeBlockDeclaration(simBuilder, null);
 				block.expectMaybeBlock(simBuilder);
@@ -199,9 +194,6 @@ public abstract class Statement extends SyntaxElement {
 		        statement = DummyStatement.ofImplicit(simBuilder);
 			break;
 		}
-		if(statement != null)
-			 simBuilder.doneTokenRange(statement);
-		else simBuilder.dropTokenRange();
 		return statement;
 	}
 

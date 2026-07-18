@@ -1,410 +1,132 @@
-/// (CC) This work is licensed under a Creative Commons
-/// Attribution 4.0 International License.
-/// 
-/// You find a copy of the License on the following
-/// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
-import java.nio.charset.Charset;
 import java.util.Vector;
+
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
 import simula.Option;
+import simula.builder.SimulaBuilder;
+import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.transform.ClassFileTransform;
-import simula.compiler.utilities.CoreGlobal;
+import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.ObjectKind;
-import simula.compiler.utilities.SimulaClassLoader;
 import simula.compiler.utilities.Util;
+import simula.exception.EOTException;
+import simula.lsp.compiler.DocumentManager;
 
-/// The Simula Compiler.
-/// 
-/// The compiler consists of the following steps:
-///
-/// 	- Initiate global variables.
-/// 	- Do Parsing: Read source file through the scanner building program syntax tree.
-/// 	- Do Checking: Traverse the syntax tree performing semantic checking.
-/// 	- Do Coding dependent on the CompilerMode:
-/// 		-  CompilerMode = viaJavaSource:
-/// 			- Do JavaCoding: Traverse the syntax tree generating .java code.
-/// 			- Call Java Compiler to generate .class files.
-/// 			- Do ByteCodeEngineering updating .class files.
-/// 			- Create executable .jar of program.
-/// 			- Execute .jar file.
-/// 		-  CompilerMode = directClassFiles:
-/// 			- Traverse the syntax tree generating ClassFile code.
-/// 			- Create executable .jar of program.
-/// 			- Execute .jar file.
-/// 		-  CompilerMode = simulaClassLoader:
-/// 			- Traverse the syntax tree generate and load ClassFile code.
-/// 			- Run the loaded program
-/// 
-/// Link to GitHub: <a href=
-/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/SimulaCompiler.java"><b>Source File</b></a>.
-/// 
-/// @author Øystein Myhre Andersen
-public final class SimulaCompiler {
+public class SimulaCompiler {
+	DocumentManager documentManager;
 	
-	/// The Reader in case of SimulaEditor.
-	private Reader reader;
-
-	/// The ProgramModule.
-	private ProgramModule programModule;
-	
-	/// The output .jar file
-	private File outputJarFile;
-
-//	/// Create a new SimulaCompiler.
-//	/// @param sourceFileName the source file name
-//	public SimulaCompiler(final String sourceFileName) {
-//		this(sourceFileName, null);
-//	}
-
-	/// Create a new SimulaCompiler.
-	/// @param inputFileName the source file name
-	/// @param reader        Reader in case of SimulaEditor
-	public SimulaCompiler(final String inputFileName, final Reader reader) {
-		IO.println("NEW SimulaCompiler(final String sourceFileName, final Reader reader)");
-		CoreGlobal.initiate();
-		this.reader = reader;
-		if(Option.verbose) Util.println("Input Source File: " + inputFileName);
-		if (!inputFileName.toLowerCase().endsWith(".sim"))
-			Util.generalWarning("Simula source file should, by convention be extended by .sim: " + inputFileName);
-
-		File inputFile = new File(inputFileName);
-
-		CoreGlobal.sourceFileName = inputFile.getName();
-		CoreGlobal.sourceName = Util.getBaseName(inputFileName);
-		CoreGlobal.sourceFileDir = inputFile.getParentFile();
-		if(CoreGlobal.sourceFileDir == null) CoreGlobal.sourceFileDir = new File(System.getProperty("user.dir"));
-		
-		if (Option.internal.TRACING)
-			Util.println("Compiling: \"" + inputFileName + "\"");
-
-		if (CoreGlobal.outputDir == null) {
-			CoreGlobal.trySetOutputDir(new File(CoreGlobal.sourceFileDir, "bin"));
-		}
-
-		// Get Temp Directory:
-		CoreGlobal.simulaTempDir = CoreGlobal.getTempFileDir("simula/");
-		deleteTempFiles(CoreGlobal.simulaTempDir);
-
-		// Create Temp .java-Files Directory:
-		File javatmp = Option.internal.keepJava;
-		if (javatmp == null)
-			javatmp = CoreGlobal.simulaTempDir;
-		File tmpJavaDir = new File(javatmp, "src/" + CoreGlobal.packetName);
-		tmpJavaDir.mkdirs();
-		CoreGlobal.tempJavaFileDir = tmpJavaDir;
-
-		// Create Temp .class-Files Directory:
-		File tmpClassDir = new File(CoreGlobal.simulaTempDir, "classes");
-		tmpClassDir.mkdirs();
-		CoreGlobal.tempClassFileDir = tmpClassDir;
-
-		File desktop = new File(System.getProperty("user.home"), "Desktop");
-		if (Option.verbose) {
-			// https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html
-			Util.println("------------  SIMULA ENVIRONMENT SUMMARY  ------------");
-			Util.println("Simula Properties    " + CoreGlobal.simulaPropertiesFile);
-			Util.println("Simula Home          " + CoreGlobal.simulaHome);
-			Util.println("Simula Home (prev)   " + CoreGlobal.getSimulaProperty("simula.home", null));
-			Util.println("Java Home            " + System.getProperty("java.home"));
-			Util.println("User Home            " + System.getProperty("user.home"));
-			Util.println("Working Directory    " + System.getProperty("user.dir"));
-			String s = (desktop.exists()) ? "true " : "false";
-			Util.println("Desktop Exists=" + s + " " + desktop.toString());
-			Util.println("Java Class Path      " + System.getProperty("java.class.path"));
-			Util.println("Java Class Version   " + System.getProperty("java.class.version"));
-			Util.println("Java Version         " + System.getProperty("java.version"));
-			Util.println("Java VM Spec Version " + System.getProperty("java.vm.specification.version"));
-			Util.println("Java Vendor          " + System.getProperty("java.vendor"));
-			Util.println("OS name              " + System.getProperty("os.name"));
-			Util.println("OS architecture      " + System.getProperty("os.arch"));
-			Util.println("OS version           " + System.getProperty("os.version"));
-			Util.println("file.encoding        " + System.getProperty("file.encoding"));
-			Util.println("defaultCharset       " + Charset.defaultCharset());
-			Util.println("compilerMode         " + Option.compilerMode);
-
-			// This will list the current system properties
-			// System.getProperties().list(System.out);
-
-		}
-	}
-	public SimulaCompiler(final String sourceFileName) {
-		IO.println("NEW SimulaCompiler(final String sourceFileName)");
-//		Global.initiate();
-//		this.reader = reader;
-		
-		if(Option.verbose) Util.println("Input Source File: " + sourceFileName);
-		if (!sourceFileName.toLowerCase().endsWith(".sim"))
-			Util.generalWarning("Simula source file should, by convention be extended by .sim: " + sourceFileName);
-
-		File inputFile = new File(sourceFileName);
-
-		CoreGlobal.sourceFileName = inputFile.getName();
-		CoreGlobal.sourceName = Util.getBaseName(sourceFileName);
-		CoreGlobal.sourceFileDir = inputFile.getParentFile();
-		if(CoreGlobal.sourceFileDir == null) CoreGlobal.sourceFileDir = new File(System.getProperty("user.dir"));
-		
-		if (Option.internal.TRACING)
-			Util.println("Compiling: \"" + sourceFileName + "\"");
-
-		if (CoreGlobal.outputDir == null) {
-			CoreGlobal.trySetOutputDir(new File(CoreGlobal.sourceFileDir, "bin"));
-		}
-
-		// Get Temp Directory:
-		CoreGlobal.simulaTempDir = CoreGlobal.getTempFileDir("simula/");
-		deleteTempFiles(CoreGlobal.simulaTempDir);
-
-		// Create Temp .java-Files Directory:
-		File javatmp = Option.internal.keepJava;
-		if (javatmp == null)
-			javatmp = CoreGlobal.simulaTempDir;
-		File tmpJavaDir = new File(javatmp, "src/" + CoreGlobal.packetName);
-		tmpJavaDir.mkdirs();
-		CoreGlobal.tempJavaFileDir = tmpJavaDir;
-
-		// Create Temp .class-Files Directory:
-		File tmpClassDir = new File(CoreGlobal.simulaTempDir, "classes");
-		tmpClassDir.mkdirs();
-		CoreGlobal.tempClassFileDir = tmpClassDir;
-
-		File desktop = new File(System.getProperty("user.home"), "Desktop");
-		if (Option.verbose) {
-			// https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html
-			Util.println("------------  SIMULA ENVIRONMENT SUMMARY  ------------");
-			Util.println("Simula Properties    " + CoreGlobal.simulaPropertiesFile);
-			Util.println("Simula Home          " + CoreGlobal.simulaHome);
-			Util.println("Simula Home (prev)   " + CoreGlobal.getSimulaProperty("simula.home", null));
-			Util.println("Java Home            " + System.getProperty("java.home"));
-			Util.println("User Home            " + System.getProperty("user.home"));
-			Util.println("Working Directory    " + System.getProperty("user.dir"));
-			String s = (desktop.exists()) ? "true " : "false";
-			Util.println("Desktop Exists=" + s + " " + desktop.toString());
-			Util.println("Java Class Path      " + System.getProperty("java.class.path"));
-			Util.println("Java Class Version   " + System.getProperty("java.class.version"));
-			Util.println("Java Version         " + System.getProperty("java.version"));
-			Util.println("Java VM Spec Version " + System.getProperty("java.vm.specification.version"));
-			Util.println("Java Vendor          " + System.getProperty("java.vendor"));
-			Util.println("OS name              " + System.getProperty("os.name"));
-			Util.println("OS architecture      " + System.getProperty("os.arch"));
-			Util.println("OS version           " + System.getProperty("os.version"));
-			Util.println("file.encoding        " + System.getProperty("file.encoding"));
-			Util.println("defaultCharset       " + Charset.defaultCharset());
-			Util.println("compilerMode         " + Option.compilerMode);
-
-			// This will list the current system properties
-			// System.getProperties().list(System.out);
-
-		}
+	public SimulaCompiler(DocumentManager documentManager) {
+		this.documentManager = documentManager;
+		StandardClass.INITIATE();
 	}
 
-	/// List temp class file directory tree
-	/// @param dir tempClassFileDir
-	private void list(final File dir) {
-		try {
-			Util.println("------------ BEGIN LIST tempClassFileDir: " + dir + "  ------------");
-			list("", dir);
-			Util.println("------------ ENDOF LIST tempClassFileDir: " + dir + "  ------------");
-		} catch (Exception e) {
-			Util.IERR("SimulaCompiler.listFiles FAILED: ", e);
-			e.printStackTrace();
-		}
+	// ***************************************************************
+	// *** Scanning and Parsing
+	// ***************************************************************
+	public boolean doParsing(SimulaBuilder simBuilder) {
+		boolean builderTerminateNormally = false;
+		simBuilder.duringParsing = true;
+        // Do the actual Building
+		simBuilder.getNextParserToken();
+		simBuilder.syntaxTree = new ProgramModule(simBuilder);
+        try {
+        	simBuilder.syntaxTree.doBuild();
+        	builderTerminateNormally = true;
+        } catch(EOTException e) {
+			System.err.println("SimulaBuilder: GOT EXCEPTION: " + e.getMessage());
+//			e.printStackTrace();
+			simBuilder.lexer.flush();
+        }
+
+    	LOG.info("SimulaBuilder: syntaxTree, tokenList and diagnostics DONE");
+    	IO.println("SimulaBuilder: this.syntaxTree: "+simBuilder.syntaxTree); // Root of Syntax Tree
+    	IO.println("SimulaBuilder: this.diagnostics: "+simBuilder.diagnostics);
+    	IO.println("SimulaBuilder: this.tokenList: "+simBuilder.tokenList);
+		
+    	simBuilder.printAll(" AFTER NEW SimulaBuilder: ");
+		
+    	return builderTerminateNormally;
 	}
 
-	/// List a directory tree.
-	/// @param indent the indentation
-	/// @param dir the directory
-	private void list(String indent, final File dir) {
-		try {
-			File[] elt = dir.listFiles();
-			if (elt == null || elt.length == 0) {
-				Util.println("Empty Directory: " + dir);
-				return;
-			}
-			for (File f : elt) {
-				Util.println(indent + "- " + f);
-				if (f.isDirectory())
-					list(indent + "   ", f);
-			}
-		} catch (Exception e) {
-			Util.IERR("SimulaCompiler.listFiles FAILED: ", e);
-			e.printStackTrace();
-		}
-	}
-
-	/// Delete temporary .class files.
-	/// @param dir temporary .class directory
-	private void deleteTempFiles(final File dir) {
-		try {
-			File[] elt = dir.listFiles();
-			if (elt == null)
-				return;
-			for (File f : elt) {
-				if (Option.internal.DEBUGGING) {
-					if (f.isFile())
-						Util.println("Delete: " + f);
-				}
-				if (f.isDirectory())
-					deleteTempFiles(f);
-				f.delete();
-			}
-		} catch (Exception e) {
-			Util.IERR("SimulaCompiler.deleteFiles FAILED: ", e);
-			e.printStackTrace();
-		}
-	}
-
-	/// Do Compile
-	/// @throws IOException when it fails
-//	public void doCompile() throws IOException {
-	public void doCompile() throws IOException {
-		IO.println("SimulaTestBatch: SimulaCompiler.doCompile");
-		throw new IOException("ZZZZZZ");
-	}
-	
-	/// Do Compile
-	/// @throws IOException when it fails
-//	public void doCompile() throws IOException {
-	public void doCompile(ProgramModule programModule) throws IOException {
-		this.programModule = programModule;
-		if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + CoreGlobal.sourceName + ": Start Simula Compiler");
-		Util.nError = 0;
-		if (!Util.isJavaIdentifier(CoreGlobal.sourceName)) {
-			String sourceName = CoreGlobal.sourceName;
-			CoreGlobal.sourceName = Util.makeJavaIdentifier(sourceName);
-			Util.warning(programModule, "The source file name '" + sourceName + "' is not a legal class identifier. Modified to: "
-					+ CoreGlobal.sourceName);
-		}
-		
-		if(CoreGlobal.jarFileBuilder == null) {
-	   		if(Option.compilerMode != Option.CompilerMode.simulaClassLoader) {
-				CoreGlobal.jarFileBuilder = new JarFileBuilder();
-			}
-		}
-		
-		// ***************************************************************
-		// *** Scanning and Parsing
-		// ***************************************************************
-		CoreGlobal.javaSourceFileCoders = new Vector<JavaSourceFileCoder>();
-//		Parse.initiateParser(reader);
-		
-//		Util.IERR("DETTE MÅ RETTES");
-//		programModule = new ProgramModule(null);
-//		Util.IERR("DETTE MÅ RETTES");
-//		Global.programModule = programModule;
-		
-//		programModule = Global.currentModule.programModule;
-		
-//		IO.println("SimulaCompiler.doCompile: mainModule"+programModule.mainModule);
-//		IO.println("SimulaCompiler.doCompile: mainModule"+programModule.mainModule.declaredIn);
-//		IO.println("SimulaCompiler.doCompile: mainModule"+programModule.mainModule.declaredIn.declaredIn);
-//		Option.internal.TRACE_FIND_MEANING = 1;
-//		Meaning meaning = programModule.mainModule.findMeaning("sysin");
-//		IO.println("SimulaCompiler.doCompile: meaning="+meaning);
-//		Option.internal.TRACE_FIND_MEANING = 0;
-//		Util.STOP();
-
-		
-		if (Option.internal.TRACING) {
-			Util.println("END Parsing, resulting Program: \"" + programModule + "\"");
-			if (Option.internal.TRACE_PARSE && programModule != null)
-				programModule.print(0);
-		}
-		if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + CoreGlobal.sourceName + ": Parsing completed");
-//		Parse.close();
-		CoreGlobal.duringParsing = false;
-		if(Option.internal.PRINT_SYNTAX_TREE > 1) {
-			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Parsing ================");
-			programModule.printTree(1,this);
-		}
-		if (Util.nError > 0) {
-			String msg="Compiler terminate " + CoreGlobal.sourceName + " after " + Util.nError + " errors during parsing";
-			Util.println(msg);
-			throw new RuntimeException(msg);
-		}
-		
-		// ***************************************************************
-		// *** Generate .java files or ClassFileBuilder -> jarFile
-		// ***************************************************************
-   		if(Option.compilerMode == Option.CompilerMode.simulaClassLoader) {
-			if (!programModule.isExecutable()) {
-				// Separate Compilation
-				if(CoreGlobal.jarFileBuilder == null)
-					CoreGlobal.jarFileBuilder = new JarFileBuilder();
-				CoreGlobal.jarFileBuilder.open(programModule);
-			} else {
-				CoreGlobal.simulaClassLoader = new SimulaClassLoader();
-				if(! Option.internal.INLINE_TESTING)
-					JarFileBuilder.loadRuntimeSystem();
-				JarFileBuilder.loadIncludeQueue();
-			}
-		} else {
-			CoreGlobal.jarFileBuilder.open(programModule);
-			CoreGlobal.jarFileBuilder.addIncludeQueue();
-		}
-		
-		if (Option.internal.TRACING)
-			Util.println("BEGIN Possible Generate AttributeFile");
-		
-		// ***************************************************************
-		// *** Semantic Checker
-		// ***************************************************************
+	// ***************************************************************
+	// *** Semantic Checker
+	// ***************************************************************
+	public void doChecking(SimulaBuilder simBuilder) {
 		if (Option.internal.TRACING)
 			Util.println("BEGIN Semantic Checker");
-		CoreGlobal.duringChecking = true;
+		simBuilder.duringParsing = false;
+		simBuilder.duringChecking = true;
+		StandardClass.ENVIRONMENT.doChecking();
+		ProgramModule programModule = simBuilder.syntaxTree;
 		programModule.doChecking();
+		
+//		programModule.doChecking();
 		if (Option.internal.TRACING) {
 			Util.println("END Semantic Checker: \"" + programModule + "\"");
 			if (Option.internal.TRACE_CHECKER_OUTPUT && programModule != null)
 				programModule.print(0);
 		}
-		if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + CoreGlobal.sourceName + ": Semantic Checker completed");
-		CoreGlobal.duringChecking = false;
+		if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + simBuilder.documentManager.sourceName + ": Semantic Checker completed");
+		simBuilder.duringChecking = false;
 		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
 			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");
 			programModule.printTree(1,this);
 		}
 		
 		if (Util.nError > 0) {
-			String msg="Compiler terminate " + CoreGlobal.sourceName + " after " + Util.nError + " errors during semantic checking";
+			String msg="Compiler terminate " + simBuilder.documentManager.sourceName + " after " + Util.nError + " errors during semantic checking";
 			Util.println(msg);
 //			Thread.dumpStack();
 			throw new RuntimeException(msg);
 		}
-		
+
+	}
+
+	// ***************************************************************
+	// *** Code Generation
+	// ***************************************************************
+	public void doCodeGeneration(SimulaBuilder simBuilder) throws IOException {
+		ProgramModule  programModule = documentManager.getSyntaxTree();
+		simBuilder.jarFileBuilder = new JarFileBuilder();
+		try {
+			simBuilder.jarFileBuilder.open(programModule);
+			simBuilder.jarFileBuilder.addIncludeQueue();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (Option.compilerMode != Option.CompilerMode.viaJavaSource) {
 			if (Option.internal.TRACING)
 				Util.println("BEGIN Generate .class Output Code");
 			// *** Generate .class files
 			programModule.createJavaClassFile();
-			if(Option.verbose) Util.println(CoreGlobal.sourceName + ": Class Files Generated - Directly");
+			if(Option.verbose) Util.println(simBuilder.documentManager.sourceName + ": Class Files Generated - Directly");
 		} else {
 			if (Option.internal.TRACING)
 				Util.println("BEGIN Generate .java Output Code");
 			// *** Generate .java intermediate code
 			programModule.doJavaCoding();
-			if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + CoreGlobal.sourceName + ": Java Source Files Generated");
+			if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + simBuilder.documentManager.sourceName + ": Java Source Files Generated");
 			if (Option.internal.TRACING) {
 				Util.println("END Generate .java Output Code");
-				for (JavaSourceFileCoder javaClass : CoreGlobal.javaSourceFileCoders)
+				for (JavaSourceFileCoder javaClass : simBuilder.javaSourceFileCoders)
 					Util.println(javaClass.javaOutputFile.toString());
 			}
 		}
 		if (Util.nError > 0) {
-			String msg="Compiler terminate " + CoreGlobal.sourceName + " after " + Util.nError + " errors during code generation";
+			String msg="Compiler terminate " + simBuilder.documentManager.sourceName + " after " + Util.nError + " errors during code generation";
 			Util.println(msg);
 			throw new RuntimeException(msg);
 		}
 
 		if (Option.verbose)
-			fileSummary();
+			fileSummary(simBuilder);
 		if (Option.internal.DEBUGGING) {
 			Util.println("------------  CLASSPATH DETAILS  ------------");
 			Util.println("Java PathSeparator " + System.getProperty("path.separator"));
@@ -417,39 +139,32 @@ public final class SimulaCompiler {
 			// *** POSSIBLE -- DO BYTE_CODE_ENGINEERING
 			// *** POSSIBLE - LIST GENERATED .class FILES
 			// ***************************************************************
-			doCallJavaCompiler();
-			doByteCodeEngineering();
+			doCallJavaCompiler(simBuilder);
+			doByteCodeEngineering(simBuilder);
 			if(Option.internal.LIST_GENERATED_CLASS_FILES)
-				listGeneratedClassFiles();
+				listGeneratedClassFiles(simBuilder);
 		}
 		AttributeFileIO.writeAttributeFile(programModule);
 
 		// ***************************************************************
 		// *** CRERATE .jar FILE INLINE
 		// ***************************************************************
-		String jarFile = null;
-   		if(Option.compilerMode == Option.CompilerMode.simulaClassLoader) {
-			if(CoreGlobal.jarFileBuilder != null) {
-				if(Option.compilerMode == Option.CompilerMode.viaJavaSource) {
-					CoreGlobal.jarFileBuilder.addTempClassFiles();
-				}
-				outputJarFile = CoreGlobal.jarFileBuilder.close();
-				jarFile = outputJarFile.toString(); 				
-			}
-		} else {
+//		String jarFile = null;
 			if(Option.compilerMode == Option.CompilerMode.viaJavaSource) {
-				CoreGlobal.jarFileBuilder.addTempClassFiles();
+				simBuilder.jarFileBuilder.addTempClassFiles();
 			}
-			outputJarFile = CoreGlobal.jarFileBuilder.close();
-			jarFile = outputJarFile.toString();
-		}
+			simBuilder.generatedJarFile = simBuilder.jarFileBuilder.close();
 		
 		if (Option.verbose) printSummary();
+		Util.IERR("NOT IMPL");
+	}
 
-		// ***************************************************************
-		// *** EXECUTE .jar FILE
-		// ***************************************************************
+	// ***************************************************************
+	// *** Run generated .jar File
+	// ***************************************************************
+	public void doRun(SimulaBuilder simBuilder) throws IOException {
 		Vector<String> cmds = new Vector<String>();
+		String jarFile = simBuilder.generatedJarFile.toString();
 		cmds.add("java");
    		if(Option.compilerMode != Option.CompilerMode.simulaClassLoader) {
 			if(Option.editorUIScale != null  && !Option.editorUIScale.equals("1")) {
@@ -478,25 +193,36 @@ public final class SimulaCompiler {
 		if (Option.internal.SOURCE_FILE != null) {
 			cmds.add(Option.internal.SOURCE_FILE);
 		}
-   		if(Option.compilerMode == Option.CompilerMode.simulaClassLoader) {
-			if(CoreGlobal.simulaClassLoader != null) {
-				String name = CoreGlobal.packetName + '.' + programModule.getIdentifier();
-				CoreGlobal.simulaClassLoader.runClass(name, cmds);
-			} else {
-				if(CoreGlobal.jarFileBuilder != null) {
-	    			doExecuteJarFile(jarFile,cmds);    					
-				} else
-				Util.IERR();
-			}
-		} else {
-			doExecuteJarFile(jarFile,cmds);
-		}
+		doExecuteJarFile(jarFile,cmds);
 		
 		if (Option.internal.DEBUGGING)
 			Util.println("------------  CLEANING UP TEMP FILES  ------------");
-		deleteTempFiles(CoreGlobal.simulaTempDir);
+		deleteTempFiles(simBuilder.simulaTempDir);
+		Util.IERR("NOT IMPL");
 	}
 
+
+	/// Delete temporary .class files.
+	/// @param dir temporary .class directory
+	private void deleteTempFiles(final File dir) {
+		try {
+			File[] elt = dir.listFiles();
+			if (elt == null)
+				return;
+			for (File f : elt) {
+				if (Option.internal.DEBUGGING) {
+					if (f.isFile())
+						Util.println("Delete: " + f);
+				}
+				if (f.isDirectory())
+					deleteTempFiles(f);
+				f.delete();
+			}
+		} catch (Exception e) {
+			Util.IERR("SimulaCompiler.deleteFiles FAILED: ", e);
+			e.printStackTrace();
+		}
+	}
 
 	/// Execute JarFile.
 	/// @param jarFile a jarFile
@@ -526,9 +252,9 @@ public final class SimulaCompiler {
 
 	/// Call Java compiler 'javac'
 	/// @throws IOException if something went wrong.
-	private void doCallJavaCompiler() throws IOException {
-		String classPath = CoreGlobal.simulaRtsLib.toString();
-		File rtsLib = new File(CoreGlobal.simulaRtsLib, "simula/runtime");
+	private void doCallJavaCompiler(SimulaBuilder simBuilder) throws IOException {
+		String classPath = simBuilder.simulaRtsLib.toString();
+		File rtsLib = new File(simBuilder.simulaRtsLib, "simula/runtime");
 		boolean rtsExist = rtsLib.exists();
 		boolean rtsCread = rtsLib.canRead();
 		if (!(rtsExist && rtsCread)) {
@@ -549,7 +275,7 @@ public final class SimulaCompiler {
 			}
 		}
 		String pathSeparator = System.getProperty("path.separator");
-		for (File jarFile : CoreGlobal.externalJarFiles) {
+		for (File jarFile : simBuilder.externalJarFiles) {
 			if (Option.internal.DEBUGGING) {
 				boolean exist = jarFile.exists();
 				boolean cread = jarFile.canRead();
@@ -574,11 +300,11 @@ public final class SimulaCompiler {
 			exitValue = callJavacCompiler(classPath);
 		if (Option.internal.DEBUGGING) {
 			Util.println("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
-			for (JavaSourceFileCoder javaClass : CoreGlobal.javaSourceFileCoders)
+			for (JavaSourceFileCoder javaClass : simBuilder.javaSourceFileCoders)
 				Util.println(javaClass.getClassOutputFileName());
-			list(CoreGlobal.tempClassFileDir);
+			list(simBuilder.tempClassFileDir);
 		}
-		if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + CoreGlobal.sourceName + ": Class Files Generated - From Java Source");
+		if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + simBuilder.documentManager.sourceName + ": Class Files Generated - From Java Source");
 		if (exitValue != 0) {
 			Util.generalError("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
 			Util.println("\nCompiler terminated after error(s) during Java Compilation");
@@ -586,12 +312,13 @@ public final class SimulaCompiler {
 		}
 	}
 
+
 	/// Call Java system compiler
 	/// @param compiler the Java compiler
 	/// @param classPath the classPath
 	/// @return return value from the Java compiler
 	/// @throws IOException if something went wrong
-	private int callJavaSystemCompiler(final JavaCompiler compiler, final String classPath) throws IOException {
+	private int callJavaSystemCompiler(final SimulaBuilder simBuilder, final JavaCompiler compiler, final String classPath) throws IOException {
 		Vector<String> arguments = new Vector<String>();
 		if (Option.internal.DEBUGGING) {
 			arguments.add("-version");
@@ -601,10 +328,10 @@ public final class SimulaCompiler {
 		arguments.add("-classpath");
 		arguments.add(classPath);
 		arguments.add("-d");
-		arguments.add(CoreGlobal.tempClassFileDir.toString()); // Specifies output directory.
+		arguments.add(simBuilder.tempClassFileDir.toString()); // Specifies output directory.
 		if (!Option.WARNINGS)
 			arguments.add("-nowarn");
-		for (JavaSourceFileCoder javaClass : CoreGlobal.javaSourceFileCoders)
+		for (JavaSourceFileCoder javaClass : simBuilder.javaSourceFileCoders)
 			arguments.add(javaClass.javaOutputFile.toString()); // Add .java Files
 		int nArg = arguments.size();
 		String[] args = new String[nArg];
@@ -623,7 +350,7 @@ public final class SimulaCompiler {
 	/// Call Java command line compiler.
 	/// @param classPath the classPath
 	/// @return return value from the Java compiler
-	private int callJavacCompiler(final String classPath) {
+	private int callJavacCompiler(final SimulaBuilder simBuilder, final String classPath) {
 		Vector<String> cmds = new Vector<String>();
 		cmds.add("javac");
 		if (Option.internal.DEBUGGING) {
@@ -634,42 +361,43 @@ public final class SimulaCompiler {
 		cmds.add("-classpath");
 		cmds.add(classPath);
 		cmds.add("-d");
-		cmds.add(CoreGlobal.tempClassFileDir.toString()); // Specifies output directory.
+		cmds.add(simBuilder.tempClassFileDir.toString()); // Specifies output directory.
 		if (!Option.WARNINGS)
 			cmds.add("-nowarn");
-		for (JavaSourceFileCoder javaClass : CoreGlobal.javaSourceFileCoders) {
+		for (JavaSourceFileCoder javaClass : simBuilder.javaSourceFileCoders) {
 			cmds.add(javaClass.javaOutputFile.toString()); // Add .java Files
 		}
 		int exitValue = Util.execute(cmds);
 		if (Option.internal.TRACING) {
 			Util.println("END Generate .class Output Code. Exit value=" + exitValue);
-			for (JavaSourceFileCoder javaClass : CoreGlobal.javaSourceFileCoders)
+			for (JavaSourceFileCoder javaClass : simBuilder.javaSourceFileCoders)
 				Util.println(javaClass.getClassOutputFileName());
 		}
 		return (exitValue);
 	}
 	
+	
 	/// Possible doByteCodeEngineering reintroducing labels and goto.
 	/// @throws IOException if something went wrong.
-	private void doByteCodeEngineering() throws IOException {
+	private void doByteCodeEngineering(final SimulaBuilder simBuilder) throws IOException {
 		if (Option.internal.keepJava == null) {
 			if (Option.internal.TRACE_BYTECODE_OUTPUT) {
 				Util.println("------------  LIST ByteCode Before Engineering  ------------");
-				for (JavaSourceFileCoder javaClass : CoreGlobal.javaSourceFileCoders) {
+				for (JavaSourceFileCoder javaClass : simBuilder.javaSourceFileCoders) {
 					String classFile = javaClass.getClassOutputFileName();
 					Util.doListClassFile(classFile);
 				}
 			}
-			for (JavaSourceFileCoder javaClass : CoreGlobal.javaSourceFileCoders) {
+			for (JavaSourceFileCoder javaClass : simBuilder.javaSourceFileCoders) {
 				if (javaClass.mustDoByteCodeEngineering) {
 					String classFileName = javaClass.getClassOutputFileName();
 					ClassFileTransform.doRepairSingleByteCode(classFileName,classFileName);
-					if(Option.verbose) Util.println("SimulaCompiler.doByteCodeEngineering: " + CoreGlobal.sourceName + ": Class File " + classFileName + " is repaired");
+					if(Option.verbose) Util.println("SimulaCompiler.doByteCodeEngineering: " + simBuilder.documentManager.sourceName + ": Class File " + classFileName + " is repaired");
 				}
 			}
 			if (Option.internal.TRACE_BYTECODE_OUTPUT) {
 				Util.println("------------  LIST ByteCode After Engineering  ------------");
-				for (JavaSourceFileCoder javaClass : CoreGlobal.javaSourceFileCoders) {
+				for (JavaSourceFileCoder javaClass : simBuilder.javaSourceFileCoders) {
 					String classFile = javaClass.getClassOutputFileName();
 					Util.doListClassFile(classFile);
 				}
@@ -680,8 +408,8 @@ public final class SimulaCompiler {
 	}
 
 	/// Debug utility: listGeneratedClassFiles.
-	private void listGeneratedClassFiles() {
-		File classFiles = new File(CoreGlobal.tempClassFileDir, CoreGlobal.packetName);
+	private void listGeneratedClassFiles(final SimulaBuilder simBuilder) {
+		File classFiles = new File(simBuilder.tempClassFileDir, DocumentManager.packetName);
 		for (File classFile : classFiles.listFiles()) {
 			if(classFile.getName().endsWith(".class"))
 				Util.doListClassFile("" + classFile); // List generated .class file
@@ -689,17 +417,17 @@ public final class SimulaCompiler {
 	}
 
 	/// File Summary
-	private void fileSummary() {
+	private void fileSummary(final SimulaBuilder simBuilder) {
 		Util.println("------------  FILE SUMMARY  ------------");
-		Util.println("Package Name:    \"" + CoreGlobal.packetName + "\"");
-		Util.println("SourceFile Name: \"" + CoreGlobal.sourceName + "\"");
-		Util.println("SourceFile Dir:  \"" + CoreGlobal.sourceFileDir + "\"");
-		if (CoreGlobal.currentWorkspace != null)
-			Util.println("CurrentWorkspace \"" + CoreGlobal.currentWorkspace + "\"");
-		Util.println("TempDir .java:   \"" + CoreGlobal.tempJavaFileDir + "\"");
-		Util.println("TempDir .class:  \"" + CoreGlobal.tempClassFileDir + "\"");
-		Util.println("SimulaRtsLib:    \"" + CoreGlobal.simulaRtsLib + "\"");
-		Util.println("OutputDir:       \"" + CoreGlobal.outputDir + "\"");
+		Util.println("Package Name:    \"" + DocumentManager.packetName + "\"");
+		Util.println("SourceFile Name: \"" + simBuilder.sourceName + "\"");
+		Util.println("SourceFile Dir:  \"" + simBuilder.sourceFileDir + "\"");
+		if (simBuilder.currentWorkspace != null)
+			Util.println("CurrentWorkspace \"" + simBuilder.currentWorkspace + "\"");
+		Util.println("TempDir .java:   \"" + simBuilder.tempJavaFileDir + "\"");
+		Util.println("TempDir .class:  \"" + simBuilder.tempClassFileDir + "\"");
+		Util.println("SimulaRtsLib:    \"" + simBuilder.simulaRtsLib + "\"");
+		Util.println("OutputDir:       \"" + simBuilder.outputDir + "\"");
 	}
 
 	// ***************************************************************
@@ -722,5 +450,6 @@ public final class SimulaCompiler {
     		}
 		}
 	}
+
 
 }

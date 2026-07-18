@@ -13,7 +13,7 @@ import java.util.Vector;
 
 import simula.compiler.SourceModule;
 import simula.Option;
-import simula.compiler.SimulaCompiler;
+import simula.compiler.REMOVE_SimulaCompiler;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.Util;
 import simula.editor.RTOption;
@@ -293,7 +293,7 @@ public final class RunFullClassTestBatch {
 			try {
 				CoreGlobal.initiate();
 		    	new SourceModule(new File(fileName));
-				new SimulaCompiler(fileName).doCompile(CoreGlobal.currentModule.getSyntaxTree());
+				new REMOVE_SimulaCompiler(fileName).doCompile(CoreGlobal.currentModule.getSyntaxTree());
 			} catch (IOException e) {
 				Util.generalError("can't open " + fileName + ", reason: " + e);
 			}

@@ -162,7 +162,6 @@ public final class ConnectionStatement extends Statement {
 			connectionPart.add(new ConnectionDoPart(simBuilder, this,connectionBlock, statement));
 			connectionBlock.end();
 		} else {
-			simBuilder.startTokenRange();
 			while (Parse.accept(simBuilder, KeyWord.WHEN)) {
 				Identifier classIdentifier = Parse.expectIdentifier(simBuilder);
 				Parse.expect(simBuilder, KeyWord.DO);
@@ -170,12 +169,9 @@ public final class ConnectionStatement extends Statement {
 				hasWhenPart = true;
 				Statement statement = Statement.acceptStatement(simBuilder);
 				ConnectionWhenPart whenPart = new ConnectionWhenPart(simBuilder, this,classIdentifier, connectionBlock, statement);
-				simBuilder.doneTokenRange(whenPart);
-				simBuilder.startTokenRange();
 				connectionPart.add(whenPart);
 				connectionBlock.end();
 			}
-			simBuilder.dropTokenRange();
 
 		}
 		if(!(hasDoPart | hasWhenPart)) Util.syntaxError(simBuilder, "Incomplete Inspect statement: "+objectExpression + ", missing DO or WHEN");

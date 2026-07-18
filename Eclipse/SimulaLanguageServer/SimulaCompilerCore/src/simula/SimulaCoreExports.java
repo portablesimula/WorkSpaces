@@ -1,7 +1,12 @@
 package simula;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.Vector;
 
+import simula.builder.SimulaBuilder;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.SimulaDiagnostic;
@@ -12,21 +17,73 @@ import simula.token.LexToken;
 
 public class SimulaCoreExports {
 	
-	public static void initiate(SimulaCoreClient client, String packetName) {
+	// Debug Utility
+	// TODO: Innfør Options via argv. Se: SimulaCompiler2'simula.java
+	// public static void initiate(SimulaCoreClient client, List<String> argv) {
+
+	public static void initiate(SimulaCoreClient client, Vector<String> argv) {
 		// Remove time, date, and headers from Logger output.
 		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
 
 		CoreGlobal.initiate();
 		CoreGlobal.simulaCoreClient = client;
-//		CoreGlobal.packetName="simulaTestBatch";
-		CoreGlobal.packetName = packetName;
-
-//		Option.internal.keepJava=userDir; // Generated .java Source is then found in Eclipse Package simulaTestBatch
-//		CoreGlobal.simulaRtsLib=new File(simulaDir,"bin"); // To use Eclipse Project's simula.runtime
-////		Global.extLib="C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin";
-
+    	String[] args = argv.toArray(new String[0]);
+		Option.decodeArguments(args);
 	}
 
+	// Debug Utility
+	public static void run(final String documentUri, Vector<String> argv) {
+		IO.println("SimulaCoreExports.run: " + documentUri);
+    	DocumentManager documentManager = DocumentManager.getDocumentManager(documentUri);
+    	SimulaBuilder simBuilder = documentManager.simBuilder;
+
+    	IO.println("SimulaCoreExports.run: sourceFileDir=" + documentManager.sourceFileDir);
+    	IO.println("SimulaCoreExports.run: outputDir=" + simBuilder.outputDir);
+    	if(simBuilder.outputDir == null) {
+    		simBuilder.outputDir = new File(documentManager.sourceFileDir,"bin");
+    	}
+    	IO.println("SimulaCoreExports.run: outputDir=" + simBuilder.outputDir);
+    	simBuilder.outputDir.mkdirs();
+    	if (! simBuilder.outputDir.canWrite()) {
+    		Util.IERR("SimulaCoreExports.run: Unable to write to " + simBuilder.outputDir);
+    	}
+    	
+//    	Util.STOP();
+//    	/// Try set Global.outputDir
+//    	/// @param dir a directory
+//    	public static void trySetOutputDir(File dir) {
+//    		dir.mkdirs();
+//    		if (dir.canWrite())
+//    			CoreGlobal.outputDir = dir;
+//    		else {
+//    			CoreGlobal.outputDir = getTempFileDir("simulaEditor/bin");
+//    		}
+//    	}
+
+    	String[] args = argv.toArray(new String[0]);
+		Option.decodeArguments2(args);
+
+    	SimulaCompiler simulaCompiler = new SimulaCompiler(documentManager);
+//    	simulaCompiler.doCompile();
+    	try {
+			simulaCompiler.doCodeGeneration(simBuilder);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	try {
+			simulaCompiler.doRun(simBuilder);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Util.IERR("STOP HER INTILL VIDERE");	
+		Util.STOP();
+	}
+	
+	// ==============================================================================================================
+	
+	
 	/// The document open notification is sent from the client to the server to
 	/// signal newly opened text documents. The document's truth is now managed
 	/// by the client and the server must not try to read the document's truth

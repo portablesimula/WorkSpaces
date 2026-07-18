@@ -154,7 +154,6 @@ public abstract class BlockDeclaration extends DeclarationScope {
 		
 		/// Repeatedly parse a declaration and add it to the given BlockDeclaration's' declaration list.
 		/// Continue until there are no more declarations.
-		simBuilder.startTokenRange("Block.Declaration: ", simBuilder.getCurrentParserToken());
 		DeclarationList declarationList=this.declarationList;
 		Vector<SyntaxElement> declarations = null;
 		while( (declarations = Declaration.acceptDeclaration(simBuilder)) != null) {
@@ -165,10 +164,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 				}
 			}
 			Parse.expect(simBuilder, KeyWord.SEMICOLON);
-			simBuilder.doneTokenRange(declarations);
-			simBuilder.startTokenRange("Block.Declaration: +", simBuilder.getCurrentParserToken());
 		}
-		simBuilder.dropTokenRange();
 		
 		LOOP:while(true) {
 			LexToken token = Parse.acceptParserToken(simBuilder, KeyWord.END, KeyWord.EOF);

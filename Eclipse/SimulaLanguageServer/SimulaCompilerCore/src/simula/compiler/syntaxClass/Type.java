@@ -28,6 +28,7 @@ import simula.compiler.utilities.Html;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
+import simula.lsp.compiler.DocumentManager;
 import simula.token.Identifier;
 
 /// Utility class Type.
@@ -494,7 +495,7 @@ public class Type extends SyntaxElement {
 					return("Lsimula/runtime/"+refIdent+";");
 				else if(refIdent.startsWith("RTS_"))
 					return("Lsimula/runtime/"+refIdent+";");
-				else return("L"+CoreGlobal.packetName+"/"+refIdent+";");
+				else return("L"+Option.packetName+"/"+refIdent+";");
 			}
 			default: Util.IERR(); return null;
 		}
@@ -522,7 +523,7 @@ public class Type extends SyntaxElement {
 					return("Lsimula/runtime/"+refIdent+";");
 				else if(refIdent.startsWith("RTS_"))
 					return("Lsimula/runtime/"+refIdent+";");
-				else return("L"+CoreGlobal.packetName+"/"+refIdent+";");
+				else return("L"+Option.packetName+"/"+refIdent+";");
 			}
 			default: Util.IERR(); return null;
 		}

@@ -217,7 +217,7 @@ public final class VariableExpression extends Expression {
 			return;
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN Variable(" + identifier + ").doChecking: type=" + type);
-		IO.println("BEGIN Variable(" + identifier + ").doChecking: type=" + type);
+//		IO.println("BEGIN Variable(" + identifier + ").doChecking: type=" + type);
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		Declaration declaredAs = getMeaning().declaredAs;
 		if (declaredAs != null)

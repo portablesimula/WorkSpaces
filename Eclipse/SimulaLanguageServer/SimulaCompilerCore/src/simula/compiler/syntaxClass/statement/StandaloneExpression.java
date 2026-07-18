@@ -63,9 +63,7 @@ public final class StandaloneExpression extends Statement {
 		LexToken prevToken = null;
 		while ((prevToken = Parse.acceptParserToken(simBuilder, KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF)) != null) { 
 //			IO.println("NEW StandaloneExpression: prevToken="+prevToken);
-			simBuilder.startTokenRange();
 			this.expression = new AssignmentOperation(simBuilder, this.expression, prevToken.keyWord, expectStandaloneExpression(simBuilder));
-			simBuilder.doneTokenRange(this);
 		}		
 		
 //		IO.println("\nEND NEW StandaloneExpression: expr="+expression);

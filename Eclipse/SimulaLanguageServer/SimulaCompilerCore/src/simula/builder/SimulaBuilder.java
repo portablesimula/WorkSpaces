@@ -1,26 +1,59 @@
 package simula.builder;
 
+import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
 import simula.Option;
-import simula.compiler.syntaxClass.SyntaxElement;
-import simula.compiler.syntaxClass.declaration.StandardClass;
+import simula.compiler.JarFileBuilder;
+import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.SimulaDiagnostic;
 import simula.compiler.utilities.Util;
-import simula.exception.EOTException;
 import simula.lsp.compiler.DocumentManager;
 import simula.token.LexToken;
 import simula.token.SimpleString;
 
 public class SimulaBuilder {
-	public DocumentManager documentManager;
-    private SimulaLexer lexer;
+
+	final public DocumentManager documentManager;
+    public SimulaLexer lexer;
+    
+    public SimulaCompiler simulaCompiler;
+    
+	/// The .jar File Builder
+	public JarFileBuilder jarFileBuilder;
+	public File generatedJarFile;
+	/// Compiler state: True while Parsing
+	public boolean duringParsing;
+
+	/// Compiler state: True while Checking
+	public boolean duringChecking;
+	
+	/// The Simula temp directory
+	public File simulaTempDir;
+	
+	/// The output directory. Used by Java-Coding to save the generated .jar files.
+	public File outputDir;
+	
+	/// The external library. Used by ExternalDeclaration.readAttributeFile
+	public File extLib;
+	
+	/// Temp directory for generated .class files
+	public File tempClassFileDir;
+	
+	/// The set of external .jar files.
+	public Vector<File> externalJarFiles;
+	
+	/// The set of Java SourceFile Coders.
+	public Vector<JavaSourceFileCoder> javaSourceFileCoders;
+	
 	
     private LexToken prevParserToken;
     private LexToken currentParserToken;
@@ -32,35 +65,87 @@ public class SimulaBuilder {
 	public List<SimulaDiagnostic> diagnostics;
 	public List<LexToken> tokenList;
 
-    private LexTokenRange lexTokenRange;
+	public File getOutputDir() {
+        if(Option.outputDir != null) {
+        	outputDir = Option.outputDir;
+        } else {
+        	outputDir = new File(documentManager.sourceFileDir, "bin");
+        }
+        return outputDir;
+	}
 
 	public SimulaBuilder(DocumentManager documentManager) {
-		boolean builderTerminateNormally = false;
 		this.documentManager = documentManager;
     	// INIT:
     	this.diagnostics = new ArrayList<>();
     	this.tokenList   = new ArrayList<>();
-		lexTokenRange = new LexTokenRange(null);
         lexer = new SimulaLexer(this, documentManager.sourceCode);
-        // Do the actual Building
-        getNextParserToken();
-    	syntaxTree = new ProgramModule(this);
-        try {
-        	syntaxTree.doBuild();
-        	builderTerminateNormally = true;
-        } catch(EOTException e) {
-			System.err.println("SimulaBuilder: GOT EXCEPTION: " + e.getMessage());
-//			e.printStackTrace();
-			lexer.flush();
-        }
+        
+//        if(args.outputDir != null) {
+//        	outputDir = args.outputDir;
+//        } else {
+//        	outputDir = new File(documentManager.sourceFileDir, "bin");
+//        }
 
-    	LOG.info("SimulaBuilder: syntaxTree, tokenList and diagnostics DONE");
-    	IO.println("SimulaBuilder: this.syntaxTree: "+this.syntaxTree); // Root of Syntax Tree
-    	IO.println("SimulaBuilder: this.diagnostics: "+this.diagnostics);
-    	IO.println("SimulaBuilder: this.tokenList: "+this.tokenList);
+		// Get Temp Directory:
+		simulaTempDir = CoreGlobal.getTempFileDir("simula/");
+		deleteTempFiles(simulaTempDir);
+
+		// Create Temp .class-Files Directory:
+		File tmpClassDir = new File(simulaTempDir, "classes");
+		tmpClassDir.mkdirs();
+		tempClassFileDir = tmpClassDir;
+
+		File desktop = new File(System.getProperty("user.home"), "Desktop");
+//		if (args.verbose) {
+			// https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html
+			Util.println("------------  SIMULA ENVIRONMENT SUMMARY  ------------");
+			Util.println("Simula Properties    " + CoreGlobal.simulaPropertiesFile);
+			Util.println("Simula Home          " + CoreGlobal.simulaHome);
+			Util.println("Simula Home (prev)   " + CoreGlobal.getSimulaProperty("simula.home", null));
+			Util.println("Java Home            " + System.getProperty("java.home"));
+			Util.println("User Home            " + System.getProperty("user.home"));
+			Util.println("Working Directory    " + System.getProperty("user.dir"));
+			String s = (desktop.exists()) ? "true " : "false";
+			Util.println("Desktop Exists=" + s + " " + desktop.toString());
+			Util.println("Java Class Path      " + System.getProperty("java.class.path"));
+			Util.println("Java Class Version   " + System.getProperty("java.class.version"));
+			Util.println("Java Version         " + System.getProperty("java.version"));
+			Util.println("Java VM Spec Version " + System.getProperty("java.vm.specification.version"));
+			Util.println("Java Vendor          " + System.getProperty("java.vendor"));
+			Util.println("OS name              " + System.getProperty("os.name"));
+			Util.println("OS architecture      " + System.getProperty("os.arch"));
+			Util.println("OS version           " + System.getProperty("os.version"));
+			Util.println("file.encoding        " + System.getProperty("file.encoding"));
+			Util.println("defaultCharset       " + Charset.defaultCharset());
+//			Util.println("compilerMode         " + args.compilerMode);
+
+			// This will list the current system properties
+			// System.getProperties().list(System.out);
+
+//		}
+		Util.println("------------  SIMULA VARIABLES SUMMARY  ------------");
+		Util.println("DocumentManager.documentUri     " + documentManager.documentUri);
+		Util.println("DocumentManager.sourceFileDir   " + documentManager.sourceFileDir);
+		Util.println("DocumentManager.documentVersion " + documentManager.documentVersion);
+		Util.println("DocumentManager.sourceName      " + documentManager.sourceName);
+//		Util.println("DocumentManager.sourceCode      " + documentManager.sourceCode);
+		Util.println("DocumentManager.packetName      " + Option.packetName);
+		Util.println("DocumentManager.simulaRtsLib    " + Option.simulaRtsLib);
 		
-    	printAll(" AFTER NEW SimulaBuilder: ");
+		Util.println("SimulaBuilder.outputDir         " + this.outputDir);
+		Util.println("SimulaBuilder.simulaTempDir     " + this.simulaTempDir);
+		Util.println("SimulaBuilder.tempClassFileDir  " + this.tempClassFileDir);
+		Util.println("SimulaBuilder.extLib            " + this.extLib);
 		
+//		Util.IERR("STOPP HER INNTIL VIDERE");
+	}
+	
+	public void doBuilding() {
+        simulaCompiler = new SimulaCompiler(documentManager);
+        
+		boolean builderTerminateNormally = simulaCompiler.doParsing(this);
+    	
     	if(Option.LEX_VERIFY) {
         	IO.println("SimulaBuilder: documentManager.sourceCode: "+documentManager.sourceCode);
     		StringBuilder sb = new StringBuilder();
@@ -75,18 +160,18 @@ public class SimulaBuilder {
     			Util.IERR("");
     		}
     	}
-    	
+
 //		Util.IERR("STOP HER INTILL VIDERE");	
 		if(builderTerminateNormally) {	
-			StandardClass.ENVIRONMENT.doChecking();
-			CoreGlobal.duringParsing = false;
-			this.syntaxTree.doChecking();
+			simulaCompiler.doChecking(this);
 		} else {
-			
+			Util.IERR("");
 		}
-		Util.IERR("STOP HER INTILL VIDERE");	
+//		Util.IERR("STOP HER INTILL VIDERE");	
+		
 	}
-	
+
+
 	public void addDiagnostic(SimulaDiagnostic diagnostic) {
 		diagnostics.add(diagnostic);
 	}
@@ -94,59 +179,6 @@ public class SimulaBuilder {
     public int getSourceLineNumber() {
     	return lexer.getSourceLineNumber();
     }
-
-    ///  ????  ?????
-    /// 
-    ///  Invariant: Lexer'currentLexerToken is a ParserToken
-    /// 
-    /// Invariant: Lexer'parserToken is first token of construct
-    /// 
-    public void startTokenRange() {}
-    public void startTokenRange(String debugName) {
-//    	LexToken first = this.prevParserToken;
-    	LexToken first = this.currentParserToken;
-    	IO.println("SimulaBuilder.startTokenRange: " + debugName + ", first=" + first);
-    	
-    	
-    }
-//    public void startTokenRange(PsiTree.Kind kind, String debugName) {
-    public void startTokenRange(String debugName,LexToken first) {
-//    	LexToken first = this.prevParserToken;
-//    	LexToken first = this.currentParserToken;
-    	IO.println("SimulaBuilder.startTokenRange: " + debugName + ", first=" + first);
-    	lexTokenRange = new LexTokenRange(lexTokenRange);
-    	lexTokenRange.addChild(first);
-	}
-    public void startTokenRange(LexToken first) {
-//    	LexToken first = this.prevParserToken;
-//    	LexToken first = this.currentParserToken;
-    	IO.println("SimulaBuilder.startTokenRange: " + ", first=" + first + Util.calledFrom(3, 25));
-    	lexTokenRange = new LexTokenRange(lexTokenRange);
-    	lexTokenRange.addChild(first);
-	}
-		
-	public void doneTokenRange(SyntaxElement syntaxElement) {
-		IO.println("PsiBuilder.doneTokenRange: syntaxElement="+syntaxElement);
-//		Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
-//		if(syntaxElement != null) syntaxElements.add(syntaxElement);
-//		doneTokenRange(syntaxElements);
-	}
-	
-	public void doneTokenRange(Vector<SyntaxElement> syntaxElements) {
-		IO.println("\nPsiBuilder.doneTokenRange: lexTokenRange=]"+lexTokenRange.getDebugText()+'[');
-		
-		for(SyntaxElement syntaxElement:syntaxElements) {
-			IO.println("PsiBuilder.doneTokenRange: syntaxElement="+syntaxElement);
-			syntaxElement.lexTokenRange = lexTokenRange;
-		}
-		lexTokenRange.syntaxElements = syntaxElements;
-
-		lexTokenRange = lexTokenRange.parent;
-	}
-	
-	public void dropTokenRange() {
-//		lexTokenRange = lexTokenRange.parent;
-	}
 	
 	public void consume(int... keyWords) {
 		LexToken lexToken = getCurrentParserToken();
@@ -270,6 +302,28 @@ public class SimulaBuilder {
     	return result;
     }
 
+
+	/// Delete temporary .class files.
+	/// @param dir temporary .class directory
+	private void deleteTempFiles(final File dir) {
+		try {
+			File[] elt = dir.listFiles();
+			if (elt == null)
+				return;
+			for (File f : elt) {
+				if (Option.internal.DEBUGGING) {
+					if (f.isFile())
+						Util.println("Delete: " + f);
+				}
+				if (f.isDirectory())
+					deleteTempFiles(f);
+				f.delete();
+			}
+		} catch (Exception e) {
+			Util.IERR("SimulaCompiler.deleteFiles FAILED: ", e);
+			e.printStackTrace();
+		}
+	}
     
 	public void printAll(String title) {
     	IO.println("\n");
@@ -298,4 +352,5 @@ public class SimulaBuilder {
 		IO.println("======================================== ENDOF TOKEN LIST: " + title + " ============================ ");		
 	}
 
+	
 }

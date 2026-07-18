@@ -33,7 +33,7 @@ public final class Option {
 
 	/// The currently selected Color Theme
 	public static String selectedTheme;
-	
+
 	/// The Compiler Modes.
 	public enum CompilerMode { 
     	/** Generate Java source and use Java compiler to generate JavaClass files. */					viaJavaSource,
@@ -43,6 +43,13 @@ public final class Option {
 
 	/// The Compiler mode.
 	public static CompilerMode compilerMode;
+
+	/// Packet name used in generated .java files.
+	/// NOTE: Must be a single identifier.
+	public static String packetName = "simprog";
+
+	/// Where to find the Simula Runtime System.
+	public static File simulaRtsLib;
 	
 	/// Source file is case sensitive.
 	public static boolean CaseSensitive=false;
@@ -62,6 +69,13 @@ public final class Option {
 	/// false: Disable all language extensions. In other words,
 	/// follow the Simula Standard literally
 	public static boolean EXTENSIONS=true;
+	
+	// Specifies where to place generated executable .jar file;
+	public static File outputDir = null;
+	
+	// Specifies where to search for precompiled classes and procedures
+	// If not found, output directory is also searched
+	public static File extLib = null;
 
 	/// Testing and debugging options
 	public static class internal {
@@ -143,6 +157,78 @@ public final class Option {
 	
 	/// The default constructor
 	private Option() {}
+	
+
+	/// Kalles før parsing og checking
+	public static void decodeArguments(String[] argv) {
+		IO.println("Option.decodeArguments: ");
+		Option.verbose=false;
+		Option.WARNINGS=true;
+//		Option.EXTENSIONS=true;
+
+		// Parse command line arguments.
+		for(int i=0;i<argv.length;i++) {
+			String arg=argv[i];
+			IO.println("Option.decodeArguments: arg: " + arg);
+			if (arg.charAt(0) == '-') { // command line option
+//				if (arg.equalsIgnoreCase("-help")) help(); else
+				if (arg.equalsIgnoreCase("-caseSensitive")) Option.CaseSensitive=true;
+//				else if (arg.equalsIgnoreCase("-compilerMode")) Option.setCompilerMode(argv[++i]);
+//				else if (arg.equalsIgnoreCase("-noexec")) Option.noExecution=true;
+				else if (arg.equalsIgnoreCase("-noextension")) Option.EXTENSIONS=false;
+				else if (arg.equalsIgnoreCase("-noPopup")) Option.noPopup = true;
+				else if (arg.equalsIgnoreCase("-nowarn")) Option.WARNINGS=false;
+				else if (arg.equalsIgnoreCase("-verbose")) Option.verbose=true;
+//				else if (arg.equalsIgnoreCase("-version")) printVersion();
+//				else if (arg.equalsIgnoreCase("-select")) setSelectors(argv[++i]);				
+//				else if (arg.equalsIgnoreCase("-keepJava")) Option.internal.keepJava = new File(argv[++i]);
+
+//				else if (arg.equalsIgnoreCase("-output")) Option.outputDir = new File(argv[++i]);
+//				else if (arg.equalsIgnoreCase("-extLib")) Option.extLib = new File(argv[++i]);
+				else {
+					IO.println("Simula ERROR: Unknown option " + arg);
+//					help();
+				}
+			} else Util.IERR(arg);
+		}
+//		Util.IERR("STOP HER INTILL VIDERE");
+	}
+
+	/// Kalles av 'run' før codeing og exec
+	public static void decodeArguments2(String[] argv) {
+		IO.println("Option.decodeArguments2: ");
+
+		// Parse command line arguments.
+		for(int i=0;i<argv.length;i++) {
+			String arg=argv[i];
+			if (arg.charAt(0) == '-') { // command line option
+				if (arg.equalsIgnoreCase("-compilerMode")) Option.setCompilerMode(argv[++i]);
+				else if (arg.equalsIgnoreCase("-noexec")) Option.noExecution=true;
+//				else if (arg.equalsIgnoreCase("-noextension")) Option.EXTENSIONS=false;
+				else if (arg.equalsIgnoreCase("-noPopup")) Option.noPopup = true;
+				else if (arg.equalsIgnoreCase("-nowarn")) Option.WARNINGS=false;
+				else if (arg.equalsIgnoreCase("-verbose")) Option.verbose=true;
+//				else if (arg.equalsIgnoreCase("-version")) printVersion();
+//				else if (arg.equalsIgnoreCase("-select")) setSelectors(argv[++i]);				
+				else if (arg.equalsIgnoreCase("-keepJava")) Option.internal.keepJava = new File(argv[++i]);
+
+				else if (arg.equalsIgnoreCase("-simulaRtsLib")) Option.simulaRtsLib = new File(argv[++i]);
+				else if (arg.equalsIgnoreCase("-output")) Option.outputDir = new File(argv[++i]);
+				else if (arg.equalsIgnoreCase("-extLib")) Option.extLib = new File(argv[++i]);
+				
+				// Special RT Options
+//				else if (arg.equalsIgnoreCase("-source")) Option.SOURCE_FILE=argv[++i];
+//				else if (arg.equalsIgnoreCase("-sourceFileDir")) sourceFileDir=argv[++i];
+				else if (arg.equalsIgnoreCase("-runtimeUserDir")) Option.internal.RUNTIME_USER_DIR=argv[++i];
+				else {
+					IO.println("Simula ERROR: Unknown option " + arg);
+//					help();
+				}
+			} else Util.IERR(arg);
+		}
+//		Util.IERR("STOP HER INTILL VIDERE");
+	}
+
 	
 	/// Initiate Compiler options.
 	public static void InitCompilerOptions() {

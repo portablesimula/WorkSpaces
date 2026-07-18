@@ -28,6 +28,7 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
 import simula.Option;
+import simula.builder.SimulaBuilder;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.ClassHierarchy;
@@ -45,6 +46,8 @@ public class JarFileBuilder {
 	
 	/// The ProgramModule.
 	private ProgramModule programModule;
+	
+	private SimulaBuilder simBuilder;
 	
 	/// The output .jar file
 	private File outputJarFile;
@@ -76,10 +79,12 @@ public class JarFileBuilder {
 		this.programModule = programModule;
 		if (Option.internal.TRACING)
 			Util.println("BEGIN Create .jar File");
-		outputJarFile = new File(CoreGlobal.outputDir, programModule.getIdentifier() + ".jar");
+		simBuilder = programModule.simBuilder;
+		outputJarFile = new File(simBuilder.outputDir, programModule.getIdentifier().value + ".jar");
 		outputJarFile.getParentFile().mkdirs();
 		Manifest manifest = new Manifest();
-		mainEntry = CoreGlobal.packetName + '/' + programModule.getIdentifier();
+		String packetName = Option.packetName;
+		mainEntry = packetName + '/' + programModule.getIdentifier();
 		mainEntry = mainEntry.replace('/', '.');
 		if (Option.internal.TRACING)
 			Util.println("Output " + outputJarFile + " MANIFEST'mainEntry=\"" + mainEntry + "\"");
@@ -97,7 +102,7 @@ public class JarFileBuilder {
 		
 		if(Option.compilerMode != Option.CompilerMode.viaJavaSource) {
 			// Add initial entry: 
-			String entryName = CoreGlobal.packetName + '/';
+			String entryName = packetName + '/';
 			writeJarEntry(entryName, null);
 		}
 	}

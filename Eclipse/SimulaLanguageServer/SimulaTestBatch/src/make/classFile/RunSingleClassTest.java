@@ -8,13 +8,9 @@
 package make.classFile;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Vector;
 
-import client.TestBatchClient;
-import simula.SimulaCoreExports;
+import client.TestBatchLauncher;
 import simula.Option;
 //import simula.editor.RTOption;
 
@@ -34,65 +30,31 @@ public final class RunSingleClassTest {
 	// C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer\SimulaTestBatch\src\simulaTestBatch
 	
 	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
-	private static final File userDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaTestBatch");
+	private static final String userDir = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaTestBatch";
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 
 	public static void main(String[] args) {
+
+		Vector<String> argv = new Vector<>();
+//		argv.add("-caseSensitive");
+//		argv.add("-noextension");
+//		argv.add("-noPopup");
+//		argv.add("-nowarn");
+		argv.add("-verbose");
+//		argv.add("-select");
+
+		Vector<String> argv2 = new Vector<>();
+//		argv2.add("-" + Option.CompilerMode.viaJavaSource);
+		argv2.add("-compilerMode"); argv2.add(Option.CompilerMode.directClassFiles.toString());
+//		argv2.add("-" + Option.CompilerMode.simulaClassLoader);
 		
-		// Set options.
-//		Option.compilerMode = Option.CompilerMode.viaJavaSource;
-		Option.compilerMode = Option.CompilerMode.directClassFiles;
-//		Option.compilerMode = Option.CompilerMode.simulaClassLoader;
-//		Option.verbose=true;
-//		Option.EXTENSIONS=false;
-//		Option.CaseSensitive=true;
-//		Option.noExecution=true;
-		Option.WARNINGS=true;
-//		Option.WARNINGS=false;
-
-		// Set internal test, debug options.
-		Option.internal.INLINE_TESTING=true;
-		Option.noPopup = true;
-		Option.internal.TESTING_STACK_SIZE = true;
-//		Option.internal.DEBUGGING=true;
-//		Option.internal.LIST_GENERATED_CLASS_FILES=true;
-//		Option.internal.TRACE_CODING=true;
-
-		// Overall TRACING Options
-//		Option.internal.TRACING=true;
-
-		// Scanner Trace Options
-//		Option.internal.TRACE_LEXER=true;
-		Option.internal.TRACE_NEW_LEXTOKEN=2;
-//		Option.internal.TRACE_COMMENTS=true;
-
-		// Parser Trace Options
-//		Option.internal.TRACE_PARSE=true;
-//		Option.internal.PRINT_SYNTAX_TREE=1;
-//		Option.internal.TRACE_ATTRIBUTE_OUTPUT=true;
-//		Option.internal.TRACE_ATTRIBUTE_INPUT=true;
-
-		// Checker Trace Options
-//		Option.internal.TRACE_FIND_MEANING=4;
-//		Option.internal.TRACE_CHECKER=true;
-//		Option.internal.TRACE_CHECKER_OUTPUT=true;
-
-//		CoreGlobal.packetName="simulaTestBatch";
-//
-//		Option.internal.keepJava=userDir; // Generated .java Source is then found in Eclipse Package simulaTestBatch
-//		CoreGlobal.simulaRtsLib=new File(simulaDir,"bin"); // To use Eclipse Project's simula.runtime
-////		Global.extLib="C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin";
+//		argv2.add("-noexec");
+//		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
+		argv2.add("-simulaRtsLib"); argv2.add(new File(simulaDir,"bin").toString()); // To use Eclipse Project's simula.runtime
+//		argv2.add("-extLib"); argv2.add("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin");
 		
-		// Set RunTime Options and tracing.
-//		RTOption.VERBOSE = false;
-//		RTOption.VERBOSE = true;
-//		RTOption.USE_CONSOLE=true;
-//		RTOption.BLOCK_TRACING = true;
-//		RTOption.GOTO_TRACING = true;
-//		RTOption.QPS_TRACING = true;
-//		RTOption.SML_TRACING = true;
+		setOptions();
 		
-//		Option.internal.RUNTIME_USER_DIR = "C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/TestBatch/";
     	//System.setProperty("file.encoding","UTF-8");
 		Vector<String> names=new Vector<String>();
 //		names.add("AdHoc_SimulaTest.sim"); // Simula TestBatch Framework
@@ -323,43 +285,60 @@ public final class RunSingleClassTest {
 //		names.add("single_tst06.sim"); // OK: Single test: inspect new simset do begin OutText("..."); end
 //		names.add("single_tst07.sim"); // OK: Single test: L: while ...
 //		names.add("single_tst08.sim"); // OK: Single test: while ...
-
 		
 		
 		for(String name:names) {
 			String fileName = sourceDir+name;
-//			try {
-//				Global.initiate();
-//		    	new SourceModule(new File(fileName));
-//				new SimulaCompiler(fileName).doCompile(Global.currentModule.getSyntaxTree());
-				
-				// Remove time, date, and headers from Logger output.
-				System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
-
-//				CoreGlobal.packetName="simulaTestBatch";
-//
-//				Option.internal.keepJava=userDir; // Generated .java Source is then found in Eclipse Package simulaTestBatch
-//				CoreGlobal.simulaRtsLib=new File(simulaDir,"bin"); // To use Eclipse Project's simula.runtime
-////			Global.extLib="C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin";
-
-				SimulaCoreExports.initiate(new TestBatchClient(), "simulaTestBatch");
-//				URI uri = new URI(sourceFileName);
-				String uri = fileName;
-				int version = 1;
-		        try {
-		            String content = Files.readString(Path.of(fileName));
-//		            content = content.replace("\r\n", "\n");
-		    	    SimulaCoreExports.didOpen(uri, version, content);
-		        } catch (IOException e) {
-		            e.printStackTrace();
-		        }
-
-//				simulaCompiler.doCompile();
-		        
-//			} catch (IOException e) {
-//				Util.generalError("can't open " + fileName + ", reason: " + e);
-//			}
+			TestBatchLauncher.run(fileName, argv, argv2);
 		}
+	}
+	
+	private static void setOptions() {
+		// Set Static Options.
+
+		// Set internal test, debug options.
+		Option.internal.INLINE_TESTING=true;
+		Option.internal.TESTING_STACK_SIZE = true;
+//		Option.internal.DEBUGGING=true;
+//		Option.internal.LIST_GENERATED_CLASS_FILES=true;
+//		Option.internal.TRACE_CODING=true;
+
+		// Overall TRACING Options
+//		Option.internal.TRACING=true;
+
+		// Scanner Trace Options
+//		Option.internal.TRACE_LEXER=true;
+		Option.internal.TRACE_NEW_LEXTOKEN=2;
+//		Option.internal.TRACE_COMMENTS=true;
+
+		// Parser Trace Options
+//		Option.internal.TRACE_PARSE=true;
+//		Option.internal.PRINT_SYNTAX_TREE=1;
+//		Option.internal.TRACE_ATTRIBUTE_OUTPUT=true;
+//		Option.internal.TRACE_ATTRIBUTE_INPUT=true;
+
+		// Checker Trace Options
+//		Option.internal.TRACE_FIND_MEANING=4;
+//		Option.internal.TRACE_CHECKER=true;
+//		Option.internal.TRACE_CHECKER_OUTPUT=true;
+
+//		CoreGlobal.packetName="simulaTestBatch";
+//
+//		Option.internal.keepJava=userDir; // Generated .java Source is then found in Eclipse Package simulaTestBatch
+//		CoreGlobal.simulaRtsLib=new File(simulaDir,"bin"); // To use Eclipse Project's simula.runtime
+////		Global.extLib="C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin";
+		
+		// Set RunTime Options and tracing.
+//		RTOption.VERBOSE = false;
+//		RTOption.VERBOSE = true;
+//		RTOption.USE_CONSOLE=true;
+//		RTOption.BLOCK_TRACING = true;
+//		RTOption.GOTO_TRACING = true;
+//		RTOption.QPS_TRACING = true;
+//		RTOption.SML_TRACING = true;
+		
+//		Option.internal.RUNTIME_USER_DIR = "C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/TestBatch/";
+		
 	}
 
 }

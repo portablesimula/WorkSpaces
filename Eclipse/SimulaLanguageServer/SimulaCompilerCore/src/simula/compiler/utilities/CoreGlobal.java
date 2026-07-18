@@ -34,11 +34,20 @@ public final class CoreGlobal {
 	public static boolean TRACE_COMMENTS = false;
 	
 	public static SimulaCoreClient simulaCoreClient;
+	
+	/// The source file name.
+	public static String sourceFileName;
+
+	/// Compiler state: True while generating STM code
+	public static boolean duringSTM_Coding;
 
 	/// The Simula release identification.
 	/// 
 	/// NOTE: When updating release id, change version in SimulaExtractor and RuntimeSystem
 	public static final String simulaReleaseID = "Simula-2.0";
+
+	
+	// ===============================================================================================
 
 	/// The Simula Home directory.
 	public static File simulaHome;
@@ -58,21 +67,21 @@ public final class CoreGlobal {
 	/// The current source line number.
 	public static int sourceLineNumber;
 	
-	/// The source file's directory.
-	public static File sourceFileDir;
-	
-	/// The source file name.
-	public static String sourceFileName;
-	
-	/// The source file name without .sim
-	public static String sourceName;
+//	/// The source file's directory.
+//	public static File sourceFileDir;
+//	
+//	/// The source file name.
+//	public static String sourceFileName;
+//	
+//	/// The source file name without .sim
+//	public static String sourceName;
 	
 	/// The insert name.
 	public static String insertName;
 
 	
-	/// Where to find the Simula Runtime System.
-	public static File simulaRtsLib; // The simula runtime system
+//	/// Where to find the Simula Runtime System.
+//	public static File simulaRtsLib; // The simula runtime system
 
 	/// The Simula properties file
 	public static File simulaPropertiesFile;
@@ -88,27 +97,27 @@ public final class CoreGlobal {
 
 	/// The set of workspaces
 	public static ArrayDeque<File> workspaces;
+//	
+//	/// The output directory. Used by Java-Coding to save the generated .jar files.
+//	public static File outputDir;
 	
-	/// The output directory. Used by Java-Coding to save the generated .jar files.
-	public static File outputDir;
-	
-	/// The external library. Used by ExternalDeclaration.readAttributeFile
-	public static File extLib;
+//	/// The external library. Used by ExternalDeclaration.readAttributeFile
+//	public static File extLib;
 
-	/// Compiler state: True while Parsing
-	public static boolean duringParsing;
+//	/// Compiler state: True while Parsing
+//	public static boolean duringParsing;
+//
+//	/// Compiler state: True while Checking
+//	public static boolean duringChecking;
+//
+//	/// Compiler state: True while generating STM code
+//	public static boolean duringSTM_Coding;
 
-	/// Compiler state: True while Checking
-	public static boolean duringChecking;
+//	/// The .jar File Builder
+//	public static JarFileBuilder jarFileBuilder;
 
-	/// Compiler state: True while generating STM code
-	public static boolean duringSTM_Coding;
-
-	/// The .jar File Builder
-	public static JarFileBuilder jarFileBuilder;
-
-	/// The Simula temp directory
-	public static File simulaTempDir;
+//	/// The Simula temp directory
+//	public static File simulaTempDir;
 	
 	/// Temp directory for generated .java files
 	public static File tempJavaFileDir;
@@ -122,9 +131,9 @@ public final class CoreGlobal {
 	/// The Simula ClassLoader.
 	public static SimulaClassLoader simulaClassLoader;
 
-	/// Packet name used in generated .java files.
-	/// NOTE: Must be a single identifier.
-	public static String packetName = "simprog";
+//	/// Packet name used in generated .java files.
+//	/// NOTE: Must be a single identifier.
+//	public static String packetName = "simprog";
 	
 	/// Current Java output Module. Maintained by JavaModule during Java Coding
 	public static JavaSourceFileCoder currentJavaFileCoder;
@@ -144,15 +153,15 @@ public final class CoreGlobal {
 //    	currentModule = null;
 //    	moduleMap = new HashMap<>();
 		Object_SEQU = 8001;
-		jarFileBuilder = null;
+//		jarFileBuilder = null;
 		simulaClassLoader = null;
 		includeQueue = null;
 		ClassHierarchy.init();
-		duringParsing = true;
-		duringChecking = false;
-		duringSTM_Coding = false;
+//		duringParsing = true;
+//		duringChecking = false;
+//		duringSTM_Coding = false;
 		externalJarFiles = new Vector<File>();
-		StandardClass.INITIATE();
+//		StandardClass.INITIATE();
 //		String SIMULA_HOME = getSimulaProperty("simula.home", null);
 //		if (SIMULA_HOME != null) {
 //			String SIMULA_VERSION = getSimulaProperty("simula.version", null);
@@ -221,16 +230,16 @@ public final class CoreGlobal {
 		dir.setExecutable(true, false); // Executable for all users
 	}
 
-	/// Try set Global.outputDir
-	/// @param dir a directory
-	public static void trySetOutputDir(File dir) {
-		dir.mkdirs();
-		if (dir.canWrite())
-			CoreGlobal.outputDir = dir;
-		else {
-			CoreGlobal.outputDir = getTempFileDir("simulaEditor/bin");
-		}
-	}
+//	/// Try set Global.outputDir
+//	/// @param dir a directory
+//	public static void trySetOutputDir(File dir) {
+//		dir.mkdirs();
+//		if (dir.canWrite())
+//			CoreGlobal.outputDir = dir;
+//		else {
+//			CoreGlobal.outputDir = getTempFileDir("simulaEditor/bin");
+//		}
+//	}
 
 	/// Initiate Simula properties.
 	public static void initSimulaProperties() {

@@ -186,7 +186,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		}
 //		LexToken first = (identifier != null)? identifier : simBuilder.getPrevParserToken();
 		ClassDeclaration cls = new ClassDeclaration(simBuilder, null);
-		cls.sourceFileName = CoreGlobal.sourceFileName;
+		cls.sourceFileName = simBuilder.documentManager.documentUri;
 		if(identifier != null) cls.prefix = identifier;
 		cls.declaredIn.hasLocalClasses = true;
 		if (cls.prefix == null)

@@ -134,9 +134,7 @@ public final class SwitchStatement extends Statement {
 			}
 			Parse.expect(simBuilder, KeyWord.DO);
 			
-			simBuilder.startTokenRange();
 			Statement statement = Statement.acceptStatement(simBuilder);
-			simBuilder.doneTokenRange(statement);
 			
 			Parse.accept(simBuilder, KeyWord.SEMICOLON);
 			SwitchWhenPart whenPart = new SwitchWhenPart(caseKeyList, statement);
