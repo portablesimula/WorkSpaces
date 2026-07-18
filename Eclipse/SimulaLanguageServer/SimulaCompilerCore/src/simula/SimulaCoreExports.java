@@ -38,14 +38,14 @@ public class SimulaCoreExports {
     	SimulaBuilder simBuilder = documentManager.simBuilder;
 
     	IO.println("SimulaCoreExports.run: sourceFileDir=" + documentManager.sourceFileDir);
-    	IO.println("SimulaCoreExports.run: outputDir=" + simBuilder.outputDir);
-    	if(simBuilder.outputDir == null) {
-    		simBuilder.outputDir = new File(documentManager.sourceFileDir,"bin");
+    	IO.println("SimulaCoreExports.run: outputDir=" + CoreGlobal.outputDir);
+    	if(CoreGlobal.outputDir == null) {
+    		CoreGlobal.outputDir = new File(documentManager.sourceFileDir,"bin");
     	}
-    	IO.println("SimulaCoreExports.run: outputDir=" + simBuilder.outputDir);
-    	simBuilder.outputDir.mkdirs();
-    	if (! simBuilder.outputDir.canWrite()) {
-    		Util.IERR("SimulaCoreExports.run: Unable to write to " + simBuilder.outputDir);
+    	IO.println("SimulaCoreExports.run: outputDir=" + CoreGlobal.outputDir);
+    	CoreGlobal.outputDir.mkdirs();
+    	if (! CoreGlobal.outputDir.canWrite()) {
+    		Util.IERR("SimulaCoreExports.run: Unable to write to " + CoreGlobal.outputDir);
     	}
     	
 //    	Util.STOP();

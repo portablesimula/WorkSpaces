@@ -22,19 +22,31 @@ import simula.Option;
  *
  */
 public final class RunSingleTest {
-	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula");
-	private static final File userDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/SimulaTestBatch");
+	
+	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
+	private static final String userDir = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaTestBatch";
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
+
 
 	public static void main(String[] args) {
 
 		Vector<String> argv = new Vector<>();
-		argv.add("-" + Option.CompilerMode.viaJavaSource);
-//		argv.add("-" + Option.CompilerMode.directClassFiles);
-//		argv.add("-" + Option.CompilerMode.simulaClassLoader);
-//		argv.add("-keepJava"); argv.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
-		argv.add("-simulaRtsLib"); argv.add(new File(simulaDir,"bin").toString()); // To use Eclipse Project's simula.runtime
-//		argv.add("-extLib"); argv.add("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin");
+//		argv.add("-caseSensitive");
+//		argv.add("-noextension");
+//		argv.add("-noPopup");
+//		argv.add("-nowarn");
+		argv.add("-verbose");
+//		argv.add("-select");
+
+		Vector<String> argv2 = new Vector<>();
+		argv2.add("-compilerMode" + Option.CompilerMode.viaJavaSource);
+//		argv2.add("-compilerMode"); argv2.add(Option.CompilerMode.directClassFiles.toString());
+//		argv2.add("-compilerMode" + Option.CompilerMode.simulaClassLoader);
+		
+//		argv2.add("-noexec");
+//		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
+		argv2.add("-simulaRtsLib"); argv2.add(new File(simulaDir,"bin").toString()); // To use Eclipse Project's simula.runtime
+//		argv2.add("-extLib"); argv2.add("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin");
 		
 		setOptions();
 		
@@ -276,7 +288,7 @@ public final class RunSingleTest {
 				
 		for(String name:names) {
 			String fileName = sourceDir+name;
-			TestBatchLauncher.run(fileName, argv);
+			TestBatchLauncher.run(fileName, argv, argv2);
 		}
 	}
 

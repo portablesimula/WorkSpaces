@@ -80,7 +80,7 @@ public class JarFileBuilder {
 		if (Option.internal.TRACING)
 			Util.println("BEGIN Create .jar File");
 		simBuilder = programModule.simBuilder;
-		outputJarFile = new File(simBuilder.outputDir, programModule.getIdentifier().value + ".jar");
+		outputJarFile = new File(CoreGlobal.outputDir, programModule.getIdentifier().value + ".jar");
 		outputJarFile.getParentFile().mkdirs();
 		Manifest manifest = new Manifest();
 		String packetName = Option.packetName;

@@ -7,7 +7,10 @@ package simula;
 
 import java.io.File;
 import java.util.Properties;
+import java.util.Vector;
 
+import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.Util;
 
 /// Compile Time Options.
@@ -70,13 +73,7 @@ public final class Option {
 	/// follow the Simula Standard literally
 	public static boolean EXTENSIONS=true;
 	
-	// Specifies where to place generated executable .jar file;
-	public static File outputDir = null;
 	
-	// Specifies where to search for precompiled classes and procedures
-	// If not found, output directory is also searched
-	public static File extLib = null;
-
 	/// Testing and debugging options
 	public static class internal {
 		/** Default Constructor: NOT USED */ public internal() { Util.IERR(); }
@@ -159,6 +156,18 @@ public final class Option {
 	private Option() {}
 	
 
+	public static void print(String title) {
+		Util.println("------------  Option.print: " + title + "  ------------");
+		Util.println("DocumentManager.packetName      " + Option.packetName);
+		Util.println("DocumentManager.simulaRtsLib    " + Option.simulaRtsLib);
+		
+		Util.println("SimulaBuilder.outputDir         " + CoreGlobal.outputDir);
+		Util.println("SimulaBuilder.simulaTempDir     " + CoreGlobal.simulaTempDir);
+		Util.println("SimulaBuilder.tempJavaFileDir   " + CoreGlobal.tempJavaFileDir);
+		Util.println("SimulaBuilder.tempClassFileDir  " + CoreGlobal.tempClassFileDir);
+		Util.println("SimulaBuilder.extLib            " + CoreGlobal.extLib);
+
+	}
 	/// Kalles før parsing og checking
 	public static void decodeArguments(String[] argv) {
 		IO.println("Option.decodeArguments: ");
@@ -183,8 +192,8 @@ public final class Option {
 //				else if (arg.equalsIgnoreCase("-select")) setSelectors(argv[++i]);				
 //				else if (arg.equalsIgnoreCase("-keepJava")) Option.internal.keepJava = new File(argv[++i]);
 
-//				else if (arg.equalsIgnoreCase("-output")) Option.outputDir = new File(argv[++i]);
-//				else if (arg.equalsIgnoreCase("-extLib")) Option.extLib = new File(argv[++i]);
+//				else if (arg.equalsIgnoreCase("-output")) CoreGlobal.outputDir = new File(argv[++i]);
+//				else if (arg.equalsIgnoreCase("-extLib")) CoreGlobal.extLib = new File(argv[++i]);
 				else {
 					IO.println("Simula ERROR: Unknown option " + arg);
 //					help();
@@ -213,8 +222,8 @@ public final class Option {
 				else if (arg.equalsIgnoreCase("-keepJava")) Option.internal.keepJava = new File(argv[++i]);
 
 				else if (arg.equalsIgnoreCase("-simulaRtsLib")) Option.simulaRtsLib = new File(argv[++i]);
-				else if (arg.equalsIgnoreCase("-output")) Option.outputDir = new File(argv[++i]);
-				else if (arg.equalsIgnoreCase("-extLib")) Option.extLib = new File(argv[++i]);
+				else if (arg.equalsIgnoreCase("-output")) CoreGlobal.outputDir = new File(argv[++i]);
+				else if (arg.equalsIgnoreCase("-extLib")) CoreGlobal.extLib = new File(argv[++i]);
 				
 				// Special RT Options
 //				else if (arg.equalsIgnoreCase("-source")) Option.SOURCE_FILE=argv[++i];

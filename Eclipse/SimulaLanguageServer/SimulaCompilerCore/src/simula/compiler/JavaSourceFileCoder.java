@@ -58,7 +58,7 @@ public final class JavaSourceFileCoder {
 			if (Option.verbose)
 				Util.TRACE("Output: " + javaOutputFile.getCanonicalPath());
 			writer = new OutputStreamWriter(new FileOutputStream(javaOutputFile), CoreGlobal._CHARSET);
-			JavaSourceFileCoder.code("package " + CoreGlobal.packetName + ";");
+			JavaSourceFileCoder.code("package " + Option.packetName + ";");
 			JavaSourceFileCoder.code("// " + CoreGlobal.simulaReleaseID + " Compiled at " + new Date());
 			JavaSourceFileCoder.code("import simula.runtime.*;");
 		} catch (IOException e) {
@@ -76,7 +76,7 @@ public final class JavaSourceFileCoder {
 	/// Returns the output file for generated Java code.
 	/// @return the output file for generated Java code
 	String getClassOutputFileName() {
-		return (CoreGlobal.tempClassFileDir + "/" + CoreGlobal.packetName + '/' + blockDeclaration.getJavaIdentifier() + ".class");
+		return (CoreGlobal.tempClassFileDir + "/" + Option.packetName + '/' + blockDeclaration.getJavaIdentifier() + ".class");
 	}
 
 	/// Close Java output file.

@@ -47,6 +47,25 @@ public final class CoreGlobal {
 	public static final String simulaReleaseID = "Simula-2.0";
 
 	
+	// Specifies where to place generated executable .jar file;
+	public static File outputDir = null;
+	
+	// Specifies where to search for precompiled classes and procedures
+	// If not found, output directory is also searched
+	public static File extLib = null;
+
+	/// The Simula temp directory
+	public static File simulaTempDir;
+	
+	/// Temp directory for generated .class files
+	public static File tempClassFileDir;
+	
+	/// The set of external .jar files.
+	public static Vector<File> externalJarFiles;
+	
+	/// The set of Java SourceFile Coders.
+	public static Vector<JavaSourceFileCoder> javaSourceFileCoders;
+
 	// ===============================================================================================
 
 	/// The Simula Home directory.
@@ -57,9 +76,6 @@ public final class CoreGlobal {
 	
 	/// The Simula Version
 	public static String simulaVersion;
-	
-	/// The set of external .jar files.
-	public static Vector<File> externalJarFiles;
 	
 	/// The current Charset.
 	public static Charset _CHARSET = Charset.defaultCharset();
@@ -122,9 +138,6 @@ public final class CoreGlobal {
 	/// Temp directory for generated .java files
 	public static File tempJavaFileDir;
 	
-	/// Temp directory for generated .class files
-	public static File tempClassFileDir;
-	
 	/// Next available Object Sequence Number.
 	public static int Object_SEQU;
 
@@ -137,9 +150,6 @@ public final class CoreGlobal {
 	
 	/// Current Java output Module. Maintained by JavaModule during Java Coding
 	public static JavaSourceFileCoder currentJavaFileCoder;
-	
-	/// The set of Java SourceFile Coders.
-	public static Vector<JavaSourceFileCoder> javaSourceFileCoders;
 
 	/// The Jar files queued for later inclusion.
 	/// See: JarFileBuilder for details.

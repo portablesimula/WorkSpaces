@@ -12,6 +12,7 @@ import simula.builder.SimulaBuilder;
 import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.transform.ClassFileTransform;
+import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
@@ -32,6 +33,7 @@ public class SimulaCompiler {
 	public boolean doParsing(SimulaBuilder simBuilder) {
 		boolean builderTerminateNormally = false;
 		simBuilder.duringParsing = true;
+    	LOG.info("SimulaCompiler.doParsing: BEGIN");
         // Do the actual Building
 		simBuilder.getNextParserToken();
 		simBuilder.syntaxTree = new ProgramModule(simBuilder);
@@ -62,6 +64,7 @@ public class SimulaCompiler {
 			Util.println("BEGIN Semantic Checker");
 		simBuilder.duringParsing = false;
 		simBuilder.duringChecking = true;
+    	LOG.info("SimulaCompiler.doChecking: BEGIN");
 		StandardClass.ENVIRONMENT.doChecking();
 		ProgramModule programModule = simBuilder.syntaxTree;
 		programModule.doChecking();
@@ -93,6 +96,32 @@ public class SimulaCompiler {
 	// ***************************************************************
 	public void doCodeGeneration(SimulaBuilder simBuilder) throws IOException {
 		ProgramModule  programModule = documentManager.getSyntaxTree();
+		switch(Option.compilerMode) {
+			case directClassFiles:
+	
+				// Create Temp .class-Files Directory:
+				File tmpClassDir = new File(CoreGlobal.simulaTempDir, "classes");
+				tmpClassDir.mkdirs();
+				CoreGlobal.tempClassFileDir = tmpClassDir;
+		    	LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempClassFileDir="+CoreGlobal.tempClassFileDir);
+				break;
+//			case simulaClassLoader:
+//				break;
+			case viaJavaSource:
+				CoreGlobal.javaSourceFileCoders = new Vector<JavaSourceFileCoder>();
+				// Create Temp .java-Files Directory:
+				File javatmp = Option.internal.keepJava;
+				if (javatmp == null)
+					javatmp = CoreGlobal.simulaTempDir;
+				File tmpJavaDir = new File(javatmp, "src/" + Option.packetName);
+				tmpJavaDir.mkdirs();
+				CoreGlobal.tempJavaFileDir = tmpJavaDir;
+		    	LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempJavaFileDir="+CoreGlobal.tempJavaFileDir);
+				break;
+			default:
+				break;
+		}
+		Option.print("SimulaCompiler.doCodeGeneration: ");
 		simBuilder.jarFileBuilder = new JarFileBuilder();
 		try {
 			simBuilder.jarFileBuilder.open(programModule);
@@ -115,7 +144,7 @@ public class SimulaCompiler {
 			if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + simBuilder.documentManager.sourceName + ": Java Source Files Generated");
 			if (Option.internal.TRACING) {
 				Util.println("END Generate .java Output Code");
-				for (JavaSourceFileCoder javaClass : simBuilder.javaSourceFileCoders)
+				for (JavaSourceFileCoder javaClass : CoreGlobal.javaSourceFileCoders)
 					Util.println(javaClass.javaOutputFile.toString());
 			}
 		}

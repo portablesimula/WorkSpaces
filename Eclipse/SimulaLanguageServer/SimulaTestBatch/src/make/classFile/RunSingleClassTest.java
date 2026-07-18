@@ -44,9 +44,9 @@ public final class RunSingleClassTest {
 //		argv.add("-select");
 
 		Vector<String> argv2 = new Vector<>();
-//		argv2.add("-" + Option.CompilerMode.viaJavaSource);
+//		argv2.add("-compilerMode" + Option.CompilerMode.viaJavaSource);
 		argv2.add("-compilerMode"); argv2.add(Option.CompilerMode.directClassFiles.toString());
-//		argv2.add("-" + Option.CompilerMode.simulaClassLoader);
+//		argv2.add("-compilerMode" + Option.CompilerMode.simulaClassLoader);
 		
 //		argv2.add("-noexec");
 //		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch

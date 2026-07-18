@@ -36,24 +36,6 @@ public class SimulaBuilder {
 	/// Compiler state: True while Checking
 	public boolean duringChecking;
 	
-	/// The Simula temp directory
-	public File simulaTempDir;
-	
-	/// The output directory. Used by Java-Coding to save the generated .jar files.
-	public File outputDir;
-	
-	/// The external library. Used by ExternalDeclaration.readAttributeFile
-	public File extLib;
-	
-	/// Temp directory for generated .class files
-	public File tempClassFileDir;
-	
-	/// The set of external .jar files.
-	public Vector<File> externalJarFiles;
-	
-	/// The set of Java SourceFile Coders.
-	public Vector<JavaSourceFileCoder> javaSourceFileCoders;
-	
 	
     private LexToken prevParserToken;
     private LexToken currentParserToken;
@@ -64,15 +46,6 @@ public class SimulaBuilder {
 	public ProgramModule syntaxTree; // Root of Syntax Tree
 	public List<SimulaDiagnostic> diagnostics;
 	public List<LexToken> tokenList;
-
-	public File getOutputDir() {
-        if(Option.outputDir != null) {
-        	outputDir = Option.outputDir;
-        } else {
-        	outputDir = new File(documentManager.sourceFileDir, "bin");
-        }
-        return outputDir;
-	}
 
 	public SimulaBuilder(DocumentManager documentManager) {
 		this.documentManager = documentManager;
@@ -88,13 +61,8 @@ public class SimulaBuilder {
 //        }
 
 		// Get Temp Directory:
-		simulaTempDir = CoreGlobal.getTempFileDir("simula/");
-		deleteTempFiles(simulaTempDir);
-
-		// Create Temp .class-Files Directory:
-		File tmpClassDir = new File(simulaTempDir, "classes");
-		tmpClassDir.mkdirs();
-		tempClassFileDir = tmpClassDir;
+		CoreGlobal.simulaTempDir = CoreGlobal.getTempFileDir("simula/");
+		deleteTempFiles(CoreGlobal.simulaTempDir);
 
 		File desktop = new File(System.getProperty("user.home"), "Desktop");
 //		if (args.verbose) {
@@ -124,20 +92,14 @@ public class SimulaBuilder {
 			// System.getProperties().list(System.out);
 
 //		}
-		Util.println("------------  SIMULA VARIABLES SUMMARY  ------------");
-		Util.println("DocumentManager.documentUri     " + documentManager.documentUri);
-		Util.println("DocumentManager.sourceFileDir   " + documentManager.sourceFileDir);
-		Util.println("DocumentManager.documentVersion " + documentManager.documentVersion);
-		Util.println("DocumentManager.sourceName      " + documentManager.sourceName);
-//		Util.println("DocumentManager.sourceCode      " + documentManager.sourceCode);
-		Util.println("DocumentManager.packetName      " + Option.packetName);
-		Util.println("DocumentManager.simulaRtsLib    " + Option.simulaRtsLib);
-		
-		Util.println("SimulaBuilder.outputDir         " + this.outputDir);
-		Util.println("SimulaBuilder.simulaTempDir     " + this.simulaTempDir);
-		Util.println("SimulaBuilder.tempClassFileDir  " + this.tempClassFileDir);
-		Util.println("SimulaBuilder.extLib            " + this.extLib);
-		
+			Util.println("------------  SIMULA VARIABLES SUMMARY  ------------");
+			Util.println("DocumentManager.documentUri     " + documentManager.documentUri);
+			Util.println("DocumentManager.sourceFileDir   " + documentManager.sourceFileDir);
+			Util.println("DocumentManager.documentVersion " + documentManager.documentVersion);
+			Util.println("DocumentManager.sourceName      " + documentManager.sourceName);
+//			Util.println("DocumentManager.sourceCode      " + documentManager.sourceCode);
+
+			Option.print(" SIMULA VARIABLES SUMMARY");
 //		Util.IERR("STOPP HER INNTIL VIDERE");
 	}
 	
