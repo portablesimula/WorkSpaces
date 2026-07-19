@@ -7,12 +7,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import simula.Option;
 import simula.SimTextDocumentContentChangeEvent;
 import simula.builder.SimulaBuilder;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.statement.ProgramModule;
-import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.SimulaDiagnostic;
 import simula.compiler.utilities.Util;
-import simula.exception.EOTException;
 import simula.token.LexToken;
 
 /// Vi må lagre innholdet til dokumentene som er åpne i editoren.
@@ -25,9 +24,9 @@ public class DocumentManager {
 
 	final public String documentUri;
 	final public File sourceFileDir;
-	final public int documentVersion;
+	public int documentVersion;
 //	final public String sourceName; // The source file name without .sim
-	final public String sourceCode;
+	public String sourceCode;
 	public SimulaBuilder simBuilder;
 	
     // Nøkkelen er filens URI (f.eks. file:///path/to/file.txt)
@@ -95,19 +94,19 @@ public class DocumentManager {
 		return documentUri;
 	}
 
-	/// Set the text document's uri.
-	public void setUri(final String uri) {
-		documentUri = uri;
-	}
+//	/// Set the text document's uri.
+//	public void setUri(final String uri) {
+//		documentUri = uri;
+//	}
 
 	/// Get the version number of this document (it will strictly increase after each change, including undo/redo).
 	public int getVersion() {
-		return version;
+		return documentVersion;
 	}
 
 	/// Set the version number of this document (it will strictly increase after each change, including undo/redo).
-	public void setVersion(final int version) {
-		this.version = version;
+	public void setVersion(final int documentVersion) {
+		this.documentVersion = documentVersion;
 	}
 
 	/// Get the content of the opened text document.
@@ -241,7 +240,7 @@ public class DocumentManager {
 		ProgramModule  programModule = this.getSyntaxTree();
 		if (Option.internal.TRACING)
 			Util.println("BEGIN Semantic Checker");
-		CoreGlobal.duringChecking = true;
+		simBuilder.duringChecking = true;
 		programModule.doChecking();
 		if (Option.internal.TRACING) {
 			Util.println("END Semantic Checker: \"" + programModule + "\"");
@@ -249,7 +248,7 @@ public class DocumentManager {
 				programModule.print(0);
 		}
 		if(SimulaCompiler.verbose) Util.println("SimulaCompiler.doCompile: " + SimulaCompiler.sourceName + ": Semantic Checker completed");
-		CoreGlobal.duringChecking = false;
+		simBuilder.duringChecking = false;
 		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
 			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");
 			programModule.printTree(1,this);

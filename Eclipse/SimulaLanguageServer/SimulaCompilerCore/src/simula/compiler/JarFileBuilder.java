@@ -17,9 +17,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.Map.Entry;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
@@ -28,12 +26,9 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
 import simula.Option;
-import simula.builder.SimulaBuilder;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.statement.ProgramModule;
-import simula.compiler.utilities.ClassHierarchy;
 import simula.compiler.utilities.CoreGlobal;
-import simula.compiler.utilities.SimulaClassLoader;
 import simula.compiler.utilities.Util;
 
 /// Utilities to build and manipulate jarFiles.
@@ -47,10 +42,8 @@ public class JarFileBuilder {
 	/// The ProgramModule.
 	private ProgramModule programModule;
 	
-	private SimulaBuilder simBuilder;
-	
 	/// The output .jar file
-	private File outputJarFile;
+	public File outputJarFile;
 	
 	/// Main entry name.
 	String mainEntry;
@@ -79,12 +72,11 @@ public class JarFileBuilder {
 		this.programModule = programModule;
 		if (Option.internal.TRACING)
 			Util.println("BEGIN Create .jar File");
-		simBuilder = programModule.simBuilder;
 		outputJarFile = new File(SimulaCompiler.outputDir, programModule.getIdentifier().value + ".jar");
 		outputJarFile.getParentFile().mkdirs();
 		Manifest manifest = new Manifest();
 		String packetName = SimulaCompiler.packetName;
-		mainEntry = packetName + '/' + programModule.getIdentifier();
+		mainEntry = packetName + '/' + programModule.getIdentifier().value;
 		mainEntry = mainEntry.replace('/', '.');
 		if (Option.internal.TRACING)
 			Util.println("Output " + outputJarFile + " MANIFEST'mainEntry=\"" + mainEntry + "\"");
@@ -303,112 +295,6 @@ public class JarFileBuilder {
 				if(TESTING)
 					IO.println("JarFileBuilder.addIncludeQueue: expandJarFile: "+jarFile.getName());
 				expandJarFile(jarFile);	
-			}
-		}
-	}
-
-	/// Load the jarFiles in the includeQueue using simulaClassLoader.
-	/// @throws IOException if something went wrong
-	public static void loadIncludeQueue() throws IOException {
-		if(CoreGlobal.includeQueue != null) {
-			for(JarFile jarFile:CoreGlobal.includeQueue) {
-				if(TESTING)
-					IO.println("JarFileBuilder.loadIncludeQueue: loadJarEntries: "+jarFile.getName());
-				loadJarEntries(jarFile, SimulaCompiler.packetName, CoreGlobal.simulaClassLoader);	
-			}
-		}
-	}
-
-	/// Load the Runtime System using simulaClassLoader.
-	/// @throws IOException if something went wrong
-	public static void loadRuntimeSystem() throws IOException {
-		if(TESTING) IO.println("JarFileBuilder.loadRuntimeSystem: "+SimulaCompiler.simulaRtsLib);
-		File rtsLib = new File(SimulaCompiler.simulaRtsLib.getParentFile(), "RTS.jar");
-		if(TESTING) IO.println("JarFileBuilder.loadRuntimeSystem: rtsLib="+rtsLib);
-		JarFile jarFile = new JarFile(rtsLib);
-
-		loadJarEntries(jarFile, "simula/runtime/", CoreGlobal.simulaClassLoader);
-	}
-	
-	/// Load jarFile entries.
-	/// @param jarFile the jarFile.
-	/// @param packetName the packet name.
-	/// @param loader the SimulaClassLoader to use.
-	/// @throws IOException if something went wrong.
-	private static void loadJarEntries(final JarFile jarFile, final String packetName, final SimulaClassLoader loader) throws IOException {
-		if(TESTING) IO.println("\nJarFileBuilder.loadJarEntries: JarFileName="+jarFile.getName());
-		if (SimulaCompiler.verbose)
-			Util.println("---------  INCLUDE .jar File: " + jarFile.getName() + "  ---------");
-		Enumeration<JarEntry> entries = jarFile.entries();
-		Map<String,byte[]> delayedLoadings = null;
-
-		LOOP: while (entries.hasMoreElements()) {
-			JarEntry inputEntry = entries.nextElement();
-
-			String entryName = inputEntry.getName();
-			if(TESTING) IO.println("JarFileBuilder.loadJarEntries: entryName="+entryName);
-			if (!entryName.startsWith(packetName))	continue LOOP;
-			if (!entryName.endsWith(".class"))		continue LOOP;
-
-			InputStream inputStream = jarFile.getInputStream(inputEntry);
-			String name = entryName.substring(0, entryName.length() - 6).replace('/', '.');
-			byte[] bytes = inputStream.readAllBytes(); inputStream.close();
-
-			String supClassName = ClassHierarchy.getRealPrefix(name);
-			boolean readyToLoad = true;
-			if(supClassName != null) {
-				boolean prefixLoaded = loader.isClassLoaded(supClassName);
-				if(TESTING) IO.println("JarFileBuilder.loadJarEntries: supClassName="+supClassName+", prefixLoaded="+prefixLoaded);
-				if(! prefixLoaded) {
-					readyToLoad = false;
-					if(delayedLoadings == null) delayedLoadings = new HashMap<String,byte[]>();
-					delayedLoadings.put(name, bytes);
-				}
-			}
-			if(readyToLoad) {
-				try { loader.loadClass(name, bytes); }
-				catch(NoClassDefFoundError e) {
-					if(delayedLoadings == null) delayedLoadings = new HashMap<String,byte[]>();
-					delayedLoadings.put(name, bytes);						
-				}
-			}
-
-		}
-
-		int NNN = 4000;
-		while(delayedLoadings != null) {
-			if(--NNN < 0) Util.IERR();
-			if(TESTING)
-				IO.println("\nJarFileBuilder.loadJarEntries: delayedLoadings +++++++++++++++++++");
-			Vector<String> loaded = new Vector<String>();
-
-			for (Entry<String, byte[]> entry : delayedLoadings.entrySet()) {
-				String name = entry.getKey();
-				byte[] bytes = entry.getValue();
-				String supClassName = ClassHierarchy.getRealPrefix(name);
-				if(TESTING)
-					IO.println("JarFileBuilder.loadJarEntries: Check Class: "+name+" extends "+supClassName);
-				boolean readyToLoad = true;
-				if(supClassName != null) {
-					boolean prefixLoaded = loader.isClassLoaded(supClassName);
-					if(! prefixLoaded) readyToLoad = false;
-				}
-				if(readyToLoad) {
-					if(TESTING)
-						IO.println("JarFileBuilder.loadJarEntries: Load Class: "+name);
-					try {	
-						loader.loadClass(name, bytes);
-						loaded.add(name);
-					} catch(NoClassDefFoundError e) { }
-				}
-			}
-
-			if(loaded.size() == 0) Util.IERR();
-			for(String name:loaded) {
-				if(TESTING)
-					IO.println("JarFileBuilder.loadJarEntries: Remove: "+name);
-				delayedLoadings.remove(name);
-				if(delayedLoadings.size() == 0) delayedLoadings = null;
 			}
 		}
 	}

@@ -66,9 +66,6 @@ public class SimulaBuilder {
 //		if (args.verbose) {
 			// https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html
 			Util.println("------------  SIMULA ENVIRONMENT SUMMARY  ------------");
-			Util.println("Simula Properties    " + CoreGlobal.simulaPropertiesFile);
-			Util.println("Simula Home          " + CoreGlobal.simulaHome);
-			Util.println("Simula Home (prev)   " + CoreGlobal.getSimulaProperty("simula.home", null));
 			Util.println("Java Home            " + System.getProperty("java.home"));
 			Util.println("User Home            " + System.getProperty("user.home"));
 			Util.println("Working Directory    " + System.getProperty("user.dir"));

@@ -57,7 +57,8 @@ public final class JavaSourceFileCoder {
 			javaOutputFile.getParentFile().mkdirs();
 			if (SimulaCompiler.verbose)
 				Util.TRACE("Output: " + javaOutputFile.getCanonicalPath());
-			writer = new OutputStreamWriter(new FileOutputStream(javaOutputFile), CoreGlobal._CHARSET);
+//			writer = new OutputStreamWriter(new FileOutputStream(javaOutputFile), CoreGlobal._CHARSET);
+			writer = new OutputStreamWriter(new FileOutputStream(javaOutputFile));
 			JavaSourceFileCoder.code("package " + SimulaCompiler.packetName + ";");
 			JavaSourceFileCoder.code("// " + SimulaCompiler.simulaReleaseID + " Compiled at " + new Date());
 			JavaSourceFileCoder.code("import simula.runtime.*;");
@@ -203,7 +204,7 @@ public final class JavaSourceFileCoder {
 		s.append(edIndent() + "public static RTS_PROGINFO _INFO=new RTS_PROGINFO(\"");
 		s.append(SimulaCompiler.sourceFileName);
 		s.append("\",\"");
-		s.append(ObjectKind.edit(blockDeclaration.declarationKind) + " " + blockDeclaration.identifier);
+		s.append(ObjectKind.edit(blockDeclaration.declarationKind) + " " + blockDeclaration.identifier.value);
 		s.append('"');
 		for (Integer i : lineMap) {
 			s.append(',');

@@ -24,20 +24,15 @@ import simula.compiler.utilities.Util;
 public final class Option {
 	public static boolean LEX_VERIFY = true;
 
-//	public static boolean TESTING_WITHOUT_PSI = true;
-//	public static boolean TESTING_NEW_LEXER = true;
-//	public static boolean TESTING_USE_SCANNER = true;
-	
-	public static int TRACE_PSITREE_START_DONE = 0;
-	public static int TRACE_ACCEPT_EXPRESSION = 0;
 	public static int TRACE_ACCEPT_STATEMENT = 0;
+	public static boolean KEEP_CLASS_LOADER = true;//false;
 	
 	/// The UI-Scale factor
 	/// See: https://docs.oracle.com/en/java/javase/25/troubleshoot/java-2d-properties.html
 	public static String editorUIScale;
 
-	/// The currently selected Color Theme
-	public static String selectedTheme;
+//	/// The currently selected Color Theme
+//	public static String selectedTheme;
 	
 	
 	/// Testing and debugging options
@@ -211,7 +206,6 @@ public final class Option {
 //		Option.selectedTheme = Palette.themeNames[0];
 //		CompilerMode compilerMode=CompilerMode.viaJavaSource;
 		SimulaCompiler.compilerMode = SimulaCompiler.CompilerMode.directClassFiles;
-//		compilerMode = CompilerMode.simulaClassLoader;
 		SimulaCompiler.CaseSensitive = false;
 		SimulaCompiler.verbose = false;
 		SimulaCompiler.noExecution = false;
@@ -219,32 +213,6 @@ public final class Option {
 		SimulaCompiler.EXTENSIONS = true;
 		
 		Option.internal.InitCompilerOptions();
-	}
-	
-	/// Get Compiler options from property file.
-	/// @param properties the properties used.
-	public static void getCompilerOptions(Properties properties) {
-//		Option.editorUIScale = properties.getProperty("simula.editor.UIScale", "1.0");
-//		Option.selectedTheme = properties.getProperty("simula.editor.theme", Palette.themeNames[0]);
-//		setCompilerMode(properties.getProperty("simula.compiler.option.mode", "directClassFiles"));
-//		SimulaCompiler.CaseSensitive = properties.getProperty("simula.compiler.option.CaseSensitive", "false").equalsIgnoreCase("true");
-//		SimulaCompiler.verbose = properties.getProperty("simula.compiler.option.verbose", "false").equalsIgnoreCase("true");
-//		SimulaCompiler.noExecution = properties.getProperty("simula.compiler.option.noExecution", "false").equalsIgnoreCase("true");
-//		SimulaCompiler.WARNINGS = properties.getProperty("simula.compiler.option.WARNINGS", "true").equalsIgnoreCase("true");
-//		SimulaCompiler.EXTENSIONS = properties.getProperty("simula.compiler.option.EXTENSIONS", "true").equalsIgnoreCase("true");
-	}
-	
-	/// Set Compiler options in property file.
-	/// @param properties the properties used.
-	public static void setCompilerOptions(Properties properties) {
-		properties.setProperty("simula.editor.UIScale", Option.editorUIScale);
-		properties.setProperty("simula.editor.theme", Option.selectedTheme);
-		properties.setProperty("simula.compiler.option.mode", ""+SimulaCompiler.compilerMode);
-		properties.setProperty("simula.compiler.option.CaseSensitive", ""+SimulaCompiler.CaseSensitive);
-		properties.setProperty("simula.compiler.option.verbose", ""+SimulaCompiler.verbose);
-		properties.setProperty("simula.compiler.option.noExecution", ""+SimulaCompiler.noExecution);
-		properties.setProperty("simula.compiler.option.WARNINGS", ""+SimulaCompiler.WARNINGS);
-		properties.setProperty("simula.compiler.option.EXTENSIONS", ""+SimulaCompiler.EXTENSIONS);
 	}
 
 	/// Editor Utility: Set Compiler Mode.
@@ -254,52 +222,7 @@ public final class Option {
 			SimulaCompiler.compilerMode = CompilerMode.viaJavaSource;
 		} else if(id.equals("directClassFiles")) {
 			SimulaCompiler.compilerMode = CompilerMode.directClassFiles;
-		} else if(id.equals("simulaClassLoader")) {
-			SimulaCompiler.compilerMode = CompilerMode.simulaClassLoader;
 		}
-	}
-
-	/// Returns the option name 'id'
-	/// @param id option id
-	/// @return the option name 'id'
-	public static boolean getOption(String id) {
-		if(id.equalsIgnoreCase("CaseSensitive")) return(CaseSensitive); 
-		if(id.equalsIgnoreCase("VERBOSE")) return(verbose); 
-		if(id.equalsIgnoreCase("noExecution")) return(noExecution); 
-		if(id.equalsIgnoreCase("WARNINGS")) return(WARNINGS); 
-		if(id.equalsIgnoreCase("EXTENSIONS")) return(EXTENSIONS); 
-		if(id.equalsIgnoreCase("TRACING")) return(internal.TRACING); 
-		if(id.equalsIgnoreCase("TRACE_LEXER")) return(internal.TRACE_LEXER > 0); 
-		if(id.equalsIgnoreCase("TRACE_COMMENTS")) return(internal.TRACE_COMMENTS); 
-		if(id.equalsIgnoreCase("TRACE_PARSE")) return(internal.TRACE_PARSE); 
-		if(id.equalsIgnoreCase("TRACE_ATTRIBUTE_OUTPUT")) return(internal.TRACE_ATTRIBUTE_OUTPUT); 
-		if(id.equalsIgnoreCase("TRACE_ATTRIBUTE_INPUT")) return(internal.TRACE_ATTRIBUTE_INPUT); 
-		if(id.equalsIgnoreCase("TRACE_CHECKER")) return(internal.TRACE_CHECKER); 
-		if(id.equalsIgnoreCase("TRACE_CHECKER_OUTPUT")) return(internal.TRACE_CHECKER_OUTPUT); 
-		if(id.equalsIgnoreCase("TRACE_CODING")) return(internal.TRACE_CODING); 
-		if(id.equalsIgnoreCase("TRACE_BYTECODE_OUTPUT")) return(internal.TRACE_BYTECODE_OUTPUT); 
-		return(false);
-	}
-
-	/// Set the option named 'id' to the given value
-	/// @param id option id
-	/// @param val new option value
-	public static void setOption(String id,boolean val) {
-		if(id.equalsIgnoreCase("CaseSensitive")) CaseSensitive=val; 
-		if(id.equalsIgnoreCase("VERBOSE")) verbose=val; 
-		if(id.equalsIgnoreCase("noExecution")) noExecution=val; 
-		if(id.equalsIgnoreCase("WARNINGS")) WARNINGS=val; 
-		if(id.equalsIgnoreCase("EXTENSIONS")) EXTENSIONS=val; 
-		if(id.equalsIgnoreCase("TRACING")) internal.TRACING=val; 
-		if(id.equalsIgnoreCase("TRACE_LEXER")) internal.TRACE_LEXER=(val)?1:0; 
-		if(id.equalsIgnoreCase("TRACE_COMMENTS")) internal.TRACE_COMMENTS=val; 
-		if(id.equalsIgnoreCase("TRACE_PARSE")) internal.TRACE_PARSE=val; 
-		if(id.equalsIgnoreCase("TRACE_ATTRIBUTE_OUTPUT")) internal.TRACE_ATTRIBUTE_OUTPUT=val; 
-		if(id.equalsIgnoreCase("TRACE_ATTRIBUTE_INPUT")) internal.TRACE_ATTRIBUTE_INPUT=val; 
-		if(id.equalsIgnoreCase("TRACE_CHECKER")) internal.TRACE_CHECKER=val; 
-		if(id.equalsIgnoreCase("TRACE_CHECKER_OUTPUT")) internal.TRACE_CHECKER_OUTPUT=val; 
-		if(id.equalsIgnoreCase("TRACE_CODING")) internal.TRACE_CODING=val; 
-		if(id.equalsIgnoreCase("TRACE_BYTECODE_OUTPUT")) internal.TRACE_BYTECODE_OUTPUT=val; 
 	}
 
 

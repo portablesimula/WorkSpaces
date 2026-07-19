@@ -36,7 +36,6 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Util;
 import simula.token.Identifier;
-import simula.token.LexToken;
 
 /// Maybe Block Declaration. I.e: CompoundStatement or SubBlock depends on
 /// whether it contains declarations.

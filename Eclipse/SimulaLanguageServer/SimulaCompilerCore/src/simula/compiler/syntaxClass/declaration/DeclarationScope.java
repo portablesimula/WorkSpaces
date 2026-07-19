@@ -430,24 +430,11 @@ public abstract class DeclarationScope extends Declaration  {
     /// @throws IOException if something went wrong
     protected void loadOrAddClassFile(byte[] bytes) throws IOException {
     	if(bytes != null) {
-    		if(SimulaCompiler.compilerMode == SimulaCompiler.CompilerMode.simulaClassLoader) {
-    			if(CoreGlobal.simulaClassLoader != null) {
-    				String name = SimulaCompiler.packetName + "." + externalIdent;
-    				if(SimulaCompiler.verbose) Util.println(SimulaCompiler.sourceName + ": Begin Load ClassFile: " + name);
-    				CoreGlobal.simulaClassLoader.loadClass(name, bytes);
-    			} else {
-        			String entryName = SimulaCompiler.packetName + "/" + externalIdent + ".class";
-        			if(SimulaCompiler.verbose) Util.println(SimulaCompiler.sourceName + ": Begin Write .jar Entry: " + entryName);
-        			SimulaCompiler.jarFileBuilder.writeJarEntry(entryName, bytes);
-    			}
-    		} else {
-    			String entryName = SimulaCompiler.packetName + "/" + externalIdent + ".class";
-    			SimulaCompiler.jarFileBuilder.putMapEntry(entryName, bytes);    				
-    		}
+    		String entryName = SimulaCompiler.packetName + "/" + externalIdent + ".class";
+    		SimulaCompiler.jarFileBuilder.putMapEntry(entryName, bytes);    				
  			if(Option.internal.LIST_GENERATED_CLASS_FILES)
    				listGeneratedClassFile(bytes);
     	}
-    	
     }
 
     /// Debug utility: listGeneratedClassFile.

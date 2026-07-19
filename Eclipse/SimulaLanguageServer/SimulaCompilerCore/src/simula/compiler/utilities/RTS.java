@@ -12,10 +12,8 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 
-import simula.Option;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.Type;
-import simula.lsp.compiler.DocumentManager;
 
 /// Predefined values for common constants, including descriptors for class types etc. 
 /// 

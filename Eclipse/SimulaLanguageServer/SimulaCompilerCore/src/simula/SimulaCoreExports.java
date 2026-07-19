@@ -77,8 +77,6 @@ public class SimulaCoreExports {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Util.IERR("STOP HER INTILL VIDERE");	
-		Util.STOP();
 	}
 	
 	// ==============================================================================================================

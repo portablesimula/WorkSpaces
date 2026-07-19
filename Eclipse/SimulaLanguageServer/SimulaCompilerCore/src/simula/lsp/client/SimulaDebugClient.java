@@ -152,7 +152,7 @@ public class SimulaDebugClient {
 //	    String updatedText = simulaTextDocumentService.getUpdatedText(demoUri);
 //	    SemanticTokens semanticTokens = simulaTextDocumentService.getAllSemanticTokens(semanticTokensParams);
 	    
-	    DocumentManager documentManager = DocumentManager.GetDocumentManager(demoUri);
+	    DocumentManager documentManager = DocumentManager.getDocumentManager(demoUri);
 	    String updatedText = documentManager.getText();
 //	    List<LexToken> tokenList = documentManager.tokenList;
 	    

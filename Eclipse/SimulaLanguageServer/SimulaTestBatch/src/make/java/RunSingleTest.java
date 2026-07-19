@@ -23,7 +23,8 @@ import simula.Option;
  */
 public final class RunSingleTest {
 	
-	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
+//	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
+	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaCompilerCore");
 	private static final String userDir = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaTestBatch";
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 
@@ -39,9 +40,9 @@ public final class RunSingleTest {
 //		argv.add("-select");
 
 		Vector<String> argv2 = new Vector<>();
-		argv2.add("-compilerMode" + SimulaCompiler.CompilerMode.viaJavaSource);
-//		argv2.add("-compilerMode"); argv2.add(SimulaCompiler.CompilerMode.directClassFiles.toString());
-//		argv2.add("-compilerMode" + SimulaCompiler.CompilerMode.simulaClassLoader);
+		argv2.add("-compilerMode"); argv2.add("viaJavaSource");
+//		argv2.add("-compilerMode"); argv2.add("directClassFiles");
+//		argv2.add("-compilerMode"); argv2.add("simulaClassLoader");
 		
 //		argv2.add("-noexec");
 //		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
@@ -295,7 +296,7 @@ public final class RunSingleTest {
 
 	private static void setOptions() {
 		// Set options.
-		Option.compilerMode = SimulaCompiler.CompilerMode.viaJavaSource;
+//		Option.compilerMode = SimulaCompiler.CompilerMode.viaJavaSource;
 //		Option.verbose=true;
 //		Option.EXTENSIONS=false;
 //		Option.CaseSensitive=true;
@@ -306,7 +307,7 @@ public final class RunSingleTest {
 
 		// Set internal test, debug options.
 		Option.internal.INLINE_TESTING=true;
-		Option.noPopup = true;
+//		Option.noPopup = true;
 		Option.internal.TESTING_STACK_SIZE = true;
 //		Option.internal.DEBUGGING=true;
 //		Option.internal.LIST_GENERATED_CLASS_FILES=true;

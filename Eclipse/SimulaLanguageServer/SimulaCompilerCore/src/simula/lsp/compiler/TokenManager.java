@@ -64,12 +64,12 @@ public class TokenManager {
 	}
 
 	public static List<LexToken> getTokenList(String documentUri) {
-    	DocumentManager documentManager = DocumentManager.GetDocumentManager(documentUri);
+    	DocumentManager documentManager = DocumentManager.getDocumentManager(documentUri);
 		return documentManager.getTokenList();
 	}
 
 	public static List<SimulaDiagnostic> getDiagnostics(String documentUri) {
-    	DocumentManager documentManager = DocumentManager.GetDocumentManager(documentUri);
+    	DocumentManager documentManager = DocumentManager.getDocumentManager(documentUri);
 		return documentManager.getDiagnostics();
 	}
 

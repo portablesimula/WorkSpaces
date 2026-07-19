@@ -17,6 +17,7 @@ import simula.builder.SimulaBuilder;
 import simula.Option;
 import simula.builder.Parse;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.ProtectedSpecification;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;

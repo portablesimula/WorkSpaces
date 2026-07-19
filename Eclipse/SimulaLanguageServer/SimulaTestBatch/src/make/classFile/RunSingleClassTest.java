@@ -28,7 +28,8 @@ public final class RunSingleClassTest {
 
 	// C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer\SimulaTestBatch\src\simulaTestBatch
 	
-	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
+//	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
+	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaCompilerCore");
 	private static final String userDir = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaTestBatch";
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 
@@ -43,9 +44,9 @@ public final class RunSingleClassTest {
 //		argv.add("-select");
 
 		Vector<String> argv2 = new Vector<>();
-//		argv2.add("-compilerMode" + SimulaCompiler.CompilerMode.viaJavaSource);
+//		argv2.add("-compilerMode"); argv2.add("viaJavaSource");
 		argv2.add("-compilerMode"); argv2.add("directClassFiles");
-//		argv2.add("-compilerMode" + SimulaCompiler.CompilerMode.simulaClassLoader);
+//		argv2.add("-compilerMode"); argv2.add("simulaClassLoader");
 		
 //		argv2.add("-noexec");
 //		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch

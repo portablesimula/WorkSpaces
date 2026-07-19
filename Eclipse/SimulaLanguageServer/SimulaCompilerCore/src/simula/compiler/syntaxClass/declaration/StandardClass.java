@@ -1124,11 +1124,6 @@ public final class StandardClass extends ClassDeclaration {
 	private StandardClass(String prefix,String className) {
 		this(className);
 		this.prefix = new Identifier(prefix);
-		if(SimulaCompiler.compilerMode == SimulaCompiler.CompilerMode.simulaClassLoader) {
-			ClassDesc CD_ThisClass = ClassDesc.of("simula.runtime.RTS_" + className); 
-			ClassDesc CD_SuperClass = ClassDesc.of("simula.runtime.RTS_" + prefix); 
-			ClassHierarchy.addClassToSuperClass(CD_ThisClass, CD_SuperClass);
-		}
 		SET_SEMANTICS_CHECKED();
 	}
 

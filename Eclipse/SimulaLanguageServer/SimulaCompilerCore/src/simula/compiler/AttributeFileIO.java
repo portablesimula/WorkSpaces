@@ -56,15 +56,7 @@ public final class AttributeFileIO {
 		byte[] bytes = buildAttrFile(program);
 		String entryName = program.getRelativeAttributeFileName();
 
-   		if(SimulaCompiler.compilerMode == SimulaCompiler.CompilerMode.simulaClassLoader) {
-			if(SimulaCompiler.jarFileBuilder!=null) {
-				SimulaCompiler.jarFileBuilder.writeJarEntry(entryName, bytes);
-			}
-			else Util.IERR();
-			
-		} else {
-			SimulaCompiler.jarFileBuilder.writeJarEntry(entryName, bytes);
-		}
+		SimulaCompiler.jarFileBuilder.writeJarEntry(entryName, bytes);
 		if (SimulaCompiler.verbose)	Util.TRACE("*** ENDOF Generate SimulaAttributeFile: " + file);
 	}
 
@@ -103,7 +95,7 @@ public final class AttributeFileIO {
 		}
 		try {
 			JarFile jarFile = new JarFile(file);
-			CoreGlobal.externalJarFiles.add(file);
+			SimulaCompiler.externalJarFiles.add(file);
 			Manifest manifest = jarFile.getManifest();
 			Attributes mainAttributes = manifest.getMainAttributes();
 			String simulaInfo = mainAttributes.getValue("SIMULA-INFO");
@@ -129,16 +121,10 @@ public final class AttributeFileIO {
 							+ '[' + module.externalIdent + ']' +"  ==>  "+declarationList.debugName);
 			}
     			
-	   		if(SimulaCompiler.compilerMode == SimulaCompiler.CompilerMode.simulaClassLoader) {
-				JarFileBuilder.addToIncludeQueue(jarFile);
-			} else {
-				if(SimulaCompiler.jarFileBuilder == null) {
-			   		if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.simulaClassLoader) {
-						SimulaCompiler.jarFileBuilder = new JarFileBuilder();
-					}
-				}
-				SimulaCompiler.jarFileBuilder.expandJarFile(jarFile);
+			if(SimulaCompiler.jarFileBuilder == null) {
+					SimulaCompiler.jarFileBuilder = new JarFileBuilder();
 			}
+			SimulaCompiler.jarFileBuilder.expandJarFile(jarFile);
 
 		} catch (IOException e) {
 			Util.generalError("Unable to read Attribute File: " + file + " caused by: " + e);
@@ -152,7 +138,7 @@ public final class AttributeFileIO {
 	/// @param jarFile the jarFile.
 	/// @return false: if the jarFile is already included.
 	public static boolean checkJarFiles(File jarFile) {
-		for(File f:CoreGlobal.externalJarFiles) if(f.equals(jarFile)) {
+		for(File f:SimulaCompiler.externalJarFiles) if(f.equals(jarFile)) {
 			Util.generalWarning("External already included: "+jarFile.getName());
 			return(false);
 		}

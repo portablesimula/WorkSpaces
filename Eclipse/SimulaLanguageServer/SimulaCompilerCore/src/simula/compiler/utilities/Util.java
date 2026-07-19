@@ -217,21 +217,6 @@ public final class Util {
 		FORCED_EXIT();
 	}
 	
-//	/// Edit a line with source line number etc.
-//	/// @param s the line string
-//	/// @return the resulting string
-//	private static String edLINE(String s) {		
-//		String line = "LINE " + Global.sourceLineNumber + s;
-//		if(Global.insertName!=null) line = Global.insertName + ':' + line;
-//		if(Global.getCurrentScope() != null) {
-//			if(Global.getCurrentScope().sourceFileName!=null) {
-//				String sourceName = getBaseName(Global.getCurrentScope().sourceFileName);
-//				line = sourceName + ':' + line;
-//			}
-//		}
-//		return(line);
-//	}
-	
 	/// Return the base name part of an URI
 	/// @param fileName a File Name.
 	/// @return the base name part of an URI
