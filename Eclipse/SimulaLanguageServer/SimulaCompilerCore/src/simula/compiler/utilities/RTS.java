@@ -13,6 +13,7 @@ import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 
 import simula.Option;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.Type;
 import simula.lsp.compiler.DocumentManager;
 
@@ -68,7 +69,7 @@ public final class RTS {
 		/// @param name class simple name
 		/// @return ClassDesc
 		public static ClassDesc classDesc(String name) {
-			return(ClassDesc.of(Option.packetName,name));
+			return(ClassDesc.of(SimulaCompiler.packetName,name));
 		}
 	}
 	

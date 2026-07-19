@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import simula.Args;
 import simula.Option;
 import simula.SimTextDocumentContentChangeEvent;
 import simula.builder.SimulaBuilder;
@@ -27,7 +26,7 @@ public class DocumentManager {
 	final public String documentUri;
 	final public File sourceFileDir;
 	final public int documentVersion;
-	final public String sourceName; // The source file name without .sim
+//	final public String sourceName; // The source file name without .sim
 	final public String sourceCode;
 	public SimulaBuilder simBuilder;
 	
@@ -40,20 +39,17 @@ public class DocumentManager {
     	this.sourceFileDir = new File(documentUri).getParentFile();
     	this.documentVersion = documentVersion;
     	this.sourceCode = sourceCode;
-    	this.sourceName = getSourceName(documentUri);
-    	
-    	CoreGlobal.sourceFileName = documentUri;
     }
-    
-    private String getSourceName(String documentUri) {
-    	String sourceName = Util.getBaseName(documentUri);
-		if (!Util.isJavaIdentifier(sourceName)) {
-			String prevName = sourceName;
-			sourceName = Util.makeJavaIdentifier(sourceName);
-			Util.generalWarning("The source file name '" + prevName + "' is not a legal class identifier. Modified to: " + this.sourceName);
-		}
-    	return sourceName;
-    }
+//    
+//    private String getSourceName(String documentUri) {
+//    	String sourceName = Util.getBaseName(documentUri);
+//		if (!Util.isJavaIdentifier(sourceName)) {
+//			String prevName = sourceName;
+//			sourceName = Util.makeJavaIdentifier(sourceName);
+//			Util.generalWarning("The source file name '" + prevName + "' is not a legal class identifier. Modified to: " + this.sourceName);
+//		}
+//    	return sourceName;
+//    }
 
     /// Debug Utility
     public static DocumentManager getDocumentManager(String documentUri)  {
@@ -252,7 +248,7 @@ public class DocumentManager {
 			if (Option.internal.TRACE_CHECKER_OUTPUT && programModule != null)
 				programModule.print(0);
 		}
-		if(Option.verbose) Util.println("SimulaCompiler.doCompile: " + CoreGlobal.sourceName + ": Semantic Checker completed");
+		if(SimulaCompiler.verbose) Util.println("SimulaCompiler.doCompile: " + SimulaCompiler.sourceName + ": Semantic Checker completed");
 		CoreGlobal.duringChecking = false;
 		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
 			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");
@@ -260,7 +256,7 @@ public class DocumentManager {
 		}
 		
 		if (Util.nError > 0) {
-			String msg="Compiler terminate " + CoreGlobal.sourceName + " after " + Util.nError + " errors during semantic checking";
+			String msg="Compiler terminate " + SimulaCompiler.sourceName + " after " + Util.nError + " errors during semantic checking";
 			Util.println(msg);
 //			Thread.dumpStack();
 			throw new RuntimeException(msg);

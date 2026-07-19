@@ -20,6 +20,7 @@ public class Identifier extends LexToken {
 	public Identifier(String value) {
 		super(KeyWord.IDENTIFIER);
 		this.value = value;
+		this.tokenText = value;
 		if(value == null) Util.IERR("");
 	}
 

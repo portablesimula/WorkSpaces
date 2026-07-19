@@ -15,6 +15,7 @@ import java.util.Vector;
 
 import simula.Option;
 import simula.builder.SimulaBuilder;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.lsp.util.SimPosition;
 import simula.lsp.util.SimRange;
@@ -357,7 +358,7 @@ public final class Util {
 	/// @param s2 argument string
 	/// @return true if the two specified strings are equal to one another
 	public static boolean equals(String s1,String s2) {
-		if(Option.CaseSensitive)
+		if(SimulaCompiler.CaseSensitive)
 			 return(s1.equals(s2));			
 		else return(s1.equalsIgnoreCase(s2));
 	}
@@ -418,7 +419,7 @@ public final class Util {
 	/// @param cmdarray command array
 	/// @return exit value
 	public static int execute(final String... cmdarray) {
-		if (Option.verbose) {
+		if (SimulaCompiler.verbose) {
 			String line = "";
 			for (int i = 0; i < cmdarray.length; i++)
 				line = line + " " + cmdarray[i];

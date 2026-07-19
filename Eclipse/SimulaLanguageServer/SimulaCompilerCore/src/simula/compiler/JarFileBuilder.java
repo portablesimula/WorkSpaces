@@ -80,16 +80,16 @@ public class JarFileBuilder {
 		if (Option.internal.TRACING)
 			Util.println("BEGIN Create .jar File");
 		simBuilder = programModule.simBuilder;
-		outputJarFile = new File(CoreGlobal.outputDir, programModule.getIdentifier().value + ".jar");
+		outputJarFile = new File(SimulaCompiler.outputDir, programModule.getIdentifier().value + ".jar");
 		outputJarFile.getParentFile().mkdirs();
 		Manifest manifest = new Manifest();
-		String packetName = Option.packetName;
+		String packetName = SimulaCompiler.packetName;
 		mainEntry = packetName + '/' + programModule.getIdentifier();
 		mainEntry = mainEntry.replace('/', '.');
 		if (Option.internal.TRACING)
 			Util.println("Output " + outputJarFile + " MANIFEST'mainEntry=\"" + mainEntry + "\"");
 		manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-		manifest.getMainAttributes().putValue("Created-By", CoreGlobal.simulaReleaseID + " (Portable Simula)");
+		manifest.getMainAttributes().putValue("Created-By", SimulaCompiler.simulaReleaseID + " (Portable Simula)");
 		if (programModule.isExecutable()) {
 			manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, mainEntry);
 //			manifest.getMainAttributes().put(Attributes.Name.CLASS_PATH, ".");
@@ -100,7 +100,7 @@ public class JarFileBuilder {
 		}
 		jarOutputStream = new JarOutputStream(new FileOutputStream(outputJarFile), manifest);
 		
-		if(Option.compilerMode != Option.CompilerMode.viaJavaSource) {
+		if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource) {
 			// Add initial entry: 
 			String entryName = packetName + '/';
 			writeJarEntry(entryName, null);
@@ -114,7 +114,7 @@ public class JarFileBuilder {
 		if(TESTING)	IO.println("JarOutputSet.putMapEntry: "+entryName);
 		byte[] prev = classFileMap.put(entryName,bytes);
 		if(prev != null) {
-			if(Option.verbose)
+			if(SimulaCompiler.verbose)
 				Util.println("JarOutputSet.putMapEntry: "+entryName+" WAS REPLACED");
 		}
 	}
@@ -146,8 +146,8 @@ public class JarFileBuilder {
 		if (programModule.isExecutable()) {
 			if(TESTING) IO.println("JarFileBuilder.close: Executable "+programModule);
 			// Add the Runtime System
-			File rtsHome = new File(CoreGlobal.simulaRtsLib, "simula/runtime");
-			add(false, rtsHome, CoreGlobal.simulaRtsLib.toString().length());
+			File rtsHome = new File(SimulaCompiler.simulaRtsLib, "simula/runtime");
+			add(false, rtsHome, SimulaCompiler.simulaRtsLib.toString().length());
 		} else {
 			String id = programModule.getIdentifier().value;
 			String kind = (programModule.mainModule instanceof ClassDeclaration) ? "Class " : "Procedure ";
@@ -155,7 +155,7 @@ public class JarFileBuilder {
 		}
         
         jarOutputStream.close();
-		if(Option.verbose) Util.println("JarFileBuilder.close: " + CoreGlobal.sourceName + ": JarFile " + outputJarFile);
+		if(SimulaCompiler.verbose) Util.println("JarFileBuilder.close: " + SimulaCompiler.sourceName + ": JarFile " + outputJarFile);
 		
 		if(TESTING) {
 			IO.println("JarFileBuilder.close: ");
@@ -170,8 +170,8 @@ public class JarFileBuilder {
 	/// Add temp .class files to jarOutputStream.
 	/// @throws IOException if something went wrong
 	public void addTempClassFiles() throws IOException {
-		if(Option.compilerMode != Option.CompilerMode.viaJavaSource) Util.IERR();
-		add(true, new File(CoreGlobal.tempClassFileDir, CoreGlobal.packetName), CoreGlobal.tempClassFileDir.toString().length());
+		if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource) Util.IERR();
+		add(true, new File(SimulaCompiler.tempClassFileDir, SimulaCompiler.packetName), SimulaCompiler.tempClassFileDir.toString().length());
 	}	
 	
 	/// Add directory or a file to a JarOutputStream, or
@@ -219,14 +219,14 @@ public class JarFileBuilder {
 	/// @throws IOException if something went wrong
 	public void expandJarFile(final JarFile jarFile) throws IOException {
 		if(TESTING) IO.println("JarFileBuilder.expandJarFile: JarFileName="+jarFile.getName());
-		if (Option.verbose)
+		if (SimulaCompiler.verbose)
 			Util.println("---------  INCLUDE .jar File: " + jarFile.getName() + "  ---------");
 		Enumeration<JarEntry> entries = jarFile.entries();
 		LOOP: while (entries.hasMoreElements()) {
 			JarEntry inputEntry = entries.nextElement();
 
 			String entryName = inputEntry.getName();
-			if (!entryName.startsWith(CoreGlobal.packetName))	continue LOOP;
+			if (!entryName.startsWith(SimulaCompiler.packetName))	continue LOOP;
 			if (!entryName.endsWith(".class"))				continue LOOP;
 
 			InputStream inputStream = null;
@@ -261,15 +261,15 @@ public class JarFileBuilder {
 		try {
 			if (externalIdentifier == null || externalIdentifier.length() == 0) {
 				// If present search extLib
-				if (CoreGlobal.extLib != null) {
-					jarFile = new File(CoreGlobal.extLib, identifier + ".jar");
+				if (SimulaCompiler.extLib != null) {
+					jarFile = new File(SimulaCompiler.extLib, identifier + ".jar");
 					if (jarFile.exists()) {
 //						IO.println("JarFileBuilder.findJarFile: FOUND in extlib: " + jarFile);
 						return (jarFile);
 					}
 //					IO.println("JarFileBuilder.findJarFile: NOT FOUND in extlib: " + jarFile);
 				}
-				jarFile = new File(CoreGlobal.outputDir, identifier + ".jar");
+				jarFile = new File(SimulaCompiler.outputDir, identifier + ".jar");
 				if (jarFile.exists()) {
 //					IO.println("JarFileBuilder.findJarFile: FOUND in outputDir: " + jarFile);
 					return (jarFile);
@@ -314,7 +314,7 @@ public class JarFileBuilder {
 			for(JarFile jarFile:CoreGlobal.includeQueue) {
 				if(TESTING)
 					IO.println("JarFileBuilder.loadIncludeQueue: loadJarEntries: "+jarFile.getName());
-				loadJarEntries(jarFile, CoreGlobal.packetName, CoreGlobal.simulaClassLoader);	
+				loadJarEntries(jarFile, SimulaCompiler.packetName, CoreGlobal.simulaClassLoader);	
 			}
 		}
 	}
@@ -322,8 +322,8 @@ public class JarFileBuilder {
 	/// Load the Runtime System using simulaClassLoader.
 	/// @throws IOException if something went wrong
 	public static void loadRuntimeSystem() throws IOException {
-		if(TESTING) IO.println("JarFileBuilder.loadRuntimeSystem: "+CoreGlobal.simulaRtsLib);
-		File rtsLib = new File(CoreGlobal.simulaRtsLib.getParentFile(), "RTS.jar");
+		if(TESTING) IO.println("JarFileBuilder.loadRuntimeSystem: "+SimulaCompiler.simulaRtsLib);
+		File rtsLib = new File(SimulaCompiler.simulaRtsLib.getParentFile(), "RTS.jar");
 		if(TESTING) IO.println("JarFileBuilder.loadRuntimeSystem: rtsLib="+rtsLib);
 		JarFile jarFile = new JarFile(rtsLib);
 
@@ -337,7 +337,7 @@ public class JarFileBuilder {
 	/// @throws IOException if something went wrong.
 	private static void loadJarEntries(final JarFile jarFile, final String packetName, final SimulaClassLoader loader) throws IOException {
 		if(TESTING) IO.println("\nJarFileBuilder.loadJarEntries: JarFileName="+jarFile.getName());
-		if (Option.verbose)
+		if (SimulaCompiler.verbose)
 			Util.println("---------  INCLUDE .jar File: " + jarFile.getName() + "  ---------");
 		Enumeration<JarEntry> entries = jarFile.entries();
 		Map<String,byte[]> delayedLoadings = null;

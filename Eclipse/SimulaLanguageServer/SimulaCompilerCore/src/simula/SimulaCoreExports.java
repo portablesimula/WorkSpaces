@@ -38,14 +38,14 @@ public class SimulaCoreExports {
     	SimulaBuilder simBuilder = documentManager.simBuilder;
 
     	IO.println("SimulaCoreExports.run: sourceFileDir=" + documentManager.sourceFileDir);
-    	IO.println("SimulaCoreExports.run: outputDir=" + CoreGlobal.outputDir);
-    	if(CoreGlobal.outputDir == null) {
-    		CoreGlobal.outputDir = new File(documentManager.sourceFileDir,"bin");
+    	IO.println("SimulaCoreExports.run: outputDir=" + SimulaCompiler.outputDir);
+    	if(SimulaCompiler.outputDir == null) {
+    		SimulaCompiler.outputDir = new File(documentManager.sourceFileDir,"bin");
     	}
-    	IO.println("SimulaCoreExports.run: outputDir=" + CoreGlobal.outputDir);
-    	CoreGlobal.outputDir.mkdirs();
-    	if (! CoreGlobal.outputDir.canWrite()) {
-    		Util.IERR("SimulaCoreExports.run: Unable to write to " + CoreGlobal.outputDir);
+    	IO.println("SimulaCoreExports.run: outputDir=" + SimulaCompiler.outputDir);
+    	SimulaCompiler.outputDir.mkdirs();
+    	if (! SimulaCompiler.outputDir.canWrite()) {
+    		Util.IERR("SimulaCoreExports.run: Unable to write to " + SimulaCompiler.outputDir);
     	}
     	
 //    	Util.STOP();
@@ -54,9 +54,9 @@ public class SimulaCoreExports {
 //    	public static void trySetOutputDir(File dir) {
 //    		dir.mkdirs();
 //    		if (dir.canWrite())
-//    			CoreGlobal.outputDir = dir;
+//    			SimulaCompiler.outputDir = dir;
 //    		else {
-//    			CoreGlobal.outputDir = getTempFileDir("simulaEditor/bin");
+//    			SimulaCompiler.outputDir = getTempFileDir("simulaEditor/bin");
 //    		}
 //    	}
 

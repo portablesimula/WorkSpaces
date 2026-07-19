@@ -19,6 +19,7 @@ import simula.Option;
 import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.OverLoad;
 import simula.compiler.syntaxClass.ProcedureSpecification;
 import simula.compiler.syntaxClass.SyntaxElement;
@@ -230,7 +231,7 @@ public final class VariableExpression extends Expression {
 
 		switch(declaredAs) {
 			case UndefinedDeclaration undef -> {
-				Util.semanticError(this, "Undefined variable: " + undef.identifier);
+				Util.semanticError(this, "Undefined variable: " + undef.identifierValue());
 			}
 			case StandardProcedure sproc -> {
 				if (Util.equals(sproc.identifier.value, "detach")) {
@@ -284,7 +285,7 @@ public final class VariableExpression extends Expression {
 					paramIterator = cdecl.new ClassParameterIterator();
 				} else if (declaredAs instanceof ProcedureDeclaration) {
 					paramIterator = ((ProcedureDeclaration) declaredAs).parameterList.iterator();
-					if(Option.compilerMode != Option.CompilerMode.viaJavaSource) {
+					if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource) {
 						if(declaredAs instanceof StandardProcedure prc) {
 							if(prc.identifier.value.equalsIgnoreCase("histd")) ; // NOTHING
 							else if(prc.identifier.value.equalsIgnoreCase("discrete")) ; // NOTHING
@@ -393,7 +394,7 @@ public final class VariableExpression extends Expression {
 			case ObjectKind.UndefinedDeclaration:
 				if(params != null) {
 //					IO.println("VariableExpression.doChecking: " + ObjectKind.edit(declaredAs.declarationKind) + " " + declaredAs);
-					Util.semanticError(this, "Illegal subscription of variable " + this.identifier);
+					Util.semanticError(this, "Illegal subscription of variable " + this.identifier.value);
 				}
 				break;
 				
@@ -403,7 +404,7 @@ public final class VariableExpression extends Expression {
 				break;
 				
 			default:
-				Util.IERR("VariableExpression.doChecking: END Variable(" + identifier + ").doChecking: type=" + type + ", kind=" + ObjectKind.edit(declaredAs.declarationKind));
+				Util.IERR("VariableExpression.doChecking: END Variable(" + identifier.value + ").doChecking: type=" + type + ", kind=" + ObjectKind.edit(declaredAs.declarationKind));
 			}
 
 		if (Option.internal.TRACE_CHECKER)
@@ -520,9 +521,12 @@ public final class VariableExpression extends Expression {
 	/// @param rightPart When destination, this is the right part of the assignment
 	/// @return the resulting Java source code
 	private String editVariable(final String rightPart) {
+		ASSERT_SEMANTICS_CHECKED();
 		boolean destination = (rightPart != null);
 		Declaration declaredAs = meaning.declaredAs;
-		ASSERT_SEMANTICS_CHECKED();
+		IO.println("VariableExpression.editVariable: " + identifier+" "+meaning);
+		if(meaning == null) Util.IERR("");
+//		ASSERT_SEMANTICS_CHECKED();
 		StringBuilder s;
 		switch (declaredAs.declarationKind) {
 			case ObjectKind.ArrayDeclaration:

@@ -25,6 +25,7 @@ import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.HiddenSpecification;
 import simula.compiler.syntaxClass.ProtectedSpecification;
 import simula.compiler.syntaxClass.Type;
@@ -518,6 +519,9 @@ public class ClassDeclaration extends BlockDeclaration {
 	public Declaration findLocalAttribute(final Identifier ident) {
 		if (Option.internal.TRACE_FIND_MEANING > 0)
 			Util.println("BEGIN Checking Class for " + ident + " ================================== " + identifier + " ==================================");
+		
+		IO.println("ClassDeclaration.findLocalAttribute: " + ident.value + ", getText=" + ident.getText());
+		
 		for (Parameter parameter : parameterList) {
 			if (Option.internal.TRACE_FIND_MEANING > 1)
 				Util.println("Checking Parameter " + parameter);
@@ -578,7 +582,9 @@ public class ClassDeclaration extends BlockDeclaration {
 	public Meaning findRemoteAttributeMeaning(final Identifier ident) {
 		boolean behindProtected = false;
 		ClassDeclaration scope = this;
+		IO.println("ClassDeclaration.findRemoteAttributeMeaning: " + ident);
 		Declaration decl = scope.findLocalAttribute(ident);
+		IO.println("ClassDeclaration.findRemoteAttributeMeaning: " + decl);
 		if (decl != null) {
 			boolean prtected = decl.isProtected != null;
 			VirtualSpecification virtSpec = VirtualSpecification.getVirtualSpecification(decl);
@@ -816,7 +822,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	public void doJavaCoding() {
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
-			if(Option.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);	
+			if(SimulaCompiler.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);	
 			return;
 		}
 		CoreGlobal.sourceLineNumber = firstLineNumber();
@@ -951,17 +957,17 @@ public class ClassDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Java coding utility: Code class statements.
 	protected void codeClassStatements() {
-		boolean duringSTM_Coding = CoreGlobal.duringSTM_Coding;
-		CoreGlobal.duringSTM_Coding = false;
+		boolean duringSTM_Coding = SimulaCompiler.duringSTM_Coding;
+		SimulaCompiler.duringSTM_Coding = false;
 		JavaSourceFileCoder.debug("// Class Statements");
 		JavaSourceFileCoder.code("@Override");
 		JavaSourceFileCoder.code("public " + getJavaIdentifier() + " _STM() {");
-		CoreGlobal.duringSTM_Coding = true;
+		SimulaCompiler.duringSTM_Coding = true;
 		codeSTMBody();
 		JavaSourceFileCoder.code("EBLK();");
 		JavaSourceFileCoder.code("return(this);");
 		JavaSourceFileCoder.code("}", "End of Class Statements");
-		CoreGlobal.duringSTM_Coding = duringSTM_Coding;
+		SimulaCompiler.duringSTM_Coding = duringSTM_Coding;
 	}
 
 	// ***********************************************************************************************
@@ -1035,7 +1041,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		int count = 5;
 		while((count--) > 0) {
 			try {
-				if(Option.verbose)
+				if(SimulaCompiler.verbose)
 					Util.println("ClassDeclaration.buildClassFile: TRY: "+CD_ThisClass+" extends "+CD_SuperClass);
 				return tryBuildClassFile(CD_ThisClass, CD_SuperClass);
 			} catch(IllegalArgumentException e) {
@@ -1067,7 +1073,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
 				classBuilder -> {
 					classBuilder
-						.with(SourceFileAttribute.of(CoreGlobal.sourceFileName))
+						.with(SourceFileAttribute.of(SimulaCompiler.sourceFileName))
 						.withFlags(ClassFile.ACC_PUBLIC + ClassFile.ACC_SUPER)
 						.withSuperclass(CD_SuperClass);
 	
@@ -1100,7 +1106,7 @@ public class ClassDeclaration extends BlockDeclaration {
 								codeBuilder -> buildIsMethodDetachUsed(codeBuilder));
 				}
 		);
-		if(Option.verbose)
+		if(SimulaCompiler.verbose)
 			Util.println("ClassDeclaration.buildClassFile: DONE: "+CD_ThisClass+" extends "+CD_SuperClass);
 		return(bytes);
 	}
@@ -1412,7 +1418,7 @@ public class ClassDeclaration extends BlockDeclaration {
 
 	@Override
 	public String toString() {
-		return ("" + identifier + '[' + externalIdent + "] DeclarationKind=" + ObjectKind.edit(declarationKind));
+		return ("" + identifierValue() + '[' + externalIdent + "] DeclarationKind=" + ObjectKind.edit(declarationKind));
 	}
 
 	// ***********************************************************************************************

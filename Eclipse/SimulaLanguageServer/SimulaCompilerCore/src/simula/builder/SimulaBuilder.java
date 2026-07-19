@@ -27,8 +27,6 @@ public class SimulaBuilder {
     
     public SimulaCompiler simulaCompiler;
     
-	/// The .jar File Builder
-	public JarFileBuilder jarFileBuilder;
 	public File generatedJarFile;
 	/// Compiler state: True while Parsing
 	public boolean duringParsing;
@@ -61,8 +59,8 @@ public class SimulaBuilder {
 //        }
 
 		// Get Temp Directory:
-		CoreGlobal.simulaTempDir = CoreGlobal.getTempFileDir("simula/");
-		deleteTempFiles(CoreGlobal.simulaTempDir);
+		SimulaCompiler.simulaTempDir = CoreGlobal.getTempFileDir("simula/");
+		deleteTempFiles(SimulaCompiler.simulaTempDir);
 
 		File desktop = new File(System.getProperty("user.home"), "Desktop");
 //		if (args.verbose) {
@@ -96,8 +94,6 @@ public class SimulaBuilder {
 			Util.println("DocumentManager.documentUri     " + documentManager.documentUri);
 			Util.println("DocumentManager.sourceFileDir   " + documentManager.sourceFileDir);
 			Util.println("DocumentManager.documentVersion " + documentManager.documentVersion);
-			Util.println("DocumentManager.sourceName      " + documentManager.sourceName);
-//			Util.println("DocumentManager.sourceCode      " + documentManager.sourceCode);
 
 			Option.print(" SIMULA VARIABLES SUMMARY");
 //		Util.IERR("STOPP HER INNTIL VIDERE");

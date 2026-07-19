@@ -50,22 +50,22 @@ public final class AttributeFileIO {
 	static void writeAttributeFile(final ProgramModule program) throws IOException {
 		String relativeAttributeFileName = program.getRelativeAttributeFileName();
 		if (relativeAttributeFileName == null) return;
-		File file = new File(CoreGlobal.tempClassFileDir,relativeAttributeFileName);
-		if (Option.verbose)
+		File file = new File(SimulaCompiler.tempClassFileDir,relativeAttributeFileName);
+		if (SimulaCompiler.verbose)
 			Util.println("*** BEGIN Generate SimulaAttributeFile: \"" + file+"\"");
 		byte[] bytes = buildAttrFile(program);
 		String entryName = program.getRelativeAttributeFileName();
 
-   		if(Option.compilerMode == Option.CompilerMode.simulaClassLoader) {
-			if(CoreGlobal.jarFileBuilder!=null) {
-				CoreGlobal.jarFileBuilder.writeJarEntry(entryName, bytes);
+   		if(SimulaCompiler.compilerMode == SimulaCompiler.CompilerMode.simulaClassLoader) {
+			if(SimulaCompiler.jarFileBuilder!=null) {
+				SimulaCompiler.jarFileBuilder.writeJarEntry(entryName, bytes);
 			}
 			else Util.IERR();
 			
 		} else {
-			CoreGlobal.jarFileBuilder.writeJarEntry(entryName, bytes);
+			SimulaCompiler.jarFileBuilder.writeJarEntry(entryName, bytes);
 		}
-		if (Option.verbose)	Util.TRACE("*** ENDOF Generate SimulaAttributeFile: " + file);
+		if (SimulaCompiler.verbose)	Util.TRACE("*** ENDOF Generate SimulaAttributeFile: " + file);
 	}
 
 	/// Build a module's attribute file.
@@ -124,20 +124,20 @@ public final class AttributeFileIO {
 				Util.generalWarning("Multiple declarations with the same name: "+module+" and "+d);
 			} else {
 				declarationList.add(module);
-				if (Option.verbose)
+				if (SimulaCompiler.verbose)
 					IO.println("***       Read External " + ObjectKind.edit(module.declarationKind) + ' ' + module.identifier
 							+ '[' + module.externalIdent + ']' +"  ==>  "+declarationList.debugName);
 			}
     			
-	   		if(Option.compilerMode == Option.CompilerMode.simulaClassLoader) {
+	   		if(SimulaCompiler.compilerMode == SimulaCompiler.CompilerMode.simulaClassLoader) {
 				JarFileBuilder.addToIncludeQueue(jarFile);
 			} else {
-				if(CoreGlobal.jarFileBuilder == null) {
-			   		if(Option.compilerMode != Option.CompilerMode.simulaClassLoader) {
-						CoreGlobal.jarFileBuilder = new JarFileBuilder();
+				if(SimulaCompiler.jarFileBuilder == null) {
+			   		if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.simulaClassLoader) {
+						SimulaCompiler.jarFileBuilder = new JarFileBuilder();
 					}
 				}
-				CoreGlobal.jarFileBuilder.expandJarFile(jarFile);
+				SimulaCompiler.jarFileBuilder.expandJarFile(jarFile);
 			}
 
 		} catch (IOException e) {
@@ -196,7 +196,7 @@ public final class AttributeFileIO {
 		else if(declarationKind == ObjectKind.Class) module = ClassDeclaration.readObject(inpt);
 		else Util.IERR();
 		inpt.close();
-		if (Option.verbose)	Util.TRACE("*** ENDOF Read SimulaAttributeFile: " + fileID);
+		if (SimulaCompiler.verbose)	Util.TRACE("*** ENDOF Read SimulaAttributeFile: " + fileID);
 		module.isPreCompiledFromFile = fileID;
 		return module;
 	}

@@ -49,7 +49,7 @@ public final class Thunk extends DeclarationScope {
 	/// @param kind the kind code
 	/// @param expr the Thunk expression.
 	private Thunk(int kind,Expression expr) {
-		super(expr.simBuilder, new Identifier(CoreGlobal.sourceName + "$THUNK$" + (++OBJECT_SEQU)));
+		super(expr.simBuilder, new Identifier(SimulaCompiler.sourceName + "$THUNK$" + (++OBJECT_SEQU)));
 		this.declarationKind = ObjectKind.Thunk;
 		this.kind = kind;
 		this.expr = expr;
@@ -100,13 +100,13 @@ public final class Thunk extends DeclarationScope {
 	// ***********************************************************************************************
 	@Override
 	public byte[] buildClassFile() {
-		if(Option.verbose) Util.println("Begin buildClassFile: "+CD_ThisClass);
+		if(SimulaCompiler.verbose) Util.println("Begin buildClassFile: "+CD_ThisClass);
 		ClassHierarchy.addClassToSuperClass(CD_ThisClass, RTS.CD.RTS_NAME);
 		
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
 				classBuilder -> {
 					classBuilder
-						.with(SourceFileAttribute.of(CoreGlobal.sourceFileName))
+						.with(SourceFileAttribute.of(SimulaCompiler.sourceFileName))
 						.withFlags(ClassFile.ACC_PUBLIC + ClassFile.ACC_SUPER + ClassFile.ACC_FINAL)
 						.withSuperclass(RTS.CD.RTS_NAME)
 						.with(SignatureAttribute.of(ClassSignature.parseFrom("Lsimula/runtime/RTS_NAME<"+Type.toJVMClassType(expr.type,kind)+">;")))

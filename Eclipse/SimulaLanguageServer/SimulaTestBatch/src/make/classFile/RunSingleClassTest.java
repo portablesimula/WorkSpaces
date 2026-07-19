@@ -12,7 +12,6 @@ import java.util.Vector;
 
 import client.TestBatchLauncher;
 import simula.Option;
-//import simula.editor.RTOption;
 
 /**
  * Simula Test Batch donated by Simula as.
@@ -44,9 +43,9 @@ public final class RunSingleClassTest {
 //		argv.add("-select");
 
 		Vector<String> argv2 = new Vector<>();
-//		argv2.add("-compilerMode" + Option.CompilerMode.viaJavaSource);
-		argv2.add("-compilerMode"); argv2.add(Option.CompilerMode.directClassFiles.toString());
-//		argv2.add("-compilerMode" + Option.CompilerMode.simulaClassLoader);
+//		argv2.add("-compilerMode" + SimulaCompiler.CompilerMode.viaJavaSource);
+		argv2.add("-compilerMode"); argv2.add("directClassFiles");
+//		argv2.add("-compilerMode" + SimulaCompiler.CompilerMode.simulaClassLoader);
 		
 //		argv2.add("-noexec");
 //		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
@@ -62,12 +61,13 @@ public final class RunSingleClassTest {
 //		names.add("adHoc01.sim"); // For ad'hoc testing
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
+		names.add("adHoc04.sim"); // For ad'hoc testing
 //		names.add("adHoc10.sim"); // For ad'hoc testing
 		
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
 		
-		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
 //		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions

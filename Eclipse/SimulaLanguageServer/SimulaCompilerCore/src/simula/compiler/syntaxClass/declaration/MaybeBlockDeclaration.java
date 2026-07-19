@@ -21,6 +21,7 @@ import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.statement.BlockStatement;
 import simula.compiler.syntaxClass.statement.DummyStatement;
 import simula.compiler.syntaxClass.statement.Statement;
@@ -196,7 +197,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	@Override
 	public Meaning findVisibleAttributeMeaning(final Identifier ident) {
-		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("BEGIN Checking MayBeBlock for "+ident+" ================================== "+identifier+" ==================================");
+		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("BEGIN Checking MayBeBlock for "+identifierValue()+" ================================== "+identifierValue()+" ==================================");
 		for (Declaration declaration : declarationList) {
 			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Local "+declaration);
 			if (Util.equals(ident, declaration.identifier))
@@ -207,7 +208,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 			if (Util.equals(ident, label.identifier))
 				return (new Meaning(label, this, this, false));
 		}
-		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("ENDOF Checking MayBeBlock for "+ident+" ================================== "+identifier+" ==================================");
+		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("ENDOF Checking MayBeBlock for "+identifierValue()+" ================================== "+identifierValue()+" ==================================");
 		return (null);
 	}
 
@@ -220,7 +221,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		if (declarationKind == ObjectKind.CompoundStatement)
 			doCompoundStatementCoding();
 		else if (this.isPreCompiledFromFile != null) {
-			if(Option.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
+			if(SimulaCompiler.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
 		} else doSubBlockCoding();
 	}
 
@@ -255,8 +256,8 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
 		CoreGlobal.enterScope(this);
 			labelList.setLabelIdexes();
-			boolean duringSTM_Coding=CoreGlobal.duringSTM_Coding;
-			CoreGlobal.duringSTM_Coding=false;
+			boolean duringSTM_Coding=SimulaCompiler.duringSTM_Coding;
+			SimulaCompiler.duringSTM_Coding=false;
 			JavaSourceFileCoder.code("@SuppressWarnings(\"unchecked\")");
 			JavaSourceFileCoder.code("public final class " + getJavaIdentifier() + " extends RTS_BASICIO" + " {");
 			JavaSourceFileCoder.debug("// SubBlock: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel() + ", firstLine="
@@ -272,9 +273,9 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 			JavaSourceFileCoder.debug("// Declare locals as attributes");
 			for (Declaration decl : declarationList) decl.doJavaCoding();
 			doCodeConstructor();
-			CoreGlobal.duringSTM_Coding=true;
+			SimulaCompiler.duringSTM_Coding=true;
 			doCodeStatements();
-			CoreGlobal.duringSTM_Coding=duringSTM_Coding;
+			SimulaCompiler.duringSTM_Coding=duringSTM_Coding;
 			if (this.isMainModule) codeMethodMain();
 			javaCoder.codeProgramInfo();
 			JavaSourceFileCoder.code("}", "End of SubBlock");
@@ -327,13 +328,13 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	public byte[] buildClassFile() {
 		labelList.setLabelIdexes();
 		ClassDesc CD_ThisClass = currentClassDesc();
-		if(Option.verbose) Util.println("SubBlock.buildClassFile: "+CD_ThisClass); 
+		if(SimulaCompiler.verbose) Util.println("SubBlock.buildClassFile: "+CD_ThisClass); 
 		ClassHierarchy.addClassToSuperClass(CD_ThisClass, RTS.CD.RTS_BASICIO);
 		
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
 				classBuilder -> {
 					classBuilder
-						.with(SourceFileAttribute.of(CoreGlobal.sourceFileName))
+						.with(SourceFileAttribute.of(SimulaCompiler.sourceFileName))
 						.withFlags(ClassFile.ACC_PUBLIC + ClassFile.ACC_FINAL + ClassFile.ACC_SUPER)
 						.withSuperclass(RTS.CD.RTS_BASICIO);
 
@@ -425,7 +426,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		}
 		CoreGlobal.enterScope(this);
 		if (this.isPreCompiledFromFile != null) {
-			if(Option.verbose) IO.println("Skip  buildClassFile: "+this.identifier);			
+			if(SimulaCompiler.verbose) IO.println("Skip  buildClassFile: "+this.identifier);			
 		} else {
 			try { createJavaClassFile(); } catch (IOException e) { e.printStackTrace();	}
 		}
@@ -497,7 +498,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
     	String spc=edIndent(indent);
 		StringBuilder s = new StringBuilder(spc);
 		s.append('[').append(sourceBlockLevel).append(':').append(getRTBlockLevel()).append("] ");
-		s.append(declarationKind).append(' ').append(identifier);
+		s.append(declarationKind).append(' ').append(identifierValue());
 		s.append('[').append(externalIdent).append("] ");
 		Util.println(s.toString());
 		String beg = "begin[" + edScopeChain() + ']';

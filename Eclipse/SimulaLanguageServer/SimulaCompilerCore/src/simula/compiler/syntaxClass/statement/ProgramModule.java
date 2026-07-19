@@ -11,6 +11,7 @@ import java.util.Vector;
 import simula.builder.SimulaBuilder;
 import simula.Option;
 import simula.builder.Parse;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
@@ -77,8 +78,8 @@ public final class ProgramModule extends Statement {
 	/// Returns the relative file name.
 	/// @return the relative file name
 	public String getRelativeAttributeFileName() {
-		if(mainModule.declarationKind==ObjectKind.Class) return(Option.packetName+"/CLASS.AF");
-		if(mainModule.declarationKind==ObjectKind.Procedure) return(Option.packetName+"/PROCEDURE.AF");
+		if(mainModule.declarationKind==ObjectKind.Class) return(SimulaCompiler.packetName+"/CLASS.AF");
+		if(mainModule.declarationKind==ObjectKind.Procedure) return(SimulaCompiler.packetName+"/PROCEDURE.AF");
 		else return(null);
 	}
 	  
@@ -150,7 +151,7 @@ public final class ProgramModule extends Statement {
 //				Util.IERR();
 			}
 			
-			if(Option.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
+			if(SimulaCompiler.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
 //		} catch(Throwable e) {
 //			e.printStackTrace();
 //			Util.IERR();
@@ -161,7 +162,7 @@ public final class ProgramModule extends Statement {
 	/// @return the Program Statement.
 	private DeclarationScope doParseProgram(final SimulaBuilder simBuilder) {
 //		BlockDeclaration mainBlock = new MaybeBlockDeclaration(simBuilder, "MainBlock: " + Global.sourceName);
-		String sourceName = simBuilder.documentManager.sourceName;
+		String sourceName = SimulaCompiler.sourceName;
 		BlockDeclaration mainBlock = new MaybeBlockDeclaration(simBuilder, new Identifier(sourceName));
 		
 		mainBlock.isMainModule = true;

@@ -112,10 +112,10 @@ public final class BlockStatement extends Statement {
 			else s.append("._STM();");
 			JavaSourceFileCoder.code(s.toString());
 		}
-		boolean duringSTM_Coding=CoreGlobal.duringSTM_Coding;
-		CoreGlobal.duringSTM_Coding=false;
+		boolean duringSTM_Coding=SimulaCompiler.duringSTM_Coding;
+		SimulaCompiler.duringSTM_Coding=false;
 		blockDeclaration.doJavaCoding();
-		CoreGlobal.duringSTM_Coding=duringSTM_Coding;
+		SimulaCompiler.duringSTM_Coding=duringSTM_Coding;
 	}
 
 	@Override

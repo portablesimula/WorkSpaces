@@ -52,6 +52,10 @@ public abstract class Declaration extends SyntaxElement {
 
 	/// Simula Identifier from Source Text
 	public Identifier identifier;
+	
+	public String identifierValue() {
+		return (identifier == null)? "null" : identifier.value;
+	}
 
 	/// External Identifier set by doChecking
 	public String externalIdent;

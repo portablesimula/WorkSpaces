@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import simula.Option;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Util;
@@ -409,7 +410,7 @@ public final class SimulaLexer {
 	private LexToken scanIdentifier() {
 		String name=scanName();
 	    if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanIdentifier: name=\""+name+"\"");
-	    String ident=(Option.CaseSensitive)?name:name.toLowerCase();
+	    String ident=(SimulaCompiler.CaseSensitive)?name:name.toLowerCase();
 	    switch(Character.toLowerCase(ident.charAt(0))) {
 	        case 'a':
 		        if(ident.equals("abstract"))	 return(javaKeyword(name)); // Java KeyWord

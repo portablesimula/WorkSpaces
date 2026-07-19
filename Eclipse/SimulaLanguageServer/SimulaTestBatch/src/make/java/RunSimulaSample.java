@@ -45,9 +45,9 @@ public final class RunSimulaSample {
 		String name="TQueens.sim";
 
 		// Set Compiler Options.
-//		Option.compilerMode = Option.CompilerMode.viaJavaSource;
-		Option.compilerMode = Option.CompilerMode.directClassFiles;
-//		Option.compilerMode = Option.CompilerMode.simulaClassLoader;
+//		Option.compilerMode = SimulaCompiler.CompilerMode.viaJavaSource;
+		Option.compilerMode = SimulaCompiler.CompilerMode.directClassFiles;
+//		Option.compilerMode = SimulaCompiler.CompilerMode.simulaClassLoader;
 //		Option.verbose=true;
 //		Option.EXTENSIONS=false;
 //		Option.CaseSensitive=true;

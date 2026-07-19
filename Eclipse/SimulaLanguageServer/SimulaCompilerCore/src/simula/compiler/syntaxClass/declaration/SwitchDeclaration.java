@@ -92,12 +92,12 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 	// ***********************************************************************************************
 	@Override
 	protected void codeProcedureBody() {
-		boolean duringSTM_Coding=CoreGlobal.duringSTM_Coding;
-		CoreGlobal.duringSTM_Coding=false;
+		boolean duringSTM_Coding=SimulaCompiler.duringSTM_Coding;
+		SimulaCompiler.duringSTM_Coding=false;
 		JavaSourceFileCoder.debug("// Switch Body");
 		JavaSourceFileCoder.code("@Override");
 		JavaSourceFileCoder.code("public " + getJavaIdentifier() + " _STM() {");
-		CoreGlobal.duringSTM_Coding=true;
+		SimulaCompiler.duringSTM_Coding=true;
 		JavaSourceFileCoder.code("switch(p__SW-1) {");
 		int n = 0;
 		for (Expression expr : ((SwitchDeclaration) this).switchList) {
@@ -108,7 +108,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		JavaSourceFileCoder.code("EBLK();");
 		JavaSourceFileCoder.code("return(this);");
 		JavaSourceFileCoder.code("}","End of Switch BODY");
-		CoreGlobal.duringSTM_Coding=duringSTM_Coding;
+		SimulaCompiler.duringSTM_Coding=duringSTM_Coding;
 	}
 
 	// ***********************************************************************************************

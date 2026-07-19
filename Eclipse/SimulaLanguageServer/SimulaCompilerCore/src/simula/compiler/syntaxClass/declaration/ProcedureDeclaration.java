@@ -30,7 +30,9 @@ import simula.Option;
 import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
-import simula.compiler.JavaSourceFileCoder;import simula.compiler.syntaxClass.Type;
+import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.SimulaCompiler;
+import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
 import simula.compiler.syntaxClass.statement.DummyStatement;
 import simula.compiler.syntaxClass.statement.Statement;
@@ -140,7 +142,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @return a newly created ProcedureDeclaration
 	public static ProcedureDeclaration expectProcedureDeclaration(final SimulaBuilder simBuilder, final Type type) {
 		ProcedureDeclaration proc = new ProcedureDeclaration(simBuilder, null, ObjectKind.Procedure);
-		proc.sourceFileName = CoreGlobal.sourceFileName;
+		proc.sourceFileName = SimulaCompiler.sourceFileName;
 //		proc.OLD_lineNumber = simBuilder.getSourceLineNumber();
 		proc.type = type;
 		if (Option.internal.TRACE_PARSE)
@@ -382,7 +384,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public void doJavaCoding() {
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
-			if(Option.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
+			if(SimulaCompiler.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
 		} else {
 			switch (declarationKind) {
 				case ObjectKind.Procedure -> doProcedureCoding();
@@ -427,7 +429,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
-			if(Option.verbose) IO.println("Skip  doProcedureCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
+			if(SimulaCompiler.verbose) IO.println("Skip  doProcedureCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
 			return;
 		}
 		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
@@ -538,17 +540,17 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Coding Utility: codeProcedureBody. Redefined in SwitchDeclaration.
 	protected void codeProcedureBody() {
-		boolean duringSTM_Coding=CoreGlobal.duringSTM_Coding;
-		CoreGlobal.duringSTM_Coding=false;
+		boolean duringSTM_Coding=SimulaCompiler.duringSTM_Coding;
+		SimulaCompiler.duringSTM_Coding=false;
 		JavaSourceFileCoder.debug("// Procedure Statements");
 		JavaSourceFileCoder.code("@Override");
 		JavaSourceFileCoder.code("public " + getJavaIdentifier() + " _STM() {");
-		CoreGlobal.duringSTM_Coding=true;
+		SimulaCompiler.duringSTM_Coding=true;
 		codeSTMBody();
 		JavaSourceFileCoder.code("EBLK();");
 		JavaSourceFileCoder.code("return(this);");
 		JavaSourceFileCoder.code("}", "End of Procedure BODY");
-		CoreGlobal.duringSTM_Coding=duringSTM_Coding;
+		SimulaCompiler.duringSTM_Coding=duringSTM_Coding;
 	}
 
 
@@ -560,14 +562,14 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public byte[] buildClassFile() {
 		labelList.setLabelIdexes();
 		ClassDesc CD_ThisClass = currentClassDesc();
-		if(Option.verbose) Util.println("ProcedureDeclaration.buildClassFile: "+CD_ThisClass);
+		if(SimulaCompiler.verbose) Util.println("ProcedureDeclaration.buildClassFile: "+CD_ThisClass);
 		if(isPreCompiledFromFile != null) return getBytesFromFile();
 		ClassHierarchy.addClassToSuperClass(CD_ThisClass, RTS.CD.RTS_PROCEDURE);
 		
 		int count = 5;
 		while((count--) > 0) {
 			try {
-				if(Option.verbose)
+				if(SimulaCompiler.verbose)
 					Util.println("ProcedureDeclaration.buildClassFile: TRY: "+CD_ThisClass);
 				return tryBuildClassFile(CD_ThisClass);
 			} catch(IllegalArgumentException e) {
@@ -598,7 +600,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
 				classBuilder -> {
 					classBuilder
-						.with(SourceFileAttribute.of(CoreGlobal.sourceFileName))
+						.with(SourceFileAttribute.of(SimulaCompiler.sourceFileName))
 						.withFlags(ClassFile.ACC_PUBLIC + ClassFile.ACC_FINAL + ClassFile.ACC_SUPER)
 						.withSuperclass(RTS.CD.RTS_PROCEDURE);
 					

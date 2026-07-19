@@ -153,7 +153,8 @@ public class LexToken {
 
 	@Override
 	public String toString() {
-		String str = (tokenText == null)? "????" : tokenText.replace("\t", "\\t").replace("\r", "\\r").replace("\n", "\\n");
+		if(tokenText == null) Util.IERR("");
+		String str = (tokenText == null)? "UNKNOWN" : tokenText.replace("\t", "\\t").replace("\r", "\\r").replace("\n", "\\n");
 		return "Line " + lineNumber + ": " + KeyWord.edit(keyWord) + "[col:" + column + ", lng:" + length + "] Text: \"" + str + '"';
 	}
 

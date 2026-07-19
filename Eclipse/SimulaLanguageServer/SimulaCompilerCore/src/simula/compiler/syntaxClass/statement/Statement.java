@@ -11,6 +11,7 @@ import simula.builder.SimulaBuilder;
 import simula.Option;
 import simula.builder.Parse;
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.LabelDeclaration;
@@ -128,7 +129,7 @@ public abstract class Statement extends SyntaxElement {
 		    case KeyWord.FOR:		 statement = new ForStatement(simBuilder); break;
 		    case KeyWord.WHILE:		 statement = new WhileStatement(simBuilder); break;
 		    case KeyWord.INSPECT:	 statement = new ConnectionStatement(simBuilder); break;
-		    case KeyWord.SWITCH:	 if(Option.EXTENSIONS) {
+		    case KeyWord.SWITCH:	 if(SimulaCompiler.EXTENSIONS) {
 		    							 statement = new SwitchStatement(simBuilder);
 		    						 } break;
 		    case KeyWord.ACTIVATE,

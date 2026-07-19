@@ -10,6 +10,8 @@ import java.util.Properties;
 import java.util.Vector;
 
 import simula.compiler.JavaSourceFileCoder;
+import simula.compiler.SimulaCompiler;
+import simula.compiler.SimulaCompiler.CompilerMode;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.Util;
 
@@ -36,42 +38,6 @@ public final class Option {
 
 	/// The currently selected Color Theme
 	public static String selectedTheme;
-
-	/// The Compiler Modes.
-	public enum CompilerMode { 
-    	/** Generate Java source and use Java compiler to generate JavaClass files. */					viaJavaSource,
-    	/** Generate JavaClass files directly. No Java source files are generated. */ 					directClassFiles,
-    	/** Generate ClassFile byte array and load it directly. No intermediate files are created. */	simulaClassLoader
-    }
-
-	/// The Compiler mode.
-	public static CompilerMode compilerMode;
-
-	/// Packet name used in generated .java files.
-	/// NOTE: Must be a single identifier.
-	public static String packetName = "simprog";
-
-	/// Where to find the Simula Runtime System.
-	public static File simulaRtsLib;
-	
-	/// Source file is case sensitive.
-	public static boolean CaseSensitive=false;
-	
-	/// Output messages about what the compiler is doing.
-	public static boolean verbose = false; 
-	
-	/// Generate warning messages
-	public static boolean WARNINGS=true;
-
-	/// TRUE:Do not create popUps at runtime
-	public static boolean noPopup = false; 
-	
-	/// true: Don't execute generated .jar file
-	public static boolean noExecution = false;
-	
-	/// false: Disable all language extensions. In other words,
-	/// follow the Simula Standard literally
-	public static boolean EXTENSIONS=true;
 	
 	
 	/// Testing and debugging options
@@ -158,22 +124,22 @@ public final class Option {
 
 	public static void print(String title) {
 		Util.println("------------  Option.print: " + title + "  ------------");
-		Util.println("DocumentManager.packetName      " + Option.packetName);
-		Util.println("DocumentManager.simulaRtsLib    " + Option.simulaRtsLib);
+		Util.println("DocumentManager.packetName      " + SimulaCompiler.packetName);
+		Util.println("DocumentManager.simulaRtsLib    " + SimulaCompiler.simulaRtsLib);
 		
-		Util.println("SimulaBuilder.outputDir         " + CoreGlobal.outputDir);
-		Util.println("SimulaBuilder.simulaTempDir     " + CoreGlobal.simulaTempDir);
-		Util.println("SimulaBuilder.tempJavaFileDir   " + CoreGlobal.tempJavaFileDir);
-		Util.println("SimulaBuilder.tempClassFileDir  " + CoreGlobal.tempClassFileDir);
-		Util.println("SimulaBuilder.extLib            " + CoreGlobal.extLib);
+		Util.println("SimulaBuilder.outputDir         " + SimulaCompiler.outputDir);
+		Util.println("SimulaBuilder.simulaTempDir     " + SimulaCompiler.simulaTempDir);
+		Util.println("SimulaBuilder.tempJavaFileDir   " + SimulaCompiler.tempJavaFileDir);
+		Util.println("SimulaBuilder.tempClassFileDir  " + SimulaCompiler.tempClassFileDir);
+		Util.println("SimulaBuilder.extLib            " + SimulaCompiler.extLib);
 
 	}
 	/// Kalles før parsing og checking
 	public static void decodeArguments(String[] argv) {
 		IO.println("Option.decodeArguments: ");
-		Option.verbose=false;
-		Option.WARNINGS=true;
-//		Option.EXTENSIONS=true;
+		SimulaCompiler.verbose = false;
+		SimulaCompiler.WARNINGS = true;
+		SimulaCompiler.EXTENSIONS = true;
 
 		// Parse command line arguments.
 		for(int i=0;i<argv.length;i++) {
@@ -181,19 +147,19 @@ public final class Option {
 			IO.println("Option.decodeArguments: arg: " + arg);
 			if (arg.charAt(0) == '-') { // command line option
 //				if (arg.equalsIgnoreCase("-help")) help(); else
-				if (arg.equalsIgnoreCase("-caseSensitive")) Option.CaseSensitive=true;
+				if (arg.equalsIgnoreCase("-caseSensitive")) SimulaCompiler.CaseSensitive = true;
 //				else if (arg.equalsIgnoreCase("-compilerMode")) Option.setCompilerMode(argv[++i]);
-//				else if (arg.equalsIgnoreCase("-noexec")) Option.noExecution=true;
-				else if (arg.equalsIgnoreCase("-noextension")) Option.EXTENSIONS=false;
-				else if (arg.equalsIgnoreCase("-noPopup")) Option.noPopup = true;
-				else if (arg.equalsIgnoreCase("-nowarn")) Option.WARNINGS=false;
-				else if (arg.equalsIgnoreCase("-verbose")) Option.verbose=true;
+//				else if (arg.equalsIgnoreCase("-noexec")) SimulaCompiler.noExecution=true;
+				else if (arg.equalsIgnoreCase("-noextension")) SimulaCompiler.EXTENSIONS = false;
+				else if (arg.equalsIgnoreCase("-noPopup")) SimulaCompiler.noPopup = true;
+				else if (arg.equalsIgnoreCase("-nowarn")) SimulaCompiler.WARNINGS = false;
+				else if (arg.equalsIgnoreCase("-verbose")) SimulaCompiler.verbose = true;
 //				else if (arg.equalsIgnoreCase("-version")) printVersion();
 //				else if (arg.equalsIgnoreCase("-select")) setSelectors(argv[++i]);				
 //				else if (arg.equalsIgnoreCase("-keepJava")) Option.internal.keepJava = new File(argv[++i]);
 
-//				else if (arg.equalsIgnoreCase("-output")) CoreGlobal.outputDir = new File(argv[++i]);
-//				else if (arg.equalsIgnoreCase("-extLib")) CoreGlobal.extLib = new File(argv[++i]);
+//				else if (arg.equalsIgnoreCase("-output")) SimulaCompiler.outputDir = new File(argv[++i]);
+//				else if (arg.equalsIgnoreCase("-extLib")) SimulaCompiler.extLib = new File(argv[++i]);
 				else {
 					IO.println("Simula ERROR: Unknown option " + arg);
 //					help();
@@ -212,18 +178,18 @@ public final class Option {
 			String arg=argv[i];
 			if (arg.charAt(0) == '-') { // command line option
 				if (arg.equalsIgnoreCase("-compilerMode")) Option.setCompilerMode(argv[++i]);
-				else if (arg.equalsIgnoreCase("-noexec")) Option.noExecution=true;
-//				else if (arg.equalsIgnoreCase("-noextension")) Option.EXTENSIONS=false;
-				else if (arg.equalsIgnoreCase("-noPopup")) Option.noPopup = true;
-				else if (arg.equalsIgnoreCase("-nowarn")) Option.WARNINGS=false;
-				else if (arg.equalsIgnoreCase("-verbose")) Option.verbose=true;
+				else if (arg.equalsIgnoreCase("-noexec")) SimulaCompiler.noExecution = true;
+//				else if (arg.equalsIgnoreCase("-noextension")) SimulaCompiler.EXTENSIONS=false;
+				else if (arg.equalsIgnoreCase("-noPopup")) SimulaCompiler.noPopup = true;
+				else if (arg.equalsIgnoreCase("-nowarn")) SimulaCompiler.WARNINGS = false;
+				else if (arg.equalsIgnoreCase("-verbose")) SimulaCompiler.verbose = true;
 //				else if (arg.equalsIgnoreCase("-version")) printVersion();
 //				else if (arg.equalsIgnoreCase("-select")) setSelectors(argv[++i]);				
 				else if (arg.equalsIgnoreCase("-keepJava")) Option.internal.keepJava = new File(argv[++i]);
 
-				else if (arg.equalsIgnoreCase("-simulaRtsLib")) Option.simulaRtsLib = new File(argv[++i]);
-				else if (arg.equalsIgnoreCase("-output")) CoreGlobal.outputDir = new File(argv[++i]);
-				else if (arg.equalsIgnoreCase("-extLib")) CoreGlobal.extLib = new File(argv[++i]);
+				else if (arg.equalsIgnoreCase("-simulaRtsLib")) SimulaCompiler.simulaRtsLib = new File(argv[++i]);
+				else if (arg.equalsIgnoreCase("-output")) SimulaCompiler.outputDir = new File(argv[++i]);
+				else if (arg.equalsIgnoreCase("-extLib")) SimulaCompiler.extLib = new File(argv[++i]);
 				
 				// Special RT Options
 //				else if (arg.equalsIgnoreCase("-source")) Option.SOURCE_FILE=argv[++i];
@@ -244,13 +210,13 @@ public final class Option {
 		Option.editorUIScale = "1.0";
 //		Option.selectedTheme = Palette.themeNames[0];
 //		CompilerMode compilerMode=CompilerMode.viaJavaSource;
-		compilerMode = CompilerMode.directClassFiles;
+		SimulaCompiler.compilerMode = SimulaCompiler.CompilerMode.directClassFiles;
 //		compilerMode = CompilerMode.simulaClassLoader;
-		Option.CaseSensitive = false;
-		Option.verbose = false;
-		Option.noExecution = false;
-		Option.WARNINGS = true;
-		Option.EXTENSIONS = true;
+		SimulaCompiler.CaseSensitive = false;
+		SimulaCompiler.verbose = false;
+		SimulaCompiler.noExecution = false;
+		SimulaCompiler.WARNINGS = true;
+		SimulaCompiler.EXTENSIONS = true;
 		
 		Option.internal.InitCompilerOptions();
 	}
@@ -261,11 +227,11 @@ public final class Option {
 //		Option.editorUIScale = properties.getProperty("simula.editor.UIScale", "1.0");
 //		Option.selectedTheme = properties.getProperty("simula.editor.theme", Palette.themeNames[0]);
 //		setCompilerMode(properties.getProperty("simula.compiler.option.mode", "directClassFiles"));
-//		Option.CaseSensitive = properties.getProperty("simula.compiler.option.CaseSensitive", "false").equalsIgnoreCase("true");
-//		Option.verbose = properties.getProperty("simula.compiler.option.verbose", "false").equalsIgnoreCase("true");
-//		Option.noExecution = properties.getProperty("simula.compiler.option.noExecution", "false").equalsIgnoreCase("true");
-//		Option.WARNINGS = properties.getProperty("simula.compiler.option.WARNINGS", "true").equalsIgnoreCase("true");
-//		Option.EXTENSIONS = properties.getProperty("simula.compiler.option.EXTENSIONS", "true").equalsIgnoreCase("true");
+//		SimulaCompiler.CaseSensitive = properties.getProperty("simula.compiler.option.CaseSensitive", "false").equalsIgnoreCase("true");
+//		SimulaCompiler.verbose = properties.getProperty("simula.compiler.option.verbose", "false").equalsIgnoreCase("true");
+//		SimulaCompiler.noExecution = properties.getProperty("simula.compiler.option.noExecution", "false").equalsIgnoreCase("true");
+//		SimulaCompiler.WARNINGS = properties.getProperty("simula.compiler.option.WARNINGS", "true").equalsIgnoreCase("true");
+//		SimulaCompiler.EXTENSIONS = properties.getProperty("simula.compiler.option.EXTENSIONS", "true").equalsIgnoreCase("true");
 	}
 	
 	/// Set Compiler options in property file.
@@ -273,23 +239,23 @@ public final class Option {
 	public static void setCompilerOptions(Properties properties) {
 		properties.setProperty("simula.editor.UIScale", Option.editorUIScale);
 		properties.setProperty("simula.editor.theme", Option.selectedTheme);
-		properties.setProperty("simula.compiler.option.mode", ""+Option.compilerMode);
-		properties.setProperty("simula.compiler.option.CaseSensitive", ""+Option.CaseSensitive);
-		properties.setProperty("simula.compiler.option.verbose", ""+Option.verbose);
-		properties.setProperty("simula.compiler.option.noExecution", ""+Option.noExecution);
-		properties.setProperty("simula.compiler.option.WARNINGS", ""+Option.WARNINGS);
-		properties.setProperty("simula.compiler.option.EXTENSIONS", ""+Option.EXTENSIONS);
+		properties.setProperty("simula.compiler.option.mode", ""+SimulaCompiler.compilerMode);
+		properties.setProperty("simula.compiler.option.CaseSensitive", ""+SimulaCompiler.CaseSensitive);
+		properties.setProperty("simula.compiler.option.verbose", ""+SimulaCompiler.verbose);
+		properties.setProperty("simula.compiler.option.noExecution", ""+SimulaCompiler.noExecution);
+		properties.setProperty("simula.compiler.option.WARNINGS", ""+SimulaCompiler.WARNINGS);
+		properties.setProperty("simula.compiler.option.EXTENSIONS", ""+SimulaCompiler.EXTENSIONS);
 	}
 
 	/// Editor Utility: Set Compiler Mode.
 	/// @param id the mode String.
 	public static void setCompilerMode(String id) {
 		if(id.equals("viaJavaSource")) {
-			Option.compilerMode = CompilerMode.viaJavaSource;
+			SimulaCompiler.compilerMode = CompilerMode.viaJavaSource;
 		} else if(id.equals("directClassFiles")) {
-			Option.compilerMode = CompilerMode.directClassFiles;
+			SimulaCompiler.compilerMode = CompilerMode.directClassFiles;
 		} else if(id.equals("simulaClassLoader")) {
-			Option.compilerMode = CompilerMode.simulaClassLoader;
+			SimulaCompiler.compilerMode = CompilerMode.simulaClassLoader;
 		}
 	}
 

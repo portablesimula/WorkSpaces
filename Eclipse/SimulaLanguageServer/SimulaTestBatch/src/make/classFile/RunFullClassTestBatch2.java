@@ -36,7 +36,7 @@ public final class RunFullClassTestBatch2 {
 	public static void main(String[] args) {
 
 		// Set Compiler Options.
-		Option.compilerMode = Option.CompilerMode.simulaClassLoader;
+		Option.compilerMode = SimulaCompiler.CompilerMode.simulaClassLoader;
 //		Option.verbose=true;
 //		Option.EXTENSIONS=false;
 //		Option.CaseSensitive=true;
@@ -47,9 +47,9 @@ public final class RunFullClassTestBatch2 {
 		Option.internal.INLINE_TESTING=true;
 		Option.noPopup = true;
 		Option.internal.TESTING_STACK_SIZE = true;
-//		Option.compilerMode = Option.CompilerMode.viaJavaSource;
-//		Option.compilerMode = Option.CompilerMode.directClassFiles;
-		Option.compilerMode = Option.CompilerMode.simulaClassLoader;
+//		Option.compilerMode = SimulaCompiler.CompilerMode.viaJavaSource;
+//		Option.compilerMode = SimulaCompiler.CompilerMode.directClassFiles;
+		Option.compilerMode = SimulaCompiler.CompilerMode.simulaClassLoader;
 //		Option.internal.TRACING=false;
 //		Option.internal.TRACE_ATTRIBUTE_OUTPUT=true;
 //		Option.internal.TRACE_ATTRIBUTE_INPUT=true;

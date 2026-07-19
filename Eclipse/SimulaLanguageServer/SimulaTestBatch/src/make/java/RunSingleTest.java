@@ -39,9 +39,9 @@ public final class RunSingleTest {
 //		argv.add("-select");
 
 		Vector<String> argv2 = new Vector<>();
-		argv2.add("-compilerMode" + Option.CompilerMode.viaJavaSource);
-//		argv2.add("-compilerMode"); argv2.add(Option.CompilerMode.directClassFiles.toString());
-//		argv2.add("-compilerMode" + Option.CompilerMode.simulaClassLoader);
+		argv2.add("-compilerMode" + SimulaCompiler.CompilerMode.viaJavaSource);
+//		argv2.add("-compilerMode"); argv2.add(SimulaCompiler.CompilerMode.directClassFiles.toString());
+//		argv2.add("-compilerMode" + SimulaCompiler.CompilerMode.simulaClassLoader);
 		
 //		argv2.add("-noexec");
 //		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
@@ -56,6 +56,7 @@ public final class RunSingleTest {
 //		names.add("adHoc01.sim"); // For ad'hoc testing
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
+		names.add("adHoc04.sim"); // For ad'hoc testing
 //		names.add("CLASS_COMMON.sim"); // For ad'hoc testing
 	
 		/// AD'HOC TEST DENNE GANG'
@@ -68,7 +69,7 @@ public final class RunSingleTest {
 		
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
-		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
 //		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
@@ -294,7 +295,7 @@ public final class RunSingleTest {
 
 	private static void setOptions() {
 		// Set options.
-		Option.compilerMode = Option.CompilerMode.viaJavaSource;
+		Option.compilerMode = SimulaCompiler.CompilerMode.viaJavaSource;
 //		Option.verbose=true;
 //		Option.EXTENSIONS=false;
 //		Option.CaseSensitive=true;

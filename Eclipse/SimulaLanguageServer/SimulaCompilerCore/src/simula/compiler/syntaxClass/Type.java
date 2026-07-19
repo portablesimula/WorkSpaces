@@ -13,6 +13,7 @@ import java.lang.constant.MethodTypeDesc;
 
 import simula.Option;
 import simula.builder.SyntaxTree;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.ConnectionBlock;
 import simula.compiler.syntaxClass.declaration.Declaration;
@@ -122,13 +123,14 @@ public class Type extends SyntaxElement {
 	/// @param classIdent the given class identifier
 	public Type(int keyWord, Identifier classIdent) {
 		super(null);
-		if(classIdent != null && !Option.CaseSensitive) classIdent.value = classIdent.value.toUpperCase();
+		if(classIdent != null && !SimulaCompiler.CaseSensitive) classIdent.value = classIdent.value.toUpperCase();
 		this.keyWord = keyWord;
 		this.classIdent = classIdent;
 		if(classIdent != null) {
 			if(classIdent.value.startsWith("<HTML>")) Util.STOP();
 			if(classIdent.value.startsWith("IDENTIFIER[")) Util.STOP();
 		}
+//		IO.println("NEW Type: " + classIdent);
 	}
 
 	/// Create a new ref(classIdent) type.
@@ -219,10 +221,12 @@ public class Type extends SyntaxElement {
 		if(qual!=null) SET_SEMANTICS_CHECKED(); // This Ref-Type is read from attribute file
 		if(IS_SEMANTICS_CHECKED()) return;
 		CoreGlobal.enterScope(scope);
-		Identifier refIdent=getRefIdent();
-		if(refIdent!=null) {
+		Identifier refIdent = getRefIdent();
+		if(refIdent != null) {
+//			IO.println("Type.doChecking: refIdent="+refIdent.value);
 			if(!refIdent.value.equals("RTS_LABEL") && !refIdent.value.equals("_UNKNOWN")) {
-				Declaration decl=scope.findMeaning(refIdent).declaredAs;
+				Declaration decl = scope.findMeaning(refIdent).declaredAs;
+//				IO.println("Type.doChecking: decl="+decl);
 			    if(decl instanceof ClassDeclaration cdecl) qual=cdecl;
 //			    else Util.generalError("Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class");
 //			    else Util.semanticError(scope, "Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class");
@@ -232,6 +236,7 @@ public class Type extends SyntaxElement {
 			    		 Util.semanticError(elt, err);
 				    else Util.generalError(err);
 			    }
+//				IO.println("Type.doChecking: refIdent="+refIdent.value+", qual="+qual);
 			}
 		}
 		CoreGlobal.exitScope();
@@ -495,7 +500,7 @@ public class Type extends SyntaxElement {
 					return("Lsimula/runtime/"+refIdent+";");
 				else if(refIdent.startsWith("RTS_"))
 					return("Lsimula/runtime/"+refIdent+";");
-				else return("L"+Option.packetName+"/"+refIdent+";");
+				else return("L"+SimulaCompiler.packetName+"/"+refIdent+";");
 			}
 			default: Util.IERR(); return null;
 		}
@@ -523,7 +528,7 @@ public class Type extends SyntaxElement {
 					return("Lsimula/runtime/"+refIdent+";");
 				else if(refIdent.startsWith("RTS_"))
 					return("Lsimula/runtime/"+refIdent+";");
-				else return("L"+Option.packetName+"/"+refIdent+";");
+				else return("L"+SimulaCompiler.packetName+"/"+refIdent+";");
 			}
 			default: Util.IERR(); return null;
 		}

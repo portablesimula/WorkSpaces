@@ -119,7 +119,7 @@ public final class ConnectionBlock extends DeclarationScope {
 			result = declaredIn.findMeaning(identifier);
 		}
 		if (result == null) {
-//			Util.error("Undefined variable: " + identifier);
+//			Util.error("Undefined variable: " + identifierValue());
 			UndefinedDeclaration undef = new UndefinedDeclaration(null, identifier);
 			result = new Meaning(undef, this); // Error Recovery
 		}

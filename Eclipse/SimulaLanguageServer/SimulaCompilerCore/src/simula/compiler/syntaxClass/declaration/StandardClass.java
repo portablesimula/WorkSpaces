@@ -6,6 +6,7 @@
 package simula.compiler.syntaxClass.declaration;
 
 import simula.compiler.utilities.ClassHierarchy;
+import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
@@ -15,6 +16,7 @@ import simula.token.Identifier;
 import java.lang.constant.ClassDesc;
 
 import simula.Option;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.OverLoad;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Constant;
@@ -81,13 +83,14 @@ public final class StandardClass extends ClassDeclaration {
 			initProcess();
 			initMAIN_PROGRAM();
 			
-		if(Option.EXTENSIONS) {
+		if(SimulaCompiler.EXTENSIONS) {
 			initCatchingErrors();
 			initDEC_Lib();
 			initDrawing();
 				initShapeElement();
 				initTextElement();
 		}
+		LOG.info("StandardClass: INITIATE DONE");
 	}
 
 
@@ -120,7 +123,7 @@ public final class StandardClass extends ClassDeclaration {
 		// **************************************
 		// *** Additional Text Procedures ***
 		// **************************************
-		if(Option.EXTENSIONS) {
+		if(SimulaCompiler.EXTENSIONS) {
 			typeText.addStandardProcedure(ObjectKind.MemberMethod,Type.Text,"trim"); 
 			typeText.addStandardProcedure(ObjectKind.MemberMethod,Type.Character,"loadChar",parameter("i",Type.Integer)); 
 			typeText.addStandardProcedure(ObjectKind.MemberMethod,null,"storeChar",parameter("c",Type.Character),parameter("i",Type.Integer)); 
@@ -296,7 +299,7 @@ public final class StandardClass extends ClassDeclaration {
 		// **************************************
 		// *** Additional Standard Procedures ***
 		// **************************************
-		if(Option.EXTENSIONS) {
+		if(SimulaCompiler.EXTENSIONS) {
 			
 			String[] mtd4 = { "(I)Lsimula/runtime/RTS_TXT;", "(F)Lsimula/runtime/RTS_TXT;","(D)Lsimula/runtime/RTS_TXT;","(Z)Lsimula/runtime/RTS_TXT;","(C)Lsimula/runtime/RTS_TXT;" };
 			String[] mtd5 = { "(FI)Lsimula/runtime/RTS_TXT;", "(DI)Lsimula/runtime/RTS_TXT;" };
@@ -479,7 +482,7 @@ public final class StandardClass extends ClassDeclaration {
 		Infile.addStandardProcedure(ObjectKind.MemberMethod,Type.Integer,"inint");  
 		Infile.addStandardProcedure(ObjectKind.MemberMethod,Type.LongReal,"inreal");  
 		Infile.addStandardProcedure(ObjectKind.MemberMethod,Type.Integer,"infrac");  
-//		if(Option.EXTENSIONS) {
+//		if(SimulaCompiler.EXTENSIONS) {
 //			Infile.addStandardProcedure(ObjectKind.MemberMethod,Type.Text,"prompt",parameter("msg",Type.Text));
 //		}
 	}  
@@ -692,7 +695,7 @@ public final class StandardClass extends ClassDeclaration {
 		Inbytefile.addStandardProcedure(ObjectKind.MemberMethod,Type.Boolean,"close");  
 		Inbytefile.addStandardProcedure(ObjectKind.MemberMethod,Type.Integer,"inbyte");  
 		Inbytefile.addStandardProcedure(ObjectKind.MemberMethod,Type.Text,"intext",parameter("t",Type.Text));
-		if(Option.EXTENSIONS) {
+		if(SimulaCompiler.EXTENSIONS) {
 			Inbytefile.addStandardProcedure(ObjectKind.MemberMethod,Type.Integer,"in2byte");  // Extension to Simula Standard
 		}
 	}  
@@ -720,7 +723,7 @@ public final class StandardClass extends ClassDeclaration {
 		Outbytefile.addStandardProcedure(ObjectKind.MemberMethod,null,"outbyte",parameter("x",Type.Integer));   
 		Outbytefile.addStandardProcedure(ObjectKind.MemberMethod,null,"outtext",parameter("t",Type.Text));  
 		Outbytefile.addStandardProcedure(ObjectKind.MemberMethod,Type.Boolean,"checkpoint");  
-		if(Option.EXTENSIONS) {
+		if(SimulaCompiler.EXTENSIONS) {
 			Outbytefile.addStandardProcedure(ObjectKind.MemberMethod,null,"out2byte",parameter("x",Type.Integer));   			
 		}
 	}  
@@ -937,7 +940,7 @@ public final class StandardClass extends ClassDeclaration {
 
 
 	// ******************************************************************
-	// *** The Standard Class CatchingErrors  NOTE: if(Option.EXTENSIONS)
+	// *** The Standard Class CatchingErrors  NOTE: if(SimulaCompiler.EXTENSIONS)
 	// ******************************************************************
 	/// Initiate the Standard Class CatchingErrors.
 	private static void initCatchingErrors() { 
@@ -951,7 +954,7 @@ public final class StandardClass extends ClassDeclaration {
 
 	
 	// ******************************************************************
-	// *** The Standard Class DEC_Lib   - as defined in DEC handbook III    NOTE: if(Option.EXTENSIONS)
+	// *** The Standard Class DEC_Lib   - as defined in DEC handbook III    NOTE: if(SimulaCompiler.EXTENSIONS)
 	// ******************************************************************
 	/// Initiate the Standard Class DEC_Lib.
 	private static void initDEC_Lib() { 
@@ -1007,7 +1010,7 @@ public final class StandardClass extends ClassDeclaration {
 	}  
 
 	// ******************************************************************
-	// *** The Standard Class Drawing    NOTE: if(Option.EXTENSIONS)
+	// *** The Standard Class Drawing    NOTE: if(SimulaCompiler.EXTENSIONS)
 	// ******************************************************************
 	/// The Standard Class Drawing.
 	private static StandardClass Drawing;
@@ -1056,7 +1059,7 @@ public final class StandardClass extends ClassDeclaration {
 	}
 
 	// ******************************************************************
-	// *** The Standard Link Class ShapeElement    NOTE: if(Option.EXTENSIONS)
+	// *** The Standard Link Class ShapeElement    NOTE: if(SimulaCompiler.EXTENSIONS)
 	// ******************************************************************
 	/// Initiate the Standard Class ShapeElement.
 	private static void initShapeElement() {
@@ -1077,7 +1080,7 @@ public final class StandardClass extends ClassDeclaration {
 	}
 
 	// ******************************************************************
-	// *** The Standard Link Class TextElement    NOTE: if(Option.EXTENSIONS)
+	// *** The Standard Link Class TextElement    NOTE: if(SimulaCompiler.EXTENSIONS)
 	// ******************************************************************
 	/// Initiate the Standard Class TextElement.
 	private static void initTextElement() {
@@ -1121,7 +1124,7 @@ public final class StandardClass extends ClassDeclaration {
 	private StandardClass(String prefix,String className) {
 		this(className);
 		this.prefix = new Identifier(prefix);
-		if(Option.compilerMode == Option.CompilerMode.simulaClassLoader) {
+		if(SimulaCompiler.compilerMode == SimulaCompiler.CompilerMode.simulaClassLoader) {
 			ClassDesc CD_ThisClass = ClassDesc.of("simula.runtime.RTS_" + className); 
 			ClassDesc CD_SuperClass = ClassDesc.of("simula.runtime.RTS_" + prefix); 
 			ClassHierarchy.addClassToSuperClass(CD_ThisClass, CD_SuperClass);
@@ -1150,14 +1153,14 @@ public final class StandardClass extends ClassDeclaration {
 
 	@Override
 	public Meaning findVisibleAttributeMeaning(Identifier ident) {
-		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("BEGIN Checking Standard Class "+identifier+" for "+ident+" ================================== "+identifier+" ==================================");
+		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("BEGIN Checking Standard Class "+identifierValue()+" for "+ident.value+" ================================== "+identifierValue()+" ==================================");
 		for(Declaration declaration:declarationList) {
 			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Local "+declaration.identifier);
 			if(Util.equals(ident, declaration.identifier)) {
 				return(new Meaning(declaration,this));
 			}
 		}
-		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("ENDOF Checking Standard Class "+identifier+" for "+ident+" ================================== "+identifier+" ==================================");
+		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("ENDOF Checking Standard Class "+identifierValue()+" for "+ident.value+" ================================== "+identifierValue()+" ==================================");
 		if(prefix != null) {
 			ClassDeclaration prfx=getPrefixClass();
 			if(prfx!=null) return(prfx.findVisibleAttributeMeaning(ident));
@@ -1167,9 +1170,13 @@ public final class StandardClass extends ClassDeclaration {
 
 	@Override
 	public Meaning findRemoteAttributeMeaning(Identifier ident) {
-		for(Declaration declaration:declarationList)
-			if(Util.equals(ident, declaration.identifier))
+//		IO.println("StandardClass.findRemoteAttributeMeaning: " + identifierValue() + ", TRY FIND: "+ident.value);
+		for(Declaration declaration:declarationList) {
+//			IO.println("StandardClass.findRemoteAttributeMeaning: CHECK: " + declaration.identifierValue() + ", find: "+ident);
+			if(Util.equals(ident, declaration.identifier)) {
 				return(new Meaning(declaration,this));
+			}
+		}
 		ClassDeclaration prfx=getPrefixClass();
 		if(prfx!=null) return(prfx.findRemoteAttributeMeaning(ident));
 		return(null);

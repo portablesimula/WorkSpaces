@@ -12,6 +12,7 @@ import java.lang.constant.MethodTypeDesc;
 import simula.Option;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.OverLoad;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
@@ -120,7 +121,7 @@ public final class TypeConversion extends Expression {
 				Constant c=new Constant(null, toType, val); c.doChecking();
 				return(c);
 			}
-			if(Option.compilerMode != Option.CompilerMode.viaJavaSource) {
+			if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource) {
 				if(toType instanceof OverLoad otp) {
 					return (new TypeConversion(otp.type[0], expression));
 				}				
@@ -137,7 +138,7 @@ public final class TypeConversion extends Expression {
 	private static boolean testCastNeccessary(Type toType,final Expression expression) {
 		if (toType == null)	return false;
 		if(expression instanceof MissingExpression) return false;
-		if(Option.compilerMode != Option.CompilerMode.viaJavaSource) {
+		if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource) {
 			if(toType instanceof OverLoad otp) {
 				if(!otp.contains(expression.type)) {
 					return(true); // Ad'Hoc
@@ -222,7 +223,7 @@ public final class TypeConversion extends Expression {
 					case Type.T_INTEGER: codeBuilder.i2f(); break;
 					case Type.T_LONG_REAL: codeBuilder.d2f(); break;
 					default:
-						if(Option.compilerMode != Option.CompilerMode.viaJavaSource && fromType instanceof OverLoad otp) {
+						if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource && fromType instanceof OverLoad otp) {
 							if(!otp.contains(Type.Real)) Util.IERR();
 						} else if (fromType.keyWord != Type.T_REAL) Util.IERR();
 				} break;
@@ -232,7 +233,7 @@ public final class TypeConversion extends Expression {
 					case Type.T_INTEGER: codeBuilder.i2d(); break;
 					case Type.T_REAL: codeBuilder.f2d(); break;
 					default:
-						if(Option.compilerMode != Option.CompilerMode.viaJavaSource && fromType instanceof OverLoad otp) {
+						if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource && fromType instanceof OverLoad otp) {
 							if(!otp.contains(Type.LongReal)) Util.IERR();
 						} else if (fromType.keyWord != Type.T_LONG_REAL) Util.IERR();
 				}

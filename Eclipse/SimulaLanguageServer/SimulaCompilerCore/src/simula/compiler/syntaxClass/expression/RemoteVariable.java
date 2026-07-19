@@ -14,6 +14,7 @@ import simula.Option;
 import simula.builder.SimulaBuilder;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
+import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.declaration.ArrayDeclaration;
@@ -117,7 +118,7 @@ public final class RemoteVariable extends Expression {
 			if(objType.keyWord != Type.T_UNDEF)
 				Util.semanticError(obj, "doRemoteChecking: Object Expression (" + obj + ") is not a ref() type rather " + objType);
 		} else if (qual.hasLocalClasses) {
-			if (Option.EXTENSIONS)
+			if (SimulaCompiler.EXTENSIONS)
 				 Util.warning(obj, "Illegal remote access into object of class with local classes.");
 			else Util.semanticError(obj, "Illegal remote access into object of class with local classes.");
 		}
@@ -128,7 +129,7 @@ public final class RemoteVariable extends Expression {
 			if(qual!=null) remoteAttribute = qual.findRemoteAttributeMeaning(ident);
 			if (remoteAttribute == null) {
 				if(objType.keyWord != Type.T_UNDEF)
-					Util.semanticError(obj, "RemoteVariable.doRemoteChecking: " + ident + " is not an attribute of "	+ objType.getRefIdent());
+					Util.semanticError(obj, "RemoteVariable.doRemoteChecking: " + ident.value + " is not an attribute of "	+ objType.getRefIdent().value);
 				UndefinedDeclaration undef = new UndefinedDeclaration(null, ident);
 				remoteAttribute = new Meaning(undef, CoreGlobal.getCurrentScope()); // Error Recovery
 			}
