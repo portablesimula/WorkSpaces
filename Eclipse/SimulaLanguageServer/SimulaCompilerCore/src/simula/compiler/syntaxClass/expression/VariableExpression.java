@@ -45,7 +45,6 @@ import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
 import simula.token.Identifier;
-import simula.token.LexToken;
 
 /// Variable.
 /// 
@@ -214,11 +213,12 @@ public final class VariableExpression extends Expression {
 
 	@Override
 	public void doChecking() {
+		IO.println("VariableExpression.deChecking BEGIN Variable(" + identifier.value + ").doChecking: type=" + type);
+//		Util.IERR("");
 		if (IS_SEMANTICS_CHECKED())
 			return;
 		if (Option.internal.TRACE_CHECKER)
-			Util.TRACE("BEGIN Variable(" + identifier + ").doChecking: type=" + type);
-//		IO.println("BEGIN Variable(" + identifier + ").doChecking: type=" + type);
+			Util.TRACE("BEGIN Variable(" + identifier.value + ").doChecking: type=" + type);
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		Declaration declaredAs = getMeaning().declaredAs;
 		if (declaredAs != null)
@@ -234,18 +234,18 @@ public final class VariableExpression extends Expression {
 				Util.semanticError(this, "Undefined variable: " + undef.identifierValue());
 			}
 			case StandardProcedure sproc -> {
-				if (Util.equals(sproc.identifier.value, "detach")) {
+				if (Util.equals(sproc.identifierValue(), "detach")) {
 //					if (meaning.declaredIn instanceof ConnectionBlock conn)
 //						conn.classDeclaration.detachUsed = true;
 //					else if (meaning.declaredIn instanceof ClassDeclaration cdecl)
 //						cdecl.detachUsed = true;
 //					else
-//						Util.semanticError(this, "Variable(" + identifier + ").doChecking:INTERNAL ERROR, "
+//						Util.semanticError(this, "Variable(" + identifierValue() + ").doChecking:INTERNAL ERROR, "
 //								+ meaning.declaredIn.getClass().getSimpleName());
 					switch(meaning.declaredIn) {
 						case ConnectionBlock  conn  -> { conn.classDeclaration.detachUsed = true; }
 						case ClassDeclaration cdecl -> { cdecl.detachUsed = true; }
-						default -> { Util.semanticError(this, "Variable(" + identifier + ").doChecking:INTERNAL ERROR, "
+						default -> { Util.semanticError(this, "Variable(" + identifier.value + ").doChecking:INTERNAL ERROR, "
 									+ meaning.declaredIn.getClass().getSimpleName()); }
 					}
 				}
@@ -287,9 +287,9 @@ public final class VariableExpression extends Expression {
 					paramIterator = ((ProcedureDeclaration) declaredAs).parameterList.iterator();
 					if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource) {
 						if(declaredAs instanceof StandardProcedure prc) {
-							if(prc.identifier.value.equalsIgnoreCase("histd")) ; // NOTHING
-							else if(prc.identifier.value.equalsIgnoreCase("discrete")) ; // NOTHING
-							else if(prc.identifier.value.equalsIgnoreCase("linear")) ; // NOTHING
+							if(prc.identifierValue().equalsIgnoreCase("histd")) ; // NOTHING
+							else if(prc.identifierValue().equalsIgnoreCase("discrete")) ; // NOTHING
+							else if(prc.identifierValue().equalsIgnoreCase("linear")) ; // NOTHING
 							else {
 								ProcedureSpecification overLoadMatch = prc.getOverLoadMatch(params);
 								if(overLoadMatch != null)
@@ -301,11 +301,11 @@ public final class VariableExpression extends Expression {
 				if (params == null) {
 					if(declaredAs.declarationKind != ObjectKind.Procedure) {
 						if (paramIterator.hasNext())
-							Util.semanticError(this, "Missing parameter(s) to " + ObjectKind.edit(declaredAs.declarationKind) + " " + declaredAs.identifier);
+							Util.semanticError(this, "Missing parameter(s) to " + ObjectKind.edit(declaredAs.declarationKind) + " " + declaredAs.identifierValue());
 					} else {
 						if(!(declaredAs instanceof SwitchDeclaration)) {
 							if(backLink == null && paramIterator.hasNext())
-								Util.semanticError(this, "Missing parameter(s) to Switch " + declaredAs.identifier);
+								Util.semanticError(this, "Missing parameter(s) to Switch " + declaredAs.identifierValue());
 						}
 					}
 				} else {
@@ -314,7 +314,7 @@ public final class VariableExpression extends Expression {
 					Iterator<Expression> actualIterator = params.iterator();
 					LOOP: while (actualIterator.hasNext()) {
 						if (!paramIterator.hasNext()) {
-							Util.semanticError(this, "Too many parameters to " + declaredAs.identifier);
+							Util.semanticError(this, "Too many parameters to " + declaredAs.identifierValue());
 							break LOOP;
 						}
 						Parameter formalParameter = (Parameter) paramIterator.next();
@@ -346,7 +346,7 @@ public final class VariableExpression extends Expression {
 						checkedParams.add(checkedParameter);
 					}
 					if (paramIterator.hasNext())
-						Util.semanticError(this, "Missing parameter(s) to " + declaredAs.identifier);
+						Util.semanticError(this, "Missing parameter(s) to " + declaredAs.identifierValue());
 				}
 				if (type instanceof OverLoad)
 					this.type = overloadedType;
@@ -408,7 +408,8 @@ public final class VariableExpression extends Expression {
 			}
 
 		if (Option.internal.TRACE_CHECKER)
-			Util.TRACE("END Variable(" + identifier + ").doChecking: type=" + type + ", kind=" + ObjectKind.edit(declaredAs.declarationKind));
+			Util.TRACE("END Variable(" + identifier.value + ").doChecking: type=" + type + ", kind=" + ObjectKind.edit(declaredAs.declarationKind));
+		IO.println("VariableExpression.doChecking: DONE: " + ObjectKind.edit(declaredAs.declarationKind) + ": " + declaredAs);
 		SET_SEMANTICS_CHECKED();
 	}
 
@@ -523,9 +524,9 @@ public final class VariableExpression extends Expression {
 	private String editVariable(final String rightPart) {
 		ASSERT_SEMANTICS_CHECKED();
 		boolean destination = (rightPart != null);
+		if(meaning == null) Util.IERR("NO MEANING: " + identifier.value);
 		Declaration declaredAs = meaning.declaredAs;
-		IO.println("VariableExpression.editVariable: " + identifier+" "+meaning);
-		if(meaning == null) Util.IERR("");
+//		IO.println("VariableExpression.editVariable: " + identifierValue()+" "+meaning);
 //		ASSERT_SEMANTICS_CHECKED();
 		StringBuilder s;
 		switch (declaredAs.declarationKind) {
@@ -547,7 +548,7 @@ public final class VariableExpression extends Expression {
 	
 			case ObjectKind.Class:
 			case ObjectKind.StandardClass:
-				Util.codingError(this, "Illegal use of class identifier: " + declaredAs.identifier);
+				Util.codingError(this, "Illegal use of class identifier: " + declaredAs.identifierValue());
 				return (edIdentifierAccess(destination));
 	
 			case ObjectKind.LabelDeclaration:
@@ -754,12 +755,12 @@ public final class VariableExpression extends Expression {
 				buildIdentifierAccess(false,codeBuilder);
 				if (this.hasArguments())
 					 arr.arrayGetElement(this, false, codeBuilder);
-				else codeBuilder.getfield(pool.fieldRefEntry(arr.declaredIn.getClassDesc(), arr.identifier.value, ArrayDeclaration.getClassDesc(type)));
+				else codeBuilder.getfield(pool.fieldRefEntry(arr.declaredIn.getClassDesc(), arr.identifierValue(), ArrayDeclaration.getClassDesc(type)));
 				break;
 
 			case ObjectKind.Class:
 			case ObjectKind.StandardClass:
-				Util.codingError(this, "Illegal use of class identifier: " + declaredAs.identifier);
+				Util.codingError(this, "Illegal use of class identifier: " + declaredAs.identifierValue());
 				break;
 
 			case ObjectKind.LabelDeclaration:
@@ -948,7 +949,7 @@ public final class VariableExpression extends Expression {
 	}
 
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		IO.println(edTreeIndent(indent)+this);
 	}
 	
@@ -966,7 +967,8 @@ public final class VariableExpression extends Expression {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder(identifier.value);
+		String ID = (identifier == null)? "UNKNOWN_Variable" : identifier.value;
+		StringBuilder sb = new StringBuilder(ID);
 		Vector<Expression> par = (checkedParams != null)? checkedParams : params;
 //		sb.append("TEST: "+par+" ");
 		if (par == null) {

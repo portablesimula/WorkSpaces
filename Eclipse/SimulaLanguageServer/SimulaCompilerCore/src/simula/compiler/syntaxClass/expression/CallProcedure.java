@@ -243,7 +243,7 @@ public final class CallProcedure {
 	private static String codeCPF(final String ident,final VariableExpression variable,final ProcedureSpecification procedureSpec) {
 		if(! variable.hasArguments()) {
 			if(procedureSpec != null && procedureSpec.parameterList.size() > 0)
-				Util.codingError(variable, "Missing parameter(s) to " + variable.identifier);
+				Util.codingError(variable, "Missing parameter(s) to " + variable.identifier.value);
 		}
 		StringBuilder s=new StringBuilder();
 		if(procedureSpec!=null) s.append(codeCSVP(ident,variable,procedureSpec));
@@ -258,7 +258,7 @@ public final class CallProcedure {
 					if((actualParameter instanceof VariableExpression var) && !var.hasArguments()) {
 						Declaration decl=var.meaning.declaredAs;
 						if(decl instanceof StandardProcedure) {
-							if(Util.equals(decl.identifier.value, "sourceline")) {
+							if(Util.equals(decl.identifierValue(), "sourceline")) {
 //								actualParameter=new Constant(Type.Integer,Global.sourceLineNumber);
 //								actualParameter=new Constant(null, Type.Integer, decl.firstLineNumber());
 								int lno = var.firstLineNumber();

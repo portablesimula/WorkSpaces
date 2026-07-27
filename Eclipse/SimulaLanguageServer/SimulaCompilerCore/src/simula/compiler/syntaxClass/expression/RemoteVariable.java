@@ -290,7 +290,7 @@ public final class RemoteVariable extends Expression {
 			for(Expression expr:variable.checkedParams)
 				expr.buildEvaluation(null,codeBuilder);
 
-		codeBuilder.invokestatic(RTS.CD.RTS_TXT, pro.identifier.value, pro.getMethodTypeDesc(beforeDot,variable.checkedParams));
+		codeBuilder.invokestatic(RTS.CD.RTS_TXT, pro.identifierValue(), pro.getMethodTypeDesc(beforeDot,variable.checkedParams));
 		if(pro.type != null && backLink == null) {
 			codeBuilder.pop();
 		}

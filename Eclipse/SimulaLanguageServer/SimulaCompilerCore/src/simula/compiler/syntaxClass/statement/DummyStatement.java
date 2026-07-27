@@ -76,7 +76,7 @@ public final class DummyStatement extends Statement {
 	}
 	
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 	}
 
 	@Override

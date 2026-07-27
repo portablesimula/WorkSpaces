@@ -65,14 +65,6 @@ public class AttributeOutputStream {
     /// Writes a boolean to the underlying DataOutputStream.
     /// @param b a boolean to be written.
     /// @throws IOException if an I/O error occurs.
-    public void writeIdentifier(Identifier identifier) throws IOException {
-		if(TRACE) IO.println("AttributeOutputStream.writeIdentifier: "+identifier);
-		Util.IERR("NOT IMPL");
-	}
-	
-    /// Writes a boolean to the underlying DataOutputStream.
-    /// @param b a boolean to be written.
-    /// @throws IOException if an I/O error occurs.
     public void writeBoolean(boolean b) throws IOException {
 		if(TRACE) IO.println("AttributeOutputStream.writeBoolean: "+b);
 		oupt.writeBoolean(b);
@@ -113,6 +105,24 @@ public class AttributeOutputStream {
 			int lng = s.length();
 			oupt.writeShort(lng+1);
 			for(int i=0;i<lng;i++) oupt.writeChar(s.charAt(i));
+		}
+	}
+	
+    /// Writes an identifier to the underlying DataOutputStream.
+    /// @param id an identifier to be written.
+    /// @throws IOException if an I/O error occurs.
+    public void writeIdentifier(Identifier id) throws IOException {
+		if(TRACE) IO.println("AttributeOutputStream.writeIdentifier: "+id);
+		if(id == null) {
+			oupt.writeShort(0);
+		} else {
+			String s = id.value;
+			if(s == null) oupt.writeShort(0);
+			else {
+				int lng = s.length();
+				oupt.writeShort(lng+1);
+				for(int i=0;i<lng;i++) oupt.writeChar(s.charAt(i));
+			}
 		}
 	}
 

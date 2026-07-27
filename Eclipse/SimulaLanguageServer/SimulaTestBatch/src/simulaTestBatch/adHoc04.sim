@@ -1,3 +1,4 @@
+Simset
 begin text t;
-	sysout.outtext("Hello World !");
-end;
+	outtext("Hello World !");
+end of program

@@ -14,6 +14,9 @@ import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.syntaxClass.declaration.Declaration;
+import simula.compiler.syntaxClass.declaration.Parameter;
+import simula.compiler.syntaxClass.declaration.StandardClass;
+import simula.compiler.syntaxClass.declaration.StandardProcedure;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.Html;
 import simula.compiler.utilities.Util;
@@ -136,15 +139,13 @@ public abstract class SyntaxElement {
 
 	/// The first source line number
 	public int firstLineNumber() {
-//		if(lexTokenRange == null) return -99;
-//		return lexTokenRange.getFirstLexToken().firstLineNumber();			
+		if(firstParserToken == null) return 0;
 		return firstParserToken.firstLineNumber();			
 	}
 
 	/// The last source line number
 	public int lastLineNumber() {
-//		if(lexTokenRange == null) return +99;
-//		return lexTokenRange.getLastLexToken().lastLineNumber();			
+		if(lastParserToken == null) return 0;
 		return lastParserToken.lastLineNumber();			
 	}
 	
@@ -213,14 +214,14 @@ public abstract class SyntaxElement {
 	/// 
 	/// @param indent number of spaces leading the line
 	public void print(final int indent) {
-		Util.println(edIndent(indent) + this);
+		Util.println(edIndent(indent) + this.getClass().getSimpleName() + ": " + this);
 	}
 
 	/// Utility print syntax tree method.
 	/// 
 	/// @param indent number of spaces leading the lines 
 	/// @param head the head of the tree.
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		Util.IERR("Method printTree need a redefinition in "+this.getClass().getSimpleName());
 	}
 

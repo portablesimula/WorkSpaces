@@ -142,7 +142,7 @@ public final class ProcedureSpecification extends SyntaxElement {
 		StringBuilder s = new StringBuilder();
 		if (type != null)
 			s.append(type).append(' ');
-		s.append("PROCEDURE ").append(identifier).append(Parameter.editParameterList(parameterList));
+		s.append("PROCEDURE ").append(identifier.value).append(Parameter.editParameterList(parameterList));
 		return (s.toString());
 	}
 
@@ -162,7 +162,7 @@ public final class ProcedureSpecification extends SyntaxElement {
 		if(spec == null) {
 			oupt.writeBoolean(false);
 		} else {
-			Util.TRACE_OUTPUT("BEGIN Write ProcedureSpecification: " + spec.identifier);
+			Util.TRACE_OUTPUT("BEGIN Write ProcedureSpecification: " + spec.identifier.value);
 			oupt.writeBoolean(true);
 			oupt.writeIdentifier(spec.identifier);
 			oupt.writeType(spec.type);
@@ -183,7 +183,7 @@ public final class ProcedureSpecification extends SyntaxElement {
 		spec.type = inpt.readType();
 		spec.parameterList = (ObjectList<Parameter>) inpt.readObjectList();
 		
-		Util.TRACE_INPUT("END Read ProcedureSpecification: " + spec.identifier);
+		Util.TRACE_INPUT("END Read ProcedureSpecification: " + spec.identifier.value);
 		return(spec);
 	}
 

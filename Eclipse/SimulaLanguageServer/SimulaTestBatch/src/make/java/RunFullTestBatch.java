@@ -8,15 +8,10 @@
 package make.java;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Vector;
 
-import simula.compiler.SourceModule;
+import client.TestBatchLauncher;
 import simula.Option;
-import simula.compiler.REMOVE_SimulaCompiler;
-import simula.compiler.utilities.CoreGlobal;
-import simula.compiler.utilities.Util;
-import simula.editor.RTOption;
 
 /**
  * Simula Test Batch donated by Simula as.
@@ -27,42 +22,42 @@ import simula.editor.RTOption;
  *
  */
 public final class RunFullTestBatch {
-	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula");
-	private static final File userDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/SimulaTestBatch");
+//	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula");
+//	private static final File userDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/SimulaTestBatch");
+//	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
+
+	
+//	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
+	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaCompilerCore");
+	private static final String userDir = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaTestBatch";
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 	private static final String testBatchJarDir = userDir+"/src/simulaTestBatch/bin/";
 	private static long startTimeMs = System.currentTimeMillis( );
 
 	public static void main(String[] args) {
 
-		// Set Compiler Options.
-//		Option.compilerMode = SimulaCompiler.CompilerMode.viaJavaSource;
-		Option.setCompilerMode("viaJavaSource");
-		
-//		Option.verbose=true;
-//		Option.EXTENSIONS=false;
-//		Option.CaseSensitive=true;
-//		Option.noExecution=true;
-		Option.WARNINGS=false;
+//		// Set Compiler Options.
 
-		// Set internal test, debug options.
-		Option.internal.INLINE_TESTING=true;
-		Option.noPopup = true;
-		Option.internal.TESTING_STACK_SIZE = true;
-//		Option.internal.TRACING=false;
-//		Option.internal.TRACE_ATTRIBUTE_OUTPUT=true;
-//		Option.internal.TRACE_ATTRIBUTE_INPUT=true;
-		
-		// Set RunTime Options and tracing.
-		RTOption.VERBOSE = false;
-//		RTOption.VERBOSE = true;
-//		RTOption.USE_CONSOLE=false;
-//		RTOption.BLOCK_TRACING = false;
-//		RTOption.GOTO_TRACING = false;
-//		RTOption.QPS_TRACING = false;
-//		RTOption.SML_TRACING = false;
+		Vector<String> argv = new Vector<>();
+//		argv.add("-caseSensitive");
+//		argv.add("-noextension");
+//		argv.add("-noPopup");
+//		argv.add("-nowarn");
+		argv.add("-verbose");
+//		argv.add("-select");
 
-		IO.println("RunFullTestBatch.main: BEGIN Compiler Mode: " + Option.compilerMode);
+		Vector<String> argv2 = new Vector<>();
+		argv2.add("-compilerMode"); argv2.add("viaJavaSource");
+//		argv2.add("-compilerMode"); argv2.add("directClassFiles");
+		
+//		argv2.add("-noexec");
+//		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
+		argv2.add("-simulaRtsLib"); argv2.add(new File(simulaDir,"bin").toString()); // To use Eclipse Project's simula.runtime
+//		argv2.add("-extLib"); argv2.add("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin");
+		
+		setOptions();
+
+		IO.println("RunFullTestBatch.main: BEGIN Compiler Mode: viaJavaSource");
 		Vector<String> names=new Vector<String>();
 		names.add("SimulaTest.sim"); // Simula TestBatch Framework
 		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements
@@ -276,31 +271,69 @@ public final class RunFullTestBatch {
 		names.add("single_tst07.sim"); // OK: Single test: L: while ...
 		names.add("single_tst08.sim"); // OK: Single test: while ...
 		
-		CoreGlobal.packetName="simulaTestBatch";
-//		Global.simulaRtsLib=new File(userDir,"bin"); // To use Eclipse Project's simula.runtime
-		CoreGlobal.simulaRtsLib=new File(simulaDir,"bin"); // To use Eclipse Project's simula.runtime
-
 		for(String name:names) {
-//			String fileName = userDir+"/src/"+Global.packetName+"/sim/"+name;
 			String fileName = sourceDir+name;
-			Option.internal.RUNTIME_USER_DIR=new File(fileName).getParent();
-			try {
-				CoreGlobal.initiate();
-		    	new SourceModule(new File(fileName));
-				new REMOVE_SimulaCompiler(fileName).doCompile(CoreGlobal.currentModule.getSyntaxTree());
-			} catch (IOException e) {
-				Util.generalError("can't open " + fileName + ", reason: " + e);
-			}
+			TestBatchLauncher.run(fileName, argv, argv2);
 		}
-		
+
 //		list(testBatchJarDir);
 		deleteFiles(testBatchJarDir);
 //		list(testBatchJarDir);
 		
-		IO.println("\n--- END OF SIMULA TESTBATCH - Compiler Mode: " + Option.compilerMode);
+		IO.println("\n--- END OF SIMULA TESTBATCH - Compiler Mode: viaJavaSource");
 		long timeUsed  = System.currentTimeMillis( ) - startTimeMs;
 		IO.println("\nElapsed Time: Approximately " + timeUsed/1000 + " sec.");
 	}
+
+
+	private static void setOptions() {
+		// Set internal test, debug options.
+		
+		Option.internal.INLINE_TESTING=true;
+//		Option.noPopup = true;
+		Option.internal.TESTING_STACK_SIZE = true;
+//		Option.internal.DEBUGGING=true;
+//		Option.internal.LIST_GENERATED_CLASS_FILES=true;
+
+		// Overall TRACING Options
+//		Option.internal.TRACING=true;
+
+		// Scanner Trace Options
+//		Option.internal.TRACE_LEXER = 2;
+//		Option.internal.TRACE_NEW_LEXTOKEN = 2;
+//		Option.TRACE_COMMENTS=true;
+
+		// Parser Trace Options
+//		Option.internal.TRACE_PARSE=true;
+//		Option.internal.PRINT_SYNTAX_TREE=1;
+//		Option.TRACE_ATTRIBUTE_OUTPUT=true;
+//		Option.internal.TRACE_ATTRIBUTE_INPUT=true;
+
+		// Checker Trace Options
+//		Option.internal.TRACE_FIND_MEANING=4;
+//		Option.internal.TRACE_CHECKER=true;
+//		Option.internal.TRACE_CHECKER_OUTPUT=true;
+
+		// .java Coder Trace Options
+//		Option.TRACE_CODING=true;
+//		Option.GNERATE_LINE_CALLS=true;
+
+		// Byte code engineering Options
+//		Option.LIST_INPUT_INSTRUCTION_LIST=true;
+//		Option.LIST_REPAIRED_INSTRUCTION_LIST=true;
+//		Option.internal.TRACE_REPAIRING_INPUT=true;
+//		Option.internal.TRACE_REPAIRING=true;
+//		Option.internal.TRACE_REPAIRING_OUTPUT=true;
+		
+		// Set RunTime Options and tracing.
+//		RTOption.VERBOSE = true;
+//		RTOption.USE_CONSOLE=true;
+//		RTOption.BLOCK_TRACING = true;
+//		RTOption.GOTO_TRACING = true;
+//		RTOption.QPS_TRACING = true;
+//		RTOption.SML_TRACING = true;
+	}
+	
 
 	// ***************************************************************
 	// *** DELETE FILES

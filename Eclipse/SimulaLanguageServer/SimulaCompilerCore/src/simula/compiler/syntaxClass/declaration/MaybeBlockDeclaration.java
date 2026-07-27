@@ -31,6 +31,7 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
@@ -196,18 +197,20 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	@Override
 	public Meaning findVisibleAttributeMeaning(final Identifier ident) {
-		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("BEGIN Checking MayBeBlock for "+identifierValue()+" ================================== "+identifierValue()+" ==================================");
+		if(Option.internal.TRACE_FIND_MEANING > 1)
+			LOG.trace("MaybeBlockDeclaration.findVisibleAttributeMeaning: BEGIN Search "+identifierValue()+" for "+ident.value+" ================================== "+identifierValue()+" ==================================");
 		for (Declaration declaration : declarationList) {
-			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Local "+declaration);
+			if(Option.internal.TRACE_FIND_MEANING > 2) LOG.trace("MaybeBlockDeclaration.findVisibleAttributeMeaning: Checking Local "+declaration);
 			if (Util.equals(ident, declaration.identifier))
 				return (new Meaning(declaration, this, this, false));
 		}
 		if(labelList != null) for (LabelDeclaration label : labelList.getDeclaredLabels()) {
-			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Label "+label);
+			if(Option.internal.TRACE_FIND_MEANING > 2) LOG.trace("MaybeBlockDeclaration.findVisibleAttributeMeaning: Checking Label "+label);
 			if (Util.equals(ident, label.identifier))
 				return (new Meaning(label, this, this, false));
 		}
-		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("ENDOF Checking MayBeBlock for "+identifierValue()+" ================================== "+identifierValue()+" ==================================");
+		if(Option.internal.TRACE_FIND_MEANING > 1)
+			LOG.trace("MaybeBlockDeclaration.findVisibleAttributeMeaning: ENDOF Search "+identifierValue()+" for "+ident.value+" ========= NOT FOUND ============== "+identifierValue()+" ==================================");
 		return (null);
 	}
 
@@ -220,7 +223,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		if (declarationKind == ObjectKind.CompoundStatement)
 			doCompoundStatementCoding();
 		else if (this.isPreCompiledFromFile != null) {
-			if(SimulaCompiler.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
+			if(SimulaCompiler.verbose) IO.println("Skip  doJavaCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);		
 		} else doSubBlockCoding();
 	}
 
@@ -425,7 +428,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		}
 		CoreGlobal.enterScope(this);
 		if (this.isPreCompiledFromFile != null) {
-			if(SimulaCompiler.verbose) IO.println("Skip  buildClassFile: "+this.identifier);			
+			if(SimulaCompiler.verbose) IO.println("Skip  buildClassFile: "+this.identifierValue());			
 		} else {
 			try { createJavaClassFile(); } catch (IOException e) { e.printStackTrace();	}
 		}
@@ -497,7 +500,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
     	String spc=edIndent(indent);
 		StringBuilder s = new StringBuilder(spc);
 		s.append('[').append(sourceBlockLevel).append(':').append(getRTBlockLevel()).append("] ");
-		s.append(declarationKind).append(' ').append(identifierValue());
+		s.append(ObjectKind.edit(declarationKind)).append(' ').append(identifierValue());
 		s.append('[').append(externalIdent).append("] ");
 		Util.println(s.toString());
 		String beg = "begin[" + edScopeChain() + ']';
@@ -508,21 +511,22 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	}
 	
 	@Override
-	public void printTree(final int indent, final Object head) {
-		verifyTree(head);
+	public void printTree(final int indent) {
+		// verifyTree(head);
 		String block = ObjectKind.edit(declarationKind);
 		String tail = (IS_SEMANTICS_CHECKED()) ? "  BL=" + getRTBlockLevel() : "";
 		if(isPreCompiledFromFile != null) tail = tail + " From: " + isPreCompiledFromFile;
-		IO.println(edTreeIndent(indent) + block + " " + identifier + tail + "  declaredIn="+this.declaredIn);
-		if(labelList != null) labelList.printTree(indent+1,this);
-		printDeclarationList(indent+1);
-		printStatementList(indent+1);
+		IO.println(edTreeIndent(indent) + block + " " + identifierValue() + tail + "  declaredIn="+this.declaredIn);
+		if(labelList != null) labelList.printTree(indent + 1);
+		printDeclarationList(indent + 1);
+		printStatementList(indent + 1);
 	}
 	
 	@Override
 	public String toString() {
 //		return identifier + '[' + externalIdent + "] Kind=" + declarationKind;
-		return identifier.value + '[' + externalIdent + "]";
+		String ID = (identifier == null)? "UNKNOWN_Block" : identifierValue();
+		return ID + '[' + externalIdent + "]";
 	}
 
 	// ***********************************************************************************************

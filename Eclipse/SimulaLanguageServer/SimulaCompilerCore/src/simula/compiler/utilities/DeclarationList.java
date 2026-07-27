@@ -55,8 +55,8 @@ public final class DeclarationList extends Vector<Declaration> {
 	public boolean add(Declaration dcl) {
 		Declaration d=find(dcl.identifier);
 		if(d!=null) {
-			Util.warning(dcl, "Multiple declarations with the same name: "+dcl.identifier);
-			Util.warning(d, "Multiple declarations with the same name: "+dcl.identifier);
+			Util.warning(dcl, "Multiple declarations with the same name: "+dcl.identifierValue());
+			Util.warning(d, "Multiple declarations with the same name: "+dcl.identifierValue());
 			return(false);			
 		}
 		super.addElement(dcl);

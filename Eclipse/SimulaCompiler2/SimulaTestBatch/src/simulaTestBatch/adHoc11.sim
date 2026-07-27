@@ -1,0 +1,9 @@
+
+% external class AdHoc_SimulaTest;
+
+AdHoc_SimulaTest(40,"--- Empty test") begin
+
+	outtext("IN EMPTY TEST");
+	outimage;
+	
+end

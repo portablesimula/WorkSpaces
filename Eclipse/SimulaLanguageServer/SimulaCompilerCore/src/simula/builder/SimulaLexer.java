@@ -31,7 +31,7 @@ import simula.token.IntegerConst;
 /// 
 /// @author Øystein Myhre Andersen
 public final class SimulaLexer {
-	private boolean TRACE_CURRENT_COLUMN = true;//false;
+	private boolean TRACE_CURRENT_COLUMN = false;//true;//false;
 	
 	private SimulaBuilder simBuilder;
     private CharSequence sourceText;
@@ -556,7 +556,7 @@ public final class SimulaLexer {
 	        	if(ident.equals("while"))        return(newKeyWordToken(KeyWord.WHILE));
 	        	break;
 	    }
-	    IO.println("SimulaLexer.scanIdentifier: " + name + " currentColumn=" + currentColumn);
+//	    IO.println("SimulaLexer.scanIdentifier: " + name + " currentColumn=" + currentColumn);
 	    return(identifierToken(name));
 	}
 	

@@ -75,7 +75,7 @@ public final class Util {
 	/// Print a error message.
 	/// @param msg the message
 	public static void generalWarning(final String msg) {
-		LOG.error("General Error: " + msg);
+		LOG.warning("General Warning: " + msg);
 //		simBuilder.addDiagnostic(diagnostic); // TODO: DETTE MÅ RETTES - 
 	}
 

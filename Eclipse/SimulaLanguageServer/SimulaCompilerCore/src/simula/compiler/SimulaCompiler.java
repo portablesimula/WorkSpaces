@@ -12,7 +12,6 @@ import simula.builder.SimulaBuilder;
 import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.transform.ClassFileTransform;
-import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
@@ -136,6 +135,20 @@ public class SimulaCompiler {
     	return sourceName;
     }
 
+    private void setOutputDir() {
+    	IO.println("SimulaCoreExports.run: sourceFileDir=" + documentManager.sourceFileDir);
+    	IO.println("SimulaCoreExports.run: outputDir=" + SimulaCompiler.outputDir);
+    	if(SimulaCompiler.outputDir == null) {
+    		SimulaCompiler.outputDir = new File(documentManager.sourceFileDir,"bin");
+    	}
+    	IO.println("SimulaCoreExports.run: outputDir=" + SimulaCompiler.outputDir);
+    	SimulaCompiler.outputDir.mkdirs();
+    	if (! SimulaCompiler.outputDir.canWrite()) {
+    		Util.IERR("SimulaCoreExports.run: Unable to write to " + SimulaCompiler.outputDir);
+    	}
+    	
+    }
+    
 	// ***************************************************************
 	// *** Scanning and Parsing
 	// ***************************************************************
@@ -143,6 +156,9 @@ public class SimulaCompiler {
 		boolean builderTerminateNormally = false;
 		simBuilder.duringParsing = true;
     	LOG.info("SimulaCompiler.doParsing: BEGIN");
+    	
+    	setOutputDir(); // Neccessary because external decclaration reads .jar
+    	
         // Do the actual Building
 		simBuilder.getNextParserToken();
 		simBuilder.syntaxTree = new ProgramModule(simBuilder);
@@ -188,7 +204,7 @@ public class SimulaCompiler {
 		simBuilder.duringChecking = false;
 		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
 			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");
-			programModule.printTree(1,this);
+			programModule.printTree(1);
 		}
 		
 		if (Util.nError > 0) {

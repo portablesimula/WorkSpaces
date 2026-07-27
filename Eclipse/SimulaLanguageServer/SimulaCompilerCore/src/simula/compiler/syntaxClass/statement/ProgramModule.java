@@ -29,7 +29,6 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
-import simula.lsp.compiler.DocumentManager;
 import simula.token.Identifier;
 import simula.token.LexToken;
 
@@ -94,8 +93,15 @@ public final class ProgramModule extends Statement {
 	/// Create a new ProgramModule.
 	public ProgramModule(SimulaBuilder simBuilder) {
 		super(simBuilder);
-		sysin = new  VariableExpression(null, new Identifier("sysin"));  sysin.SET_SEMANTICS_CHECKED();
-		sysout = new VariableExpression(null, new Identifier("sysout")); sysout.SET_SEMANTICS_CHECKED();
+		Identifier sysinID = new Identifier("sysin");
+		sysin = new  VariableExpression(null, sysinID);
+		sysin.meaning = StandardClass.BASICIO.findMeaning(sysinID);
+		sysin.SET_SEMANTICS_CHECKED();
+		Identifier sysoutID = new Identifier("sysout");
+		sysout = new VariableExpression(null, sysoutID);
+		sysout.meaning = StandardClass.BASICIO.findMeaning(sysoutID);
+		sysout.SET_SEMANTICS_CHECKED();
+		IO.println("NEW ProgramModule: sysout.meaning="+sysout.meaning);
 	}
 	
 	public void doBuild() {
@@ -125,6 +131,8 @@ public final class ProgramModule extends Statement {
 					mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, mayBeClassIdent);
 				}
 			    else {
+			    	IO.println("ProgramModule.doBuild: IDENTIFIER ...");
+			    	Parse.saveCurrentToken(simBuilder);
 			    	mainModule = doParseProgram(simBuilder);
 			    }
 			}
@@ -178,7 +186,10 @@ public final class ProgramModule extends Statement {
 		if(IS_SEMANTICS_CHECKED()) return;
 		CoreGlobal.enterScope(mainModule);
 		sysin.doChecking();
+		IO.println("ProgramModule.doChecking: BEFORE SYSOUT: sysout.meaning="+sysout.meaning);
 		sysout.doChecking();
+		IO.println("ProgramModule.doChecking: AFTER SYSOUT: sysout.meaning="+sysout.meaning);
+//		Util.IERR("");
 		mainModule.doChecking();
 		SET_SEMANTICS_CHECKED();
 	}
@@ -197,20 +208,20 @@ public final class ProgramModule extends Statement {
 	public void print(final int indent) { mainModule.print(0); }
 
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		IO.println("BASICIO");
 		IO.println("    ... Standard Classes and Procedures");
 		for(Declaration decl:StandardClass.BASICIO.declarationList) {
 			if(decl instanceof StandardProcedure) ; // Nothing
 			else if(decl instanceof StandardClass) ; // Nothing
-			else decl.printTree(1,this);
+			else decl.printTree(1);
 		}
 		IO.println("=================================================================");
 	}
 	
 	@Override
 	public String toString() {
-		return (mainModule==null)?"MAIN":mainModule.identifier.value;
+		return (mainModule==null)?"MAIN":mainModule.identifierValue();
 	}
 	
 }

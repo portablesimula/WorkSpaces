@@ -113,14 +113,14 @@ public class InspectVariableDeclaration extends Declaration {
 	}
 	
 	@Override
-	public void printTree(final int indent, final Object head) {
-		verifyTree(head);
+	public void printTree(final int indent) {
+		// verifyTree(head);
 		IO.println(edTreeIndent(indent)+this);
 	}
 
 	@Override
 	public String toString() {
-		String s = identifier + ", type=" + type + ", connectionScope=" + connectionScope;
+		String s = identifierValue() + ", type=" + type + ", connectionScope=" + connectionScope;
 		return (s);
 	}
 

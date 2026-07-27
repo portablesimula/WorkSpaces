@@ -14,7 +14,6 @@ import simula.compiler.syntaxClass.ProcedureSpecification;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
 import simula.compiler.utilities.CoreGlobal;
-import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
 import simula.compiler.utilities.Util;
 import simula.token.Identifier;
@@ -238,7 +237,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 	@Override
 	public String toString() {
 		String pfx=""; if(type!=null) pfx=type.toString()+" ";
-		return(pfx+"PROCEDURE "+identifier);
+		return(pfx+"PROCEDURE "+identifierValue());
 	}
 
 }

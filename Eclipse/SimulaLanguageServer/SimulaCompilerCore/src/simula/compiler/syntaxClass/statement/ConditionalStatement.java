@@ -139,12 +139,12 @@ public final class ConditionalStatement extends Statement {
 	}
 	
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		IO.println(edTreeIndent(indent)+"IF " + condition + " THEN");
-		thenStatement.printTree(indent+1,this);
+		thenStatement.printTree(indent + 1);
 		if(elseStatement != null) {
 			IO.println(edTreeIndent(indent)+"ELSE");
-			elseStatement.printTree(indent+1,this);
+			elseStatement.printTree(indent + 1);
 		}
 	}
 

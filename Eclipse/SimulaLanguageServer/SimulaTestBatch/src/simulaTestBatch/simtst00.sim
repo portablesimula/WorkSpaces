@@ -5,4 +5,4 @@ SimulaTest(0,"--- Empty test") begin
 
 	outtext("IN EMPTY TEST"); outimage;
 	
-end of program
+end

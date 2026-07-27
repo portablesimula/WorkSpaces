@@ -21,6 +21,7 @@ import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.syntaxClass.statement.ConnectionStatement;
 import simula.compiler.syntaxClass.statement.Statement;
 import simula.compiler.utilities.DeclarationList;
+import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.Meaning;
@@ -107,21 +108,35 @@ public final class ConnectionBlock extends DeclarationScope {
 
 	@Override
 	public Meaning findMeaning(final Identifier identifier) {
-		if (classDeclaration == null && simBuilder.duringParsing)
+		if(Option.internal.TRACE_FIND_MEANING > 0)
+			LOG.trace("ConnectionBlock.findMeaning("+identifierValue()+"): BEGIN Search "+identifierValue());
+		if (classDeclaration == null && simBuilder.duringParsing) {
 			return (null); // Still in Pass1(Parser)
+		}
 		Meaning result = null;
-		if (classDeclaration != null)
+		if (classDeclaration != null) {
+			if(Option.internal.TRACE_FIND_MEANING > 0)
+				LOG.trace("ConnectionBlock.findMeaning: BEFORE Search " + classDeclaration);
 			result = classDeclaration.findRemoteAttributeMeaning(identifier);
+			if(Option.internal.TRACE_FIND_MEANING > 0)
+				LOG.trace("ConnectionBlock.findMeaning: AFTER Search " + classDeclaration + "  RESULT="+result);
+		}
 		if (result != null) {
 			result.declaredIn = this;
 		} else if (declaredIn != null) {
+			if(Option.internal.TRACE_FIND_MEANING > 0)
+				LOG.trace("ConnectionBlock.findMeaning: BEFORE Search " + declaredIn);
 			result = declaredIn.findMeaning(identifier);
+			if(Option.internal.TRACE_FIND_MEANING > 0)
+				LOG.trace("ConnectionBlock.findMeaning: AFTER Search " + declaredIn + "  RESULT="+result);
 		}
 		if (result == null) {
 //			Util.error("Undefined variable: " + identifierValue());
 			UndefinedDeclaration undef = new UndefinedDeclaration(null, identifier);
 			result = new Meaning(undef, this); // Error Recovery
 		}
+		if (Option.internal.TRACE_FIND_MEANING > 0)
+			LOG.trace("ConnectionBlock.findVisibleAttributeMeaning("+identifierValue()+"): ENDOF Search "+identifierValue()+" ========= RESULT: " + result);
 		return (result);
 	}
 
@@ -130,21 +145,20 @@ public final class ConnectionBlock extends DeclarationScope {
 	// ***********************************************************************************************
 	@Override
 	public Meaning findVisibleAttributeMeaning(final Identifier ident) {
-		if(Option.internal.TRACE_FIND_MEANING>0)
-			Util.println("BEGIN Checking ConnectionBlock for "+ident+" ================================== "+identifier+" ==================================");
+		if(Option.internal.TRACE_FIND_MEANING > 1)
+			LOG.trace("ConnectionBlock.findVisibleAttributeMeaning: BEGIN Search "+identifierValue()+" for "+ident.value+" ================================== "+identifierValue()+" ==================================");
 		for (Declaration declaration : declarationList) {
-			if(Option.internal.TRACE_FIND_MEANING>1)
-				Util.println("Checking Local "+declaration);
+			if(Option.internal.TRACE_FIND_MEANING > 2) LOG.trace("ConnectionBlock.findVisibleAttributeMeaning: Checking Local " + declaration);
 			if (Util.equals(ident, declaration.identifier))
 				return (new Meaning(declaration, this, this, false));
 		}
 		if(labelList != null) for (LabelDeclaration label : labelList.getDeclaredLabels()) {
-			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Label "+label);
+			if(Option.internal.TRACE_FIND_MEANING > 2) LOG.trace("ConnectionBlock.findVisibleAttributeMeaning: Checking Label " + label);
 			if (Util.equals(ident, label.identifier))
 				return (new Meaning(label, this, this, false));
 		}
-		if(Option.internal.TRACE_FIND_MEANING>0)
-			Util.println("ENDOF Checking ConnectionBlock for "+ident+" ================================== "+identifier+" ==================================");
+		if(Option.internal.TRACE_FIND_MEANING > 1)
+			LOG.trace("ConnectionBlock.findVisibleAttributeMeaning: ENDOF Search "+ident.value+" ========== NOT FOUND ============= "+identifierValue()+" ==================================");
 		return (null);
 	}
 
@@ -210,7 +224,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		String spc = edIndent(indent);
 		StringBuilder s = new StringBuilder(indent);
 		s.append('[').append(sourceBlockLevel).append(':').append(getRTBlockLevel()).append("] ");
-		s.append(declarationKind).append(' ').append(identifier);
+		s.append(ObjectKind.edit(declarationKind)).append(' ').append(identifierValue());
 		Util.println(s.toString());
 		String beg = "begin[" + edScopeChain() + ']';
 		Util.println(spc + beg);
@@ -224,14 +238,14 @@ public final class ConnectionBlock extends DeclarationScope {
 	// *** Printing Utility: printTree
 	// ***********************************************************************************************
 	@Override
-	public void printTree(final int indent, final Object head) {
-		verifyTree(head);
+	public void printTree(final int indent) {
+		// verifyTree(head);
 		String tail = (IS_SEMANTICS_CHECKED()) ? "  BL=" + getRTBlockLevel() : "";
 		if(isPreCompiledFromFile != null) tail = tail + " From: " + isPreCompiledFromFile;
-		IO.println(edTreeIndent(indent) + "CONNECTION " + identifier + tail + "  PrefixLevel=" + prefixLevel() + "  declaredIn="+this.declaredIn);
-		printDeclarationList(indent+1);
-		statement.printTree(indent + 1, this);
-		IO.println(edTreeIndent(indent)+"END CONNECTION "+identifier);
+		IO.println(edTreeIndent(indent) + "CONNECTION " + identifierValue() + tail + "  PrefixLevel=" + prefixLevel() + "  declaredIn="+this.declaredIn);
+		printDeclarationList(indent + 1);
+		statement.printTree(indent + 1);
+		IO.println(edTreeIndent(indent)+"END CONNECTION "+identifierValue());
 	}
 
 	@Override
@@ -257,7 +271,7 @@ public final class ConnectionBlock extends DeclarationScope {
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
-		Util.TRACE_OUTPUT("BEGIN Write ConnectionBlock: "+identifier);
+		Util.TRACE_OUTPUT("BEGIN Write ConnectionBlock: "+identifierValue());
 		oupt.writeKind(declarationKind); // Mark: This is a ConnectionBlock
 		oupt.writeIdentifier(identifier);
 		oupt.writeShort(OBJECT_SEQU);
@@ -283,7 +297,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		oupt.writeIdentifier(whenClassIdentifier);
 		oupt.writeObj(inspectedVariable);
 
-		Util.TRACE_OUTPUT("END Write ConnectionBlock: "+identifier);
+		Util.TRACE_OUTPUT("END Write ConnectionBlock: "+identifierValue());
 	}
 
 	/// Read and return a ConnectionBlock object.
@@ -316,7 +330,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		blk.inspectedVariable = (VariableExpression) inpt.readObj();
 
 		blk.isPreCompiledFromFile = inpt.jarFileName;
-		Util.TRACE_INPUT("END Read ConnectionBlock: "+identifier+", Declared in: "+blk.declaredIn);
+		Util.TRACE_INPUT("END Read ConnectionBlock: " + identifier.value + ", Declared in: "+blk.declaredIn);
 		CoreGlobal.setScope(blk.declaredIn);
 		return(blk);
 	}

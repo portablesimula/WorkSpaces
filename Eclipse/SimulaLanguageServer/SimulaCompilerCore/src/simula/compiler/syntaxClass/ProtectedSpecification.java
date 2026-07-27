@@ -72,7 +72,7 @@ public final class ProtectedSpecification extends SyntaxElement {
 	public void doChecking() {
 		Declaration attribute=getAttribute();
 		if(attribute!=null) attribute.isProtected=this;
-		else Util.semanticError(this, "No Attribute "+identifier+" match 'protected' specification: "+this);
+		else Util.semanticError(this, "No Attribute " + identifier.value + " match 'protected' specification: " + this);
 		VirtualSpecification virtSpec=VirtualSpecification.getVirtualSpecification(attribute);
 		if(virtSpec!=null) {
 			if( virtSpec.declaredIn != attribute.declaredIn )
@@ -85,18 +85,18 @@ public final class ProtectedSpecification extends SyntaxElement {
 
 
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
 
 	@Override
 	public String toString()
 	{ StringBuilder s=new StringBuilder();
-	  s.append("Protected ").append(identifier);
+	  s.append("Protected ").append(identifier.value);
 	  s.append("[ Defined in ");
 	  s.append((definedIn!=null)?definedIn.identifier:"UNKNOWN");
 	  if(hiddenBy!=null) {
-		  s.append(", Hidden by ").append(hiddenBy.identifier);
+		  s.append(", Hidden by ").append(hiddenBy.identifier.value);
 		  s.append(" defined in ");
 		  s.append((hiddenBy.definedIn!=null)?hiddenBy.definedIn.identifier:"MISSING");
 	  }
@@ -115,7 +115,7 @@ public final class ProtectedSpecification extends SyntaxElement {
 	
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
-		Util.TRACE_OUTPUT("writeProtectedSpecification: " + identifier);
+		Util.TRACE_OUTPUT("writeProtectedSpecification: " + identifier.value);
 		oupt.writeKind(ObjectKind.ProtectedSpecification);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
@@ -137,7 +137,7 @@ public final class ProtectedSpecification extends SyntaxElement {
 		// *** ProtectedSpecification
 		spec.identifier = inpt.readIdentifier();
 		spec.definedIn = (ClassDeclaration) inpt.readObj();
-		Util.TRACE_INPUT("ProtectedSpecification: " + spec.identifier);
+		Util.TRACE_INPUT("ProtectedSpecification: " + spec.identifier.value);
 		return(spec);
 	}
 

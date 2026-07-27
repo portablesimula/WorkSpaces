@@ -134,16 +134,6 @@ public class AttributeInputStream {
     /// Reads and returns a boolean from the underlying DataInputStream.
     /// @return the boolean read.
     /// @throws IOException if an I/O error occurs.
-    public Identifier readIdentifier() throws IOException {
-    	Util.IERR("NOT IMPL");
-    	Identifier indetifier = null;
-    	if(TRACE) IO.println("AttributeInputStream.readIdentifier: "+indetifier);
-    	return indetifier;
-    }
-	
-    /// Reads and returns a boolean from the underlying DataInputStream.
-    /// @return the boolean read.
-    /// @throws IOException if an I/O error occurs.
     public boolean readBoolean() throws IOException {
     	boolean b = inpt.readBoolean();
     	if(TRACE) IO.println("AttributeInputStream.readBoolean: "+b);
@@ -194,6 +184,23 @@ public class AttributeInputStream {
     	String s = sb.toString();
     	if(TRACE) IO.println("AttributeInputStream.readString: \""+s+'"');
     	return s;
+    }
+	
+    /// Reads and returns an identifier from the underlying DataInputStream.
+    /// @return the identifier read.
+    /// @throws IOException if an I/O error occurs.
+    public Identifier readIdentifier() throws IOException {
+    	int lng = inpt.readShort()-1;
+    	if(lng < 0) {
+        	if(TRACE) IO.println("AttributeInputStream.readString: null");
+    		return null;
+    	}
+    	StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < lng; i++) sb.append(inpt.readChar());
+    	Identifier identifier = new Identifier(sb.toString());
+    	if(TRACE) IO.println("AttributeInputStream.readIdentifier: "+identifier.value);
+//    	Util.IERR("SJEKK DETTE");
+    	return identifier;
     }
 
     /// Reads and returns an Object list from the underlying DataInputStream.

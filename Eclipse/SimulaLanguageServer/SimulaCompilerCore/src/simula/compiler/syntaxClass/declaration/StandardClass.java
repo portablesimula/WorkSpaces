@@ -5,7 +5,6 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.compiler.syntaxClass.declaration;
 
-import simula.compiler.utilities.ClassHierarchy;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
@@ -32,7 +31,7 @@ import simula.compiler.syntaxClass.statement.Statement;
 /// @author Øystein Myhre Andersen
 public final class StandardClass extends ClassDeclaration {
 	public String edJavaClassName() {
-		return (identifier.value);
+		return (identifierValue());
 	}
 
 	/// The type text.
@@ -1148,14 +1147,16 @@ public final class StandardClass extends ClassDeclaration {
 
 	@Override
 	public Meaning findVisibleAttributeMeaning(Identifier ident) {
-		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("BEGIN Checking Standard Class "+identifierValue()+" for "+ident.value+" ================================== "+identifierValue()+" ==================================");
+		if(Option.internal.TRACE_FIND_MEANING > 1)
+			LOG.trace("StandardClass.findVisibleAttributeMeaning: BEGIN Search "+identifierValue()+" for "+ident.value+" ================================== "+identifierValue()+" ==================================");
 		for(Declaration declaration:declarationList) {
-			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Local "+declaration.identifier);
+			if(Option.internal.TRACE_FIND_MEANING > 2) LOG.trace("StandardClass.findVisibleAttributeMeaning: Checking Local "+declaration.identifierValue());
 			if(Util.equals(ident, declaration.identifier)) {
 				return(new Meaning(declaration,this));
 			}
 		}
-		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("ENDOF Checking Standard Class "+identifierValue()+" for "+ident.value+" ================================== "+identifierValue()+" ==================================");
+		if(Option.internal.TRACE_FIND_MEANING > 1)
+			LOG.trace("StandardClass.findVisibleAttributeMeaning: ENDOF Search "+identifierValue()+" for "+ident.value+" ========= NOT FOUND ============== "+identifierValue()+" ==================================");
 		if(prefix != null) {
 			ClassDeclaration prfx=getPrefixClass();
 			if(prfx!=null) return(prfx.findVisibleAttributeMeaning(ident));

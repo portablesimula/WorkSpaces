@@ -5,6 +5,6 @@ module SimulaCore {
 	requires java.logging;
 	
 	exports simula;
-//	exports simula.compiler;
+	exports simula.runtime;
 //	exports simula.compiler.utilities;
 }

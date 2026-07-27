@@ -77,7 +77,7 @@ public class LabelList {
 	/// Debug utility: Return identification String.
 	/// @return identification String.
 	private String ident() {
-		return "LabelList["+sequ+':'+declaredIn.identifier+"]";
+		return "LabelList["+sequ+':'+declaredIn.identifierValue() + "]";
 	}
 	
 	/// Get DeclaredLabels
@@ -112,7 +112,7 @@ public class LabelList {
 		if(n > 0) {
 			for(int i=n-1;i>=0;i--) {
 				LabelDeclaration lab = declaredLabels.get(i);
-				if(lab.identifier.value.equalsIgnoreCase(ident)) return lab;
+				if(lab.identifierValue().equalsIgnoreCase(ident)) return lab;
 			}
 		}
 		return null;
@@ -121,7 +121,7 @@ public class LabelList {
 	/// Add a label to the local label list. 
 	/// @param lab the label to add.
 	public void add(LabelDeclaration lab) {
-		if(TRACING) IO.println(ident()+".add: "+lab.identifier+'['+lab.externalIdent+']');
+		if(TRACING) IO.println(ident()+".add: " + lab.identifierValue() + '['+lab.externalIdent+']');
 		if(READY_FOR_CODING) Util.IERR("Can't add a new Label when LabelLisit is marked READY_FOR_CODING");
 		declaredLabels.add(lab);
 		if(TRACING) IO.println(ident()+".add: DONE: LabelList = "+this);
@@ -235,7 +235,7 @@ public class LabelList {
 	/// Debug utility: Print Syntax tree
 	/// @param indent indentation
 	/// @param owner the BlockDeclaration owning this LabelList
-	public void printTree(final int indent, final BlockDeclaration owner) {
+	public void printTree(final int indent) {
 		if(Option.internal.PRINT_SYNTAX_TREE > 2) {
 			IO.println(SyntaxElement.edIndent(indent)+this);
 		} else {
@@ -247,18 +247,18 @@ public class LabelList {
 	/// @param title title String
 	public void print(String title) {
 		IO.println("\n************ BEGIN LabelList[" +sequ + "]: "+title+" ************");
-		IO.println("*** DeclaredIn: "+declaredIn.identifier+"  READY_FOR_CODING="+READY_FOR_CODING);
+		IO.println("*** DeclaredIn: "+declaredIn.identifierValue() + "  READY_FOR_CODING="+READY_FOR_CODING);
 		System.out.print("*** DeclaredLabels:");
 		if(declaredLabelSize() > 0) {
 			for(LabelDeclaration lab:getDeclaredLabels()) {
-				System.out.print(" " + lab.identifier + '[' + lab.declaredIn.externalIdent + ':' + lab.index + ']' + "atLine:" + lab.firstLineNumber());
+				System.out.print(" " + lab.identifierValue() + '[' + lab.declaredIn.externalIdent + ':' + lab.index + ']' + "atLine:" + lab.firstLineNumber());
 			}
 			IO.println("");
 		} else IO.println(" NONE");
 		System.out.print("*** AccumLabels:   ");
 		if(accumLabelSize() > 0) {
 			for(LabelDeclaration lab:getAccumLabels()) {
-				System.out.print(" " + lab.identifier + '[' + lab.declaredIn.externalIdent + ':' + lab.index + ']' + "atLine:" + lab.firstLineNumber());
+				System.out.print(" " + lab.identifierValue() + '[' + lab.declaredIn.externalIdent + ':' + lab.index + ']' + "atLine:" + lab.firstLineNumber());
 			}
 			IO.println("");
 		} else IO.println(" NONE");

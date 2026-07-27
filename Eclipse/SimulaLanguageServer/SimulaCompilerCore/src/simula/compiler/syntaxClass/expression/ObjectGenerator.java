@@ -127,7 +127,7 @@ public final class ObjectGenerator extends Expression {
 		Iterator<Expression> actualIterator = params.iterator();
 		LOOP: while (actualIterator.hasNext()) {
 			if (!formalIterator.hasNext()) {
-				Util.semanticError(this, "Wrong number of parameters to Class " + cls.identifier);
+				Util.semanticError(this, "Wrong number of parameters to Class " + cls.identifierValue());
 				break LOOP;
 			}
 			Declaration formalParameter = formalIterator.next();
@@ -146,7 +146,7 @@ public final class ObjectGenerator extends Expression {
 
 		}
 		if (formalIterator.hasNext())
-			Util.semanticError(this, "Missing parameter '"+formalIterator.next().identifier+"' to Class " + cls.identifier);
+			Util.semanticError(this, "Missing parameter '" + formalIterator.next().identifierValue() + "' to Class " + cls.identifierValue());
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("END ObjectGenerator(" + classIdentifier + ").doChecking: type=" + type);
 		SET_SEMANTICS_CHECKED();

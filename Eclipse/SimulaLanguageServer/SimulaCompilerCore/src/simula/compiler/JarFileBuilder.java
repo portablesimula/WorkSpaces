@@ -262,11 +262,12 @@ public class JarFileBuilder {
 //					IO.println("JarFileBuilder.findJarFile: NOT FOUND in extlib: " + jarFile);
 				}
 				jarFile = new File(SimulaCompiler.outputDir, identifier + ".jar");
+				IO.println("JarFileBuilder.findJarFile: SimulaCompiler.outputDir: " + SimulaCompiler.outputDir);
 				if (jarFile.exists()) {
-//					IO.println("JarFileBuilder.findJarFile: FOUND in outputDir: " + jarFile);
+					IO.println("JarFileBuilder.findJarFile: FOUND in outputDir: " + jarFile);
 					return (jarFile);
 				}
-//				IO.println("JarFileBuilder.findJarFile: NOT FOUND in outputDir: " + jarFile);
+				IO.println("JarFileBuilder.findJarFile: NOT FOUND in outputDir: " + jarFile);
 			} else {
 				jarFile = new File(externalIdentifier);
 				if (jarFile.exists()) {

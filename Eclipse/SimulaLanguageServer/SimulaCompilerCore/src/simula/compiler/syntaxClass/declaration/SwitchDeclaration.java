@@ -160,7 +160,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 
 	@Override
 	public String toString() {
-		return ("SWITCH " + identifier + " := " + switchList);
+		return ("SWITCH " + identifierValue() + " := " + switchList);
 	}
 
 }

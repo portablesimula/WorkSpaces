@@ -4,10 +4,8 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import simula.Option;
 import simula.SimTextDocumentContentChangeEvent;
 import simula.builder.SimulaBuilder;
-import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.SimulaDiagnostic;
@@ -236,31 +234,31 @@ public class DocumentManager {
 	// ***************************************************************
 	// *** Semantic Checker
 	// ***************************************************************
-	public void semanticChacker() {
-		ProgramModule  programModule = this.getSyntaxTree();
-		if (Option.internal.TRACING)
-			Util.println("BEGIN Semantic Checker");
-		simBuilder.duringChecking = true;
-		programModule.doChecking();
-		if (Option.internal.TRACING) {
-			Util.println("END Semantic Checker: \"" + programModule + "\"");
-			if (Option.internal.TRACE_CHECKER_OUTPUT && programModule != null)
-				programModule.print(0);
-		}
-		if(SimulaCompiler.verbose) Util.println("SimulaCompiler.doCompile: " + SimulaCompiler.sourceName + ": Semantic Checker completed");
-		simBuilder.duringChecking = false;
-		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
-			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");
-			programModule.printTree(1,this);
-		}
-		
-		if (Util.nError > 0) {
-			String msg="Compiler terminate " + SimulaCompiler.sourceName + " after " + Util.nError + " errors during semantic checking";
-			Util.println(msg);
-//			Thread.dumpStack();
-			throw new RuntimeException(msg);
-		}
-		
-	}
+//	public void semanticChecker() {
+//		ProgramModule  programModule = this.getSyntaxTree();
+//		if (Option.internal.TRACING)
+//			Util.println("BEGIN Semantic Checker");
+//		simBuilder.duringChecking = true;
+//		programModule.doChecking();
+//		if (Option.internal.TRACING) {
+//			Util.println("END Semantic Checker: \"" + programModule + "\"");
+//			if (Option.internal.TRACE_CHECKER_OUTPUT && programModule != null)
+//				programModule.print(0);
+//		}
+//		if(SimulaCompiler.verbose) Util.println("SimulaCompiler.doCompile: " + SimulaCompiler.sourceName + ": Semantic Checker completed");
+//		simBuilder.duringChecking = false;
+//		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
+//			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");
+//			programModule.printTree(1);
+//		}
+//		
+//		if (Util.nError > 0) {
+//			String msg="Compiler terminate " + SimulaCompiler.sourceName + " after " + Util.nError + " errors during semantic checking";
+//			Util.println(msg);
+////			Thread.dumpStack();
+//			throw new RuntimeException(msg);
+//		}
+//		
+//	}
 
 }

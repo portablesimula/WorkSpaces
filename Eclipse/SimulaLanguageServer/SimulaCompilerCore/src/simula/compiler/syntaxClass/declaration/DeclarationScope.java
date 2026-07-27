@@ -15,6 +15,7 @@ import java.lang.constant.ClassDesc;
 import simula.Option;
 import simula.builder.SimulaBuilder;
 import simula.compiler.utilities.DeclarationList;
+import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.RTS;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.utilities.CoreGlobal;
@@ -74,8 +75,8 @@ public abstract class DeclarationScope extends Declaration  {
 	public void modifyIdentifier(final Identifier identifier) {
 		this.identifier = identifier;
 		checkAlreadyDefined();
-		if (declarationKind == ObjectKind.ContextFreeMethod) externalIdent = this.identifier.value;
-		else if (declarationKind == ObjectKind.MemberMethod) externalIdent = this.identifier.value;
+		if (declarationKind == ObjectKind.ContextFreeMethod) externalIdent = this.identifierValue();
+		else if (declarationKind == ObjectKind.MemberMethod) externalIdent = this.identifierValue();
 		else if (externalIdent == null)	externalIdent = edJavaClassName();
 	}
 
@@ -91,9 +92,9 @@ public abstract class DeclarationScope extends Declaration  {
 			if ((scope instanceof BlockDeclaration) && !(scope instanceof StandardClass)
 					&& !(scope instanceof StandardProcedure)) {
 				if (id == null)
-					id = scope.identifier.value;
+					id = scope.identifierValue();
 				else
-					id = scope.identifier.value + '_' + id;
+					id = scope.identifierValue() + '_' + id;
 			}
 			scope = scope.declaredIn;
 		}
@@ -117,8 +118,8 @@ public abstract class DeclarationScope extends Declaration  {
 	/// @return a printable scope ID
 	public String scopeID() {
 		if (getRTBlockLevel() > 1)
-			return (declaredIn.scopeID() + '.' + identifier);
-		return identifier.value;
+			return (declaredIn.scopeID() + '.' + identifierValue());
+		return identifierValue();
 	}
 
 	// ***********************************************************************************************
@@ -140,7 +141,7 @@ public abstract class DeclarationScope extends Declaration  {
 	/// @param ident attribute identifier
 	/// @return the resulting Meaning
 	public Meaning findVisibleAttributeMeaning(final Identifier ident) {
-		Util.IERR("DeclarationScope.findVisibleAttributeMeaning: SHOULD BEEN REDEFINED: " + identifier + " IN " + this.getClass().getSimpleName());
+		Util.IERR("DeclarationScope.findVisibleAttributeMeaning: SHOULD BEEN REDEFINED: " + identifierValue() + " IN " + this.getClass().getSimpleName());
 		return null;
 	}
 
@@ -152,16 +153,20 @@ public abstract class DeclarationScope extends Declaration  {
 	/// @param identifier declared identifier
 	/// @return the resulting Meaning
 	public Meaning findMeaning(final Identifier identifier) {
+		if(Option.internal.TRACE_FIND_MEANING > 0)
+			LOG.trace("DeclarationScope.findMeaning("+identifierValue()+"): BEGIN Search "+identifierValue());
+//		IO.println("DeclarationScope.findMeaning: " + this.getClass());
+//		IO.println("DeclarationScope.findMeaning: Looking for "+identifierValue()+" in "+declaredIn.getClass());
 		Meaning meaning = findVisibleAttributeMeaning(identifier);
 		if (meaning == null && declaredIn != null) {
-//			IO.println("DeclarationScope.findMeaning: Looking for "+identifier+" in "+declaredIn);
+//			IO.println("DeclarationScope.findMeaning: Looking for " + identifierValue() + " in "+declaredIn);
 			meaning = declaredIn.findMeaning(identifier);
 		}
 		
 		if (meaning == null) {
 //			if (!Global.duringParsing) {
 //				IO.println("DeclarationScope.findMeaning: Undefined variable: " + identifierValue());
-//				Util.error("Undefined variable: " + identifier);
+//				Util.error("Undefined variable: " + identifierValue());
 //			}
 			if(SimulaCompiler.CaseSensitive) {
 				SimulaCompiler.WARNINGS = true;
@@ -170,6 +175,8 @@ public abstract class DeclarationScope extends Declaration  {
 			UndefinedDeclaration undef = new UndefinedDeclaration(null, identifier);
 			meaning = new Meaning(undef, this); // Error Recovery
 		}
+		if(Option.internal.TRACE_FIND_MEANING > 0)
+			LOG.trace("DeclarationScope.findMeaning("+identifierValue()+"): ENDOF Search "+identifierValue()+" Meaning: " + meaning);
 		return (meaning);
 	}
 
@@ -317,9 +324,9 @@ public abstract class DeclarationScope extends Declaration  {
 	/// @return edited scope chain
 	public String edScopeChain() {
 		if (declaredIn == null)
-			return (identifier.value);
+			return (identifierValue());
 		String encName = declaredIn.edScopeChain();
-		return (identifier.value + '.' + encName);
+		return (identifierValue() + '.' + encName);
 	}
 
 	// ***********************************************************************************************
@@ -352,15 +359,15 @@ public abstract class DeclarationScope extends Declaration  {
 	/// Debug utility: print DeclarationList.
 	/// @param indent the indentation.
 	protected void printDeclarationList(int indent) {
-		for(Declaration d:declarationList) d.printTree(indent,this);
-		if(labelList != null) for(LabelDeclaration d:labelList.getDeclaredLabels()) d.printTree(indent,this);
+		for(Declaration d:declarationList) d.printTree(indent);
+		if(labelList != null) for(LabelDeclaration d:labelList.getDeclaredLabels()) d.printTree(indent);
 	}
 
 	/// Debug utility: edScope
 	/// @return edited scope String
 	public String edScope() {
 		return "DeclarationScope: BL=" + getRTBlockLevel() + "  "
-				+ getClass().getSimpleName() + ' ' + identifier + '[' + externalIdent + "] declaredIn="+declaredIn;
+				+ getClass().getSimpleName() + ' ' + identifierValue() + '[' + externalIdent + "] declaredIn="+declaredIn;
 	}
 
 	// ***********************************************************************************************
@@ -381,9 +388,9 @@ public abstract class DeclarationScope extends Declaration  {
 	/// @throws IOException  if something went wrong.
     public void createJavaClassFile() throws IOException {
     	if (this.isPreCompiledFromFile != null) {
-			if(SimulaCompiler.verbose) IO.println("Skip  buildClassFile: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);			
+			if(SimulaCompiler.verbose) IO.println("Skip  buildClassFile: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);			
     	} else if (CLASSFILE_ALREADY_GENERATED) {
-			if(SimulaCompiler.verbose) IO.println("Skip  buildClassFile: "+this.identifier+" -- It is already generated");			
+			if(SimulaCompiler.verbose) IO.println("Skip  buildClassFile: " + this.identifierValue() + " -- It is already generated");			
     	} else {
     		CLASSFILE_ALREADY_GENERATED = true;
     		buildAndLoadOrAddClassFile();
@@ -395,7 +402,7 @@ public abstract class DeclarationScope extends Declaration  {
     /// @throws IOException if something went wrong.
     protected void buildAndLoadOrAddClassFile() throws IOException {
 		if (this.isPreCompiledFromFile != null) {
-			if(SimulaCompiler.verbose) IO.println("Skip  buildClassFile: "+this.identifier);
+			if(SimulaCompiler.verbose) IO.println("Skip  buildClassFile: "+this.identifierValue());
 		} else {
 	    	byte[] bytes = doBuildClassFile();
 	    	loadOrAddClassFile(bytes);

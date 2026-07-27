@@ -93,12 +93,12 @@ public final class LabeledStatement extends Statement {
 	}
 
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		System.out.print(edTreeIndent(indent)+"LABELED_STATEMENT ");
 		for (LabelDeclaration lab:labels)
 			System.out.print(" "+lab+":");
 		IO.println("");
-		statement.printTree(indent+1,this);
+		statement.printTree(indent + 1);
 	}
 
 	@Override
@@ -107,7 +107,7 @@ public final class LabeledStatement extends Statement {
 		boolean first = true;
 		for(LabelDeclaration lab:labels) {
 			if(! first) sb.append("Line").append(lab.firstLineNumber()).append(": "); first = false;
-			sb.append(lab.identifier).append(": ");
+			sb.append(lab.identifierValue()).append(": ");
 		}
 		
 		return sb.toString() + statement;

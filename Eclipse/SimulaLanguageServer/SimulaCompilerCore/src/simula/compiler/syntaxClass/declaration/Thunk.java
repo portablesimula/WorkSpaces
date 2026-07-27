@@ -27,6 +27,7 @@ import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.ClassHierarchy;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.CoreGlobal;
+import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
@@ -65,11 +66,13 @@ public final class Thunk extends DeclarationScope {
 	// ***********************************************************************************************
 	@Override
 	public Meaning findVisibleAttributeMeaning(final Identifier ident) {
-		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("BEGIN Checking Thunk for "+ident+" ================================== "+identifier+" ==================================");
+		if(Option.internal.TRACE_FIND_MEANING > 1)
+			LOG.trace("Thunk.findVisibleAttributeMeaning: BEGIN Search "+identifierValue()+" for "+ident.value+" ================================== "+identifierValue()+" ==================================");
 
 		Meaning meaning = declaredIn.findVisibleAttributeMeaning(ident);
 		
-		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("ENDOF Checking Thunk for "+ident+" ================================== "+identifier+" ==================================");
+		if(Option.internal.TRACE_FIND_MEANING > 1)
+			LOG.trace("Thunk.findVisibleAttributeMeaning: ENDOF Search "+ident.value+" ================================== "+identifierValue()+" ==================================");
 		return (meaning);
 	}
 
@@ -292,8 +295,8 @@ public final class Thunk extends DeclarationScope {
 			String ident=null;
 			if(declaredAs instanceof SimpleVariableDeclaration var) ident=var.getFieldIdentifier();
 			else if(declaredAs instanceof Parameter par)            ident=par.getFieldIdentifier();
-			else if(declaredAs instanceof ArrayDeclaration arr)     ident=arr.identifier.value;
-			else if(declaredAs instanceof ProcedureDeclaration pro) ident=pro.identifier.value;
+			else if(declaredAs instanceof ArrayDeclaration arr)     ident=arr.identifierValue();
+			else if(declaredAs instanceof ProcedureDeclaration pro) ident=pro.identifierValue();
 			else Util.IERR();
 
 			if(nameParameter != null) {
@@ -459,7 +462,7 @@ public final class Thunk extends DeclarationScope {
 	@Override
 	public String toString() {
 		StringBuilder s = new StringBuilder();
-		s.append(identifier).append("[externalIdent=").append(externalIdent).append("] Kind=").append(declarationKind);
+		s.append(identifierValue()).append("[externalIdent=").append(externalIdent).append("] Kind=").append(ObjectKind.edit(declarationKind));
 		s.append(", declaredIn="+declaredIn.externalIdent);//.append(", rtBlockLevel="+getRTBlockLevel());
 		s.append(", QUAL=").append(this.getClass().getSimpleName()).append(", HashCode=").append(hashCode());
 		return (s.toString());

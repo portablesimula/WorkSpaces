@@ -95,7 +95,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		block.blockPrefix = blockPrefix;
 		block.prefix = blockPrefix.identifier;
 		block.isMainModule=isMainModule;
-		String ID = (isMainModule)? SimulaCompiler.sourceName : block.prefix + "Begin";
+		String ID = (isMainModule)? SimulaCompiler.sourceName : block.prefix.value + "Begin";
 		block.modifyIdentifier(new Identifier(ID));
 		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse PrefixedBlock");
 		
@@ -119,7 +119,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 //			getPrefixClass().doChecking();
 			prefixClass = getPrefixClass();
 			if(prefixClass == null) {
-				Util.semanticError(this, "Prefix " + prefix + " is not a Class");
+				Util.semanticError(this, "Prefix " + prefix.value + " is not a Class");
 			} else {
 				prefixClass.doChecking();
 			}
@@ -146,7 +146,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
-			if(SimulaCompiler.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);	
+			if(SimulaCompiler.verbose) IO.println("Skip  doJavaCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);	
 			return;
 		}
 		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
@@ -156,8 +156,10 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 			SimulaCompiler.duringSTM_Coding=false;
 			JavaSourceFileCoder.code("@SuppressWarnings(\"unchecked\")");
 			String line = "public final class " + getJavaIdentifier();
-			if (prefix != null)
-				 line = line + " extends " + getPrefixClass().getJavaIdentifier();
+			if (prefix != null) {
+				ClassDeclaration prefixClass = getPrefixClass();
+				if(prefixClass != null) line = line + " extends " +prefixClass.getJavaIdentifier();
+			}
 			else line = line + " extends RTS_BASICIO";
 			JavaSourceFileCoder.code(line + " {");
 			JavaSourceFileCoder.debug("// PrefixedBlockDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
@@ -203,7 +205,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		JavaSourceFileCoder.code("public " + getJavaIdentifier() + edFormalParameterList());
 		if (prefix != null) {
 			ClassDeclaration prefixClass = this.getPrefixClass();
-			JavaSourceFileCoder.code("super" + prefixClass.edCompleteParameterList());
+			if(prefixClass != null) JavaSourceFileCoder.code("super" + prefixClass.edCompleteParameterList());
 		} else JavaSourceFileCoder.code("super(staticLink);");
 		JavaSourceFileCoder.debug("// Parameter assignment to locals");
 		for (Parameter par : parameterList)
@@ -220,7 +222,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(SimulaCompiler.verbose)
-				IO.println("Skip  buildClassFile: "+this.identifier+" extends "+this.prefix+" -- It is read from "+isPreCompiledFromFile);		
+				IO.println("Skip  buildClassFile: " + this.identifierValue()+" extends " + this.prefix + " -- It is read from " + isPreCompiledFromFile);		
 		} else {
 			try { createJavaClassFile(); } catch (IOException e) { e.printStackTrace(); }
 		}
@@ -324,7 +326,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		StringBuilder s = new StringBuilder(spc);
 		s.append('[').append(sourceBlockLevel).append(':').append(getRTBlockLevel()).append("] ");
 		if (prefix != null)	s.append(prefix).append(' ');
-		s.append(declarationKind).append(' ').append(identifier);
+		s.append(ObjectKind.edit(declarationKind)).append(' ').append(identifierValue());
 		s.append('[').append(externalIdent).append("] ");
 		s.append(Parameter.editParameterList(parameterList));
 		Util.println(s.toString());
@@ -336,20 +338,20 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	}
 	
 	@Override
-	public void printTree(final int indent, final Object head) {
-		verifyTree(head);
+	public void printTree(final int indent) {
+		// verifyTree(head);
 		String tail = (IS_SEMANTICS_CHECKED()) ? "  BL=" + getRTBlockLevel() : "";
 		if(isPreCompiledFromFile != null) tail = tail + " From: " + isPreCompiledFromFile;
-		IO.println(edTreeIndent(indent) + blockPrefix + " begin" + tail);
-		if(labelList != null) labelList.printTree(indent+1,this);
-		for(Parameter p : parameterList) p.printTree(indent+1,this);
-		printDeclarationList(indent+1);
-		printStatementList(indent+1);
+		IO.println(edTreeIndent(indent) + blockPrefix + " begin" + tail + " nParam=" + parameterList.size());
+		if(labelList != null) labelList.printTree(indent + 1);
+		for(Parameter p : parameterList) p.printTree(indent + 1);
+		printDeclarationList(indent + 1);
+		printStatementList(indent + 1);
 	}
 
 	@Override
 	public String toString() {
-		return ("" + identifier + '[' + externalIdent + "] Kind=" + declarationKind + ", BlockPrefix=" + blockPrefix);
+		return ("PrefixedBlockDeclaration: " + identifierValue() + '[' + externalIdent + "] Kind=" + declarationKind + ", BlockPrefix=" + blockPrefix);
 	}
 
 	// ***********************************************************************************************
@@ -361,7 +363,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	}
 
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
-		Util.TRACE_OUTPUT("PrefixedBlockDeclaration: " + identifier + ", Declared in: " + declaredIn);
+		Util.TRACE_OUTPUT("PrefixedBlockDeclaration: " + identifierValue() + ", Declared in: " + declaredIn);
 		oupt.writeKind(declarationKind); // Mark: This is a PrefixedBlockDeclaration
 		oupt.writeIdentifier(identifier);
 		oupt.writeShort(OBJECT_SEQU);
@@ -438,7 +440,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		pbl.blockPrefix = (VariableExpression) inpt.readObj();
 		
 		pbl.isPreCompiledFromFile = inpt.jarFileName;
-		Util.TRACE_INPUT("END Read PrefixedBlockDeclaration: " + pbl.identifier + ", Declared in: " + pbl.declaredIn);
+		Util.TRACE_INPUT("END Read PrefixedBlockDeclaration: " + pbl.identifierValue() + ", Declared in: " + pbl.declaredIn);
 		CoreGlobal.setScope(pbl.declaredIn);
 		return(pbl);
 	}

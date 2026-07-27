@@ -40,6 +40,7 @@ import simula.compiler.utilities.ClassHierarchy;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
@@ -149,7 +150,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			Parse.TRACE("Parse ProcedureDeclaration, type=" + type);
 //		proc.modifyIdentifier(PsiParse.expectIdentifier(simBuilder, PsiTextPanel.styleNameProcedure).edText());
 		proc.modifyIdentifier(Parse.expectIdentifier(simBuilder, "PsiTextPanel.styleNameProcedure"));
-//		IO.println("ProcedureDeclaration.expectProcedureDeclaration: "+proc.identifier);
+//		IO.println("ProcedureDeclaration.expectProcedureDeclaration: "+proc.identifierValue());
 		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
 			expectFormalParameterPart(simBuilder, proc.parameterList);
 			Parse.expect(simBuilder, KeyWord.SEMICOLON);
@@ -197,7 +198,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.syntaxError(simBuilder, "Identifier " + identifier + " is not defined in this scope");
+					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
 					parameter = new Parameter(simBuilder, identifier);
 				}
 				parameter.setMode(mode);
@@ -250,7 +251,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 				for (Parameter par : proc.parameterList)
 					if (Util.equals(identifier,par.identifier)) { parameter = par; break; }
 				if (parameter == null) {
-					Util.syntaxError(simBuilder, "Identifier " + identifier + " is not defined in this scope");
+					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
 					parameter = new Parameter(simBuilder, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
@@ -269,7 +270,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 				case Parameter.Kind.Simple:
 				default:
 					if (par.type == null)
-						Util.syntaxError(simBuilder, "Missing specification of parameter: " + par.identifier);
+						Util.syntaxError(simBuilder, "Missing specification of parameter: " + par.identifierValue());
 				}
 		}
 	}
@@ -357,23 +358,25 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	@Override
 	public Meaning findVisibleAttributeMeaning(final Identifier ident) {
-		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("BEGIN Checking Procedure for "+ident+" ================================== "+identifier+" ==================================");
+		if(Option.internal.TRACE_FIND_MEANING > 1)
+			LOG.trace("ProcedureDeclaration.findVisibleAttributeMeaning: BEGIN Search "+identifierValue()+" for "+ident.value+" ================================== "+identifierValue()+" ==================================");
 		for (Declaration declaration : declarationList) {
-			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Local "+declaration);
+			if(Option.internal.TRACE_FIND_MEANING > 2) LOG.trace("ProcedureDeclaration.findVisibleAttributeMeaning: Checking Local "+declaration);
 			if (Util.equals(ident, declaration.identifier))
 				return (new Meaning(declaration, this, this, false));
 		}
 		for (Parameter parameter : parameterList) {
-			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Parameter "+parameter);
+			if(Option.internal.TRACE_FIND_MEANING > 2) LOG.trace("ProcedureDeclaration.findVisibleAttributeMeaning: Checking Parameter "+parameter);
 			if (Util.equals(ident, parameter.identifier))
 				return (new Meaning(parameter, this, this, false));
 		}
 		if(labelList != null) for (LabelDeclaration label : labelList.getDeclaredLabels()) {
-			if(Option.internal.TRACE_FIND_MEANING>1) Util.println("Checking Label "+label);
+			if(Option.internal.TRACE_FIND_MEANING > 2) LOG.trace("ProcedureDeclaration.findVisibleAttributeMeaning: Checking Label "+label);
 			if (Util.equals(ident, label.identifier))
 				return (new Meaning(label, this, this, false));
 		}
-		if(Option.internal.TRACE_FIND_MEANING>0) Util.println("ENDOF Checking Procedure for "+ident+" ================================== "+identifier+" ==================================");
+		if(Option.internal.TRACE_FIND_MEANING > 1)
+			LOG.trace("ProcedureDeclaration.findVisibleAttributeMeaning: ENDOF Search "+identifierValue()+" for "+ident.value+" ========= NOT FOUND ============== "+identifierValue()+" ==================================");
 		return (null);
 	}
 
@@ -414,7 +417,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			withparams = true;
 			s.append(((Parameter) par).toJavaType()).append(' ');
 			if (isInlineMethod)
-				 s.append(par.identifier);
+				 s.append(par.identifierValue());
 			else s.append('s').append(par.externalIdent); // s to indicate Specified Parameter
 		}
 		s.append(") {");
@@ -429,7 +432,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
-			if(SimulaCompiler.verbose) IO.println("Skip  doProcedureCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
+			if(SimulaCompiler.verbose) IO.println("Skip  doProcedureCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);		
 			return;
 		}
 		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
@@ -444,7 +447,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 				JavaSourceFileCoder.code("public boolean isQPSystemBlock() { return(true); }");
 			if ( declarationKind == ObjectKind.Procedure && type != null) {
 				JavaSourceFileCoder.code("@Override");
-				JavaSourceFileCoder.code("public Object _RESULT() { return("+this.result.identifier+"); }");
+				JavaSourceFileCoder.code("public Object _RESULT() { return(" + this.result.identifier + "); }");
 			}
 			JavaSourceFileCoder.debug("// Declare parameters as attributes");
 			boolean hasParameter = false;
@@ -1037,7 +1040,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
     	String spc=edIndent(indent);
 		StringBuilder s = new StringBuilder(spc);
 		s.append('[').append(sourceBlockLevel).append(':').append(getRTBlockLevel()).append("] ");
-		s.append(declarationKind).append(' ').append(identifier);
+		s.append(ObjectKind.edit(declarationKind)).append(' ').append(identifierValue());
 		s.append('[').append(externalIdent).append("] ");
 		s.append(Parameter.editParameterList(parameterList));
 		s.append("  isProtected=").append(isProtected);
@@ -1050,14 +1053,14 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	}
 	
 	@Override
-	public void printTree(final int indent, final Object head) {
-		verifyTree(head);
+	public void printTree(final int indent) {
+		// verifyTree(head);
 		String typeID = (type == null) ? "" : type.toString() + " ";
 		String tail = (IS_SEMANTICS_CHECKED()) ? "  BL=" + getRTBlockLevel() : "";
 		if(isPreCompiledFromFile != null) tail = tail + " From: " + isPreCompiledFromFile;
-		IO.println(edTreeIndent(indent) + typeID + "PROCEDURE " + identifier + '[' + externalIdent + "]" + tail);
-		if (labelList != null) labelList.printTree(indent + 1, this);
-		for (Parameter p : parameterList) p.printTree(indent + 1, this);
+		IO.println(edTreeIndent(indent) + typeID + "PROCEDURE " + identifierValue() + '[' + externalIdent + "]" + tail);
+		if (labelList != null) labelList.printTree(indent + 1);
+		for (Parameter p : parameterList) p.printTree(indent + 1);
 		printDeclarationList(indent + 1);
 		printStatementList(indent + 1);
 	}
@@ -1066,12 +1069,12 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public String toString() {
 		StringBuilder s = new StringBuilder();
 		if(type != null) s.append(type.toString()).append(" ");
-		s.append("procedure ").append(identifier).append("[externalIdent=").append(externalIdent).append("] Kind=")
-		.append(declarationKind).append(", QUAL=").append(this.getClass().getSimpleName()).append(", HashCode=").append(hashCode());
+		s.append("procedure ").append(identifierValue()).append("[externalIdent=").append(externalIdent).append("] Kind=")
+		.append(ObjectKind.edit(declarationKind)).append(", QUAL=").append(this.getClass().getSimpleName()).append(", HashCode=").append(hashCode());
 		if (isProtected != null) {
-			s.append(", Protected by ").append(isProtected.identifier);
+			s.append(", Protected by ").append(isProtected.identifier.value);
 			s.append(" defined in ");
-			s.append((isProtected.definedIn != null) ? isProtected.definedIn.identifier : "MISSING");
+			s.append((isProtected.definedIn != null) ? isProtected.definedIn.identifierValue() : "MISSING");
 		}
 		return (s.toString());
 	}
@@ -1084,7 +1087,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
-		Util.TRACE_OUTPUT("BEGIN Write ProcedureDeclaration: "+identifier);
+		Util.TRACE_OUTPUT("BEGIN Write ProcedureDeclaration: "+identifierValue());
 		oupt.writeKind(declarationKind); // Mark: This is a ProcedureDeclaration
 		oupt.writeIdentifier(identifier);
 		oupt.writeShort(OBJECT_SEQU);
@@ -1103,7 +1106,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		// *** ProcedurekDeclaration
 		oupt.writeObjectList(parameterList);
 
-		Util.TRACE_OUTPUT("END Write ProcedureDeclaration: "+identifier);
+		Util.TRACE_OUTPUT("END Write ProcedureDeclaration: "+identifierValue());
 	}
 
 	/// Read and return an object.
@@ -1131,7 +1134,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		pro.parameterList = (ObjectList<Parameter>) inpt.readObjectList();
 
 		pro.isPreCompiledFromFile = inpt.jarFileName;
-//		Util.TRACE_INPUT("END Read ProcedureDeclaration: Procedure "+identifier+", Declared in: "+pro.declaredIn);
+//		Util.TRACE_INPUT("END Read ProcedureDeclaration: Procedure "+identifierValue() + ", Declared in: "+pro.declaredIn);
 		Util.TRACE_INPUT("END Read ProcedureDeclaration: "+pro+", Declared in: "+pro.declaredIn);
 		CoreGlobal.setScope(pro.declaredIn);
 		return(pro);

@@ -52,7 +52,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// @param identifier label identifier
 	public LabelDeclaration(final SimulaBuilder simBuilder, final Identifier identifier) {
 		super(simBuilder, Type.Label, identifier);
-		this.externalIdent = "_LABEL_" + identifier;
+		this.externalIdent = "_LABEL_" + identifierValue();
 		this.declarationKind = ObjectKind.LabelDeclaration;
 	}
 
@@ -62,7 +62,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 			return;
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		DeclarationScope declaredIn = CoreGlobal.getCurrentScope();
-		this.externalIdent = "_LABEL_" + declaredIn.externalIdent + '_' + identifier + '_' + declaredIn.prefixLevel();
+		this.externalIdent = "_LABEL_" + declaredIn.externalIdent + '_' + identifierValue() + '_' + declaredIn.prefixLevel();
 		type.doChecking(declaredIn, this);
 		VirtualSpecification virtSpec = VirtualSpecification.getVirtualSpecification(this);
 		if (virtSpec == null) {
@@ -94,13 +94,13 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		if (virtSpec != null) {
 			if(this.isLatestVirtualLabel(encloser)) {
 				JavaSourceFileCoder.code("    public RTS_LABEL " + virtSpec.getVirtualIdentifier()
-					+ " { return(new RTS_LABEL(this," + prefixLevel + ',' + index + ",\"" + identifier + "\")); }",
-					" // Virtual Label #" + index + '=' + identifier + " At PrefixLevel " + prefixLevel);
+					+ " { return(new RTS_LABEL(this," + prefixLevel + ',' + index + ",\"" + identifierValue() + "\")); }",
+					" // Virtual Label #" + index + '=' + identifierValue() + " At PrefixLevel " + prefixLevel);
 			}
 		} else {
 			JavaSourceFileCoder.code(
-					"final RTS_LABEL " + ident + "=new RTS_LABEL(this," +prefixLevel + ',' + index + ",\"" + identifier + "\");",
-					"Local Label #" + index + '=' + identifier + " At PrefixLevel " + prefixLevel);
+					"final RTS_LABEL " + ident + "=new RTS_LABEL(this," +prefixLevel + ',' + index + ",\"" + identifierValue() + "\");",
+					"Local Label #" + index + '=' + identifierValue() + " At PrefixLevel " + prefixLevel);
 		}
 	}
 
@@ -126,7 +126,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// @param encloser the owner.
 	/// @return true: if this label is the last label in the owner's label list.
 	private boolean isLatestVirtualLabel(DeclarationScope encloser) {
-		LabelDeclaration last = encloser.labelList.getLastDeclaredLabel(this.identifier.value);
+		LabelDeclaration last = encloser.labelList.getLastDeclaredLabel(this.identifierValue());
 		if(this.index == last.index) {
 			return true;
 		}
@@ -159,7 +159,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 			.aload(0); // this
 		Constant.buildIntConst(codeBuilder, prefixLevel);
 		Constant.buildIntConst(codeBuilder, index);
-		codeBuilder.ldc(pool.stringEntry(this.identifier.value));
+		codeBuilder.ldc(pool.stringEntry(this.identifierValue()));
 		codeBuilder
 			.invokespecial(RTS.CD.RTS_LABEL, "<init>", MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_RTObject;IILjava/lang/String;)V"))
 			.areturn();
@@ -215,7 +215,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		Constant.buildIntConst(codeBuilder, prefixLevel);
 		Constant.buildIntConst(codeBuilder, index);
 		codeBuilder
-			.ldc(codeBuilder.constantPool().stringEntry(identifier.value))
+			.ldc(codeBuilder.constantPool().stringEntry(identifierValue()))
 			.invokespecial(RTS.CD.RTS_LABEL, "<init>", MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_RTObject;IILjava/lang/String;)V"));
 	}
 
@@ -223,7 +223,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	public String toString() {
 		String comment = "DeclaredIn: "+declaredIn.identifier;
 		if(movedTo != null) comment = comment+" -> "+movedTo;
-		return ("LABEL " + identifier + '[' + externalIdent + ']' + ", index=" + index + " IN " + comment);
+		return ("LABEL " + identifierValue() + '[' + externalIdent + ']' + ", index=" + index + " IN " + comment);
 	}
 
 	// ***********************************************************************************************
@@ -231,13 +231,13 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	// ***********************************************************************************************
 	public LabelDeclaration(final Identifier identifier) {
 		super(null, Type.Label, identifier);
-		this.externalIdent = "_LABEL_" + identifier;
+		this.externalIdent = "_LABEL_" + identifierValue();
 		this.declarationKind = ObjectKind.LabelDeclaration;
 	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
-		Util.TRACE_OUTPUT("writeLabelDeclaration: " + identifier);
+		Util.TRACE_OUTPUT("writeLabelDeclaration: " + identifierValue());
 		oupt.writeKind(declarationKind);
 		oupt.writeIdentifier(identifier);
 		oupt.writeShort(OBJECT_SEQU);

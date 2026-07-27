@@ -42,10 +42,9 @@ public final class RunSingleTest {
 		Vector<String> argv2 = new Vector<>();
 		argv2.add("-compilerMode"); argv2.add("viaJavaSource");
 //		argv2.add("-compilerMode"); argv2.add("directClassFiles");
-//		argv2.add("-compilerMode"); argv2.add("simulaClassLoader");
 		
 //		argv2.add("-noexec");
-//		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
+		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
 		argv2.add("-simulaRtsLib"); argv2.add(new File(simulaDir,"bin").toString()); // To use Eclipse Project's simula.runtime
 //		argv2.add("-extLib"); argv2.add("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin");
 		
@@ -57,7 +56,9 @@ public final class RunSingleTest {
 //		names.add("adHoc01.sim"); // For ad'hoc testing
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
-		names.add("adHoc04.sim"); // For ad'hoc testing
+//		names.add("adHoc04.sim"); // For ad'hoc testing
+//		names.add("adHoc10.sim"); // For ad'hoc testing
+//		names.add("adHoc11.sim"); // For ad'hoc testing
 //		names.add("CLASS_COMMON.sim"); // For ad'hoc testing
 	
 		/// AD'HOC TEST DENNE GANG'
@@ -71,7 +72,7 @@ public final class RunSingleTest {
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
 //		names.add("SimulaTest.sim"); // Simula TestBatch Framework
-//		names.add("simtst00.sim"); // OK:  Empty test
+		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
 //		names.add("simtst03.sim"); // OK:  Test Text Value Relations
@@ -295,17 +296,8 @@ public final class RunSingleTest {
 	}
 
 	private static void setOptions() {
-		// Set options.
-//		Option.compilerMode = SimulaCompiler.CompilerMode.viaJavaSource;
-//		Option.verbose=true;
-//		Option.EXTENSIONS=false;
-//		Option.CaseSensitive=true;
-//		Option.noExecution=true;
-//		Option.WARNINGS=false;
-//		Simula.setSelectors("ZDTW");
-//		Simula.setSelectors("ZD");
-
 		// Set internal test, debug options.
+		
 		Option.internal.INLINE_TESTING=true;
 //		Option.noPopup = true;
 		Option.internal.TESTING_STACK_SIZE = true;
@@ -323,13 +315,14 @@ public final class RunSingleTest {
 		// Parser Trace Options
 //		Option.internal.TRACE_PARSE=true;
 //		Option.internal.PRINT_SYNTAX_TREE=1;
-//		Option.TRACE_ATTRIBUTE_OUTPUT=true;
+//		Option.internal.TRACE_ATTRIBUTE_OUTPUT=true;
 //		Option.internal.TRACE_ATTRIBUTE_INPUT=true;
 
 		// Checker Trace Options
 //		Option.internal.TRACE_FIND_MEANING=4;
 //		Option.internal.TRACE_CHECKER=true;
 //		Option.internal.TRACE_CHECKER_OUTPUT=true;
+		Option.internal.PRINT_SYNTAX_TREE = 4;
 
 		// .java Coder Trace Options
 //		Option.TRACE_CODING=true;
@@ -341,11 +334,6 @@ public final class RunSingleTest {
 //		Option.internal.TRACE_REPAIRING_INPUT=true;
 //		Option.internal.TRACE_REPAIRING=true;
 //		Option.internal.TRACE_REPAIRING_OUTPUT=true;
-
-//		CoreGlobal.packetName="simulaTestBatch";
-//		Option.internal.keepJava=userDir; // Generated .java Source is then found in Eclipse Package simulaTestBatch
-//		CoreGlobal.simulaRtsLib=new File(simulaDir,"bin"); // To use Eclipse Project's simula.runtime
-//		Global.extLib="C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin";
 		
 		// Set RunTime Options and tracing.
 //		RTOption.VERBOSE = true;
@@ -356,4 +344,6 @@ public final class RunSingleTest {
 //		RTOption.SML_TRACING = true;
 
 	}
+	
+	
 }

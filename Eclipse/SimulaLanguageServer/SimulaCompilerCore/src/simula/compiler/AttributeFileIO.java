@@ -15,7 +15,6 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
-import simula.Option;
 import simula.builder.SimulaBuilder;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
@@ -28,7 +27,6 @@ import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.ClassHierarchy;
 import simula.compiler.utilities.DeclarationList;
-import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
 
@@ -89,6 +87,7 @@ public final class AttributeFileIO {
 	public static Type readAttributeFile(final SimulaBuilder simBuilder,final String identifier, final File file, final BlockDeclaration enclosure) {
 		Type moduleType = null;
 		Util.generalWarning("Separate Compiled Module is read from: \"" + file + "\"");
+		IO.println("Separate Compiled Module is read from: \"" + file + "\"");
 		if (!(file.exists() && file.canRead())) {
 			Util.generalError("Can't read attribute file: " + file);
 			return (null);
@@ -164,13 +163,13 @@ public final class AttributeFileIO {
 //			xdecl.readExternalAttributeFile();
 			/// Read external Attribute file.
 //			public void readExternalAttributeFile() {
-				File jarFile = JarFileBuilder.findJarFile(xdecl.identifier.value, xdecl.externalIdent);
+				File jarFile = JarFileBuilder.findJarFile(xdecl.identifierValue(), xdecl.externalIdent);
 				if (jarFile == null) {
 					Util.syntaxError(simBuilder, "Can't find attribute file: " + xdecl.identifier + '[' + xdecl.externalIdent + ']');
 				} else {
 					if(checkJarFiles(jarFile)) {
 						BlockDeclaration enclosure = StandardClass.BASICIO;
-						AttributeFileIO.readAttributeFile(simBuilder, xdecl.identifier.value, jarFile, enclosure);
+						AttributeFileIO.readAttributeFile(simBuilder, xdecl.identifierValue(), jarFile, enclosure);
 					}
 				}		
 //			}

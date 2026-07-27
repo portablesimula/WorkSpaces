@@ -38,6 +38,7 @@ import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LabelList;
 import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.ObjectList;
@@ -179,8 +180,8 @@ public class ClassDeclaration extends BlockDeclaration {
 		boolean TESTING = true;
 		if(TESTING) {
 			LexToken prev = simBuilder.getPrevParserToken();
-			IO.println("ClassDeclaration.expectClassDeclaration: identifier: "+identifier);
-			IO.println("ClassDeclaration.expectClassDeclaration: prev: "+prev);
+//			IO.println("ClassDeclaration.expectClassDeclaration: identifier: "+identifierValue());
+//			IO.println("ClassDeclaration.expectClassDeclaration: prev: "+prev);
 			if(identifier == null) {
 				if(prev.keyWord != KeyWord.CLASS) Util.IERR("Pre-Condition FAILED: "+prev);
 			}
@@ -234,7 +235,7 @@ public class ClassDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.syntaxError(simBuilder, "Identifier " + identifier + " is not defined in this scope");
+					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
 					parameter = new Parameter(simBuilder, identifier);
 				}
 				parameter.setMode(Parameter.Mode.value);
@@ -282,7 +283,7 @@ public class ClassDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.syntaxError(simBuilder, "Identifier " + identifier + " is not defined in this scope");
+					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
 					parameter = new Parameter(simBuilder, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
@@ -421,8 +422,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		CoreGlobal.enterScope(this);
 		if(Option.internal.TRACE_CHECKER)
-			Util.TRACE("BEGIN ClassDeclaration("+this.identifier+").doChecking");
-//		IO.println("ClassDeclaration("+this.identifier+").doChecking");
+			Util.TRACE("BEGIN ClassDeclaration(" + this.identifierValue() + ").doChecking");
 		
 		if (hasRealPrefix()) {
 			prefixClass = getPrefixClass();
@@ -518,25 +518,22 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @return a ProcedureDeclaration when it was found, otherwise null
 	public Declaration findLocalAttribute(final Identifier ident) {
 		if (Option.internal.TRACE_FIND_MEANING > 0)
-			Util.println("BEGIN Checking Class for " + ident + " ================================== " + identifier + " ==================================");
-		
-		IO.println("ClassDeclaration.findLocalAttribute: " + ident.value + ", getText=" + ident.getText());
-		
+			Util.println("ClassDeclaration.findLocalAttribute: BEGIN Checking Class for " + ident + " ================================== " + identifierValue() + " ==================================");
 		for (Parameter parameter : parameterList) {
 			if (Option.internal.TRACE_FIND_MEANING > 1)
-				Util.println("Checking Parameter " + parameter);
+				Util.println("ClassDeclaration.findLocalAttribute: Checking Parameter " + parameter);
 			if (Util.equals(ident, parameter.identifier))
 				return (parameter);
 		}
 		for (Declaration declaration : declarationList) {
 			if (Option.internal.TRACE_FIND_MEANING > 1)
-				Util.println("Checking Local " + declaration);
+				Util.println("ClassDeclaration.findLocalAttribute: Checking Local " + declaration);
 			if (Util.equals(ident, declaration.identifier))
 				return (declaration);
 		}
 		if(labelList != null) for (LabelDeclaration label : labelList.getDeclaredLabels()) {
 			if (Option.internal.TRACE_FIND_MEANING > 1)
-				Util.println("Checking Label " + label);
+				Util.println("ClassDeclaration.findLocalAttribute: Checking Label " + label);
 			if (Util.equals(ident, label.identifier))
 				return (label);
 		}
@@ -553,7 +550,7 @@ public class ClassDeclaration extends BlockDeclaration {
 				return (virtual);
 		}
 		if (Option.internal.TRACE_FIND_MEANING > 0)
-			Util.println("ENDOF Checking Class for " + ident + " ================================== " + identifier + " ==================================");
+			Util.println("ENDOF Checking Class for " + ident + " ============ NOT FOUND =========== " + identifierValue() + " ==================================");
 		return (null);
 	}
 
@@ -657,7 +654,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	@Override
 	public Meaning findVisibleAttributeMeaning(final Identifier ident) {
 		if (Option.internal.TRACE_FIND_MEANING > 0)
-			Util.println("BEGIN Checking Class for " + ident + " ================================== " + identifier + " ==================================");
+			LOG.trace("ClassDeclaration.findVisibleAttributeMeaning: BEGIN Search "+identifierValue()+" for "+ident.value+" ================================== "+identifierValue()+" ==================================");
 		boolean searchBehindHidden = false;
 		ClassDeclaration scope = this;
 		Declaration decl = scope.findLocalAttribute(ident);
@@ -681,7 +678,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			scope = scope.getPrefixClass();
 		}
 		if (Option.internal.TRACE_FIND_MEANING > 0)
-			Util.println("ENDOF Checking Class for " + ident + " ================================== " + identifier + " ==================================");
+			LOG.trace("ClassDeclaration.findVisibleAttributeMeaning: ENDOF Search "+identifierValue()+" for "+ident.value+" ========= NOT FOUND ============== "+identifierValue()+" ==================================");
 		return (null);
 	}
 
@@ -714,7 +711,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			return null;
 		Declaration decl = meaning.declaredAs;
 		if (decl == this) {
-			Util.semanticError(this, "Class prefix chain loops: " + identifier);
+			Util.semanticError(this, "Class prefix chain loops: " + identifierValue());
 			return null;
 		}
 		if (decl instanceof ClassDeclaration cls) {
@@ -822,7 +819,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	public void doJavaCoding() {
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
-			if(SimulaCompiler.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);	
+			if(SimulaCompiler.verbose) IO.println("Skip  doJavaCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);	
 			return;
 		}
 		CoreGlobal.sourceLineNumber = firstLineNumber();
@@ -844,6 +841,8 @@ public class ClassDeclaration extends BlockDeclaration {
 			JavaSourceFileCoder.debug("// Declare parameters as attributes");
 			for (Parameter par : parameterList) {
 				String tp = par.toJavaType();
+//				IO.println("ClassDeclaration.doJavaCoding: externalIdent="+par.externalIdent);
+//				Util.STOP();
 				JavaSourceFileCoder.code("public " + tp + ' ' + par.externalIdent + ';');
 			}
 			if(this.hasAccumLabel()) {
@@ -936,7 +935,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			if (prfx != null) prfx.codeStatementsBeforeInner();
 		}
 		if(statements1 != null) for (Statement stm : statements1) stm.doJavaCoding();
-		JavaSourceFileCoder.code("// BEGIN "+identifier+" INNER PART");
+		JavaSourceFileCoder.code("// BEGIN " + identifierValue() + " INNER PART");
 	}
 
 	// ***********************************************************************************************
@@ -944,7 +943,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Java coding utility: codeStatementsAfterInner
 	private void codeStatementsAfterInner() {
-		JavaSourceFileCoder.code("// ENDOF "+identifier+" INNER PART");
+		JavaSourceFileCoder.code("// ENDOF " + identifierValue() + " INNER PART");
 		for (Statement stm : statements) stm.doJavaCoding();
 		if (hasRealPrefix()) {
 			ClassDeclaration prfx = this.getPrefixClass();
@@ -1371,7 +1370,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		s.append('[').append(sourceBlockLevel).append(':').append(getRTBlockLevel()).append("] ");
 		if (prefix != null)
 			s.append(prefix).append(' ');
-		s.append(declarationKind).append(' ').append(identifier);
+		s.append(ObjectKind.edit(declarationKind)).append(' ').append(identifierValue());
 		s.append('[').append(externalIdent).append("] ");
 		s.append(Parameter.editParameterList(parameterList));
 		Util.println(s.toString());
@@ -1393,27 +1392,27 @@ public class ClassDeclaration extends BlockDeclaration {
 	}
 	
 	@Override
-	public void printTree(final int indent, final Object head) {
-		verifyTree(head);
+	public void printTree(final int indent) {
+		// verifyTree(head);
 		String tail = (IS_SEMANTICS_CHECKED()) ? "  BL=" + getRTBlockLevel() : "";
 		if(isPreCompiledFromFile != null) tail = tail + " From: " + isPreCompiledFromFile;
 		String prfx = (prefix==null) ? "" : "  extends " + prefix;
 		String declIn = " declaredIn " + this.declaredIn.identifier;
-		IO.println(edTreeIndent(indent) + "CLASS " + identifier + tail + "  PrefixLevel=" + prefixLevel() + prfx + declIn);
-		if(labelList != null) labelList.printTree(indent+1,this);
-		for(Parameter p:parameterList) p.printTree(indent+1,this);
+		IO.println(edTreeIndent(indent) + "CLASS " + identifierValue() + tail + "  PrefixLevel=" + prefixLevel() + prfx + declIn);
+		if(labelList != null) labelList.printTree(indent + 1);
+		for(Parameter p:parameterList) p.printTree(indent + 1);
 		if (!virtualSpecList.isEmpty())
-			for( VirtualSpecification v:virtualSpecList) v.printTree(indent+1,this);
+			for( VirtualSpecification v:virtualSpecList) v.printTree(indent + 1);
 		if (!virtualMatchList.isEmpty())
-			for( VirtualMatch m:virtualMatchList) m.printTree(indent+1,this);
+			for( VirtualMatch m:virtualMatchList) m.printTree(indent + 1);
 		if (!hiddenList.isEmpty())
-			for( HiddenSpecification h:hiddenList) h.printTree(indent+1,this);
+			for( HiddenSpecification h:hiddenList) h.printTree(indent + 1);
 		if (!protectedList.isEmpty())
-			for( ProtectedSpecification p:protectedList) p.printTree(indent+1,this);
-		printDeclarationList(indent+1);
+			for( ProtectedSpecification p:protectedList) p.printTree(indent + 1);
+		printDeclarationList(indent + 1);
 		if(Option.internal.PRINT_SYNTAX_TREE > 2)
-			for(Statement s:statements1) s.printTree(indent+1,this);
-		printStatementList(indent+1);
+			for(Statement s:statements1) s.printTree(indent + 1);
+		printStatementList(indent + 1);
 	}
 
 	@Override
@@ -1426,7 +1425,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
-		Util.TRACE_OUTPUT("BEGIN Write ClassDeclaration: " + identifier + ", Declared in: " + declaredIn);
+		Util.TRACE_OUTPUT("BEGIN Write ClassDeclaration: " + identifierValue() + ", Declared in: " + declaredIn);
 		oupt.writeKind(declarationKind); // Mark: This is a ClassDeclaration
 		oupt.writeIdentifier(identifier);
 		oupt.writeShort(OBJECT_SEQU);
@@ -1458,7 +1457,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		oupt.writeObjectList(hiddenList);
 		oupt.writeObjectList(protectedList);
 		oupt.writeObjectList(statements1);
-		Util.TRACE_OUTPUT("END Write ClassDeclaration: " + identifier);
+		Util.TRACE_OUTPUT("END Write ClassDeclaration: " + identifierValue());
 	}
 
 	/// Read and return a ClassDeclaration object.
@@ -1469,7 +1468,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	public static ClassDeclaration readObject(AttributeInputStream inpt) throws IOException {
 		Identifier identifier = inpt.readIdentifier();
 		ClassDeclaration cls = new ClassDeclaration(null, identifier);
-		Util.TRACE_INPUT("BEGIN Read ClassDeclaration: " + identifier + ", Declared in: " + cls.declaredIn);
+		Util.TRACE_INPUT("BEGIN Read ClassDeclaration: " + identifier.value + ", Declared in: " + cls.declaredIn);
 		cls.declarationKind = ObjectKind.Class;
 		cls.OBJECT_SEQU = inpt.readSEQU(cls);
 		
@@ -1501,7 +1500,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		cls.statements1 = (ObjectList<Statement>) inpt.readObjectList();
 
 		cls.isPreCompiledFromFile = inpt.jarFileName;
-		Util.TRACE_INPUT("END Read ClassDeclaration: " + identifier + ", Declared in: " + cls.declaredIn);
+		Util.TRACE_INPUT("END Read ClassDeclaration: " + identifier.value + ", Declared in: " + cls.declaredIn);
 		CoreGlobal.setScope(cls.declaredIn);
 		return(cls);
 	}

@@ -84,10 +84,10 @@ public class ConnectionDoPart extends SyntaxElement {
 	/// Utility print method.
 	/// @param indent the indent
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
     	String spc=edTreeIndent(indent);
 		Util.println(spc + "DO " + connectionBlock.statement);
-		connectionBlock.printTree(indent, head);
+		connectionBlock.printTree(indent);
 	}
 
 	@Override

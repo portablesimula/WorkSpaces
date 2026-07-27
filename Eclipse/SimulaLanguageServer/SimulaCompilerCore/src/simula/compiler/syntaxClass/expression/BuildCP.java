@@ -129,8 +129,8 @@ public class BuildCP {
 	/// @param codeBuilder the codeBuilder to use.
 	private static void callRemoteStandardProcedure(Expression beforeDot,StandardProcedure pro,final VariableExpression variable,CodeBuilder codeBuilder) {
 		if (beforeDot instanceof VariableExpression var) {
-			IO.println("VariableExpression.editVariable: " + var.identifier.value+" "+var.meaning);
 			if(var.meaning == null) Util.IERR("");
+			IO.println("BuildCP.callRemoteStandardProcedure: " + var.identifier.value + " "+var.meaning);
 			Meaning meaning = var.meaning;
 			ClassDesc owner = meaning.declaredIn.getClassDesc();
 			Declaration remoteQual = meaning.declaredAs;
@@ -139,11 +139,11 @@ public class BuildCP {
 					case ObjectKind.MemberMethod -> {
 						var.buildIdentifierAccess(false, codeBuilder);
 						codeBuilder
-							.invokevirtual(owner, prx.identifier.value, prx.getMethodTypeDesc(null,variable.checkedParams));
+							.invokevirtual(owner, prx.identifierValue(), prx.getMethodTypeDesc(null,variable.checkedParams));
 					}
 					case ObjectKind.ContextFreeMethod -> {
 						codeBuilder
-							.invokestatic(owner, prx.identifier.value, prx.getMethodTypeDesc(null,variable.checkedParams));
+							.invokestatic(owner, prx.identifierValue(), prx.getMethodTypeDesc(null,variable.checkedParams));
 					}
 					default -> Util.IERR();
 				}
@@ -155,7 +155,7 @@ public class BuildCP {
 			par.buildEvaluation(null,codeBuilder);
 		}
 		ClassDesc owner=ClassDesc.of("simula.runtime."+pro.declaredIn.externalIdent);
-		codeBuilder.invokevirtual(owner, pro.identifier.value, pro.getMethodTypeDesc(null,variable.checkedParams));
+		codeBuilder.invokevirtual(owner, pro.identifierValue(), pro.getMethodTypeDesc(null,variable.checkedParams));
 		if(pro.type != null && variable.backLink == null)
 			pro.type.pop(codeBuilder);
 	}
@@ -192,7 +192,7 @@ public class BuildCP {
 			}
 			ClassDesc owner = meaning.declaredIn.getClassDesc();
 			codeBuilder
-				.invokevirtual(owner, pro.identifier.value, pro.getMethodTypeDesc(null,variable.checkedParams));
+				.invokevirtual(owner, pro.identifierValue(), pro.getMethodTypeDesc(null,variable.checkedParams));
 			if(pro.type != null && variable.backLink == null)
 				pro.type.pop(codeBuilder);
 		}
@@ -227,7 +227,7 @@ public class BuildCP {
 			MTD = MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_REALTYPE_ARRAY;Lsimula/runtime/RTS_REALTYPE_ARRAY;Lsimula/runtime/RTS_NAME;)D");
 		} else MTD = pro.getMethodTypeDesc(null,variable.checkedParams);
 		codeBuilder
-			.invokestatic(owner, pro.identifier.value, MTD);
+			.invokestatic(owner, pro.identifierValue(), MTD);
 		if(pro.type != null && variable.backLink == null) {
 			pro.type.pop(codeBuilder);
 		}

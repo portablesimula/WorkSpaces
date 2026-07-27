@@ -111,7 +111,7 @@ public abstract class Statement extends SyntaxElement {
 		Statement statement = null;
 		int keyWord = simToken.keyWord;
 		
-		IO.println("\nStatement.acceptUnlabeledStatement(1): "+simToken);
+		IO.println("\nStatement.acceptUnlabeledStatement(1): keyWord=" + KeyWord.edit(keyWord) + " " + simToken);
 		switch(keyWord) {
 			case KeyWord.BEGIN:
 				// case KeyWord.BEGIN: PsiParse.nextToken(); return (new MaybeBlockDeclaration(null).expectMaybeBlock(lineNumber));
@@ -156,7 +156,8 @@ public abstract class Statement extends SyntaxElement {
 				}
 				
 				Expression expr = Expression.acceptExpression(simBuilder);
-//				IO.println("\n\nStatement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr+" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
+				IO.println("\n\nStatement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr.getClass().getSimpleName()+" "+expr+" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
+//				Thread.dumpStack();
 				
 //				if(Option.TRACE_ACCEPT_STATEMENT > 2) {
 //					IO.println("\nStatement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr);
@@ -172,16 +173,16 @@ public abstract class Statement extends SyntaxElement {
 						if (Parse.accept(simBuilder, KeyWord.BEGIN)) {
 							PrefixedBlockDeclaration prfblk = PrefixedBlockDeclaration.expectPrefixedBlock(simBuilder, var,false);
 							statement = new BlockStatement(simBuilder, prfblk, "Statement.acceptIdentifierStatement: GOT VariableExpression: "+var);
-//							IO.println("Statement.acceptUnlabeledStatement: GOT BlockStatement: "+statement);
+							IO.println("Statement.acceptUnlabeledStatement: GOT BlockStatement: "+statement);
 							break;
 		      			} else {
 		      				statement = new StandaloneExpression(simBuilder, expr);
-//							IO.println("Statement.acceptUnlabeledStatement: GOT StandaloneExpression(1): "+statement);
+							IO.println("Statement.acceptUnlabeledStatement: GOT StandaloneExpression(1): "+statement);
 		      				break;
 	      				}
 	      			} else {
 	      				statement = new StandaloneExpression(simBuilder, expr);
-//						IO.println("Statement.acceptUnlabeledStatement: GOT StandaloneExpression(2): "+statement);
+						IO.println("Statement.acceptUnlabeledStatement: GOT StandaloneExpression(2): "+statement);
 	      				break;
 	      			}
 //					IO.println("\nStatement.acceptUnlabeledStatement: GOT STATEMENT: "+statement);

@@ -103,14 +103,14 @@ public class UndefinedDeclaration extends Declaration {
 	}
 
 	@Override
-	public void printTree(final int indent, final Object head) {
-		verifyTree(head);
+	public void printTree(final int indent) {
+		// verifyTree(head);
 		IO.println(edTreeIndent(indent)+this);
 	}
 
 	@Override
 	public String toString() {
-		return "Undefined " + identifier + " Type=" + type;
+		return "Undefined " + identifierValue() + " Type=" + type;
 	}
 
 	// ***********************************************************************************************

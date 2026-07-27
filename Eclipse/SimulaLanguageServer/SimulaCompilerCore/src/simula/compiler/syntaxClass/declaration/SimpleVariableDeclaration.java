@@ -30,7 +30,6 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
 import simula.token.Identifier;
-import simula.token.LexToken;
 
 /// Simple Variable Declaration.
 /// 
@@ -149,9 +148,9 @@ public class SimpleVariableDeclaration extends Declaration {
 		
 		if (CoreGlobal.getCurrentScope() instanceof ClassDeclaration cls) {
 			if (cls.prefixLevel() > 0)
-				externalIdent = identifier.value + '_' + cls.prefixLevel();
+				externalIdent = identifierValue() + '_' + cls.prefixLevel();
 			else
-				externalIdent = identifier.value;
+				externalIdent = identifierValue();
 		}
 		
 		SET_SEMANTICS_CHECKED();
@@ -227,8 +226,8 @@ public class SimpleVariableDeclaration extends Declaration {
 	}
 
 	@Override
-	public void printTree(final int indent, final Object head) {
-		verifyTree(head);
+	public void printTree(final int indent) {
+		// verifyTree(head);
 		IO.println(edTreeIndent(indent)+this);
 	}
 

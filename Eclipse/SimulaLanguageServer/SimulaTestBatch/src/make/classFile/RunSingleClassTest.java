@@ -22,11 +22,6 @@ import simula.Option;
  *
  */
 public final class RunSingleClassTest {
-//	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula");
-//	private static final File userDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/SimulaTestBatch");
-//	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
-
-	// C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer\SimulaTestBatch\src\simulaTestBatch
 	
 //	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
 	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaCompilerCore");
@@ -46,7 +41,6 @@ public final class RunSingleClassTest {
 		Vector<String> argv2 = new Vector<>();
 //		argv2.add("-compilerMode"); argv2.add("viaJavaSource");
 		argv2.add("-compilerMode"); argv2.add("directClassFiles");
-//		argv2.add("-compilerMode"); argv2.add("simulaClassLoader");
 		
 //		argv2.add("-noexec");
 //		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
@@ -322,12 +316,6 @@ public final class RunSingleClassTest {
 //		Option.internal.TRACE_FIND_MEANING=4;
 //		Option.internal.TRACE_CHECKER=true;
 //		Option.internal.TRACE_CHECKER_OUTPUT=true;
-
-//		CoreGlobal.packetName="simulaTestBatch";
-//
-//		Option.internal.keepJava=userDir; // Generated .java Source is then found in Eclipse Package simulaTestBatch
-//		CoreGlobal.simulaRtsLib=new File(simulaDir,"bin"); // To use Eclipse Project's simula.runtime
-////		Global.extLib="C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin";
 		
 		// Set RunTime Options and tracing.
 //		RTOption.VERBOSE = false;

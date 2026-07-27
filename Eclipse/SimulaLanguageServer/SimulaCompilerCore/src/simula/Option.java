@@ -6,13 +6,8 @@
 package simula;
 
 import java.io.File;
-import java.util.Properties;
-import java.util.Vector;
-
-import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.SimulaCompiler.CompilerMode;
-import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.Util;
 
 /// Compile Time Options.
@@ -30,10 +25,6 @@ public final class Option {
 	/// The UI-Scale factor
 	/// See: https://docs.oracle.com/en/java/javase/25/troubleshoot/java-2d-properties.html
 	public static String editorUIScale;
-
-//	/// The currently selected Color Theme
-//	public static String selectedTheme;
-	
 	
 	/// Testing and debugging options
 	public static class internal {
@@ -164,7 +155,7 @@ public final class Option {
 //		Util.IERR("STOP HER INTILL VIDERE");
 	}
 
-	/// Kalles av 'run' før codeing og exec
+	/// Kalles av 'run' før coding og exec
 	public static void decodeArguments2(String[] argv) {
 		IO.println("Option.decodeArguments2: ");
 

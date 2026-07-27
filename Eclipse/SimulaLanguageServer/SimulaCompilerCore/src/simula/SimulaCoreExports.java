@@ -37,16 +37,16 @@ public class SimulaCoreExports {
     	DocumentManager documentManager = DocumentManager.getDocumentManager(documentUri);
     	SimulaBuilder simBuilder = documentManager.simBuilder;
 
-    	IO.println("SimulaCoreExports.run: sourceFileDir=" + documentManager.sourceFileDir);
-    	IO.println("SimulaCoreExports.run: outputDir=" + SimulaCompiler.outputDir);
-    	if(SimulaCompiler.outputDir == null) {
-    		SimulaCompiler.outputDir = new File(documentManager.sourceFileDir,"bin");
-    	}
-    	IO.println("SimulaCoreExports.run: outputDir=" + SimulaCompiler.outputDir);
-    	SimulaCompiler.outputDir.mkdirs();
-    	if (! SimulaCompiler.outputDir.canWrite()) {
-    		Util.IERR("SimulaCoreExports.run: Unable to write to " + SimulaCompiler.outputDir);
-    	}
+//    	IO.println("SimulaCoreExports.run: sourceFileDir=" + documentManager.sourceFileDir);
+//    	IO.println("SimulaCoreExports.run: outputDir=" + SimulaCompiler.outputDir);
+//    	if(SimulaCompiler.outputDir == null) {
+//    		SimulaCompiler.outputDir = new File(documentManager.sourceFileDir,"bin");
+//    	}
+//    	IO.println("SimulaCoreExports.run: outputDir=" + SimulaCompiler.outputDir);
+//    	SimulaCompiler.outputDir.mkdirs();
+//    	if (! SimulaCompiler.outputDir.canWrite()) {
+//    		Util.IERR("SimulaCoreExports.run: Unable to write to " + SimulaCompiler.outputDir);
+//    	}
     	
 //    	Util.STOP();
 //    	/// Try set Global.outputDir

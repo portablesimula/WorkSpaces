@@ -27,7 +27,6 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
 import simula.token.Identifier;
-import simula.token.LexToken;
 
 /// Virtual Quantities.
 /// <pre>
@@ -86,7 +85,7 @@ public final class VirtualSpecification extends Declaration {
 	VirtualSpecification(final SimulaBuilder simBuilder, final Identifier identifier, final Type type, final int kind, final int prefixLevel, final ProcedureSpecification procedureSpec) {
 		super(simBuilder, identifier);
 		this.declarationKind = ObjectKind.VirtualSpecification;
-		this.externalIdent = identifier.value;
+		this.externalIdent = identifierValue();
 		this.type = type;
 		this.kind = kind;
 		this.prefixLevel = prefixLevel;
@@ -126,7 +125,7 @@ public final class VirtualSpecification extends Declaration {
 				}
 
 				Identifier identifier = Parse.expectIdentifier(simBuilder);
-//				IO.println("\n\nVirtualSpecification.expectVirtualPart: " + identifier);
+//				IO.println("\n\nVirtualSpecification.expectVirtualPart: " + identifierValue());
 				ProcedureSpecification procedureSpec = null;
 				if (Parse.accept(simBuilder, KeyWord.IS)) {
 					if(type != null) Util.syntaxError(simBuilder, "An IS-specified virtual procedure can have its type only after IS.");
@@ -142,7 +141,7 @@ public final class VirtualSpecification extends Declaration {
 					else
 						Parse.expect(simBuilder, KeyWord.SEMICOLON);
 				}
-//				IO.println("\n\nVirtualSpecification.expectVirtualPart: AFTER: " + identifier);
+//				IO.println("\n\nVirtualSpecification.expectVirtualPart: AFTER: " + identifierValue());
 			}
 		}
 		if(cls.virtualSpecList.size()==0) Util.syntaxError(simBuilder, "Missing virtual specifier after VIRTUAL:");
@@ -232,7 +231,7 @@ public final class VirtualSpecification extends Declaration {
 	@Override
 	public void doJavaCoding() {
 		ASSERT_SEMANTICS_CHECKED();
-		String matchCode = "{ throw new RTS_SimulaRuntimeError(\"No Virtual Match: " + identifier + "\"); }";
+		String matchCode = "{ throw new RTS_SimulaRuntimeError(\"No Virtual Match: " + identifierValue() + "\"); }";
 		String qnt = (kind == Kind.Label) ? "RTS_LABEL " : "RTS_PRCQNT ";
 		JavaSourceFileCoder.code("public " + qnt + getVirtualIdentifier() + matchCode);
 	}
@@ -260,7 +259,7 @@ public final class VirtualSpecification extends Declaration {
 	}
 
 	@Override
-	public void printTree(int indent, final Object head) {
+	public void printTree(int indent) {
 		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
 
@@ -272,7 +271,7 @@ public final class VirtualSpecification extends Declaration {
 		if (kind == Kind.Procedure)
 			s.append("PROCEDURE ");
 		s.append(identifier);
-		s.append("[Specified in ").append(declaredIn.identifier).append(']');
+		if(declaredIn != null) s.append("[Specified in ").append(declaredIn.identifierValue()).append(']');
 		if (procedureSpec != null)
 			s.append('=').append(procedureSpec);
 		return (s.toString());
@@ -289,7 +288,7 @@ public final class VirtualSpecification extends Declaration {
 	
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
-		Util.TRACE_OUTPUT("VirtualSpec: " + type + ' ' + identifier + ' ' + kind);
+		Util.TRACE_OUTPUT("VirtualSpec: " + type + ' ' + identifierValue() + ' ' + kind);
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** VirtualSpecification

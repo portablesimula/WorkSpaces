@@ -10,10 +10,13 @@ import simula.Option;
 import simula.compiler.JarFileBuilder;
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.SimulaCompiler;
+import simula.compiler.syntaxClass.declaration.DeclarationScope;
+import simula.compiler.syntaxClass.declaration.MaybeBlockDeclaration;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.LOG;
+import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.SimulaDiagnostic;
 import simula.compiler.utilities.Util;
 import simula.lsp.compiler.DocumentManager;
@@ -282,14 +285,29 @@ public class SimulaBuilder {
     
 	public void printAll(String title) {
     	IO.println("\n");
+//    	dumpSyntaxTree();
 		printSyntaxTree(title);
 		printDiagnostics(title);
 		printTokenList(title);
+//		Util.STOP();
+	}
+	
+	private void dumpSyntaxTree() {
+		IO.println("SimulaBuilder.dumpSyntaxTree: ProgramModule: " + syntaxTree);
+		DeclarationScope mainModule = syntaxTree.mainModule;
+		IO.println("SimulaBuilder.dumpSyntaxTree: ProgramModule.mainModule: " + mainModule.getClass().getSimpleName() + " " + mainModule);
+		if(mainModule instanceof MaybeBlockDeclaration blk) {
+			IO.println("SimulaBuilder.dumpSyntaxTree: Block: " + ObjectKind.edit(blk.declarationKind));
+//			blk.print(4);
+			blk.printTree(4);
+		}
+		Util.STOP();
 	}
 	
 	public void printSyntaxTree(String title) {
 		IO.println("======================================== BEGIN SYNTAX TREE: " + title + " ============================ ");
-		if(syntaxTree.mainModule != null) syntaxTree.print(0);
+//		if(syntaxTree.mainModule != null) syntaxTree.print(0);
+		if(syntaxTree.mainModule != null) syntaxTree.printTree(0);
 		IO.println("======================================== ENDOF SYNTAX TREE: " + title + " ============================ ");
 	}
 

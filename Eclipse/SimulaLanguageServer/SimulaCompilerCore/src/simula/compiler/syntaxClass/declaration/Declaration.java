@@ -75,7 +75,7 @@ public abstract class Declaration extends SyntaxElement {
 	protected Declaration(final SimulaBuilder simBuilder, final Identifier identifier) {
 		super(simBuilder);
 		this.identifier = identifier;
-		if(identifier != null) this.externalIdent = identifier.value; // May be overwritten
+		if(identifier != null) this.externalIdent = identifierValue(); // May be overwritten
 		declaredIn = CoreGlobal.getCurrentScope();
 		checkAlreadyDefined();
 	}
@@ -126,9 +126,9 @@ public abstract class Declaration extends SyntaxElement {
 			}
 		}
 		if (error)
-			Util.syntaxError(simBuilder, identifier + " is alrerady defined in " + declaredIn.identifier);
+			Util.syntaxError(simBuilder, identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
 		else if (warning)
-			Util.warning(simBuilder, identifier + " is alrerady defined in " + declaredIn.identifier);
+			Util.warning(simBuilder, identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
 	}
 
 	/// Parse a declaration and add it to the given declaration list.
@@ -139,16 +139,16 @@ public abstract class Declaration extends SyntaxElement {
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse Declaration");
 		Declaration decl = null;
-		IO.println("Declaration.acceptDeclaration: BEFORE acceptIdentifier");
+//		IO.println("Declaration.acceptDeclaration: BEFORE acceptIdentifier");
 		Identifier maybePrefix = Parse.acceptIdentifier(simBuilder);
-		IO.println("Declaration.acceptDeclaration: AFTER acceptIdentifier");
+//		IO.println("Declaration.acceptDeclaration: AFTER acceptIdentifier");
 		if (maybePrefix != null) {
-			IO.println("Declaration.acceptDeclaration: maybePrefix="+maybePrefix);
+//			IO.println("Declaration.acceptDeclaration: maybePrefix="+maybePrefix);
 			if (Parse.accept(simBuilder, KeyWord.CLASS)) {
-				IO.println("Declaration.acceptDeclaration: CLASS");
+//				IO.println("Declaration.acceptDeclaration: CLASS");
 				decl = ClassDeclaration.expectClassDeclaration(simBuilder, maybePrefix);
 			} else {
-				IO.println("Declaration.acceptDeclaration: NOT CLASS");
+//				IO.println("Declaration.acceptDeclaration: NOT CLASS");
 				
 				Parse.saveCurrentToken(simBuilder); // Identifier is NOT a class prefix.
 				return null;
@@ -243,20 +243,6 @@ public abstract class Declaration extends SyntaxElement {
 	public void buildDeclarationCode(CodeBuilder codeBuilder) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		// Default: No code
-	}
-	
-	/// Debug utility: verifyTree.
-	/// @param head of the tree.
-	protected void verifyTree(final Object head) {
-		if(head instanceof Declaration decl) {
-			if(! decl.identifier.equals(this.declaredIn.identifier)) {
-				IO.println("\nDeclaration.verifyTree: Treating: "+this);
-				IO.println("Declaration.verifyTree: "+this.getClass().getSimpleName()+".head="+head);
-				IO.println("Declaration.verifyTree: head.identifier=" + decl.identifier);
-				IO.println("Declaration.verifyTree: declaredIn.identifier=" + declaredIn.identifier);
-				Util.IERR("verifyTree FAILED");
-			}
-		}
 	}
 
 }

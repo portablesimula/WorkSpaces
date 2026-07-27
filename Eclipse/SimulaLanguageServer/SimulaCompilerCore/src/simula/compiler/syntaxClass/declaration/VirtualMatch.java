@@ -44,7 +44,7 @@ public final class VirtualMatch extends Declaration {
 
 	@Override
 	public void doJavaCoding() {
-		String matchCode = "{ throw new RTS_SimulaRuntimeError(\"No Virtual Match: " + identifier + "\"); }";
+		String matchCode = "{ throw new RTS_SimulaRuntimeError(\"No Virtual Match: " + identifierValue() + "\"); }";
 		if (match != null)
 			matchCode = "{ return(new RTS_PRCQNT(this," + match.getJavaIdentifier() + ".class)); }";
 		JavaSourceFileCoder.code("    public RTS_PRCQNT " + virtualSpec.getVirtualIdentifier() + " " + matchCode);
@@ -70,7 +70,7 @@ public final class VirtualMatch extends Declaration {
 	}
 
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
 
@@ -79,9 +79,9 @@ public final class VirtualMatch extends Declaration {
 		StringBuilder s = new StringBuilder();
 		if (match.type != null)
 			s.append(match.type).append(' ');
-		s.append("PROCEDURE ").append(match.identifier);
+		s.append("PROCEDURE ").append(match.identifierValue());
 		if (virtualSpec != null)
-			s.append("[Specified by ").append(virtualSpec.identifier).append(']');
+			s.append("[Specified by ").append(virtualSpec.identifierValue()).append(']');
 		return (s.toString());
 	}
 

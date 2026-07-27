@@ -9,14 +9,14 @@ import java.util.Vector;
 import simula.SimulaCoreExports;
 
 public class TestBatchLauncher {
-	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
+//	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
 
 	public static void run(String fileName, Vector<String> argv, Vector<String> argv2) {
 //		try {
 		// Remove time, date, and headers from Logger output.
 		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
 		
-		SimulaCoreExports.initiate(new TestBatchClient(), argv);//, simulaRtsLib);//, keepJava, extLib);
+		SimulaCoreExports.initiate(new TestBatchClient(), argv);
 		String uri = fileName;
 		int version = 1;
         try {

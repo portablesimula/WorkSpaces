@@ -22,7 +22,6 @@ import simula.compiler.syntaxClass.expression.VariableExpression;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
-import simula.token.LexToken;
 
 /// BlockStatement.
 /// <pre>
@@ -102,7 +101,7 @@ public final class BlockStatement extends Statement {
 			s.append(staticLink);
 			if(blockDeclaration instanceof PrefixedBlockDeclaration pref) {
 				VariableExpression blockPrefix=pref.blockPrefix;
-				if(blockPrefix.hasArguments())
+				if(blockPrefix.hasArguments() && blockPrefix.checkedParams != null)
 					for (Expression par:blockPrefix.checkedParams) {
 						s.append(',').append(par.toJavaCode());
 					}
@@ -132,13 +131,13 @@ public final class BlockStatement extends Statement {
 	}
 	
 	@Override
-	public void printTree(final int indent, final Object head) {
-		blockDeclaration.printTree(indent,head);
+	public void printTree(final int indent) {
+		blockDeclaration.printTree(indent);
 	}
 	
 	@Override
 	public String toString() {
-		return blockDeclaration.identifier.value;
+		return "BlockStatement: " + blockDeclaration.getClass().getSimpleName() + " " + blockDeclaration;
 	}
 
 	// ***********************************************************************************************

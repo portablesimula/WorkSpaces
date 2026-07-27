@@ -80,7 +80,7 @@ public final class InnerStatement extends Statement {
 	}
 	
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		IO.println(edTreeIndent(indent)+"INNER ");
 	}
 
@@ -104,6 +104,7 @@ public final class InnerStatement extends Statement {
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
 		writeAstData(oupt);
+//		Util.IERR("");
 	}
 
 	/// Read and return an InnerStatement object.
@@ -116,6 +117,7 @@ public final class InnerStatement extends Statement {
 		// *** SyntaxElement
 		stm.astData = readAstData(inpt);
 		Util.TRACE_INPUT("InnerStatement: " + stm);
+//		Util.IERR("");
 		return(stm);
 	}	
 

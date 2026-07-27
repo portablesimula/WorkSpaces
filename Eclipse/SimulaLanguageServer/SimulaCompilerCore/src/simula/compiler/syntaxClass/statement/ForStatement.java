@@ -370,10 +370,10 @@ public final class ForStatement extends Statement {
 	}
 
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		String fl = forList.toString().replace('[', ' ').replace(']', ' ');
 		IO.println(edTreeIndent(indent)+"FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + " DO ");
-		doStatement.printTree(indent+1,this);
+		doStatement.printTree(indent + 1);
 	}
 	
 	@Override

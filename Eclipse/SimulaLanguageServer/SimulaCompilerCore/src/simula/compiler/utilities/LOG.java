@@ -18,6 +18,10 @@ public class LOG {
 		logger.warning(message);
 	}
 
+	public static void trace(String message) {
+		logger.info(message);
+	}
+
 	public static void info(String message) {
 		logger.info(message);
 	}

@@ -264,12 +264,12 @@ public final class ConnectionStatement extends Statement {
 
 	
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		IO.println(edTreeIndent(indent)+"INSPECT " + inspectedVariable + " = " + objectExpression);
-		for (ConnectionDoPart doPart : connectionPart) doPart.printTree(indent+1,this);
+		for (ConnectionDoPart doPart : connectionPart) doPart.printTree(indent + 1);
 		if(otherwise != null) {
 			IO.println(edTreeIndent(indent)+"OTHERWISE");
-			otherwise.printTree(indent+1,this);
+			otherwise.printTree(indent + 1);
 		}
 	}
 
@@ -281,7 +281,7 @@ public final class ConnectionStatement extends Statement {
     	String spc=edIndent(indent);
 		// if(assignment!=null) assignment.print(indent);
 		Util.println(spc + "INSPECT " + inspectedVariable + " = " + objectExpression);
-		for (ConnectionDoPart doPart : connectionPart) doPart.printTree(indent,this);
+		for (ConnectionDoPart doPart : connectionPart) doPart.printTree(indent);
 		if (otherwise != null) Util.println(spc + "   OTHERWISE " + otherwise + ';');
 	}
 

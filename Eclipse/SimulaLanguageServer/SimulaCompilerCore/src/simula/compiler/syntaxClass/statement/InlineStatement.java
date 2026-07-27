@@ -76,7 +76,7 @@ public final class InlineStatement extends Statement {
 	}
 
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		IO.println(edTreeIndent(indent)+"INLINE "+kind);
 	}
 

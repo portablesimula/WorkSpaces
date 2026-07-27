@@ -290,10 +290,10 @@ public final class ActivationStatement extends Statement {
 
 
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		IO.println(edTreeIndent(indent)+this);
-		object1.printTree(indent+1,this);
-		if(object2 != null) object2.printTree(indent+1,this);
+		object1.printTree(indent + 1);
+		if(object2 != null) object2.printTree(indent + 1);
 	}
 
 	@Override

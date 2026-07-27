@@ -127,7 +127,7 @@ public final class Parameter extends Declaration {
 	public void into(final Vector<Parameter> parameterList) {
 		for (Parameter par : parameterList)
 			if (Util.equals(par.identifier, this.identifier)) {
-				Util.syntaxError(simBuilder, "Parameter already defined: " + identifier);
+				Util.syntaxError(simBuilder, "Parameter already defined: " + identifierValue());
 				return;
 			}
 		parameterList.add(this);
@@ -151,7 +151,7 @@ public final class Parameter extends Declaration {
 	/// @param mode the new mode
 	void setMode(final int mode) {
 		if (this.mode != 0)
-			Util.syntaxError(simBuilder, "Parameter " + identifier + " is already specified by " + this.mode);
+			Util.syntaxError(simBuilder, "Parameter " + identifierValue() + " is already specified by " + this.mode);
 		this.mode = mode;
 	}
 
@@ -167,8 +167,8 @@ public final class Parameter extends Declaration {
 	/// @param prefixLevel the given prefix level
 	void setExternalIdentifier(final int prefixLevel) {
 		if (prefixLevel > 0)
-			 externalIdent = "p" + prefixLevel + '_' + identifier;
-		else externalIdent = "p_" + identifier;
+			 externalIdent = "p" + prefixLevel + '_' + identifierValue();
+		else externalIdent = "p_" + identifierValue();
 	}
 
 	@Override
@@ -177,14 +177,14 @@ public final class Parameter extends Declaration {
 			return;
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		if (kind == 0) {
-			Util.semanticError(this.declaredIn, "Parameter " + identifier + " is not specified -- assumed Simple Integer");
+			Util.semanticError(this.declaredIn, "Parameter " + identifierValue() + " is not specified -- assumed Simple Integer");
 			kind = Kind.Simple;
 			type = Type.Integer;
 		}
 		if (type != null)
 			type.doChecking(CoreGlobal.getCurrentScope().declaredIn, this);
 		if (!legalTransmitionMode())
-			Util.semanticError(this, "Illegal transmission mode: " + mode + ' ' + kind + ' ' + identifier + " by " + edMode(mode) + " is not allowed");
+			Util.semanticError(this, "Illegal transmission mode: " + mode + ' ' + kind + ' ' + identifierValue() + " by " + edMode(mode) + " is not allowed");
 		SET_SEMANTICS_CHECKED();
 	}
 
@@ -372,8 +372,8 @@ public final class Parameter extends Declaration {
 	@Override
 	public String getFieldIdentifier() {
 		if(declaredIn instanceof ClassDeclaration cls)
-			 return("p"+cls.prefixLevel()+'_'+identifier);
-		else return("p_"+identifier);
+			 return("p"+cls.prefixLevel()+'_'+identifierValue());
+		else return("p_"+identifierValue());
 	}
 
 	/// ClassFile coding utility: buildDeclaration of this Parameter.
@@ -461,7 +461,7 @@ public final class Parameter extends Declaration {
 	}
 	
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		IO.println(edTreeIndent(indent)+this);
 	}
 
@@ -480,7 +480,7 @@ public final class Parameter extends Declaration {
 			s = s + " " + nDim + "-Dimentional";
 		else if (kind != Parameter.Kind.Simple)
 			s = s + " " + kind;
-		return (s + ' ' + identifier + "(" + externalIdent + ')');
+		return (s + ' ' + identifierValue() + "(" + externalIdent + ')');
 	}
 
 	// ***********************************************************************************************
@@ -494,7 +494,7 @@ public final class Parameter extends Declaration {
 	
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
-		Util.TRACE_OUTPUT("Parameter: " + type + ' ' + identifier + ' ' + kind + ' ' + mode);
+		Util.TRACE_OUTPUT("Parameter: " + type + ' ' + identifierValue() + ' ' + kind + ' ' + mode);
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** Parameter
@@ -518,7 +518,7 @@ public final class Parameter extends Declaration {
 		par.type = inpt.readType();
 		par.kind = inpt.readShort();
 		par.mode = inpt.readShort();
-		Util.TRACE_INPUT("Parameter: " + par.type + ' ' + par.identifier + ' ' + par.kind + ' ' + par.mode);
+		Util.TRACE_INPUT("Parameter: " + par.type + ' ' + par.identifierValue() + ' ' + par.kind + ' ' + par.mode);
 		return(par);
 	}
 

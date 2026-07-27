@@ -148,7 +148,7 @@ public final class ExternalDeclaration extends Declaration {
 		Vector<SyntaxElement> declarations = new Vector<SyntaxElement>();
 		Identifier identifier = Parse.expectIdentifier(simBuilder);
 		LOOP: while (true) {
-//			IO.println("ExternalDeclaration.expectExternalDeclaration: identifier=" + identifier);
+//			IO.println("ExternalDeclaration.expectExternalDeclaration: identifier=" + identifierValue());
 			String externalIdentifier = null;
 			if (Parse.accept(simBuilder, KeyWord.EQ)) {
 //				externalIdentifier = Parse.currentToken;
@@ -166,11 +166,12 @@ public final class ExternalDeclaration extends Declaration {
 			ExternalDeclaration externalDeclaration = new ExternalDeclaration(simBuilder, identifier, externalIdentifier);
 			externalDeclaration.type = expectedType;
 			declarations.add(externalDeclaration);
-//			IO.println("ExternalDeclaration.expectExternalDeclaration: externalDeclaration" + externalDeclaration);
+			IO.println("ExternalDeclaration.expectExternalDeclaration: externalDeclaration: " + externalDeclaration);
 
 			File jarFile = JarFileBuilder.findJarFile(identifier.value, externalIdentifier);
+			IO.println("ExternalDeclaration.expectExternalDeclaration: jarFile: " + jarFile);
 			if(jarFile == null) {
-				Util.syntaxError(simBuilder, "Can't find attribute file: " + identifier + '[' + externalIdentifier + ']');
+				Util.syntaxError(simBuilder, "Can't find attribute file: " + identifier.value + '[' + externalIdentifier + ']');
 			}
 			if (jarFile != null) {
 				if(AttributeFileIO.checkJarFiles(jarFile)) {
@@ -214,7 +215,7 @@ public final class ExternalDeclaration extends Declaration {
 		for(Declaration memb:StandardClass.BASICIO.declarationList) {
 			IO.println("ExternalDeclaration.doChecking: " + memb);
 		}
-		IO.println("ExternalDeclaration.doChecking: +++++++++++++++++ CURRENT SCOPE "+CoreGlobal.getCurrentScope().identifier +" ++++++++++++++++++++++");
+		IO.println("ExternalDeclaration.doChecking: +++++++++++++++++ CURRENT SCOPE "+CoreGlobal.getCurrentScope().identifierValue() +" ++++++++++++++++++++++");
 		for(Declaration z:CoreGlobal.getCurrentScope().declarationList) {
 			IO.println("ExternalDeclaration.doChecking: " + z);
 			if(z instanceof ExternalDeclaration ext) {
@@ -251,7 +252,7 @@ public final class ExternalDeclaration extends Declaration {
 
 
 	public String toString() {
-		return "ExternalDeclaration: identifier=" + identifier + ", externalIdent=" + externalIdent;
+		return "ExternalDeclaration: identifier=" + identifierValue() + ", externalIdent=" + externalIdent;
 	}
 
 

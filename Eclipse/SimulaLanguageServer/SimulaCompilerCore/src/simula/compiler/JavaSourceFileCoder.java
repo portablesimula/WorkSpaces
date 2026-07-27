@@ -16,6 +16,7 @@ import java.util.Vector;
 import simula.Option;
 import simula.compiler.syntaxClass.declaration.BlockDeclaration;
 import simula.compiler.utilities.CoreGlobal;
+import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
 
@@ -53,6 +54,7 @@ public final class JavaSourceFileCoder {
 		enclosingJavaCoder = CoreGlobal.currentJavaFileCoder;
 		CoreGlobal.currentJavaFileCoder = this;
 		javaOutputFile = new File(SimulaCompiler.tempJavaFileDir, blockDeclaration.getJavaIdentifier() + ".java");
+		LOG.info("JavaSourceFileCoder: javaOutputFile: " + javaOutputFile);
 		try {
 			javaOutputFile.getParentFile().mkdirs();
 			if (SimulaCompiler.verbose)
@@ -204,7 +206,7 @@ public final class JavaSourceFileCoder {
 		s.append(edIndent() + "public static RTS_PROGINFO _INFO=new RTS_PROGINFO(\"");
 		s.append(SimulaCompiler.sourceFileName);
 		s.append("\",\"");
-		s.append(ObjectKind.edit(blockDeclaration.declarationKind) + " " + blockDeclaration.identifier.value);
+		s.append(ObjectKind.edit(blockDeclaration.declarationKind) + " " + blockDeclaration.identifierValue());
 		s.append('"');
 		for (Integer i : lineMap) {
 			s.append(',');

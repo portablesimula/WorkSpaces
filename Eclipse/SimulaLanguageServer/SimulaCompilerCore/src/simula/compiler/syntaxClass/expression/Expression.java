@@ -544,7 +544,7 @@ public abstract class Expression extends SyntaxElement {
 
 
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		IO.println(edTreeIndent(indent)+this);
 	}
 	

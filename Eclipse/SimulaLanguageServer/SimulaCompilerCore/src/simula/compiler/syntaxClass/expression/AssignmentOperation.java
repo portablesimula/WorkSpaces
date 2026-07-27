@@ -28,7 +28,6 @@ import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Meaning;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
-import simula.token.LexToken;
 
 /// Assignment Operation.
 /// 
@@ -98,7 +97,7 @@ public final class AssignmentOperation extends Expression {
 //			IO.println("AssignmentOperation.doChecking: meaning.declaredAs="+meaning.declaredAs.getClass().getSimpleName()+"  "+meaning.declaredAs);
 			switch(meaning.declaredAs) {
 				case SimpleVariableDeclaration dcl -> { if (dcl.isConstant()) Util.semanticError(var, "Assignment to Constant: '" + lhs + "' is Illegal"); }
-				case ClassDeclaration cls -> { Util.semanticError(lhs, "Can't assign to Class Identifier: " + cls.identifier); }
+				case ClassDeclaration cls -> { Util.semanticError(lhs, "Can't assign to Class Identifier: " + cls.identifierValue()); }
 				default -> {} // NOTHING
 			}
 		}

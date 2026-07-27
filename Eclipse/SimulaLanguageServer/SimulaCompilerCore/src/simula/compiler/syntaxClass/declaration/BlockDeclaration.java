@@ -269,6 +269,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	// ***********************************************************************************************
 	/// ClassFile coding utility: Code STM body
 	protected void codeSTMBody() {
+		IO.println("BlockDeclaration.codeSTMBody: ");
 		if (hasAccumLabel()) {
 			JavaSourceFileCoder.code(externalIdent + " _THIS=(" + externalIdent + ")_CUR;");
 			JavaSourceFileCoder.code("_LOOP:while(_JTX>=0) {");
@@ -297,7 +298,10 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	protected void codeStatements() {
 		boolean duringSTM_Coding=SimulaCompiler.duringSTM_Coding;
 		SimulaCompiler.duringSTM_Coding=true;
-		for (Statement stm : statements) stm.doJavaCoding();
+		for (Statement stm : statements) {
+			IO.println("BlockDeclaration.codeStatements: "+stm.getClass().getSimpleName()+"  "+stm);
+			stm.doJavaCoding();
+		}
 		SimulaCompiler.duringSTM_Coding=duringSTM_Coding;
 	}
 
@@ -573,15 +577,15 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// @param indent the indentation.
 	protected void printStatementList(int indent) {
 		if(Option.internal.PRINT_SYNTAX_TREE > 2) {
-			for(Statement s:statements) s.printTree(indent, this);
+			for(Statement s:statements) s.printTree(indent);
 		} else {
-			IO.println(edTreeIndent(indent) + ' ' + this.identifier + ' ' + (statements.size()) + " Statements ...");
+			IO.println(edTreeIndent(indent) + ' ' + this.identifierValue() + ' ' + (statements.size()) + " Statements ...");
 		}
 	}
 
 	@Override
 	public String toString() {
-		return ("" + identifier + '[' + externalIdent + "] ObjectKind=" + declarationKind);
+		return ("BlockDeclaration: " + identifierValue() + '[' + externalIdent + "] ObjectKind=" + declarationKind);
 	}
 
 }

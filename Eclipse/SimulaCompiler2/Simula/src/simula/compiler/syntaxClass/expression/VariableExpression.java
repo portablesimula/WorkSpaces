@@ -383,6 +383,7 @@ public final class VariableExpression extends Expression {
 
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("END Variable(" + identifier + ").doChecking: type=" + type);
+		
 		SET_SEMANTICS_CHECKED();
 	}
 

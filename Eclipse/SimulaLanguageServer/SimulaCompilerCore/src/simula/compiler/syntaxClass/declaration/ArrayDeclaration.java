@@ -269,7 +269,7 @@ public final class ArrayDeclaration extends Declaration {
 	public void buildDeclaration(ClassBuilder classBuilder, BlockDeclaration encloser) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
-		classBuilder.withField(identifier.value, RTS.CD.RTS_ARRAY(type), fieldBuilder -> {
+		classBuilder.withField(identifierValue(), RTS.CD.RTS_ARRAY(type), fieldBuilder -> {
 			fieldBuilder
 				.withFlags(ClassFile.ACC_PUBLIC)
 				.with(SignatureAttribute.of(type.toArrayClassSignature()));
@@ -373,7 +373,7 @@ public final class ArrayDeclaration extends Declaration {
 		}
 		codeBuilder
 			.invokespecial(CD_ArrayType, "<init>", MethodTypeDesc.ofDescriptor("([Lsimula/runtime/RTS_BOUNDS;)V"))
-			.putfield(pool.fieldRefEntry(BlockDeclaration.currentClassDesc(),identifier.value, CD_ArrayType));
+			.putfield(pool.fieldRefEntry(BlockDeclaration.currentClassDesc(),identifierValue(), CD_ArrayType));
 	}
 
 	// ********************************************************************************************
@@ -531,7 +531,7 @@ public final class ArrayDeclaration extends Declaration {
 
 
 	@Override
-	public void printTree(final int indent, final Object head) {
+	public void printTree(final int indent) {
 		IO.println(SyntaxElement.edIndent(indent)+this.getClass().getSimpleName()+"    "+this);
 	}
 
@@ -539,7 +539,7 @@ public final class ArrayDeclaration extends Declaration {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		if(type != null) sb.append(type).append(' ');
-		sb.append("ARRAY ").append(identifier).append('(');
+		sb.append("ARRAY ").append(identifierValue()).append('(');
 		boolean first = true;
 		for(BoundPair boundPair:boundPairList) {
 			if(!first) sb.append(',');
@@ -561,7 +561,7 @@ public final class ArrayDeclaration extends Declaration {
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
-		Util.TRACE_OUTPUT("Array: " + type + ' ' + identifier + ", nDim=" + nDim);
+		Util.TRACE_OUTPUT("Array: " + type + ' ' + identifierValue() + ", nDim=" + nDim);
 		oupt.writeKind(declarationKind);
 		oupt.writeShort(OBJECT_SEQU);
 
