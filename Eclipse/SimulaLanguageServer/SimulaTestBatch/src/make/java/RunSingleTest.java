@@ -34,7 +34,7 @@ public final class RunSingleTest {
 		Vector<String> argv = new Vector<>();
 //		argv.add("-caseSensitive");
 //		argv.add("-noextension");
-//		argv.add("-noPopup");
+		argv.add("-noPopup");
 //		argv.add("-nowarn");
 		argv.add("-verbose");
 //		argv.add("-select");
@@ -71,7 +71,7 @@ public final class RunSingleTest {
 		
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
-//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+		names.add("SimulaTest.sim"); // Simula TestBatch Framework
 		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions

@@ -58,7 +58,7 @@ public class JarFileBuilder {
 	private JarOutputStream jarOutputStream;
 
 	/// Debug utility.
-	private final static boolean TESTING = true;// false;
+	private final static boolean TESTING = false;
 	
 	/// Construct a new JarFileBuilder.
 	public JarFileBuilder() {
@@ -236,19 +236,18 @@ public class JarFileBuilder {
 	}
 	
 	private void addToTempClassfiles(final String entryName, final byte[] bytes) throws IOException {
-		IO.println("JarFileBuilder.addToTempClassfiles: " + entryName);
-        Path path = Paths.get(""+SimulaCompiler.tempClassFileDir + '/' + entryName);
+//		IO.println("JarFileBuilder.addToTempClassfiles: " + entryName);
+        Path path = Paths.get(SimulaCompiler.tempClassFileDir.toString() + '/' + entryName);
 
         // Oppretter nødvendige mapper hvis de ikke eksisterer (f.eks. com/example/)
         if (path.getParent() != null) {
             Files.createDirectories(path.getParent());
         }
-		IO.println("JarFileBuilder.addToTempClassfiles: path = " + path);
+//		IO.println("JarFileBuilder.addToTempClassfiles: path = " + path);
 
         // Skriver alle bytes til filen i én operasjon
         Files.write(path, bytes);
-    	Util.doListDirectory(""+SimulaCompiler.tempClassFileDir);
-//    	Util.STOP();
+//    	Util.doListDirectory(""+SimulaCompiler.tempClassFileDir);
 	}
 	
     /**

@@ -33,7 +33,7 @@ public final class RunSingleClassTest {
 		Vector<String> argv = new Vector<>();
 //		argv.add("-caseSensitive");
 //		argv.add("-noextension");
-//		argv.add("-noPopup");
+		argv.add("-noPopup");
 //		argv.add("-nowarn");
 		argv.add("-verbose");
 //		argv.add("-select");
@@ -56,14 +56,14 @@ public final class RunSingleClassTest {
 //		names.add("adHoc01.sim"); // For ad'hoc testing
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
-		names.add("adHoc04.sim"); // For ad'hoc testing
+//		names.add("adHoc04.sim"); // For ad'hoc testing
 //		names.add("adHoc10.sim"); // For ad'hoc testing
 		
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
 		
-//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
-//		names.add("simtst00.sim"); // OK:  Empty test
+		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
 //		names.add("simtst03.sim"); // OK:  Test Text Value Relations

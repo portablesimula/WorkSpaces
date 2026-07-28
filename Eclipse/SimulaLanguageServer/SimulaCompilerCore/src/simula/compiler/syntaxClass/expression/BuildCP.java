@@ -130,7 +130,7 @@ public class BuildCP {
 	private static void callRemoteStandardProcedure(Expression beforeDot,StandardProcedure pro,final VariableExpression variable,CodeBuilder codeBuilder) {
 		if (beforeDot instanceof VariableExpression var) {
 			if(var.meaning == null) Util.IERR("");
-			IO.println("BuildCP.callRemoteStandardProcedure: " + var.identifier.value + " "+var.meaning);
+//			IO.println("BuildCP.callRemoteStandardProcedure: " + var.identifier.value + " "+var.meaning);
 			Meaning meaning = var.meaning;
 			ClassDesc owner = meaning.declaredIn.getClassDesc();
 			Declaration remoteQual = meaning.declaredAs;

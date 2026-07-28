@@ -484,19 +484,16 @@ public class SimulaCompiler {
 	/// @return return value from the Java compiler
 	/// @throws IOException if something went wrong
 	private int callJavaSystemCompiler(final SimulaBuilder simBuilder, final JavaCompiler compiler, final String classPath) throws IOException {
-    	IO.println("SimulaCompiler.callJavaSystemCompiler: sourceFileDir=" + documentManager.sourceFileDir);
-    	IO.println("SimulaCompiler.callJavaSystemCompiler: outputDir=" + SimulaCompiler.outputDir);
-    	IO.println("SimulaCompiler.callJavaSystemCompiler: tempClassFileDir=" + SimulaCompiler.tempClassFileDir);
-    	IO.println("SimulaCompiler.callJavaSystemCompiler: tempClassFileDir=" + SimulaCompiler.simulaRtsLib);
-    	IO.println("SimulaCompiler.callJavaSystemCompiler: userHome=" + System.getProperty("user.home"));
-    	IO.println("SimulaCompiler.callJavaSystemCompiler: userDir=" + System.getProperty("user.dir"));
-    	IO.println("SimulaCompiler.callJavaSystemCompiler: javaClassPath=" + System.getProperty("java.class.path"));
-    	
-//    	Util.doListDirectory(""+SimulaCompiler.outputDir);
-//    	Util.doListDirectory(""+SimulaCompiler.outputDir + "/" + packetName);
-    	Util.doListDirectory(""+SimulaCompiler.tempClassFileDir);
-    	Util.doListDirectory(""+SimulaCompiler.tempClassFileDir + "/" + packetName);
-//    	Util.STOP();
+//    	IO.println("SimulaCompiler.callJavaSystemCompiler: sourceFileDir=" + documentManager.sourceFileDir);
+//    	IO.println("SimulaCompiler.callJavaSystemCompiler: outputDir=" + SimulaCompiler.outputDir);
+//    	IO.println("SimulaCompiler.callJavaSystemCompiler: tempClassFileDir=" + SimulaCompiler.tempClassFileDir);
+//    	IO.println("SimulaCompiler.callJavaSystemCompiler: tempClassFileDir=" + SimulaCompiler.simulaRtsLib);
+//    	IO.println("SimulaCompiler.callJavaSystemCompiler: userHome=" + System.getProperty("user.home"));
+//    	IO.println("SimulaCompiler.callJavaSystemCompiler: userDir=" + System.getProperty("user.dir"));
+//    	IO.println("SimulaCompiler.callJavaSystemCompiler: javaClassPath=" + System.getProperty("java.class.path"));
+//    	
+//    	Util.doListDirectory(""+SimulaCompiler.tempClassFileDir);
+//    	Util.doListDirectory(""+SimulaCompiler.tempClassFileDir + "/" + packetName);
     	
 		Vector<String> arguments = new Vector<String>();
 		if (Option.internal.DEBUGGING) {
@@ -504,21 +501,11 @@ public class SimulaCompiler {
 		}
 		if (Option.internal.TRACING)
 			Util.println("SimulaCompiler.callJavaSystemCompiler: classPath=\"" + classPath + "\"");
-		
-		boolean TESTING = true;
-		if(TESTING) {
-//			String clazzPath = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaCompilerCore/bin";
-//			String clazzPath = ""+SimulaCompiler.tempClassFileDir + "/" + packetName;
-			String clazzPath = ""+SimulaCompiler.tempClassFileDir;
-//			String rtsLib = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaCompilerCore/bin";
-			String rtsLib = ""+SimulaCompiler.simulaRtsLib;
-			clazzPath = clazzPath + ';' + rtsLib;
-			arguments.add("-classpath");
-			arguments.add(clazzPath);
-		} else {
-			arguments.add("-classpath");
-			arguments.add(classPath);
-		}
+		String clazzPath = SimulaCompiler.tempClassFileDir.toString();
+		String rtsLib = SimulaCompiler.simulaRtsLib.toString();
+		clazzPath = clazzPath + ';' + rtsLib;
+		arguments.add("-classpath");
+		arguments.add(clazzPath);
 		arguments.add("-d");
 		arguments.add(SimulaCompiler.tempClassFileDir.toString()); // Specifies output directory.
 		if (!SimulaCompiler.WARNINGS)
@@ -550,8 +537,12 @@ public class SimulaCompiler {
 		}
 		if (Option.internal.TRACING)
 			Util.println("SimulaCompiler.callJavacCompiler: classPath=\"" + classPath + "\"");
+		String clazzPath = SimulaCompiler.tempClassFileDir.toString();
+		String rtsLib = SimulaCompiler.simulaRtsLib.toString();
+		clazzPath = clazzPath + ';' + rtsLib;
 		cmds.add("-classpath");
-		cmds.add(classPath);
+		cmds.add(clazzPath);
+
 		cmds.add("-d");
 		cmds.add(SimulaCompiler.tempClassFileDir.toString()); // Specifies output directory.
 		if (!SimulaCompiler.WARNINGS)

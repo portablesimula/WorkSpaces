@@ -213,7 +213,7 @@ public final class VariableExpression extends Expression {
 
 	@Override
 	public void doChecking() {
-		IO.println("VariableExpression.deChecking BEGIN Variable(" + identifier.value + ").doChecking: type=" + type);
+//		IO.println("VariableExpression.deChecking BEGIN Variable(" + identifier.value + ").doChecking: type=" + type);
 //		Util.IERR("");
 		if (IS_SEMANTICS_CHECKED())
 			return;
@@ -409,7 +409,7 @@ public final class VariableExpression extends Expression {
 
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("END Variable(" + identifier.value + ").doChecking: type=" + type + ", kind=" + ObjectKind.edit(declaredAs.declarationKind));
-		IO.println("VariableExpression.doChecking: DONE: " + ObjectKind.edit(declaredAs.declarationKind) + ": " + declaredAs);
+//		IO.println("VariableExpression.doChecking: DONE: " + ObjectKind.edit(declaredAs.declarationKind) + ": " + declaredAs);
 		SET_SEMANTICS_CHECKED();
 	}
 
