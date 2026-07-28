@@ -1,6 +1,6 @@
 // JavaLine 1 <== SourceLine 3
 package simprog;
-// Simula-2.0 Compiled at Mon Jul 27 15:34:26 CEST 2026
+// Simula-2.0 Compiled at Tue Jul 28 09:04:20 CEST 2026
 import simula.runtime.*;
 @SuppressWarnings("unchecked")
 public final class simtst00 extends RTS_BASICIO {
@@ -16,7 +16,7 @@ public final class simtst00 extends RTS_BASICIO {
     @Override
     public RTS_RTObject _STM() {
         // JavaLine 18 <== SourceLine 7
-        new simtst00_SimulaTestBegin(_USR,0,new RTS_TXT("--- Empty test"))._STM();
+        new simtst00_SimulaTest_Begin(_USR,0,new RTS_TXT("--- Empty test"))._STM();
         EBLK();
         return(this);
     } // End of 11 Statements

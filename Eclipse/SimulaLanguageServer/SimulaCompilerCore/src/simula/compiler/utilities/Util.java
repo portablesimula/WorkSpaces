@@ -6,12 +6,17 @@
 package simula.compiler.utilities;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 import simula.Option;
 import simula.builder.SimulaBuilder;
@@ -372,7 +377,24 @@ public final class Util {
 		return((int)res);
 	}
   
+	// ***************************************************************
+	// *** LIST .class file
+	// ***************************************************************
+	/// Print a .class file listing.
+	/// @param classFileName the .class file name
+	public static void doListDirectory(final String dirName) {
+        Path path = Paths.get(dirName); 
+        IO.println("================== LIST: " + path + " ======================");
 
+        // Try-with-resources sikrer at strømmen lukkes automatisk
+        try (Stream<Path> stream = Files.list(path)) {
+            stream.forEach(System.out::println);
+        } catch (IOException e) {
+            System.err.println("Kunne ikke lese katalogen: " + e.getMessage());
+        }
+        IO.println("================== ENDE: " + path + " ======================");
+    }
+    
 	// ***************************************************************
 	// *** LIST .class file
 	// ***************************************************************

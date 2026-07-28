@@ -10,6 +10,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -55,7 +58,7 @@ public class JarFileBuilder {
 	private JarOutputStream jarOutputStream;
 
 	/// Debug utility.
-	private final static boolean TESTING = false;
+	private final static boolean TESTING = true;// false;
 	
 	/// Construct a new JarFileBuilder.
 	public JarFileBuilder() {
@@ -103,7 +106,7 @@ public class JarFileBuilder {
 	/// @param entryName the entry name
 	/// @param bytes the bytes, may be null
 	public void putMapEntry(String entryName, byte[] bytes) {
-		if(TESTING)	IO.println("JarOutputSet.putMapEntry: "+entryName);
+		if(TESTING)	IO.println("JarFileBuilder.putMapEntry: "+entryName);
 		byte[] prev = classFileMap.put(entryName,bytes);
 		if(prev != null) {
 			if(SimulaCompiler.verbose)
@@ -226,11 +229,50 @@ public class JarFileBuilder {
 				inputStream = jarFile.getInputStream(inputEntry);
 				byte[] bytes = inputStream.readAllBytes();
 				putMapEntry(entryName, bytes);
+				addToTempClassfiles(entryName, bytes);
 			} finally {	if (inputStream != null) inputStream.close(); }
 		}
 		if(TESTING) printClassFileMap("END JarFileBuilder.expandJarFile");
 	}
 	
+	private void addToTempClassfiles(final String entryName, final byte[] bytes) throws IOException {
+		IO.println("JarFileBuilder.addToTempClassfiles: " + entryName);
+        Path path = Paths.get(""+SimulaCompiler.tempClassFileDir + '/' + entryName);
+
+        // Oppretter nødvendige mapper hvis de ikke eksisterer (f.eks. com/example/)
+        if (path.getParent() != null) {
+            Files.createDirectories(path.getParent());
+        }
+		IO.println("JarFileBuilder.addToTempClassfiles: path = " + path);
+
+        // Skriver alle bytes til filen i én operasjon
+        Files.write(path, bytes);
+    	Util.doListDirectory(""+SimulaCompiler.tempClassFileDir);
+//    	Util.STOP();
+	}
+	
+    /**
+     * Skriver en klassefil til disk basert på klassenavn og bytes.
+     *
+     * @param className Det fulle navnet på klassen (f.eks. "com.example.MyClass")
+     * @param classBytes Den ferdige byte-arrayen som utgjør klassefilen
+     * @throws IOException Hvis det oppstår en feil under skriving til fil
+     */
+    public static void writeClassFile(String className, byte[] classBytes) throws IOException {
+        // Konverterer pakkenavn (med punktum) til en gyldig filsti
+        // F.eks: "com.example.MyClass" blir til "com/example/MyClass.class"
+        String fileName = className.replace('.', '/') + ".class";
+        Path path = Paths.get(fileName);
+
+        // Oppretter nødvendige mapper hvis de ikke eksisterer (f.eks. com/example/)
+        if (path.getParent() != null) {
+            Files.createDirectories(path.getParent());
+        }
+
+        // Skriver alle bytes til filen i én operasjon
+        Files.write(path, classBytes);
+    }
+
 	/// Debug utility: printClassFileMap.
 	/// @param title the title String.
 	private void printClassFileMap(String title) {

@@ -95,7 +95,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		block.blockPrefix = blockPrefix;
 		block.prefix = blockPrefix.identifier;
 		block.isMainModule=isMainModule;
-		String ID = (isMainModule)? SimulaCompiler.sourceName : block.prefix.value + "Begin";
+		String ID = (isMainModule)? SimulaCompiler.sourceName : block.prefix.value + "_Begin";
 		block.modifyIdentifier(new Identifier(ID));
 		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse PrefixedBlock");
 		

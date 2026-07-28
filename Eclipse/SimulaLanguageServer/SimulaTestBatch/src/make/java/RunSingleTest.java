@@ -44,7 +44,7 @@ public final class RunSingleTest {
 //		argv2.add("-compilerMode"); argv2.add("directClassFiles");
 		
 //		argv2.add("-noexec");
-		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
+//		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
 		argv2.add("-simulaRtsLib"); argv2.add(new File(simulaDir,"bin").toString()); // To use Eclipse Project's simula.runtime
 //		argv2.add("-extLib"); argv2.add("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin");
 		

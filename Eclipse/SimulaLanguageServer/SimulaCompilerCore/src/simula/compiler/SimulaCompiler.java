@@ -135,18 +135,27 @@ public class SimulaCompiler {
     	return sourceName;
     }
 
+    private void setTmpClassDir() {
+		// Create Temp .class-Files Directory:
+		File tmpClassDir = new File(SimulaCompiler.simulaTempDir, "classes");
+		tmpClassDir.mkdirs();
+		SimulaCompiler.tempClassFileDir = tmpClassDir;
+    	LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempClassFileDir="+SimulaCompiler.tempClassFileDir);
+    }
+    
     private void setOutputDir() {
-    	IO.println("SimulaCoreExports.run: sourceFileDir=" + documentManager.sourceFileDir);
-    	IO.println("SimulaCoreExports.run: outputDir=" + SimulaCompiler.outputDir);
+    	IO.println("SimulaCompiler.setOutputDir: sourceFileDir=" + documentManager.sourceFileDir);
+    	IO.println("SimulaCompiler.setOutputDir: outputDir=" + SimulaCompiler.outputDir);
     	if(SimulaCompiler.outputDir == null) {
-    		SimulaCompiler.outputDir = new File(documentManager.sourceFileDir,"bin");
+//    		SimulaCompiler.outputDir = new File(documentManager.sourceFileDir,"bin");
+        	File userDir = new File(System.getProperty("user.dir"));
+    		SimulaCompiler.outputDir = new File(userDir,"bin");
     	}
-    	IO.println("SimulaCoreExports.run: outputDir=" + SimulaCompiler.outputDir);
+    	IO.println("SimulaCompiler.setOutputDir: outputDir=" + SimulaCompiler.outputDir);
     	SimulaCompiler.outputDir.mkdirs();
     	if (! SimulaCompiler.outputDir.canWrite()) {
-    		Util.IERR("SimulaCoreExports.run: Unable to write to " + SimulaCompiler.outputDir);
+    		Util.IERR("SimulaCompiler.setOutputDir: Unable to write to " + SimulaCompiler.outputDir);
     	}
-    	
     }
     
 	// ***************************************************************
@@ -157,7 +166,8 @@ public class SimulaCompiler {
 		simBuilder.duringParsing = true;
     	LOG.info("SimulaCompiler.doParsing: BEGIN");
     	
-    	setOutputDir(); // Neccessary because external decclaration reads .jar
+    	setTmpClassDir(); // Neccessary because external decclaration reads .jar
+    	setOutputDir();   // Neccessary because external decclaration reads .jar
     	
         // Do the actual Building
 		simBuilder.getNextParserToken();
@@ -239,11 +249,11 @@ public class SimulaCompiler {
 				break;
 		}
 		
-		// Create Temp .class-Files Directory:
-		File tmpClassDir = new File(SimulaCompiler.simulaTempDir, "classes");
-		tmpClassDir.mkdirs();
-		SimulaCompiler.tempClassFileDir = tmpClassDir;
-    	LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempClassFileDir="+SimulaCompiler.tempClassFileDir);
+//		// Create Temp .class-Files Directory:
+//		File tmpClassDir = new File(SimulaCompiler.simulaTempDir, "classes");
+//		tmpClassDir.mkdirs();
+//		SimulaCompiler.tempClassFileDir = tmpClassDir;
+//    	LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempClassFileDir="+SimulaCompiler.tempClassFileDir);
 
 		Option.print("SimulaCompiler.doCodeGeneration: ");
 		SimulaCompiler.jarFileBuilder = new JarFileBuilder();
@@ -474,14 +484,41 @@ public class SimulaCompiler {
 	/// @return return value from the Java compiler
 	/// @throws IOException if something went wrong
 	private int callJavaSystemCompiler(final SimulaBuilder simBuilder, final JavaCompiler compiler, final String classPath) throws IOException {
+    	IO.println("SimulaCompiler.callJavaSystemCompiler: sourceFileDir=" + documentManager.sourceFileDir);
+    	IO.println("SimulaCompiler.callJavaSystemCompiler: outputDir=" + SimulaCompiler.outputDir);
+    	IO.println("SimulaCompiler.callJavaSystemCompiler: tempClassFileDir=" + SimulaCompiler.tempClassFileDir);
+    	IO.println("SimulaCompiler.callJavaSystemCompiler: tempClassFileDir=" + SimulaCompiler.simulaRtsLib);
+    	IO.println("SimulaCompiler.callJavaSystemCompiler: userHome=" + System.getProperty("user.home"));
+    	IO.println("SimulaCompiler.callJavaSystemCompiler: userDir=" + System.getProperty("user.dir"));
+    	IO.println("SimulaCompiler.callJavaSystemCompiler: javaClassPath=" + System.getProperty("java.class.path"));
+    	
+//    	Util.doListDirectory(""+SimulaCompiler.outputDir);
+//    	Util.doListDirectory(""+SimulaCompiler.outputDir + "/" + packetName);
+    	Util.doListDirectory(""+SimulaCompiler.tempClassFileDir);
+    	Util.doListDirectory(""+SimulaCompiler.tempClassFileDir + "/" + packetName);
+//    	Util.STOP();
+    	
 		Vector<String> arguments = new Vector<String>();
 		if (Option.internal.DEBUGGING) {
 			arguments.add("-version");
 		}
 		if (Option.internal.TRACING)
 			Util.println("SimulaCompiler.callJavaSystemCompiler: classPath=\"" + classPath + "\"");
-		arguments.add("-classpath");
-		arguments.add(classPath);
+		
+		boolean TESTING = true;
+		if(TESTING) {
+//			String clazzPath = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaCompilerCore/bin";
+//			String clazzPath = ""+SimulaCompiler.tempClassFileDir + "/" + packetName;
+			String clazzPath = ""+SimulaCompiler.tempClassFileDir;
+//			String rtsLib = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaCompilerCore/bin";
+			String rtsLib = ""+SimulaCompiler.simulaRtsLib;
+			clazzPath = clazzPath + ';' + rtsLib;
+			arguments.add("-classpath");
+			arguments.add(clazzPath);
+		} else {
+			arguments.add("-classpath");
+			arguments.add(classPath);
+		}
 		arguments.add("-d");
 		arguments.add(SimulaCompiler.tempClassFileDir.toString()); // Specifies output directory.
 		if (!SimulaCompiler.WARNINGS)
@@ -492,12 +529,12 @@ public class SimulaCompiler {
 		String[] args = new String[nArg];
 		arguments.toArray(args);
 
-		if (Option.internal.DEBUGGING) {
+//		if (Option.internal.DEBUGGING) {
 			Util.println("------------  Call Java System Compiler  ------------");
 			Util.println("System Compiler supports " + compiler.getSourceVersions());
 			for (int i = 0; i < args.length; i++)
 				Util.println("Compiler'args[" + i + "]=" + args[i]);
-		}
+//		}
 		int exitValue = compiler.run(System.in, System.out, System.err, args);
 		return (exitValue);			
 	}
