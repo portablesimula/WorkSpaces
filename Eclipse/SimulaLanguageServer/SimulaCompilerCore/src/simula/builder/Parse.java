@@ -121,20 +121,17 @@ public class Parse {
 	}
 	
 	public static boolean accept_AND_THEN(final SimulaBuilder simBuilder) {
-//		Util.IERR("WARNING: SKAL FLYTTES TIL LEXER: accept_AND_THEN");
-		IO.println("\nPsiParse.accept_AND_THEN: BEGIN ======================================================================");
-		IO.println("PsiParse.accept_AND_THEN: current="+getCurrentParserToken(simBuilder));
+//		IO.println("\nPsiParse.accept_AND_THEN: BEGIN ======================================================================");
+//		IO.println("PsiParse.accept_AND_THEN: current="+getCurrentParserToken(simBuilder));
 		if(accept(simBuilder, KeyWord.AND_THEN)) {
 //			IO.println("PsiParse.accept_AND_THEN: GOT: AND_THEN");
 			return true;
 		}
 		if(accept(simBuilder, KeyWord.AND)) {
 			LexToken prv = simBuilder.getCurrentParserToken();
-			IO.println("PsiParse.accept_AND_THEN: MAYBE AND THEN prv="+prv);
+//			IO.println("PsiParse.accept_AND_THEN: MAYBE AND THEN prv="+prv);
 			if(accept(simBuilder, KeyWord.THEN)) {
-				if(TESTING_AND_THEN) Util.IERR("DETTE MÅ TESTES");
-				IO.println("PsiParse.accept_AND_THEN: GOT: AND THEN prv="+prv);
-//				Util.STOP();
+//				IO.println("PsiParse.accept_AND_THEN: GOT: AND THEN prv="+prv);
 				return true;
 			}
 //			IO.println("PsiParse.accept_AND_THEN: FAILED --> ROLLBACK prv="+prv);
@@ -144,14 +141,12 @@ public class Parse {
 	}
 
 	public static boolean accept_AND_ONLY(final SimulaBuilder simBuilder) {
-//		Util.IERR("WARNING: SKAL FLYTTES TIL LEXER: accept_AND_ONLY");
-		IO.println("\nPsiParse.accept_AND_ONLY: BEGIN ======================================================================");
-		IO.println("PsiParse.accept_AND_ONLY: current="+getCurrentParserToken(simBuilder));
+//		IO.println("\nPsiParse.accept_AND_ONLY: BEGIN ======================================================================");
+//		IO.println("PsiParse.accept_AND_ONLY: current="+getCurrentParserToken(simBuilder));
 		LexToken prv = simBuilder.getCurrentParserToken();
 		if(accept(simBuilder, KeyWord.AND)) {
-			IO.println("PsiParse.accept_AND_ONLY: MAYBE AND THEN: current="+getCurrentParserToken(simBuilder));
+//			IO.println("PsiParse.accept_AND_ONLY: MAYBE AND THEN: current="+getCurrentParserToken(simBuilder));
 			if(accept(simBuilder, KeyWord.THEN)) {
-				if(TESTING_AND_THEN) if(TESTING_AND_THEN) Util.IERR("DETTE MÅ TESTES");
 //				IO.println("PsiParse.accept_AND_ONLY: GOT: AND THEN prv="+prv);
 				simBuilder.rollBackTo(prv, " is not a single AND without THEN");
 				return false;
@@ -162,11 +157,9 @@ public class Parse {
 		return false;
 	}
 	
-	private static boolean TESTING_AND_THEN = false;
 	public static boolean accept_OR_ELSE(final SimulaBuilder simBuilder) {
-//		Util.IERR("WARNING: SKAL FLYTTES TIL LEXER: accept_OR_ELSE");
-		IO.println("\nPsiParse.accept_OR_ELSE: BEGIN ======================================================================");
-		IO.println("PsiParse.accept_OR_ELSE: current="+getCurrentParserToken(simBuilder));
+//		IO.println("\nPsiParse.accept_OR_ELSE: BEGIN ======================================================================");
+//		IO.println("PsiParse.accept_OR_ELSE: current="+getCurrentParserToken(simBuilder));
 		if(accept(simBuilder, KeyWord.OR_ELSE)) {
 //			IO.println("PsiParse.accept_OR_ELSE: GOT: OR_ELSE");
 			return true;
@@ -175,7 +168,6 @@ public class Parse {
 			LexToken prv = simBuilder.getCurrentParserToken();
 //			IO.println("PsiParse.accept_OR_ELSE: MAYBE OR ELSE prv="+prv);
 			if(accept(simBuilder, KeyWord.ELSE)) {
-				if(TESTING_AND_THEN) Util.IERR("DETTE MÅ TESTES");
 //				IO.println("PsiParse.accept_OR_ELSE: GOT: OR ELSE prv="+prv);
 				return true;
 			}
@@ -186,14 +178,12 @@ public class Parse {
 	}
 
 	public static boolean accept_OR_ONLY(final SimulaBuilder simBuilder) {
-//		Util.IERR("WARNING: SKAL FLYTTES TIL LEXER: accept_OR_ONLY");
-		IO.println("\nPsiParse.accept_OR_ONLY: BEGIN ======================================================================");
-		IO.println("PsiParse.accept_OR_ONLY: current="+getCurrentParserToken(simBuilder));
+//		IO.println("\nPsiParse.accept_OR_ONLY: BEGIN ======================================================================");
+//		IO.println("PsiParse.accept_OR_ONLY: current="+getCurrentParserToken(simBuilder));
 		LexToken prv = simBuilder.getCurrentParserToken();
 		if(accept(simBuilder, KeyWord.OR)) {
 //			IO.println("PsiParse.accept_OR_ONLY: MAYBE OR ELSE prv="+prv);
 			if(accept(simBuilder, KeyWord.ELSE)) {
-				if(TESTING_AND_THEN) Util.IERR("DETTE MÅ TESTES");
 //				IO.println("PsiParse.accept_OR_ONLY: GOT: OR ELSE prv="+prv);
 				simBuilder.rollBackTo(prv, " is not a single OR without ELSE");
 				return false;
