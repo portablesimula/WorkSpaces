@@ -256,7 +256,9 @@ public class SimulaCompiler {
 //    	LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempClassFileDir="+SimulaCompiler.tempClassFileDir);
 
 		Option.print("SimulaCompiler.doCodeGeneration: ");
-		SimulaCompiler.jarFileBuilder = new JarFileBuilder();
+		if(SimulaCompiler.jarFileBuilder == null) {
+			SimulaCompiler.jarFileBuilder = new JarFileBuilder();
+		}
 		try {
 			SimulaCompiler.jarFileBuilder.open(programModule);
 			SimulaCompiler.jarFileBuilder.addIncludeQueue();
@@ -392,7 +394,7 @@ public class SimulaCompiler {
 	/// @param jarFile a jarFile
 	/// @param arg the arguments
 	/// @throws IOException if something went wrong.
-	private void doExecuteJarFile(String jarFile,Vector<String> arg) throws IOException {
+	private void doExecuteJarFile(String jarFile, Vector<String> arg) throws IOException {
 		ProgramModule programModule = documentManager.simBuilder.syntaxTree;
 		if (!programModule.isExecutable()) {
 			if (SimulaCompiler.verbose)
@@ -410,6 +412,9 @@ public class SimulaCompiler {
 				Util.println("END Execute .jar File. Exit value=" + exitValue3);
 			if(exitValue3 != 0) {
 				IO.println("SimulaCompiler.doCompile: Exit value = " + exitValue3);
+		    	Util.doListDirectory(""+SimulaCompiler.tempClassFileDir);
+		    	Util.doListDirectory(""+SimulaCompiler.tempClassFileDir + "/" + packetName);
+		    	JarFileBuilder.listJarFile(new File(jarFile));
 				throw new RuntimeException("Execution of "+jarFile+" failed. ExitValue = "+exitValue3);
 			}
 		}

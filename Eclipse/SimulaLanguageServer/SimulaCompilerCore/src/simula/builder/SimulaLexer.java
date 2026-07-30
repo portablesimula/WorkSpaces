@@ -31,7 +31,7 @@ import simula.token.IntegerConst;
 /// 
 /// @author Øystein Myhre Andersen
 public final class SimulaLexer {
-	private boolean TRACE_CURRENT_COLUMN = false;//true;//false;
+	private boolean TRACE_CURRENT_COLUMN = false;// true;//false;
 	
 	private SimulaBuilder simBuilder;
     private CharSequence sourceText;
@@ -206,27 +206,31 @@ public final class SimulaLexer {
 			if(TRACE_CURRENT_COLUMN) IO.println("SimulaLexer.nextToken(2): currentColumn="+currentColumn);
 		} else token = scanToken();
 
-		if (token != null) {
-			if (token.keyWord == KeyWord.AND) {
-				LexToken maybeThen = scanToken();
-				if (maybeThen.keyWord == KeyWord.THEN) {
-					LexToken andThen=newKeyWordToken(KeyWord.AND_THEN);
-//					andThen.setText(token.getText()+maybeThen.getText());
-					Util.IERR("DETTE MÅ RETTES");
-					return(andThen);
-				}
-				tokenQueue.add(maybeThen);
-			} else if (token.keyWord == KeyWord.OR) {
-				LexToken maybeElse = scanToken();
-				if (maybeElse.keyWord == KeyWord.ELSE) {
-					LexToken orElse=newKeyWordToken(KeyWord.OR_ELSE);
-//					orElse.setText(token.getText()+maybeElse.getText());
-					Util.IERR("DETTE MÅ RETTES");
-					return(orElse);
-				}
-				tokenQueue.add(maybeElse);
-			}
-		}
+// AND THEN  og  OR ELSE  behandles i Parse.java    	
+//		if (token != null) {
+//			if (token.keyWord == KeyWord.AND) {
+//				IO.println("SimulaLexr.nextToken: GOT AND: tokenStartPos="+tokenStartPos);
+//				IO.println("SimulaLexr.nextToken: GOT AND: currentColumn="+currentColumn);
+//				LexToken maybeThen = scanToken();
+//				if (maybeThen.keyWord == KeyWord.THEN) {
+//					LexToken andThen=newKeyWordToken(KeyWord.AND_THEN);
+////					andThen.setText(token.getText()+maybeThen.getText());
+//					Util.IERR("DETTE MÅ RETTES");
+//					return(andThen);
+//				}
+//				tokenQueue.add(maybeThen);
+//			} else if (token.keyWord == KeyWord.OR) {
+//				LexToken maybeElse = scanToken();
+//				if (maybeElse.keyWord == KeyWord.ELSE) {
+//					LexToken orElse=newKeyWordToken(KeyWord.OR_ELSE);
+////					orElse.setText(token.getText()+maybeElse.getText());
+//					Util.IERR("DETTE MÅ RETTES");
+//					return(orElse);
+//				}
+//				tokenQueue.add(maybeElse);
+//			}
+//		}
+		
 		if (Option.internal.TRACE_LEXER > 0) Util.TRACE("Item.nextToken, " + edcurrent());
 		currentLexerToken = token;
 //	    IO.println("GOT LexToken: " + token);
@@ -832,7 +836,7 @@ public final class SimulaLexer {
     ///                getNext will return first character after construct.
     /// </pre>
     /// @return next Token
-	private boolean TRACE_TEXTCONST = true;//false;//true;
+	private boolean TRACE_TEXTCONST = false;//true;
     private LexToken scanTextConstant() {
     	if(Option.LEX_VERIFY) {
     		if(current != '"') Util.IERR(""+edCurrent());
@@ -1299,24 +1303,47 @@ public final class SimulaLexer {
     		} else if (current == ';') {
     			IO.println("\n\n\n\nLexToken.scanComment: BEGIN TREAT SEMICOLON: nextPos="+nextPos+", tokenStartPos="+tokenStartPos);
     			IO.println("LexToken.scanComment: AT SEMICOLON: nextPos="+nextPos+", tokenStartPos="+tokenStartPos);
-    			int lng = nextPos - tokenStartPos - 1;
-    			IO.println("LexToken.scanComment: AT SEMICOLON: lng="+lng);
-    			if(lng > 0) {
-    				nPhrase++;
-    				pushBackPos(1);
-    				if(sourceText.charAt(nextPos) != ';') Util.IERR("IMPOSSIBLE");
+    			
+    			boolean TESTING = true;
+    			if(TESTING) {
+	    			int lng = nextPos - tokenStartPos;// - 1;
+	    			IO.println("LexToken.scanComment: AT SEMICOLON: lng="+lng);
+//	    			Util.STOP();
+//    				nPhrase++;
+//    				pushBackPos(1);
+//    				if(sourceText.charAt(nextPos) != ';') Util.IERR("IMPOSSIBLE");
 
     				LexToken token = newKeyWordToken(KeyWord.COMMENT_TEXT);
     				if(nPhrase > 1) Util.warning(simBuilder, token, "Comment spans multiple lines");
     				tokenQueueAdd("scanComment-SEMICOLON", token);
 
-    				getNext(); // Skip to SEMICOLON
-    				if(Option.LEX_VERIFY) {
-    					if(current != ';') Util.IERR("IMPOSSIBLE");
-    					if(sourceText.charAt(tokenStartPos) != ';') Util.IERR("IMPOSSIBLE");
-    				}
+//    				getNext(); // Skip past SEMICOLON
+//    				if(Option.LEX_VERIFY) {
+//    					if(current != ';') Util.IERR("IMPOSSIBLE");
+//    					if(sourceText.charAt(tokenStartPos) != ';') Util.IERR("IMPOSSIBLE");
+//    				}
+//	    			tokenQueueAdd("scanComment-SEMICOLON", newKeyWordToken(KeyWord.SEMICOLON));
+    				
+    			} else {
+	    			int lng = nextPos - tokenStartPos - 1;
+	    			IO.println("LexToken.scanComment: AT SEMICOLON: lng="+lng);
+	    			if(lng > 0) {
+	    				nPhrase++;
+	    				pushBackPos(1);
+	    				if(sourceText.charAt(nextPos) != ';') Util.IERR("IMPOSSIBLE");
+	
+	    				LexToken token = newKeyWordToken(KeyWord.COMMENT_TEXT);
+	    				if(nPhrase > 1) Util.warning(simBuilder, token, "Comment spans multiple lines");
+	    				tokenQueueAdd("scanComment-SEMICOLON", token);
+	
+	    				getNext(); // Skip to SEMICOLON
+	    				if(Option.LEX_VERIFY) {
+	    					if(current != ';') Util.IERR("IMPOSSIBLE");
+	    					if(sourceText.charAt(tokenStartPos) != ';') Util.IERR("IMPOSSIBLE");
+	    				}
+	    			}
+	    			tokenQueueAdd("scanComment-SEMICOLON", newKeyWordToken(KeyWord.SEMICOLON));
     			}
-    			tokenQueueAdd("scanComment-SEMICOLON", newKeyWordToken(KeyWord.SEMICOLON));
     			break LOOP;
     		} else {
     			if(TRACE_SCAN_COMMENT) IO.println("LexToken.scanComment: GOT OTHER="+current+":'"+(""+(char)current).replace("\r", "\\r").replace("\n", "\\n")+"'");
@@ -1424,11 +1451,12 @@ public final class SimulaLexer {
         	
         	getNext();
         	if(TESTING_SCAN_END) IO.println("LexToken.scanEndComment: current="+current+":'"+(""+(char)current).replace("\r", "\\r").replace("\n", "\\n")+"'");
-        	
+    		
     		if(current == '\r' && nextCharIs('\n')) {
             	if(TESTING_SCAN_END) IO.println("\n\n\n\nLexToken.scanEndComment: BEGIN TREAT NEWLINE(CRLF): nextPos="+nextPos+", tokenStartPos="+tokenStartPos);
                 
                 int lng = nextPos - tokenStartPos - 1;
+	        	IO.println("LexToken.scanEndComment: lng="+lng);
                 if(lng > 0) {
                 	nPhrase++;
                     pushBackPos(1);
@@ -1438,15 +1466,17 @@ public final class SimulaLexer {
                     }
                     LexToken token = newKeyWordToken(KeyWord.COMMENT_TEXT);
                     if(nPhrase > 1) Util.warning(simBuilder, token, "END comment spans multiple lines");
-                    tokenQueueAdd("scanEndComment-NEWLINE", token);
-        			
-                    getNext(); getNext(); // Leser første tegn etter comment, altså et CRLF tegn
+                    tokenQueueAdd("scanEndComment-COMMENT", token);
+                    getNext(); // Reads the first character after the comment. I.e. CR character.
                     if(Option.LEX_VERIFY) {
-	                    if(current != '\n') Util.IERR("IMPOSSIBLE");
+	                    if(current != '\r') Util.IERR("IMPOSSIBLE");
 	                    if(sourceText.charAt(tokenStartPos) != '\r') Util.IERR("IMPOSSIBLE");
                     }
                 }
-                if(current != '\n') Util.IERR("IMPOSSIBLE");
+                if(Option.LEX_VERIFY) {
+                	if(current != '\r') Util.IERR("IMPOSSIBLE: " + current);
+                }
+                getNext(); // current = LF
         	    tokenQueueAdd("scanEndComment - NEWLINE", newNewlineToken());
     		} else if (current == '\n') {
             	if(TESTING_SCAN_END) IO.println("\n\n\n\nLexToken.scanEndComment: BEGIN TREAT NEWLINE(LF): nextPos="+nextPos+", tokenStartPos="+tokenStartPos);
@@ -1463,7 +1493,7 @@ public final class SimulaLexer {
                     if(nPhrase > 1) Util.warning(simBuilder, token, "END comment spans multiple lines");
                     tokenQueueAdd("scanEndComment-NEWLINE", token);
         			
-                    getNext(); // Leser første tegn etter comment, altså et NEWLINE tegn
+                    getNext(); // Reads the first character after the comment. I.e. CR character.
                     if(Option.LEX_VERIFY) {
 	                    if(current != '\n') Util.IERR("IMPOSSIBLE");
 	                    if(sourceText.charAt(tokenStartPos) != '\n') Util.IERR("IMPOSSIBLE");

@@ -53,8 +53,8 @@ public class Directive {
 	/// </pre>
 	/// @return a Comment Token
 	static void treatDirective(SimulaBuilder simBuilder, LexToken lexToken, String line) {
-		IO.println("Directive.treatDirective: " + line + ", line.charAt(1)="+(int)line.charAt(1));
-		if(line.length() > 1 && Character.isWhitespace(line.charAt(1))) {
+		IO.println("Directive.treatDirective: \"" + line + '"');
+		if(line.length() == 1 || Character.isWhitespace(line.charAt(1))) {
 			IO.println("Directive.treatDirective: Comment: " + line);
 			return;
 		}

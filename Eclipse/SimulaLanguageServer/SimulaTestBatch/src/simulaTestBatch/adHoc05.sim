@@ -1,0 +1,8 @@
+
+begin
+boolean result; !To contain the result of the;
+boolean b1, b2;
+
+result := b1 and then b2;
+
+end;

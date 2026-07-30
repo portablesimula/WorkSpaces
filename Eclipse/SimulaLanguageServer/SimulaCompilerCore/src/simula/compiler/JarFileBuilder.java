@@ -176,8 +176,9 @@ public class JarFileBuilder {
 	/// @param pathSize the path size
 	/// @throws IOException if something went wrong
 	private void add(final boolean doPut, final File source, final int pathSize) throws IOException {
+		if(TESTING) IO.println("JarFileBuilder.add: " + ((doPut)?"PUT: ":"WRITE: ") + source);
 		if(!source.exists())
-			Util.IERR("SimulaCompiler.add: source="+source+", exists="+source.exists());
+			Util.IERR("JarFileBuilder.add: source="+source+", exists="+source.exists());
 		if (source.isDirectory()) {
 			String name = source.getPath().replace("\\", "/");
 			if (!name.isEmpty()) {

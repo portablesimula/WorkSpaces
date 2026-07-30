@@ -62,10 +62,10 @@ public final class RunSingleClassTest {
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
 		
-		names.add("SimulaTest.sim"); // Simula TestBatch Framework
-		names.add("simtst00.sim"); // OK:  Empty test
+//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+//		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
-//		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
+		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
 //		names.add("simtst03.sim"); // OK:  Test Text Value Relations
 //		names.add("simtst04.sim"); // OK:  To test putint and putreal.
 //		names.add("simtst05.sim"); // OK:  Test Aritmetisk Relations
@@ -299,7 +299,7 @@ public final class RunSingleClassTest {
 //		Option.internal.TRACE_CODING=true;
 
 		// Overall TRACING Options
-//		Option.internal.TRACING=true;
+		Option.internal.TRACING=true;
 
 		// Scanner Trace Options
 //		Option.internal.TRACE_LEXER=true;
