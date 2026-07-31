@@ -88,7 +88,7 @@ public abstract class BuildCPF {
 						if(Util.equals(decl.identifierValue(), "sourceline")) {
 //							actualParameter=new Constant(Type.Integer,actualParameter.firstLineNumber());
 //							actualParameter=new Constant(null, Type.Integer, decl.firstLineNumber());
-							int lno = var.firstLineNumber();
+							int lno = var.firstLineNumber() + 1;
 							if(lno <= 0) Util.IERR("BuildCPF.buildCPF: Illegal lineNumber: " + lno + " for argument " + decl);
 							actualParameter=new Constant(null, Type.Integer, lno);
 							actualParameter.doChecking();

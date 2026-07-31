@@ -71,7 +71,7 @@ public class JarFileBuilder {
 	/// @throws IOException if something went wrong
 	public void open(final ProgramModule programModule) throws IOException {
 		if(TESTING) IO.println("JarFileBuilder.open: " + programModule);
-		if(jarOutputStream != null) Util.IERR();
+//		if(jarOutputStream != null) Util.IERR();
 		this.programModule = programModule;
 		if (Option.internal.TRACING)
 			Util.println("BEGIN Create .jar File");

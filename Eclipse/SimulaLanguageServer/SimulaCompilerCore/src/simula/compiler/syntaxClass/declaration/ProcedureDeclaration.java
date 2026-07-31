@@ -447,7 +447,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 				JavaSourceFileCoder.code("public boolean isQPSystemBlock() { return(true); }");
 			if ( declarationKind == ObjectKind.Procedure && type != null) {
 				JavaSourceFileCoder.code("@Override");
-				JavaSourceFileCoder.code("public Object _RESULT() { return(" + this.result.identifier + "); }");
+				JavaSourceFileCoder.code("public Object _RESULT() { return(" + this.result.identifier.value + "); }");
 			}
 			JavaSourceFileCoder.debug("// Declare parameters as attributes");
 			boolean hasParameter = false;

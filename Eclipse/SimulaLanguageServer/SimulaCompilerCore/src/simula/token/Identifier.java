@@ -1,5 +1,7 @@
 package simula.token;
 
+import javax.lang.model.SourceVersion;
+
 import simula.Option;
 import simula.builder.SimulaLexer;
 import simula.compiler.utilities.KeyWord;
@@ -13,6 +15,7 @@ public class Identifier extends LexToken {
 //		super(tokenStartLine, sourceText, startOffset, endOffset, KeyWord.CHARACTERKONST);
 		super(tokenStartLine, sourceText, column, length, KeyWord.IDENTIFIER, lexer);
 		this.value = this.edTokenText(lexer);
+		if(SourceVersion.isKeyword(value)) value = "_" + value;
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();
 		if(value == null) Util.IERR("");
 	}

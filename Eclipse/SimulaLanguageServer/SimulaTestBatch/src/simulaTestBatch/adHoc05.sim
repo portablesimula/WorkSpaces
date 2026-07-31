@@ -1,10 +1,7 @@
-
 begin
-boolean result; !To contain the result of the;
-boolean b1, b2;
-text t1;
-
-result := b1 and then b2;
-if t1 >= "" then else outtext("***  Equality between empty texts not recognized (7).");
-
-end;
+comment
+program
+;
+	integer case;
+	case := 44;
+end

@@ -41,7 +41,7 @@ public final class RunFullTestBatch {
 		Vector<String> argv = new Vector<>();
 //		argv.add("-caseSensitive");
 //		argv.add("-noextension");
-//		argv.add("-noPopup");
+		argv.add("-noPopup");
 //		argv.add("-nowarn");
 		argv.add("-verbose");
 //		argv.add("-select");

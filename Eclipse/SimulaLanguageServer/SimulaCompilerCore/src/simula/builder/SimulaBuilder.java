@@ -40,8 +40,10 @@ public class SimulaBuilder {
 	
     private LexToken prevParserToken;
     private LexToken currentParserToken;
-	/// The saved Token used by 'saveCurrentToken'
-	private LexToken savedToken;
+//	/// The saved Token used by 'saveCurrentToken'
+//	private LexToken savedToken;
+	/// The rollBackIndex Token used by 'saveCurrentToken', 'rollBackTo' and 'getNextParserToken'
+	private int rollBackIndex;
 
 	// Builder generated data structure:
 	public ProgramModule syntaxTree; // Root of Syntax Tree
@@ -168,65 +170,6 @@ public class SimulaBuilder {
 		lexer.setParsingBoundPairList(parsingBoundPairList);
 	}
 
-	private int rollBackIndex;
-	public void	rollBackTo(LexToken prev, String debugInfo) {
-		IO.println("PsiBuilder.rollBackTo: "+prev);
-		IO.println("PsiBuilder.rollBackTo: CurrentParserToken: "+getCurrentParserToken());
-//		IO.println("PsiBuilder.rollBackTo: tokenList: "+tokenList);
-		IO.println("PsiBuilder.rollBackTo: =========== tokenList: BAKLENGS");
-		int n = tokenList.size();
-		rollBackIndex = -1;
-		LOOP:for(int i=n-1;i>=0;i--) {
-			IO.println("PsiBuilder.rollBackTo: token "+i+": "+tokenList.get(i));	
-			if(tokenList.get(i) == prev) {
-				IO.println("PsiBuilder.rollBackTo: FOUND: " + i + ": " + prev);	
-				rollBackIndex = i + 1;
-				break LOOP;
-			}
-		}
-		if(rollBackIndex < 0) Util.IERR("");
-		currentParserToken = prev;
-//		IO.println("PsiBuilder.rollBackTo: =========== tokenList: FORLENGS");
-//		for(int i=0;i<n;i++) {
-//			IO.println("PsiBuilder.rollBackTo: token "+i+": "+tokenList.get(i));			
-//		}
-		IO.println("PsiBuilder.rollBackTo: END rollBackIndex="+rollBackIndex);
-//		Util.STOP();
-	}
-
-//	public LexToken prevToken() {
-//		return lexer.getPrevLexerToken();
-//	}
-
-//	public LexToken prevParserToken() {
-//		return lexer.getPrevParserToken();
-//	}
-
-	/// Return next 'Parser' token.
-	/// Skip Comment, Whitespace and Newline tokens.
-	public LexToken getNextParserToken() {
-		prevParserToken = currentParserToken;
-//		lexTokenRange.addChild(currentParserToken);      // Add 'old' current LexToken to the lexTokenRange
-		if(rollBackIndex > 0) {
-			IO.println("PsiBuilder.getNextParserToken: rollBackIndex="+rollBackIndex+" =========== tokenList: BAKLENGS");
-//			int n = tokenList.size();
-//			for(int i=n-1;i>=0;i--) {
-//				IO.println("PsiBuilder.rollBackTo: token "+i+": "+tokenList.get(i));	
-//			}
-			do {
-				currentParserToken = tokenList.get(rollBackIndex++);
-			} while(! currentParserToken.isParserToken());
-			
-			if(rollBackIndex > tokenList.size() - 1) rollBackIndex = 0;
-			IO.println("PsiBuilder.getNextParserToken: currentParserToken="+currentParserToken);
-//			Util.STOP();
-		} else if(savedToken != null) {
-    		currentParserToken = savedToken;
-    		savedToken = null;
-    	} else currentParserToken = lexer.getNextParserToken(); // And then advance the lexer.	
-    	return currentParserToken;
-	}
-
 	/// Return previous 'Parser' token.
 	/// Skip Comment, Whitespace and Newline tokens.
     public LexToken getPrevParserToken() {
@@ -242,25 +185,51 @@ public class SimulaBuilder {
 	/// Save current Token
 	public void saveCurrentToken() {
 		IO.println("SimulaLexer.saveCurrentToken: "+currentParserToken+", prevParserToken="+prevParserToken);
-		if (savedToken != null) Util.IERR("SimulaLexer.saveCurrentToken: Already called");
-		savedToken = getCurrentParserToken();
+//		if (savedToken != null) Util.IERR("SimulaLexer.saveCurrentToken: Already called");
+//		savedToken = getCurrentParserToken();
+		
+		rollBackIndex = tokenList.size() - 1;
+		
 		currentParserToken = prevParserToken;
 		prevParserToken = null;
 //    	Util.STOP();
 	}
 
-	public boolean eof() {
-//		return lexer.EOF != null;
-		return lexer.eof();
+	public void	rollBackTo(LexToken prev, String debugInfo) {
+//		IO.println("PsiBuilder.rollBackTo: "+prev);
+//		IO.println("PsiBuilder.rollBackTo: CurrentParserToken: "+getCurrentParserToken());
+//		IO.println("PsiBuilder.rollBackTo: =========== tokenList: BAKLENGS");
+		int n = tokenList.size();
+		rollBackIndex = -1;
+		LOOP:for(int i=n-1;i>=0;i--) {
+			IO.println("PsiBuilder.rollBackTo: token "+i+": "+tokenList.get(i));	
+			if(tokenList.get(i) == prev) {
+				IO.println("PsiBuilder.rollBackTo: FOUND: " + i + ": " + prev);	
+				rollBackIndex = i + 1;
+				break LOOP;
+			}
+		}
+		if(rollBackIndex < 0) Util.IERR("");
+		currentParserToken = prev;
+//		IO.println("PsiBuilder.rollBackTo: END rollBackIndex="+rollBackIndex);
 	}
 
-//	public LexToken getCurrentLexerToken() {
-//		return lexer.getCurrentLexerToken();
-//	}
-//
-//	public LexToken getPrevLexerToken() {
-//		return lexer.getPrevLexerToken();
-//	}
+	/// Return next 'Parser' token.
+	/// Skip Comment, Whitespace and Newline tokens.
+	public LexToken getNextParserToken() {
+		prevParserToken = currentParserToken;
+		if(rollBackIndex > 0) {
+			do { currentParserToken = tokenList.get(rollBackIndex++);
+			} while(! currentParserToken.isParserToken());
+			if(rollBackIndex >= tokenList.size()) rollBackIndex = 0;
+//			IO.println("PsiBuilder.getNextParserToken: currentParserToken="+currentParserToken);
+    	} else currentParserToken = lexer.getNextParserToken(); // And then advance the lexer.	
+    	return currentParserToken;
+	}
+
+	public boolean eof() {
+		return lexer.eof();
+	}
     
     /// Get text string, possibly concatenated.
     /// 

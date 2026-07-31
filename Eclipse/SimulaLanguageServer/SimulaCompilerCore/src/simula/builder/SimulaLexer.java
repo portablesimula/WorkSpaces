@@ -21,6 +21,7 @@ import simula.token.LongRealConst;
 import simula.token.RealConst;
 import simula.token.SimpleString;
 import simula.token.WhiteSpaceToken;
+import simula.token.CharacterConst;
 import simula.token.Identifier;
 import simula.token.IntegerConst;
 
@@ -682,9 +683,7 @@ public final class SimulaLexer {
     	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanDigitsExp, result='"+result);
     	pushBackPos(1);
     	try {
-//    		if(doubleAmpersand) return(newKeyWordToken(KeyWord.REALKONST,Double.parseDouble(result)));
-//    		return(newKeyWordToken(KeyWord.REALKONST,Float.parseFloat(result)));
-    		if(doubleAmpersand) return newRealToken(Double.parseDouble(result));
+    		if(doubleAmpersand) return newLongRealToken(Double.parseDouble(result));
     		return newRealToken(Float.parseFloat(result));
     	} catch(NumberFormatException e) {
     		LexToken token = newRealToken(0);
@@ -823,8 +822,8 @@ public final class SimulaLexer {
     	} while(moreSimpleString());
     	pushBackPos(1);
     	
-//		simBuilder.printTokenList("END scanTextConstant");
-//		printQueue("SimulaLexer.scanTextConstant: ");
+		simBuilder.printTokenList("END scanTextConstant");
+		printQueue("SimulaLexer.scanTextConstant: ");
 //		Util.STOP();
 
     	LexToken result=tokenQueue.remove();
@@ -1090,6 +1089,7 @@ public final class SimulaLexer {
     	}
     	
     	if(Character.isLetter((char)current)) {
+//        	IO.println("SimulaLexer.currentIsTokenSeparator: Current isLetter:" + (char)current);
     		if((nextPos-1) > tokenStartPos) {
 	    		pushBackPos(1);
 	    	    tokenQueueAdd("currentIsTokenSeparator - COMMENT-0", newKeyWordToken(KeyWord.COMMENT_KEY));
@@ -1105,11 +1105,15 @@ public final class SimulaLexer {
     		    		Util.IERR("SimulaLexer.currentIsTokenSeparator: End-Condition Failed: nextPos="+nextPos+", current = "+edCurrent());
         	    }
     			return true;
-    		} else pushBackPos(name.length());
+    		} else {
+    			pushBackPos(name.length() - 1);
+    		}
     		return false;
 		}
     	
-    	return(isWhiteSpace(current));
+    	boolean res = isWhiteSpace(current);
+//    	IO.println("SimulaLexer.currentIsTokenSeparator: isWhiteSpace("+current+")=" + isWhiteSpace(current));
+    	return res;
     }
   
 
@@ -1227,28 +1231,55 @@ public final class SimulaLexer {
     			if(TRACE_SCAN_COMMENT) IO.println("LexToken.scanComment: GOT CRLF");
     			IO.println("\n\n\n\nLexToken.scanComment: BEGIN TREAT NEWLINE: nextPos="+nextPos+", tokenStartPos="+tokenStartPos);
 
-    			int lng = nextPos - tokenStartPos - 1;
-    			if(lng > 0) {
-    				nPhrase++;
-    				pushBackPos(1);
-    				if(Option.LEX_VERIFY) {
-    					if(lng != (nextPos - tokenStartPos)) Util.IERR("IMPOSSIBLE: lng=" + lng +", nextPos - tokenStartPos: " + (nextPos - tokenStartPos));
-    					if(sourceText.charAt(nextPos) != '\r') Util.IERR("IMPOSSIBLE: " + edCurrent());
-    				}
-    				LexToken token = newKeyWordToken(KeyWord.COMMENT_TEXT);
-    				if(nPhrase > 1) Util.warning(simBuilder, token, "Comment spans multiple lines");
-    				tokenQueueAdd("scanComment-NEWLINE", token);
-
-    				getNext(); getNext(); // Skip NEWLINE(CRLF)
-    				if(Option.LEX_VERIFY) {
-    					if(current != '\n') Util.IERR("IMPOSSIBLE");
-    					if(sourceText.charAt(tokenStartPos) != '\r') Util.IERR("IMPOSSIBLE: ");
-    				}
+    			boolean TESTING = true;
+    			if(TESTING) {
+                    int lng = nextPos - tokenStartPos - 1;
+    	        	IO.println("LexToken.scanComment: lng="+lng);
+                    if(lng > 0) {
+                    	nPhrase++;
+                        pushBackPos(1);
+                        if(Option.LEX_VERIFY) {
+    	                    if(lng != (nextPos - tokenStartPos)) Util.IERR("IMPOSSIBLE: lng=" + lng +", nextPos - tokenStartPos: " + (nextPos - tokenStartPos));
+    	                    if(sourceText.charAt(nextPos) != '\r') Util.IERR("IMPOSSIBLE");
+                        }
+                        LexToken token = newKeyWordToken(KeyWord.COMMENT_TEXT);
+                        if(nPhrase > 1) Util.warning(simBuilder, token, "END comment spans multiple lines");
+                        tokenQueueAdd("scanComment-COMMENT", token);
+                        getNext(); // Reads the first character after the comment. I.e. CR character.
+                        if(Option.LEX_VERIFY) {
+    	                    if(current != '\r') Util.IERR("IMPOSSIBLE");
+    	                    if(sourceText.charAt(tokenStartPos) != '\r') Util.IERR("IMPOSSIBLE");
+                        }
+                    }
+                    if(Option.LEX_VERIFY) {
+                    	if(current != '\r') Util.IERR("IMPOSSIBLE: " + current);
+                    }
+                    getNext(); // current = LF
+            	    tokenQueueAdd("scanComment - NEWLINE", newNewlineToken());
+    			} else {
+	    			int lng = nextPos - tokenStartPos - 1;
+	    			if(lng > 0) {
+	    				nPhrase++;
+	    				pushBackPos(1);
+	    				if(Option.LEX_VERIFY) {
+	    					if(lng != (nextPos - tokenStartPos)) Util.IERR("IMPOSSIBLE: lng=" + lng +", nextPos - tokenStartPos: " + (nextPos - tokenStartPos));
+	    					if(sourceText.charAt(nextPos) != '\r') Util.IERR("IMPOSSIBLE: " + edCurrent());
+	    				}
+	    				LexToken token = newKeyWordToken(KeyWord.COMMENT_TEXT);
+	    				if(nPhrase > 1) Util.warning(simBuilder, token, "Comment spans multiple lines");
+	    				tokenQueueAdd("scanComment-NEWLINE", token);
+	
+	    				getNext(); getNext(); // Skip NEWLINE(CRLF)
+	    				if(Option.LEX_VERIFY) {
+	    					if(current != '\n') Util.IERR("IMPOSSIBLE");
+	    					if(sourceText.charAt(tokenStartPos) != '\r') Util.IERR("IMPOSSIBLE: ");
+	    				}
+	    			}
+	    			if(current != '\n') Util.IERR("IMPOSSIBLE");
+	    			tokenQueueAdd("scanComment - CRLF", newNewlineToken());
+	
+	    			this.snapShot("SimulaLexer.scanTextConstant: ");
     			}
-    			if(current != '\n') Util.IERR("IMPOSSIBLE");
-    			tokenQueueAdd("scanComment - CRLF", newNewlineToken());
-
-    			this.snapShot("SimulaLexer.scanTextConstant: ");
     		}
     		else if (current == '\n') {
     			if(TRACE_SCAN_COMMENT) IO.println("LexToken.scanComment: GOT NEWLINE");
@@ -1594,6 +1625,20 @@ public final class SimulaLexer {
     	currentColumn = 0;
     	if(TRACE_CURRENT_COLUMN) IO.println("SimulaLexer.newNewlineToken: currentColumn="+currentColumn);
        	update_LineStartPos_List();
+       	if(Option.LEX_VERIFY) {
+       		String text = newlineToken.getText();
+       		int lng = text.length();
+       		boolean ok;
+       		switch(lng){
+	       		case 1: ok = text.equals("\n"); break;
+	       		case 2: ok = text.equals("\r\n"); break;
+	       		default: ok = false;
+       		}
+       		if(! ok) {
+       			String err = text.replace("\r", "\\r").replace("\n", "\\n");
+       			Util.IERR("SimulaLexer.newNewlineToken: LEX_VERIFY Failed: Illegal content: " + err);
+       		}
+       	}
         return newlineToken;
     }
 	  
@@ -1610,7 +1655,7 @@ public final class SimulaLexer {
     /// @param value the value
     /// @return the newly created Token
 	private LexToken newCharacterToken(final char value) {
-		return new IntegerConst(currentLineNumber, sourceText, currentColumn, nextPos - tokenStartPos, value, this);
+		return new CharacterConst(currentLineNumber, sourceText, currentColumn, nextPos - tokenStartPos, value, this);
 	}
 	  
     /// Create a new Simple String Token
@@ -1618,7 +1663,6 @@ public final class SimulaLexer {
     /// @param value the value
     /// @return the newly created Token
 	private LexToken newSimpleStringToken(final String value) {
-//		return new StringToken(currentLineNumber, sourceText, currentColumn, nextPos - tokenStartPos, value, this);
 		return new SimpleString(currentLineNumber, sourceText, currentColumn, nextPos - tokenStartPos, value, this);
 	}
 
@@ -1626,8 +1670,15 @@ public final class SimulaLexer {
     /// @param keyWord the KeyWord
     /// @param value the value
     /// @return the newly created Token
-	private LexToken newRealToken(final double value) {
-//		return new RealConst(currentLineNumber, sourceText, currentColumn, nextPos - tokenStartPos, value, this);
+	private LexToken newRealToken(final float value) {
+		return new RealConst(currentLineNumber, sourceText, currentColumn, nextPos - tokenStartPos, value, this);
+	}
+
+    /// Create a new Long Real Token
+    /// @param keyWord the KeyWord
+    /// @param value the value
+    /// @return the newly created Token
+	private LexToken newLongRealToken(final double value) {
 		return new LongRealConst(currentLineNumber, sourceText, currentColumn, nextPos - tokenStartPos, value, this);
 	}
 	

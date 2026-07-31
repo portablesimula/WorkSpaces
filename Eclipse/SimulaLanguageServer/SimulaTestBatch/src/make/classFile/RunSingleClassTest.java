@@ -65,7 +65,7 @@ public final class RunSingleClassTest {
 //		names.add("SimulaTest.sim"); // Simula TestBatch Framework
 //		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
-		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
+//		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
 //		names.add("simtst03.sim"); // OK:  Test Text Value Relations
 //		names.add("simtst04.sim"); // OK:  To test putint and putreal.
 //		names.add("simtst05.sim"); // OK:  Test Aritmetisk Relations
@@ -185,7 +185,7 @@ public final class RunSingleClassTest {
 //		names.add("simtst103.sim"); // OK: All kinds of Activation Statements
 //		names.add("simtst104.sim"); // OK: Procedure parameter 'F' by name.
 //		names.add("simtst105.sim"); // OK: Multiple assignments.
-//		names.add("simtst106.sim"); // ERR: Test SIMULATION, complex example.
+		names.add("simtst106.sim"); // ERR: Test SIMULATION, complex example.
 //			names.add("simtst107.sim"); // OK:  Test Process, activation statements, idle, terminated, time.
 //		names.add("simtst108.sim"); // OK: Simple Co-Routine Sample 1: detach - call
 //		names.add("simtst109.sim"); // OK: Simple Co-Routine Sample 2: detach - resume

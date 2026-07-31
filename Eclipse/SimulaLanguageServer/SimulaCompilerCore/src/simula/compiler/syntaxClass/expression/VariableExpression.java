@@ -615,7 +615,7 @@ public final class VariableExpression extends Expression {
 			case ObjectKind.ContextFreeMethod:
 				// Standard Library Procedure
 				if (Util.equals(identifier.value, "sourceline")) {
-					int lno = this.firstLineNumber();
+					int lno = this.firstLineNumber() + 1;
 					if(lno <= 0) Util.IERR("VariableExpressiopn.editVariable: Illegal lineNumber: " + lno);
 					return "" + lno;
 				}
@@ -783,7 +783,7 @@ public final class VariableExpression extends Expression {
 
 			case ObjectKind.ContextFreeMethod:
 				if (Util.equals(identifier.value, "sourceline")) {
-					int lno = this.firstLineNumber();
+					int lno = this.firstLineNumber() + 1;
 					if(lno <= 0) Util.IERR("VariableExpressiopn.buildEvaluation: Illegal lineNumber: " + lno);
 					Constant.buildIntConst(codeBuilder, lno);
 				}
