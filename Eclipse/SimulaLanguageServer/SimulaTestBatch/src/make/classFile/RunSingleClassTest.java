@@ -62,7 +62,7 @@ public final class RunSingleClassTest {
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
 		
-//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+		names.add("SimulaTest.sim"); // Simula TestBatch Framework
 //		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
@@ -185,8 +185,8 @@ public final class RunSingleClassTest {
 //		names.add("simtst103.sim"); // OK: All kinds of Activation Statements
 //		names.add("simtst104.sim"); // OK: Procedure parameter 'F' by name.
 //		names.add("simtst105.sim"); // OK: Multiple assignments.
-		names.add("simtst106.sim"); // ERR: Test SIMULATION, complex example.
-//			names.add("simtst107.sim"); // OK:  Test Process, activation statements, idle, terminated, time.
+//		names.add("simtst106.sim"); // ERR: Test SIMULATION, complex example.
+//	names.add("simtst107.sim"); // OK:  Test Process, activation statements, idle, terminated, time.
 //		names.add("simtst108.sim"); // OK: Simple Co-Routine Sample 1: detach - call
 //		names.add("simtst109.sim"); // OK: Simple Co-Routine Sample 2: detach - resume
 //		names.add("simtst110.sim"); // OK: Simple Co-Routine Sample 3: detach - resume - chain
@@ -194,7 +194,7 @@ public final class RunSingleClassTest {
 //		names.add("simtst111.sim"); // OK: Virtual Label Sample 1
 //		names.add("simtst112.sim"); // OK: Virtual Label Sample 2
 //		names.add("simtst113.sim"); // OK: Virtual Switch Sample 1
-//		names.add("simtst114.sim"); // OK: Switch Statement
+		names.add("simtst114.sim"); // OK: Switch Statement
 //		names.add("simtst115.sim"); // OK: Simple QPS-Sample 1
 //		names.add("simtst116.sim"); // OK: Simple QPS-Sample 2
 //		names.add("simtst117.sim"); // OK: Simple QPS-Sample 3

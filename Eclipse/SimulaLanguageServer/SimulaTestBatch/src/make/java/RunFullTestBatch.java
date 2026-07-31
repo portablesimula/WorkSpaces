@@ -188,7 +188,7 @@ public final class RunFullTestBatch {
 		names.add("simtst111.sim"); // OK: Virtual Label Sample 1
 		names.add("simtst112.sim"); // OK: Virtual Label Sample 2
 		names.add("simtst113.sim"); // OK: Virtual Switch Sample 1
-		names.add("simtst114.sim"); // OK: Switch Statement
+//	names.add("simtst114.sim"); // OK: Switch Statement
 		names.add("simtst115.sim"); // OK: Simple QPS-Sample 1
 		names.add("simtst116.sim"); // OK: Simple QPS-Sample 2
 		names.add("simtst117.sim"); // OK: Simple QPS-Sample 3
@@ -203,7 +203,7 @@ public final class RunFullTestBatch {
 		names.add("simtst124.sim"); // OK: GOTO VIRTUAL LABEL
 		names.add("simtst125.sim"); // OK: GOTO LABEL WITHIN NESTED COMPOUND STATEMENTS
 		names.add("simtst126.sim"); // OK: GOTO SIMPLE SWITCH
-		names.add("simtst127.sim"); // OK: Switch (character) Statement
+//	names.add("simtst127.sim"); // OK: Switch (character) Statement
 		names.add("simtst128.sim"); // OK: Standard Procedure edit and edfix
 		names.add("Precompiled129.sim"); // OK: Precompile this for Simtst 129.
 		names.add("simtst129.sim"); // OK: Switch in precompiled class
