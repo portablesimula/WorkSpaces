@@ -43,7 +43,7 @@ public final class InnerStatement extends Statement {
 //		IO.println("NEW InnerStatement: Line "+firstLineNumber()+": InnerStatement: "+this+ "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 //		Thread.dumpStack();
 		
-		if(explicit) simBuilder.consume(KeyWord.INNER); //  (add it to 'current tree')
+		if(explicit) simBuilder.consume(KeyWord.INNER); //  (add it to tokenList)
 		
 		if(CoreGlobal.getCurrentScope() instanceof ClassDeclaration cls) {
 			if(cls.statements1 != null) {

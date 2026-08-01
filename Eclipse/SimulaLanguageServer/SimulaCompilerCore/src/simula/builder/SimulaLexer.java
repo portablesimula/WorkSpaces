@@ -123,7 +123,7 @@ public final class SimulaLexer {
 	/// @param reader The character source to scan
 	/// @param editorMode true: delivers tokens to the SimulaEditor
 	public SimulaLexer(final SimulaBuilder simBuilder, final CharSequence sourceText) {
-		IO.println("NEW SimulaLexer: sourceText(lng:"+sourceText.length()+")" + ((String) sourceText).replace("\r", "\\r").replace("\n", "\\n"));
+		IO.println("NEW SimulaLexer: sourceText(lng:"+sourceText.length()+")" + Util.printable((String) sourceText));
 		this.simBuilder = simBuilder;
 		this.sourceText = sourceText;
 		this.textEndOffset = sourceText.length();
@@ -1225,7 +1225,7 @@ public final class SimulaLexer {
     		}
 
     		getNext();
-    		if(TRACE_SCAN_COMMENT) IO.println("LexToken.scanComment: current="+current+":'"+(""+(char)current).replace("\r", "\\r").replace("\n", "\\n")+"'");
+    		if(TRACE_SCAN_COMMENT) IO.println("LexToken.scanComment: current="+current+":'"+Util.printable(""+(char)current)+"'");
 
     		if(current == '\r' && nextCharIs('\n')) {
     			if(TRACE_SCAN_COMMENT) IO.println("LexToken.scanComment: GOT CRLF");
@@ -1316,7 +1316,7 @@ public final class SimulaLexer {
 				tokenQueueAdd("scanComment-SEMICOLON", token);
     			break LOOP;
     		} else {
-    			if(TRACE_SCAN_COMMENT) IO.println("LexToken.scanComment: GOT OTHER="+current+":'"+(""+(char)current).replace("\r", "\\r").replace("\n", "\\n")+"'");
+    			if(TRACE_SCAN_COMMENT) IO.println("LexToken.scanComment: GOT OTHER="+current+":'"+Util.printable(""+(char)current)+"'");
     		}
     	}
 
@@ -1420,7 +1420,7 @@ public final class SimulaLexer {
         	}
         	
         	getNext();
-        	if(TESTING_SCAN_END) IO.println("LexToken.scanEndComment: current="+current+":'"+(""+(char)current).replace("\r", "\\r").replace("\n", "\\n")+"'");
+        	if(TESTING_SCAN_END) IO.println("LexToken.scanEndComment: current="+current+":'"+Util.printable(""+(char)current)+"'");
     		
     		if(current == '\r' && nextCharIs('\n')) {
             	if(TESTING_SCAN_END) IO.println("\n\n\n\nLexToken.scanEndComment: BEGIN TREAT NEWLINE(CRLF): nextPos="+nextPos+", tokenStartPos="+tokenStartPos);
@@ -1506,7 +1506,7 @@ public final class SimulaLexer {
                     break LOOP;
                 }
             } else {
-            	if(TESTING_SCAN_END) IO.println("LexToken.scanEndComment: GOT OTHER="+current+":'"+(""+(char)current).replace("\r", "\\r").replace("\n", "\\n")+"'");
+            	if(TESTING_SCAN_END) IO.println("LexToken.scanEndComment: GOT OTHER="+current+":'"+Util.printable(""+(char)current)+"'");
             }
         }
 
@@ -1635,8 +1635,7 @@ public final class SimulaLexer {
 	       		default: ok = false;
        		}
        		if(! ok) {
-       			String err = text.replace("\r", "\\r").replace("\n", "\\n");
-       			Util.IERR("SimulaLexer.newNewlineToken: LEX_VERIFY Failed: Illegal content: " + err);
+       			Util.IERR("SimulaLexer.newNewlineToken: LEX_VERIFY Failed: Illegal content: " + Util.printable(text));
        		}
        	}
         return newlineToken;
@@ -1791,8 +1790,6 @@ public final class SimulaLexer {
     	IO.println("############################### LEXER SNAPSHOT["+beg+':'+end+") - " + title + " ######################################");
     	IO.println("sourceText:        0         10        20        30        40        50        60        70        80        90");
     	IO.println("sourceText:        0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789");
-//    	IO.println("sourceText:        " + (""+sourceText).replace("\r", "\\r").replace("\n", "\\n"));
-//    	IO.println("sourceText:        " + (""+sourceText).replace("\r", "¤").replace("\n", "¤"));
     	IO.println("sourceText:        " + (""+text).replace("\t", "¤").replace("\r", "¤").replace("\n", "¤"));
     	IO.println("sourceText(esc):   " + (""+text).replace("\t", "\\t").replace("\r", "\\r").replace("\n", "\\n"));
     	IO.println("textEndOffset:     " + textEndOffset + '(' + (textEndOffset-beg) + ')');

@@ -49,7 +49,7 @@ public final class WhileStatement extends Statement {
 	/// @param line the source line number
 	WhileStatement(final SimulaBuilder simBuilder) {
 		super(simBuilder);
-		simBuilder.consume(KeyWord.WHILE); //  (add it to 'current tree')
+		simBuilder.consume(KeyWord.WHILE); //  (add it to tokenList)
 
 //		if (Option.internal.TRACE_PARSE)
 //			Util.TRACE("Parse WhileStatement: line="+line+", current=" + PsiParse.currentLexToken(simBuilder));

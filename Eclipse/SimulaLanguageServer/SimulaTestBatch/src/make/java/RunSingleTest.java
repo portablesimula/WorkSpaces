@@ -57,7 +57,7 @@ public final class RunSingleTest {
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
 //		names.add("adHoc04.sim"); // For ad'hoc testing
-//	names.add("adHoc05.sim"); // For ad'hoc testing
+	names.add("adHoc05.sim"); // For ad'hoc testing
 //		names.add("adHoc10.sim"); // For ad'hoc testing
 //		names.add("adHoc11.sim"); // For ad'hoc testing
 //		names.add("CLASS_COMMON.sim"); // For ad'hoc testing
@@ -72,7 +72,7 @@ public final class RunSingleTest {
 		
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
-		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
 //		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
@@ -204,7 +204,7 @@ public final class RunSingleTest {
 //		names.add("simtst111.sim"); // OK: Virtual Label Sample 1
 //		names.add("simtst112.sim"); // OK: Virtual Label Sample 2
 //		names.add("simtst113.sim"); // OK: Virtual Switch Sample 1
-		names.add("simtst114.sim"); // OK: Switch Statement
+//		names.add("simtst114.sim"); // OK: Switch Statement
 //		names.add("simtst115.sim"); // OK: Simple QPS-Sample 1
 //		names.add("simtst116.sim"); // OK: Simple QPS-Sample 2
 //		names.add("simtst117.sim"); // OK: Simple QPS-Sample 3
@@ -263,7 +263,7 @@ public final class RunSingleTest {
 //		names.add("simtst162.sim"); // OK: Test Complicated nested inspection
 //		names.add("simtst163.sim"); // OK: Test Inspect when, when, otherwise (selected)
 //		names.add("simtst164.sim"); // OK: Test Extended Text Procedures
-//		names.add("simtst165.sim"); // OK: Activate direct
+//	names.add("simtst165.sim"); // OK: Activate direct
 //		names.add("simtst166.sim"); // OK: Activate before/after
 //		names.add("simtst167.sim"); // OK: Activate at/delay
 //		

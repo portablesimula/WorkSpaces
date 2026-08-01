@@ -109,7 +109,7 @@ public final class SwitchStatement extends Statement {
 	/// @param line the source line number
 	SwitchStatement(final SimulaBuilder simBuilder) {
 		super(simBuilder);
-		simBuilder.consume(KeyWord.SWITCH); //  (add it to 'current tree')
+		simBuilder.consume(KeyWord.SWITCH); //  (add it to tokenList)
 
 //		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);
 		Parse.expect(simBuilder, KeyWord.BEGPAR);

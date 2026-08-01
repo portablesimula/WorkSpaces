@@ -120,41 +120,24 @@ public class LexToken {
 	public String getText() {
 		return tokenText;
 	}
-
-//	public String edText() {
-//		try {
-////			CharSequence txt = sourceText.subSequence(startOffset, endOffset);
-////			String str = txt.toString();
-//			String str = tokenText;
-//			if(keyWord == KeyWord.IDENTIFIER && SourceVersion.isKeyword(str)) // Check for Java keyWord
-//				 str = "_" + str;
-//			else str = str.replace("\r", "\\r").replace("\n", "\\n");
-//			return str;
-//		} catch(Exception e) {
-//			return "EOF";
-//		}
-//	}
 	
 	public String edTokenText(SimulaLexer lexer) {
 		int startOfLine = lexer.getLineStartPos(lineNumber);
-//		lexer.snapShot("LexToken.edTokenText: ");
-//		IO.println("LexToken.edTokenText: StartOfLine("+lineNumber+"): "+startOfLine + ", column=" + column);
 		int tokenStartPos = startOfLine + column;
-//		IO.println("LexToken.edTokenText: tokenStartPos="+tokenStartPos + ", column=" + column);
 		CharSequence txt = sourceText.subSequence(tokenStartPos, tokenStartPos + length);
 		String debugText=txt.toString();
 		return debugText;
 	}
 	
 	public String edToken(SimulaLexer lexer) {
-		String str = edTokenText(lexer).replace("\t", "\\t").replace("\r", "\\r").replace("\n", "\\n");
+		String str = Util.printable(edTokenText(lexer));
 		return "Line " + lineNumber + ": " + KeyWord.edit(keyWord) + "[col:" + column + ", lng:" + length + "]=\"" + str + '"';
 	}
 
 	@Override
 	public String toString() {
 		if(tokenText == null) Util.IERR("");
-		String str = (tokenText == null)? "UNKNOWN" : tokenText.replace("\t", "\\t").replace("\r", "\\r").replace("\n", "\\n");
+		String str = (tokenText == null)? "UNKNOWN" :  Util.printable(tokenText);
 		return "Line " + lineNumber + ": " + KeyWord.edit(keyWord) + "[col:" + column + ", lng:" + length + "] Text: \"" + str + '"';
 	}
 

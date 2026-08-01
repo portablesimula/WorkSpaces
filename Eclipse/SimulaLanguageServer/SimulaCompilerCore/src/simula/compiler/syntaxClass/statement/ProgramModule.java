@@ -147,7 +147,7 @@ public final class ProgramModule extends Statement {
 			
 			LexToken token = Parse.getCurrentParserToken(simBuilder);
 			if(token != null && token.keyWord != KeyWord.EOF) {
-				while(!simBuilder.eof()) simBuilder.getNextParserToken(); // consume tokens  (add it to 'current tree')
+				while(!simBuilder.eof()) simBuilder.getNextParserToken(); // consume tokens  (add it to tokenList)
 				
 				IO.println("NEW ProgramModule - NOTE: FINN EN ANNEN MÅTE Å GJØRE DETTE PÅ");
 				

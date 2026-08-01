@@ -158,7 +158,7 @@ public final class ForStatement extends Statement {
 	/// @param line the source line number
 	ForStatement(final SimulaBuilder simBuilder) {
 		super(simBuilder);
-		simBuilder.consume(KeyWord.FOR); //  (add it to 'current tree')
+		simBuilder.consume(KeyWord.FOR); //  (add it to tokenList)
 
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ForStatement");

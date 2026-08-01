@@ -1,7 +1,3 @@
 begin
-comment
-program
-;
-	integer case;
-	case := 44;
+	Simulation begin end
 end

@@ -3,6 +3,7 @@ package simula.builder;
 import java.util.Vector;
 
 import simula.compiler.syntaxClass.SyntaxElement;
+import simula.compiler.utilities.Util;
 import simula.token.LexToken;
 
 public class LexTokenRange {
@@ -35,7 +36,7 @@ public class LexTokenRange {
 		for(LexToken token:lexTokenRange) {
 			sb.append(token.getText());
 		}
-		return sb.toString().replace("\r", "\\r").replace("\n", "\\n");
+		return Util.printable(sb.toString());
 	}
 	
 	@Override

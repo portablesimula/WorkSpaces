@@ -168,6 +168,7 @@ public abstract class Declaration extends SyntaxElement {
 			Identifier ident = Parse.acceptIdentifier(simBuilder);
 			if (ident == null) {
 				// Switch Statement
+				Parse.saveCurrentToken(simBuilder);
 				return null;
 			}
 			decl = new SwitchDeclaration(simBuilder, ident);

@@ -58,7 +58,7 @@ public final class ConditionalStatement extends Statement {
 		int lno = simBuilder.getSourceLineNumber();
 //		IO.println("NEW ConditionalStatement: "+simBuilder.getSourceLineNumber());
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN IfStatement: ");
-		simBuilder.consume(KeyWord.IF); //  (add it to 'current tree')
+		simBuilder.consume(KeyWord.IF); //  (add it to tokenList)
 
 		condition = Expression.expectExpression(simBuilder, "if-condition");
 		Parse.expect(simBuilder, KeyWord.THEN);

@@ -119,7 +119,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN "+debugName);
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("BlockStatement expectMaybeBlock: BEGIN " + debugName);
 
-		simBuilder.consume(KeyWord.BEGIN); // consume BEGIN (add it to 'current tree')
+		simBuilder.consume(KeyWord.BEGIN); // consume BEGIN (add it to tokenList)
 
 		parseBlock(simBuilder);
 

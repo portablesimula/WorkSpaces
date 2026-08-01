@@ -127,7 +127,7 @@ public final class ConnectionStatement extends Statement {
 	/// @param line the source line number
 	ConnectionStatement(final SimulaBuilder simBuilder) {
 		super(simBuilder);
-		simBuilder.consume(KeyWord.INSPECT); //  (add it to 'current tree')
+		simBuilder.consume(KeyWord.INSPECT); //  (add it to tokenList)
 
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ConnectionStatement");

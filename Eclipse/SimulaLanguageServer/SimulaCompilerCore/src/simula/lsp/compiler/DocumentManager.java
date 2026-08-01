@@ -223,7 +223,7 @@ public class DocumentManager {
 		// TRY BUILD SYNTAX TREE ...
 		try {
 			newSimBuilder.doBuilding();
-    		IO.println("DocumentManager.tryCreateBuilder: " + sourceText.replace("\n", "\\n").replace("\r", "\\r"));
+    		IO.println("DocumentManager.tryCreateBuilder: " + Util.printable(sourceText));
     		simBuilder = newSimBuilder;
 		} catch (Exception e) {
 			IO.println("DocumentManager.tryCreateBuilder: GOT EXCEPTION: " + e.getMessage());

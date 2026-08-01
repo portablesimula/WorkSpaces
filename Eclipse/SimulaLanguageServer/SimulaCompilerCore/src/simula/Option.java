@@ -131,28 +131,24 @@ public final class Option {
 		for(int i=0;i<argv.length;i++) {
 			String arg=argv[i];
 			IO.println("Option.decodeArguments: arg: " + arg);
-			if (arg.charAt(0) == '-') { // command line option
-//				if (arg.equalsIgnoreCase("-help")) help(); else
-				if (arg.equalsIgnoreCase("-caseSensitive")) SimulaCompiler.CaseSensitive = true;
-//				else if (arg.equalsIgnoreCase("-compilerMode")) Option.setCompilerMode(argv[++i]);
-//				else if (arg.equalsIgnoreCase("-noexec")) SimulaCompiler.noExecution=true;
-				else if (arg.equalsIgnoreCase("-noextension")) SimulaCompiler.EXTENSIONS = false;
-				else if (arg.equalsIgnoreCase("-noPopup")) SimulaCompiler.noPopup = true;
-				else if (arg.equalsIgnoreCase("-nowarn")) SimulaCompiler.WARNINGS = false;
-				else if (arg.equalsIgnoreCase("-verbose")) SimulaCompiler.verbose = true;
-//				else if (arg.equalsIgnoreCase("-version")) printVersion();
-//				else if (arg.equalsIgnoreCase("-select")) setSelectors(argv[++i]);				
-//				else if (arg.equalsIgnoreCase("-keepJava")) Option.internal.keepJava = new File(argv[++i]);
+			switch(arg) {
+//				case "-help": help(); break;
+				case "-caseSensitive": SimulaCompiler.CaseSensitive = true; break;
+//				case "-compilerMode": Option.setCompilerMode(argv[++i]); break;
+//				case "-noexec": SimulaCompiler.noExecution=true; break;
+				case "-noextension": SimulaCompiler.EXTENSIONS = false; break;
+				case "-noPopup": SimulaCompiler.noPopup = true; break;
+				case "-nowarn": SimulaCompiler.WARNINGS = false; break;
+				case "-verbose": SimulaCompiler.verbose = true; break;
+//				case "-version": printVersion(); break;
+//				case "-select": setSelectors(argv[++i]); break;				
+//				case "-keepJava": Option.internal.keepJava = new File(argv[++i]); break;
 
-//				else if (arg.equalsIgnoreCase("-output")) SimulaCompiler.outputDir = new File(argv[++i]);
-//				else if (arg.equalsIgnoreCase("-extLib")) SimulaCompiler.extLib = new File(argv[++i]);
-				else {
-					IO.println("Simula ERROR: Unknown option " + arg);
-//					help();
-				}
-			} else Util.IERR(arg);
+//				case "-output": SimulaCompiler.outputDir = new File(argv[++i]); break;
+//				case "-extLib": SimulaCompiler.extLib = new File(argv[++i]); break;
+				default: IO.println("Simula ERROR: Unknown option " + arg);
+			}
 		}
-//		Util.IERR("STOP HER INTILL VIDERE");
 	}
 
 	/// Kalles av 'run' før coding og exec

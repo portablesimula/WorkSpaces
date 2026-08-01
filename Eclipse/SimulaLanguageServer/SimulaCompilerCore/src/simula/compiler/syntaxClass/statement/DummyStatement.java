@@ -44,7 +44,7 @@ public final class DummyStatement extends Statement {
 	}
 
 	public static DummyStatement ofExplicit(final SimulaBuilder simBuilder) {
-		simBuilder.consume(KeyWord.SEMICOLON); //  (add it to 'current tree')
+		simBuilder.consume(KeyWord.SEMICOLON); //  (add it to tokenList)
 		DummyStatement dummyStatement = new DummyStatement(simBuilder);		
 		return dummyStatement;
 	}

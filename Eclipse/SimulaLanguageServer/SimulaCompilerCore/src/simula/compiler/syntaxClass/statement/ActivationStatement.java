@@ -105,7 +105,7 @@ public final class ActivationStatement extends Statement {
 		super(simBuilder);
 		LexToken activator = Parse.getCurrentParserToken(simBuilder);
 		REAC = activator.keyWord == KeyWord.REACTIVATE;
-		simBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to 'current tree')
+		simBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to tokenList)
 		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse ActivationStatement");
 		object1 = Expression.expectExpression(simBuilder, "process");
 		object1.backLink = this;

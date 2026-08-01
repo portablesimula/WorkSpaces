@@ -57,7 +57,7 @@ public final class GotoStatement extends Statement {
 	/// @param line source line
 	GotoStatement(final SimulaBuilder simBuilder, final int keyWord) {
 		super(simBuilder);
-		simBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to 'current tree')
+		simBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to tokenList)
 		if(keyWord != KeyWord.GOTO) {
 	        if (!Parse.accept(simBuilder, KeyWord.TO))
 	        	Util.syntaxError(simBuilder, "Missing 'TO' after 'GO'");
