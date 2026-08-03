@@ -54,8 +54,6 @@ public class Identifier extends LexToken {
 
 	@Override
 	public String toString() {
-//		IO.println("Identifier.toString: " + value);
-//		if(value.equals("AdHoc_SimulaTest")) Thread.dumpStack();
 		return super.toString() + ", Value: \"" + value + '"';
 	}
 }

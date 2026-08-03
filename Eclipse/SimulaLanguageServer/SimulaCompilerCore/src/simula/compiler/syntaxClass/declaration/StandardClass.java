@@ -54,6 +54,24 @@ public final class StandardClass extends ClassDeclaration {
 
 	/// The Standard Class CatchingErrors.
 	public static StandardClass CatchingErrors;
+	
+	private static Type ref_RTObject = Type.Ref("RTObject");
+
+	private static Type ref_File = Type.Ref("File");
+	private static Type ref_Infile = Type.Ref("Infile");
+	private static Type ref_Printfile = Type.Ref("Printfile"); 
+	
+	private static Type ref_Link = Type.Ref("Link");  
+	private static Type ref_Linkage = Type.Ref("Linkage");  
+	private static Type ref_Head = Type.Ref("Head");  
+	
+	private static Type ref_MAIN_PROGRAM = Type.Ref("MAIN_PROGRAM");
+	private static Type ref_EVENT_NOTICE = Type.Ref("EVENT_NOTICE");
+	private static Type ref_Process = Type.Ref("Process");
+	
+	private static Type ref_TextElement = Type.Ref("TextElement");  
+	private static Type ref_ShapeElement = Type.Ref("ShapeElement");  
+
 
 	/// Method to initiate all standard classes.
 	public static void INITIATE() {
@@ -156,6 +174,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// Initiate the Standard Class RTObject.
 	private static void initRTObject() {
 		StandardClass RTObject = new StandardClass("RTObject");
+		ref_RTObject.setQual(RTObject);
 		UNIVERSE.addStandardClass(RTObject); // Declared in UNIVERSE
 		RTObject.isContextFree = true;
 		RTObject.addStandardProcedure(ObjectKind.MemberMethod, Type.Text, "objectTraceIdentifier");
@@ -363,11 +382,11 @@ public final class StandardClass extends ClassDeclaration {
 		BASICIO=new StandardClass("RTObject","BASICIO");
 		ENVIRONMENT.addStandardClass(BASICIO); // Declared in ENVIRONMENT
 		BASICIO.isContextFree=true;
-		BASICIO.addStandardProcedure(ObjectKind.ContextFreeMethod,Type.Ref("Infile"),"sysin");  
-		BASICIO.addStandardProcedure(ObjectKind.ContextFreeMethod,Type.Ref("Printfile"),"sysout");  
+		BASICIO.addStandardProcedure(ObjectKind.ContextFreeMethod,ref_Infile,"sysin");  
+		BASICIO.addStandardProcedure(ObjectKind.ContextFreeMethod,ref_Printfile,"sysout");  
 		BASICIO.addStandardProcedure(ObjectKind.ContextFreeMethod,null,"terminate_program");  
-		BASICIO.addStandardProcedure(ObjectKind.MemberMethod,null,"call",parameter("obj",Type.Ref("RTObject")));
-		BASICIO.addStandardProcedure(ObjectKind.MemberMethod,null,"resume",parameter("obj",Type.Ref("RTObject")));
+		BASICIO.addStandardProcedure(ObjectKind.MemberMethod,null,"call",parameter("obj",ref_RTObject));
+		BASICIO.addStandardProcedure(ObjectKind.MemberMethod,null,"resume",parameter("obj",ref_RTObject));
 	}
 
 
@@ -410,6 +429,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// </pre>
 	private static void initFile() {
 		File=new StandardClass("CLASS","File",parameter("FILENAME_",Type.Text));
+		ref_File.setQual(File);
 		BASICIO.addStandardClass(File);  // Declared in BASICIO
 		File.addStandardAttribute(Type.Boolean,"OPEN_");  
 		File.addStandardProcedure(ObjectKind.MemberMethod,Type.Text,"filename");
@@ -468,6 +488,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// </pre>
 	private static void initInfile() {
 		Infile=new StandardClass("Imagefile","Infile");
+		ref_Infile.setQual(Infile);
 		BASICIO.addStandardClass(Infile);  // Declared in BASICIO
 		Infile.addStandardAttribute(Type.Boolean,"ENDFILE_");  
 		Infile.addStandardProcedure(ObjectKind.MemberMethod,Type.Boolean,"endfile");  
@@ -631,6 +652,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// </pre>
 	private static void initPrintfile() {
 		Printfile=new StandardClass("Outfile","Printfile");
+		ref_Printfile.setQual(Printfile);
 		BASICIO.addStandardClass(Printfile);  // Declared in BASICIO
 		Printfile.addStandardAttribute(Type.Integer,"LINE_");  
 		Printfile.addStandardAttribute(Type.Integer,"LINES_PER_PAGE_");  
@@ -797,10 +819,11 @@ public final class StandardClass extends ClassDeclaration {
 	/// Initiate the Standard Class Linkage.
 	private static void initLinkage() { 
 		Linkage=new StandardClass("CLASS","Linkage");
+		ref_Linkage.setQual(Linkage);
 		Simset.addStandardClass(Linkage);  // Declared in Simset
-		Linkage.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("Link"),"suc");  
-		Linkage.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("Link"),"pred");  
-		Linkage.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("Linkage"),"prev");  
+		Linkage.addStandardProcedure(ObjectKind.MemberMethod,ref_Link,"suc");  
+		Linkage.addStandardProcedure(ObjectKind.MemberMethod,ref_Link,"pred");  
+		Linkage.addStandardProcedure(ObjectKind.MemberMethod,ref_Linkage,"prev");  
 	}  
 
 	// ******************************************************************
@@ -809,9 +832,10 @@ public final class StandardClass extends ClassDeclaration {
 	/// Initiate the Standard Class Head.
 	private static void initHead() {
 		StandardClass Head=new StandardClass("Linkage","Head");
+		ref_Head.setQual(Head);
 		Simset.addStandardClass(Head);  // Declared in Simset
-		Head.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("Link"),"first");  
-		Head.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("Link"),"last");  
+		Head.addStandardProcedure(ObjectKind.MemberMethod,ref_Link,"first");  
+		Head.addStandardProcedure(ObjectKind.MemberMethod,ref_Link,"last");  
 		Head.addStandardProcedure(ObjectKind.MemberMethod,Type.Boolean,"empty");  
 		Head.addStandardProcedure(ObjectKind.MemberMethod,Type.Integer,"cardinal");  
 		Head.addStandardProcedure(ObjectKind.MemberMethod,null,"clear");  
@@ -823,60 +847,61 @@ public final class StandardClass extends ClassDeclaration {
 	/// Initiate the Standard Class Link.
 	private static void initLink() { 
 		StandardClass Link=new StandardClass("Linkage","Link");
+		ref_Link.setQual(Link);
 		Simset.addStandardClass(Link);  // Declared in Simset
 		Link.addStandardProcedure(ObjectKind.MemberMethod,null,"out");  
-		Link.addStandardProcedure(ObjectKind.MemberMethod,null,"follow",parameter("X",Type.Ref("Linkage")));  
-		Link.addStandardProcedure(ObjectKind.MemberMethod,null,"precede",parameter("X",Type.Ref("Linkage")));  
-		Link.addStandardProcedure(ObjectKind.MemberMethod,null,"into",parameter("S",Type.Ref("Head")));  
+		Link.addStandardProcedure(ObjectKind.MemberMethod,null,"follow",parameter("X",ref_Linkage));  
+		Link.addStandardProcedure(ObjectKind.MemberMethod,null,"precede",parameter("X",ref_Linkage));  
+		Link.addStandardProcedure(ObjectKind.MemberMethod,null,"into",parameter("S",ref_Head));  
 	}  
 
 	// ******************************************************************
 	// *** The Standard Class Simulation
 	// ******************************************************************
 	/// The Standard Class Simulation.
-	private static StandardClass Simulation;	
+	private static StandardClass Simulation;
 
 	/// Initiate the Standard Class Simulation.
 	private static void initSimulation() { 
 		Simulation=new StandardClass("Simset","Simulation");
 		ENVIRONMENT.addStandardClass(Simulation);  // Declared in ENVIRONMENT
 		Simulation.detachUsed=true;
-		Simulation.addStandardAttribute(Type.Ref("Head"),"SQS");  
-		Simulation.addStandardAttribute(Type.Ref("MAIN_PROGRAM"),"main");  
+		Simulation.addStandardAttribute(ref_Head,"SQS");  
+		Simulation.addStandardAttribute(ref_MAIN_PROGRAM, "main");  
 		Simulation.addStandardProcedure(ObjectKind.MemberMethod,Type.LongReal,"time");  
-		Simulation.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("EVENT_NOTICE"),"FIRSTEV");  
-		Simulation.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("Process"),"current");  
+		Simulation.addStandardProcedure(ObjectKind.MemberMethod,ref_EVENT_NOTICE,"FIRSTEV");  
+		Simulation.addStandardProcedure(ObjectKind.MemberMethod,ref_Process,"current");  
 		Simulation.addStandardProcedure(ObjectKind.MemberMethod,null,"hold",parameter("T",Type.LongReal));  
 		Simulation.addStandardProcedure(ObjectKind.MemberMethod,null,"passivate");  
-		Simulation.addStandardProcedure(ObjectKind.MemberMethod,null,"wait",parameter("S",Type.Ref("Head")));  
-		Simulation.addStandardProcedure(ObjectKind.MemberMethod,null,"cancel",parameter("x",Type.Ref("Process")));  
+		Simulation.addStandardProcedure(ObjectKind.MemberMethod,null,"wait",parameter("S",ref_Head));  
+		Simulation.addStandardProcedure(ObjectKind.MemberMethod,null,"cancel",parameter("x",ref_Process));  
 		Simulation.addStandardProcedure(ObjectKind.MemberMethod,null,"accum",parameter("a",Parameter.Mode.name,Type.LongReal),parameter("b",Parameter.Mode.name,Type.LongReal)
 				,parameter("c",Parameter.Mode.name,Type.LongReal),parameter("d",Type.LongReal));    
 		Simulation.addStandardProcedure(ObjectKind.MemberMethod,null,"ActivateDirect"
 				,parameter("REAC",Type.Boolean)
-				,parameter("X",Type.Ref("Process"))
+				,parameter("X",ref_Process)
 				);  
 		Simulation.addStandardProcedure(ObjectKind.MemberMethod,null,"ActivateAt"
 				,parameter("REAC",Type.Boolean)
-				,parameter("X",Type.Ref("Process"))
+				,parameter("X",ref_Process)
 				,parameter("T",Type.LongReal)
 				,parameter("PRIO",Type.Boolean)
 				);  
 		Simulation.addStandardProcedure(ObjectKind.MemberMethod,null,"ActivateDelay"
 				,parameter("REAC",Type.Boolean)
-				,parameter("X",Type.Ref("Process"))
+				,parameter("X",ref_Process)
 				,parameter("T",Type.LongReal)
 				,parameter("PRIO",Type.Boolean)
 				);  
 		Simulation.addStandardProcedure(ObjectKind.MemberMethod,null,"ActivateBefore"
 				,parameter("REAC",Type.Boolean)
-				,parameter("X",Type.Ref("Process"))
-				,parameter("Y",Type.Ref("Process"))
+				,parameter("X",ref_Process)
+				,parameter("Y",ref_Process)
 				);  
 		Simulation.addStandardProcedure(ObjectKind.MemberMethod,null,"ActivateAfter"
 				,parameter("REAC",Type.Boolean)
-				,parameter("X",Type.Ref("Process"))
-				,parameter("Y",Type.Ref("Process"))
+				,parameter("X",ref_Process)
+				,parameter("Y",ref_Process)
 				);  
 	}  
 
@@ -886,12 +911,13 @@ public final class StandardClass extends ClassDeclaration {
 	/// Initiate the Standard Class EVENT_NOTICE.
 	private static void initEVENT_NOTICE() { 
 		StandardClass EVENT_NOTICE=new StandardClass("Link","EVENT_NOTICE");
+		ref_EVENT_NOTICE.setQual(EVENT_NOTICE);
 		Simulation.addStandardClass(EVENT_NOTICE);  // Declared in Simulation
 		//	    ref(EVENT_NOTICE) procedure suc;
 		//	    ref(EVENT_NOTICE) procedure pred;
 		//	    procedure RANK(BEFORE_); Boolean BEFORE_;
-		EVENT_NOTICE.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("EVENT_NOTICE"),"suc");  
-		EVENT_NOTICE.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("EVENT_NOTICE"),"pred");  
+		EVENT_NOTICE.addStandardProcedure(ObjectKind.MemberMethod,ref_EVENT_NOTICE,"suc");  
+		EVENT_NOTICE.addStandardProcedure(ObjectKind.MemberMethod,ref_EVENT_NOTICE,"pred");  
 		EVENT_NOTICE.addStandardProcedure(ObjectKind.MemberMethod,null,"RANK",parameter("BEFORET",Type.Boolean));  
 	}  
 
@@ -904,6 +930,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// Initiate the Standard Class Process.
 	private static void initProcess() { 
 		Process=new StandardClass("Link","Process");
+		ref_Process.setQual(Process);
 		Simulation.addStandardClass(Process);  // Declared in Simulation
 		Process.detachUsed=true;
 		Process.statements1=new ObjectList<Statement>();
@@ -915,12 +942,12 @@ public final class StandardClass extends ClassDeclaration {
 		//	    Boolean procedure terminated;
 		//	    real procedure evtime;
 		//	    ref(Process) procedure nextev;
-		Process.addStandardAttribute(Type.Ref("EVENT_NOTICE"),"EVENT");  
+		Process.addStandardAttribute(ref_EVENT_NOTICE,"EVENT");  
 		Process.addStandardAttribute(Type.Boolean,"TERMINATED_");  
 		Process.addStandardProcedure(ObjectKind.MemberMethod,Type.Boolean,"idle");  
 		Process.addStandardProcedure(ObjectKind.MemberMethod,Type.Boolean,"terminated");  
 		Process.addStandardProcedure(ObjectKind.MemberMethod,Type.LongReal,"evtime");  
-		Process.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("Process"),"nextev");  
+		Process.addStandardProcedure(ObjectKind.MemberMethod,ref_Process,"nextev");  
 	}  
 
 
@@ -930,6 +957,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// Initiate the Standard Class MAIN_PROGRAM.
 	private static void initMAIN_PROGRAM() { 
 		StandardClass MAIN_PROGRAM=new StandardClass("Process","MAIN_PROGRAM");
+		ref_MAIN_PROGRAM.setQual(MAIN_PROGRAM);
 		Simulation.addStandardClass(MAIN_PROGRAM);   // Declared in Simulation
 		//	    Process class MAIN_PROGRAM;
 		//	    begin
@@ -986,8 +1014,8 @@ public final class StandardClass extends ClassDeclaration {
 		DEC_Lib.addStandardProcedure(ObjectKind.ContextFreeMethod,Type.Text,"frontstrip",parameter("t",Type.Text));  
 		DEC_Lib.addStandardProcedure(ObjectKind.ContextFreeMethod,Type.Text,"getitem",parameter("tt",Parameter.Mode.name,Type.Text));  
 		DEC_Lib.addStandardProcedure(ObjectKind.ContextFreeMethod,Type.Integer,"hash",parameter("t",Type.Text),parameter("n",Type.Integer));  
-		DEC_Lib.addStandardProcedure(ObjectKind.ContextFreeMethod,Type.Text,"initem",parameter("f",Type.Ref("File")));  
-		DEC_Lib.addStandardProcedure(ObjectKind.ContextFreeMethod,Type.Integer,"linecount",parameter("pf",Type.Ref("Printfile")));  
+		DEC_Lib.addStandardProcedure(ObjectKind.ContextFreeMethod,Type.Text,"initem",parameter("f",ref_File));  
+		DEC_Lib.addStandardProcedure(ObjectKind.ContextFreeMethod,Type.Integer,"linecount",parameter("pf",ref_Printfile));  
 		DEC_Lib.addStandardProcedure(ObjectKind.ContextFreeMethod,Type.Character,"insinglechar");  
 		DEC_Lib.addStandardProcedure(ObjectKind.ContextFreeMethod,Type.Character,"lowc",parameter("c",Type.Character));  
 		DEC_Lib.addStandardProcedure(ObjectKind.ContextFreeMethod,Type.Text,"maketext",parameter("c",Type.Character),parameter("n",Type.Integer));  
@@ -1037,7 +1065,7 @@ public final class StandardClass extends ClassDeclaration {
 		Drawing.addStandardProcedure(ObjectKind.MemberMethod,null,"setFillColor",parameter("color",Type.Integer));  
 		Drawing.addStandardProcedure(ObjectKind.MemberMethod,null,"setStroke",parameter("width",Type.Real));  
 
-		Drawing.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("Head"),"renderingSet");  
+		Drawing.addStandardProcedure(ObjectKind.MemberMethod,ref_Head,"renderingSet");  
 		Drawing.addStandardProcedure(ObjectKind.MemberMethod,null,"setFontStylePlain");  
 		Drawing.addStandardProcedure(ObjectKind.MemberMethod,null,"setFontStyleBold");  
 		Drawing.addStandardProcedure(ObjectKind.MemberMethod,null,"setFontStyleItalic");  
@@ -1045,15 +1073,15 @@ public final class StandardClass extends ClassDeclaration {
 		Drawing.addStandardProcedure(ObjectKind.MemberMethod,null,"setFontSize",parameter("size",Type.Real));  
 		Drawing.addStandardProcedure(ObjectKind.MemberMethod,Type.Real,"getFontSize");  
 
-		Drawing.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("TextElement"),"drawText",parameter("t",Type.Text),parameter("x",Type.LongReal),parameter("y",Type.LongReal));  
-		Drawing.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("ShapeElement"),"drawLine",parameter("x1",Type.LongReal),parameter("y1",Type.LongReal),parameter("x2",Type.LongReal),parameter("y2",Type.LongReal));  
-		Drawing.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("ShapeElement"),"drawEllipse",parameter("x",Type.LongReal),parameter("y",Type.LongReal),parameter("width",Type.LongReal),parameter("height",Type.LongReal));  
-		Drawing.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("ShapeElement"),"drawRectangle",parameter("x",Type.LongReal),parameter("y",Type.LongReal),parameter("width",Type.LongReal),parameter("height",Type.LongReal));  
-		Drawing.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("ShapeElement"),"drawRoundRectangle",parameter("x",Type.LongReal),parameter("y",Type.LongReal),parameter("width",Type.LongReal)
+		Drawing.addStandardProcedure(ObjectKind.MemberMethod,ref_TextElement,"drawText",parameter("t",Type.Text),parameter("x",Type.LongReal),parameter("y",Type.LongReal));  
+		Drawing.addStandardProcedure(ObjectKind.MemberMethod,ref_ShapeElement,"drawLine",parameter("x1",Type.LongReal),parameter("y1",Type.LongReal),parameter("x2",Type.LongReal),parameter("y2",Type.LongReal));  
+		Drawing.addStandardProcedure(ObjectKind.MemberMethod,ref_ShapeElement,"drawEllipse",parameter("x",Type.LongReal),parameter("y",Type.LongReal),parameter("width",Type.LongReal),parameter("height",Type.LongReal));  
+		Drawing.addStandardProcedure(ObjectKind.MemberMethod,ref_ShapeElement,"drawRectangle",parameter("x",Type.LongReal),parameter("y",Type.LongReal),parameter("width",Type.LongReal),parameter("height",Type.LongReal));  
+		Drawing.addStandardProcedure(ObjectKind.MemberMethod,ref_ShapeElement,"drawRoundRectangle",parameter("x",Type.LongReal),parameter("y",Type.LongReal),parameter("width",Type.LongReal)
 				,parameter("height",Type.LongReal),parameter("arcw",Type.LongReal),parameter("arch",Type.LongReal));  
-		Drawing.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("ShapeElement"),"fillEllipse",parameter("x",Type.LongReal),parameter("y",Type.LongReal),parameter("width",Type.LongReal),parameter("height",Type.LongReal));  
-		Drawing.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("ShapeElement"),"fillRectangle",parameter("x",Type.LongReal),parameter("y",Type.LongReal),parameter("width",Type.LongReal),parameter("height",Type.LongReal));  
-		Drawing.addStandardProcedure(ObjectKind.MemberMethod,Type.Ref("ShapeElement"),"fillRoundRectangle",parameter("x",Type.LongReal),parameter("y",Type.LongReal),parameter("width",Type.LongReal)
+		Drawing.addStandardProcedure(ObjectKind.MemberMethod,ref_ShapeElement,"fillEllipse",parameter("x",Type.LongReal),parameter("y",Type.LongReal),parameter("width",Type.LongReal),parameter("height",Type.LongReal));  
+		Drawing.addStandardProcedure(ObjectKind.MemberMethod,ref_ShapeElement,"fillRectangle",parameter("x",Type.LongReal),parameter("y",Type.LongReal),parameter("width",Type.LongReal),parameter("height",Type.LongReal));  
+		Drawing.addStandardProcedure(ObjectKind.MemberMethod,ref_ShapeElement,"fillRoundRectangle",parameter("x",Type.LongReal),parameter("y",Type.LongReal),parameter("width",Type.LongReal)
 				,parameter("height",Type.LongReal),parameter("arcw",Type.LongReal),parameter("arch",Type.LongReal));  
 	}
 
@@ -1063,6 +1091,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// Initiate the Standard Class ShapeElement.
 	private static void initShapeElement() {
 		StandardClass ShapeElement=new StandardClass("Link","ShapeElement");
+		ref_ShapeElement.setQual(ShapeElement);
 		Drawing.addStandardClass(ShapeElement);  // Declared in Drawing
 		ShapeElement.addStandardProcedure(ObjectKind.MemberMethod,null,"setColor",parameter("color",Type.Integer));  
 		ShapeElement.addStandardProcedure(ObjectKind.MemberMethod,null,"drawLine",parameter("x1",Type.LongReal),parameter("y1",Type.LongReal),parameter("x2",Type.LongReal),parameter("y2",Type.LongReal));  
@@ -1084,6 +1113,7 @@ public final class StandardClass extends ClassDeclaration {
 	/// Initiate the Standard Class TextElement.
 	private static void initTextElement() {
 		StandardClass TextElement=new StandardClass("Link","TextElement",parameter("txt",Type.Text),parameter("x",Type.LongReal),parameter("y",Type.LongReal));  
+		ref_TextElement.setQual(TextElement);
 		Drawing.addStandardClass(TextElement);  // Declared in Drawing
 		TextElement.addStandardProcedure(ObjectKind.MemberMethod,null,"setColor",parameter("color",Type.Integer));  
 		TextElement.addStandardProcedure(ObjectKind.MemberMethod,null,"setStroke",parameter("width",Type.Real));  

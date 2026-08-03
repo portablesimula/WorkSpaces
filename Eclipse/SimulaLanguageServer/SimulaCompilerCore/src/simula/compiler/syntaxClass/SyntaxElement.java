@@ -177,6 +177,7 @@ public abstract class SyntaxElement {
 	protected void ASSERT_SEMANTICS_CHECKED() {
 		if (!CHECKED) {
 			IO.println("FATAL error - THE Semantic checker not called: " + this.getClass().getName() + ", " + this);
+			Util.IERR("");
 			System.exit(-1);
 		}
 		if (this instanceof Declaration decl) {

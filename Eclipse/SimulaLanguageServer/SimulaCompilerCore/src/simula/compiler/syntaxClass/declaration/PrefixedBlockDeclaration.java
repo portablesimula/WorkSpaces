@@ -101,7 +101,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		
 		block.parseBlock(simBuilder);
 		
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+block.firstLineNumber()+": PrefixedBlockDeclaration: "+block);
+		if (Option.internal.TRACE_PARSE)
+			Util.TRACE("Line "+block.firstLineNumber()+": PrefixedBlockDeclaration: "+block);
 		CoreGlobal.setScope(block.declaredIn);
 		return block;
 	}

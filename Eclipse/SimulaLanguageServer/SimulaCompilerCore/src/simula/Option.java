@@ -50,7 +50,7 @@ public final class Option {
 
 		// Lexer Trace Options
 		/** Debug option */	public static int TRACE_LEXER = 0;
-		/** Debug option */	public static int TRACE_NEW_LEXTOKEN = 2;//0;
+		/** Debug option */	public static int TRACE_NEW_LEXTOKEN = 0;
 		/** Debug option */	public static boolean TRACE_ADVANCE_LEXER = false;//true;
 		/** Debug option */	public static boolean TRACE_COMMENTS = false;
 
@@ -122,7 +122,7 @@ public final class Option {
 	}
 	/// Kalles før parsing og checking
 	public static void decodeArguments(String[] argv) {
-		IO.println("Option.decodeArguments: ");
+//		IO.println("Option.decodeArguments: ");
 		SimulaCompiler.verbose = false;
 		SimulaCompiler.WARNINGS = true;
 		SimulaCompiler.EXTENSIONS = true;
@@ -130,7 +130,7 @@ public final class Option {
 		// Parse command line arguments.
 		for(int i=0;i<argv.length;i++) {
 			String arg=argv[i];
-			IO.println("Option.decodeArguments: arg: " + arg);
+//			IO.println("Option.decodeArguments: arg: " + arg);
 			switch(arg) {
 //				case "-help": help(); break;
 				case "-caseSensitive": SimulaCompiler.CaseSensitive = true; break;

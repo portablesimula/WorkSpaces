@@ -68,7 +68,7 @@ public class SimulaBuilder {
 		deleteTempFiles(SimulaCompiler.simulaTempDir);
 
 		File desktop = new File(System.getProperty("user.home"), "Desktop");
-//		if (args.verbose) {
+		if (SimulaCompiler.verbose) {
 			// https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html
 			Util.println("------------  SIMULA ENVIRONMENT SUMMARY  ------------");
 			Util.println("Java Home            " + System.getProperty("java.home"));
@@ -91,14 +91,13 @@ public class SimulaBuilder {
 			// This will list the current system properties
 			// System.getProperties().list(System.out);
 
-//		}
 			Util.println("------------  SIMULA VARIABLES SUMMARY  ------------");
 			Util.println("DocumentManager.documentUri     " + documentManager.documentUri);
 			Util.println("DocumentManager.sourceFileDir   " + documentManager.sourceFileDir);
 			Util.println("DocumentManager.documentVersion " + documentManager.documentVersion);
 
 			Option.print(" SIMULA VARIABLES SUMMARY");
-//		Util.IERR("STOPP HER INNTIL VIDERE");
+		}
 	}
 	
 	public void doBuilding() {
@@ -107,7 +106,7 @@ public class SimulaBuilder {
 		boolean builderTerminateNormally = simulaCompiler.doParsing(this);
     	
     	if(Option.LEX_VERIFY) {
-        	IO.println("SimulaBuilder: documentManager.sourceCode: "+documentManager.sourceCode);
+//        	IO.println("SimulaBuilder: documentManager.sourceCode: "+documentManager.sourceCode);
     		StringBuilder sb = new StringBuilder();
     		for(LexToken token : tokenList)	sb.append(token.getText());
     		String reconstr = Util.printable(sb.toString());
@@ -197,15 +196,10 @@ public class SimulaBuilder {
 
 	/// Save current Token
 	public void saveCurrentToken() {
-		IO.println("SimulaLexer.saveCurrentToken: "+currentParserToken+", prevParserToken="+prevParserToken);
-//		if (savedToken != null) Util.IERR("SimulaLexer.saveCurrentToken: Already called");
-//		savedToken = getCurrentParserToken();
-		
 		rollBackIndex = tokenList.size() - 1;
 		
 		currentParserToken = prevParserToken;
 		prevParserToken = null;
-//    	Util.STOP();
 	}
 
 	public void	rollBackTo(LexToken prev, String debugInfo) {
@@ -256,16 +250,16 @@ public class SimulaBuilder {
     public String getTextString(LexToken prevToken) {
 //		Util.IERR("SJEKK DETTE");
 		LexToken nextToken = prevToken;
-		IO.println("\n\nPsiBuilder.getTextString: nextToken: "+nextToken);
+//		IO.println("\n\nSimulaBuilder.getTextString: nextToken: "+nextToken);
 		String result = ((SimpleString)prevToken).value;
     	while(getCurrentParserToken() instanceof SimpleString str) {
     		result += str.value;
-    		IO.println("PsiBuilder.getTextString: RESULT: "+result);
-        	IO.println("PsiBuilder.getTextString: NEXT TOKEN: "+nextToken);
+//    		IO.println("SimulaBuilder.getTextString: RESULT: "+result);
+//        	IO.println("SimulaBuilder.getTextString: NEXT TOKEN: "+nextToken);
 //    		Util.IERR("SJEKK DETTE");
         	getNextParserToken();
     	}
-    	IO.println("SimulaBuilder.getTextString: RETURN TEXT: ]"+result+"[\n\n");
+//    	IO.println("SimulaBuilder.getTextString: RETURN TEXT: ]"+result+"[\n\n");
     	return result;
     }
 

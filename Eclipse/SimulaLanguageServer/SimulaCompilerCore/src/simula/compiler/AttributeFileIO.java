@@ -87,7 +87,6 @@ public final class AttributeFileIO {
 	public static Type readAttributeFile(final SimulaBuilder simBuilder,final String identifier, final File file, final BlockDeclaration enclosure) {
 		Type moduleType = null;
 		Util.generalWarning("Separate Compiled Module is read from: \"" + file + "\"");
-		IO.println("Separate Compiled Module is read from: \"" + file + "\"");
 		if (!(file.exists() && file.canRead())) {
 			Util.generalError("Can't read attribute file: " + file);
 			return (null);

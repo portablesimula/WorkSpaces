@@ -146,12 +146,14 @@ public class Type extends SyntaxElement {
 		super(null);
 		this.keyWord = tp.keyWord;
 		this.classIdent = tp.classIdent;
-		if(classIdent != null) {
-			if(classIdent.value.startsWith("<HTML>")) Util.STOP();
-			if(classIdent.value.startsWith("IDENTIFIER[")) Util.STOP();
-		}
 		this.qual = tp.qual;
 		this.declaredIn = declaredIn;
+	}
+	
+	/// Used by Standard classes
+	public void setQual(ClassDeclaration qual) {
+		this.qual = qual;
+		SET_SEMANTICS_CHECKED();		
 	}
 	
 	
@@ -722,9 +724,9 @@ public class Type extends SyntaxElement {
 			case T_LABEL:		return "Label";
 			case T_REF:
 				if(declaredIn==null) {
-					return("ref("+classIdent+')');
+					return("ref("+classIdent.value+')');
 				}
-				return("ref("+classIdent+") declared in "+declaredIn.identifier);
+				return("ref("+classIdent+") declared in "+declaredIn.identifier.value);
 		}
 		return "UNKNOWN";
 	}

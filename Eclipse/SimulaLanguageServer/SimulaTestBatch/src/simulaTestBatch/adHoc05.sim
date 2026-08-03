@@ -1,3 +1,7 @@
+ 
 begin
-	Simulation begin end
-end
+	boolean found_error;
+
+    found_error:=true;
+	
+end of Simula test prologue;

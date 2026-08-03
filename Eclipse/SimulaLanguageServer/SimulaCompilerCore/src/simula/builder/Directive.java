@@ -53,9 +53,9 @@ public class Directive {
 	/// </pre>
 	/// @return a Comment Token
 	static void treatDirective(SimulaBuilder simBuilder, LexToken lexToken, String line) {
-		IO.println("Directive.treatDirective: \"" + line + '"');
+//		IO.println("Directive.treatDirective: \"" + line + '"');
 		if(line.length() == 1 || Character.isWhitespace(line.charAt(1))) {
-			IO.println("Directive.treatDirective: Comment: " + line);
+//			IO.println("Directive.treatDirective: Comment: " + line);
 			return;
 		}
 		
@@ -63,7 +63,7 @@ public class Directive {
         StringTokenizer st = new StringTokenizer(line, "% ");
         while (st.hasMoreTokens()) tokens.add(st.nextToken());
         
-		IO.println("Directive.treatDirective: Tokens: " + tokens);
+//		IO.println("Directive.treatDirective: Tokens: " + tokens);
 		
 //		String id = tokens.getFirst();	
 //		if (id.equalsIgnoreCase("SELECT")) setSelectors();

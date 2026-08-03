@@ -2,6 +2,10 @@ package simula.compiler;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.Vector;
 
 import javax.tools.JavaCompiler;
@@ -182,11 +186,11 @@ public class SimulaCompiler {
         }
 
     	LOG.info("SimulaBuilder: syntaxTree, tokenList and diagnostics DONE");
-    	IO.println("SimulaBuilder: this.syntaxTree: "+simBuilder.syntaxTree); // Root of Syntax Tree
-    	IO.println("SimulaBuilder: this.diagnostics: "+simBuilder.diagnostics);
-    	IO.println("SimulaBuilder: this.tokenList: "+simBuilder.tokenList);
-		
-    	simBuilder.printAll(" AFTER NEW SimulaBuilder: ");
+//    	IO.println("SimulaBuilder: this.syntaxTree: "+simBuilder.syntaxTree); // Root of Syntax Tree
+//    	IO.println("SimulaBuilder: this.diagnostics: "+simBuilder.diagnostics);
+//    	IO.println("SimulaBuilder: this.tokenList: "+simBuilder.tokenList);
+//		
+//    	simBuilder.printAll(" AFTER NEW SimulaBuilder: ");
 		
     	return builderTerminateNormally;
 	}
@@ -315,12 +319,13 @@ public class SimulaCompiler {
 		// *** CRERATE .jar FILE INLINE
 		// ***************************************************************
 //		String jarFile = null;
-			if(SimulaCompiler.compilerMode == SimulaCompiler.CompilerMode.viaJavaSource) {
-				SimulaCompiler.jarFileBuilder.addTempClassFiles();
-			}
-			simBuilder.generatedJarFile = SimulaCompiler.jarFileBuilder.close();
+		if(SimulaCompiler.compilerMode == SimulaCompiler.CompilerMode.viaJavaSource) {
+			SimulaCompiler.jarFileBuilder.addTempClassFiles();
+		}
+		simBuilder.generatedJarFile = SimulaCompiler.jarFileBuilder.close();
 		
 		if (SimulaCompiler.verbose) printSummary(simBuilder);
+//		deleteTempFiles(SimulaCompiler.tempClassFileDir);
 	}
 
 	// ***************************************************************
@@ -370,26 +375,55 @@ public class SimulaCompiler {
 
 	/// Delete temporary .class files.
 	/// @param dir temporary .class directory
-	private void deleteTempFiles(final File dir) {
-		try {
-			File[] elt = dir.listFiles();
-			if (elt == null)
-				return;
-			for (File f : elt) {
-				if (Option.internal.DEBUGGING) {
-					if (f.isFile())
-						Util.println("Delete: " + f);
-				}
-				if (f.isDirectory())
-					deleteTempFiles(f);
-				f.delete();
-			}
+//	private void deleteTempFiles(final File dir) {
+//		Util.println("SimulaCompiler.deleteTempFiles:  Delete: " + dir);
+//		Thread.dumpStack();
+//		Option.internal.DEBUGGING = true;
+//		try {
+//			File[] elt = dir.listFiles();
+//			if (elt == null)
+//				return;
+//			for (File f : elt) {
+//				if (Option.internal.DEBUGGING) {
+//					if (f.isFile())
+//						Util.println("SimulaCompiler.deleteTempFiles:  Delete: " + f);
+//				}
+//				if (f.isDirectory())
+//					deleteTempFiles(f);
+//				f.delete();
+//			}
+//		} catch (Exception e) {
+//			Util.IERR("SimulaCompiler.deleteFiles FAILED: ", e);
+//			e.printStackTrace();
+//		}
+//	}
+
+//	public static void deleteTempFiles(final Path path) {
+	public static void deleteTempFiles(final File dir) {
+		IO.println("SimulaCompiler.deleteTempFiles:  Delete: " + dir);
+//		Thread.dumpStack();
+        if (! dir.exists()) {
+            Util.IERR("File does not exist: " + dir);
+            return;
+        }
+		Path path = dir.toPath();
+        try { Files.walk(path)
+	             // Sorts in reverse order (subfolders and files first)
+	             .sorted(Comparator.reverseOrder())
+	             .forEach(p -> {
+	                 try {
+	                	 IO.println("SimulaCompiler.deleteTempFiles: TRY Delete: " + p);
+	                     Files.delete(p);
+	                 } catch (IOException e) {
+	                     Util.IERR("Could not delete: " + p + " - " + e.getMessage());
+	                 }
+	             });
 		} catch (Exception e) {
 			Util.IERR("SimulaCompiler.deleteFiles FAILED: ", e);
 			e.printStackTrace();
 		}
-	}
-
+    }
+	
 	/// Execute JarFile.
 	/// @param jarFile a jarFile
 	/// @param arg the arguments

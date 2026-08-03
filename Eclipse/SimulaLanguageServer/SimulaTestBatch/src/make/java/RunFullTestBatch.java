@@ -43,7 +43,7 @@ public final class RunFullTestBatch {
 //		argv.add("-noextension");
 		argv.add("-noPopup");
 //		argv.add("-nowarn");
-		argv.add("-verbose");
+//		argv.add("-verbose");
 //		argv.add("-select");
 
 		Vector<String> argv2 = new Vector<>();

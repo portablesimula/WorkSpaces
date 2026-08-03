@@ -36,7 +36,7 @@ public final class RunSingleTest {
 //		argv.add("-noextension");
 		argv.add("-noPopup");
 //		argv.add("-nowarn");
-		argv.add("-verbose");
+//		argv.add("-verbose");
 //		argv.add("-select");
 
 		Vector<String> argv2 = new Vector<>();
@@ -323,7 +323,7 @@ public final class RunSingleTest {
 //		Option.internal.TRACE_FIND_MEANING=4;
 //		Option.internal.TRACE_CHECKER=true;
 //		Option.internal.TRACE_CHECKER_OUTPUT=true;
-		Option.internal.PRINT_SYNTAX_TREE = 4;
+//		Option.internal.PRINT_SYNTAX_TREE = 4;
 
 		// .java Coder Trace Options
 //		Option.TRACE_CODING=true;

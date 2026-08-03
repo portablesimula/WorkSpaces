@@ -31,7 +31,7 @@ public final class RunFullClassTestBatch {
 //	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula");
 //	private static final File userDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/SimulaTestBatch");
 //	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
-	private static final String testBatchJarDir = userDir+"/src/simulaTestBatch/bin/";
+	private static final String testBatchJarDir = userDir+"/bin/simulaTestBatch/bin";
 	private static long startTimeMs = System.currentTimeMillis( );
 
 	public static void main(String[] args) {
@@ -43,7 +43,7 @@ public final class RunFullClassTestBatch {
 //		argv.add("-noextension");
 		argv.add("-noPopup");
 //		argv.add("-nowarn");
-		argv.add("-verbose");
+//		argv.add("-verbose");
 //		argv.add("-select");
 
 		Vector<String> argv2 = new Vector<>();
@@ -309,7 +309,7 @@ public final class RunFullClassTestBatch {
 
 		// Scanner Trace Options
 //		Option.internal.TRACE_LEXER=true;
-		Option.internal.TRACE_NEW_LEXTOKEN=2;
+//		Option.internal.TRACE_NEW_LEXTOKEN=2;
 //		Option.internal.TRACE_COMMENTS=true;
 
 		// Parser Trace Options

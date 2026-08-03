@@ -73,7 +73,7 @@ public abstract class Statement extends SyntaxElement {
 			int lineNumber=Parse.getCurrentParserToken(simBuilder).lineNumber;
 			Util.TRACE("Statement.acceptStatement: LabeledStatement: lineNumber="+lineNumber+", current=" + Parse.getCurrentParserToken(simBuilder));//	+ ", prev=" + PsiParse.prevToken);
 		}
-		IO.println("Statement.acceptStatement: LabeledStatement: current=" + Parse.getCurrentParserToken(simBuilder));//	+ ", prev=" + PsiParse.prevToken);
+//		IO.println("Statement.acceptStatement: LabeledStatement: current=" + Parse.getCurrentParserToken(simBuilder));//	+ ", prev=" + PsiParse.prevToken);
 		Statement statement = null;
 		Identifier mayBeLabel = Parse.acceptIdentifier(simBuilder);
 		LOOP:while (mayBeLabel != null) {
@@ -101,7 +101,7 @@ public abstract class Statement extends SyntaxElement {
 			statement = new LabeledStatement(simBuilder, labels, statement);
 //			IO.println("Statement.acceptStatement: DONE LabeledStatement: " + statement);				
 		}
-		IO.println("Statement.acceptStatement: DONE: " + statement);
+//		IO.println("Statement.acceptStatement: DONE: " + statement);
 		return (statement);
 	}
 
@@ -151,7 +151,7 @@ public abstract class Statement extends SyntaxElement {
 			case KeyWord.NEW:
 		    case KeyWord.THIS:
 				if(Option.TRACE_ACCEPT_STATEMENT > 2) {
-					IO.println("\nStatement.acceptUnlabeledStatement: IDENTIFIER");
+//					IO.println("\nStatement.acceptUnlabeledStatement: IDENTIFIER");
 //					simBuilder.printPSI("Statement.acceptUnlabeledStatement: IDENTIFIER");
 				}
 				
@@ -167,22 +167,23 @@ public abstract class Statement extends SyntaxElement {
 				
 				if(expr!=null) {
 					if(expr instanceof VariableExpression var) {
-						if(Option.TRACE_ACCEPT_STATEMENT > 1)
+						if(Option.TRACE_ACCEPT_STATEMENT > 1) {
 							IO.println("Statement.acceptUnlabeledStatement: GOT VariableExpression: "+var);
+						}
 							
 						if (Parse.accept(simBuilder, KeyWord.BEGIN)) {
 							PrefixedBlockDeclaration prfblk = PrefixedBlockDeclaration.expectPrefixedBlock(simBuilder, var,false);
 							statement = new BlockStatement(simBuilder, prfblk, "Statement.acceptIdentifierStatement: GOT VariableExpression: "+var);
-							IO.println("Statement.acceptUnlabeledStatement: GOT BlockStatement: "+statement);
+//							IO.println("Statement.acceptUnlabeledStatement: GOT BlockStatement: "+statement);
 							break;
 		      			} else {
 		      				statement = new StandaloneExpression(simBuilder, expr);
-							IO.println("Statement.acceptUnlabeledStatement: GOT StandaloneExpression(1): "+statement);
+//							IO.println("Statement.acceptUnlabeledStatement: GOT StandaloneExpression(1): "+statement);
 		      				break;
 	      				}
 	      			} else {
 	      				statement = new StandaloneExpression(simBuilder, expr);
-						IO.println("Statement.acceptUnlabeledStatement: GOT StandaloneExpression(2): "+statement);
+//						IO.println("Statement.acceptUnlabeledStatement: GOT StandaloneExpression(2): "+statement);
 	      				break;
 	      			}
 //					IO.println("\nStatement.acceptUnlabeledStatement: GOT STATEMENT: "+statement);

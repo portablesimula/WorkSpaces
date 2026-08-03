@@ -101,7 +101,7 @@ public final class ProgramModule extends Statement {
 		sysout = new VariableExpression(null, sysoutID);
 		sysout.meaning = StandardClass.BASICIO.findMeaning(sysoutID);
 		sysout.SET_SEMANTICS_CHECKED();
-		IO.println("NEW ProgramModule: sysout.meaning="+sysout.meaning);
+//		IO.println("NEW ProgramModule: sysout.meaning="+sysout.meaning);
 	}
 	
 	public void doBuild() {
@@ -131,7 +131,7 @@ public final class ProgramModule extends Statement {
 					mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, mayBeClassIdent);
 				}
 			    else {
-			    	IO.println("ProgramModule.doBuild: IDENTIFIER ...");
+//			    	IO.println("ProgramModule.doBuild: IDENTIFIER ...");
 			    	Parse.saveCurrentToken(simBuilder);
 			    	mainModule = doParseProgram(simBuilder);
 			    }

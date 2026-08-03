@@ -57,12 +57,13 @@ public final class RunSingleClassTest {
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
 //		names.add("adHoc04.sim"); // For ad'hoc testing
+//		names.add("adHoc05.sim"); // For ad'hoc testing
 //		names.add("adHoc10.sim"); // For ad'hoc testing
 		
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
 		
-		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
 //		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
@@ -194,7 +195,7 @@ public final class RunSingleClassTest {
 //		names.add("simtst111.sim"); // OK: Virtual Label Sample 1
 //		names.add("simtst112.sim"); // OK: Virtual Label Sample 2
 //		names.add("simtst113.sim"); // OK: Virtual Switch Sample 1
-		names.add("simtst114.sim"); // OK: Switch Statement
+//		names.add("simtst114.sim"); // OK: Switch Statement
 //		names.add("simtst115.sim"); // OK: Simple QPS-Sample 1
 //		names.add("simtst116.sim"); // OK: Simple QPS-Sample 2
 //		names.add("simtst117.sim"); // OK: Simple QPS-Sample 3
@@ -216,7 +217,7 @@ public final class RunSingleClassTest {
 //		names.add("simtst129.sim"); // OK: Switch in precompiled class
 //		names.add("simtst130.sim"); // OK: Class SimLib, a set of utility procedures from DEC Handbook.
 //
-//		names.add("simtst131.sim"); // OK: Catching Errors
+		names.add("simtst131.sim"); // OK: Catching Errors
 //		names.add("simtst132.sim"); // OK: SPORT Options
 //		names.add("simtst133.sim"); // OK: Test infile reading with inimage and inrecord.
 //		names.add("simtst134.sim"); // OK: Outfile with CREATE, APPEND, SYNCHRONOUS and PURGE.
@@ -303,7 +304,7 @@ public final class RunSingleClassTest {
 
 		// Scanner Trace Options
 //		Option.internal.TRACE_LEXER=true;
-		Option.internal.TRACE_NEW_LEXTOKEN=2;
+//		Option.internal.TRACE_NEW_LEXTOKEN=2;
 //		Option.internal.TRACE_COMMENTS=true;
 
 		// Parser Trace Options
