@@ -269,7 +269,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	// ***********************************************************************************************
 	/// ClassFile coding utility: Code STM body
 	protected void codeSTMBody() {
-		IO.println("BlockDeclaration.codeSTMBody: ");
+//		IO.println("BlockDeclaration.codeSTMBody: ");
 		if (hasAccumLabel()) {
 			JavaSourceFileCoder.code(externalIdent + " _THIS=(" + externalIdent + ")_CUR;");
 			JavaSourceFileCoder.code("_LOOP:while(_JTX>=0) {");
@@ -299,7 +299,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 		boolean duringSTM_Coding=SimulaCompiler.duringSTM_Coding;
 		SimulaCompiler.duringSTM_Coding=true;
 		for (Statement stm : statements) {
-			IO.println("BlockDeclaration.codeStatements: "+stm.getClass().getSimpleName()+"  "+stm);
+//			IO.println("BlockDeclaration.codeStatements: "+stm.getClass().getSimpleName()+"  "+stm);
 			stm.doJavaCoding();
 		}
 		SimulaCompiler.duringSTM_Coding=duringSTM_Coding;

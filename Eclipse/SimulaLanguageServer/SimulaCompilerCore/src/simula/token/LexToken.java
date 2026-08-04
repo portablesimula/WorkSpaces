@@ -2,9 +2,10 @@ package simula.token;
 
 import simula.Option;
 import simula.builder.SimulaLexer;
+import simula.compiler.TokenManager;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Util;
-import simula.lsp.compiler.TokenManager;
+import simula.lsp.util.SimPosition;
 
 public class LexToken {
     CharSequence sourceText; // Pointer to the Whole FILE
@@ -23,6 +24,10 @@ public class LexToken {
 
 	public LexToken(int tokenStartLine, CharSequence sourceText, int column, int length, int keyWord, SimulaLexer lexer) {
 		this(tokenStartLine, sourceText, column, length, keyWord, null, lexer);
+	}
+	
+	public SimPosition getPosition() {
+		return new SimPosition(lineNumber, column);
 	}
 	
 	public LexToken(int tokenStartLine, CharSequence sourceText, int column, int length, int keyWord, String styleName, SimulaLexer lexer) {

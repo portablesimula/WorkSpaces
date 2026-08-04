@@ -1057,7 +1057,7 @@ public final class SimulaLexer {
  			if(TRACE_TOKEN_SEP) IO.println("SimulaLexer.currentIsTokenSeparator: currentColumn="+currentColumn);
 //			Util.IERR("SJEKK DETTE");
     	    tokenQueueAdd("currentIsTokenSeparator - COMMENT-0", scanCommentToEndOfLine());
-			this.snapShot("SimulaLexer.currentIsTokenSeparator: ");
+//			this.snapShot("SimulaLexer.currentIsTokenSeparator: ");
     	    if(Option.LEX_VERIFY) {
     	    	if(! (nextCharIs('\r') || nextCharIs('\n')))
 		    		Util.IERR("SimulaLexer.currentIsTokenSeparator: End-Condition Failed: current = "+edCurrent());
@@ -1505,8 +1505,8 @@ public final class SimulaLexer {
                         if(nPhrase > 1) Util.warning(simBuilder, token, "END comment spans multiple lines");
                         tokenQueueAdd("scanEndComment-NAME", token);
                     }
-                    this.snapShot("GOT name="+name);
-                    IO.println("LexToken.scanEndComment: GOT name="+name+" break LOOP\n\n");
+//                    this.snapShot("GOT name="+name);
+//                    IO.println("LexToken.scanEndComment: GOT name="+name+" break LOOP\n\n");
                     break LOOP;
                 }
             } else {
@@ -1571,7 +1571,7 @@ public final class SimulaLexer {
     			throw new EOTException("Attempt to scan beyond EOF");
     		} else {
     			EOF_SEEN = true; current = EOF_MARK;
-    	    	IO.println("SimulaLexer.getNext: EOF_MARK: " + current);
+//    	    	IO.println("SimulaLexer.getNext: EOF_MARK: " + current);
 //    	    	Thread.dumpStack();
     		}
     	} else {

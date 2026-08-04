@@ -1,4 +1,4 @@
-package simula.lsp.compiler;
+package simula.compiler;
 
 import simula.SimTextDocumentContentChangeEvent;
 import simula.lsp.util.SimPosition;

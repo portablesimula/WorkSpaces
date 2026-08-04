@@ -2,8 +2,8 @@ package simula.token;
 
 import simula.Option;
 import simula.builder.SimulaLexer;
+import simula.compiler.TokenManager;
 import simula.compiler.utilities.KeyWord;
-import simula.lsp.compiler.TokenManager;
 
 public class StringToken extends LexToken {
 	public final String value;

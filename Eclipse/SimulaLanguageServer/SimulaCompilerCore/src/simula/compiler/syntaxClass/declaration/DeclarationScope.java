@@ -156,7 +156,7 @@ public abstract class DeclarationScope extends Declaration  {
 		if(Option.internal.TRACE_FIND_MEANING > 0)
 			LOG.trace("DeclarationScope.findMeaning("+identifierValue()+"): BEGIN Search "+identifierValue());
 //		IO.println("DeclarationScope.findMeaning: " + this.getClass());
-//		IO.println("DeclarationScope.findMeaning: Looking for "+identifierValue()+" in "+declaredIn.getClass());
+//		IO.println("DeclarationScope.findMeaning: Looking for "+identifierValue()+" in " + ((declaredIn==null)?"NULL":declaredIn.getClass()));
 		Meaning meaning = findVisibleAttributeMeaning(identifier);
 		if (meaning == null && declaredIn != null) {
 //			IO.println("DeclarationScope.findMeaning: Looking for " + identifierValue() + " in "+declaredIn);

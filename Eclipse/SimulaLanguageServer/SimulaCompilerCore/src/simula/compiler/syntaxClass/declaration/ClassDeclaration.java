@@ -579,9 +579,9 @@ public class ClassDeclaration extends BlockDeclaration {
 	public Meaning findRemoteAttributeMeaning(final Identifier ident) {
 		boolean behindProtected = false;
 		ClassDeclaration scope = this;
-		IO.println("ClassDeclaration.findRemoteAttributeMeaning: " + ident);
+//		IO.println("ClassDeclaration.findRemoteAttributeMeaning: " + ident);
 		Declaration decl = scope.findLocalAttribute(ident);
-		IO.println("ClassDeclaration.findRemoteAttributeMeaning: " + decl);
+//		IO.println("ClassDeclaration.findRemoteAttributeMeaning: " + decl);
 		if (decl != null) {
 			boolean prtected = decl.isProtected != null;
 			VirtualSpecification virtSpec = VirtualSpecification.getVirtualSpecification(decl);
@@ -703,8 +703,9 @@ public class ClassDeclaration extends BlockDeclaration {
 	public ClassDeclaration getPrefixClass() {
 		if (prefix == null)
 			return (null);
-		if(prefixClass != null) return(prefixClass);
-		
+		if(prefixClass != null) {
+			return(prefixClass);
+		}
 		Meaning meaning = declaredIn.findMeaning(prefix);
 		if (meaning == null)
 //			Util.error("Undefined prefix: " + prefix);
@@ -1256,7 +1257,9 @@ public class ClassDeclaration extends BlockDeclaration {
 		clearLabelList();
 		labelContextStack.push(labelContext);
 		labelContext = this;
-		if(this.getPrefixClass() == StandardClass.CatchingErrors) {	
+		
+//		if(this.getPrefixClass() == StandardClass.CatchingErrors) {	
+		if(this.prefix.equals("CatchingErrors") && this.getPrefixClass().declarationKind == ObjectKind.StandardClass) {	
 			if(this instanceof PrefixedBlockDeclaration)
 				buildMethod_CatchingErrors_TRY_CATCH(codeBuilder, begScope, endScope);
 			else {

@@ -19,6 +19,7 @@ import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
+import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
 import simula.token.Identifier;
@@ -157,7 +158,7 @@ public final class ExternalDeclaration extends Declaration {
 //				IO.println("ExternalDeclaration.expectExternalDeclaration: " + token.getClass().getSimpleName());
 				if(token instanceof SimpleString xident) {
 					externalIdentifier = xident.value;
-					IO.println("ExternalDeclaration.expectExternalDeclaration: extIdentifier" + externalIdentifier);
+					LOG.info("ExternalDeclaration.expectExternalDeclaration: extIdentifier" + externalIdentifier);
 				} else {
 					Util.syntaxError(simBuilder, token, "Expecting external identifier string");
 				}
@@ -166,10 +167,10 @@ public final class ExternalDeclaration extends Declaration {
 			ExternalDeclaration externalDeclaration = new ExternalDeclaration(simBuilder, identifier, externalIdentifier);
 			externalDeclaration.type = expectedType;
 			declarations.add(externalDeclaration);
-			IO.println("ExternalDeclaration.expectExternalDeclaration: externalDeclaration: " + externalDeclaration);
+//			IO.println("ExternalDeclaration.expectExternalDeclaration: externalDeclaration: " + externalDeclaration);
 
 			File jarFile = JarFileBuilder.findJarFile(identifier.value, externalIdentifier);
-			IO.println("ExternalDeclaration.expectExternalDeclaration: jarFile: " + jarFile);
+//			IO.println("ExternalDeclaration.expectExternalDeclaration: jarFile: " + jarFile);
 			if(jarFile == null) {
 				Util.syntaxError(simBuilder, "Can't find attribute file: " + identifier.value + '[' + externalIdentifier + ']');
 			}

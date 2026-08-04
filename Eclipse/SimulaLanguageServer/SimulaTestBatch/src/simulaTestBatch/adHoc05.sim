@@ -1,7 +1,6 @@
- 
 begin
-	boolean found_error;
+   integer i;
+end	komm
 
-    found_error:=true;
-	
-end of Simula test prologue;
+en tar;
+og mere til

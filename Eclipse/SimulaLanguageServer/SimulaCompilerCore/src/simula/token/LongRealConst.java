@@ -2,8 +2,8 @@ package simula.token;
 
 import simula.Option;
 import simula.builder.SimulaLexer;
+import simula.compiler.TokenManager;
 import simula.compiler.utilities.KeyWord;
-import simula.lsp.compiler.TokenManager;
 
 public class LongRealConst extends LexToken {
 	public final double value;

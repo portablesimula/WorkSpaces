@@ -4,9 +4,9 @@ import javax.lang.model.SourceVersion;
 
 import simula.Option;
 import simula.builder.SimulaLexer;
+import simula.compiler.TokenManager;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.Util;
-import simula.lsp.compiler.TokenManager;
 
 public class Identifier extends LexToken {
 	public String value;

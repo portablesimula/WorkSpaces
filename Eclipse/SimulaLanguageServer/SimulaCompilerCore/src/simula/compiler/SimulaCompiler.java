@@ -20,7 +20,6 @@ import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
 import simula.exception.EOTException;
-import simula.lsp.compiler.DocumentManager;
 
 public class SimulaCompiler {
 	DocumentManager documentManager;
@@ -148,14 +147,14 @@ public class SimulaCompiler {
     }
     
     private void setOutputDir() {
-    	IO.println("SimulaCompiler.setOutputDir: sourceFileDir=" + documentManager.sourceFileDir);
-    	IO.println("SimulaCompiler.setOutputDir: outputDir=" + SimulaCompiler.outputDir);
+//    	IO.println("SimulaCompiler.setOutputDir: sourceFileDir=" + documentManager.sourceFileDir);
+//    	IO.println("SimulaCompiler.setOutputDir: outputDir=" + SimulaCompiler.outputDir);
     	if(SimulaCompiler.outputDir == null) {
 //    		SimulaCompiler.outputDir = new File(documentManager.sourceFileDir,"bin");
         	File userDir = new File(System.getProperty("user.dir"));
     		SimulaCompiler.outputDir = new File(userDir,"bin");
     	}
-    	IO.println("SimulaCompiler.setOutputDir: outputDir=" + SimulaCompiler.outputDir);
+    	LOG.info("SimulaCompiler.setOutputDir: outputDir=" + SimulaCompiler.outputDir);
     	SimulaCompiler.outputDir.mkdirs();
     	if (! SimulaCompiler.outputDir.canWrite()) {
     		Util.IERR("SimulaCompiler.setOutputDir: Unable to write to " + SimulaCompiler.outputDir);
@@ -259,7 +258,7 @@ public class SimulaCompiler {
 //		SimulaCompiler.tempClassFileDir = tmpClassDir;
 //    	LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempClassFileDir="+SimulaCompiler.tempClassFileDir);
 
-		Option.print("SimulaCompiler.doCodeGeneration: ");
+//		Option.print("SimulaCompiler.doCodeGeneration: ");
 		if(SimulaCompiler.jarFileBuilder == null) {
 			SimulaCompiler.jarFileBuilder = new JarFileBuilder();
 		}
@@ -398,10 +397,11 @@ public class SimulaCompiler {
 //		}
 //	}
 
-//	public static void deleteTempFiles(final Path path) {
 	public static void deleteTempFiles(final File dir) {
+		if(SimulaCompiler.verbose) {
 		IO.println("SimulaCompiler.deleteTempFiles:  Delete: " + dir);
-//		Thread.dumpStack();
+//			Thread.dumpStack();
+		}
         if (! dir.exists()) {
             Util.IERR("File does not exist: " + dir);
             return;
@@ -412,7 +412,9 @@ public class SimulaCompiler {
 	             .sorted(Comparator.reverseOrder())
 	             .forEach(p -> {
 	                 try {
-	                	 IO.println("SimulaCompiler.deleteTempFiles: TRY Delete: " + p);
+	             		if(SimulaCompiler.verbose) {
+	             			IO.println("SimulaCompiler.deleteTempFiles: Delete: " + p);
+	             		}
 	                     Files.delete(p);
 	                 } catch (IOException e) {
 	                     Util.IERR("Could not delete: " + p + " - " + e.getMessage());
@@ -437,10 +439,10 @@ public class SimulaCompiler {
 			if (SimulaCompiler.verbose)
 				Util.println("Option 'noexec' ==> No Execution of .jar File: " + jarFile);
 		} else {
-			if (SimulaCompiler.verbose)
+			if (SimulaCompiler.verbose) {
 				Util.println("------------  EXECUTION SUMMARY  ------------");
-			if (Option.internal.TRACING)
 				Util.println("Execute .jar File");
+			}
 			int exitValue3 = Util.execute(arg);
 			if (SimulaCompiler.verbose)
 				Util.println("END Execute .jar File. Exit value=" + exitValue3);
@@ -538,8 +540,7 @@ public class SimulaCompiler {
 		if (Option.internal.DEBUGGING) {
 			arguments.add("-version");
 		}
-		if (Option.internal.TRACING)
-			Util.println("SimulaCompiler.callJavaSystemCompiler: classPath=\"" + classPath + "\"");
+		LOG.info("SimulaCompiler.callJavaSystemCompiler: classPath=\"" + classPath + "\"");
 		String clazzPath = SimulaCompiler.tempClassFileDir.toString();
 		String rtsLib = SimulaCompiler.simulaRtsLib.toString();
 		clazzPath = clazzPath + ';' + rtsLib;
@@ -555,12 +556,12 @@ public class SimulaCompiler {
 		String[] args = new String[nArg];
 		arguments.toArray(args);
 
-//		if (Option.internal.DEBUGGING) {
+		if (SimulaCompiler.verbose) {
 			Util.println("------------  Call Java System Compiler  ------------");
 			Util.println("System Compiler supports " + compiler.getSourceVersions());
 			for (int i = 0; i < args.length; i++)
 				Util.println("Compiler'args[" + i + "]=" + args[i]);
-//		}
+		}
 		int exitValue = compiler.run(System.in, System.out, System.err, args);
 		return (exitValue);			
 	}

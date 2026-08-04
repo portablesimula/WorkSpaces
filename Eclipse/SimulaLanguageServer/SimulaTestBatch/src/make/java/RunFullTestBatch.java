@@ -42,7 +42,7 @@ public final class RunFullTestBatch {
 //		argv.add("-caseSensitive");
 //		argv.add("-noextension");
 		argv.add("-noPopup");
-//		argv.add("-nowarn");
+		argv.add("-nowarn");
 //		argv.add("-verbose");
 //		argv.add("-select");
 

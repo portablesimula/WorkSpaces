@@ -126,7 +126,7 @@ public abstract class SyntaxElement {
 
 	/// The first source line number
 	public LexToken getFirstLexToken() {
-		IO.println("SyntaxElement.getFirstLexToken: "+this.getClass());
+//		IO.println("SyntaxElement.getFirstLexToken: "+this.getClass());
 //		return lexTokenRange.getFirstLexToken();			
 		return firstParserToken;			
 	}

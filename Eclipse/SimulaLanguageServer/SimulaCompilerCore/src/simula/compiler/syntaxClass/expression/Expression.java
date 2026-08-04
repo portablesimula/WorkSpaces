@@ -113,7 +113,7 @@ public abstract class Expression extends SyntaxElement {
 	/// 
 	/// @return Expression or null if no expression is found.
 	public static Expression acceptExpression(SimulaBuilder simBuilder) {
-		IO.println("Expression.acceptExpression: current: " + simBuilder.getCurrentParserToken());
+//		IO.println("Expression.acceptExpression: current: " + simBuilder.getCurrentParserToken());
 		if(Parse.accept(simBuilder, KeyWord.IF)) {
 			Expression condition=acceptExpression(simBuilder);
 			Parse.expect(simBuilder, KeyWord.THEN);
@@ -392,7 +392,7 @@ public abstract class Expression extends SyntaxElement {
 		else {
 			LexToken prevToken2 = Parse.getCurrentParserToken(simBuilder) ;
 			Identifier ident = Parse.acceptIdentifier(simBuilder);
-			IO.println("Expression.acceptExpression: Ident=" + ident);
+//			IO.println("Expression.acceptExpression: Ident=" + ident);
 			if(ident != null) {
 				expr=VariableExpression.expectVariable(simBuilder, ident);
 			} else {

@@ -13,6 +13,7 @@ import java.lang.constant.MethodTypeDesc;
 
 import simula.Option;
 import simula.builder.SyntaxTree;
+import simula.compiler.DocumentManager;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.declaration.ConnectionBlock;
@@ -29,7 +30,6 @@ import simula.compiler.utilities.Html;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.RTS;
 import simula.compiler.utilities.Util;
-import simula.lsp.compiler.DocumentManager;
 import simula.token.Identifier;
 
 /// Utility class Type.

@@ -1,4 +1,4 @@
-package simula.lsp.compiler;
+package simula.compiler;
 
 import java.io.File;
 import java.util.List;
@@ -218,12 +218,12 @@ public class DocumentManager {
 
 	public void tryCreateBuilder() {
     	LOG.info("DocumentManager.tryCreateBuilder: BEGIN");
-		String sourceText = this.getText();
+//		String sourceText = this.getText();
 		SimulaBuilder newSimBuilder = new SimulaBuilder(this);
 		// TRY BUILD SYNTAX TREE ...
 		try {
 			newSimBuilder.doBuilding();
-    		IO.println("DocumentManager.tryCreateBuilder: " + Util.printable(sourceText));
+//    		IO.println("DocumentManager.tryCreateBuilder: " + Util.printable(sourceText));
     		simBuilder = newSimBuilder;
 		} catch (Exception e) {
 			IO.println("DocumentManager.tryCreateBuilder: GOT EXCEPTION: " + e.getMessage());

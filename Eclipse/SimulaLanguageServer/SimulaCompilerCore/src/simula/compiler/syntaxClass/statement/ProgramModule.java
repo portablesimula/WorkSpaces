@@ -29,6 +29,7 @@ import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.Util;
+import simula.lsp.util.SimPosition;
 import simula.token.Identifier;
 import simula.token.LexToken;
 
@@ -147,16 +148,19 @@ public final class ProgramModule extends Statement {
 			
 			LexToken token = Parse.getCurrentParserToken(simBuilder);
 			if(token != null && token.keyWord != KeyWord.EOF) {
+				int mrk = simBuilder.tokenList.size();
 				while(!simBuilder.eof()) simBuilder.getNextParserToken(); // consume tokens  (add it to tokenList)
-				
-				IO.println("NEW ProgramModule - NOTE: FINN EN ANNEN MÅTE Å GJØRE DETTE PÅ");
-				
-//				IO.println("NEW ProgramModule: TextAfterEnd: \"" + dum.psiTree.getText().replace("\n", "\\n") + '"');
-//				String textAfterEnd = dum.getPsiTree().getText().replaceAll("\\s+", ""); // Remove WhiteSpaces			
-//				IO.println("NEW ProgramModule: TextAfterEnd: \"" + textAfterEnd + '"');
-//				simBuilder.psiRoot.printTree("");
-//				if(! textAfterEnd.equals(";")) Util.warning("Text after Program end: \"" + textAfterEnd + '"');
-//				Util.IERR();
+				int n = simBuilder.tokenList.size();
+				StringBuilder sb = new StringBuilder();
+				for(int i=mrk-1;i<n;i++) {
+//					IO.println("NEW ProgramModule: tokenAfter: " + simBuilder.tokenList.get(i));
+					sb.append(simBuilder.tokenList.get(i).getText());
+				}
+				String textAfterEnd = Util.printable(sb.toString());
+//				IO.println("NEW ProgramModule: TextAfterEnd: " + Util.printable(textAfterEnd));
+				SimPosition start = simBuilder.tokenList.get(mrk-1).getPosition();
+				SimPosition end = simBuilder.tokenList.get(n-1).getPosition();
+				if(! textAfterEnd.equals(";")) Util.warning(simBuilder, start, end, "Text after Program end: \"" + textAfterEnd + '"');
 			}
 			
 			if(SimulaCompiler.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
@@ -186,9 +190,9 @@ public final class ProgramModule extends Statement {
 		if(IS_SEMANTICS_CHECKED()) return;
 		CoreGlobal.enterScope(mainModule);
 		sysin.doChecking();
-		IO.println("ProgramModule.doChecking: BEFORE SYSOUT: sysout.meaning="+sysout.meaning);
+//		IO.println("ProgramModule.doChecking: BEFORE SYSOUT: sysout.meaning="+sysout.meaning);
 		sysout.doChecking();
-		IO.println("ProgramModule.doChecking: AFTER SYSOUT: sysout.meaning="+sysout.meaning);
+//		IO.println("ProgramModule.doChecking: AFTER SYSOUT: sysout.meaning="+sysout.meaning);
 //		Util.IERR("");
 		mainModule.doChecking();
 		SET_SEMANTICS_CHECKED();

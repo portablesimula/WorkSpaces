@@ -2,7 +2,7 @@ package simula.token;
 
 import simula.Option;
 import simula.builder.SimulaLexer;
-import simula.lsp.compiler.TokenManager;
+import simula.compiler.TokenManager;
 
 public class KeyWordToken extends LexToken {
 	

@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Vector;
 
 import simula.builder.SimulaBuilder;
+import simula.compiler.DocumentManager;
 import simula.compiler.SimulaCompiler;
+import simula.compiler.TokenManager;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.SimulaDiagnostic;
 import simula.compiler.utilities.Util;
-import simula.lsp.compiler.DocumentManager;
-import simula.lsp.compiler.TokenManager;
 import simula.token.LexToken;
 
 public class SimulaCoreExports {
@@ -33,44 +33,27 @@ public class SimulaCoreExports {
 
 	// Debug Utility
 	public static void run(final String documentUri, Vector<String> argv) {
-		IO.println("SimulaCoreExports.run: " + documentUri);
+//		IO.println("SimulaCoreExports.run: " + documentUri);
     	DocumentManager documentManager = DocumentManager.getDocumentManager(documentUri);
     	SimulaBuilder simBuilder = documentManager.simBuilder;
-
-//    	IO.println("SimulaCoreExports.run: sourceFileDir=" + documentManager.sourceFileDir);
-//    	IO.println("SimulaCoreExports.run: outputDir=" + SimulaCompiler.outputDir);
-//    	if(SimulaCompiler.outputDir == null) {
-//    		SimulaCompiler.outputDir = new File(documentManager.sourceFileDir,"bin");
-//    	}
-//    	IO.println("SimulaCoreExports.run: outputDir=" + SimulaCompiler.outputDir);
-//    	SimulaCompiler.outputDir.mkdirs();
-//    	if (! SimulaCompiler.outputDir.canWrite()) {
-//    		Util.IERR("SimulaCoreExports.run: Unable to write to " + SimulaCompiler.outputDir);
-//    	}
-    	
-//    	Util.STOP();
-//    	/// Try set Global.outputDir
-//    	/// @param dir a directory
-//    	public static void trySetOutputDir(File dir) {
-//    		dir.mkdirs();
-//    		if (dir.canWrite())
-//    			SimulaCompiler.outputDir = dir;
-//    		else {
-//    			SimulaCompiler.outputDir = getTempFileDir("simulaEditor/bin");
-//    		}
-//    	}
 
     	String[] args = argv.toArray(new String[0]);
 		Option.decodeArguments2(args);
 
     	SimulaCompiler simulaCompiler = new SimulaCompiler(documentManager);
 //    	simulaCompiler.doCompile();
+    	if(simBuilder.nErrors != 0) {
+    		Util.IERR("Can't generate code due to " + simBuilder.nErrors + " errors.");
+    	}
     	try {
 			simulaCompiler.doCodeGeneration(simBuilder);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    	if(simBuilder.nErrors != 0) {
+    		Util.IERR("Can't run due to " + simBuilder.nErrors + " errors.");
+    	}
     	try {
 			simulaCompiler.doRun(simBuilder);
 		} catch (IOException e) {

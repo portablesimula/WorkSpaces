@@ -35,7 +35,7 @@ public final class RunSingleClassTest {
 //		argv.add("-noextension");
 		argv.add("-noPopup");
 //		argv.add("-nowarn");
-		argv.add("-verbose");
+//		argv.add("-verbose");
 //		argv.add("-select");
 
 		Vector<String> argv2 = new Vector<>();
@@ -57,7 +57,7 @@ public final class RunSingleClassTest {
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
 //		names.add("adHoc04.sim"); // For ad'hoc testing
-//		names.add("adHoc05.sim"); // For ad'hoc testing
+		names.add("adHoc05.sim"); // For ad'hoc testing
 //		names.add("adHoc10.sim"); // For ad'hoc testing
 		
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
@@ -187,7 +187,7 @@ public final class RunSingleClassTest {
 //		names.add("simtst104.sim"); // OK: Procedure parameter 'F' by name.
 //		names.add("simtst105.sim"); // OK: Multiple assignments.
 //		names.add("simtst106.sim"); // ERR: Test SIMULATION, complex example.
-//	names.add("simtst107.sim"); // OK:  Test Process, activation statements, idle, terminated, time.
+//		names.add("simtst107.sim"); // OK:  Test Process, activation statements, idle, terminated, time.
 //		names.add("simtst108.sim"); // OK: Simple Co-Routine Sample 1: detach - call
 //		names.add("simtst109.sim"); // OK: Simple Co-Routine Sample 2: detach - resume
 //		names.add("simtst110.sim"); // OK: Simple Co-Routine Sample 3: detach - resume - chain
@@ -217,7 +217,7 @@ public final class RunSingleClassTest {
 //		names.add("simtst129.sim"); // OK: Switch in precompiled class
 //		names.add("simtst130.sim"); // OK: Class SimLib, a set of utility procedures from DEC Handbook.
 //
-		names.add("simtst131.sim"); // OK: Catching Errors
+//	names.add("simtst131.sim"); // OK: Catching Errors
 //		names.add("simtst132.sim"); // OK: SPORT Options
 //		names.add("simtst133.sim"); // OK: Test infile reading with inimage and inrecord.
 //		names.add("simtst134.sim"); // OK: Outfile with CREATE, APPEND, SYNCHRONOUS and PURGE.
@@ -300,7 +300,7 @@ public final class RunSingleClassTest {
 //		Option.internal.TRACE_CODING=true;
 
 		// Overall TRACING Options
-		Option.internal.TRACING=true;
+//		Option.internal.TRACING=true;
 
 		// Scanner Trace Options
 //		Option.internal.TRACE_LEXER=true;

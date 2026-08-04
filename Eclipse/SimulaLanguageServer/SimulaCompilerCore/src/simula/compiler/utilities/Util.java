@@ -80,21 +80,21 @@ public final class Util {
 	/// Print a error message.
 	/// @param msg the message
 	public static void generalWarning(final String msg) {
-		LOG.warning("General Warning: " + msg);
+		if(SimulaCompiler.WARNINGS) LOG.warning("General Warning: " + msg);
 //		simBuilder.addDiagnostic(diagnostic); // TODO: DETTE MÅ RETTES - 
 	}
 
 	/// Print a error message.
 	/// @param msg the message
 	public static void generalWarning(final int lineNumber, final String msg) {
-		LOG.error("Line " + lineNumber + ": General Error: " + msg);
+		if(SimulaCompiler.WARNINGS) LOG.error("Line " + lineNumber + ": General Error: " + msg);
 //		simBuilder.addDiagnostic(diagnostic); // TODO: DETTE MÅ RETTES - 
 	}
 
 	/// Print a warning message.
 	/// @param msg the message
 	public static void warning(final SimulaBuilder simBuilder, final String msg) {
-		warning(simBuilder, simBuilder.getPrevParserToken(), msg);
+		if(SimulaCompiler.WARNINGS)	warning(simBuilder, simBuilder.getPrevParserToken(), msg);
 	}
 
 	/// Print a warning message.
@@ -109,8 +109,10 @@ public final class Util {
         SimPosition end = new SimPosition(token.lineNumber, token.column + token.length);
 		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new SimRange(start, end), msg);
 		
-		LOG.warning(diagnostic.toString());
-		simBuilder.addDiagnostic(diagnostic);
+		if(SimulaCompiler.WARNINGS) {
+			LOG.warning(diagnostic.toString());
+			simBuilder.addDiagnostic(diagnostic);
+		}
 	}
 
 	/// Print a warning message.
@@ -123,8 +125,21 @@ public final class Util {
         SimPosition end = new SimPosition(last.lineNumber, last.column + last.length);
 		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new SimRange(start, end), msg);
 
-		LOG.warning(diagnostic.toString());
-		elt.simBuilder.addDiagnostic(diagnostic);
+		if(SimulaCompiler.WARNINGS) {
+			LOG.warning(diagnostic.toString());
+			elt.simBuilder.addDiagnostic(diagnostic);
+		}
+	}
+
+	/// Print a warning message.
+	/// @param msg the message
+	public static void warning(final SimulaBuilder simBuilder, final SimPosition start, final SimPosition end, final String msg) {
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new SimRange(start, end), msg);
+
+		if(SimulaCompiler.WARNINGS) {
+			LOG.warning(diagnostic.toString());
+			simBuilder.addDiagnostic(diagnostic);
+		}
 	}
 
 
@@ -157,10 +172,7 @@ public final class Util {
 		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new SimRange(start, end), msg);
 		
 		LOG.error(diagnostic.toString());
-		
-//		Util.IERR("Util.SyntaxError: ");
-		
-		simBuilder.addDiagnostic(diagnostic);
+		simBuilder.addError(diagnostic);
 	}
 	
 	public static void semanticError(final SyntaxElement elt, final String msg) {
@@ -172,7 +184,7 @@ public final class Util {
 		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new SimRange(start, end), msg);
 		
 		LOG.error(diagnostic.toString());
-		elt.simBuilder.addDiagnostic(diagnostic);
+		elt.simBuilder.addError(diagnostic);
 	}
 	
 	/// Error during Code generation:
@@ -185,7 +197,7 @@ public final class Util {
 		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new SimRange(start, end), msg);
 		
 		LOG.error(diagnostic.toString());
-		elt.simBuilder.addDiagnostic(diagnostic);
+		elt.simBuilder.addError(diagnostic);
 	}
 
 	/// Exit with Thread.dumpStack

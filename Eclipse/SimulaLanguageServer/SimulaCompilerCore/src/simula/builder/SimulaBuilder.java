@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Vector;
 
 import simula.Option;
+import simula.compiler.DocumentManager;
 import simula.compiler.JarFileBuilder;
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.SimulaCompiler;
@@ -19,7 +20,6 @@ import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.SimulaDiagnostic;
 import simula.compiler.utilities.Util;
-import simula.lsp.compiler.DocumentManager;
 import simula.token.LexToken;
 import simula.token.SimpleString;
 
@@ -47,12 +47,14 @@ public class SimulaBuilder {
 
 	// Builder generated data structure:
 	public ProgramModule syntaxTree; // Root of Syntax Tree
+	public int nErrors;
 	public List<SimulaDiagnostic> diagnostics;
 	public List<LexToken> tokenList;
 
 	public SimulaBuilder(DocumentManager documentManager) {
 		this.documentManager = documentManager;
     	// INIT:
+		this.nErrors = 0;
     	this.diagnostics = new ArrayList<>();
     	this.tokenList   = new ArrayList<>();
         lexer = new SimulaLexer(this, documentManager.sourceCode);
@@ -144,6 +146,11 @@ public class SimulaBuilder {
 	}
 
 
+	public void addError(SimulaDiagnostic diagnostic) {
+		diagnostics.add(diagnostic);
+		nErrors++;
+	}
+
 	public void addDiagnostic(SimulaDiagnostic diagnostic) {
 		diagnostics.add(diagnostic);
 	}
@@ -209,9 +216,9 @@ public class SimulaBuilder {
 		int n = tokenList.size();
 		rollBackIndex = -1;
 		LOOP:for(int i=n-1;i>=0;i--) {
-			IO.println("PsiBuilder.rollBackTo: token "+i+": "+tokenList.get(i));	
+//			IO.println("PsiBuilder.rollBackTo: token "+i+": "+tokenList.get(i));	
 			if(tokenList.get(i) == prev) {
-				IO.println("PsiBuilder.rollBackTo: FOUND: " + i + ": " + prev);	
+//				IO.println("PsiBuilder.rollBackTo: FOUND: " + i + ": " + prev);	
 				rollBackIndex = i + 1;
 				break LOOP;
 			}

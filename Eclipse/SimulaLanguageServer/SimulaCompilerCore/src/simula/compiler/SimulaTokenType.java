@@ -1,4 +1,4 @@
-package simula.lsp.compiler;
+package simula.compiler;
 
 /// @author Øystein Myhre Andersen
 /// @author Google AI

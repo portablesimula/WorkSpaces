@@ -111,7 +111,7 @@ public abstract class Statement extends SyntaxElement {
 		Statement statement = null;
 		int keyWord = simToken.keyWord;
 		
-		IO.println("\nStatement.acceptUnlabeledStatement(1): keyWord=" + KeyWord.edit(keyWord) + " " + simToken);
+//		IO.println("\nStatement.acceptUnlabeledStatement(1): keyWord=" + KeyWord.edit(keyWord) + " " + simToken);
 		switch(keyWord) {
 			case KeyWord.BEGIN:
 				// case KeyWord.BEGIN: PsiParse.nextToken(); return (new MaybeBlockDeclaration(null).expectMaybeBlock(lineNumber));
@@ -156,7 +156,7 @@ public abstract class Statement extends SyntaxElement {
 				}
 				
 				Expression expr = Expression.acceptExpression(simBuilder);
-				IO.println("\n\nStatement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr.getClass().getSimpleName()+" "+expr+" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
+//				IO.println("\n\nStatement.acceptUnlabeledStatement: IDENTIFIER: expr="+expr.getClass().getSimpleName()+" "+expr+" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
 //				Thread.dumpStack();
 				
 //				if(Option.TRACE_ACCEPT_STATEMENT > 2) {

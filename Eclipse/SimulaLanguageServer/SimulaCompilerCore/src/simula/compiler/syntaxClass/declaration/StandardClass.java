@@ -973,6 +973,10 @@ public final class StandardClass extends ClassDeclaration {
 	private static void initCatchingErrors() { 
 		CatchingErrors=new StandardClass("CLASS","CatchingErrors");
 		ENVIRONMENT.addStandardClass(CatchingErrors);  // Declared in ENVIRONMENT
+
+//		IO.println("StandardClass.initCatchingErrors: ENVIRONMENT.declarationList: " + ENVIRONMENT.declarationList);
+//		ENVIRONMENT.declarationList.print("StandardClass.initCatchingErrors: ");
+		
 		CatchingErrors.virtualSpecList.add(new VirtualSpecification(null, new Identifier("onError"), null, VirtualSpecification.Kind.Procedure,CatchingErrors.prefixLevel(),null));
 		CatchingErrors.statements1=new ObjectList<Statement>();
 		CatchingErrors.statements1.add(new InlineStatement(null, "try")); // Statements before inner 

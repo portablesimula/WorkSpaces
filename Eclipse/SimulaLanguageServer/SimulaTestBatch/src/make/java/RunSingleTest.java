@@ -306,11 +306,11 @@ public final class RunSingleTest {
 //		Option.internal.LIST_GENERATED_CLASS_FILES=true;
 
 		// Overall TRACING Options
-		Option.internal.TRACING=true;
+//		Option.internal.TRACING=true;
 
 		// Scanner Trace Options
 //		Option.internal.TRACE_LEXER = 2;
-//		Option.internal.TRACE_NEW_LEXTOKEN = 2;
+		Option.internal.TRACE_NEW_LEXTOKEN = 2;
 //		Option.TRACE_COMMENTS=true;
 
 		// Parser Trace Options

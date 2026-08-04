@@ -61,7 +61,7 @@ public final class CoreGlobal {
 		Object_SEQU = 8001;
 		includeQueue = null;
 		ClassHierarchy.init();
-    	IO.println("Global.initiate completed");
+//    	IO.println("Global.initiate completed");
 	}
 
 	/// The declaration scope stack.

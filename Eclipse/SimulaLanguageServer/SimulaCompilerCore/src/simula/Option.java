@@ -153,7 +153,7 @@ public final class Option {
 
 	/// Kalles av 'run' før coding og exec
 	public static void decodeArguments2(String[] argv) {
-		IO.println("Option.decodeArguments2: ");
+//		IO.println("Option.decodeArguments2: ");
 
 		// Parse command line arguments.
 		for(int i=0;i<argv.length;i++) {
