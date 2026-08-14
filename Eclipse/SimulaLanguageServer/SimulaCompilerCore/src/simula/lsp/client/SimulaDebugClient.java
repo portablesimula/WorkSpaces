@@ -1,8 +1,8 @@
 package simula.lsp.client;
 
 import simula.SimTextDocumentContentChangeEvent;
-import simula.compiler.DocumentManager;
-import simula.compiler.utilities.CoreGlobal;
+import simula.core.DocumentManager;
+import simula.core.utilities.CoreGlobal;
 import simula.lsp.util.SimPosition;
 import simula.lsp.util.SimRange;
 

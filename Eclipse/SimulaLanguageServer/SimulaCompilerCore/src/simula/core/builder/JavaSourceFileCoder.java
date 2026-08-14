@@ -1,0 +1,240 @@
+/// (CC) This work is licensed under a Creative Commons
+/// Attribution 4.0 International License.
+/// 
+/// You find a copy of the License on the following
+/// page: https://creativecommons.org/licenses/by/4.0/
+package simula.core.builder;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Date;
+import java.util.Vector;
+
+import simula.Option;
+import simula.core.DocumentManager;
+import simula.core.coder.SimulaCompiler;
+import simula.core.syntaxClass.declaration.BlockDeclaration;
+import simula.core.utilities.CoreGlobal;
+import simula.core.utilities.LOG;
+import simula.core.utilities.ObjectKind;
+import simula.core.utilities.Util;
+
+/// Java source-file coder.
+/// 
+/// Link to GitHub: <a href=
+/// "https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/JavaSourceFileCoder.java"><b>Source File</b></a>.
+/// 
+/// @author Øystein Myhre Andersen 
+public final class JavaSourceFileCoder {
+	
+	/// The enclosing JavaSourceFileCoder
+	private JavaSourceFileCoder enclosingJavaCoder;
+	
+	/// The underlying Java output writer.
+	private final Writer writer;
+	
+	/// The line number map
+	private final Vector<Integer> lineMap = new Vector<Integer>();
+	
+	/// The output file for generated Java code.
+	public final File javaOutputFile;
+
+	/// Given as argument. Class, Procedure, Prefixed Block or Sub-Block.
+	public final BlockDeclaration blockDeclaration;
+	
+	/// Signals that ByteCodeEngineering is necessary.
+	public boolean mustDoByteCodeEngineering;
+
+	/// Create a new JavaSourceFileCoder.
+	/// @param blockDeclaration argument
+	public JavaSourceFileCoder(final BlockDeclaration blockDeclaration) {
+		this.blockDeclaration = blockDeclaration;
+		SimulaCompiler.javaSourceFileCoders.add(this);
+		enclosingJavaCoder = CoreGlobal.currentJavaFileCoder;
+		CoreGlobal.currentJavaFileCoder = this;
+		javaOutputFile = new File(SimulaCompiler.tempJavaFileDir, blockDeclaration.getJavaIdentifier() + ".java");
+		LOG.info("JavaSourceFileCoder: javaOutputFile: " + javaOutputFile);
+		try {
+			javaOutputFile.getParentFile().mkdirs();
+			if (SimulaCompiler.verbose)
+				Util.TRACE("Output: " + javaOutputFile.getCanonicalPath());
+//			writer = new OutputStreamWriter(new FileOutputStream(javaOutputFile), CoreGlobal._CHARSET);
+			writer = new OutputStreamWriter(new FileOutputStream(javaOutputFile));
+			JavaSourceFileCoder.code("package " + SimulaCompiler.packetName + ";");
+			JavaSourceFileCoder.code("// " + SimulaCompiler.simulaReleaseID + " Compiled at " + new Date());
+			JavaSourceFileCoder.code("import simula.runtime.*;");
+		} catch (IOException e) {
+			throw new RuntimeException("Writing .java output failed", e);
+		}
+	}
+
+	/// Edit the current module's identification.
+	/// @return the current module's identification
+	private String modid() {
+		BlockDeclaration blk = CoreGlobal.currentJavaFileCoder.blockDeclaration;
+		return (blk.declarationKind + " " + blk.scopeID());
+	}
+
+	/// Returns the output file for generated Java code.
+	/// @return the output file for generated Java code
+	public String getClassOutputFileName() {
+		return (SimulaCompiler.tempClassFileDir + "/" + SimulaCompiler.packetName + '/' + blockDeclaration.getJavaIdentifier() + ".class");
+	}
+
+	/// Close Java output file.
+	/// @throws RuntimeException if writing .java output failed
+	public void closeJavaOutput() {
+		try {
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			throw new RuntimeException("Writing .java output failed", e);
+		}
+		CoreGlobal.currentJavaFileCoder = enclosingJavaCoder;
+		enclosingJavaCoder = null;
+	}
+
+	/// Output a debug code line.
+	/// 
+	/// To optimize, it is safe to drop such lines
+	/// 
+	/// @param line a debug code line
+	public static void debug(final String line) {
+		code(line);
+	}
+
+	/// Output a code line without comment.
+	/// 
+	/// @param line a code line
+	public static void code(final String line) {
+		CoreGlobal.currentJavaFileCoder.write(CoreGlobal.sourceLineNumber, line, CoreGlobal.currentJavaFileCoder.modid());
+	}
+
+	/// Output a code line with comment.
+	/// 
+	/// @param line a code line
+	/// @param comment a comment string
+	public static void code(final String line, final String comment) {
+		code(line + " // " + comment);
+	}
+
+	/// Current Java line number
+	private int currentJavaLineNumber = 0;
+
+	/// Previous source line number.
+	private static int prevLineNumber = 0;
+	
+	/// Current indentation
+	private int indent;
+
+	/// Write a code line to the Java output writer.
+	/// @param sourceLineNumber the source line number
+	/// @param line the code line string
+	/// @param modid module identifier
+	private void write(final int sourceLineNumber, final String line, final String modid) {
+//		Util.ASSERT(sourceLineNumber > 0, "Invariant: sourceLineNumber="+sourceLineNumber);
+		try {
+			currentJavaLineNumber++;
+			if (prevLineNumber != sourceLineNumber) {
+				String s0 = edIndent() + edLineNumberLine(sourceLineNumber, modid);
+				appendLine(currentJavaLineNumber, sourceLineNumber);
+				if (Option.internal.TRACE_CODING)
+					IO.println("CODE " + sourceLineNumber + ": " + s0);
+				currentJavaLineNumber++;
+				writer.write(s0 + '\n');
+			}
+			if (line.contains("}")) {
+				indent--;
+				if (indent < 0)
+					indent = 0;
+			}
+			String s = edIndent() + line;
+			if (line.contains("{"))
+				indent++;
+			if (Option.internal.TRACE_CODING)
+				IO.println("CODE " + sourceLineNumber + ": " + s);
+			Util.ASSERT(writer != null, "Can't Output Code - writer==null");
+			writer.write(s + '\n');
+		} catch (IOException e) {
+			Util.IERR("Error Writing File: " + javaOutputFile, e);
+		}
+		prevLineNumber = sourceLineNumber;
+	}
+
+	/// Code Utility: Edit line number comment line.
+	///
+	/// On the form:
+	///
+	/// 		// JavaLine currentJavaLineNumber <== SourceLine simulaLine
+	/// @param simulaLine Simula line number
+	/// @param modid the module identifier
+	/// @return the resulting Java source line
+	private String edLineNumberLine(final int simulaLine, final String modid) {
+		StringBuilder sb = new StringBuilder();
+		if (SimulaCompiler.duringSTM_Coding && Option.internal.GNERATE_LINE_CALLS) {
+			sb.append("RTS_UTIL._LINE(\"").append(modid).append("\",").append(simulaLine).append("); ");
+		}
+		sb.append("// JavaLine ").append(currentJavaLineNumber).append(" <== SourceLine ").append(simulaLine);
+		return (sb.toString());
+	}
+
+	/// Utility: Edit indent string
+	/// @return the indent string
+	private String edIndent() {
+		int i = indent;
+		String s = "";
+		while ((i--) > 0)
+			s = s + "    ";
+		return (s);
+	}
+
+	/// Append an entry to the line map.
+	/// @param javaLine the Java line number
+	/// @param simulaLine the simula line number
+	private void appendLine(final int javaLine, final int simulaLine) {
+		lineMap.add(javaLine);
+		lineMap.addElement(simulaLine);
+	}
+
+	/// Output program info. I.e. identifier and lineMap.
+	public void codeProgramInfo() {
+		appendLine(currentJavaLineNumber, blockDeclaration.lastLineNumber());
+		// public static RTS_PROGINFO _INFO=new
+		// RTS_PROGINFO("file.sim","MainProgram",1,4,12,5,14,12,32,14,37,16);
+		StringBuilder s = new StringBuilder();
+		s.append(edIndent() + "public static RTS_PROGINFO _INFO=new RTS_PROGINFO(\"");
+		s.append(DocumentManager.sourceFileName);
+		s.append("\",\"");
+		s.append(ObjectKind.edit(blockDeclaration.declarationKind) + " " + blockDeclaration.identifierValue());
+		s.append('"');
+		for (Integer i : lineMap) {
+			s.append(',');
+			s.append("" + i);
+		}
+		s.append(");");
+		writeCode(s.toString());
+	}
+
+	/// Write a code line to the Java output writer.
+	/// @param s the code line string
+	private void writeCode(String s) {
+		if (Option.internal.TRACE_CODING)
+			IO.println("CODE " + CoreGlobal.sourceLineNumber + ": " + s);
+		Util.ASSERT(writer != null, "Can't Output Code - writer==null");
+		try {
+			writer.write(s.toString() + '\n');
+		} catch (IOException e) {
+			Util.IERR("Error Writing File: " + javaOutputFile, e);
+		}
+
+	}
+
+	@Override
+	public String toString() {
+		return ("JavaModule " + blockDeclaration + ", javaOutputFile=" + javaOutputFile);
+	}
+
+}

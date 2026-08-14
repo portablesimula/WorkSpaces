@@ -1,6 +1,6 @@
 package simula.lsp.util;
 
-import simula.compiler.utilities.Util;
+import simula.core.utilities.Util;
 
 public class AstData {
 	String string;

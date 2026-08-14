@@ -118,7 +118,7 @@ public abstract class RTS_RTObject {
 	/// 
 	/// If the parameter is 'by name' the parameter is evaluated.
 	/// 
-	/// See {@link simula.compiler.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
+	/// See {@link simula.core.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
 	/// @param par an Object
 	/// @return a RTS_ARRAY value
 	public RTS_ARRAY arrayValue(final Object par) {
@@ -131,7 +131,7 @@ public abstract class RTS_RTObject {
 	/// 
 	/// If the parameter is 'by name' the parameter is evaluated.
 	/// 
-	/// See {@link simula.compiler.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
+	/// See {@link simula.core.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
 	/// @param par an Object
 	/// @return a RTS_PRCQNT value
 	public RTS_PRCQNT procValue(final Object par) {
@@ -146,7 +146,7 @@ public abstract class RTS_RTObject {
 	/// 
 	/// - If the parameter is a RTS_PRCQNT that procedure is called 
 	/// 
-	/// See {@link simula.compiler.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
+	/// See {@link simula.core.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
 	/// @param par an Object
 	/// @return a Object value
 	public Object objectValue(Object par) {
@@ -165,7 +165,7 @@ public abstract class RTS_RTObject {
 	/// 
 	/// - If the parameter is a Float or Double they are casted to Integer 
 	/// 
-	/// See {@link simula.compiler.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
+	/// See {@link simula.core.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
 	/// @param par an Object
 	/// @return an Integer value
 	public int intValue(Object par) {
@@ -190,7 +190,7 @@ public abstract class RTS_RTObject {
 	/// 
 	/// - If the parameter is a Integer or Double they are casted to Float 
 	/// 
-	/// See {@link simula.compiler.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
+	/// See {@link simula.core.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
 	/// @param par an Object
 	/// @return a Float value
 	public float floatValue(Object par) {
@@ -215,7 +215,7 @@ public abstract class RTS_RTObject {
 	/// 
 	/// - If the parameter is an Integer or Float they are casted to Double 
 	/// 
-	/// See {@link simula.compiler.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
+	/// See {@link simula.core.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
 	/// @param par an Object
 	/// @return a Double value
 	public double doubleValue(Object par) {
@@ -238,7 +238,7 @@ public abstract class RTS_RTObject {
 	/// 
 	/// - If the parameter is a _PRCQNT that procedure is called 
 	/// 
-	/// See {@link simula.compiler.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
+	/// See {@link simula.core.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
 	/// @param par an Object
 	/// @return a boolean value
 	public boolean booleanValue(Object par) {
@@ -257,7 +257,7 @@ public abstract class RTS_RTObject {
 	/// 
 	/// - If the parameter is a _PRCQNT that procedure is called 
 	/// 
-	/// See {@link simula.compiler.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
+	/// See {@link simula.core.syntaxClass.declaration.ProcedureDeclaration#doCodePrepareFormal() simula.compiler.declaration.ProcedureDeclaration#doCodePrepareFormal}
 	/// @param par an Object
 	/// @return a boolean value
 	public char charValue(Object par) {

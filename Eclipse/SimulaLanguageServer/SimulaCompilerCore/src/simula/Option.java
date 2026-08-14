@@ -6,9 +6,10 @@
 package simula;
 
 import java.io.File;
-import simula.compiler.SimulaCompiler;
-import simula.compiler.SimulaCompiler.CompilerMode;
-import simula.compiler.utilities.Util;
+
+import simula.core.coder.SimulaCompiler;
+import simula.core.coder.SimulaCompiler.CompilerMode;
+import simula.core.utilities.Util;
 
 /// Compile Time Options.
 /// 

@@ -5,15 +5,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
-import simula.builder.SimulaBuilder;
-import simula.compiler.DocumentManager;
-import simula.compiler.SimulaCompiler;
-import simula.compiler.TokenManager;
-import simula.compiler.utilities.CoreGlobal;
-import simula.compiler.utilities.LOG;
-import simula.compiler.utilities.SimulaDiagnostic;
-import simula.compiler.utilities.Util;
-import simula.token.LexToken;
+import simula.core.DocumentManager;
+import simula.core.builder.SimulaBuilder;
+import simula.core.builder.TokenManager;
+import simula.core.builder.token.LexToken;
+import simula.core.coder.SimulaCompiler;
+import simula.core.utilities.CoreGlobal;
+import simula.core.utilities.LOG;
+import simula.core.utilities.SimulaDiagnostic;
+import simula.core.utilities.Util;
 
 public class SimulaCoreExports {
 	
