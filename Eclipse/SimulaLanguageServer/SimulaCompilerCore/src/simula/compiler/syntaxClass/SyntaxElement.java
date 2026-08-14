@@ -215,7 +215,7 @@ public abstract class SyntaxElement {
 	/// 
 	/// @param indent number of spaces leading the line
 	public void print(final int indent) {
-		Util.println(edIndent(indent) + this.getClass().getSimpleName() + ": " + this);
+		IO.println(edIndent(indent) + this.getClass().getSimpleName() + ": " + this);
 	}
 
 	/// Utility print syntax tree method.

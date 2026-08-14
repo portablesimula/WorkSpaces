@@ -364,7 +364,7 @@ public final class ForStatement extends Statement {
 	public void print(final int indent) {
 		String spc = edIndent(indent);
 		String fl = forList.toString().replace('[', ' ').replace(']', ' ');
-		Util.println(spc + "FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + "DO");
+		IO.println(spc + "FOR " + controlVariable + " " + KeyWord.edit(assignmentOperator) + fl + "DO");
 		if (doStatement != null)
 			doStatement.print(indent);
 	}

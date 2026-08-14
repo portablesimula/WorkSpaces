@@ -49,9 +49,9 @@ public final class CoreGlobal {
 	/// Current Java output Module. Maintained by JavaModule during Java Coding
 	public static JavaSourceFileCoder currentJavaFileCoder;
 
-	/// The Jar files queued for later inclusion.
-	/// See: JarFileBuilder for details.
-	public static LinkedList<JarFile> includeQueue;
+//	/// The Jar files queued for later inclusion.
+//	/// See: JarFileBuilder for details.
+//	public static LinkedList<JarFile> includeQueue;
 
 	/// Default constructor.
 	CoreGlobal() {}
@@ -59,7 +59,7 @@ public final class CoreGlobal {
 	/// Initiate Global variables.
 	public static void initiate() {
 		Object_SEQU = 8001;
-		includeQueue = null;
+//		includeQueue = null;
 		ClassHierarchy.init();
 //    	IO.println("Global.initiate completed");
 	}

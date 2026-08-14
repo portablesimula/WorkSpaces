@@ -82,11 +82,11 @@ public final class ConditionalStatement extends Statement {
     	String spc=edIndent(indent);
 		StringBuilder s = new StringBuilder(spc);
 		s.append("IF ").append(condition);
-		Util.println(s.toString());
-		Util.println(spc + "THEN ");
+		IO.println(s.toString());
+		IO.println(spc + "THEN ");
 		thenStatement.print(indent + 1);
 		if (elseStatement != null) {
-			Util.println(spc + "ELSE ");
+			IO.println(spc + "ELSE ");
 			elseStatement.print(indent + 1);
 		}
 	}

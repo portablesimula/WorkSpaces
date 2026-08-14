@@ -11,6 +11,7 @@ import java.util.Vector;
 import simula.builder.SimulaBuilder;
 import simula.Option;
 import simula.builder.Parse;
+import simula.compiler.DocumentManager;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.SyntaxElement;
 import simula.compiler.syntaxClass.Type;
@@ -174,7 +175,7 @@ public final class ProgramModule extends Statement {
 	/// @return the Program Statement.
 	private DeclarationScope doParseProgram(final SimulaBuilder simBuilder) {
 //		BlockDeclaration mainBlock = new MaybeBlockDeclaration(simBuilder, "MainBlock: " + Global.sourceName);
-		String sourceName = SimulaCompiler.sourceName;
+		String sourceName = DocumentManager.sourceName;
 		BlockDeclaration mainBlock = new MaybeBlockDeclaration(simBuilder, new Identifier(sourceName));
 		
 		mainBlock.isMainModule = true;

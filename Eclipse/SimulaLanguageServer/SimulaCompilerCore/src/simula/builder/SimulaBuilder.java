@@ -13,6 +13,7 @@ import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.declaration.DeclarationScope;
 import simula.compiler.syntaxClass.declaration.MaybeBlockDeclaration;
+import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.KeyWord;
@@ -20,6 +21,7 @@ import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.ObjectKind;
 import simula.compiler.utilities.SimulaDiagnostic;
 import simula.compiler.utilities.Util;
+import simula.exception.EOTException;
 import simula.token.LexToken;
 import simula.token.SimpleString;
 
@@ -72,40 +74,40 @@ public class SimulaBuilder {
 		File desktop = new File(System.getProperty("user.home"), "Desktop");
 		if (SimulaCompiler.verbose) {
 			// https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html
-			Util.println("------------  SIMULA ENVIRONMENT SUMMARY  ------------");
-			Util.println("Java Home            " + System.getProperty("java.home"));
-			Util.println("User Home            " + System.getProperty("user.home"));
-			Util.println("Working Directory    " + System.getProperty("user.dir"));
+			IO.println("------------  SIMULA ENVIRONMENT SUMMARY  ------------");
+			IO.println("Java Home            " + System.getProperty("java.home"));
+			IO.println("User Home            " + System.getProperty("user.home"));
+			IO.println("Working Directory    " + System.getProperty("user.dir"));
 			String s = (desktop.exists()) ? "true " : "false";
-			Util.println("Desktop Exists=" + s + " " + desktop.toString());
-			Util.println("Java Class Path      " + System.getProperty("java.class.path"));
-			Util.println("Java Class Version   " + System.getProperty("java.class.version"));
-			Util.println("Java Version         " + System.getProperty("java.version"));
-			Util.println("Java VM Spec Version " + System.getProperty("java.vm.specification.version"));
-			Util.println("Java Vendor          " + System.getProperty("java.vendor"));
-			Util.println("OS name              " + System.getProperty("os.name"));
-			Util.println("OS architecture      " + System.getProperty("os.arch"));
-			Util.println("OS version           " + System.getProperty("os.version"));
-			Util.println("file.encoding        " + System.getProperty("file.encoding"));
-			Util.println("defaultCharset       " + Charset.defaultCharset());
-//			Util.println("compilerMode         " + args.compilerMode);
+			IO.println("Desktop Exists=" + s + " " + desktop.toString());
+			IO.println("Java Class Path      " + System.getProperty("java.class.path"));
+			IO.println("Java Class Version   " + System.getProperty("java.class.version"));
+			IO.println("Java Version         " + System.getProperty("java.version"));
+			IO.println("Java VM Spec Version " + System.getProperty("java.vm.specification.version"));
+			IO.println("Java Vendor          " + System.getProperty("java.vendor"));
+			IO.println("OS name              " + System.getProperty("os.name"));
+			IO.println("OS architecture      " + System.getProperty("os.arch"));
+			IO.println("OS version           " + System.getProperty("os.version"));
+			IO.println("file.encoding        " + System.getProperty("file.encoding"));
+			IO.println("defaultCharset       " + Charset.defaultCharset());
+//			IO.println("compilerMode         " + args.compilerMode);
 
 			// This will list the current system properties
 			// System.getProperties().list(System.out);
 
-			Util.println("------------  SIMULA VARIABLES SUMMARY  ------------");
-			Util.println("DocumentManager.documentUri     " + documentManager.documentUri);
-			Util.println("DocumentManager.sourceFileDir   " + documentManager.sourceFileDir);
-			Util.println("DocumentManager.documentVersion " + documentManager.documentVersion);
+			IO.println("------------  SIMULA VARIABLES SUMMARY  ------------");
+			IO.println("DocumentManager.sourceFileName     " + documentManager.documentUri);
+			IO.println("DocumentManager.sourceFileDir   " + documentManager.sourceFileDir);
+			IO.println("DocumentManager.documentVersion " + documentManager.documentVersion);
 
 			Option.print(" SIMULA VARIABLES SUMMARY");
 		}
 	}
 	
 	public void doBuilding() {
-        simulaCompiler = new SimulaCompiler(documentManager);
+//        simulaCompiler = new SimulaCompiler(documentManager);
         
-		boolean builderTerminateNormally = simulaCompiler.doParsing(this);
+		boolean builderTerminateNormally = this.doParsing(this);
     	
     	if(Option.LEX_VERIFY) {
 //        	IO.println("SimulaBuilder: documentManager.sourceCode: "+documentManager.sourceCode);
@@ -137,12 +139,105 @@ public class SimulaBuilder {
 
 //		Util.IERR("STOP HER INTILL VIDERE");	
 		if(builderTerminateNormally) {	
-			simulaCompiler.doChecking(this);
+//			simulaCompiler.doChecking(this);
+			this.doChecking(this);
 		} else {
 			Util.IERR("");
 		}
 //		Util.IERR("STOP HER INTILL VIDERE");	
 		
+	}
+
+	// ***************************************************************
+	// *** Scanning and Parsing
+	// ***************************************************************
+	public boolean doParsing(SimulaBuilder simBuilder) {
+		boolean builderTerminateNormally = false;
+		simBuilder.duringParsing = true;
+    	LOG.info("SimulaCompiler.doParsing: BEGIN");
+    	
+    	setTmpClassDir(); // Neccessary because external decclaration reads .jar
+    	setOutputDir();   // Neccessary because external decclaration reads .jar
+    	
+        // Do the actual Building
+		simBuilder.getNextParserToken();
+		simBuilder.syntaxTree = new ProgramModule(simBuilder);
+        try {
+        	simBuilder.syntaxTree.doBuild();
+        	builderTerminateNormally = true;
+        } catch(EOTException e) {
+			System.err.println("SimulaBuilder: GOT EXCEPTION: " + e.getMessage());
+//			e.printStackTrace();
+			simBuilder.lexer.flush();
+        }
+
+    	LOG.info("SimulaBuilder: syntaxTree, tokenList and diagnostics DONE");
+//    	IO.println("SimulaBuilder: this.syntaxTree: "+simBuilder.syntaxTree); // Root of Syntax Tree
+//    	IO.println("SimulaBuilder: this.diagnostics: "+simBuilder.diagnostics);
+//    	IO.println("SimulaBuilder: this.tokenList: "+simBuilder.tokenList);
+//		
+//    	simBuilder.printAll(" AFTER NEW SimulaBuilder: ");
+		
+    	return builderTerminateNormally;
+	}
+    private void setTmpClassDir() {
+		// Create Temp .class-Files Directory:
+		File tmpClassDir = new File(SimulaCompiler.simulaTempDir, "classes");
+		tmpClassDir.mkdirs();
+		SimulaCompiler.tempClassFileDir = tmpClassDir;
+    	LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempClassFileDir="+SimulaCompiler.tempClassFileDir);
+//    	Util.IERR("");
+//    	Thread.dumpStack();
+    }
+    
+    private void setOutputDir() {
+//    	IO.println("SimulaCompiler.setOutputDir: sourceFileDir=" + documentManager.sourceFileDir);
+//    	IO.println("SimulaCompiler.setOutputDir: outputDir=" + SimulaCompiler.outputDir);
+    	if(SimulaCompiler.outputDir == null) {
+//    		SimulaCompiler.outputDir = new File(documentManager.sourceFileDir,"bin");
+        	File userDir = new File(System.getProperty("user.dir"));
+    		SimulaCompiler.outputDir = new File(userDir,"bin");
+    	}
+    	LOG.info("SimulaCompiler.setOutputDir: outputDir=" + SimulaCompiler.outputDir);
+    	SimulaCompiler.outputDir.mkdirs();
+    	if (! SimulaCompiler.outputDir.canWrite()) {
+    		Util.IERR("SimulaCompiler.setOutputDir: Unable to write to " + SimulaCompiler.outputDir);
+    	}
+    }
+
+	// ***************************************************************
+	// *** Semantic Checker
+	// ***************************************************************
+	public void doChecking(SimulaBuilder simBuilder) {
+		if (Option.internal.TRACING)
+			IO.println("BEGIN Semantic Checker");
+		simBuilder.duringParsing = false;
+		simBuilder.duringChecking = true;
+    	LOG.info("SimulaCompiler.doChecking: BEGIN");
+		StandardClass.ENVIRONMENT.doChecking();
+		ProgramModule programModule = simBuilder.syntaxTree;
+		programModule.doChecking();
+		
+//		programModule.doChecking();
+		if (Option.internal.TRACING) {
+			IO.println("END Semantic Checker: \"" + programModule + "\"");
+			if (Option.internal.TRACE_CHECKER_OUTPUT && programModule != null)
+				programModule.print(0);
+		}
+		if(SimulaCompiler.verbose) IO.println("SimulaCompiler.doCompile: " + DocumentManager.sourceName + ": Semantic Checker completed");
+		simBuilder.duringChecking = false;
+		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
+			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");
+			programModule.printTree(1);
+		}
+		
+		if (Util.nError > 0) {
+			String msg="Compiler terminate " + DocumentManager.sourceName + " after " + Util.nError + " errors during semantic checking";
+			IO.println(msg);
+//			Thread.dumpStack();
+			throw new RuntimeException(msg);
+		}
+
 	}
 
 
@@ -281,7 +376,7 @@ public class SimulaBuilder {
 			for (File f : elt) {
 				if (Option.internal.DEBUGGING) {
 					if (f.isFile())
-						Util.println("Delete: " + f);
+						IO.println("Delete: " + f);
 				}
 				if (f.isDirectory())
 					deleteTempFiles(f);

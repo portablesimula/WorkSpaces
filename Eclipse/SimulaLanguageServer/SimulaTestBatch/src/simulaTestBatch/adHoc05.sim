@@ -1,6 +1,15 @@
 begin
    integer i;
+   text t;
+   t :- copy(
+% kommentar   
+   "abra" -- mer komment
+   "ca" comment her åsså;
+   "dab
+   );
+   
+   outtext(t); outimage;
 end	komm
 
-en tar;
+en tar else;
 og mere til

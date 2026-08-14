@@ -18,20 +18,19 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
 import simula.Option;
 import simula.compiler.syntaxClass.declaration.ClassDeclaration;
 import simula.compiler.syntaxClass.statement.ProgramModule;
-import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.Util;
 
@@ -52,19 +51,19 @@ public class JarFileBuilder {
 	/// Main entry name.
 	String mainEntry;
 
-	/// The intermediate classFileMap.
-	private final HashMap<String,byte[]> classFileMap;
+	/// The Jar files queued for later inclusion.
+//	public List<JarFile> includeQueue;
+	public Map<String, JarFile> includeQueue;
 
 	/// The target JarOutputStream.
 	private JarOutputStream jarOutputStream;
 
 	/// Debug utility.
-	private final static boolean TESTING = false;
+	private final static boolean TESTING = false;//true;//false;
 	
 	/// Construct a new JarFileBuilder.
 	public JarFileBuilder() {
 		if(TESTING) IO.println("\nNEW JarFileBuilder");
-		this.classFileMap = new HashMap<String,byte[]>();
 	}
 	
 	/// Open the JarFileBuilder.
@@ -75,43 +74,37 @@ public class JarFileBuilder {
 //		if(jarOutputStream != null) Util.IERR();
 		this.programModule = programModule;
 		if (Option.internal.TRACING)
-			Util.println("BEGIN Create .jar File");
+			IO.println("BEGIN Create .jar File");
 		outputJarFile = new File(SimulaCompiler.outputDir, programModule.getIdentifier().value + ".jar");
 		outputJarFile.getParentFile().mkdirs();
+
+		if(outputJarFile.exists()) {
+			boolean done = outputJarFile.delete();
+			IO.println("JarFileBuilder.open: outputJarFile.delete() ==> " + done);
+		}
+
 		Manifest manifest = new Manifest();
 		String packetName = SimulaCompiler.packetName;
 		mainEntry = packetName + '/' + programModule.getIdentifier().value;
 		mainEntry = mainEntry.replace('/', '.');
 		if (Option.internal.TRACING)
-			Util.println("Output " + outputJarFile + " MANIFEST'mainEntry=\"" + mainEntry + "\"");
+			IO.println("Output " + outputJarFile + " MANIFEST'mainEntry=\"" + mainEntry + "\"");
 		manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
 		manifest.getMainAttributes().putValue("Created-By", SimulaCompiler.simulaReleaseID + " (Portable Simula)");
 		if (programModule.isExecutable()) {
 			manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, mainEntry);
-//			manifest.getMainAttributes().put(Attributes.Name.CLASS_PATH, ".");
 		} else {
 			String relativeAttributeFileName = programModule.getRelativeAttributeFileName();
 			if (relativeAttributeFileName != null)
 				manifest.getMainAttributes().putValue("SIMULA-INFO", relativeAttributeFileName);
 		}
 		jarOutputStream = new JarOutputStream(new FileOutputStream(outputJarFile), manifest);
+		if(TESTING) IO.println("JarFileBuilder.open: "+jarOutputStream);
 		
 		if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource) {
 			// Add initial entry: 
 			String entryName = packetName + '/';
-			writeJarEntry(entryName, null);
-		}
-	}
-	
-	/// Put a JarEntry to the intermediate classFileMap.
-	/// @param entryName the entry name
-	/// @param bytes the bytes, may be null
-	public void putMapEntry(String entryName, byte[] bytes) {
-		if(TESTING)	IO.println("JarFileBuilder.putMapEntry: "+entryName);
-		byte[] prev = classFileMap.put(entryName,bytes);
-		if(prev != null) {
-			if(SimulaCompiler.verbose)
-				Util.println("JarOutputSet.putMapEntry: "+entryName+" WAS REPLACED");
+			writeEntryToJarOutput(entryName, null);
 		}
 	}
 	
@@ -119,8 +112,9 @@ public class JarFileBuilder {
 	/// @param entryName the entry name
 	/// @param bytes the bytes, may be null
 	/// @throws IOException if something went wrong
-	public void writeJarEntry(String entryName, byte[] bytes) throws IOException {
-		if(TESTING) IO.println("JarFileBuilder.writeJarEntry: "+entryName);
+	public void writeEntryToJarOutput(String entryName, byte[] bytes) throws IOException {
+//		if(TESTING)
+			IO.println("JarFileBuilder.writeEntryToJarOutput: "+entryName);
 		JarEntry entry = new JarEntry(entryName);
 		jarOutputStream.putNextEntry(entry);
 		if(bytes != null) jarOutputStream.write(bytes);
@@ -131,19 +125,21 @@ public class JarFileBuilder {
 	/// @return the outputJarFile
 	/// @throws IOException if something went wrong
 	public File close() throws IOException {
-		// Write the actual .jar file
-		if(TESTING) printClassFileMap("END JarFileBuilder.close");
-        for (Entry<String, byte[]> entry : classFileMap.entrySet()) {
-            String entryName = entry.getKey();
-            byte[] bytes = entry.getValue();
-            writeJarEntry(entryName, bytes);
-        }
-       
+
+//		if(TESTING) {
+			IO.println("JarFileBuilder.close: BEGIN: ");
+	    	Util.doListDirectory("JarFileBuilder.close: BEGIN: ", ""+SimulaCompiler.tempClassFileDir + "/" + SimulaCompiler.packetName);
+//			Util.IERR("");
+//		}
+
+		//		if(SimulaCompiler.compilerMode == SimulaCompiler.CompilerMode.viaJavaSource) {
+			writeFileToJarFile(new File(SimulaCompiler.tempClassFileDir, SimulaCompiler.packetName), SimulaCompiler.tempClassFileDir.toString().length());			
+//		}
 		if (programModule.isExecutable()) {
 			if(TESTING) IO.println("JarFileBuilder.close: Executable "+programModule);
 			// Add the Runtime System
 			File rtsHome = new File(SimulaCompiler.simulaRtsLib, "simula/runtime");
-			add(false, rtsHome, SimulaCompiler.simulaRtsLib.toString().length());
+			writeFileToJarFile(rtsHome, SimulaCompiler.simulaRtsLib.toString().length());
 		} else {
 			String id = programModule.getIdentifier().value;
 			String kind = (programModule.mainModule instanceof ClassDeclaration) ? "Class " : "Procedure ";
@@ -151,46 +147,64 @@ public class JarFileBuilder {
 		}
         
         jarOutputStream.close();
-		if(SimulaCompiler.verbose) Util.println("JarFileBuilder.close: " + SimulaCompiler.sourceName + ": JarFile " + outputJarFile);
+		if(TESTING) IO.println("JarFileBuilder.close: "+jarOutputStream);
+		if(SimulaCompiler.verbose) IO.println("JarFileBuilder.close: " + DocumentManager.sourceName + ": JarFile " + outputJarFile);
 		
 		if(TESTING) {
-			IO.println("JarFileBuilder.close: ");
-			listJarFile(outputJarFile);
+			IO.println("JarFileBuilder.close: END: ");
+			listJarFile("JarFileBuilder.close: END: ", outputJarFile);
+	    	Util.doListDirectory("JarFileBuilder.close: END: ", ""+SimulaCompiler.tempClassFileDir + "/" + SimulaCompiler.packetName);
+//			Util.IERR("");
 		}
 
 		LOG.info("END Create .jar File: " + outputJarFile);
 		return (outputJarFile);
 	}
-	
-	/// Add temp .class files to jarOutputStream.
+
+	/// Add the jarFile entries to the temp ClassFile directory.
+	/// @param jarFile the jarFile to be added
 	/// @throws IOException if something went wrong
-	public void addTempClassFiles() throws IOException {
-		if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource) Util.IERR();
-		add(true, new File(SimulaCompiler.tempClassFileDir, SimulaCompiler.packetName), SimulaCompiler.tempClassFileDir.toString().length());
-	}	
+	public void writeJarEntriesToTempClassFiles(final String jarFileName, final JarFile jarFile) throws IOException {
+		try (JarInputStream jarInputStream = new JarInputStream(new FileInputStream(jarFileName))) {
+			String tempClassFileDirName = SimulaCompiler.tempClassFileDir.toString();
+			JarEntry entry;
+			// Loop through all entries in the source JAR
+			LOOP2:while ((entry = jarInputStream.getNextJarEntry()) != null) {
+
+				String entryName = entry.getName();
+				if (!entryName.startsWith(SimulaCompiler.packetName)) continue LOOP2;
+				if (!entryName.endsWith(".class"))				      continue LOOP2;
+
+				// Write entry to tempClassFileDir
+				byte[] bytes = jarInputStream.readAllBytes();
+		        Path path = Paths.get(tempClassFileDirName + '/' + entryName);
+	            Files.createDirectories(path.getParent());
+	            IO.println("JarFileBuilder.writeJarEntriesToTempClassFiles: " + path);
+		        Files.write(path, bytes);
+			}
+		}
+	}
 	
-	/// Add directory or a file to a JarOutputStream, or
-	/// Put it into the intermediate classFileMap.
-	/// @param doPut true:put it, otherwise add it
+	/// Add directory or a file to a JarOutputStream.
 	/// @param source source file or directory
 	/// @param pathSize the path size
 	/// @throws IOException if something went wrong
-	private void add(final boolean doPut, final File source, final int pathSize) throws IOException {
-		if(TESTING) IO.println("JarFileBuilder.add: " + ((doPut)?"PUT: ":"WRITE: ") + source);
-		if(!source.exists())
-			Util.IERR("JarFileBuilder.add: source="+source+", exists="+source.exists());
+	private void writeFileToJarFile(final File source, final int pathSize) throws IOException {
+		if(TESTING) IO.println("JarFileBuilder.writeFileToJarFile: WRITE: " + source);
+		if(!source.exists()) {
+//			Util.IERR("JarFileBuilder.writeFileToJarFile: source="+source+", exists="+source.exists());
+			return;
+		}
 		if (source.isDirectory()) {
 			String name = source.getPath().replace("\\", "/");
 			if (!name.isEmpty()) {
 				if (!name.endsWith("/")) name += "/";
 				name = name.substring(pathSize);
 				if (name.startsWith("/")) name = name.substring(1);
-				if(doPut)
-					 putMapEntry(name, null);
-				else writeJarEntry(name, null);
+//				writeEntryToJarOutput(name, null);
 			}
 			for (File nestedFile : source.listFiles())
-				add(doPut, nestedFile, pathSize);
+				writeFileToJarFile(nestedFile, pathSize);
 			return;
 		}
 		String entryName = source.getPath().replace("\\", "/");
@@ -201,88 +215,10 @@ public class JarFileBuilder {
 
 			try (InputStream inpt = new FileInputStream(source)) {
 				byte[] bytes = inpt.readAllBytes();
-				if(doPut)
-					 putMapEntry(entryName, bytes);
-				else writeJarEntry(entryName, bytes);
+				writeEntryToJarOutput(entryName, bytes);
 			}
 		}
 	}
-	
-	/// Expand .jar file entries into the classFileMap.
-	/// @param jarFile the .jar file to read
-	/// @throws IOException if something went wrong
-	public void expandJarFile(final JarFile jarFile) throws IOException {
-		if(TESTING) IO.println("JarFileBuilder.expandJarFile: JarFileName="+jarFile.getName());
-		if (SimulaCompiler.verbose)
-			Util.println("---------  INCLUDE .jar File: " + jarFile.getName() + "  ---------");
-		Enumeration<JarEntry> entries = jarFile.entries();
-		LOOP: while (entries.hasMoreElements()) {
-			JarEntry inputEntry = entries.nextElement();
-
-			String entryName = inputEntry.getName();
-			if (!entryName.startsWith(SimulaCompiler.packetName))	continue LOOP;
-			if (!entryName.endsWith(".class"))				continue LOOP;
-
-			InputStream inputStream = null;
-			try {
-				inputStream = jarFile.getInputStream(inputEntry);
-				byte[] bytes = inputStream.readAllBytes();
-				putMapEntry(entryName, bytes);
-				addToTempClassfiles(entryName, bytes);
-			} finally {	if (inputStream != null) inputStream.close(); }
-		}
-		if(TESTING) printClassFileMap("END JarFileBuilder.expandJarFile");
-	}
-	
-	private void addToTempClassfiles(final String entryName, final byte[] bytes) throws IOException {
-//		IO.println("JarFileBuilder.addToTempClassfiles: " + entryName);
-        Path path = Paths.get(SimulaCompiler.tempClassFileDir.toString() + '/' + entryName);
-
-        // Oppretter nødvendige mapper hvis de ikke eksisterer (f.eks. com/example/)
-        if (path.getParent() != null) {
-            Files.createDirectories(path.getParent());
-        }
-//		IO.println("JarFileBuilder.addToTempClassfiles: path = " + path);
-
-        // Skriver alle bytes til filen i én operasjon
-        Files.write(path, bytes);
-//    	Util.doListDirectory(""+SimulaCompiler.tempClassFileDir);
-	}
-	
-    /**
-     * Skriver en klassefil til disk basert på klassenavn og bytes.
-     *
-     * @param className Det fulle navnet på klassen (f.eks. "com.example.MyClass")
-     * @param classBytes Den ferdige byte-arrayen som utgjør klassefilen
-     * @throws IOException Hvis det oppstår en feil under skriving til fil
-     */
-    public static void writeClassFile(String className, byte[] classBytes) throws IOException {
-        // Konverterer pakkenavn (med punktum) til en gyldig filsti
-        // F.eks: "com.example.MyClass" blir til "com/example/MyClass.class"
-        String fileName = className.replace('.', '/') + ".class";
-        Path path = Paths.get(fileName);
-
-        // Oppretter nødvendige mapper hvis de ikke eksisterer (f.eks. com/example/)
-        if (path.getParent() != null) {
-            Files.createDirectories(path.getParent());
-        }
-
-        // Skriver alle bytes til filen i én operasjon
-        Files.write(path, classBytes);
-    }
-
-	/// Debug utility: printClassFileMap.
-	/// @param title the title String.
-	private void printClassFileMap(String title) {
-		IO.println("============================== printClassFileMap: "+title+" ==============================");
-        for (Entry<String, byte[]> entry : classFileMap.entrySet()) {
-            String entryName = entry.getKey();
-            byte[] bytes = entry.getValue();
-            IO.println("JarFileBuilder.printClassFileMap: "+entryName+"   Size="+((bytes==null)?0:bytes.length));
-        }		
-		IO.println("END ========================== printClassFileMap: "+title+" ==============================");
-	}
-
 
 	/// Find the .jar file containing an external class or procedure.
 	/// @param identifier class or procedure identifier
@@ -319,35 +255,14 @@ public class JarFileBuilder {
 		} catch (Exception e) {}
 		return null;
 	}
-
-	/// Add the jarFile to the includeQueue.
-	/// @param jarFile the jarFile to be added
-	/// @throws IOException if something went wrong
-	public static void addToIncludeQueue(final JarFile jarFile) throws IOException {
-		if(CoreGlobal.includeQueue == null) CoreGlobal.includeQueue = new LinkedList<JarFile>();
-		CoreGlobal.includeQueue.add(jarFile);			
-	}
-
-	/// Add the jarFiles in the includeQueue.
-	/// @throws IOException if something went wrong
-	public void addIncludeQueue() throws IOException {
-		if(CoreGlobal.includeQueue != null) {
-			for(JarFile jarFile:CoreGlobal.includeQueue) {
-				if(TESTING)
-					IO.println("JarFileBuilder.addIncludeQueue: expandJarFile: "+jarFile.getName());
-				expandJarFile(jarFile);	
-			}
-		}
-	}
-
 	
 	// ***************************************************************
 	// *** LIST .jar file
 	// ***************************************************************
 	/// Debug utility: List .jar file
 	/// @param file the .jar file
-	public static void listJarFile(final File file) {
-		Util.println("---------  LIST .jar File: " + file + "  ---------");
+	public static void listJarFile(final String title, final File file) {
+		IO.println("\n--------- " + title + " LIST .jar File: " + file + "  ---------");
 		if (!(file.exists() && file.canRead())) {
 			Util.generalError("Can't read .jar file: " + file);
 			return;
@@ -360,7 +275,7 @@ public class JarFileBuilder {
 			Set<Object> keys = mainAttributes.keySet();
 			for (Object key : keys) {
 				String val = mainAttributes.getValue(key.toString());
-				Util.println(key.toString() + "=\"" + val + "\"");
+				IO.println(key.toString() + "=\"" + val + "\"");
 			}
 
 			Enumeration<JarEntry> entries = jarFile.entries();
@@ -372,7 +287,7 @@ public class JarFileBuilder {
 				FileTime fileTime = entry.getLastModifiedTime();
 				String date = DateTimeFormatter.ofPattern("uuuu-MMM-dd HH:mm:ss", Locale.getDefault())
 						.withZone(ZoneId.systemDefault()).format(fileTime.toInstant());
-				Util.println("Jar-Entry: " + size + "  " + date + "  \"" + entry + "\"");
+				IO.println("Jar-Entry: " + size + "  " + date + "  \"" + entry + "\"");
 			}
 		} catch (IOException e) {
 			Util.IERR("Caused by:", e);
@@ -384,6 +299,7 @@ public class JarFileBuilder {
 					e.printStackTrace();
 				}
 		}
+		IO.println();
 	}
 
 

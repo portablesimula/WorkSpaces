@@ -225,13 +225,13 @@ public final class ConnectionBlock extends DeclarationScope {
 		StringBuilder s = new StringBuilder(indent);
 		s.append('[').append(sourceBlockLevel).append(':').append(getRTBlockLevel()).append("] ");
 		s.append(ObjectKind.edit(declarationKind)).append(' ').append(identifierValue());
-		Util.println(s.toString());
+		IO.println(s.toString());
 		String beg = "begin[" + edScopeChain() + ']';
-		Util.println(spc + beg);
+		IO.println(spc + beg);
 		for (Declaration decl : declarationList)
 			decl.print(indent + 1);
 		if(statement != null) statement.print(indent + 1);
-		Util.println(spc + "end[" + edScopeChain() + ']');
+		IO.println(spc + "end[" + edScopeChain() + ']');
 	}
 
 	// ***********************************************************************************************

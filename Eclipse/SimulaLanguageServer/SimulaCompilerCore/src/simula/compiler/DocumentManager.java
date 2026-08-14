@@ -2,10 +2,12 @@ package simula.compiler;
 
 import java.io.File;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import simula.SimTextDocumentContentChangeEvent;
 import simula.builder.SimulaBuilder;
+import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.SimulaDiagnostic;
@@ -27,6 +29,17 @@ public class DocumentManager {
 	public String sourceCode;
 	public SimulaBuilder simBuilder;
 	
+	
+	/// The source file name.
+	public static String sourceFileName;
+
+	/// The source file name without .sim
+	public static String sourceName;
+	
+	/// The set of external .jar files.
+	public static Vector<File> externalJarFiles;
+
+	
     // Nøkkelen er filens URI (f.eks. file:///path/to/file.txt)
 //    private final ConcurrentHashMap<String, SourceDocumentItem> openDocuments = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, DocumentManager> openDocuments = new ConcurrentHashMap<>();
@@ -36,17 +49,21 @@ public class DocumentManager {
     	this.sourceFileDir = new File(documentUri).getParentFile();
     	this.documentVersion = documentVersion;
     	this.sourceCode = sourceCode;
+    	sourceFileName = this.documentUri;
+		sourceName = getSourceName(this.documentUri);
+		this.externalJarFiles = new Vector<File>();
+		StandardClass.INITIATE();
     }
-//    
-//    private String getSourceName(String documentUri) {
-//    	String sourceName = Util.getBaseName(documentUri);
-//		if (!Util.isJavaIdentifier(sourceName)) {
-//			String prevName = sourceName;
-//			sourceName = Util.makeJavaIdentifier(sourceName);
-//			Util.generalWarning("The source file name '" + prevName + "' is not a legal class identifier. Modified to: " + this.sourceName);
-//		}
-//    	return sourceName;
-//    }
+    
+    private String getSourceName(String documentUri) {
+    	String sourceName = Util.getBaseName(documentUri);
+		if (!Util.isJavaIdentifier(sourceName)) {
+			String prevName = sourceName;
+			sourceName = Util.makeJavaIdentifier(sourceName);
+			Util.generalWarning("The source file name '" + prevName + "' is not a legal class identifier. Modified to: " + sourceName);
+		}
+    	return sourceName;
+    }
 
     /// Debug Utility
     public static DocumentManager getDocumentManager(String documentUri)  {
@@ -237,15 +254,15 @@ public class DocumentManager {
 //	public void semanticChecker() {
 //		ProgramModule  programModule = this.getSyntaxTree();
 //		if (Option.internal.TRACING)
-//			Util.println("BEGIN Semantic Checker");
+//			IO.println("BEGIN Semantic Checker");
 //		simBuilder.duringChecking = true;
 //		programModule.doChecking();
 //		if (Option.internal.TRACING) {
-//			Util.println("END Semantic Checker: \"" + programModule + "\"");
+//			IO.println("END Semantic Checker: \"" + programModule + "\"");
 //			if (Option.internal.TRACE_CHECKER_OUTPUT && programModule != null)
 //				programModule.print(0);
 //		}
-//		if(SimulaCompiler.verbose) Util.println("SimulaCompiler.doCompile: " + SimulaCompiler.sourceName + ": Semantic Checker completed");
+//		if(SimulaCompiler.verbose) IO.println("SimulaCompiler.doCompile: " + SimulaCompiler.sourceName + ": Semantic Checker completed");
 //		simBuilder.duringChecking = false;
 //		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
 //			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");
@@ -254,7 +271,7 @@ public class DocumentManager {
 //		
 //		if (Util.nError > 0) {
 //			String msg="Compiler terminate " + SimulaCompiler.sourceName + " after " + Util.nError + " errors during semantic checking";
-//			Util.println(msg);
+//			IO.println(msg);
 ////			Thread.dumpStack();
 //			throw new RuntimeException(msg);
 //		}

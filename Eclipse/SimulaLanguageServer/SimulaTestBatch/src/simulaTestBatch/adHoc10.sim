@@ -1,4 +1,13 @@
-class SimulaTest(n,title); integer n; text title;
 begin
-	L1:L2:sysout.setpos(1);
-end;
+   integer i;
+   text t;
+   t :- copy(
+% kommentar   
+   "abra" -- mer komment
+   "ca" comment her åsså;
+   "dab
+   );
+   
+   outtext(t); outimage;
+end	komm
+

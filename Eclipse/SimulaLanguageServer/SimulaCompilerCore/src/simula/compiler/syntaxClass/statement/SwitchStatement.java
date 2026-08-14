@@ -389,10 +389,10 @@ public final class SwitchStatement extends Statement {
 	@Override
     public void print(final int indent) {
     	String spc=edIndent(indent);
-    	Util.println(spc+"SWITCH("+lowKey+':'+hiKey+") "+switchKey);
-    	Util.println(spc+"BEGIN");
+    	IO.println(spc+"SWITCH("+lowKey+':'+hiKey+") "+switchKey);
+    	IO.println(spc+"BEGIN");
     	for(SwitchWhenPart when:switchCases) when.print(indent + 1);
-        Util.println(spc+"END"); 
+        IO.println(spc+"END"); 
     }
 	
 	@Override

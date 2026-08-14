@@ -18,6 +18,7 @@ import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 
 import simula.Option;
+import simula.compiler.DocumentManager;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.Type;
 import simula.compiler.syntaxClass.expression.Expression;
@@ -51,7 +52,7 @@ public final class Thunk extends DeclarationScope {
 	/// @param kind the kind code
 	/// @param expr the Thunk expression.
 	private Thunk(int kind,Expression expr) {
-		super(expr.simBuilder, new Identifier(SimulaCompiler.sourceName + "$THUNK$" + (++OBJECT_SEQU)));
+		super(expr.simBuilder, new Identifier(DocumentManager.sourceName + "$THUNK$" + (++OBJECT_SEQU)));
 		this.declarationKind = ObjectKind.Thunk;
 		this.kind = kind;
 		this.expr = expr;
@@ -104,13 +105,13 @@ public final class Thunk extends DeclarationScope {
 	// ***********************************************************************************************
 	@Override
 	public byte[] buildClassFile() {
-		if(SimulaCompiler.verbose) Util.println("Begin buildClassFile: "+CD_ThisClass);
+		if(SimulaCompiler.verbose) IO.println("Begin buildClassFile: "+CD_ThisClass);
 		ClassHierarchy.addClassToSuperClass(CD_ThisClass, RTS.CD.RTS_NAME);
 		
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
 				classBuilder -> {
 					classBuilder
-						.with(SourceFileAttribute.of(SimulaCompiler.sourceFileName))
+						.with(SourceFileAttribute.of(DocumentManager.sourceFileName))
 						.withFlags(ClassFile.ACC_PUBLIC + ClassFile.ACC_SUPER + ClassFile.ACC_FINAL)
 						.withSuperclass(RTS.CD.RTS_NAME)
 						.with(SignatureAttribute.of(ClassSignature.parseFrom("Lsimula/runtime/RTS_NAME<"+Type.toJVMClassType(expr.type,kind)+">;")))

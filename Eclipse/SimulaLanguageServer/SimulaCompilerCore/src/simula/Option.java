@@ -109,15 +109,15 @@ public final class Option {
 	
 
 	public static void print(String title) {
-		Util.println("------------  Option.print: " + title + "  ------------");
-		Util.println("DocumentManager.packetName      " + SimulaCompiler.packetName);
-		Util.println("DocumentManager.simulaRtsLib    " + SimulaCompiler.simulaRtsLib);
+		IO.println("------------  Option.print: " + title + "  ------------");
+		IO.println("DocumentManager.packetName      " + SimulaCompiler.packetName);
+		IO.println("DocumentManager.simulaRtsLib    " + SimulaCompiler.simulaRtsLib);
 		
-		Util.println("SimulaBuilder.outputDir         " + SimulaCompiler.outputDir);
-		Util.println("SimulaBuilder.simulaTempDir     " + SimulaCompiler.simulaTempDir);
-		Util.println("SimulaBuilder.tempJavaFileDir   " + SimulaCompiler.tempJavaFileDir);
-		Util.println("SimulaBuilder.tempClassFileDir  " + SimulaCompiler.tempClassFileDir);
-		Util.println("SimulaBuilder.extLib            " + SimulaCompiler.extLib);
+		IO.println("SimulaBuilder.outputDir         " + SimulaCompiler.outputDir);
+		IO.println("SimulaBuilder.simulaTempDir     " + SimulaCompiler.simulaTempDir);
+		IO.println("SimulaBuilder.tempJavaFileDir   " + SimulaCompiler.tempJavaFileDir);
+		IO.println("SimulaBuilder.tempClassFileDir  " + SimulaCompiler.tempClassFileDir);
+		IO.println("SimulaBuilder.extLib            " + SimulaCompiler.extLib);
 
 	}
 	/// Kalles før parsing og checking

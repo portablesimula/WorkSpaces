@@ -17,6 +17,7 @@ import simula.builder.SimulaBuilder;
 import simula.compiler.utilities.DeclarationList;
 import simula.compiler.utilities.LOG;
 import simula.compiler.utilities.RTS;
+import simula.compiler.JarFileBuilder;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.utilities.CoreGlobal;
 import simula.compiler.utilities.LabelList;
@@ -438,7 +439,7 @@ public abstract class DeclarationScope extends Declaration  {
     protected void loadOrAddClassFile(byte[] bytes) throws IOException {
     	if(bytes != null) {
     		String entryName = SimulaCompiler.packetName + "/" + externalIdent + ".class";
-    		SimulaCompiler.jarFileBuilder.putMapEntry(entryName, bytes);    				
+    		SimulaCompiler.jarFileBuilder.writeEntryToJarOutput(entryName, bytes);    				    			
  			if(Option.internal.LIST_GENERATED_CLASS_FILES)
    				listGeneratedClassFile(bytes);
     	}

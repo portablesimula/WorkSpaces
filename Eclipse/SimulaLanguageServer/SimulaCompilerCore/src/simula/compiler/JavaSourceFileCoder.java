@@ -140,7 +140,7 @@ public final class JavaSourceFileCoder {
 				String s0 = edIndent() + edLineNumberLine(sourceLineNumber, modid);
 				appendLine(currentJavaLineNumber, sourceLineNumber);
 				if (Option.internal.TRACE_CODING)
-					Util.println("CODE " + sourceLineNumber + ": " + s0);
+					IO.println("CODE " + sourceLineNumber + ": " + s0);
 				currentJavaLineNumber++;
 				writer.write(s0 + '\n');
 			}
@@ -153,7 +153,7 @@ public final class JavaSourceFileCoder {
 			if (line.contains("{"))
 				indent++;
 			if (Option.internal.TRACE_CODING)
-				Util.println("CODE " + sourceLineNumber + ": " + s);
+				IO.println("CODE " + sourceLineNumber + ": " + s);
 			Util.ASSERT(writer != null, "Can't Output Code - writer==null");
 			writer.write(s + '\n');
 		} catch (IOException e) {
@@ -204,7 +204,7 @@ public final class JavaSourceFileCoder {
 		// RTS_PROGINFO("file.sim","MainProgram",1,4,12,5,14,12,32,14,37,16);
 		StringBuilder s = new StringBuilder();
 		s.append(edIndent() + "public static RTS_PROGINFO _INFO=new RTS_PROGINFO(\"");
-		s.append(SimulaCompiler.sourceFileName);
+		s.append(DocumentManager.sourceFileName);
 		s.append("\",\"");
 		s.append(ObjectKind.edit(blockDeclaration.declarationKind) + " " + blockDeclaration.identifierValue());
 		s.append('"');
@@ -220,7 +220,7 @@ public final class JavaSourceFileCoder {
 	/// @param s the code line string
 	private void writeCode(String s) {
 		if (Option.internal.TRACE_CODING)
-			Util.println("CODE " + CoreGlobal.sourceLineNumber + ": " + s);
+			IO.println("CODE " + CoreGlobal.sourceLineNumber + ": " + s);
 		Util.ASSERT(writer != null, "Can't Output Code - writer==null");
 		try {
 			writer.write(s.toString() + '\n');

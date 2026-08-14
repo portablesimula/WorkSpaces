@@ -255,14 +255,14 @@ public final class Util {
 	/// @param msg the message to print
 	public static void TRACE_OUTPUT(final String msg) {
 		if (Option.internal.TRACE_ATTRIBUTE_OUTPUT)
-			Util.println("ATTR OUTPUT: " + msg);
+			IO.println("ATTR OUTPUT: " + msg);
 	}
 
 	/// Utility method: TRACE_INPUT
 	/// @param msg the message to print
 	public static void TRACE_INPUT(final String msg) {
 		if (Option.internal.TRACE_ATTRIBUTE_INPUT)
-			Util.println("ATTR INPUT: " + msg);
+			IO.println("ATTR INPUT: " + msg);
 	}
 
 	/// Utility method: ASSERT
@@ -441,9 +441,9 @@ public final class Util {
 	// ***************************************************************
 	/// Print a .class file listing.
 	/// @param classFileName the .class file name
-	public static void doListDirectory(final String dirName) {
+	public static void doListDirectory(final String title, final String dirName) {
         Path path = Paths.get(dirName); 
-        IO.println("================== LIST: " + path + " ======================");
+        IO.println("================== LIST DIRECTORY: " + title + ", Path: " + path + " ======================");
 
         // Try-with-resources sikrer at strømmen lukkes automatisk
         try (Stream<Path> stream = Files.list(path)) {
@@ -490,7 +490,7 @@ public final class Util {
 			for (int i = 0; i < cmdarray.length; i++)
 				line = line + " " + cmdarray[i];
 //			IO.println("Util.execute: " + line);
-			Util.println("Execute: " + line);
+			IO.println("Execute: " + line);
 		}
 		ProcessBuilder processBuilder = new ProcessBuilder(cmdarray);
 		processBuilder.redirectErrorStream(true);

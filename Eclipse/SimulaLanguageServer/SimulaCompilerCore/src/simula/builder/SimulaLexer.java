@@ -912,8 +912,9 @@ public final class SimulaLexer {
 		if(TRACE_TEXTCONST) IO.println("SimulaLexer.scanSimpleString: BEGIN Scan simple-string: ");
 		getNext();
 		LOOP:while(true) {
-//			IO.println("SimulaLexer.scanSimpleString: CHECK character: " + edChar((char) current));
-			if(current=='"') {
+//			IO.println("SimulaLexer.scanSimpleString: CHECK line: " + currentLineNumber + ", currrent=" + edChar((char) current));
+			switch(current) {
+			case '"':
 				if(nextCharIs('"')) {
 					sb.append('"');
 					getNext(); getNext();
@@ -923,10 +924,13 @@ public final class SimulaLexer {
 					tokenQueueAdd("scanSimpleString - TOKEN-2", newSimpleStringToken(sb.toString()));
 				}
 				break LOOP;
-			} else if(current=='!') {
+			case '!':
 				int code=scanPossibleIsoCode();
 				sb.append((char)code);
-			} else if(current == '\r' && nextCharIs('\n')) {
+				break;
+			case '\r':
+				IO.println("\nSimulaLexer.scanSimpleString: GOT NEWLINE(CRLF) length: " + (nextPos - tokenStartPos));
+				if(! nextCharIs('\n')) Util.IERR("");
 				pushBackPos(1);
 				if(TRACE_TEXTCONST) IO.println("\nSimulaLexer.scanSimpleString: GOT NEWLINE(CRLF) length: " + (nextPos - tokenStartPos));
 				if(nextPos > tokenStartPos) {
@@ -938,9 +942,9 @@ public final class SimulaLexer {
 				getNext(); getNext(); // Consume CRLF
         	    tokenQueueAdd("scanSimpleString - CRLF", newNewlineToken());
 				sb = new StringBuilder();
-				getNext();
-				
-			} else if(current == '\n') {
+//				getNext();
+				break;
+			case '\n':
 				pushBackPos(1);
 				if(TRACE_TEXTCONST) IO.println("\nSimulaLexer.scanSimpleString: GOT NEWLINE(LF) length: " + (nextPos - tokenStartPos));
 				if(nextPos > tokenStartPos) {
@@ -952,8 +956,8 @@ public final class SimulaLexer {
 				getNext();
         	    tokenQueueAdd("scanSimpleString - CRLF", newNewlineToken());
 				sb = new StringBuilder();
-				
-			} else if(current == EOF_MARK) {
+				break;
+			case EOF_MARK:
 				if(TRACE_TEXTCONST) IO.println("\nSimulaLexer.scanSimpleString: GOT EOF_MARK length: " + (nextPos - tokenStartPos));
 				if(nextPos > tokenStartPos) {
 					LexToken token = newSimpleStringToken(sb.toString());
@@ -964,7 +968,8 @@ public final class SimulaLexer {
 				
 				break LOOP;
 				
-			} else sb.append((char)current);
+			default: sb.append((char)current);
+			}
 			getNext();
 		}
 		if(TRACE_TEXTCONST) IO.println("\nSimulaLexer.scanSimpleString: ENDOF Scan simple-string: " + (nextPos - tokenStartPos));
@@ -979,7 +984,7 @@ public final class SimulaLexer {
     		else Util.IERR("SimulaLexer.scanSimpleString: End-Condition Failed: current = "+edCurrent());
     	}
     }
-	
+
     //********************************************************************************
   	//**	                                                  currentIsStringSeparator
     //********************************************************************************
@@ -1591,6 +1596,7 @@ public final class SimulaLexer {
      	} else {
     		next = sourceText.charAt(nextPos);
     	}
+//		IO.println("SimulaLexer.nextCharIs("+c+") ==> current: " + edChar((char) current) + ", next: " + edChar((char) next) + " ==> " + (next == c));
 //    	IO.println("SimulaLexer.getNext: " + current);
 //		IO.println("SimulaLexer.getNext(nextPos: " + (nextPos - 1)
 //				+ ") ==> nextPos: " + nextPos + " current: " + edChar((char) current)

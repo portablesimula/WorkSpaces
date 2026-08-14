@@ -280,9 +280,9 @@ public final class ConnectionStatement extends Statement {
 	public void print(final int indent) {
     	String spc=edIndent(indent);
 		// if(assignment!=null) assignment.print(indent);
-		Util.println(spc + "INSPECT " + inspectedVariable + " = " + objectExpression);
+		IO.println(spc + "INSPECT " + inspectedVariable + " = " + objectExpression);
 		for (ConnectionDoPart doPart : connectionPart) doPart.printTree(indent);
-		if (otherwise != null) Util.println(spc + "   OTHERWISE " + otherwise + ';');
+		if (otherwise != null) IO.println(spc + "   OTHERWISE " + otherwise + ';');
 	}
 
 	@Override

@@ -50,11 +50,11 @@ public final class AttributeFileIO {
 		if (relativeAttributeFileName == null) return;
 		File file = new File(SimulaCompiler.tempClassFileDir,relativeAttributeFileName);
 		if (SimulaCompiler.verbose)
-			Util.println("*** BEGIN Generate SimulaAttributeFile: \"" + file+"\"");
+			IO.println("*** BEGIN Generate SimulaAttributeFile: \"" + file+"\"");
 		byte[] bytes = buildAttrFile(program);
 		String entryName = program.getRelativeAttributeFileName();
 
-		SimulaCompiler.jarFileBuilder.writeJarEntry(entryName, bytes);
+		SimulaCompiler.jarFileBuilder.writeEntryToJarOutput(entryName, bytes);
 		if (SimulaCompiler.verbose)	Util.TRACE("*** ENDOF Generate SimulaAttributeFile: " + file);
 	}
 
@@ -93,7 +93,12 @@ public final class AttributeFileIO {
 		}
 		try {
 			JarFile jarFile = new JarFile(file);
-			SimulaCompiler.externalJarFiles.add(file);
+			JarFileBuilder.listJarFile("AttributeFileIO.readAttributeFile: ", file);
+			
+			DocumentManager.externalJarFiles.add(file);
+			IO.println("AttributeFileIO.readAttributeFile: " + DocumentManager.externalJarFiles);
+//			Util.IERR("");
+			
 			Manifest manifest = jarFile.getManifest();
 			Attributes mainAttributes = manifest.getMainAttributes();
 			String simulaInfo = mainAttributes.getValue("SIMULA-INFO");
@@ -122,7 +127,9 @@ public final class AttributeFileIO {
 			if(SimulaCompiler.jarFileBuilder == null) {
 					SimulaCompiler.jarFileBuilder = new JarFileBuilder();
 			}
-			SimulaCompiler.jarFileBuilder.expandJarFile(jarFile);
+//			SimulaCompiler.jarFileBuilder.addToIncludeQueue(file.toString(), jarFile);
+			SimulaCompiler.jarFileBuilder.writeJarEntriesToTempClassFiles(file.toString(), jarFile);
+
 
 		} catch (IOException e) {
 			Util.generalError("Unable to read Attribute File: " + file + " caused by: " + e);
@@ -136,7 +143,8 @@ public final class AttributeFileIO {
 	/// @param jarFile the jarFile.
 	/// @return false: if the jarFile is already included.
 	public static boolean checkJarFiles(File jarFile) {
-		for(File f:SimulaCompiler.externalJarFiles) if(f.equals(jarFile)) {
+//		for(File f:SimulaCompiler.externalJarFiles) if(f.equals(jarFile)) {
+		for(File f:DocumentManager.externalJarFiles) if(f.equals(jarFile)) {
 			Util.generalWarning("External already included: "+jarFile.getName());
 			return(false);
 		}

@@ -30,6 +30,7 @@ import simula.Option;
 import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
+import simula.compiler.DocumentManager;
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.Type;
@@ -143,7 +144,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @return a newly created ProcedureDeclaration
 	public static ProcedureDeclaration expectProcedureDeclaration(final SimulaBuilder simBuilder, final Type type) {
 		ProcedureDeclaration proc = new ProcedureDeclaration(simBuilder, null, ObjectKind.Procedure);
-		proc.sourceFileName = SimulaCompiler.sourceFileName;
+		proc.sourceFileName = DocumentManager.sourceFileName;
 //		proc.OLD_lineNumber = simBuilder.getSourceLineNumber();
 		proc.type = type;
 		if (Option.internal.TRACE_PARSE)
@@ -565,7 +566,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public byte[] buildClassFile() {
 		labelList.setLabelIdexes();
 		ClassDesc CD_ThisClass = currentClassDesc();
-		if(SimulaCompiler.verbose) Util.println("ProcedureDeclaration.buildClassFile: "+CD_ThisClass);
+		if(SimulaCompiler.verbose) IO.println("ProcedureDeclaration.buildClassFile: "+CD_ThisClass);
 		if(isPreCompiledFromFile != null) return getBytesFromFile();
 		ClassHierarchy.addClassToSuperClass(CD_ThisClass, RTS.CD.RTS_PROCEDURE);
 		
@@ -573,7 +574,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		while((count--) > 0) {
 			try {
 				if(SimulaCompiler.verbose)
-					Util.println("ProcedureDeclaration.buildClassFile: TRY: "+CD_ThisClass);
+					IO.println("ProcedureDeclaration.buildClassFile: TRY: "+CD_ThisClass);
 				return tryBuildClassFile(CD_ThisClass);
 			} catch(IllegalArgumentException e) {
 				boolean feasibleToReTry = false;
@@ -587,7 +588,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 						feasibleToReTry = classInfo != null;
 					}
 				}
-				Util.println("ProcedureDeclaration.buildClassFile: FATAL ERROR CAUSED BY "+e+" FeasibleToReTry="+feasibleToReTry);
+				IO.println("ProcedureDeclaration.buildClassFile: FATAL ERROR CAUSED BY "+e+" FeasibleToReTry="+feasibleToReTry);
 				if(count <= 0 || !feasibleToReTry) throw e;
 			}
 		}
@@ -603,7 +604,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
 				classBuilder -> {
 					classBuilder
-						.with(SourceFileAttribute.of(SimulaCompiler.sourceFileName))
+						.with(SourceFileAttribute.of(DocumentManager.sourceFileName))
 						.withFlags(ClassFile.ACC_PUBLIC + ClassFile.ACC_FINAL + ClassFile.ACC_SUPER)
 						.withSuperclass(RTS.CD.RTS_PROCEDURE);
 					
@@ -1044,12 +1045,12 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		s.append('[').append(externalIdent).append("] ");
 		s.append(Parameter.editParameterList(parameterList));
 		s.append("  isProtected=").append(isProtected);
-		Util.println(s.toString());
+		IO.println(s.toString());
 		String beg = "begin[" + edScopeChain() + ']';
-		Util.println(spc + beg);
+		IO.println(spc + beg);
 		for (Declaration decl : declarationList) decl.print(indent + 1);
 		for (Statement stm : statements) stm.print(indent + 1);
-		Util.println(spc + "end[" + edScopeChain() + ']');
+		IO.println(spc + "end[" + edScopeChain() + ']');
 	}
 	
 	@Override

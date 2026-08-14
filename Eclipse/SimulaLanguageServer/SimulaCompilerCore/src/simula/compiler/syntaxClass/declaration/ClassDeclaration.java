@@ -24,6 +24,7 @@ import simula.Option;
 import simula.builder.Parse;
 import simula.compiler.AttributeInputStream;
 import simula.compiler.AttributeOutputStream;
+import simula.compiler.DocumentManager;
 import simula.compiler.JavaSourceFileCoder;
 import simula.compiler.SimulaCompiler;
 import simula.compiler.syntaxClass.HiddenSpecification;
@@ -518,39 +519,39 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @return a ProcedureDeclaration when it was found, otherwise null
 	public Declaration findLocalAttribute(final Identifier ident) {
 		if (Option.internal.TRACE_FIND_MEANING > 0)
-			Util.println("ClassDeclaration.findLocalAttribute: BEGIN Checking Class for " + ident + " ================================== " + identifierValue() + " ==================================");
+			IO.println("ClassDeclaration.findLocalAttribute: BEGIN Checking Class for " + ident + " ================================== " + identifierValue() + " ==================================");
 		for (Parameter parameter : parameterList) {
 			if (Option.internal.TRACE_FIND_MEANING > 1)
-				Util.println("ClassDeclaration.findLocalAttribute: Checking Parameter " + parameter);
+				IO.println("ClassDeclaration.findLocalAttribute: Checking Parameter " + parameter);
 			if (Util.equals(ident, parameter.identifier))
 				return (parameter);
 		}
 		for (Declaration declaration : declarationList) {
 			if (Option.internal.TRACE_FIND_MEANING > 1)
-				Util.println("ClassDeclaration.findLocalAttribute: Checking Local " + declaration);
+				IO.println("ClassDeclaration.findLocalAttribute: Checking Local " + declaration);
 			if (Util.equals(ident, declaration.identifier))
 				return (declaration);
 		}
 		if(labelList != null) for (LabelDeclaration label : labelList.getDeclaredLabels()) {
 			if (Option.internal.TRACE_FIND_MEANING > 1)
-				Util.println("ClassDeclaration.findLocalAttribute: Checking Label " + label);
+				IO.println("ClassDeclaration.findLocalAttribute: Checking Label " + label);
 			if (Util.equals(ident, label.identifier))
 				return (label);
 		}
 		for (VirtualMatch match : virtualMatchList) {
 			if (Option.internal.TRACE_FIND_MEANING > 1)
-				Util.println("Checking Match " + match);
+				IO.println("Checking Match " + match);
 			if (Util.equals(ident, match.identifier))
 				return (match);
 		}
 		for (VirtualSpecification virtual : virtualSpecList) {
 			if (Option.internal.TRACE_FIND_MEANING > 1)
-				Util.println("Checking Virtual " + virtual);
+				IO.println("Checking Virtual " + virtual);
 			if (Util.equals(ident, virtual.identifier))
 				return (virtual);
 		}
 		if (Option.internal.TRACE_FIND_MEANING > 0)
-			Util.println("ENDOF Checking Class for " + ident + " ============ NOT FOUND =========== " + identifierValue() + " ==================================");
+			IO.println("ENDOF Checking Class for " + ident + " ============ NOT FOUND =========== " + identifierValue() + " ==================================");
 		return (null);
 	}
 
@@ -1042,7 +1043,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		while((count--) > 0) {
 			try {
 				if(SimulaCompiler.verbose)
-					Util.println("ClassDeclaration.buildClassFile: TRY: "+CD_ThisClass+" extends "+CD_SuperClass);
+					IO.println("ClassDeclaration.buildClassFile: TRY: "+CD_ThisClass+" extends "+CD_SuperClass);
 				return tryBuildClassFile(CD_ThisClass, CD_SuperClass);
 			} catch(IllegalArgumentException e) {
 				boolean feasibleToReTry = false;
@@ -1056,7 +1057,7 @@ public class ClassDeclaration extends BlockDeclaration {
 						feasibleToReTry = classInfo != null;
 					}
 				}
-				Util.println("ClassDeclaration.buildClassFile: FATAL ERROR CAUSED BY "+e+" FeasibleToReTry="+feasibleToReTry);
+				IO.println("ClassDeclaration.buildClassFile: FATAL ERROR CAUSED BY "+e+" FeasibleToReTry="+feasibleToReTry);
 				if(count <= 0 || !feasibleToReTry) throw e;
 			}
 		}
@@ -1073,7 +1074,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
 				classBuilder -> {
 					classBuilder
-						.with(SourceFileAttribute.of(SimulaCompiler.sourceFileName))
+						.with(SourceFileAttribute.of(DocumentManager.sourceFileName))
 						.withFlags(ClassFile.ACC_PUBLIC + ClassFile.ACC_SUPER)
 						.withSuperclass(CD_SuperClass);
 	
@@ -1107,7 +1108,7 @@ public class ClassDeclaration extends BlockDeclaration {
 				}
 		);
 		if(SimulaCompiler.verbose)
-			Util.println("ClassDeclaration.buildClassFile: DONE: "+CD_ThisClass+" extends "+CD_SuperClass);
+			IO.println("ClassDeclaration.buildClassFile: DONE: "+CD_ThisClass+" extends "+CD_SuperClass);
 		return(bytes);
 	}
 
@@ -1376,22 +1377,22 @@ public class ClassDeclaration extends BlockDeclaration {
 		s.append(ObjectKind.edit(declarationKind)).append(' ').append(identifierValue());
 		s.append('[').append(externalIdent).append("] ");
 		s.append(Parameter.editParameterList(parameterList));
-		Util.println(s.toString());
+		IO.println(s.toString());
 		if (!virtualSpecList.isEmpty())
-			Util.println(spc + "    VIRTUAL-SPEC" + virtualSpecList);
+			IO.println(spc + "    VIRTUAL-SPEC" + virtualSpecList);
 		if (!virtualMatchList.isEmpty())
-			Util.println(spc + "    VIRTUAL-MATCH" + virtualMatchList);
+			IO.println(spc + "    VIRTUAL-MATCH" + virtualMatchList);
 		if (!hiddenList.isEmpty())
-			Util.println(spc + "    HIDDEN" + hiddenList);
+			IO.println(spc + "    HIDDEN" + hiddenList);
 		if (!protectedList.isEmpty())
-			Util.println(spc + "    PROTECTED" + protectedList);
+			IO.println(spc + "    PROTECTED" + protectedList);
 		String beg = "begin[" + edScopeChain() + ']';
-		Util.println(spc + beg);
+		IO.println(spc + beg);
 		for (Declaration decl : declarationList)
 			decl.print(indent + 1);
 		for (Statement stm : statements)
 			stm.print(indent + 1);
-		Util.println(spc + "end[" + edScopeChain() + ']');
+		IO.println(spc + "end[" + edScopeChain() + ']');
 	}
 	
 	@Override

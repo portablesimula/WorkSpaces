@@ -76,7 +76,7 @@ public final class InnerStatement extends Statement {
 	@Override
 	public void print(final int indent) {
     	String spc=edIndent(indent);
-		Util.println(spc+"inner"); 
+		IO.println(spc+"inner"); 
 	}
 	
 	@Override
