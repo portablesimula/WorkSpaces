@@ -26,7 +26,9 @@ import java.util.List;
 import java.util.Vector;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
+import simula.core.CoreGlobal2;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -34,13 +36,12 @@ import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.builder.token.LexToken;
-import simula.core.coder.SimulaCompiler;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Constant;
 import simula.core.syntaxClass.statement.DummyStatement;
 import simula.core.syntaxClass.statement.Statement;
 import simula.core.utilities.ClassHierarchy;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.LOG;
 import simula.core.utilities.LabelList;
@@ -388,7 +389,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public void doJavaCoding() {
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
-			if(SimulaCompiler.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
+			if(CoreGlobal2.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
 		} else {
 			switch (declarationKind) {
 				case ObjectKind.Procedure -> doProcedureCoding();
@@ -433,7 +434,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
-			if(SimulaCompiler.verbose) IO.println("Skip  doProcedureCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);		
+			if(CoreGlobal2.verbose) IO.println("Skip  doProcedureCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);		
 			return;
 		}
 		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
@@ -544,17 +545,17 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Coding Utility: codeProcedureBody. Redefined in SwitchDeclaration.
 	protected void codeProcedureBody() {
-		boolean duringSTM_Coding=SimulaCompiler.duringSTM_Coding;
-		SimulaCompiler.duringSTM_Coding=false;
+		boolean duringSTM_Coding=SimulaCoder.duringSTM_Coding;
+		SimulaCoder.duringSTM_Coding=false;
 		JavaSourceFileCoder.debug("// Procedure Statements");
 		JavaSourceFileCoder.code("@Override");
 		JavaSourceFileCoder.code("public " + getJavaIdentifier() + " _STM() {");
-		SimulaCompiler.duringSTM_Coding=true;
+		SimulaCoder.duringSTM_Coding=true;
 		codeSTMBody();
 		JavaSourceFileCoder.code("EBLK();");
 		JavaSourceFileCoder.code("return(this);");
 		JavaSourceFileCoder.code("}", "End of Procedure BODY");
-		SimulaCompiler.duringSTM_Coding=duringSTM_Coding;
+		SimulaCoder.duringSTM_Coding=duringSTM_Coding;
 	}
 
 
@@ -566,14 +567,14 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public byte[] buildClassFile() {
 		labelList.setLabelIdexes();
 		ClassDesc CD_ThisClass = currentClassDesc();
-		if(SimulaCompiler.verbose) IO.println("ProcedureDeclaration.buildClassFile: "+CD_ThisClass);
+		if(CoreGlobal2.verbose) IO.println("ProcedureDeclaration.buildClassFile: "+CD_ThisClass);
 		if(isPreCompiledFromFile != null) return getBytesFromFile();
 		ClassHierarchy.addClassToSuperClass(CD_ThisClass, RTS.CD.RTS_PROCEDURE);
 		
 		int count = 5;
 		while((count--) > 0) {
 			try {
-				if(SimulaCompiler.verbose)
+				if(CoreGlobal2.verbose)
 					IO.println("ProcedureDeclaration.buildClassFile: TRY: "+CD_ThisClass);
 				return tryBuildClassFile(CD_ThisClass);
 			} catch(IllegalArgumentException e) {

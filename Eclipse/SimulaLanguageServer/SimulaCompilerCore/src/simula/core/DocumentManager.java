@@ -1,6 +1,10 @@
 package simula.core;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -278,5 +282,37 @@ public class DocumentManager {
 //		}
 //		
 //	}
+
+
+	/// Delete temporary .class files.
+	/// @param dir temporary .class directory
+	public static void deleteTempFiles(final File dir) {
+		if(CoreGlobal2.verbose) {
+			IO.println("SimulaCompiler.deleteTempFiles:  Delete: " + dir);
+//			Thread.dumpStack();
+		}
+        if (! dir.exists()) {
+            Util.IERR("File does not exist: " + dir);
+            return;
+        }
+		Path path = dir.toPath();
+        try { Files.walk(path)
+	             // Sorts in reverse order (subfolders and files first)
+	             .sorted(Comparator.reverseOrder())
+	             .forEach(p -> {
+	                 try {
+	             		if(CoreGlobal2.verbose) {
+	             			IO.println("SimulaCompiler.deleteTempFiles: Delete: " + p);
+	             		}
+	                     Files.delete(p);
+	                 } catch (IOException e) {
+	                     Util.IERR("Could not delete: " + p + " - " + e.getMessage());
+	                 }
+	             });
+		} catch (Exception e) {
+			Util.IERR("SimulaCompiler.deleteFiles FAILED: ", e);
+			e.printStackTrace();
+		}
+    }
 
 }

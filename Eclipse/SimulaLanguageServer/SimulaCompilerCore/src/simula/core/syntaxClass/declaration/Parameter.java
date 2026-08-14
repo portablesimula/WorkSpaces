@@ -16,6 +16,7 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
 
+import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
@@ -25,7 +26,6 @@ import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Expression;
 import simula.core.syntaxClass.expression.RemoteVariable;
 import simula.core.syntaxClass.expression.VariableExpression;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.RTS;
 import simula.core.utilities.Util;

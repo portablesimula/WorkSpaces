@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
@@ -24,7 +25,6 @@ import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.syntaxClass.declaration.Declaration;
 import simula.core.syntaxClass.declaration.Parameter;
 import simula.core.syntaxClass.declaration.UndefinedDeclaration;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.Meaning;
 import simula.core.utilities.ObjectKind;

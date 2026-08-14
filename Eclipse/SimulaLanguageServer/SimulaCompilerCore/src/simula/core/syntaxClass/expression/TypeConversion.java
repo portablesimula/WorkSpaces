@@ -9,15 +9,15 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.MethodTypeDesc;
 
+import simula.core.CoreGlobal;
+import simula.core.CoreGlobal2;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.token.Identifier;
-import simula.core.coder.SimulaCompiler;
 import simula.core.syntaxClass.OverLoad;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.Type.ConversionKind;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.RTS;
 import simula.core.utilities.Util;
@@ -120,7 +120,7 @@ public final class TypeConversion extends Expression {
 				Constant c=new Constant(null, toType, val); c.doChecking();
 				return(c);
 			}
-			if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource) {
+			if(CoreGlobal2.compilerMode != CoreGlobal2.CompilerMode.viaJavaSource) {
 				if(toType instanceof OverLoad otp) {
 					return (new TypeConversion(otp.type[0], expression));
 				}				
@@ -137,7 +137,7 @@ public final class TypeConversion extends Expression {
 	private static boolean testCastNeccessary(Type toType,final Expression expression) {
 		if (toType == null)	return false;
 		if(expression instanceof MissingExpression) return false;
-		if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource) {
+		if(CoreGlobal2.compilerMode != CoreGlobal2.CompilerMode.viaJavaSource) {
 			if(toType instanceof OverLoad otp) {
 				if(!otp.contains(expression.type)) {
 					return(true); // Ad'Hoc
@@ -222,7 +222,7 @@ public final class TypeConversion extends Expression {
 					case Type.T_INTEGER: codeBuilder.i2f(); break;
 					case Type.T_LONG_REAL: codeBuilder.d2f(); break;
 					default:
-						if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource && fromType instanceof OverLoad otp) {
+						if(CoreGlobal2.compilerMode != CoreGlobal2.CompilerMode.viaJavaSource && fromType instanceof OverLoad otp) {
 							if(!otp.contains(Type.Real)) Util.IERR();
 						} else if (fromType.keyWord != Type.T_REAL) Util.IERR();
 				} break;
@@ -232,7 +232,7 @@ public final class TypeConversion extends Expression {
 					case Type.T_INTEGER: codeBuilder.i2d(); break;
 					case Type.T_REAL: codeBuilder.f2d(); break;
 					default:
-						if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource && fromType instanceof OverLoad otp) {
+						if(CoreGlobal2.compilerMode != CoreGlobal2.CompilerMode.viaJavaSource && fromType instanceof OverLoad otp) {
 							if(!otp.contains(Type.LongReal)) Util.IERR();
 						} else if (fromType.keyWord != Type.T_LONG_REAL) Util.IERR();
 				}

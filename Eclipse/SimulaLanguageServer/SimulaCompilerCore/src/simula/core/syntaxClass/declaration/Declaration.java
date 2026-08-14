@@ -10,13 +10,13 @@ import java.lang.classfile.CodeBuilder;
 import java.util.Vector;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.syntaxClass.ProtectedSpecification;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.Util;
 

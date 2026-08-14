@@ -20,7 +20,9 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
+import simula.core.CoreGlobal2;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -28,7 +30,7 @@ import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.builder.token.LexToken;
-import simula.core.coder.SimulaCompiler;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.HiddenSpecification;
 import simula.core.syntaxClass.ProtectedSpecification;
 import simula.core.syntaxClass.Type;
@@ -36,7 +38,6 @@ import simula.core.syntaxClass.statement.DummyStatement;
 import simula.core.syntaxClass.statement.InnerStatement;
 import simula.core.syntaxClass.statement.Statement;
 import simula.core.utilities.ClassHierarchy;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.DeclarationList;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.LOG;
@@ -821,7 +822,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	public void doJavaCoding() {
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
-			if(SimulaCompiler.verbose) IO.println("Skip  doJavaCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);	
+			if(CoreGlobal2.verbose) IO.println("Skip  doJavaCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);	
 			return;
 		}
 		CoreGlobal.sourceLineNumber = firstLineNumber();
@@ -958,17 +959,17 @@ public class ClassDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Java coding utility: Code class statements.
 	protected void codeClassStatements() {
-		boolean duringSTM_Coding = SimulaCompiler.duringSTM_Coding;
-		SimulaCompiler.duringSTM_Coding = false;
+		boolean duringSTM_Coding = SimulaCoder.duringSTM_Coding;
+		SimulaCoder.duringSTM_Coding = false;
 		JavaSourceFileCoder.debug("// Class Statements");
 		JavaSourceFileCoder.code("@Override");
 		JavaSourceFileCoder.code("public " + getJavaIdentifier() + " _STM() {");
-		SimulaCompiler.duringSTM_Coding = true;
+		SimulaCoder.duringSTM_Coding = true;
 		codeSTMBody();
 		JavaSourceFileCoder.code("EBLK();");
 		JavaSourceFileCoder.code("return(this);");
 		JavaSourceFileCoder.code("}", "End of Class Statements");
-		SimulaCompiler.duringSTM_Coding = duringSTM_Coding;
+		SimulaCoder.duringSTM_Coding = duringSTM_Coding;
 	}
 
 	// ***********************************************************************************************
@@ -1042,7 +1043,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		int count = 5;
 		while((count--) > 0) {
 			try {
-				if(SimulaCompiler.verbose)
+				if(CoreGlobal2.verbose)
 					IO.println("ClassDeclaration.buildClassFile: TRY: "+CD_ThisClass+" extends "+CD_SuperClass);
 				return tryBuildClassFile(CD_ThisClass, CD_SuperClass);
 			} catch(IllegalArgumentException e) {
@@ -1107,7 +1108,7 @@ public class ClassDeclaration extends BlockDeclaration {
 								codeBuilder -> buildIsMethodDetachUsed(codeBuilder));
 				}
 		);
-		if(SimulaCompiler.verbose)
+		if(CoreGlobal2.verbose)
 			IO.println("ClassDeclaration.buildClassFile: DONE: "+CD_ThisClass+" extends "+CD_SuperClass);
 		return(bytes);
 	}

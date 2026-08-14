@@ -12,7 +12,7 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 
-import simula.core.coder.SimulaCompiler;
+import simula.core.CoreGlobal2;
 import simula.core.syntaxClass.Type;
 
 /// Predefined values for common constants, including descriptors for class types etc. 
@@ -67,7 +67,7 @@ public final class RTS {
 		/// @param name class simple name
 		/// @return ClassDesc
 		public static ClassDesc classDesc(String name) {
-			return(ClassDesc.of(SimulaCompiler.packetName,name));
+			return(ClassDesc.of(CoreGlobal2.packetName,name));
 		}
 	}
 	

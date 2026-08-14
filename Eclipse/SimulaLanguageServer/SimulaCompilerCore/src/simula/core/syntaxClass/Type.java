@@ -12,10 +12,11 @@ import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
+import simula.core.CoreGlobal2;
 import simula.core.builder.SyntaxTree;
 import simula.core.builder.token.Identifier;
-import simula.core.coder.SimulaCompiler;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.syntaxClass.declaration.ConnectionBlock;
 import simula.core.syntaxClass.declaration.Declaration;
@@ -26,7 +27,6 @@ import simula.core.syntaxClass.declaration.UndefinedDeclaration;
 import simula.core.syntaxClass.expression.Expression;
 import simula.core.syntaxClass.expression.MissingExpression;
 import simula.core.syntaxClass.expression.VariableExpression;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.Html;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.RTS;
@@ -123,7 +123,7 @@ public class Type extends SyntaxElement {
 	/// @param classIdent the given class identifier
 	public Type(int keyWord, Identifier classIdent) {
 		super(null);
-		if(classIdent != null && !SimulaCompiler.CaseSensitive) classIdent.value = classIdent.value.toUpperCase();
+		if(classIdent != null && !CoreGlobal2.CaseSensitive) classIdent.value = classIdent.value.toUpperCase();
 		this.keyWord = keyWord;
 		this.classIdent = classIdent;
 		if(classIdent != null) {
@@ -502,7 +502,7 @@ public class Type extends SyntaxElement {
 					return("Lsimula/runtime/"+refIdent+";");
 				else if(refIdent.startsWith("RTS_"))
 					return("Lsimula/runtime/"+refIdent+";");
-				else return("L"+SimulaCompiler.packetName+"/"+refIdent+";");
+				else return("L"+CoreGlobal2.packetName+"/"+refIdent+";");
 			}
 			default: Util.IERR(); return null;
 		}
@@ -530,7 +530,7 @@ public class Type extends SyntaxElement {
 					return("Lsimula/runtime/"+refIdent+";");
 				else if(refIdent.startsWith("RTS_"))
 					return("Lsimula/runtime/"+refIdent+";");
-				else return("L"+SimulaCompiler.packetName+"/"+refIdent+";");
+				else return("L"+CoreGlobal2.packetName+"/"+refIdent+";");
 			}
 			default: Util.IERR(); return null;
 		}

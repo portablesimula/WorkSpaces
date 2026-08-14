@@ -9,17 +9,17 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.SimulaBuilder;
-import simula.core.coder.SimulaCompiler;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.BlockDeclaration;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.syntaxClass.declaration.PrefixedBlockDeclaration;
 import simula.core.syntaxClass.expression.Expression;
 import simula.core.syntaxClass.expression.VariableExpression;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.Util;
 
@@ -112,10 +112,10 @@ public final class BlockStatement extends Statement {
 			else s.append("._STM();");
 			JavaSourceFileCoder.code(s.toString());
 		}
-		boolean duringSTM_Coding=SimulaCompiler.duringSTM_Coding;
-		SimulaCompiler.duringSTM_Coding=false;
+		boolean duringSTM_Coding=SimulaCoder.duringSTM_Coding;
+		SimulaCoder.duringSTM_Coding=false;
 		blockDeclaration.doJavaCoding();
-		SimulaCompiler.duringSTM_Coding=duringSTM_Coding;
+		SimulaCoder.duringSTM_Coding=duringSTM_Coding;
 	}
 
 	@Override

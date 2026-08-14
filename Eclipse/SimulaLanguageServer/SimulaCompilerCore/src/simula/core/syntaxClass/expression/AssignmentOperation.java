@@ -11,6 +11,7 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
@@ -22,7 +23,6 @@ import simula.core.syntaxClass.declaration.Declaration;
 import simula.core.syntaxClass.declaration.Parameter;
 import simula.core.syntaxClass.declaration.ProcedureDeclaration;
 import simula.core.syntaxClass.declaration.SimpleVariableDeclaration;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.Meaning;
 import simula.core.utilities.ObjectKind;

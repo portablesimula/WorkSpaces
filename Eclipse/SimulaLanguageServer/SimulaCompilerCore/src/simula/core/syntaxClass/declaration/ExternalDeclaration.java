@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 
+import simula.core.CoreGlobal;
 import simula.core.builder.AttributeFileIO;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
@@ -20,7 +21,6 @@ import simula.core.builder.token.SimpleString;
 import simula.core.coder.JarFileBuilder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.LOG;
 import simula.core.utilities.ObjectKind;

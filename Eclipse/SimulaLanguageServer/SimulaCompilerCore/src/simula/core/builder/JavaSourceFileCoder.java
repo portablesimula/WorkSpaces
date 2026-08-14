@@ -14,10 +14,11 @@ import java.util.Date;
 import java.util.Vector;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.coder.SimulaCompiler;
+import simula.core.CoreGlobal2;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.BlockDeclaration;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.LOG;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.Util;
@@ -52,19 +53,19 @@ public final class JavaSourceFileCoder {
 	/// @param blockDeclaration argument
 	public JavaSourceFileCoder(final BlockDeclaration blockDeclaration) {
 		this.blockDeclaration = blockDeclaration;
-		SimulaCompiler.javaSourceFileCoders.add(this);
+		SimulaCoder.javaSourceFileCoders.add(this);
 		enclosingJavaCoder = CoreGlobal.currentJavaFileCoder;
 		CoreGlobal.currentJavaFileCoder = this;
-		javaOutputFile = new File(SimulaCompiler.tempJavaFileDir, blockDeclaration.getJavaIdentifier() + ".java");
+		javaOutputFile = new File(SimulaCoder.tempJavaFileDir, blockDeclaration.getJavaIdentifier() + ".java");
 		LOG.info("JavaSourceFileCoder: javaOutputFile: " + javaOutputFile);
 		try {
 			javaOutputFile.getParentFile().mkdirs();
-			if (SimulaCompiler.verbose)
+			if (CoreGlobal2.verbose)
 				Util.TRACE("Output: " + javaOutputFile.getCanonicalPath());
 //			writer = new OutputStreamWriter(new FileOutputStream(javaOutputFile), CoreGlobal._CHARSET);
 			writer = new OutputStreamWriter(new FileOutputStream(javaOutputFile));
-			JavaSourceFileCoder.code("package " + SimulaCompiler.packetName + ";");
-			JavaSourceFileCoder.code("// " + SimulaCompiler.simulaReleaseID + " Compiled at " + new Date());
+			JavaSourceFileCoder.code("package " + CoreGlobal2.packetName + ";");
+			JavaSourceFileCoder.code("// " + CoreGlobal2.simulaReleaseID + " Compiled at " + new Date());
 			JavaSourceFileCoder.code("import simula.runtime.*;");
 		} catch (IOException e) {
 			throw new RuntimeException("Writing .java output failed", e);
@@ -81,7 +82,7 @@ public final class JavaSourceFileCoder {
 	/// Returns the output file for generated Java code.
 	/// @return the output file for generated Java code
 	public String getClassOutputFileName() {
-		return (SimulaCompiler.tempClassFileDir + "/" + SimulaCompiler.packetName + '/' + blockDeclaration.getJavaIdentifier() + ".class");
+		return (SimulaCoder.tempClassFileDir + "/" + CoreGlobal2.packetName + '/' + blockDeclaration.getJavaIdentifier() + ".class");
 	}
 
 	/// Close Java output file.
@@ -174,7 +175,7 @@ public final class JavaSourceFileCoder {
 	/// @return the resulting Java source line
 	private String edLineNumberLine(final int simulaLine, final String modid) {
 		StringBuilder sb = new StringBuilder();
-		if (SimulaCompiler.duringSTM_Coding && Option.internal.GNERATE_LINE_CALLS) {
+		if (SimulaCoder.duringSTM_Coding && Option.internal.GNERATE_LINE_CALLS) {
 			sb.append("RTS_UTIL._LINE(\"").append(modid).append("\",").append(simulaLine).append("); ");
 		}
 		sb.append("// JavaLine ").append(currentJavaLineNumber).append(" <== SourceLine ").append(simulaLine);

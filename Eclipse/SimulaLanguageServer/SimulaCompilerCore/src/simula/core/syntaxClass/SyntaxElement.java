@@ -8,6 +8,7 @@ package simula.core.syntaxClass;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
+import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -18,7 +19,6 @@ import simula.core.syntaxClass.declaration.Declaration;
 import simula.core.syntaxClass.declaration.Parameter;
 import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.declaration.StandardProcedure;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.Html;
 import simula.core.utilities.Util;
 import simula.lsp.util.AstData;

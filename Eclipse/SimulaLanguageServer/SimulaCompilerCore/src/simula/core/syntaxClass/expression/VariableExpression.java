@@ -15,12 +15,13 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import simula.Option;
+import simula.core.CoreGlobal;
+import simula.core.CoreGlobal2;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
-import simula.core.coder.SimulaCompiler;
 import simula.core.syntaxClass.OverLoad;
 import simula.core.syntaxClass.ProcedureSpecification;
 import simula.core.syntaxClass.SyntaxElement;
@@ -39,7 +40,6 @@ import simula.core.syntaxClass.declaration.StandardProcedure;
 import simula.core.syntaxClass.declaration.SwitchDeclaration;
 import simula.core.syntaxClass.declaration.UndefinedDeclaration;
 import simula.core.syntaxClass.declaration.VirtualSpecification;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.Meaning;
 import simula.core.utilities.ObjectKind;
@@ -285,7 +285,7 @@ public final class VariableExpression extends Expression {
 					paramIterator = cdecl.new ClassParameterIterator();
 				} else if (declaredAs instanceof ProcedureDeclaration) {
 					paramIterator = ((ProcedureDeclaration) declaredAs).parameterList.iterator();
-					if(SimulaCompiler.compilerMode != SimulaCompiler.CompilerMode.viaJavaSource) {
+					if(CoreGlobal2.compilerMode != CoreGlobal2.CompilerMode.viaJavaSource) {
 						if(declaredAs instanceof StandardProcedure prc) {
 							if(prc.identifierValue().equalsIgnoreCase("histd")) ; // NOTHING
 							else if(prc.identifierValue().equalsIgnoreCase("discrete")) ; // NOTHING

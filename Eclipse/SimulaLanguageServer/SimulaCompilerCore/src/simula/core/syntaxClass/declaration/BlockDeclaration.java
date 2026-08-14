@@ -15,17 +15,17 @@ import java.util.Stack;
 import java.util.Vector;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.builder.token.LexToken;
-import simula.core.coder.SimulaCompiler;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Expression;
 import simula.core.syntaxClass.statement.Statement;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.DeclarationList;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.ObjectKind;
@@ -296,13 +296,13 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	// ***********************************************************************************************
 	/// ClassFile coding utility: Code statements
 	protected void codeStatements() {
-		boolean duringSTM_Coding=SimulaCompiler.duringSTM_Coding;
-		SimulaCompiler.duringSTM_Coding=true;
+		boolean duringSTM_Coding=SimulaCoder.duringSTM_Coding;
+		SimulaCoder.duringSTM_Coding=true;
 		for (Statement stm : statements) {
 //			IO.println("BlockDeclaration.codeStatements: "+stm.getClass().getSimpleName()+"  "+stm);
 			stm.doJavaCoding();
 		}
-		SimulaCompiler.duringSTM_Coding=duringSTM_Coding;
+		SimulaCoder.duringSTM_Coding=duringSTM_Coding;
 	}
 
     

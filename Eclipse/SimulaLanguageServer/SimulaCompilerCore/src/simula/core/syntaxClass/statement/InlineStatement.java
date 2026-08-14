@@ -7,9 +7,9 @@ package simula.core.syntaxClass.statement;
 
 import java.lang.classfile.CodeBuilder;
 
+import simula.core.CoreGlobal;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.SimulaBuilder;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.RTS;
 import simula.core.utilities.Util;
 

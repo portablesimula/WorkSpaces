@@ -9,12 +9,12 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.builder.token.Identifier;
 import simula.core.syntaxClass.OverLoad;
 import simula.core.syntaxClass.ProcedureSpecification;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Expression;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.ObjectList;
 import simula.core.utilities.Util;
 

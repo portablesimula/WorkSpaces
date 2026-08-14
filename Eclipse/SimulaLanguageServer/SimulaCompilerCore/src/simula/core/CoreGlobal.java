@@ -3,7 +3,7 @@
 /// 
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
-package simula.core.utilities;
+package simula.core;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +17,7 @@ import java.util.jar.JarFile;
 import simula.SimulaCoreClient;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.syntaxClass.declaration.DeclarationScope;
+import simula.core.utilities.ClassHierarchy;
 
 /// Global Variables.
 /// 

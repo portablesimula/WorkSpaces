@@ -2,7 +2,7 @@ package simula.core.utilities;
 
 import java.util.logging.Logger;
 
-import simula.core.coder.SimulaCompiler;
+import simula.core.CoreGlobal2;
 
 public class LOG {
 //	private static final Logger logger = Logger.getLogger(SimulaServer.class.getName());
@@ -21,12 +21,12 @@ public class LOG {
 	}
 
 	public static void trace(String message) {
-		if(SimulaCompiler.verbose)
+		if(CoreGlobal2.verbose)
 			logger.info(message);
 	}
 
 	public static void info(String message) {
-		if(SimulaCompiler.verbose)
+		if(CoreGlobal2.verbose)
 			logger.info(message);
 	}
 }

@@ -8,6 +8,7 @@ package simula.core.syntaxClass;
 import java.io.IOException;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
@@ -16,7 +17,6 @@ import simula.core.builder.token.Identifier;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.syntaxClass.declaration.Parameter;
 import simula.core.syntaxClass.declaration.ProcedureDeclaration;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.ObjectList;
 import simula.core.utilities.Util;

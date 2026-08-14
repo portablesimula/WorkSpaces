@@ -9,12 +9,13 @@ import java.io.IOException;
 import java.util.Vector;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
+import simula.core.CoreGlobal2;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.builder.token.LexToken;
-import simula.core.coder.SimulaCompiler;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.BlockDeclaration;
@@ -28,7 +29,6 @@ import simula.core.syntaxClass.declaration.ProcedureDeclaration;
 import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.declaration.StandardProcedure;
 import simula.core.syntaxClass.expression.VariableExpression;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.Util;
@@ -79,8 +79,8 @@ public final class ProgramModule extends Statement {
 	/// Returns the relative file name.
 	/// @return the relative file name
 	public String getRelativeAttributeFileName() {
-		if(mainModule.declarationKind==ObjectKind.Class) return(SimulaCompiler.packetName+"/CLASS.AF");
-		if(mainModule.declarationKind==ObjectKind.Procedure) return(SimulaCompiler.packetName+"/PROCEDURE.AF");
+		if(mainModule.declarationKind==ObjectKind.Class) return(CoreGlobal2.packetName+"/CLASS.AF");
+		if(mainModule.declarationKind==ObjectKind.Procedure) return(CoreGlobal2.packetName+"/PROCEDURE.AF");
 		else return(null);
 	}
 	  
@@ -164,7 +164,7 @@ public final class ProgramModule extends Statement {
 				if(! textAfterEnd.equals(";")) Util.warning(simBuilder, start, end, "Text after Program end: \"" + textAfterEnd + '"');
 			}
 			
-			if(SimulaCompiler.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
+			if(CoreGlobal2.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
 //		} catch(Throwable e) {
 //			e.printStackTrace();
 //			Util.IERR();

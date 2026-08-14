@@ -7,16 +7,17 @@ import java.util.List;
 import java.util.Vector;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
+import simula.core.CoreGlobal2;
 import simula.core.builder.token.LexToken;
 import simula.core.builder.token.SimpleString;
 import simula.core.coder.JarFileBuilder;
-import simula.core.coder.SimulaCompiler;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.syntaxClass.declaration.MaybeBlockDeclaration;
 import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.statement.ProgramModule;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.LOG;
 import simula.core.utilities.ObjectKind;
@@ -29,7 +30,7 @@ public class SimulaBuilder {
 	final public DocumentManager documentManager;
     public SimulaLexer lexer;
     
-    public SimulaCompiler simulaCompiler;
+    public CoreGlobal2 simulaCompiler;
     
 	public File generatedJarFile;
 	/// Compiler state: True while Parsing
@@ -67,11 +68,11 @@ public class SimulaBuilder {
 //        }
 
 		// Get Temp Directory:
-		SimulaCompiler.simulaTempDir = CoreGlobal.getTempFileDir("simula/");
-		deleteTempFiles(SimulaCompiler.simulaTempDir);
+		SimulaCoder.simulaTempDir = CoreGlobal.getTempFileDir("simula/");
+		deleteTempFiles(SimulaCoder.simulaTempDir);
 
 		File desktop = new File(System.getProperty("user.home"), "Desktop");
-		if (SimulaCompiler.verbose) {
+		if (CoreGlobal2.verbose) {
 			// https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html
 			IO.println("------------  SIMULA ENVIRONMENT SUMMARY  ------------");
 			IO.println("Java Home            " + System.getProperty("java.home"));
@@ -181,26 +182,26 @@ public class SimulaBuilder {
 	}
     private void setTmpClassDir() {
 		// Create Temp .class-Files Directory:
-		File tmpClassDir = new File(SimulaCompiler.simulaTempDir, "classes");
+		File tmpClassDir = new File(SimulaCoder.simulaTempDir, "classes");
 		tmpClassDir.mkdirs();
-		SimulaCompiler.tempClassFileDir = tmpClassDir;
-    	LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempClassFileDir="+SimulaCompiler.tempClassFileDir);
+		SimulaCoder.tempClassFileDir = tmpClassDir;
+    	LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempClassFileDir="+SimulaCoder.tempClassFileDir);
 //    	Util.IERR("");
 //    	Thread.dumpStack();
     }
     
     private void setOutputDir() {
 //    	IO.println("SimulaCompiler.setOutputDir: sourceFileDir=" + documentManager.sourceFileDir);
-//    	IO.println("SimulaCompiler.setOutputDir: outputDir=" + SimulaCompiler.outputDir);
-    	if(SimulaCompiler.outputDir == null) {
-//    		SimulaCompiler.outputDir = new File(documentManager.sourceFileDir,"bin");
+//    	IO.println("SimulaCompiler.setOutputDir: outputDir=" + SimulaCoder.outputDir);
+    	if(SimulaCoder.outputDir == null) {
+//    		SimulaCoder.outputDir = new File(documentManager.sourceFileDir,"bin");
         	File userDir = new File(System.getProperty("user.dir"));
-    		SimulaCompiler.outputDir = new File(userDir,"bin");
+    		SimulaCoder.outputDir = new File(userDir,"bin");
     	}
-    	LOG.info("SimulaCompiler.setOutputDir: outputDir=" + SimulaCompiler.outputDir);
-    	SimulaCompiler.outputDir.mkdirs();
-    	if (! SimulaCompiler.outputDir.canWrite()) {
-    		Util.IERR("SimulaCompiler.setOutputDir: Unable to write to " + SimulaCompiler.outputDir);
+    	LOG.info("SimulaCompiler.setOutputDir: outputDir=" + SimulaCoder.outputDir);
+    	SimulaCoder.outputDir.mkdirs();
+    	if (! SimulaCoder.outputDir.canWrite()) {
+    		Util.IERR("SimulaCompiler.setOutputDir: Unable to write to " + SimulaCoder.outputDir);
     	}
     }
 
@@ -223,7 +224,7 @@ public class SimulaBuilder {
 			if (Option.internal.TRACE_CHECKER_OUTPUT && programModule != null)
 				programModule.print(0);
 		}
-		if(SimulaCompiler.verbose) IO.println("SimulaCompiler.doCompile: " + DocumentManager.sourceName + ": Semantic Checker completed");
+		if(CoreGlobal2.verbose) IO.println("SimulaCompiler.doCompile: " + DocumentManager.sourceName + ": Semantic Checker completed");
 		simBuilder.duringChecking = false;
 		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
 			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");

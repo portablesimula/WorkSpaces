@@ -7,6 +7,7 @@ package simula.core.syntaxClass.expression;
 
 import java.util.Iterator;
 
+import simula.core.CoreGlobal;
 import simula.core.syntaxClass.ProcedureSpecification;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -18,7 +19,6 @@ import simula.core.syntaxClass.declaration.Parameter;
 import simula.core.syntaxClass.declaration.ProcedureDeclaration;
 import simula.core.syntaxClass.declaration.StandardProcedure;
 import simula.core.syntaxClass.declaration.VirtualSpecification;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.Meaning;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.Util;

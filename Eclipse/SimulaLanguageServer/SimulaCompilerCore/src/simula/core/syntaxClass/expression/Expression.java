@@ -8,6 +8,7 @@ package simula.core.syntaxClass.expression;
 import java.lang.classfile.CodeBuilder;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.CharacterConst;
@@ -21,7 +22,6 @@ import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.syntaxClass.declaration.Declaration;
 import simula.core.syntaxClass.declaration.SimpleVariableDeclaration;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.Meaning;
 import simula.core.utilities.Util;

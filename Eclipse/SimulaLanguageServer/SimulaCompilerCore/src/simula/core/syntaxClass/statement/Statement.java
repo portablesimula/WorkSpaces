@@ -8,12 +8,13 @@ package simula.core.syntaxClass.statement;
 import java.lang.classfile.CodeBuilder;
 
 import simula.Option;
+import simula.core.CoreGlobal;
+import simula.core.CoreGlobal2;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.builder.token.LexToken;
-import simula.core.coder.SimulaCompiler;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.syntaxClass.declaration.LabelDeclaration;
@@ -21,7 +22,6 @@ import simula.core.syntaxClass.declaration.MaybeBlockDeclaration;
 import simula.core.syntaxClass.declaration.PrefixedBlockDeclaration;
 import simula.core.syntaxClass.expression.Expression;
 import simula.core.syntaxClass.expression.VariableExpression;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.LabelList;
 import simula.core.utilities.ObjectList;
@@ -129,7 +129,7 @@ public abstract class Statement extends SyntaxElement {
 		    case KeyWord.FOR:		 statement = new ForStatement(simBuilder); break;
 		    case KeyWord.WHILE:		 statement = new WhileStatement(simBuilder); break;
 		    case KeyWord.INSPECT:	 statement = new ConnectionStatement(simBuilder); break;
-		    case KeyWord.SWITCH:	 if(SimulaCompiler.EXTENSIONS) {
+		    case KeyWord.SWITCH:	 if(CoreGlobal2.EXTENSIONS) {
 		    							 statement = new SwitchStatement(simBuilder);
 		    						 } break;
 		    case KeyWord.ACTIVATE,

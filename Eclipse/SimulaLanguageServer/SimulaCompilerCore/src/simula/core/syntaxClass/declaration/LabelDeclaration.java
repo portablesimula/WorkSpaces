@@ -14,6 +14,7 @@ import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 
+import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -23,7 +24,6 @@ import simula.core.syntaxClass.ProtectedSpecification;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Constant;
 import simula.core.syntaxClass.expression.Expression;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.RTS;
 import simula.core.utilities.Util;

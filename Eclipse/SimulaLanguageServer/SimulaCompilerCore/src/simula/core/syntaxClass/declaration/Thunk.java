@@ -18,16 +18,16 @@ import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
+import simula.core.CoreGlobal2;
 import simula.core.builder.token.Identifier;
-import simula.core.coder.SimulaCompiler;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Expression;
 import simula.core.syntaxClass.expression.RemoteVariable;
 import simula.core.syntaxClass.expression.TypeConversion;
 import simula.core.syntaxClass.expression.VariableExpression;
 import simula.core.utilities.ClassHierarchy;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.LOG;
 import simula.core.utilities.Meaning;
 import simula.core.utilities.ObjectKind;
@@ -105,7 +105,7 @@ public final class Thunk extends DeclarationScope {
 	// ***********************************************************************************************
 	@Override
 	public byte[] buildClassFile() {
-		if(SimulaCompiler.verbose) IO.println("Begin buildClassFile: "+CD_ThisClass);
+		if(CoreGlobal2.verbose) IO.println("Begin buildClassFile: "+CD_ThisClass);
 		ClassHierarchy.addClassToSuperClass(CD_ThisClass, RTS.CD.RTS_NAME);
 		
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,

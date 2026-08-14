@@ -10,6 +10,7 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
@@ -21,7 +22,6 @@ import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.syntaxClass.declaration.ConnectionBlock;
 import simula.core.syntaxClass.declaration.Declaration;
 import simula.core.syntaxClass.declaration.DeclarationScope;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.Meaning;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.Util;

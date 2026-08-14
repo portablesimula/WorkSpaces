@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.SimulaBuilder;
 import simula.core.syntaxClass.declaration.LabelDeclaration;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.ObjectList;
 import simula.core.utilities.Util;

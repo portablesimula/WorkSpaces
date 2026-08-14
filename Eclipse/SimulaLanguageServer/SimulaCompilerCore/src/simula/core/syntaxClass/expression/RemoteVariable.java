@@ -11,11 +11,12 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 
 import simula.Option;
+import simula.core.CoreGlobal;
+import simula.core.CoreGlobal2;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
-import simula.core.coder.SimulaCompiler;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.ArrayDeclaration;
@@ -27,7 +28,6 @@ import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.declaration.StandardProcedure;
 import simula.core.syntaxClass.declaration.UndefinedDeclaration;
 import simula.core.syntaxClass.declaration.VirtualSpecification;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.Meaning;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.RTS;
@@ -118,7 +118,7 @@ public final class RemoteVariable extends Expression {
 			if(objType.keyWord != Type.T_UNDEF)
 				Util.semanticError(obj, "doRemoteChecking: Object Expression (" + obj + ") is not a ref() type rather " + objType);
 		} else if (qual.hasLocalClasses) {
-			if (SimulaCompiler.EXTENSIONS)
+			if (CoreGlobal2.EXTENSIONS)
 				 Util.warning(obj, "Illegal remote access into object of class with local classes.");
 			else Util.semanticError(obj, "Illegal remote access into object of class with local classes.");
 		}

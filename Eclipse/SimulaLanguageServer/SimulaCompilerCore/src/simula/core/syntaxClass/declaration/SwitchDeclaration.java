@@ -14,16 +14,16 @@ import java.util.List;
 import java.util.Vector;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
-import simula.core.coder.SimulaCompiler;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.ProtectedSpecification;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Expression;
-import simula.core.utilities.CoreGlobal;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.RTS;
@@ -93,12 +93,12 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 	// ***********************************************************************************************
 	@Override
 	protected void codeProcedureBody() {
-		boolean duringSTM_Coding=SimulaCompiler.duringSTM_Coding;
-		SimulaCompiler.duringSTM_Coding=false;
+		boolean duringSTM_Coding=SimulaCoder.duringSTM_Coding;
+		SimulaCoder.duringSTM_Coding=false;
 		JavaSourceFileCoder.debug("// Switch Body");
 		JavaSourceFileCoder.code("@Override");
 		JavaSourceFileCoder.code("public " + getJavaIdentifier() + " _STM() {");
-		SimulaCompiler.duringSTM_Coding=true;
+		SimulaCoder.duringSTM_Coding=true;
 		JavaSourceFileCoder.code("switch(p__SW-1) {");
 		int n = 0;
 		for (Expression expr : ((SwitchDeclaration) this).switchList) {
@@ -109,7 +109,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		JavaSourceFileCoder.code("EBLK();");
 		JavaSourceFileCoder.code("return(this);");
 		JavaSourceFileCoder.code("}","End of Switch BODY");
-		SimulaCompiler.duringSTM_Coding=duringSTM_Coding;
+		SimulaCoder.duringSTM_Coding=duringSTM_Coding;
 	}
 
 	// ***********************************************************************************************
