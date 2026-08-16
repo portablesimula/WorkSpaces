@@ -1,13 +1,11 @@
 package simula;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.CoreGlobal2;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.TokenManager;
 import simula.core.builder.token.LexToken;
@@ -47,8 +45,10 @@ public class SimulaCoreExports {
     	if(simBuilder.nErrors != 0) {
     		Util.IERR("Can't generate code due to " + simBuilder.nErrors + " errors.");
     	}
+    	SimulaCoder simCoder = null;
     	try {
-			SimulaCoder.doCodeGeneration(simBuilder);
+			simCoder = new SimulaCoder(documentManager);
+			simCoder.doCodeGeneration(simBuilder.documentManager.getSyntaxTree());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -57,7 +57,7 @@ public class SimulaCoreExports {
     		Util.IERR("Can't run due to " + simBuilder.nErrors + " errors.");
     	}
     	try {
-			SimulaExec.doRun(simBuilder);
+			SimulaExec.doRun(simCoder);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

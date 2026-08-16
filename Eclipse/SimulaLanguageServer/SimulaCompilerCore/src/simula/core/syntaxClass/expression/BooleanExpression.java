@@ -14,6 +14,7 @@ import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.utilities.KeyWord;
@@ -182,25 +183,25 @@ public final class BooleanExpression extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		switch(opr) {
 			case KeyWord.AND:
-				lhs.buildEvaluation(null,codeBuilder);
-				rhs.buildEvaluation(null,codeBuilder);
+				lhs.buildEvaluation(simCoder, null, codeBuilder);
+				rhs.buildEvaluation(simCoder, null, codeBuilder);
 				codeBuilder.iand(); break;
 			case KeyWord.OR:
-				lhs.buildEvaluation(null,codeBuilder);
-				rhs.buildEvaluation(null,codeBuilder);
+				lhs.buildEvaluation(simCoder, null, codeBuilder);
+				rhs.buildEvaluation(simCoder, null, codeBuilder);
 				codeBuilder.ior(); break;
 			case KeyWord.IMP:
-				lhs.buildEvaluation(null,codeBuilder);
+				lhs.buildEvaluation(simCoder, null, codeBuilder);
 				UnaryOperation.buildNOT(codeBuilder);
-				rhs.buildEvaluation(null,codeBuilder);
+				rhs.buildEvaluation(simCoder, null, codeBuilder);
 				codeBuilder.ior(); break;
 			case KeyWord.EQV:
-				lhs.buildEvaluation(null,codeBuilder);
-				rhs.buildEvaluation(null,codeBuilder);
+				lhs.buildEvaluation(simCoder, null, codeBuilder);
+				rhs.buildEvaluation(simCoder, null, codeBuilder);
 				Label L1 = codeBuilder.newLabel();
 				Label L2 = codeBuilder.newLabel();
 				codeBuilder
@@ -214,10 +215,10 @@ public final class BooleanExpression extends Expression {
 			case KeyWord.AND_THEN:
 				Label AL1 = codeBuilder.newLabel();
 				Label AL2 = codeBuilder.newLabel();
-				lhs.buildEvaluation(null,codeBuilder);
+				lhs.buildEvaluation(simCoder, null, codeBuilder);
 				codeBuilder
 						.ifeq(AL1);
-				rhs.buildEvaluation(null,codeBuilder);
+				rhs.buildEvaluation(simCoder, null, codeBuilder);
 				codeBuilder
 						.ifeq(AL1)
 						.iconst_1()
@@ -230,10 +231,10 @@ public final class BooleanExpression extends Expression {
 				Label OL1 = codeBuilder.newLabel();
 				Label OL2 = codeBuilder.newLabel();
 				Label OL3 = codeBuilder.newLabel();
-				lhs.buildEvaluation(null,codeBuilder);
+				lhs.buildEvaluation(simCoder, null, codeBuilder);
 				codeBuilder
 						.ifne(OL1);
-				rhs.buildEvaluation(null,codeBuilder);
+				rhs.buildEvaluation(simCoder, null, codeBuilder);
 				codeBuilder
 						.ifeq(OL2)
 						.labelBinding(OL1)

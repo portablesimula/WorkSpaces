@@ -14,6 +14,7 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
@@ -149,14 +150,14 @@ public final class ObjectRelation extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder) {
 //		setLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if(opr == KeyWord.IS) {
-			lhs.buildEvaluation(null,codeBuilder);
+			lhs.buildEvaluation(simCoder, null, codeBuilder);
 			RTS.invokestatic_UTIL_IS(classDeclaration.getClassDesc(), codeBuilder);
 		} else if(opr == KeyWord.IN) {
-			lhs.buildEvaluation(null,codeBuilder);
+			lhs.buildEvaluation(simCoder, null, codeBuilder);
 			codeBuilder.instanceOf(classDeclaration.getClassDesc());
 		} else Util.IERR();
 	}

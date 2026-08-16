@@ -7,6 +7,7 @@ package simula.core.utilities;
 
 import java.lang.classfile.CodeBuilder;
 
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.ConnectionBlock;
 import simula.core.syntaxClass.declaration.Declaration;
 import simula.core.syntaxClass.declaration.DeclarationScope;
@@ -125,11 +126,11 @@ public final class Meaning {
 	// ***************************************************************************************
 	/// ClassFile coding utility: Build qualified static link chain.
 	/// @param codeBuilder the codeBuilder to use.
-	public void buildQualifiedStaticLink(CodeBuilder codeBuilder) {
+	public void buildQualifiedStaticLink(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		// Edit staticLink reference
 		if(this.isConnected()) {
 	    	VariableExpression inspectedVariable = getInspectedVariable();
-			inspectedVariable.buildEvaluation(null, codeBuilder);
+			inspectedVariable.buildEvaluation(simCoder, null, codeBuilder);
 		}
 		else {
 			boolean withFollowSL = declaredIn.buildCTX(codeBuilder);
@@ -143,11 +144,11 @@ public final class Meaning {
 	/// ClassFile Coding Utility: Build identifier access.
 	/// @param destination true if destination
 	/// @param codeBuilder the CodeBuilder
-	public void buildIdentifierAccess(boolean destination,CodeBuilder codeBuilder) {
+	public void buildIdentifierAccess(final SimulaCoder simCoder, final boolean destination, final CodeBuilder codeBuilder) {
 		Meaning meaning=this;
 		if (meaning.isConnected()) {
 			Expression inspectedExpression = ((ConnectionBlock) meaning.declaredIn).getTypedInspectedVariable();
-				inspectedExpression.buildEvaluation(null, codeBuilder);
+				inspectedExpression.buildEvaluation(simCoder, null, codeBuilder);
 		} else if(declaredAs instanceof ProcedureDeclaration) {			
 	        // 0: getstatic     #17                 // Field _CUR:Lsimula/runtime/RTS_RTObject;
 	        // 3: getfield      #21                 // Field simula/runtime/RTS_RTObject._SL:Lsimula/runtime/RTS_RTObject;

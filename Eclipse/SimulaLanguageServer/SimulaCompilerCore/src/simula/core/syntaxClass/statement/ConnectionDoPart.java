@@ -13,6 +13,7 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
@@ -75,9 +76,9 @@ public class ConnectionDoPart extends SyntaxElement {
 	}
 
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
-		connectionBlock.buildByteCode(codeBuilder);
+		connectionBlock.buildByteCode(simCoder, codeBuilder);
 		codeBuilder.goto_(connectionStatement.endLabel);
 	}
 

@@ -15,6 +15,7 @@ import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.LexTokenRange;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.LexToken;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.Declaration;
 import simula.core.syntaxClass.declaration.Parameter;
 import simula.core.syntaxClass.declaration.StandardClass;
@@ -206,7 +207,7 @@ public abstract class SyntaxElement {
 
 	/// Build Java ClassFile ByteCode.
 	/// @param codeBuilder the codeBuilder to use.
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		Util.IERR("Method buildByteCode need a redefinition in "+this.getClass().getSimpleName()
 				+"\n\n            MAYBE: Use buildEvaluation(boolean destination,CodeBuilder codeBuilder)\n");
 	}

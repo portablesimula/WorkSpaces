@@ -13,6 +13,7 @@ import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.ObjectKind;
@@ -69,7 +70,7 @@ public final class InnerStatement extends Statement {
 	}
 
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		// No code !
 	}
 

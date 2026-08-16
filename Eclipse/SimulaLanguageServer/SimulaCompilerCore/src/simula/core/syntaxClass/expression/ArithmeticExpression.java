@@ -14,6 +14,7 @@ import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.utilities.KeyWord;
@@ -227,27 +228,27 @@ public final class ArithmeticExpression extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if(opr == KeyWord.EXP) {
 			// Real:     r2=((float)(Math.pow(((double)(r1)),((double)(e)))));
 			// LongReal: r2=Math.pow(r1,e);
 			// Integer:  k=_IPOW(i,j);
-			lhs.buildEvaluation(null,codeBuilder);
+			lhs.buildEvaluation(simCoder, null, codeBuilder);
 			if(type.keyWord == Type.T_INTEGER) {
-				rhs.buildEvaluation(null,codeBuilder);
+				rhs.buildEvaluation(simCoder, null, codeBuilder);
 				RTS.invokestatic_UTIL_IPOW(codeBuilder);
 			} else {
 				if(type.keyWord == Type.T_REAL) codeBuilder.f2d();
-				rhs.buildEvaluation(null,codeBuilder);
+				rhs.buildEvaluation(simCoder, null, codeBuilder);
 				if(type.keyWord == Type.T_REAL) codeBuilder.f2d();
 				codeBuilder.invokestatic(RTS.CD.JAVA_LANG_MATH, "pow", MethodTypeDesc.ofDescriptor("(DD)D"));
 				if(type.keyWord == Type.T_REAL) codeBuilder.d2f();
 			}
 			return;
 		}
-		lhs.buildEvaluation(null,codeBuilder);
-		rhs.buildEvaluation(null,codeBuilder);
+		lhs.buildEvaluation(simCoder, null, codeBuilder);
+		rhs.buildEvaluation(simCoder, null, codeBuilder);
 		switch(type.keyWord) {
 			case Type.T_INTEGER -> {
 				switch (opr) {

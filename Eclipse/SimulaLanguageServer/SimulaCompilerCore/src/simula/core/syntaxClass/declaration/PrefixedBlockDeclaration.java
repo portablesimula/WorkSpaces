@@ -220,14 +220,14 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 
 	
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		CoreGlobal.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(CoreGlobal2.verbose)
 				IO.println("Skip  buildClassFile: " + this.identifierValue()+" extends " + this.prefix + " -- It is read from " + isPreCompiledFromFile);		
 		} else {
-			try { createJavaClassFile(); } catch (IOException e) { e.printStackTrace(); }
+			try { createJavaClassFile(simCoder); } catch (IOException e) { e.printStackTrace(); }
 		}
 
 		// ===================================================
@@ -243,7 +243,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		// Push parameters
 		if(blockPrefix.checkedParams != null)
 			for(Expression expr:blockPrefix.checkedParams)
-				expr.buildEvaluation(null,codeBuilder);
+				expr.buildEvaluation(simCoder, null, codeBuilder);
 
 		codeBuilder.invokespecial(CD_pblk, "<init>", this.getConstructorMethodTypeDesc());
 
@@ -261,7 +261,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// *** ByteCoding: buildClassFile
 	// ***********************************************************************************************
 	@Override
-	public byte[] buildClassFile() {
+	public byte[] buildClassFile(final SimulaCoder simCoder) {
 		labelList.setLabelIdexes();
 		ClassDesc CD_ThisClass = currentClassDesc();
 		ClassDesc CD_SuperClass = superClassDesc();
@@ -278,13 +278,13 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 
 					if(this.hasAccumLabel())
 						for (LabelDeclaration lab : labelList.getAccumLabels())
-							lab.buildDeclaration(classBuilder,this);
+							lab.buildDeclaration(simCoder, classBuilder,this);
 					
 					for (Declaration decl : declarationList)
-						decl.buildDeclaration(classBuilder,this);
+						decl.buildDeclaration(simCoder, classBuilder,this);
 					
 					for(Parameter par:parameterList)
-						par.buildDeclaration(classBuilder,this);
+						par.buildDeclaration(simCoder, classBuilder,this);
 					
 					for (VirtualSpecification virtual : virtualSpecList)
 						if (!virtual.hasDefaultMatch)
@@ -295,9 +295,9 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 
 					classBuilder
 						.withMethodBody("<init>", MethodTypeDesc.ofDescriptor(edConstructorSignature()), ClassFile.ACC_PUBLIC,
-							codeBuilder -> buildConstructor(codeBuilder))
+							codeBuilder -> buildConstructor(simCoder, codeBuilder))
 						.withMethodBody("_STM", MethodTypeDesc.ofDescriptor("()Lsimula/runtime/RTS_RTObject;"), ClassFile.ACC_PUBLIC,
-							codeBuilder -> buildMethod_STM(codeBuilder) );
+							codeBuilder -> buildMethod_STM(simCoder, codeBuilder) );
 					
 					if (isQPSystemBlock())
 						classBuilder
@@ -313,7 +313,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 						classBuilder
 							.withMethodBody("main", MethodTypeDesc.ofDescriptor("([Ljava/lang/String;)V"),
 									ClassFile.ACC_PUBLIC + ClassFile.ACC_STATIC + ClassFile.ACC_VARARGS,
-								codeBuilder -> buildMethodMain(codeBuilder));
+								codeBuilder -> buildMethodMain(simCoder, codeBuilder));
 				}
 		);
 		return(bytes);

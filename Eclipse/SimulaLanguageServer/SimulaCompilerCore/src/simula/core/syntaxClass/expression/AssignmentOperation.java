@@ -15,6 +15,7 @@ import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.ArrayDeclaration;
@@ -225,17 +226,17 @@ public final class AssignmentOperation extends Expression {
 	
 	/// Build Java ByteCode.
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.textValueAssignment)
-			 buildTextValueAssignment(codeBuilder);
+			 buildTextValueAssignment(simCoder, codeBuilder);
 		else
-			buildAssignment(codeBuilder);
+			buildAssignment(simCoder, codeBuilder);
 	}
 
 	/// ClassFile coding utility: Build Text Value Assignment.
 	/// @param codeBuilder the codeBuilder to use.
-	private void buildTextValueAssignment(CodeBuilder codeBuilder) {
+	private void buildTextValueAssignment(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
 		
 		boolean isRESULT = false;
@@ -255,7 +256,7 @@ public final class AssignmentOperation extends Expression {
 			Object value = cnst.value;
 			if (value != null) {
 				if(!isRESULT)
-					lhs.buildEvaluation(null,codeBuilder);
+					lhs.buildEvaluation(simCoder, null, codeBuilder);
 				codeBuilder.ldc(pool.stringEntry(value.toString()));
 				RTS.invokestatic_UTIL_ASGSTR(codeBuilder);
 				if(this.backLink == null) codeBuilder.pop();
@@ -264,23 +265,23 @@ public final class AssignmentOperation extends Expression {
 		}
 		
 		if(! isRESULT)
-			lhs.buildEvaluation(this,codeBuilder);
+			lhs.buildEvaluation(simCoder, this, codeBuilder);
 		
-		rhs.buildEvaluation(null,codeBuilder);
+		rhs.buildEvaluation(simCoder, null, codeBuilder);
 		RTS.invokestatic_UTIL_ASGTXT(codeBuilder);
 		if(this.backLink == null) codeBuilder.pop();
 	}
 
 	/// ClassFile coding utility: Build Assigment.
 	/// @param codeBuilder the codeBuilder to use.
-	private void buildAssignment(CodeBuilder codeBuilder) {
+	private void buildAssignment(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
 		if(lhs instanceof VariableExpression var) {
 			Declaration decl = var.meaning.declaredAs;
 			switch(decl.declarationKind) {
 				case ObjectKind.SimpleVariableDeclaration -> {
-					var.buildIdentifierAccess(true,codeBuilder);
-					rhs.buildEvaluation(null,codeBuilder);
+					var.buildIdentifierAccess(simCoder, true, codeBuilder);
+					rhs.buildEvaluation(simCoder, null, codeBuilder);
 					
 					// Prepare for multiple assignment
 					if(this.backLink != null) {
@@ -291,8 +292,8 @@ public final class AssignmentOperation extends Expression {
 				}
 					
 				case ObjectKind.InspectVariableDeclaration -> {
-					var.buildIdentifierAccess(true,codeBuilder);
-					rhs.buildEvaluation(null,codeBuilder);
+					var.buildIdentifierAccess(simCoder, true, codeBuilder);
+					rhs.buildEvaluation(simCoder, null, codeBuilder);
 					
 					// Prepare for multiple assignment
 					if(this.backLink != null) {
@@ -306,8 +307,8 @@ public final class AssignmentOperation extends Expression {
 					Parameter par = (Parameter)decl;
 					boolean assignRef = opr==KeyWord.ASSIGNREF;
 					switch(par.kind) {
-						case Parameter.Kind.Simple -> buildSimpleParameter(par,var,assignRef,codeBuilder);
-						case Parameter.Kind.Array  -> buildArrayParameter(par,var,assignRef,codeBuilder);
+						case Parameter.Kind.Simple -> buildSimpleParameter(simCoder, par, var, assignRef, codeBuilder);
+						case Parameter.Kind.Array  -> buildArrayParameter(simCoder, par, var, assignRef, codeBuilder);
 						default -> Util.IERR();
 					}
 				}
@@ -317,7 +318,7 @@ public final class AssignmentOperation extends Expression {
 					boolean withFollowSL = proc.buildCTX(codeBuilder);
 					if(withFollowSL) codeBuilder.checkcast(proc.getClassDesc());
 
-					rhs.buildEvaluation(null,codeBuilder);
+					rhs.buildEvaluation(simCoder, null, codeBuilder);
 					
 					// Prepare for multiple assignment
 					if(this.backLink != null) {
@@ -328,8 +329,8 @@ public final class AssignmentOperation extends Expression {
 					
 				case ObjectKind.ArrayDeclaration -> {
 					ArrayDeclaration arr = (ArrayDeclaration) decl;
-					var.meaning.buildIdentifierAccess(false,codeBuilder);
-					arr.arrayPutElement(var,false,rhs,codeBuilder);
+					var.meaning.buildIdentifierAccess(simCoder, false, codeBuilder);
+					arr.arrayPutElement(simCoder, var,false,rhs,codeBuilder);
 					if(this.backLink == null) {
 						type.pop(codeBuilder);
 					} else {
@@ -342,9 +343,9 @@ public final class AssignmentOperation extends Expression {
 			}
 			
 		} else if(lhs instanceof RemoteVariable var) {
-			if(!tryRemoteArray(var, codeBuilder)) {
-				var.obj.buildEvaluation(null,codeBuilder);
-				rhs.buildEvaluation(null,codeBuilder);
+			if(!tryRemoteArray(simCoder, var, codeBuilder)) {
+				var.obj.buildEvaluation(simCoder, null, codeBuilder);
+				rhs.buildEvaluation(simCoder, null, codeBuilder);
 				// Prepare for multiple assignment
 				if(this.backLink != null) {
 					type.dup_x1(codeBuilder);
@@ -359,16 +360,16 @@ public final class AssignmentOperation extends Expression {
 	/// @param remvar remote variable.
 	/// @param codeBuilder the codeBuilder to use.
 	/// @return true: if success.
-	private boolean tryRemoteArray(RemoteVariable remvar, CodeBuilder codeBuilder) {
+	private boolean tryRemoteArray(final SimulaCoder simCoder, final RemoteVariable remvar, final CodeBuilder codeBuilder) {
 		if(remvar.var instanceof VariableExpression) {
 			Declaration decl = remvar.var.meaning.declaredAs;
 			if(decl instanceof ArrayDeclaration arr) {
-				remvar.obj.buildEvaluation(null,codeBuilder);
-				arr.arrayPutElement(remvar.var,false,rhs,codeBuilder);
+				remvar.obj.buildEvaluation(simCoder, null, codeBuilder);
+				arr.arrayPutElement(simCoder, remvar. var, false, rhs, codeBuilder);
 			} else if(decl instanceof Parameter par) {
 				if(par.kind != Parameter.Kind.Array) return(false);
-				remvar.obj.buildEvaluation(null,codeBuilder);
-				ArrayDeclaration.arrayPutElement(remvar.var.meaning,par.getFieldIdentifier(),true,remvar.var.checkedParams, rhs, codeBuilder);
+				remvar.obj.buildEvaluation(simCoder, null, codeBuilder);
+				ArrayDeclaration.arrayPutElement(simCoder, remvar.var.meaning, par.getFieldIdentifier(), true, remvar.var.checkedParams, rhs, codeBuilder);
 			} else return(false);
 			
 			// Prepare for multiple assignment
@@ -385,13 +386,14 @@ public final class AssignmentOperation extends Expression {
 	/// @param var the variable
 	/// @param assignRef true: assign by reference.
 	/// @param codeBuilder the codeBuilder to use.
-	private void buildSimpleParameter(Parameter par,VariableExpression var,boolean assignRef,CodeBuilder codeBuilder) {
+	private void buildSimpleParameter(final SimulaCoder simCoder, final Parameter par,
+			final VariableExpression var, final boolean assignRef, final CodeBuilder codeBuilder) {
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
 		FieldRefEntry FRE_par = par.getFieldRefEntry(pool);
 		if(par.mode == Parameter.Mode.name) {
-			var.buildIdentifierAccess(true,codeBuilder);
+			var.buildIdentifierAccess(simCoder, true, codeBuilder);
 			codeBuilder.getfield(FRE_par);
-			rhs.buildEvaluation(null,codeBuilder); // Result may be int,float, ...		
+			rhs.buildEvaluation(simCoder, null, codeBuilder); // Result may be int,float, ...		
         	par.type.buildObjectValueOf(codeBuilder);
 			RTS.invokevirtual_NAME_put(codeBuilder);
 			
@@ -404,8 +406,8 @@ public final class AssignmentOperation extends Expression {
 			}
 		} else {
 			// Simple Parameter by value/default
-			var.buildIdentifierAccess(true,codeBuilder);
-			rhs.buildEvaluation(null,codeBuilder);
+			var.buildIdentifierAccess(simCoder, true,codeBuilder);
+			rhs.buildEvaluation(simCoder, null, codeBuilder);
 
 			// Prepare for multiple assignment
 			if(this.backLink != null) {
@@ -420,7 +422,7 @@ public final class AssignmentOperation extends Expression {
 	/// @param var the variable
 	/// @param assignRef true: assign by reference.
 	/// @param codeBuilder the codeBuilder to use.
-	private void buildArrayParameter(Parameter par,VariableExpression var,boolean assignRef,CodeBuilder codeBuilder) {
+	private void buildArrayParameter(final SimulaCoder simCoder, final Parameter par,VariableExpression var,boolean assignRef,CodeBuilder codeBuilder) {
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
 		if(par.mode == Parameter.Mode.name) {
 			//    	 0: aload_0
@@ -439,9 +441,9 @@ public final class AssignmentOperation extends Expression {
 			codeBuilder
 				.checkcast(RTS.CD.RTS_ARRAY(par.type))
 				.dup();
-			ArrayDeclaration.arrayPutElement2(var.meaning,var.checkedParams,rhs,codeBuilder);
+			ArrayDeclaration.arrayPutElement2(simCoder, var.meaning, var.checkedParams, rhs, codeBuilder);
 		} else {
-			lhs.buildEvaluation(rhs,codeBuilder);
+			lhs.buildEvaluation(simCoder, rhs,codeBuilder);
 		}
 		if(this.backLink == null) codeBuilder.pop();
 	}

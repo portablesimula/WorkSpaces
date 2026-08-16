@@ -6,14 +6,7 @@
 package simula.core;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.LinkedList;
-import java.util.Properties;
 import java.util.Stack;
-import java.util.jar.JarFile;
-
 import simula.SimulaCoreClient;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.syntaxClass.declaration.DeclarationScope;
@@ -34,25 +27,14 @@ public final class CoreGlobal {
 
 	// ===============================================================================================
 	
-//	/// The current Charset.
-//	public static Charset _CHARSET = Charset.defaultCharset();
-
 	/// The current source line number.
 	public static int sourceLineNumber;
 	
 	/// Next available Object Sequence Number.
 	public static int Object_SEQU;
-
-//	/// Packet name used in generated .java files.
-//	/// NOTE: Must be a single identifier.
-//	public static String packetName = "simprog";
 	
 	/// Current Java output Module. Maintained by JavaModule during Java Coding
 	public static JavaSourceFileCoder currentJavaFileCoder;
-
-//	/// The Jar files queued for later inclusion.
-//	/// See: JarFileBuilder for details.
-//	public static LinkedList<JarFile> includeQueue;
 
 	/// Default constructor.
 	CoreGlobal() {}

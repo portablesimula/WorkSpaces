@@ -72,7 +72,7 @@ public final class RunSingleTest {
 		
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
-//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+		names.add("SimulaTest.sim"); // Simula TestBatch Framework
 		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
@@ -117,10 +117,10 @@ public final class RunSingleTest {
 //		names.add("simtst37.sim"); // OK:  Parameter by name and type conversion
 //		names.add("simtst38.sim"); // OK:  Test the value of type procedures.
 //		names.add("simtst39.sim"); // OK:  Check that a formal parameter is global to the procedure body.
-//		names.add("p40b.sim");     // OK:  Precompile this for Simtst 40.
-//		names.add("p40a.sim");     // OK:  Precompile this for Simtst 40.
-//		names.add("p40c.sim");     // OK:  Precompile this for Simtst 40.
-//		names.add("simtst40.sim"); // OK:  Test separate compilation of procedures.
+		names.add("p40b.sim");     // OK:  Precompile this for Simtst 40.
+		names.add("p40a.sim");     // OK:  Precompile this for Simtst 40.
+		names.add("p40c.sim");     // OK:  Precompile this for Simtst 40.
+		names.add("simtst40.sim"); // OK:  Test separate compilation of procedures.
 //
 //		names.add("p41.sim");      // OK:  Precompile this for Simtst 41.
 //		names.add("simtst41.sim"); // OK:  Name parameter in external procedure.

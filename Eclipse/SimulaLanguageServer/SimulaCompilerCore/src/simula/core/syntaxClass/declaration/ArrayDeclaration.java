@@ -26,6 +26,7 @@ import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Constant;
@@ -266,7 +267,7 @@ public final class ArrayDeclaration extends Declaration {
 
 	
 	@Override
-	public void buildDeclaration(ClassBuilder classBuilder, BlockDeclaration encloser) {
+	public void buildDeclaration(final SimulaCoder simCoder, final ClassBuilder classBuilder, final BlockDeclaration encloser) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		classBuilder.withField(identifierValue(), RTS.CD.RTS_ARRAY(type), fieldBuilder -> {
@@ -300,7 +301,7 @@ public final class ArrayDeclaration extends Declaration {
 	}
 
 	@Override
-	public void buildDeclarationCode(CodeBuilder codeBuilder) {
+	public void buildDeclarationCode(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
 		// --------------------------------------------------------------------
 		// integer array A(1:4,4:6,6:12);
@@ -365,8 +366,8 @@ public final class ArrayDeclaration extends Declaration {
 			codeBuilder
 				.new_(RTS.CD.RTS_BOUNDS)
 				.dup();
-			bp.LB.buildEvaluation(null,codeBuilder);
-			bp.UB.buildEvaluation(null,codeBuilder);
+			bp.LB.buildEvaluation(simCoder, null, codeBuilder);
+			bp.UB.buildEvaluation(simCoder, null, codeBuilder);
 			codeBuilder
 				.invokespecial(RTS.CD.RTS_BOUNDS, "<init>", MethodTypeDesc.ofDescriptor("(II)V"))
 				.aastore();
@@ -407,13 +408,13 @@ public final class ArrayDeclaration extends Declaration {
 	/// ClassFile coding utility: Prepare for indexing.
 	/// @param checkedParams the checked parameters
 	/// @param codeBuilder the codeBuilder to use.
-	private static void prepIndexing(Vector<Expression> checkedParams, CodeBuilder codeBuilder) {
+	private static void prepIndexing(final SimulaCoder simCoder, final Vector<Expression> checkedParams, CodeBuilder codeBuilder) {
 		Constant.buildIntConst(codeBuilder, checkedParams.size());
 		codeBuilder.newarray(TypeKind.INT);
 		for(int i=0;i<checkedParams.size();i++) {
 			codeBuilder.dup();
 			Constant.buildIntConst(codeBuilder, i);
-			checkedParams.get(i).buildEvaluation(null,codeBuilder);
+			checkedParams.get(i).buildEvaluation(simCoder, null, codeBuilder);
 			codeBuilder.iastore();
 		}
 	}
@@ -456,9 +457,9 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param isParameter true: variable is a parameter
 	/// @param rhs expression.
 	/// @param codeBuilder the codeBuilder to use.
-	public void arrayPutElement(VariableExpression var, boolean isParameter, Expression rhs, CodeBuilder codeBuilder) {
+	public void arrayPutElement(final SimulaCoder simCoder, final VariableExpression var, boolean isParameter, Expression rhs, CodeBuilder codeBuilder) {
 		String arrayIdent = this.getJavaIdentifier();
-		arrayPutElement(var.meaning,arrayIdent,isParameter,var.checkedParams,rhs,codeBuilder);
+		arrayPutElement(simCoder, var.meaning,arrayIdent,isParameter,var.checkedParams,rhs,codeBuilder);
 	}
 	
 	/// ClassFile coding utility: Build invoke ARRAY_putELEMENT.
@@ -468,11 +469,11 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param checkedParams checked parameters.
 	/// @param rhs expression.
 	/// @param codeBuilder the codeBuilder to use.
-	public static void arrayPutElement(Meaning meaning,String arrayIdent,boolean isParameter,Vector<Expression> checkedParams, Expression rhs, CodeBuilder codeBuilder) {
+	public static void arrayPutElement(final SimulaCoder simCoder, final Meaning meaning,String arrayIdent,boolean isParameter,Vector<Expression> checkedParams, Expression rhs, CodeBuilder codeBuilder) {
 		Type type=meaning.declaredAs.type;
 		buildGetArrayField(type,meaning,meaning.declaredIn,arrayIdent,isParameter,codeBuilder);
 		codeBuilder.dup();
-		arrayPutElement2(meaning,checkedParams,rhs,codeBuilder);
+		arrayPutElement2(simCoder, meaning,checkedParams,rhs,codeBuilder);
 	}
 
 	/// ClassFile coding utility: Build invoke ARRAY_putELEMENT.
@@ -480,14 +481,14 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param checkedParams checked parameters.
 	/// @param rhs expression.
 	/// @param codeBuilder the codeBuilder to use.
-	public static void arrayPutElement2(Meaning meaning,Vector<Expression> checkedParams, Expression rhs, CodeBuilder codeBuilder) {
+	public static void arrayPutElement2(final SimulaCoder simCoder, final Meaning meaning,Vector<Expression> checkedParams, Expression rhs, CodeBuilder codeBuilder) {
 		
-		prepIndexing(checkedParams,codeBuilder);
+		prepIndexing(simCoder, checkedParams,codeBuilder);
 		
 		Type type=meaning.declaredAs.type;
 		RTS.invokevirtual_ARRAY_index(type, codeBuilder);
 		
-		rhs.buildEvaluation(null,codeBuilder);
+		rhs.buildEvaluation(simCoder, null, codeBuilder);
 		RTS.invokevirtual_ARRAY_putELEMENT(type, codeBuilder);
 	}
 	
@@ -499,9 +500,9 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param var the variable
 	/// @param isParameter true: variable is a parameter
 	/// @param codeBuilder the codeBuilder to use.
-	public void arrayGetElement(VariableExpression var, boolean isParameter, CodeBuilder codeBuilder) {
+	public void arrayGetElement(final SimulaCoder simCoder, final VariableExpression var, boolean isParameter, CodeBuilder codeBuilder) {
 		String arrayIdent = this.getJavaIdentifier();
-		arrayGetElement(type,arrayIdent,isParameter,var.checkedParams,var.meaning,var.meaning.declaredIn,codeBuilder);
+		arrayGetElement(simCoder, type,arrayIdent,isParameter,var.checkedParams,var.meaning,var.meaning.declaredIn,codeBuilder);
 	}
 
 	/// ClassFile coding utility: Build invoke ARRAY_getELEMENT.
@@ -512,10 +513,10 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param meaning variable's meaning.
 	/// @param declaredIn array's owner
 	/// @param codeBuilder the codeBuilder to use.
-	public static void arrayGetElement(Type type,String arrayIdent,boolean isParameter,Vector<Expression> checkedParams,
+	public static void arrayGetElement(final SimulaCoder simCoder, final Type type,String arrayIdent,boolean isParameter,Vector<Expression> checkedParams,
 			Meaning meaning,DeclarationScope declaredIn, CodeBuilder codeBuilder) {
 		buildGetArrayField(type,meaning,declaredIn,arrayIdent,isParameter,codeBuilder);
-		arrayGetElement2(type,arrayIdent,checkedParams,codeBuilder);
+		arrayGetElement2(simCoder, type,arrayIdent,checkedParams,codeBuilder);
 	}
 	
 	/// ClassFile coding utility: Build invoke ARRAY_getELEMENT.
@@ -523,8 +524,8 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param arrayIdent array's identifier
 	/// @param checkedParams checked parameters.
 	/// @param codeBuilder the codeBuilder to use.
-	public static void arrayGetElement2(Type type,String arrayIdent,Vector<Expression> checkedParams, CodeBuilder codeBuilder) {
-		prepIndexing(checkedParams,codeBuilder);
+	public static void arrayGetElement2(final SimulaCoder simCoder, final Type type,String arrayIdent,Vector<Expression> checkedParams, CodeBuilder codeBuilder) {
+		prepIndexing(simCoder, checkedParams, codeBuilder);
 		RTS.invokevirtual_ARRAY_getELEMENT(type, codeBuilder);
 	}
 

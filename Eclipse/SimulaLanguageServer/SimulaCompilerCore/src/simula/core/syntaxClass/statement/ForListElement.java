@@ -15,6 +15,7 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
@@ -109,7 +110,7 @@ public class ForListElement extends SyntaxElement {
 
 	/// Build SingleElement ByteCoding
 	/// @param codeBuilder the codeBuilder to use.
-	public void doSingleElementByteCoding(CodeBuilder codeBuilder) {
+	public void doSingleElementByteCoding(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
         // 0: aload_0
         // 1: aload_0
         // 2: getfield      #16                 // Field k:I
@@ -117,19 +118,19 @@ public class ForListElement extends SyntaxElement {
 		SimpleVariableDeclaration decl = (SimpleVariableDeclaration)forStatement.controlVariable.meaning.declaredAs;
 
 		// controlVariable := expr1
-		forStatement.controlVariable.buildIdentifierAccess(true, codeBuilder);
-		expr1.buildEvaluation(null,codeBuilder); // evaluate expr1
+		forStatement.controlVariable.buildIdentifierAccess(simCoder, true, codeBuilder);
+		expr1.buildEvaluation(simCoder, null, codeBuilder); // evaluate expr1
 		
 		// JavaSourceFileCoder.code(cv + "=" + val + "; {");
 		codeBuilder.putfield(decl.getFieldRefEntry(codeBuilder.constantPool()));
 
-		forStatement.doStatement.buildByteCode(codeBuilder);
+		forStatement.doStatement.buildByteCode(simCoder, codeBuilder);
 	}
 
 	/// Build byte code.
 	/// @param codeBuilder the codeBuilder to use.
 	/// @param controlVariable the ForStatement's controlVariable.
-	public void buildByteCode(CodeBuilder codeBuilder,VariableExpression controlVariable) {
+	public void buildByteCode(final SimulaCoder simCoder, final CodeBuilder codeBuilder, final VariableExpression controlVariable) {
 		codeBuilder
 			.new_(RTS.CD.FOR_SingleElt)
 			.dup();
@@ -140,10 +141,10 @@ public class ForListElement extends SyntaxElement {
         //   dup
         //   aload_0
         //   invokespecial #31                 // Method simulaTestPrograms/adHoc13$1."<init>":(LsimulaTestPrograms/adHoc13;)V
-		Parameter.buildNameParam(codeBuilder,controlVariable);
+		Parameter.buildNameParam(simCoder, codeBuilder,controlVariable);
 
 		// PARAMETER: RTS_NAME<T> value
-		Parameter.buildNameParam(codeBuilder,expr1);
+		Parameter.buildNameParam(simCoder, codeBuilder, expr1);
 
 		MethodTypeDesc MTD=MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_NAME;Lsimula/runtime/RTS_NAME;)V");
 		codeBuilder.invokespecial(RTS.CD.FOR_SingleElt, "<init>", MTD); // Invoke Constructor

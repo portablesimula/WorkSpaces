@@ -1005,20 +1005,20 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// Defined in DeclarationScope - Redefined in ClassDeclaration
     /// @throws IOException if something went wrong.
 	@Override
-    protected void buildAndLoadOrAddClassFile() throws IOException {
+    protected void buildAndLoadOrAddClassFile(final SimulaCoder simCoder) throws IOException {
 		if(this.isLoaded) return;
 		if(this instanceof StandardClass) return;
 		if(hasRealPrefix()) {
 			ClassDeclaration prefix = this.getPrefixClass();
 			if(!prefix.isLoaded) {
-				prefix.buildAndLoadOrAddClassFile();
+				prefix.buildAndLoadOrAddClassFile(simCoder);
 			}
 		}
 		
 		if(isPreCompiledFromFile != null) return;
 			
-    	byte[] bytes = doBuildClassFile();
-    	loadOrAddClassFile(bytes);
+    	byte[] bytes = doBuildClassFile(simCoder);
+    	writeClassFile(simCoder, bytes);
     	this.isLoaded = true;
     }
 
@@ -1027,7 +1027,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	// *** ByteCoding: buildClassFile
 	// ***********************************************************************************************
 	@Override
-	public byte[] buildClassFile() {
+	public byte[] buildClassFile(final SimulaCoder simCoder) {
 		labelList.setLabelIdexes();
 		ClassDesc CD_ThisClass = currentClassDesc();
 		ClassDesc CD_SuperClass = superClassDesc();
@@ -1045,7 +1045,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			try {
 				if(CoreGlobal2.verbose)
 					IO.println("ClassDeclaration.buildClassFile: TRY: "+CD_ThisClass+" extends "+CD_SuperClass);
-				return tryBuildClassFile(CD_ThisClass, CD_SuperClass);
+				return tryBuildClassFile(simCoder, CD_ThisClass, CD_SuperClass);
 			} catch(IllegalArgumentException e) {
 				boolean feasibleToReTry = false;
 				String msg = e.getMessage();
@@ -1071,7 +1071,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	 * @param CD_SuperClass super class descriprot
 	 * @return class file bytes
 	 */
-	private byte[] tryBuildClassFile(ClassDesc CD_ThisClass, ClassDesc CD_SuperClass) {
+	private byte[] tryBuildClassFile(SimulaCoder simCoder, ClassDesc CD_ThisClass, ClassDesc CD_SuperClass) {
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
 				classBuilder -> {
 					classBuilder
@@ -1081,13 +1081,13 @@ public class ClassDeclaration extends BlockDeclaration {
 	
 					if(this.hasAccumLabel())
 						for (LabelDeclaration lab : labelList.getAccumLabels())
-							lab.buildDeclaration(classBuilder,this);
+							lab.buildDeclaration(simCoder,classBuilder,this);
 	
 					for (Declaration decl : declarationList)
-						decl.buildDeclaration(classBuilder,this);
+						decl.buildDeclaration(simCoder, classBuilder,this);
 					
 					for (Parameter par : parameterList)
-						par.buildDeclaration(classBuilder,this);
+						par.buildDeclaration(simCoder,classBuilder,this);
 					
 					for (VirtualSpecification virtual : virtualSpecList) 
 						if (!virtual.hasDefaultMatch) 
@@ -1098,9 +1098,9 @@ public class ClassDeclaration extends BlockDeclaration {
 	
 					classBuilder
 						.withMethodBody("<init>", MethodTypeDesc.ofDescriptor(edConstructorSignature()), ClassFile.ACC_PUBLIC,
-							codeBuilder -> buildConstructor(codeBuilder))
+							codeBuilder -> buildConstructor(simCoder, codeBuilder))
 						.withMethodBody("_STM", MethodTypeDesc.ofDescriptor("()Lsimula/runtime/RTS_RTObject;"), ClassFile.ACC_PUBLIC,
-							codeBuilder -> buildMethod_STM(codeBuilder));
+							codeBuilder -> buildMethod_STM(simCoder, codeBuilder));
 					
 					if (isDetachUsed()) 
 						classBuilder
@@ -1149,7 +1149,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// </pre>
 	/// Also used by PrefixedBlockDeclaration
 	/// @param codeBuilder the CodeBuilder
-	protected void buildConstructor(CodeBuilder codeBuilder) {
+	protected void buildConstructor(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		CoreGlobal.enterScope(this);
 			ConstantPoolBuilder pool=codeBuilder.constantPool();
@@ -1218,7 +1218,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			
 			// Add Declaration Code to Constructor
 			for (Declaration decl : declarationList)
-				decl.buildDeclarationCode(codeBuilder);
+				decl.buildDeclarationCode(simCoder, codeBuilder);
 
 			codeBuilder
 				.return_()
@@ -1227,10 +1227,10 @@ public class ClassDeclaration extends BlockDeclaration {
 	}
 	
 	@Override
-	public void buildDeclaration(ClassBuilder classBuilder, BlockDeclaration encloser) {
+	public void buildDeclaration(final SimulaCoder simCoder, final ClassBuilder classBuilder, final BlockDeclaration encloser) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		try {
-			this.createJavaClassFile();
+			this.createJavaClassFile(simCoder);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -1247,7 +1247,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// Generate byteCode for the '_STM' method.
 	/// @param codeBuilder the CodeBuilder
 	@Override
-	protected void build_STM_BODY(CodeBuilder codeBuilder, Label begScope, Label endScope) {
+	protected void build_STM_BODY(SimulaCoder simCoder, CodeBuilder codeBuilder, Label begScope, Label endScope) {
 		int nStat = this.statements.size();
 		if(statements1 != null) nStat = nStat + this.statements1.size();
 		ClassDeclaration prefix = this.getPrefixClass();
@@ -1263,15 +1263,15 @@ public class ClassDeclaration extends BlockDeclaration {
 //		if(this.getPrefixClass() == StandardClass.CatchingErrors) {	
 		if(this.prefix.equals("CatchingErrors") && this.getPrefixClass().declarationKind == ObjectKind.StandardClass) {	
 			if(this instanceof PrefixedBlockDeclaration)
-				buildMethod_CatchingErrors_TRY_CATCH(codeBuilder, begScope, endScope);
+				buildMethod_CatchingErrors_TRY_CATCH(simCoder, codeBuilder, begScope, endScope);
 			else {
 				Util.codingError(this, "It is not allowed to declare a subclass of StandardClass CatchingErrors");
-				buildStatementsBeforeInner(codeBuilder);
-				buildStatementsAfterInner(codeBuilder);
+				buildStatementsBeforeInner(simCoder, codeBuilder);
+				buildStatementsAfterInner(simCoder, codeBuilder);
 			}
 		} else {
-			buildStatementsBeforeInner(codeBuilder);
-			buildStatementsAfterInner(codeBuilder);
+			buildStatementsBeforeInner(simCoder, codeBuilder);
+			buildStatementsAfterInner(simCoder, codeBuilder);
 		}
 		labelContext = labelContextStack.pop();
 
@@ -1298,11 +1298,11 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @param begScope label
 	/// @param endScope label
 	@SuppressWarnings("unused")
-	private void buildMethod_CatchingErrors_TRY_CATCH(CodeBuilder codeBuilder, Label begScope, Label endScope) {
+	private void buildMethod_CatchingErrors_TRY_CATCH(final SimulaCoder simCoder, final CodeBuilder codeBuilder, final Label begScope, final Label endScope) {
 		codeBuilder.trying(
 			tryCodeBuilder -> {
-				buildStatementsBeforeInner(tryCodeBuilder);
-				buildStatementsAfterInner(tryCodeBuilder);
+				buildStatementsBeforeInner(simCoder, tryCodeBuilder);
+				buildStatementsAfterInner(simCoder, tryCodeBuilder);
 			},
 			catchBuilder -> catchBuilder.catching(RTS.CD.JAVA_LANG_RUNTIME_EXCEPTION,
 				catchCodeBuilder -> {
@@ -1326,10 +1326,10 @@ public class ClassDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// ClassFile coding utility: buildStatementsBeforeInner
 	/// @param codeBuilder the codeBuilder to use.
-	private void buildStatementsBeforeInner(CodeBuilder codeBuilder) {
+	private void buildStatementsBeforeInner(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		if (hasRealPrefix()) {
 			ClassDeclaration prfx = this.getPrefixClass();
-			if (prfx != null) prfx.buildStatementsBeforeInner(codeBuilder);
+			if (prfx != null) prfx.buildStatementsBeforeInner(simCoder, codeBuilder);
 		}
 		if(statements1 != null) for (Statement stm : statements1) {
 			if(!(stm instanceof DummyStatement)) {
@@ -1344,7 +1344,7 @@ public class ClassDeclaration extends BlockDeclaration {
 //					Util.warning("ClassDeclaration.buildStatementsBeforeInner: Illegal LNO: "+lno+" "+stm.getClass().getSimpleName()+" "+stm);
 				}
 			}
-			stm.buildByteCode(codeBuilder);
+			stm.buildByteCode(simCoder, codeBuilder);
 		}
 	}
 
@@ -1353,14 +1353,14 @@ public class ClassDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// ClassFile coding utility: buildStatementsAfterInner
 	/// @param codeBuilder the codeBuilder to use.
-	private void buildStatementsAfterInner(CodeBuilder codeBuilder) {
+	private void buildStatementsAfterInner(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		for (Statement stm : statements){
 			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.firstLineNumber());
-			stm.buildByteCode(codeBuilder);
+			stm.buildByteCode(simCoder, codeBuilder);
 		}
 		if (hasRealPrefix()) {
 			ClassDeclaration prfx = this.getPrefixClass();
-			if (prfx != null) prfx.buildStatementsAfterInner(codeBuilder);
+			if (prfx != null) prfx.buildStatementsAfterInner(simCoder, codeBuilder);
 		}
 	}
 

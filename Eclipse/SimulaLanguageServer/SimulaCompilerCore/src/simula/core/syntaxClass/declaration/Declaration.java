@@ -14,6 +14,7 @@ import simula.core.CoreGlobal;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.ProtectedSpecification;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -221,7 +222,7 @@ public abstract class Declaration extends SyntaxElement {
 	/// Output Java ByteCode. Treat Declaration.
 	/// @param classBuilder the classBuilder to use.
 	/// @param encloser the owning block.
-	public void buildDeclaration(ClassBuilder classBuilder,BlockDeclaration encloser) {
+	public void buildDeclaration(final SimulaCoder simCoder, final ClassBuilder classBuilder, final BlockDeclaration encloser) {
 		Util.IERR("Method buildDeclaration need a redefinition in "+this.getClass().getSimpleName());
 	}
 
@@ -241,7 +242,7 @@ public abstract class Declaration extends SyntaxElement {
 
 	/// Output Java ByteCode. Build declaration code for an Attribute.
 	/// @param codeBuilder the codeBuilder to use.
-	public void buildDeclarationCode(CodeBuilder codeBuilder) {
+	public void buildDeclarationCode(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		// Default: No code
 	}

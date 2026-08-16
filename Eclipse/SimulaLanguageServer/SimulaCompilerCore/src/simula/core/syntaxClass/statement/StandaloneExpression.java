@@ -16,6 +16,7 @@ import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.LexToken;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.AssignmentOperation;
 import simula.core.syntaxClass.expression.Expression;
@@ -117,8 +118,8 @@ public final class StandaloneExpression extends Statement {
 	}
 
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
-		expression.buildEvaluation(null,codeBuilder);
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
+		expression.buildEvaluation(simCoder, null, codeBuilder);
 	}
 
 	@Override

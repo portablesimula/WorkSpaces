@@ -14,6 +14,7 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.LabelDeclaration;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.ObjectList;
@@ -84,12 +85,12 @@ public final class LabeledStatement extends Statement {
 	}
 
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		CoreGlobal.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		for (LabelDeclaration lab:labels)
 			lab.doBind(codeBuilder); // Bind Label
-		statement.buildByteCode(codeBuilder);
+		statement.buildByteCode(simCoder, codeBuilder);
 	}
 
 	@Override

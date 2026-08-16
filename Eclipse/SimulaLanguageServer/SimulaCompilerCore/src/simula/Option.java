@@ -115,11 +115,11 @@ public final class Option {
 		IO.println("DocumentManager.packetName      " + CoreGlobal2.packetName);
 		IO.println("DocumentManager.simulaRtsLib    " + CoreGlobal2.simulaRtsLib);
 		
-		IO.println("SimulaBuilder.outputDir         " + SimulaCoder.outputDir);
-		IO.println("SimulaBuilder.simulaTempDir     " + SimulaCoder.simulaTempDir);
-		IO.println("SimulaBuilder.tempJavaFileDir   " + SimulaCoder.tempJavaFileDir);
-		IO.println("SimulaBuilder.tempClassFileDir  " + SimulaCoder.tempClassFileDir);
-		IO.println("SimulaBuilder.extLib            " + SimulaCoder.extLib);
+//		IO.println("SimulaBuilder.outputDir         " + SimulaCoder.outputDir);
+//		IO.println("SimulaBuilder.simulaTempDir     " + SimulaCoder.simulaTempDir);
+//		IO.println("SimulaBuilder.tempJavaFileDir   " + SimulaCoder.tempJavaFileDir);
+//		IO.println("SimulaBuilder.tempClassFileDir  " + SimulaCoder.tempClassFileDir);
+//		IO.println("SimulaBuilder.extLib            " + SimulaCoder.extLib);
 
 	}
 	/// Kalles før parsing og checking

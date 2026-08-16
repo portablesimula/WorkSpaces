@@ -21,6 +21,7 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Expression;
@@ -269,13 +270,13 @@ public final class Parameter extends Declaration {
 	/// ClassFile coding utility: buildParamCode
 	/// @param codeBuilder the codeBuilder to use
 	/// @param expr parameter value expression
-	public void buildParamCode(CodeBuilder codeBuilder,Expression expr) {
+	public void buildParamCode(final SimulaCoder simCoder, final CodeBuilder codeBuilder, Expression expr) {
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
 		if (mode == Parameter.Mode.name) {
-			buildNameParam(codeBuilder,this,expr);
+			buildNameParam(simCoder, codeBuilder, this, expr);
 		} else switch (kind) {
 			case Kind.Array -> {
-				expr.buildEvaluation(null,codeBuilder);
+				expr.buildEvaluation(simCoder, null, codeBuilder);
 				if(mode == Parameter.Mode.value)
 					RTS.invokevirtual_ARRAY_copy(codeBuilder);
 				}
@@ -308,7 +309,7 @@ public final class Parameter extends Declaration {
 						codeBuilder
 							.aload(0)
 							.checkcast(BlockDeclaration.currentClassDesc());
-					} else beforeDot.buildEvaluation(null, codeBuilder);
+					} else beforeDot.buildEvaluation(simCoder, null, codeBuilder);
 					codeBuilder
 						.ldc(pool.loadableConstantEntry(proc.getClassDesc()))
 						.invokespecial(RTS.CD.RTS_PRCQNT, "<init>", MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_RTObject;Ljava/lang/Class;)V"));
@@ -331,7 +332,7 @@ public final class Parameter extends Declaration {
 			}
 				
 			case Kind.Simple ->  {
-				expr.buildEvaluation(null,codeBuilder);
+				expr.buildEvaluation(simCoder, null, codeBuilder);
 				if(mode == Parameter.Mode.value && type.keyWord == Type.T_TEXT) {
 					RTS.invokestatic_ENVIRONMENT_copy(codeBuilder);
 				}
@@ -342,16 +343,16 @@ public final class Parameter extends Declaration {
 	/// ClassFile coding utility: buildNameParam
 	/// @param codeBuilder to use
 	/// @param expr the Thunk expression to be evaluated.
-	public static void buildNameParam(CodeBuilder codeBuilder,Expression expr) {
-		Thunk.buildInvoke(0, expr, codeBuilder);
+	public static void buildNameParam(final SimulaCoder simCoder, final CodeBuilder codeBuilder, final Expression expr) {
+		Thunk.buildInvoke(simCoder, 0, expr, codeBuilder);
 	}	
 	
 	/// ClassFile coding utility: buildNameParam
 	/// @param codeBuilder to use
 	/// @param par the parameter used decide parameter kind
 	/// @param expr the Thunk expression to be evaluated.
-	private static void buildNameParam(CodeBuilder codeBuilder,Parameter par,Expression expr) {
-		Thunk.buildInvoke((par==null)?0:par.kind, expr, codeBuilder);
+	private static void buildNameParam(final SimulaCoder simCoder, final CodeBuilder codeBuilder, final Parameter par, final Expression expr) {
+		Thunk.buildInvoke(simCoder, (par==null)?0:par.kind, expr, codeBuilder);
 	}
 	
 
@@ -378,7 +379,7 @@ public final class Parameter extends Declaration {
 
 	/// ClassFile coding utility: buildDeclaration of this Parameter.
 	@Override
-	public void buildDeclaration(ClassBuilder classBuilder,BlockDeclaration encloser) {
+	public void buildDeclaration(final SimulaCoder simCoder, final ClassBuilder classBuilder, final BlockDeclaration encloser) {
 		String ident = getFieldIdentifier();
 		if (mode == Parameter.Mode.name) {
 			if (kind == Parameter.Kind.Procedure) {

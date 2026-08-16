@@ -20,6 +20,7 @@ import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.ProtectedSpecification;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Constant;
@@ -105,7 +106,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	}
 
 	@Override
-	public void buildDeclaration(ClassBuilder classBuilder,BlockDeclaration encloser) {
+	public void buildDeclaration(final SimulaCoder simCoder, final ClassBuilder classBuilder, final BlockDeclaration encloser) {
 		String ident = getFieldIdentifier();
 		int prefixLevel = getPrefixLevel();
 		

@@ -11,6 +11,7 @@ import java.lang.classfile.CodeBuilder;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.utilities.ObjectKind;
@@ -52,7 +53,7 @@ public final class MissingExpression extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		Util.IERR("NOT IMPL");
 	}

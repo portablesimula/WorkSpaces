@@ -18,7 +18,6 @@ import java.util.zip.ZipEntry;
 import simula.core.DocumentManager;
 import simula.core.CoreGlobal2;
 import simula.core.coder.JarFileBuilder;
-import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.BlockDeclaration;
@@ -48,24 +47,19 @@ public final class AttributeFileIO {
 	/// Write an attribute file.
 	/// @param program the program module
 	/// @throws IOException if an output operation fail
-	public static void writeAttributeFile(final ProgramModule program) throws IOException {
-		String relativeAttributeFileName = program.getRelativeAttributeFileName();
-		if (relativeAttributeFileName == null) return;
-		File file = new File(SimulaCoder.tempClassFileDir,relativeAttributeFileName);
-		if (CoreGlobal2.verbose)
-			IO.println("*** BEGIN Generate SimulaAttributeFile: \"" + file+"\"");
-		byte[] bytes = buildAttrFile(program);
-		String entryName = program.getRelativeAttributeFileName();
+//	public static void writeAttributeFile(final JarFileBuilder jarFileBuilder, final ProgramModule programModule) throws IOException {
+//		String entryName = programModule.getRelativeAttributeFileName();
+//		if (entryName != null) {
+//			byte[] bytes = buildAttrFile(programModule);
+//			jarFileBuilder.writeEntryToJarOutput(entryName, bytes);
+//		}
+//	}
 
-		SimulaCoder.jarFileBuilder.writeEntryToJarOutput(entryName, bytes);
-		if (CoreGlobal2.verbose)	Util.TRACE("*** ENDOF Generate SimulaAttributeFile: " + file);
-	}
-
-	/// Build a module's attribute file.
+	/// Build a module's attribute entry.
 	/// @param program the program module.
-	/// @return the attribute file's bytes.
+	/// @return the attribute entry's bytes.
 	/// @throws IOException if an io-error occurs.
-	private static byte[] buildAttrFile(final ProgramModule program) throws IOException {
+	public static byte[] buildAttrEntry(final ProgramModule program) throws IOException {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		AttributeOutputStream oupt = new AttributeOutputStream(byteArrayOutputStream);
 		oupt.writeString(version);
@@ -82,25 +76,23 @@ public final class AttributeFileIO {
 	}
 
 	
-	/// Read an attribute file.
+	/// Read an attribute entry from a .jar file.
 	/// @param identifier class or procedure identifier
 	/// @param file the .jar file to read
 	/// @param enclosure the declaration list to update
 	/// @return the module type
-	public static Type readAttributeFile(final SimulaBuilder simBuilder,final String identifier, final File file, final BlockDeclaration enclosure) {
+	public static Type readAttributeEntry(final SimulaBuilder simBuilder,final String identifier, final File file, final BlockDeclaration enclosure) {
 		Type moduleType = null;
 		Util.generalWarning("Separate Compiled Module is read from: \"" + file + "\"");
 		if (!(file.exists() && file.canRead())) {
 			Util.generalError("Can't read attribute file: " + file);
 			return (null);
 		}
-		try {
-			JarFile jarFile = new JarFile(file);
-			JarFileBuilder.listJarFile("AttributeFileIO.readAttributeFile: ", file);
+		try (JarFile jarFile = new JarFile(file)) {
+//			JarFileBuilder.listJarFile("AttributeFileIO.readAttributeFile: ", file);
 			
-			DocumentManager.externalJarFiles.add(file);
-			IO.println("AttributeFileIO.readAttributeFile: " + DocumentManager.externalJarFiles);
-//			Util.IERR("");
+			DocumentManager.externalJarFileNames.add(file.toString());
+//			IO.println("AttributeFileIO.readAttributeFile: " + DocumentManager.externalJarFileNames);
 			
 			Manifest manifest = jarFile.getManifest();
 			Attributes mainAttributes = manifest.getMainAttributes();
@@ -126,13 +118,6 @@ public final class AttributeFileIO {
 					IO.println("***       Read External " + ObjectKind.edit(module.declarationKind) + ' ' + module.identifier
 							+ '[' + module.externalIdent + ']' +"  ==>  "+declarationList.debugName);
 			}
-    			
-			if(SimulaCoder.jarFileBuilder == null) {
-					SimulaCoder.jarFileBuilder = new JarFileBuilder();
-			}
-//			SimulaCoder.jarFileBuilder.writeJarEntriesToTempClassFiles(file.toString(), jarFile);
-
-
 		} catch (IOException e) {
 			Util.generalError("Unable to read Attribute File: " + file + " caused by: " + e);
 			Util.generalWarning("It may be necessary to recompile '" + identifier + "'");
@@ -144,10 +129,10 @@ public final class AttributeFileIO {
 	/// Check if the jarFile is already included.
 	/// @param jarFile the jarFile.
 	/// @return false: if the jarFile is already included.
-	public static boolean checkJarFiles(File jarFile) {
+	public static boolean checkJarFiles(String jarFileName) {
 //		for(File f:SimulaCompiler.externalJarFiles) if(f.equals(jarFile)) {
-		for(File f:DocumentManager.externalJarFiles) if(f.equals(jarFile)) {
-			Util.generalWarning("External already included: "+jarFile.getName());
+		for(String f:DocumentManager.externalJarFileNames) if(f.equals(jarFileName)) {
+			Util.generalWarning("External already included: "+jarFileName);
 			return(false);
 		}
 		return true;
@@ -169,19 +154,16 @@ public final class AttributeFileIO {
 		int declarationKind = inpt.readKind();
 		while(declarationKind == ObjectKind.ExternalDeclaration) {
 			ExternalDeclaration xdecl = ExternalDeclaration.readObject(inpt);
-//			xdecl.readExternalAttributeFile();
 			/// Read external Attribute file.
-//			public void readExternalAttributeFile() {
-				File jarFile = JarFileBuilder.findJarFile(xdecl.identifierValue(), xdecl.externalIdent);
-				if (jarFile == null) {
-					Util.syntaxError(simBuilder, "Can't find attribute file: " + xdecl.identifier + '[' + xdecl.externalIdent + ']');
-				} else {
-					if(checkJarFiles(jarFile)) {
-						BlockDeclaration enclosure = StandardClass.BASICIO;
-						AttributeFileIO.readAttributeFile(simBuilder, xdecl.identifierValue(), jarFile, enclosure);
-					}
-				}		
-//			}
+			File jarFile = JarFileBuilder.findJarFile(xdecl.identifierValue(), xdecl.externalIdent);
+			if (jarFile == null) {
+				Util.syntaxError(simBuilder, "Can't find attribute file: " + xdecl.identifier + '[' + xdecl.externalIdent + ']');
+			} else {
+				if(checkJarFiles(jarFile.toString())) {
+					BlockDeclaration enclosure = StandardClass.BASICIO;
+					AttributeFileIO.readAttributeEntry(simBuilder, xdecl.identifierValue(), jarFile, enclosure);
+				}
+			}		
 			declarationKind = inpt.readKind();
 		}
 		

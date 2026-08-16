@@ -14,6 +14,7 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
@@ -115,9 +116,9 @@ public final class QualifiedObject extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
-		lhs.buildEvaluation(null,codeBuilder);
+		lhs.buildEvaluation(simCoder, null, codeBuilder);
 		codeBuilder.checkcast(classDeclaration.getClassDesc());
 	}
 

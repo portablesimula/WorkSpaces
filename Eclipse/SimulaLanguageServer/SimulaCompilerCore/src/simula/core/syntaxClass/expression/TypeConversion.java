@@ -14,6 +14,7 @@ import simula.core.CoreGlobal2;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.OverLoad;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -200,9 +201,9 @@ public final class TypeConversion extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
-		expression.buildEvaluation(null,codeBuilder);
+		expression.buildEvaluation(simCoder, null, codeBuilder);
 		Type fromType = expression.type;
 		switch(type.keyWord) {
 			case Type.T_INTEGER: 

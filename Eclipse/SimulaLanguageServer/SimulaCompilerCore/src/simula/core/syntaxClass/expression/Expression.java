@@ -17,6 +17,7 @@ import simula.core.builder.token.IntegerConst;
 import simula.core.builder.token.LexToken;
 import simula.core.builder.token.LongRealConst;
 import simula.core.builder.token.RealConst;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
@@ -542,7 +543,7 @@ public abstract class Expression extends SyntaxElement {
 	/// ClassFile coding utility: Build Evaluation Code.
 	/// @param rightPart expression
 	/// @param codeBuilder the codeBuilder used.
-	public abstract void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder);
+	public abstract void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder);
 
 
 	@Override

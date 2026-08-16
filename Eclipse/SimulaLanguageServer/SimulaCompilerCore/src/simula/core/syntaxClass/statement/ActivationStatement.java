@@ -16,6 +16,7 @@ import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.builder.token.LexToken;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Constant;
 import simula.core.syntaxClass.expression.Expression;
@@ -196,7 +197,7 @@ public final class ActivationStatement extends Statement {
 	}
 	
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		Type refProcess = Type.Ref("Process");
 		if (object1 != null) {
 			object1 = TypeConversion.testAndCreate(refProcess, object1);
@@ -209,18 +210,18 @@ public final class ActivationStatement extends Statement {
 		if(time != null) 	 time = TypeConversion.testAndCreate(Type.LongReal, time);
 
 		switch (code) {
-		    case at:     buildActivateAt(codeBuilder); break;
-		    case delay:	 buildActivateDelay(codeBuilder); break;
-		    case before: buildActivateBefore(codeBuilder); break;
-		    case after:  buildActivateAfter(codeBuilder); break;
+		    case at:     buildActivateAt(simCoder, codeBuilder); break;
+		    case delay:	 buildActivateDelay(simCoder, codeBuilder); break;
+		    case before: buildActivateBefore(simCoder, codeBuilder); break;
+		    case after:  buildActivateAfter(simCoder, codeBuilder); break;
 		    case direct:
-			default: buildActivateDirect(codeBuilder);
+			default: buildActivateDirect(simCoder, codeBuilder);
 		}
 	}
 
 	/// ClassFile coding utility: Build direct (re)activation
 	/// @param codeBuilder the codeBuilder to use.
-	private void buildActivateDirect(CodeBuilder codeBuilder) {
+	private void buildActivateDirect(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 //        0: getstatic     #47                 // Field _CUR:Lsimula/runtime/RTS_RTObject;
 //        3: checkcast     #8                  // class simulaTestPrograms/adHoc000
 //        6: iconst_0  or  iconst_1   Avhengig av  REAC
@@ -228,15 +229,15 @@ public final class ActivationStatement extends Statement {
 //        8: getfield      #7                  // Field bil1_2:LsimulaTestPrograms/adHoc000_Car;
 //       11: invokevirtual #51                 // Method ActivateDirect:(ZLsimula/runtime/RTS_Process;)V
 		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateDirect"));
-		activate1.buildQualifiedStaticLink(codeBuilder);
+		activate1.buildQualifiedStaticLink(simCoder, codeBuilder);
 		Constant.buildIntConst(codeBuilder, REAC);
-		object1.buildEvaluation(null, codeBuilder);
+		object1.buildEvaluation(simCoder, null, codeBuilder);
 		RTS.invokevirtual_Simulation_ActivateDirect(codeBuilder);
 	}
 
 	/// ClassFile coding utility: Build (Re)Activate Process AT ...
 	/// @param codeBuilder the codeBuilder to use.
-	private void buildActivateAt(CodeBuilder codeBuilder) {
+	private void buildActivateAt(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 //        29: getstatic     #49                 // Field _CUR:Lsimula/runtime/RTS_RTObject;
 //        32: checkcast     #8                  // class simulaTestPrograms/adHoc000
 //        35: iconst_0
@@ -246,45 +247,45 @@ public final class ActivationStatement extends Statement {
 //        43: iconst_0
 //        44: invokevirtual #68                 // Method ActivateAt:(ZLsimula/runtime/RTS_Process;DZ)V
 		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateAt"));
-		activate1.buildQualifiedStaticLink(codeBuilder);
+		activate1.buildQualifiedStaticLink(simCoder, codeBuilder);
 		Constant.buildIntConst(codeBuilder, REAC);
-		object1.buildEvaluation(null, codeBuilder);
-		time.buildEvaluation(null, codeBuilder);
+		object1.buildEvaluation(simCoder, null, codeBuilder);
+		time.buildEvaluation(simCoder, null, codeBuilder);
 		Constant.buildIntConst(codeBuilder, prior);
 		RTS.invokevirtual_Simulation_ActivateAt(codeBuilder);
 	}
 
 	/// ClassFile coding utility: Build (Re)Activate Process DELAY ...
 	/// @param codeBuilder the codeBuilder to use.
-	private void buildActivateDelay(CodeBuilder codeBuilder) {
+	private void buildActivateDelay(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateDelay"));
-		activate1.buildQualifiedStaticLink(codeBuilder);
+		activate1.buildQualifiedStaticLink(simCoder, codeBuilder);
 		Constant.buildIntConst(codeBuilder, REAC);
-		object1.buildEvaluation(null, codeBuilder);
-		time.buildEvaluation(null, codeBuilder);
+		object1.buildEvaluation(simCoder, null, codeBuilder);
+		time.buildEvaluation(simCoder, null, codeBuilder);
 		Constant.buildIntConst(codeBuilder, prior);
 		RTS.invokevirtual_Simulation_ActivateDelay(codeBuilder);
 	}
 
 	/// ClassFile coding utility: Build (Re)Activate Process BEFORE ...
 	/// @param codeBuilder the codeBuilder to use.
-	private void buildActivateBefore(CodeBuilder codeBuilder) {
+	private void buildActivateBefore(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateBefore"));
-		activate1.buildQualifiedStaticLink(codeBuilder);
+		activate1.buildQualifiedStaticLink(simCoder, codeBuilder);
 		Constant.buildIntConst(codeBuilder, REAC);
-		object1.buildEvaluation(null, codeBuilder);
-		object2.buildEvaluation(null, codeBuilder);
+		object1.buildEvaluation(simCoder, null, codeBuilder);
+		object2.buildEvaluation(simCoder, null, codeBuilder);
 		RTS.invokevirtual_Simulation_ActivateBefore(codeBuilder);
 	}
 
 	/// ClassFile coding utility: Build (Re)Activate Process AFTER ...
 	/// @param codeBuilder the codeBuilder to use.
-	private void buildActivateAfter(CodeBuilder codeBuilder) {
+	private void buildActivateAfter(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		Meaning activate1 = CoreGlobal.getCurrentScope().findMeaning(new Identifier("ActivateAfter"));
-		activate1.buildQualifiedStaticLink(codeBuilder);
+		activate1.buildQualifiedStaticLink(simCoder, codeBuilder);
 		Constant.buildIntConst(codeBuilder, REAC);
-		object1.buildEvaluation(null, codeBuilder);
-		object2.buildEvaluation(null, codeBuilder);
+		object1.buildEvaluation(simCoder, null, codeBuilder);
+		object2.buildEvaluation(simCoder, null, codeBuilder);
 		RTS.invokevirtual_Simulation_ActivateAfter(codeBuilder);
 	}
 

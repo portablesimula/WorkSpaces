@@ -13,6 +13,7 @@ import simula.SimTextDocumentContentChangeEvent;
 import simula.core.builder.DocumentTextUpdater;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.LexToken;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.statement.ProgramModule;
 import simula.core.utilities.LOG;
@@ -32,7 +33,9 @@ public class DocumentManager {
 	public int documentVersion;
 //	final public String sourceName; // The source file name without .sim
 	public String sourceCode;
+	
 	public SimulaBuilder simBuilder;
+	public SimulaCoder simCoder;
 	
 	
 	/// The source file name.
@@ -42,7 +45,7 @@ public class DocumentManager {
 	public static String sourceName;
 	
 	/// The set of external .jar files.
-	public static Vector<File> externalJarFiles;
+	public static Vector<String> externalJarFileNames;
 
 	
     // Nøkkelen er filens URI (f.eks. file:///path/to/file.txt)
@@ -56,7 +59,7 @@ public class DocumentManager {
     	this.sourceCode = sourceCode;
     	sourceFileName = this.documentUri;
 		sourceName = getSourceName(this.documentUri);
-		this.externalJarFiles = new Vector<File>();
+		DocumentManager.externalJarFileNames = new Vector<String>();
 		StandardClass.INITIATE();
     }
     

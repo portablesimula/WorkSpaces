@@ -16,6 +16,7 @@ import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Constant;
 import simula.core.syntaxClass.expression.Expression;
@@ -89,14 +90,14 @@ public final class WhileStatement extends Statement {
 	}
 
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		Label whlLabel = codeBuilder.newLabel();
 		Label endLabel = codeBuilder.newLabel();
 		codeBuilder.labelBinding(whlLabel);
-		condition.buildEvaluation(null,codeBuilder);
+		condition.buildEvaluation(simCoder, null,codeBuilder);
 		codeBuilder.ifeq(endLabel);
-		doStatement.buildByteCode(codeBuilder);
+		doStatement.buildByteCode(simCoder, codeBuilder);
 		codeBuilder.goto_(whlLabel);
 		codeBuilder.labelBinding(endLabel);
 	}

@@ -14,6 +14,7 @@ import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.utilities.KeyWord;
@@ -183,14 +184,14 @@ public final class RelationalOperation extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if(lhs.type.keyWord == Type.T_TEXT) {
-			buildTextRelation(codeBuilder);
+			buildTextRelation(simCoder, codeBuilder);
 			return;
 		}
-		lhs.buildEvaluation(null,codeBuilder);
-		rhs.buildEvaluation(null,codeBuilder);
+		lhs.buildEvaluation(simCoder, null, codeBuilder);
+		rhs.buildEvaluation(simCoder, null, codeBuilder);
 		Label target = codeBuilder.newLabel();
 		Label lab2 = codeBuilder.newLabel();
 		switch(lhs.type.keyWord) {
@@ -248,9 +249,9 @@ public final class RelationalOperation extends Expression {
 
 	/// ClassFile coding utility: Build Text Relation.
 	/// @param codeBuilder the codeBuiløder to use.
-	private void buildTextRelation(CodeBuilder codeBuilder) {
-		lhs.buildEvaluation(null,codeBuilder);
-		rhs.buildEvaluation(null,codeBuilder);
+	private void buildTextRelation(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
+		lhs.buildEvaluation(simCoder, null, codeBuilder);
+		rhs.buildEvaluation(simCoder, null, codeBuilder);
 		RTS.buildInvokeTextRel(opr, codeBuilder);
 	}
 

@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
-
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.CoreGlobal2;
@@ -376,7 +375,7 @@ public abstract class DeclarationScope extends Declaration  {
     // ***********************************************************************************************
 	/// Build Class File
 	/// @return Class File bytes
-    public abstract byte[] buildClassFile();
+    public abstract byte[] buildClassFile(final SimulaCoder simCoder);
 
 	// ***********************************************************************************************
 	// *** createJavaClassFile
@@ -387,40 +386,40 @@ public abstract class DeclarationScope extends Declaration  {
 
 	/// Create Java ClassFile.
 	/// @throws IOException  if something went wrong.
-    public void createJavaClassFile() throws IOException {
+    public void createJavaClassFile(final SimulaCoder simCoder) throws IOException {
     	if (this.isPreCompiledFromFile != null) {
 			if(CoreGlobal2.verbose) IO.println("Skip  buildClassFile: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);			
     	} else if (CLASSFILE_ALREADY_GENERATED) {
 			if(CoreGlobal2.verbose) IO.println("Skip  buildClassFile: " + this.identifierValue() + " -- It is already generated");			
     	} else {
     		CLASSFILE_ALREADY_GENERATED = true;
-    		buildAndLoadOrAddClassFile();
+    		buildAndLoadOrAddClassFile(simCoder);
 //    		Util.dumpStack();
     	}
     }
 	
     /// Redefined in ClassDeclaration
     /// @throws IOException if something went wrong.
-    protected void buildAndLoadOrAddClassFile() throws IOException {
+    protected void buildAndLoadOrAddClassFile(final SimulaCoder simCoder) throws IOException {
 		if (this.isPreCompiledFromFile != null) {
 			if(CoreGlobal2.verbose) IO.println("Skip  buildClassFile: "+this.identifierValue());
 		} else {
-	    	byte[] bytes = doBuildClassFile();
-	    	loadOrAddClassFile(bytes);
+	    	byte[] bytes = doBuildClassFile(simCoder);
+	    	writeClassFile(simCoder, bytes);
     	}
     }
     
     /// Build ClassFile.
     /// @return ClassFile bytes.
-    protected byte[] doBuildClassFile() {
+    protected byte[] doBuildClassFile(final SimulaCoder simCoder) {
     	byte[] bytes;
     	if(this instanceof BlockDeclaration blk) {
     		blk.prevBlock = BlockDeclaration.currentBlock;
     		BlockDeclaration.currentBlock = blk;
-    			bytes = buildClassFile();
+    			bytes = buildClassFile(simCoder);
     		BlockDeclaration.currentBlock = blk.prevBlock;
     	} else {
-    		bytes = buildClassFile();
+    		bytes = buildClassFile(simCoder);
     	}
     	return bytes;
     }
@@ -433,26 +432,32 @@ public abstract class DeclarationScope extends Declaration  {
     	return null;
     }
     
-    /// Load or add a ClassFile depending on the SimulaCompiler.compilerMode
+    /// Write a ClassFile to the temp ClassFile directory.
     /// @param bytes the ClassFile bytes
     /// @throws IOException if something went wrong
-    protected void loadOrAddClassFile(byte[] bytes) throws IOException {
+    protected void writeClassFile(final SimulaCoder simCoder, final byte[] bytes) throws IOException {
     	if(bytes != null) {
     		String entryName = CoreGlobal2.packetName + "/" + externalIdent + ".class";
-    		SimulaCoder.jarFileBuilder.writeEntryToJarOutput(entryName, bytes);    				    			
+    		String fileName = simCoder.tempClassFileDir.toString() + '/' + entryName;
+//    		IO.println("DeclarationScope.writeClassFile: " + entryName);
+//    		IO.println("DeclarationScope.writeClassFile: " + fileName);
+            try (FileOutputStream oupt = new FileOutputStream(fileName)) {
+				oupt.write(bytes);
+			}
  			if(Option.internal.LIST_GENERATED_CLASS_FILES)
-   				listGeneratedClassFile(bytes);
+   				listGeneratedClassFile(simCoder, bytes);
     	}
     }
 
     /// Debug utility: listGeneratedClassFile.
     /// @param bytes the classFile bytes.
     /// @throws IOException if something went wrong.
-	private void listGeneratedClassFile(byte[] bytes) throws IOException {
-        File outputFile = new File(SimulaCoder.tempClassFileDir + "\\" + CoreGlobal2.packetName + "\\" + externalIdent + ".class");
+	private void listGeneratedClassFile(final SimulaCoder simCoder, final byte[] bytes) throws IOException {
+        File outputFile = new File(simCoder.tempClassFileDir + "\\" + CoreGlobal2.packetName + "\\" + externalIdent + ".class");
         outputFile.getParentFile().mkdirs();
-        FileOutputStream oupt = new FileOutputStream(outputFile);
-        oupt.write(bytes); oupt.flush(); oupt.close();
+        try (FileOutputStream oupt = new FileOutputStream(outputFile)) {
+			oupt.write(bytes); //oupt.flush(); oupt.close();
+		}
         if(CoreGlobal2.verbose) IO.println("ClassFile written to: " + outputFile + "  nBytes="+bytes.length);
 
         Util.doListClassFile("" + outputFile); // List generated .class file

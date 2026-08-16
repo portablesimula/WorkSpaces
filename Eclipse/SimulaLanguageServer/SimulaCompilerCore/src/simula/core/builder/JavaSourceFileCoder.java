@@ -81,8 +81,8 @@ public final class JavaSourceFileCoder {
 
 	/// Returns the output file for generated Java code.
 	/// @return the output file for generated Java code
-	public String getClassOutputFileName() {
-		return (SimulaCoder.tempClassFileDir + "/" + CoreGlobal2.packetName + '/' + blockDeclaration.getJavaIdentifier() + ".class");
+	public String getClassOutputFileName(final SimulaCoder simCoder) {
+		return (simCoder.tempClassFileDir + "/" + CoreGlobal2.packetName + '/' + blockDeclaration.getJavaIdentifier() + ".class");
 	}
 
 	/// Close Java output file.

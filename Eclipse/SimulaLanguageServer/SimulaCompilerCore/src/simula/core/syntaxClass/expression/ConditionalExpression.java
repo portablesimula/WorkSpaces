@@ -14,6 +14,7 @@ import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.utilities.ObjectKind;
@@ -113,17 +114,17 @@ public final class ConditionalExpression extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
-		condition.buildEvaluation(null,codeBuilder);
+		condition.buildEvaluation(simCoder, null, codeBuilder);
 		Label elseLabel = codeBuilder.newLabel();
 		codeBuilder.ifeq(elseLabel);
-		thenExpression.buildEvaluation(null,codeBuilder);
+		thenExpression.buildEvaluation(simCoder, null, codeBuilder);
 		if(elseExpression != null) {
 			Label endLabel = codeBuilder.newLabel();
 			codeBuilder.goto_(endLabel);
 			codeBuilder.labelBinding(elseLabel);
-			elseExpression.buildEvaluation(null,codeBuilder);
+			elseExpression.buildEvaluation(simCoder, null, codeBuilder);
 			codeBuilder.labelBinding(endLabel);
 		} else codeBuilder.labelBinding(elseLabel);
 	}

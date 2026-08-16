@@ -442,19 +442,26 @@ public final class Util {
 	// ***************************************************************
 	/// Print a .class file listing.
 	/// @param classFileName the .class file name
-	public static void doListDirectory(final String title, final String dirName) {
-        Path path = Paths.get(dirName); 
-        IO.println("================== LIST DIRECTORY: " + title + ", Path: " + path + " ======================");
-
-        // Try-with-resources sikrer at strømmen lukkes automatisk
+	public static void doListDirectory(final String title, final String directoryPath) {
+        Path path = Paths.get(directoryPath); 
+        IO.println("================== LIST DIRECTORY: " + title + ", Path: " + directoryPath + " ======================");
+        if (!Files.exists(path)) { System.out.println("Error: The directory does not exist: " + directoryPath); return; }
+        if (!Files.isDirectory(path)) { System.out.println("Error: The specified path is a file, not a directory: " + directoryPath); return; }
+        // Try-with-resources ensures that the stream is closed automatically
         try (Stream<Path> stream = Files.list(path)) {
-            stream.forEach(System.out::println);
+            if (!stream.iterator().hasNext()) { System.out.println("Info: The directory is empty."); return; }
+            try (Stream<Path> listStream = Files.list(path)) {
+//                listStream.forEach(p -> System.out.println("- " + p.getFileName()));
+        		listStream.forEach(System.out::println);
+            }
         } catch (IOException e) {
-            System.err.println("Kunne ikke lese katalogen: " + e.getMessage());
+            System.err.println("An error occurred while reading the directory: " + e.getMessage());
         }
+        
         IO.println("================== ENDE: " + path + " ======================");
     }
     
+	
 	// ***************************************************************
 	// *** LIST .class file
 	// ***************************************************************

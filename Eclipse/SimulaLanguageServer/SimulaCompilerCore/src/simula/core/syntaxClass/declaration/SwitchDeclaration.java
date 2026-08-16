@@ -118,7 +118,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 	/// Generate byteCode for the '_STM' method.
 	/// @param codeBuilder the CodeBuilder
 	@Override
-	protected void build_STM_BODY(CodeBuilder codeBuilder, Label begScope, Label endScope) {
+	protected void build_STM_BODY(SimulaCoder simCoder, CodeBuilder codeBuilder, Label begScope, Label endScope) {
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
 		List<SwitchCase> tableSwitchCases;
 		int tableSize = switchList.size();
@@ -144,7 +144,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 				.labelBinding(lab)
 				.aload(0);
 			
-			expr.buildEvaluation(null,codeBuilder);
+			expr.buildEvaluation(simCoder, null, codeBuilder);
 			
 			codeBuilder
 				.putfield(pool.fieldRefEntry(currentClassDesc(), "_RESULT", RTS.CD.RTS_LABEL)) // _RESULT

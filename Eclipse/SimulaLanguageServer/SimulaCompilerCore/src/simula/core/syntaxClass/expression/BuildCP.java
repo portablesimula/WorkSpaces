@@ -11,6 +11,7 @@ import java.util.Vector;
 import java.lang.classfile.CodeBuilder;
 
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.*;
@@ -35,7 +36,7 @@ public class BuildCP {
 	/// @param variable the procedure variable
 	/// @param prc Procedure Declaration
 	/// @param codeBuilder the CodeBuilder
-	static void normal(final VariableExpression variable,final ProcedureDeclaration prc,final CodeBuilder codeBuilder) {
+	static void normal(final SimulaCoder simCoder, final VariableExpression variable,final ProcedureDeclaration prc,final CodeBuilder codeBuilder) {
 		//  	kkk := P(444);
 		// ==>  kkk=new adHoc00_P((_CUR),444)._RESULT;
 		//
@@ -52,13 +53,13 @@ public class BuildCP {
 		codeBuilder
 			.new_(CD_prc)
 			.dup();
-		variable.meaning.buildQualifiedStaticLink(codeBuilder); // SL
+		variable.meaning.buildQualifiedStaticLink(simCoder, codeBuilder); // SL
 		// Push parameters
 		if(variable.checkedParams != null) {
 			int n=variable.checkedParams.size();
 			for(int i=0;i<n;i++) {
 				Parameter p=prc.parameterList.get(i);
-				p.buildParamCode(codeBuilder, variable.checkedParams.get(i));
+				p.buildParamCode(simCoder, codeBuilder, variable.checkedParams.get(i));
 			}
 		}
 		codeBuilder.invokespecial(CD_prc, "<init>", prc.getConstructorMethodTypeDesc());
@@ -81,16 +82,16 @@ public class BuildCP {
 	/// @param func Function Designator, may be subscripted
 	/// @param backLink if not null, this procedure call is part of the backLink Expression/Statement.
 	/// @param codeBuilder the CodeBuilder
-	static void remote(final Expression obj,final ProcedureDeclaration procedure,final VariableExpression func,final SyntaxElement backLink,CodeBuilder codeBuilder) {
+	static void remote(final SimulaCoder simCoder, final Expression obj,final ProcedureDeclaration procedure,final VariableExpression func,final SyntaxElement backLink,CodeBuilder codeBuilder) {
 		if(procedure.myVirtual!=null) {
 			// Call Remote Virtual Procedure
-			BuildCPV.remoteVirtual(obj,func,procedure.myVirtual.virtualSpec,backLink,codeBuilder);
+			BuildCPV.remoteVirtual(simCoder, obj,func,procedure.myVirtual.virtualSpec,backLink,codeBuilder);
 		} else if(procedure.declarationKind==ObjectKind.ContextFreeMethod) {
 			// Call Remote Method
 			Util.IERR();
 		} else if(procedure.declarationKind==ObjectKind.MemberMethod) {
 			// Call Remote Standard Member Method
-			callRemoteStandardProcedure(obj,(StandardProcedure) procedure,func,codeBuilder);
+			callRemoteStandardProcedure(simCoder, obj, (StandardProcedure) procedure, func, codeBuilder);
 			if(procedure.type != null) {
 				SyntaxElement backLnk = obj.backLink;
 				if(backLnk instanceof QualifiedObject qua)	backLnk = qua.backLink;
@@ -102,13 +103,13 @@ public class BuildCP {
 			codeBuilder
 				.new_(CD_prc)
 				.dup();
-			obj.buildEvaluation(null,codeBuilder);
+			obj.buildEvaluation(simCoder, null, codeBuilder);
 			// Push parameters
 			if(func.checkedParams != null) {
 				int n=func.checkedParams.size();
 				for(int i=0;i<n;i++) {
 					Parameter p=procedure.parameterList.get(i);
-					p.buildParamCode(codeBuilder, func.checkedParams.get(i));
+					p.buildParamCode(simCoder, codeBuilder, func.checkedParams.get(i));
 				}
 			}
 			RemoteVariable remVar=(RemoteVariable)func.backLink;
@@ -128,7 +129,8 @@ public class BuildCP {
 	/// @param pro StandardProcedure.
 	/// @param variable the variable.
 	/// @param codeBuilder the codeBuilder to use.
-	private static void callRemoteStandardProcedure(Expression beforeDot,StandardProcedure pro,final VariableExpression variable,CodeBuilder codeBuilder) {
+	private static void callRemoteStandardProcedure(final SimulaCoder simCoder, final Expression beforeDot,
+			final StandardProcedure pro,final VariableExpression variable, final CodeBuilder codeBuilder) {
 		if (beforeDot instanceof VariableExpression var) {
 			if(var.meaning == null) Util.IERR("");
 //			IO.println("BuildCP.callRemoteStandardProcedure: " + var.identifier.value + " "+var.meaning);
@@ -138,7 +140,7 @@ public class BuildCP {
 			if (remoteQual instanceof StandardProcedure prx) {
 				switch(remoteQual.declarationKind) {
 					case ObjectKind.MemberMethod -> {
-						var.buildIdentifierAccess(false, codeBuilder);
+						var.buildIdentifierAccess(simCoder, false, codeBuilder);
 						codeBuilder
 							.invokevirtual(owner, prx.identifierValue(), prx.getMethodTypeDesc(null,variable.checkedParams));
 					}
@@ -148,12 +150,12 @@ public class BuildCP {
 					}
 					default -> Util.IERR();
 				}
-			} else beforeDot.buildEvaluation(null, codeBuilder);
-		} else beforeDot.buildEvaluation(null, codeBuilder);
+			} else beforeDot.buildEvaluation(simCoder, null, codeBuilder);
+		} else beforeDot.buildEvaluation(simCoder, null, codeBuilder);
 		// PUSH Parameter values onto the stack
 		checkForExtraParameter(variable);
 		if(variable.checkedParams != null) for(Expression par:variable.checkedParams) {
-			par.buildEvaluation(null,codeBuilder);
+			par.buildEvaluation(simCoder, null, codeBuilder);
 		}
 		ClassDesc owner=ClassDesc.of("simula.runtime."+pro.declaredIn.externalIdent);
 		codeBuilder.invokevirtual(owner, pro.identifierValue(), pro.getMethodTypeDesc(null,variable.checkedParams));
@@ -168,12 +170,12 @@ public class BuildCP {
 	/// ClassFile coding utility: BuildCP.normalStandardProcedure
 	/// @param variable the variable.
 	/// @param codeBuilder the codeBuilder to use.
-	static void normalStandardProcedure(final VariableExpression variable,CodeBuilder codeBuilder) {
+	static void normalStandardProcedure(final SimulaCoder simCoder, final VariableExpression variable,CodeBuilder codeBuilder) {
 		Meaning meaning=variable.meaning;
 		StandardProcedure pro = (StandardProcedure) meaning.declaredAs;
 		if (meaning.isConnected()) {
 			Expression inspectedVariable = ((ConnectionBlock) meaning.declaredIn).getTypedInspectedVariable();
-			callRemoteStandardProcedure(inspectedVariable, pro, variable, codeBuilder);
+			callRemoteStandardProcedure(simCoder, inspectedVariable, pro, variable, codeBuilder);
 		} else {
 			// PUSH Parameter values onto the stack
 			boolean xpar = checkForExtraParameter(variable);
@@ -182,12 +184,12 @@ public class BuildCP {
 			if (variable.checkedParams != null) {
 				if(xpar) {
 					for (Expression par : variable.checkedParams)
-						par.buildEvaluation(null,codeBuilder);
+						par.buildEvaluation(simCoder, null,codeBuilder);
 				} else {
 					int n=variable.checkedParams.size();
 					for(int i=0;i<n;i++) {
 						Parameter p=pro.parameterList.get(i);
-						p.buildParamCode(codeBuilder, variable.checkedParams.get(i));
+						p.buildParamCode(simCoder, codeBuilder, variable.checkedParams.get(i));
 					}
 				}
 			}
@@ -205,7 +207,7 @@ public class BuildCP {
 	/// ClassFile coding utility: BuildCP.staticStandardProcedure
 	/// @param variable the variable.
 	/// @param codeBuilder the codeBuilder to use.
-	static void staticStandardProcedure(final VariableExpression variable,CodeBuilder codeBuilder) {
+	static void staticStandardProcedure(final SimulaCoder simCoder, final VariableExpression variable, final CodeBuilder codeBuilder) {
 		Meaning meaning=variable.meaning;
 		StandardProcedure pro = (StandardProcedure) meaning.declaredAs;
 		// PUSH Parameter values onto the stack
@@ -214,7 +216,7 @@ public class BuildCP {
 			for(int i=0;i<n;i++) {
 				Parameter par = pro.parameterList.get(i);
 				Expression expr = variable.checkedParams.get(i);
-				par.buildParamCode(codeBuilder,expr);
+				par.buildParamCode(simCoder, codeBuilder,expr);
 			}
 		}
 		DeclarationScope declaredIn = variable.meaning.declaredIn;

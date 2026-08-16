@@ -3,7 +3,6 @@ package simula.core.coder;
 import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
-
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
@@ -19,63 +18,46 @@ public class JavaCoding {
 
 	/// Call Java compiler 'javac'
 	/// @throws IOException if something went wrong.
-	static void doCallJavaCompiler(SimulaBuilder simBuilder) throws IOException {
+	static void doCallJavaCompiler(SimulaCoder simCoder) throws IOException {
 		String classPath = CoreGlobal2.simulaRtsLib.toString();
 		File rtsLib = new File(CoreGlobal2.simulaRtsLib, "simula/runtime");
 		boolean rtsExist = rtsLib.exists();
 		boolean rtsCread = rtsLib.canRead();
 		if (!(rtsExist && rtsCread)) {
-			Util.IERR("DETTE MÅ RETTES");
-//			Util.popUpError("Unable to access the Runtime System at:" + "\n" + rtsLib
-//					+ "\nCheck the installation and consider" + "\nto Download it again.\n");
+			Util.generalError("Unable to access the Runtime System at:" + rtsLib
+					+ "\nCheck the installation and consider to Download it again.");
 		}
 		if (Option.internal.DEBUGGING) {
-			IO.println(
-					"Simula Runtime System:    \"" + rtsLib + "\", exists=" + rtsExist + ", canRead=" + rtsCread);
+			IO.println("Simula Runtime System:    \"" + rtsLib + "\", exists=" + rtsExist + ", canRead=" + rtsCread);
 			String[] list = rtsLib.list();
 			if (list != null) {
-				IO.println("Simula Runtime System:    \"" + rtsLib + "\", exists=" + rtsExist + ", canRead="
-						+ rtsCread + ", size=" + list.length);
+				IO.println("Simula Runtime System:    \"" + rtsLib + "\", exists=" + rtsExist + ", canRead=" + rtsCread + ", size=" + list.length);
 				for (int i = 0; i < list.length; i++) {
 					IO.println("       " + i + ": \"" + list[i] + "\"");
 				}
 			}
 		}
 		
-		IO.println("SimulaCompiler.doCallJavaCompiler: externalJarFiles: " + DocumentManager.externalJarFiles);
-		String pathSeparator = System.getProperty("path.separator");
-		for (File jarFile : DocumentManager.externalJarFiles) {
-			if (Option.internal.DEBUGGING) {
-				boolean exist = jarFile.exists();
-				boolean cread = jarFile.canRead();
-				IO.println("Precompiled Library:      \"" + jarFile + "\", exists=" + exist + ", canRead=" + cread);
-				JarFileBuilder.listJarFile("SimulaCompiler.doCallJavaCompiler: ",jarFile);
-			}
-			classPath = classPath + pathSeparator + (jarFile.toString().trim());
-//			Util.IERR(""+classPath);
-		}
-//		Util.IERR("");
-		
 		int exitValue = -1;
 		String msg = "Commandline";
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		if (compiler != null) {
-			exitValue = callJavaSystemCompiler(simBuilder, compiler, classPath);
+			exitValue = callJavaSystemCompiler(simCoder, compiler, classPath);
 			msg = "System";
 			if (exitValue != 0) {
 				Util.generalError("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
 				msg = "Commandline"; // Try use CommandLine Compiler
-				exitValue = callJavacCompiler(simBuilder, classPath);
+				exitValue = callJavacCompiler(simCoder, classPath);
 			}
 		} else
-			exitValue = callJavacCompiler(simBuilder, classPath);
+			exitValue = callJavacCompiler(simCoder, classPath);
 		if (Option.internal.DEBUGGING) {
 			IO.println("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
 			for (JavaSourceFileCoder javaClass : SimulaCoder.javaSourceFileCoders)
-				IO.println(javaClass.getClassOutputFileName());
+				IO.println(javaClass.getClassOutputFileName(simCoder));
 //			list(SimulaCoder.tempClassFileDir);
 		}
-		if(CoreGlobal2.verbose) IO.println("SimulaCompiler.doCompile: " + DocumentManager.sourceName + ": Class Files Generated - From Java Source");
+		if(CoreGlobal2.verbose) IO.println("JavaCoding.doCompile: " + DocumentManager.sourceName + ": Class Files Generated - From Java Source");
 		if (exitValue != 0) {
 			Util.generalError("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
 			IO.println("\nCompiler terminated after error(s) during Java Compilation");
@@ -89,14 +71,14 @@ public class JavaCoding {
 	/// @param classPath the classPath
 	/// @return return value from the Java compiler
 	/// @throws IOException if something went wrong
-	private static int callJavaSystemCompiler(final SimulaBuilder simBuilder, final JavaCompiler compiler, final String classPath) throws IOException {
-//    	IO.println("SimulaCompiler.callJavaSystemCompiler: sourceFileDir=" + documentManager.sourceFileDir);
-//    	IO.println("SimulaCompiler.callJavaSystemCompiler: outputDir=" + SimulaCoder.outputDir);
-//    	IO.println("SimulaCompiler.callJavaSystemCompiler: tempClassFileDir=" + SimulaCoder.tempClassFileDir);
-//    	IO.println("SimulaCompiler.callJavaSystemCompiler: tempClassFileDir=" + SimulaCompiler.simulaRtsLib);
-//    	IO.println("SimulaCompiler.callJavaSystemCompiler: userHome=" + System.getProperty("user.home"));
-//    	IO.println("SimulaCompiler.callJavaSystemCompiler: userDir=" + System.getProperty("user.dir"));
-//    	IO.println("SimulaCompiler.callJavaSystemCompiler: javaClassPath=" + System.getProperty("java.class.path"));
+	private static int callJavaSystemCompiler(final SimulaCoder simCoder, final JavaCompiler compiler, final String classPath) throws IOException {
+//    	IO.println("JavaCoding.callJavaSystemCompiler: sourceFileDir=" + documentManager.sourceFileDir);
+//    	IO.println("JavaCoding.callJavaSystemCompiler: outputDir=" + SimulaCoder.outputDir);
+//    	IO.println("JavaCoding.callJavaSystemCompiler: tempClassFileDir=" + SimulaCoder.tempClassFileDir);
+//    	IO.println("JavaCoding.callJavaSystemCompiler: tempClassFileDir=" + JavaCoding.simulaRtsLib);
+//    	IO.println("JavaCoding.callJavaSystemCompiler: userHome=" + System.getProperty("user.home"));
+//    	IO.println("JavaCoding.callJavaSystemCompiler: userDir=" + System.getProperty("user.dir"));
+//    	IO.println("JavaCoding.callJavaSystemCompiler: javaClassPath=" + System.getProperty("java.class.path"));
 //    	
 //    	Util.doListDirectory(""+SimulaCoder.tempClassFileDir);
 //    	Util.doListDirectory(""+SimulaCoder.tempClassFileDir + "/" + packetName);
@@ -105,14 +87,14 @@ public class JavaCoding {
 		if (Option.internal.DEBUGGING) {
 			arguments.add("-version");
 		}
-		LOG.info("SimulaCompiler.callJavaSystemCompiler: classPath=\"" + classPath + "\"");
+		LOG.info("JavaCoding.callJavaSystemCompiler: classPath=\"" + classPath + "\"");
 		
 		boolean TESTING = false;//true;
 		String clazzPath = null;
 		if(TESTING) {
 			clazzPath = classPath;
 		} else {
-			clazzPath = SimulaCoder.tempClassFileDir.toString();
+			clazzPath = simCoder.tempClassFileDir.toString();
 		}
 		
 
@@ -121,7 +103,7 @@ public class JavaCoding {
 		arguments.add("-classpath");
 		arguments.add(clazzPath);
 		arguments.add("-d");
-		arguments.add(SimulaCoder.tempClassFileDir.toString()); // Specifies output directory.
+		arguments.add(simCoder.tempClassFileDir.toString()); // Specifies output directory.
 		if (!CoreGlobal2.WARNINGS)
 			arguments.add("-nowarn");
 		for (JavaSourceFileCoder javaClass : SimulaCoder.javaSourceFileCoders)
@@ -130,11 +112,11 @@ public class JavaCoding {
 		String[] args = new String[nArg];
 		arguments.toArray(args);
 
-//		if (SimulaCompiler.verbose) {
-			IO.println("------------  Call Java System Compiler  ------------");
-			IO.println("System Compiler supports " + compiler.getSourceVersions());
-			for (int i = 0; i < args.length; i++)
-				IO.println("Compiler'args[" + i + "]=" + args[i]);
+//		if (JavaCoding.verbose) {
+//			IO.println("------------  Call Java System Compiler  ------------");
+//			IO.println("System Compiler supports " + compiler.getSourceVersions());
+//			for (int i = 0; i < args.length; i++)
+//				IO.println("Compiler'args[" + i + "]=" + args[i]);
 //		}
 		int exitValue = compiler.run(System.in, System.out, System.err, args);
 		return (exitValue);			
@@ -143,22 +125,22 @@ public class JavaCoding {
 	/// Call Java command line compiler.
 	/// @param classPath the classPath
 	/// @return return value from the Java compiler
-	private static  int callJavacCompiler(final SimulaBuilder simBuilder, final String classPath) {
+	private static  int callJavacCompiler(final SimulaCoder simCoder, final String classPath) {
 		Vector<String> cmds = new Vector<String>();
 		cmds.add("javac");
 		if (Option.internal.DEBUGGING) {
 			cmds.add("-version");
 		}
 		if (Option.internal.TRACING)
-			IO.println("SimulaCompiler.callJavacCompiler: classPath=\"" + classPath + "\"");
-		String clazzPath = SimulaCoder.tempClassFileDir.toString();
+			IO.println("JavaCoding.callJavacCompiler: classPath=\"" + classPath + "\"");
+		String clazzPath = simCoder.tempClassFileDir.toString();
 		String rtsLib = CoreGlobal2.simulaRtsLib.toString();
 		clazzPath = clazzPath + ';' + rtsLib;
 		cmds.add("-classpath");
 		cmds.add(clazzPath);
 
 		cmds.add("-d");
-		cmds.add(SimulaCoder.tempClassFileDir.toString()); // Specifies output directory.
+		cmds.add(simCoder.tempClassFileDir.toString()); // Specifies output directory.
 		if (!CoreGlobal2.WARNINGS)
 			cmds.add("-nowarn");
 		for (JavaSourceFileCoder javaClass : SimulaCoder.javaSourceFileCoders) {
@@ -168,7 +150,7 @@ public class JavaCoding {
 		if (Option.internal.TRACING) {
 			IO.println("END Generate .class Output Code. Exit value=" + exitValue);
 			for (JavaSourceFileCoder javaClass : SimulaCoder.javaSourceFileCoders)
-				IO.println(javaClass.getClassOutputFileName());
+				IO.println(javaClass.getClassOutputFileName(simCoder));
 		}
 		return (exitValue);
 	}

@@ -17,6 +17,7 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.Parameter;
 import simula.core.syntaxClass.declaration.SimpleVariableDeclaration;
@@ -97,7 +98,7 @@ public class ForWhileElement extends ForListElement {
 	}
 
 	@Override
-	public void doSingleElementByteCoding(CodeBuilder codeBuilder) {
+	public void doSingleElementByteCoding(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		
 		// V while B REPEAT: C:= V;
 		//                   if not B then goto END;
@@ -112,28 +113,28 @@ public class ForWhileElement extends ForListElement {
 
 		codeBuilder.labelBinding(repeatLabel);
 		// controlVariable := expr1
-		forStatement.controlVariable.buildIdentifierAccess(true, codeBuilder);
-		this.expr1.buildEvaluation(null,codeBuilder); // evaluate expr1
+		forStatement.controlVariable.buildIdentifierAccess(simCoder, true, codeBuilder);
+		this.expr1.buildEvaluation(simCoder, null,codeBuilder); // evaluate expr1
 		codeBuilder.putfield(FRE);
 		
-		this.expr2.buildEvaluation(null,codeBuilder); // evaluate condition
+		this.expr2.buildEvaluation(simCoder, null,codeBuilder); // evaluate condition
 		codeBuilder
 			.iconst_1()
 			.if_icmpne(endLabel);
-		forStatement.doStatement.buildByteCode(codeBuilder);
+		forStatement.doStatement.buildByteCode(simCoder, codeBuilder);
 		codeBuilder
 			.goto_(repeatLabel)
 			.labelBinding(endLabel);
 	}
 
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder,VariableExpression controlVariable) {
+	public void buildByteCode(final SimulaCoder simCoder, final CodeBuilder codeBuilder, final VariableExpression controlVariable) {
 		codeBuilder
 			.new_(RTS.CD.FOR_WhileElt)
 			.dup();
-		Parameter.buildNameParam(codeBuilder,controlVariable);
-		Parameter.buildNameParam(codeBuilder,expr1); // PARAMETER: RTS_NAME<T> expr
-		Parameter.buildNameParam(codeBuilder,expr2); // PARAMETER: RTS_NAME<T> cond
+		Parameter.buildNameParam(simCoder, codeBuilder,controlVariable);
+		Parameter.buildNameParam(simCoder, codeBuilder,expr1); // PARAMETER: RTS_NAME<T> expr
+		Parameter.buildNameParam(simCoder, codeBuilder,expr2); // PARAMETER: RTS_NAME<T> cond
 
 		MethodTypeDesc MTD=MethodTypeDesc.ofDescriptor(
 				"(Lsimula/runtime/RTS_NAME;Lsimula/runtime/RTS_NAME;Lsimula/runtime/RTS_NAME;)V");

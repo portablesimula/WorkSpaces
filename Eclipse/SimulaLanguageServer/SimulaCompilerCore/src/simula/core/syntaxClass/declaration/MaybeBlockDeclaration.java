@@ -329,7 +329,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// *** ByteCoding: buildClassFile
 	// ***********************************************************************************************
 	@Override
-	public byte[] buildClassFile() {
+	public byte[] buildClassFile(final SimulaCoder simCoder) {
 		labelList.setLabelIdexes();
 		ClassDesc CD_ThisClass = currentClassDesc();
 		if(CoreGlobal2.verbose) IO.println("SubBlock.buildClassFile: "+CD_ThisClass); 
@@ -344,10 +344,10 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 
 					if(this.hasAccumLabel())
 						for (LabelDeclaration lab : labelList.getAccumLabels())
-							lab.buildDeclaration(classBuilder,this);
+							lab.buildDeclaration(simCoder, classBuilder,this);
 					
 					for (Declaration decl : declarationList)
-						decl.buildDeclaration(classBuilder,this);
+						decl.buildDeclaration(simCoder, classBuilder,this);
 					
 					if (isQPSystemBlock())
 						classBuilder
@@ -356,14 +356,14 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 
 					classBuilder
 						.withMethodBody("<init>",
-							MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_RTObject;)V"), ClassFile.ACC_PUBLIC, codeBuilder -> buildConstructor(codeBuilder))
+							MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_RTObject;)V"), ClassFile.ACC_PUBLIC, codeBuilder -> buildConstructor(simCoder, codeBuilder))
 						.withMethodBody("_STM",
-							MethodTypeDesc.ofDescriptor("()Lsimula/runtime/RTS_RTObject;"), ClassFile.ACC_PUBLIC, codeBuilder -> buildMethod_STM(codeBuilder));
+							MethodTypeDesc.ofDescriptor("()Lsimula/runtime/RTS_RTObject;"), ClassFile.ACC_PUBLIC, codeBuilder -> buildMethod_STM(simCoder, codeBuilder));
 					
 					if (this.isMainModule)
 						classBuilder
 							.withMethodBody("main", MethodTypeDesc.ofDescriptor("([Ljava/lang/String;)V"),
-								ClassFile.ACC_PUBLIC + ClassFile.ACC_STATIC + ClassFile.ACC_VARARGS, codeBuilder -> buildMethodMain(codeBuilder));
+								ClassFile.ACC_PUBLIC + ClassFile.ACC_STATIC + ClassFile.ACC_VARARGS, codeBuilder -> buildMethodMain(simCoder, codeBuilder));
 				}
 		);
 		return(bytes);
@@ -382,7 +382,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	///     }
 	/// </pre>
 	/// @param codeBuilder the CodeBuilder
-	private void buildConstructor(CodeBuilder codeBuilder) {
+	private void buildConstructor(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		Label begScope = codeBuilder.newLabel();
 		Label endScope = codeBuilder.newLabel();
 		ASSERT_SEMANTICS_CHECKED();
@@ -412,7 +412,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 			
 			// Add Declaration Code to Constructor
 			for (Declaration decl : declarationList)
-				decl.buildDeclarationCode(codeBuilder);
+				decl.buildDeclarationCode(simCoder, codeBuilder);
 
 			codeBuilder
 				.return_()
@@ -421,18 +421,18 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	}
 
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		CoreGlobal.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (declarationKind == ObjectKind.CompoundStatement) {
-			build_STMS(codeBuilder);
+			build_STMS(simCoder, codeBuilder);
 			return;
 		}
 		CoreGlobal.enterScope(this);
 		if (this.isPreCompiledFromFile != null) {
 			if(CoreGlobal2.verbose) IO.println("Skip  buildClassFile: "+this.identifierValue());			
 		} else {
-			try { createJavaClassFile(); } catch (IOException e) { e.printStackTrace();	}
+			try { createJavaClassFile(simCoder); } catch (IOException e) { e.printStackTrace();	}
 		}
 
 		//  0: new           #42                 // class simulaTestPrograms/adHoc12_SubBlock18
@@ -467,16 +467,16 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	}
 	
 	@Override
-	protected void build_STM_BODY(CodeBuilder codeBuilder, Label begScope, Label endScope) {
+	protected void build_STM_BODY(SimulaCoder simCoder, CodeBuilder codeBuilder, Label begScope, Label endScope) {
 		labelContextStack.push(labelContext);
 		labelContext = this;
-		build_STMS(codeBuilder);
+		build_STMS(simCoder, codeBuilder);
 		labelContext = labelContextStack.pop();
 	}
 
 	/// ClassFile coding utility: Build the statements.
 	/// @param codeBuilder the codeBuilder to use.
-	private void build_STMS(CodeBuilder codeBuilder) {
+	private void build_STMS(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		for (Statement stm : statements) {
 			if(!(stm instanceof DummyStatement)) {
 				
@@ -489,7 +489,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 				
 				Util.buildLineNumber(codeBuilder,stm.firstLineNumber());
 			}
-			stm.buildByteCode(codeBuilder);
+			stm.buildByteCode(simCoder, codeBuilder);
 		}
 	}
 

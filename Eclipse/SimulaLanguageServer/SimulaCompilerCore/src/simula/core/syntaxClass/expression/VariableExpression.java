@@ -22,6 +22,7 @@ import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.OverLoad;
 import simula.core.syntaxClass.ProcedureSpecification;
 import simula.core.syntaxClass.SyntaxElement;
@@ -731,9 +732,9 @@ public final class VariableExpression extends Expression {
 	/// ClassFile Coding Utility: Edit identifier access.
 	/// @param destination true if destination
 	/// @param codeBuilder the CodeBuilder
-	public void buildIdentifierAccess(boolean destination,CodeBuilder codeBuilder) {
+	public void buildIdentifierAccess(final SimulaCoder simCoder, final boolean destination, final CodeBuilder codeBuilder) {
 		if (remotelyAccessed) return;
-		meaning.buildIdentifierAccess(destination, codeBuilder);
+		meaning.buildIdentifierAccess(simCoder, destination, codeBuilder);
 	}
 
 	// ******************************************************************
@@ -743,7 +744,7 @@ public final class VariableExpression extends Expression {
 	/// @param rightPart When destination, this is the right part of the assignment
 	/// @param codeBuilder the CodeBuilder
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		Declaration declaredAs=meaning.declaredAs;
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
@@ -752,9 +753,9 @@ public final class VariableExpression extends Expression {
 		switch (declaredAs.declarationKind) {
 			case ObjectKind.ArrayDeclaration:
 				ArrayDeclaration arr=(ArrayDeclaration)declaredAs;
-				buildIdentifierAccess(false,codeBuilder);
+				buildIdentifierAccess(simCoder, false, codeBuilder);
 				if (this.hasArguments())
-					 arr.arrayGetElement(this, false, codeBuilder);
+					 arr.arrayGetElement(simCoder, this, false, codeBuilder);
 				else codeBuilder.getfield(pool.fieldRefEntry(arr.declaredIn.getClassDesc(), arr.identifierValue(), ArrayDeclaration.getClassDesc(type)));
 				break;
 
@@ -765,7 +766,7 @@ public final class VariableExpression extends Expression {
 
 			case ObjectKind.LabelDeclaration:
 				if (destination) Util.IERR();
-				buildIdentifierAccess(false,codeBuilder);
+				buildIdentifierAccess(simCoder, false, codeBuilder);
 				LabelDeclaration lab=(LabelDeclaration)declaredAs;
 				VirtualSpecification virtSpec = VirtualSpecification.getVirtualSpecification(declaredAs);
 				if (virtSpec == null) {
@@ -778,7 +779,7 @@ public final class VariableExpression extends Expression {
 				break;
 
 			case ObjectKind.Parameter:
-				buildEvaluateParameter((Parameter) declaredAs,inspectedVariable,rightPart,codeBuilder);
+				buildEvaluateParameter(simCoder, (Parameter) declaredAs,inspectedVariable,rightPart,codeBuilder);
 				break;
 
 			case ObjectKind.ContextFreeMethod:
@@ -787,11 +788,11 @@ public final class VariableExpression extends Expression {
 					if(lno <= 0) Util.IERR("VariableExpressiopn.buildEvaluation: Illegal lineNumber: " + lno);
 					Constant.buildIntConst(codeBuilder, lno);
 				}
-				else BuildCP.staticStandardProcedure(this,codeBuilder);
+				else BuildCP.staticStandardProcedure(simCoder, this, codeBuilder);
 				break;
 
 			case ObjectKind.MemberMethod:
-				BuildCP.normalStandardProcedure(this,codeBuilder);
+				BuildCP.normalStandardProcedure(simCoder, this, codeBuilder);
 				break;
 
 			case ObjectKind.Procedure:
@@ -804,16 +805,16 @@ public final class VariableExpression extends Expression {
 					Util.IERR();
 				} //else
 				if (procedure.myVirtual != null)
-					 BuildCPV.virtual(this, procedure.myVirtual.virtualSpec, remotelyAccessed, codeBuilder);
+					 BuildCPV.virtual(simCoder, this, procedure.myVirtual.virtualSpec, remotelyAccessed, codeBuilder);
 				else {
-					BuildCP.normal(this, procedure, codeBuilder);
+					BuildCP.normal(simCoder, this, procedure, codeBuilder);
 				}
 				break;
 
 			case ObjectKind.SimpleVariableDeclaration:
 				SimpleVariableDeclaration var=(SimpleVariableDeclaration)declaredAs;
 				if(var.constantElement != null) {
-					var.constantElement.buildEvaluation(null,codeBuilder);
+					var.constantElement.buildEvaluation(simCoder, null,codeBuilder);
 					break;
 				}
 				if(inspectedVariable != null) {
@@ -840,7 +841,7 @@ public final class VariableExpression extends Expression {
 						.checkcast( ((DeclarationScope)var.declaredIn).getClassDesc())
 						.getfield(var.getFieldRefEntry(pool));
 				} else {
-					buildIdentifierAccess(destination,codeBuilder);
+					buildIdentifierAccess(simCoder, destination, codeBuilder);
 					codeBuilder.getfield(var.getFieldRefEntry(pool));
 				}
 				break;
@@ -860,14 +861,14 @@ public final class VariableExpression extends Expression {
 //						.getfield(ivar.getFieldRefEntry(pool));
 					Util.IERR("DON'T BELIEVE THIS WILL EVER HAPPEN !");
 				} else {
-					buildIdentifierAccess(destination,codeBuilder);
+					buildIdentifierAccess(simCoder, destination, codeBuilder);
 					codeBuilder.getfield(ivar.getFieldRefEntry(pool));
 				}
 				break;
 
 			case ObjectKind.VirtualSpecification:
 				VirtualSpecification virtual = (VirtualSpecification) declaredAs;
-				BuildCPV.virtual(this, virtual, remotelyAccessed,codeBuilder);
+				BuildCPV.virtual(simCoder, this, virtual, remotelyAccessed,codeBuilder);
 				break;
 
 			default:
@@ -897,23 +898,24 @@ public final class VariableExpression extends Expression {
 	/// @param inspectedVariable then inspected variable or null
 	/// @param rightPart When destination, this is the right part of the assignment
 	/// @param codeBuilder the CodeBuilder
-	private void buildEvaluateParameter(Parameter par,Expression inspectedVariable,Expression rightPart,CodeBuilder codeBuilder) {
+	private void buildEvaluateParameter(final SimulaCoder simCoder, final Parameter par,
+			final Expression inspectedVariable, final Expression rightPart, final CodeBuilder codeBuilder) {
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
 		boolean destination = (rightPart != null);
 		switch (par.kind) {
 		case Parameter.Kind.Array: // Parameter Array
-			buildIdentifierAccess(destination,codeBuilder);
+			buildIdentifierAccess(simCoder, destination, codeBuilder);
 			if (par.mode == Parameter.Mode.name) {
 				codeBuilder.getfield(par.getFieldRefEntry(pool));
 				RTS.invokevirtual_NAME_get(codeBuilder);
 				codeBuilder.checkcast(RTS.CD.RTS_ARRAY(type));
 				if(checkedParams != null)
-					ArrayDeclaration.arrayGetElement2(type,par.getFieldIdentifier(),checkedParams,codeBuilder);
+					ArrayDeclaration.arrayGetElement2(simCoder, type,par.getFieldIdentifier(),checkedParams,codeBuilder);
 			} else {
 				if (this.hasArguments()) {
 					if (destination)
-						 ArrayDeclaration.arrayPutElement(meaning,par.getFieldIdentifier(),true,this.checkedParams,rightPart,codeBuilder);
-					else ArrayDeclaration.arrayGetElement(type,par.getFieldIdentifier(),true,this.checkedParams,null,par.declaredIn,codeBuilder);
+						 ArrayDeclaration.arrayPutElement(simCoder, meaning,par.getFieldIdentifier(),true,this.checkedParams,rightPart,codeBuilder);
+					else ArrayDeclaration.arrayGetElement(simCoder, type,par.getFieldIdentifier(),true,this.checkedParams,null,par.declaredIn,codeBuilder);
 				} else {
 					if (destination) Util.IERR();
 					ClassDesc owner = (inspectedVariable == null)
@@ -930,13 +932,13 @@ public final class VariableExpression extends Expression {
 			if (par.mode == Parameter.Mode.value)
 				Util.codingError(this, "Parameter " + this + " by Value is not allowed - Rewrite Program");
 			else { // Procedure By Reference or Name.
-				BuildCPF.formal(this, par, codeBuilder);
+				BuildCPF.formal(simCoder, this, par, codeBuilder);
 				if(par.type == null) codeBuilder.pop();
 			}
 			break;
 
 		case Parameter.Kind.Simple, Parameter.Kind.Label:
-			buildIdentifierAccess(destination,codeBuilder); // Kind: Simple/Label
+			buildIdentifierAccess(simCoder, destination,codeBuilder); // Kind: Simple/Label
 			codeBuilder.getfield(par.getFieldRefEntry(pool));
 			if (!destination && par.mode == Parameter.Mode.name) {
 				RTS.invokevirtual_NAME_get(codeBuilder);

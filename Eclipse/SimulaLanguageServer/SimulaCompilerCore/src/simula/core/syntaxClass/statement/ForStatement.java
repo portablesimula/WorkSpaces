@@ -20,6 +20,7 @@ import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.LexToken;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.BlockDeclaration;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
@@ -293,11 +294,11 @@ public final class ForStatement extends Statement {
 	}
 
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if (forList.size() == 1) {
 			ForListElement singleElement = forList.firstElement();
-			singleElement.doSingleElementByteCoding(codeBuilder);
+			singleElement.doSingleElementByteCoding(simCoder, codeBuilder);
 			return;
 		}
 
@@ -327,7 +328,7 @@ public final class ForStatement extends Statement {
 		int n = this.forList.size();
 		for(int i=0;i<n;i++) {
 			Constant.buildIntConst(codeBuilder, i); // Index in 
-			forList.get(i).buildByteCode(codeBuilder,controlVariable);
+			forList.get(i).buildByteCode(simCoder, codeBuilder,controlVariable);
 		    //   aastore
 		    //   dup        // ONLY IF i < (n-1)
 			codeBuilder.aastore();
@@ -354,7 +355,7 @@ public final class ForStatement extends Statement {
 			.ifne(stmLabel)
 			.goto_(contLabel)
 			.labelBinding(stmLabel);
-		doStatement.buildByteCode(codeBuilder);
+		doStatement.buildByteCode(simCoder, codeBuilder);
 		codeBuilder
 			.goto_(contLabel)
 			.labelBinding(endLabel);

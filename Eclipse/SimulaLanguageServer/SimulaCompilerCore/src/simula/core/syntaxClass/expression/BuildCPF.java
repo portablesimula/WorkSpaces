@@ -8,6 +8,7 @@ package simula.core.syntaxClass.expression;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.Declaration;
@@ -35,7 +36,7 @@ public abstract class BuildCPF {
 	/// @param variable the procedure variable
 	/// @param par declared as parameter 'par'
 	/// @param codeBuilder the CodeBuilder
-	static void formal(final VariableExpression variable,final Parameter par,CodeBuilder codeBuilder) {
+	static void formal(final SimulaCoder simCoder, final VariableExpression variable,final Parameter par,CodeBuilder codeBuilder) {
 		//return("<IDENT>.CPF().setPar(4).setpar(3.14)._ENT()");
 		SyntaxElement backLink = variable.backLink;
 		if(backLink instanceof RemoteVariable rem) backLink = rem.backLink;
@@ -44,7 +45,7 @@ public abstract class BuildCPF {
 			codeBuilder.aload(0);
 		}
 
-		variable.buildIdentifierAccess(false, codeBuilder);
+		variable.buildIdentifierAccess(simCoder, false, codeBuilder);
 
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
 		codeBuilder.getfield(par.getFieldRefEntry(pool));			
@@ -52,7 +53,7 @@ public abstract class BuildCPF {
 			RTS.invokevirtual_NAME_get(codeBuilder);
 			codeBuilder.checkcast(RTS.CD.RTS_PRCQNT);
 		}
-		BuildCPF.buildCPF(variable, codeBuilder);
+		BuildCPF.buildCPF(simCoder, variable, codeBuilder);
 	}
 	
 	// ********************************************************************
@@ -61,7 +62,7 @@ public abstract class BuildCPF {
 	/// Coding Utility: Build Call Procedure Formal.
 	/// @param variable the procedure variable
 	/// @param codeBuilder the CodeBuilder
-	static void buildCPF(final VariableExpression variable, CodeBuilder codeBuilder) {
+	static void buildCPF(final SimulaCoder simCoder, final VariableExpression variable, CodeBuilder codeBuilder) {
 //		s.append(ident).append(".CPF()");
 //	    p_SFD.CPF().setPar(new RTS_NAME<Integer>(){ public Integer get() { return(1); } })._ENT();
 //		0: aload_0
@@ -109,7 +110,7 @@ public abstract class BuildCPF {
 				}
 				
 				// Evaluate and set Parameter
-				Thunk.buildInvoke(kind, actualParameter, codeBuilder);
+				Thunk.buildInvoke(simCoder, kind, actualParameter, codeBuilder);
 				RTS.invokevirtual_PROCEDURE_setpar(codeBuilder);
 			}
 			// s.append("._ENT()"); // Only when any parameter

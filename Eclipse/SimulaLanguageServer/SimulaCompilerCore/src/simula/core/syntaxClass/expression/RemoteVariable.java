@@ -17,6 +17,7 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.ArrayDeclaration;
@@ -230,13 +231,13 @@ public final class RemoteVariable extends Expression {
 	/// @param beforeDot expression before dot
 	/// @param array the array variable
 	/// @param codeBuilder the codeBuilder to use.
-	private void doAccessRemoteArray(final Expression beforeDot, final VariableExpression array,CodeBuilder codeBuilder) {
-		beforeDot.buildEvaluation(null, codeBuilder);
+	private void doAccessRemoteArray(final SimulaCoder simCoder, final Expression beforeDot, final VariableExpression array,CodeBuilder codeBuilder) {
+		beforeDot.buildEvaluation(simCoder, null, codeBuilder);
 		Declaration declaredAs=array.meaning.declaredAs;
 		if(declaredAs instanceof Parameter par) {
-			ArrayDeclaration.arrayGetElement(type,par.getFieldIdentifier(),true,array.checkedParams,null,par.declaredIn,codeBuilder);
+			ArrayDeclaration.arrayGetElement(simCoder, type, par.getFieldIdentifier(), true, array.checkedParams, null, par.declaredIn, codeBuilder);
 		} else if(declaredAs instanceof ArrayDeclaration) {
-			array.buildEvaluation(null, codeBuilder);
+			array.buildEvaluation(simCoder, null, codeBuilder);
 		} else Util.IERR();;
 	}
 
@@ -250,27 +251,27 @@ public final class RemoteVariable extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if(obj.type.keyWord == Type.T_TEXT) {
-			callStandardTextProcedure(obj, (StandardProcedure)callRemoteProcedure, var, backLink, codeBuilder);
+			callStandardTextProcedure(simCoder, obj, (StandardProcedure)callRemoteProcedure, var, backLink, codeBuilder);
 		} else if (callRemoteProcedure != null) {
-			BuildCP.remote(obj, callRemoteProcedure, var, backLink,codeBuilder);
+			BuildCP.remote(simCoder, obj, callRemoteProcedure, var, backLink,codeBuilder);
 		} else if (callRemoteVirtual != null) {
-			BuildCPV.remoteVirtual(obj, var, callRemoteVirtual, backLink, codeBuilder);
+			BuildCPV.remoteVirtual(simCoder, obj, var, callRemoteVirtual, backLink, codeBuilder);
 		} else if (accessRemoteArray) {
-			doAccessRemoteArray(obj, var,codeBuilder);
+			doAccessRemoteArray(simCoder, obj, var,codeBuilder);
 		} else {
 			Expression constantElement = remoteAttribute.getConstant();
 			if (constantElement != null) {
 				if(constantElement instanceof Constant constant) {
-					constant.buildEvaluation(null, codeBuilder);
+					constant.buildEvaluation(simCoder, null, codeBuilder);
 					return;
 				}
 			}
 			// result = obj.get() + KeyWord.DOT.toJavaCode() + var.get();
-			obj.buildEvaluation(null,codeBuilder);
-			var.buildEvaluation(null,codeBuilder);
+			obj.buildEvaluation(simCoder, null,codeBuilder);
+			var.buildEvaluation(simCoder, null,codeBuilder);
 		}
 	}
 
@@ -284,11 +285,12 @@ public final class RemoteVariable extends Expression {
 	/// @param variable the VariableExpression.
 	/// @param backLink if not null, this procedure call is part of the backLink Expression/Statement.
 	/// @param codeBuilder the codeBuilder to use.
-	private static void callStandardTextProcedure(Expression beforeDot,StandardProcedure pro,final VariableExpression variable, Object backLink,CodeBuilder codeBuilder) {
-		beforeDot.buildEvaluation(null,codeBuilder);
+	private static void callStandardTextProcedure(final SimulaCoder simCoder, final Expression beforeDot,
+			final StandardProcedure pro,final VariableExpression variable, final Object backLink, final CodeBuilder codeBuilder) {
+		beforeDot.buildEvaluation(simCoder, null,codeBuilder);
 		if(variable.checkedParams != null) 
 			for(Expression expr:variable.checkedParams)
-				expr.buildEvaluation(null,codeBuilder);
+				expr.buildEvaluation(simCoder, null, codeBuilder);
 
 		codeBuilder.invokestatic(RTS.CD.RTS_TXT, pro.identifierValue(), pro.getMethodTypeDesc(beforeDot,variable.checkedParams));
 		if(pro.type != null && backLink == null) {

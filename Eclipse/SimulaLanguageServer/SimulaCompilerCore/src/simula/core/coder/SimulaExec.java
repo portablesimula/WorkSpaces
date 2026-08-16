@@ -16,9 +16,9 @@ public class SimulaExec {
 	// ***************************************************************
 	// *** Run generated .jar File
 	// ***************************************************************
-	public static void doRun(SimulaBuilder simBuilder) throws IOException {
+	public static void doRun(SimulaCoder simCoder) throws IOException {
 		Vector<String> cmds = new Vector<String>();
-		String jarFile = simBuilder.generatedJarFile.toString();
+		String jarFile = simCoder.generatedJarFile.toString();
 		cmds.add("java");
 		if(Option.editorUIScale != null  && !Option.editorUIScale.equals("1")) {
 			// java -Dsun.java2d.uiScale=2 -jar application.jar
@@ -40,11 +40,11 @@ public class SimulaExec {
 		if (Option.internal.SOURCE_FILE != null) {
 			cmds.add(Option.internal.SOURCE_FILE);
 		}
-		doExecuteJarFile(simBuilder, jarFile, cmds);
+		doExecuteJarFile(simCoder, jarFile, cmds);
 		
 		if (Option.internal.DEBUGGING)
 			IO.println("------------  CLEANING UP TEMP FILES  ------------");
-		DocumentManager.deleteTempFiles(SimulaCoder.simulaTempDir);
+		DocumentManager.deleteTempFiles(simCoder.simulaTempDir);
 	}
 
     /// Add Runtime options to the argument vector.
@@ -61,8 +61,8 @@ public class SimulaExec {
 	/// @param jarFile a jarFile
 	/// @param arg the arguments
 	/// @throws IOException if something went wrong.
-	private static void doExecuteJarFile(SimulaBuilder simBuilder, String jarFile, Vector<String> arg) throws IOException {
-		ProgramModule programModule = simBuilder.syntaxTree;
+	private static void doExecuteJarFile(SimulaCoder simCoder, String jarFile, Vector<String> arg) throws IOException {
+		ProgramModule programModule = simCoder.documentManager.simBuilder.syntaxTree;
 		if (!programModule.isExecutable()) {
 			if (CoreGlobal2.verbose)
 				IO.println("Separate Compilation - No Execution of .jar File: " + jarFile);
@@ -79,8 +79,8 @@ public class SimulaExec {
 				IO.println("END Execute .jar File. Exit value=" + exitValue3);
 			if(exitValue3 != 0) {
 				IO.println("SimulaCompiler.doCompile: Exit value = " + exitValue3);
-		    	Util.doListDirectory("SimulaCompiler.doExecuteJarFile: ", ""+SimulaCoder.tempClassFileDir);
-		    	Util.doListDirectory("SimulaCompiler.doExecuteJarFile: ", ""+SimulaCoder.tempClassFileDir + "/" + CoreGlobal2.packetName);
+		    	Util.doListDirectory("SimulaCompiler.doExecuteJarFile: ", ""+simCoder.tempClassFileDir);
+		    	Util.doListDirectory("SimulaCompiler.doExecuteJarFile: ", ""+simCoder.tempClassFileDir + "/" + CoreGlobal2.packetName);
 		    	JarFileBuilder.listJarFile("SimulaCompiler.doExecuteJarFile: ",new File(jarFile));
 				throw new RuntimeException("Execution of "+jarFile+" failed. ExitValue = "+exitValue3);
 			}

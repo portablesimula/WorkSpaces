@@ -20,6 +20,7 @@ import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.BlockDeclaration;
 import simula.core.syntaxClass.declaration.ConnectionBlock;
@@ -229,13 +230,13 @@ public final class ConnectionStatement extends Statement {
 	}
 
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
 		Label otwLabel = null;
 		endLabel = codeBuilder.newLabel();
 		codeBuilder.aload(0);
-		objectExpression.buildEvaluation(null,codeBuilder);
+		objectExpression.buildEvaluation(simCoder, null, codeBuilder);
 		ClassDesc CD_type=inspectedVariable.type.toClassDesc();
 		FieldRefEntry FRE=pool.fieldRefEntry(BlockDeclaration.currentClassDesc(),inspectedVariable.identifier.value, CD_type);
 		codeBuilder.putfield(FRE);
@@ -250,13 +251,13 @@ public final class ConnectionStatement extends Statement {
 		}
 		
 		for(ConnectionDoPart part:connectionPart) 
-			part.buildByteCode(codeBuilder);
+			part.buildByteCode(simCoder, codeBuilder);
 		
 		if (otherwise != null) {
 			if(otwLabel != null) {
 				codeBuilder.labelBinding(otwLabel);	
 			}
-			otherwise.buildByteCode(codeBuilder);
+			otherwise.buildByteCode(simCoder, codeBuilder);
 		}
 	
 		codeBuilder.labelBinding(endLabel);

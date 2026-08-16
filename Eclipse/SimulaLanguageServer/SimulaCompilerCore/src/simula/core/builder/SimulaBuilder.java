@@ -4,15 +4,12 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
-
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.CoreGlobal2;
 import simula.core.builder.token.LexToken;
 import simula.core.builder.token.SimpleString;
-import simula.core.coder.JarFileBuilder;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.syntaxClass.declaration.MaybeBlockDeclaration;
@@ -28,11 +25,11 @@ import simula.exception.EOTException;
 public class SimulaBuilder {
 
 	final public DocumentManager documentManager;
+	
     public SimulaLexer lexer;
     
     public CoreGlobal2 simulaCompiler;
     
-	public File generatedJarFile;
 	/// Compiler state: True while Parsing
 	public boolean duringParsing;
 
@@ -55,21 +52,12 @@ public class SimulaBuilder {
 
 	public SimulaBuilder(DocumentManager documentManager) {
 		this.documentManager = documentManager;
+		documentManager.simBuilder = this;
     	// INIT:
 		this.nErrors = 0;
     	this.diagnostics = new ArrayList<>();
     	this.tokenList   = new ArrayList<>();
         lexer = new SimulaLexer(this, documentManager.sourceCode);
-        
-//        if(args.outputDir != null) {
-//        	outputDir = args.outputDir;
-//        } else {
-//        	outputDir = new File(documentManager.sourceFileDir, "bin");
-//        }
-
-		// Get Temp Directory:
-		SimulaCoder.simulaTempDir = CoreGlobal.getTempFileDir("simula/");
-		deleteTempFiles(SimulaCoder.simulaTempDir);
 
 		File desktop = new File(System.getProperty("user.home"), "Desktop");
 		if (CoreGlobal2.verbose) {
@@ -105,8 +93,6 @@ public class SimulaBuilder {
 	}
 	
 	public void doBuilding() {
-//        simulaCompiler = new SimulaCompiler(documentManager);
-        
 		boolean builderTerminateNormally = this.doParsing(this);
     	
     	if(Option.LEX_VERIFY) {
@@ -154,10 +140,7 @@ public class SimulaBuilder {
 	public boolean doParsing(SimulaBuilder simBuilder) {
 		boolean builderTerminateNormally = false;
 		simBuilder.duringParsing = true;
-    	LOG.info("SimulaCompiler.doParsing: BEGIN");
-    	
-    	setTmpClassDir(); // Neccessary because external decclaration reads .jar
-    	setOutputDir();   // Neccessary because external decclaration reads .jar
+    	LOG.info("SimulaBuilder.doParsing: BEGIN");
     	
         // Do the actual Building
 		simBuilder.getNextParserToken();
@@ -180,30 +163,6 @@ public class SimulaBuilder {
 		
     	return builderTerminateNormally;
 	}
-    private void setTmpClassDir() {
-		// Create Temp .class-Files Directory:
-		File tmpClassDir = new File(SimulaCoder.simulaTempDir, "classes");
-		tmpClassDir.mkdirs();
-		SimulaCoder.tempClassFileDir = tmpClassDir;
-    	LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempClassFileDir="+SimulaCoder.tempClassFileDir);
-//    	Util.IERR("");
-//    	Thread.dumpStack();
-    }
-    
-    private void setOutputDir() {
-//    	IO.println("SimulaCompiler.setOutputDir: sourceFileDir=" + documentManager.sourceFileDir);
-//    	IO.println("SimulaCompiler.setOutputDir: outputDir=" + SimulaCoder.outputDir);
-    	if(SimulaCoder.outputDir == null) {
-//    		SimulaCoder.outputDir = new File(documentManager.sourceFileDir,"bin");
-        	File userDir = new File(System.getProperty("user.dir"));
-    		SimulaCoder.outputDir = new File(userDir,"bin");
-    	}
-    	LOG.info("SimulaCompiler.setOutputDir: outputDir=" + SimulaCoder.outputDir);
-    	SimulaCoder.outputDir.mkdirs();
-    	if (! SimulaCoder.outputDir.canWrite()) {
-    		Util.IERR("SimulaCompiler.setOutputDir: Unable to write to " + SimulaCoder.outputDir);
-    	}
-    }
 
 	// ***************************************************************
 	// *** Semantic Checker
@@ -213,7 +172,7 @@ public class SimulaBuilder {
 			IO.println("BEGIN Semantic Checker");
 		simBuilder.duringParsing = false;
 		simBuilder.duringChecking = true;
-    	LOG.info("SimulaCompiler.doChecking: BEGIN");
+    	LOG.info("SimulaBuilder.doChecking: BEGIN");
 		StandardClass.ENVIRONMENT.doChecking();
 		ProgramModule programModule = simBuilder.syntaxTree;
 		programModule.doChecking();
@@ -224,7 +183,7 @@ public class SimulaBuilder {
 			if (Option.internal.TRACE_CHECKER_OUTPUT && programModule != null)
 				programModule.print(0);
 		}
-		if(CoreGlobal2.verbose) IO.println("SimulaCompiler.doCompile: " + DocumentManager.sourceName + ": Semantic Checker completed");
+		if(CoreGlobal2.verbose) IO.println("SimulaBuilder.doChecking: " + DocumentManager.sourceName + ": Semantic Checker completed");
 		simBuilder.duringChecking = false;
 		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
 			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");
@@ -364,29 +323,6 @@ public class SimulaBuilder {
 //    	IO.println("SimulaBuilder.getTextString: RETURN TEXT: ]"+result+"[\n\n");
     	return result;
     }
-
-
-	/// Delete temporary .class files.
-	/// @param dir temporary .class directory
-	private void deleteTempFiles(final File dir) {
-		try {
-			File[] elt = dir.listFiles();
-			if (elt == null)
-				return;
-			for (File f : elt) {
-				if (Option.internal.DEBUGGING) {
-					if (f.isFile())
-						IO.println("Delete: " + f);
-				}
-				if (f.isDirectory())
-					deleteTempFiles(f);
-				f.delete();
-			}
-		} catch (Exception e) {
-			Util.IERR("SimulaCompiler.deleteFiles FAILED: ", e);
-			e.printStackTrace();
-		}
-	}
     
 	public void printAll(String title) {
     	IO.println("\n");

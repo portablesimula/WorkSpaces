@@ -400,7 +400,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// Generate byteCode for the '_STM' method.
 	/// 
 	/// @param codeBuilder the CodeBuilder
-	protected void buildMethod_STM(CodeBuilder codeBuilder) {
+	protected void buildMethod_STM(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		CoreGlobal.enterScope(this);
 			Label begScope = codeBuilder.newLabel();
@@ -418,8 +418,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 						.ifnonnull(checkStackSize); // TESTING_STACK_SIZE
 				}
 				if (hasAccumLabel())	
-					 build_TRY_CATCH(codeBuilder, begScope, endScope);
-				else build_STM_BODY(codeBuilder, begScope, endScope);
+					 build_TRY_CATCH(simCoder, codeBuilder, begScope, endScope);
+				else build_STM_BODY(simCoder, codeBuilder, begScope, endScope);
 				codeBuilder.aload(0);
 				RTS.invokevirtual_RTObject_EBLK(codeBuilder);
 					
@@ -439,7 +439,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// @param codeBuilder the codeBuilder to use.
 	/// @param begScope label
 	/// @param endScope label
-	protected void build_STM_BODY(CodeBuilder codeBuilder, Label begScope, Label endScope) {
+	protected void build_STM_BODY(SimulaCoder simCoder, CodeBuilder codeBuilder, Label begScope, Label endScope) {
 		Util.IERR("Method build_STM_BODY need a redefinition in "+this.getClass().getSimpleName());
 	}
 	
@@ -464,7 +464,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// @param codeBuilder the codeBuilder to use.
 	/// @param begScope label
 	/// @param endScope label
-	protected void build_TRY_CATCH(CodeBuilder codeBuilder,Label begScope,Label endScope) {
+	protected void build_TRY_CATCH(final SimulaCoder simCoder, final CodeBuilder codeBuilder, final Label begScope, final Label endScope) {
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
 		Label loopWhile = codeBuilder.newLabel();
 		Label loopEnd = codeBuilder.newLabel();
@@ -489,7 +489,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 		codeBuilder.trying(
 			blockCodeBuilder -> {
 				labelList.build_JUMPTABLE(blockCodeBuilder);
-				build_STM_BODY(blockCodeBuilder, begScope, endScope);  // Virtual
+				build_STM_BODY(simCoder, blockCodeBuilder, begScope, endScope);  // Virtual
 				// break _LOOP;
 				blockCodeBuilder.goto_(blockCodeBuilder.breakLabel());
 			},
@@ -532,7 +532,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
     ///     }
     /// </pre>
     /// @param codeBuilder the CodeBuilder
-	void buildMethodMain(CodeBuilder codeBuilder) {
+	void buildMethodMain(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		Label begScope = codeBuilder.newLabel();
 		Label endScope = codeBuilder.newLabel();
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
@@ -558,7 +558,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 			// Push parameters
 			if(pblk.blockPrefix.checkedParams != null)
 				for(Expression expr:pblk.blockPrefix.checkedParams)
-					expr.buildEvaluation(null,codeBuilder);
+					expr.buildEvaluation(simCoder, null,codeBuilder);
 
 			codeBuilder.invokespecial(currentClassDesc(), "<init>", this.getConstructorMethodTypeDesc());
 		} else {

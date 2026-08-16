@@ -22,6 +22,7 @@ import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.CoreGlobal2;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Expression;
 import simula.core.syntaxClass.expression.RemoteVariable;
@@ -84,14 +85,14 @@ public final class Thunk extends DeclarationScope {
 	/// @param kind a kind code
 	/// @param expr the Thunk expression
 	/// @param codeBuilder the codeBuilder to use.
-	public static void buildInvoke(int kind,Expression expr,CodeBuilder codeBuilder) {
+	public static void buildInvoke(final SimulaCoder simCoder, final int kind, final Expression expr, final CodeBuilder codeBuilder) {
 		//  new RTS_NAME< TYPE >() {
 		//     public TYPE get() {
 		//        return("+apar.toJavaCode()+");
 		//     }
 		//  }	
 		Thunk thunk = new Thunk(kind,expr);
-		try { thunk.createJavaClassFile(); } catch (IOException e) { e.printStackTrace(); }
+		try { thunk.createJavaClassFile(simCoder); } catch (IOException e) { e.printStackTrace(); }
 		ClassDesc CD_THUNK=thunk.getClassDesc();
 		codeBuilder
 			.new_(CD_THUNK)
@@ -104,7 +105,7 @@ public final class Thunk extends DeclarationScope {
 	// *** ByteCoding: buildClassFile
 	// ***********************************************************************************************
 	@Override
-	public byte[] buildClassFile() {
+	public byte[] buildClassFile(final SimulaCoder simCoder) {
 		if(CoreGlobal2.verbose) IO.println("Begin buildClassFile: "+CD_ThisClass);
 		ClassHierarchy.addClassToSuperClass(CD_ThisClass, RTS.CD.RTS_NAME);
 		
@@ -118,7 +119,7 @@ public final class Thunk extends DeclarationScope {
 						.withMethodBody("<init>", MethodTypeDesc.ofDescriptor("("+BlockDeclaration.currentClassDesc().descriptorString()+")V"), 0,
 							codeBuilder -> buildConstructor(codeBuilder))
 						.withMethodBody("get", MethodTypeDesc.ofDescriptor("()Ljava/lang/Object;"), ClassFile.ACC_PUBLIC,
-							codeBuilder -> buildMethod_get(codeBuilder));
+							codeBuilder -> buildMethod_get(simCoder, codeBuilder));
 				    VariableExpression writeableVariable=expr.getWriteableVariable();
 				    if(writeableVariable!=null) {
 				    	Declaration declaredAs = writeableVariable.meaning.declaredAs;
@@ -154,7 +155,7 @@ public final class Thunk extends DeclarationScope {
 				    		Expression beforeDot=(expr instanceof RemoteVariable rem)?rem.obj:null;
 				    		classBuilder
 				    			.withMethodBody("put", MethodTypeDesc.ofDescriptor(MTD_put), ClassFile.ACC_PUBLIC,
-				    				codeBuilder -> buildMethod_put(codeBuilder,beforeDot,expr))
+				    				codeBuilder -> buildMethod_put(simCoder, codeBuilder,beforeDot,expr))
 				    			.withMethodBody("put", MethodTypeDesc.ofDescriptor("(Ljava/lang/Object;)Ljava/lang/Object;"),
 				    				ClassFile.ACC_PUBLIC + ClassFile.ACC_BRIDGE + ClassFile.ACC_SYNTHETIC,
 				    				codeBuilder -> buildMethod_put2(codeBuilder));
@@ -202,7 +203,7 @@ public final class Thunk extends DeclarationScope {
 	/// 
 	/// 	public Integer get() { return(((adHoc13)(_ENV._SL)).n);
 	/// @param codeBuilder the CodeBuilder
-	void buildMethod_get(CodeBuilder codeBuilder) {
+	void buildMethod_get(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		CoreGlobal.enterScope(this);
 			Label begScope = codeBuilder.newLabel();
 			Label endScope = codeBuilder.newLabel();
@@ -211,17 +212,17 @@ public final class Thunk extends DeclarationScope {
 				.localVariable(0,"this",CD_ThisClass,begScope,endScope);
 
 			if(kind==0) {
-				expr.buildEvaluation(null,codeBuilder);
+				expr.buildEvaluation(simCoder, null, codeBuilder);
 				expr.type.buildObjectValueOf(codeBuilder);
 			} else {
 				switch(kind) { // Parameter.Kind
-					case Parameter.Kind.Array ->		expr.buildEvaluation(null,codeBuilder);
+					case Parameter.Kind.Array ->		expr.buildEvaluation(simCoder, null, codeBuilder);
 					case Parameter.Kind.Label ->		Util.IERR();
-					case Parameter.Kind.Procedure ->	buildProcedureQuant(expr,codeBuilder);
-					case Parameter.Kind.Simple ->     { expr.buildEvaluation(null,codeBuilder);
+					case Parameter.Kind.Procedure ->	buildProcedureQuant(simCoder, expr, codeBuilder);
+					case Parameter.Kind.Simple ->     { expr.buildEvaluation(simCoder, null,codeBuilder);
 														expr.type.buildObjectValueOf(codeBuilder); }
 					default -> {
-						expr.buildEvaluation(null,codeBuilder);
+						expr.buildEvaluation(simCoder, null,codeBuilder);
 						expr.type.buildObjectValueOf(codeBuilder);
 					}
 				}
@@ -243,7 +244,7 @@ public final class Thunk extends DeclarationScope {
 	/// @param codeBuilder the CodeBuilder
 	/// @param beforeDot expression.
 	/// @param expr the Thunk expression.
-	void buildMethod_put(CodeBuilder codeBuilder, Expression beforeDot, Expression expr) {
+	void buildMethod_put(final SimulaCoder simCoder, final CodeBuilder codeBuilder, final Expression beforeDot, final Expression expr) {
 		ConstantPoolBuilder pool=codeBuilder.constantPool();
 		VariableExpression writeableVariable=expr.getWriteableVariable();
 		Meaning meaning=writeableVariable.meaning;
@@ -264,9 +265,9 @@ public final class Thunk extends DeclarationScope {
 					.ifnonnull(checkStackSize);  // TESTING_STACK_SIZE				
 			}
 
-			writeableVariable.buildIdentifierAccess(true,codeBuilder);
+			writeableVariable.buildIdentifierAccess(simCoder, true, codeBuilder);
 				
-			if(beforeDot != null) beforeDot.buildEvaluation(null,codeBuilder);
+			if(beforeDot != null) beforeDot.buildEvaluation(simCoder, null, codeBuilder);
 				
 			Parameter nameParameter = null;
 			if(declaredAs instanceof Parameter par) {
@@ -287,7 +288,7 @@ public final class Thunk extends DeclarationScope {
 					TypeConversion.buildMayBeConvert(fromType,toType, codeBuilder);
 				} else if(toType.isRefClassType()) {
 				    // return("=("+toType.toJavaType()+")("+expr+");");
-					expr.buildEvaluation(null, codeBuilder);
+					expr.buildEvaluation(simCoder, null, codeBuilder);
 					codeBuilder.checkcast(toType.toClassDesc());
 				}
 				else Util.IERR();
@@ -388,7 +389,7 @@ public final class Thunk extends DeclarationScope {
 	/// ClassFile Coding Utility: Edit new procedure quant.
 	/// @param apar the actual parameter
 	/// @param codeBuilder the CodeBuilder
-	private static void buildProcedureQuant(final Expression apar,CodeBuilder codeBuilder) {
+	private static void buildProcedureQuant(final SimulaCoder simCoder, final Expression apar, final CodeBuilder codeBuilder) {
 //        0: new           #7                  // class simula/runtime/RTS_PRCQNT
 //        3: dup
 //        4: getstatic     #9                  // Field simula/runtime/RTS_RTObject._CUR:Lsimula/runtime/RTS_RTObject;
@@ -427,7 +428,7 @@ public final class Thunk extends DeclarationScope {
 					codeBuilder
 						.new_(RTS.CD.RTS_PRCQNT)
 						.dup();
-					var.buildIdentifierAccess(false, codeBuilder);
+					var.buildIdentifierAccess(simCoder, false, codeBuilder);
 					codeBuilder
 						.ldc(RTS.CD.classDesc(procIdent))
 						.invokespecial(RTS.CD.RTS_PRCQNT, "<init>", MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_RTObject;Ljava/lang/Class;)V"));
@@ -438,7 +439,7 @@ public final class Thunk extends DeclarationScope {
 			Meaning meaning = rem.var.meaning;
 			if (meaning.declaredAs instanceof ProcedureDeclaration procedure) {
     	    	if(procedure.myVirtual!=null) {
-					rem.obj.buildEvaluation(null, codeBuilder);
+					rem.obj.buildEvaluation(simCoder, null, codeBuilder);
 					
 			    	ClassDesc owner = meaning.declaredIn.getClassDesc();
     	    		VirtualSpecification vir = procedure.myVirtual.virtualSpec;
@@ -448,7 +449,7 @@ public final class Thunk extends DeclarationScope {
     					.new_(RTS.CD.RTS_PRCQNT)
     					.dup();
     				// Check for <ObjectExpression> DOT <Variable>
-    				rem.obj.buildEvaluation(null,codeBuilder);
+    				rem.obj.buildEvaluation(simCoder, null, codeBuilder);
     				codeBuilder.ldc(procedure.getClassDesc());
     				codeBuilder.invokespecial(RTS.CD.RTS_PRCQNT
     						, "<init>", MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_RTObject;Ljava/lang/Class;)V"));

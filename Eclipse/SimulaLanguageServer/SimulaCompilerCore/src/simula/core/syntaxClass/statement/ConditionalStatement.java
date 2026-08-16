@@ -16,6 +16,7 @@ import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Expression;
 import simula.core.utilities.KeyWord;
@@ -123,17 +124,17 @@ public final class ConditionalStatement extends Statement {
 	}
 
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
-		condition.buildEvaluation(null,codeBuilder);
+		condition.buildEvaluation(simCoder, null, codeBuilder);
 		Label elseLabel = codeBuilder.newLabel();
 		codeBuilder.ifeq(elseLabel);
-		thenStatement.buildByteCode(codeBuilder);
+		thenStatement.buildByteCode(simCoder, codeBuilder);
 		if(elseStatement != null) {
 			Label endLabel = codeBuilder.newLabel();
 			codeBuilder.goto_(endLabel);
 			codeBuilder.labelBinding(elseLabel);
-			elseStatement.buildByteCode(codeBuilder);
+			elseStatement.buildByteCode(simCoder, codeBuilder);
 			codeBuilder.labelBinding(endLabel);
 		} else codeBuilder.labelBinding(elseLabel);
 	}

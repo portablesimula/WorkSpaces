@@ -19,6 +19,7 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.statement.ConnectionStatement;
 import simula.core.utilities.ObjectKind;
@@ -88,7 +89,7 @@ public class InspectVariableDeclaration extends Declaration {
 	}
 
 	@Override
-	public void buildDeclaration(ClassBuilder classBuilder,BlockDeclaration encloser) {
+	public void buildDeclaration(final SimulaCoder simCoder, final ClassBuilder classBuilder, final BlockDeclaration encloser) {
 		ClassDesc CD=type.toClassDesc();
 		classBuilder.withField(getFieldIdentifier(), CD, ClassFile.ACC_PUBLIC);
 	}

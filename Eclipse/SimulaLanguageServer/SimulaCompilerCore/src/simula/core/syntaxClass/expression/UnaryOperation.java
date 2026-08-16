@@ -14,6 +14,7 @@ import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.utilities.KeyWord;
@@ -107,9 +108,9 @@ public final class UnaryOperation extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
-		operand.buildEvaluation(null,codeBuilder);
+		operand.buildEvaluation(simCoder, null, codeBuilder);
 		if (oprator == KeyWord.PLUS) ; // NOTHING
 		else if (oprator == KeyWord.NOT) {
 			buildNOT(codeBuilder);

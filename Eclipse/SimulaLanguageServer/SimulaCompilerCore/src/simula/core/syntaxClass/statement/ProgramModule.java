@@ -16,6 +16,7 @@ import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.builder.token.LexToken;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.BlockDeclaration;
@@ -204,9 +205,9 @@ public final class ProgramModule extends Statement {
 
 	/// Create Java ClassFile.
 	/// @throws IOException if something went wrong
-	public void createJavaClassFile() throws IOException {
+	public void createJavaClassFile(final SimulaCoder simCoder) throws IOException {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
-		mainModule.createJavaClassFile();
+		mainModule.createJavaClassFile(simCoder);
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.Parameter;
 import simula.core.syntaxClass.expression.Expression;
@@ -89,9 +90,9 @@ public final class GotoStatement extends Statement {
 	}
 	
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		if(! labelIsParameterProcedure()) codeBuilder.aload(0);
-		label.buildEvaluation(null,codeBuilder);
+		label.buildEvaluation(simCoder, null, codeBuilder);
 		RTS.invokevirtual_RTS_GOTO(codeBuilder);
 	}
 	

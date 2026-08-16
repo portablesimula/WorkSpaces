@@ -13,6 +13,7 @@ import simula.core.CoreGlobal;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.utilities.ObjectKind;
@@ -142,11 +143,11 @@ public final class TextExpression extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {
+	public void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		codeBuilder.aload(0);
-		lhs.buildEvaluation(null,codeBuilder);
-		rhs.buildEvaluation(null,codeBuilder);
+		lhs.buildEvaluation(simCoder, null,codeBuilder);
+		rhs.buildEvaluation(simCoder, null,codeBuilder);
 		RTS.invokevirtual_RTS_CONC(codeBuilder);
 	}
 

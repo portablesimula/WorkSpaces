@@ -15,6 +15,7 @@ import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.syntaxClass.declaration.ConnectionBlock;
@@ -90,16 +91,16 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 	}
 
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if (!impossibleWhenPart) {
-			connectionStatement.inspectedVariable.buildEvaluation(null, codeBuilder);
+			connectionStatement.inspectedVariable.buildEvaluation(simCoder, null, codeBuilder);
 			Label elseLabel = codeBuilder.newLabel();
 			codeBuilder
 				.instanceOf(classDeclaration.getClassDesc())
 				.ifeq(elseLabel);
 			
-			connectionBlock.buildByteCode(codeBuilder);
+			connectionBlock.buildByteCode(simCoder, codeBuilder);
 			
 			codeBuilder
 				.goto_(connectionStatement.endLabel)

@@ -29,6 +29,7 @@ import java.util.jar.Manifest;
 
 import simula.Option;
 import simula.core.DocumentManager;
+import simula.core.builder.AttributeFileIO;
 import simula.core.CoreGlobal2;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.syntaxClass.statement.ProgramModule;
@@ -63,14 +64,32 @@ public class JarFileBuilder {
 	private final static boolean TESTING = false;//true;//false;
 	
 	/// Construct a new JarFileBuilder.
-	public JarFileBuilder() {
+	private JarFileBuilder() {
 		if(TESTING) IO.println("\nNEW JarFileBuilder");
+	}
+	
+	// ***************************************************************
+	// *** CRERATE AND WRITE ATTRIBUTE .jar FILE INLINE
+	// ***************************************************************
+	public static File writeAttributeFile(final SimulaCoder simCoder, final ProgramModule programModule) throws IOException {
+		SimulaCoder.jarFileBuilder = new JarFileBuilder();
+		SimulaCoder.jarFileBuilder.open(programModule);
+		String entryName = programModule.getRelativeAttributeFileName();
+		if (entryName != null) {
+			byte[] bytes = AttributeFileIO.buildAttrEntry(programModule);
+			SimulaCoder.jarFileBuilder.writeEntryToJarOutput(entryName, bytes);
+		}
+
+		// ***************************************************************
+		// *** ADD CLASS FILES PART OF OUTPUT .jar FILE INLINE
+		// ***************************************************************
+		return SimulaCoder.jarFileBuilder.close(simCoder);
 	}
 	
 	/// Open the JarFileBuilder.
 	/// @param programModule the relevant ProgramModule
 	/// @throws IOException if something went wrong
-	public void open(final ProgramModule programModule) throws IOException {
+	private void open(final ProgramModule programModule) throws IOException {
 		if(TESTING) IO.println("JarFileBuilder.open: " + programModule);
 //		if(jarOutputStream != null) Util.IERR();
 		this.programModule = programModule;
@@ -81,7 +100,7 @@ public class JarFileBuilder {
 
 		if(outputJarFile.exists()) {
 			boolean done = outputJarFile.delete();
-			IO.println("JarFileBuilder.open: outputJarFile.delete() ==> " + done);
+			if(TESTING) IO.println("JarFileBuilder.open: outputJarFile.delete() ==> " + done);
 		}
 
 		Manifest manifest = new Manifest();
@@ -114,28 +133,23 @@ public class JarFileBuilder {
 	/// @param bytes the bytes, may be null
 	/// @throws IOException if something went wrong
 	public void writeEntryToJarOutput(String entryName, byte[] bytes) throws IOException {
-//		if(TESTING)
-			IO.println("JarFileBuilder.writeEntryToJarOutput: "+entryName);
+		if(TESTING) IO.println("JarFileBuilder.writeEntryToJarOutput: "+entryName);
 		JarEntry entry = new JarEntry(entryName);
 		jarOutputStream.putNextEntry(entry);
 		if(bytes != null) jarOutputStream.write(bytes);
 		jarOutputStream.closeEntry();
+//		Thread.dumpStack();
 	}
 	
 	/// Close the JarFileBuilder by writing the .jar file.
 	/// @return the outputJarFile
 	/// @throws IOException if something went wrong
-	public File close() throws IOException {
-
-//		if(TESTING) {
+	private File close(final SimulaCoder simCoder) throws IOException {
+		if(TESTING) {
 			IO.println("JarFileBuilder.close: BEGIN: ");
-	    	Util.doListDirectory("JarFileBuilder.close: BEGIN: ", ""+SimulaCoder.tempClassFileDir + "/" + CoreGlobal2.packetName);
-//			Util.IERR("");
-//		}
-
-		//		if(SimulaCompiler.compilerMode == SimulaCompiler.CompilerMode.viaJavaSource) {
-			writeFileToJarFile(new File(SimulaCoder.tempClassFileDir, CoreGlobal2.packetName), SimulaCoder.tempClassFileDir.toString().length());			
-//		}
+	    	Util.doListDirectory("JarFileBuilder.close: BEGIN: ", ""+simCoder.tempClassFileDir + "/" + CoreGlobal2.packetName);
+		}
+		writeFileToJarFile(new File(simCoder.tempClassFileDir, CoreGlobal2.packetName), simCoder.tempClassFileDir.toString().length());			
 		if (programModule.isExecutable()) {
 			if(TESTING) IO.println("JarFileBuilder.close: Executable "+programModule);
 			// Add the Runtime System
@@ -154,8 +168,7 @@ public class JarFileBuilder {
 		if(TESTING) {
 			IO.println("JarFileBuilder.close: END: ");
 			listJarFile("JarFileBuilder.close: END: ", outputJarFile);
-	    	Util.doListDirectory("JarFileBuilder.close: END: ", ""+SimulaCoder.tempClassFileDir + "/" + CoreGlobal2.packetName);
-//			Util.IERR("");
+	    	Util.doListDirectory("JarFileBuilder.close: END: ", ""+simCoder.tempClassFileDir + "/" + CoreGlobal2.packetName);
 		}
 
 		LOG.info("END Create .jar File: " + outputJarFile);
@@ -165,9 +178,10 @@ public class JarFileBuilder {
 	/// Add the jarFile entries to the temp ClassFile directory.
 	/// @param jarFile the jarFile to be added
 	/// @throws IOException if something went wrong
-	public void writeJarEntriesToTempClassFiles(final String jarFileName, final JarFile jarFile) throws IOException {
+//	public static void writeJarEntriesToTempClassFiles(final String jarFileName, final JarFile jarFile) throws IOException {
+	public static void writeJarEntriesToTempClassFiles(final SimulaCoder simCoder, final String jarFileName) throws IOException {
 		try (JarInputStream jarInputStream = new JarInputStream(new FileInputStream(jarFileName))) {
-			String tempClassFileDirName = SimulaCoder.tempClassFileDir.toString();
+			String tempClassFileDirName = simCoder.tempClassFileDir.toString();
 			JarEntry entry;
 			// Loop through all entries in the source JAR
 			LOOP2:while ((entry = jarInputStream.getNextJarEntry()) != null) {
@@ -180,7 +194,7 @@ public class JarFileBuilder {
 				byte[] bytes = jarInputStream.readAllBytes();
 		        Path path = Paths.get(tempClassFileDirName + '/' + entryName);
 	            Files.createDirectories(path.getParent());
-	            IO.println("JarFileBuilder.writeJarEntriesToTempClassFiles: " + path);
+//	            IO.println("JarFileBuilder.writeJarEntriesToTempClassFiles: " + path);
 		        Files.write(path, bytes);
 			}
 		}

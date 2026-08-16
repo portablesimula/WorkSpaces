@@ -119,10 +119,10 @@ public final class BlockStatement extends Statement {
 	}
 
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		CoreGlobal.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
-		blockDeclaration.buildByteCode(codeBuilder);
+		blockDeclaration.buildByteCode(simCoder, codeBuilder);
 	}
 
 	@Override

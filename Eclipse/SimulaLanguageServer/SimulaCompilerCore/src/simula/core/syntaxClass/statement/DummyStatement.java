@@ -12,6 +12,7 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.Util;
@@ -68,7 +69,7 @@ public final class DummyStatement extends Statement {
 	}
 
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 	}
 
 	@Override

@@ -19,6 +19,7 @@ import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
@@ -196,7 +197,7 @@ public final class ObjectGenerator extends Expression {
 	}
 
 	@Override
-	public void buildEvaluation(Expression rightPart,CodeBuilder codeBuilder) {	
+	public void buildEvaluation(final SimulaCoder simCoder, final Expression rightPart, final CodeBuilder codeBuilder) {	
 		ASSERT_SEMANTICS_CHECKED();
 		//  new adHoc03_A((_CUR))._STM();
 		//
@@ -221,12 +222,12 @@ public final class ObjectGenerator extends Expression {
 		codeBuilder
 			.new_(CD_cls)
 			.dup();
-		meaning.buildQualifiedStaticLink(codeBuilder);
+		meaning.buildQualifiedStaticLink(simCoder, codeBuilder);
 
 		// Push parameters
 		Iterator<Parameter> formalIterator = cls.parameterIterator();
 		for (Expression par : checkedParams) {
-			par.buildEvaluation(null,codeBuilder);
+			par.buildEvaluation(simCoder, null, codeBuilder);
 			Parameter formalParameter = formalIterator.next();
 			if (formalParameter.mode == Parameter.Mode.value) {
 				if (par.type.keyWord == Type.T_TEXT) {

@@ -564,7 +564,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	// *** ByteCoding: buildClassFile
 	// ***********************************************************************************************
 	@Override
-	public byte[] buildClassFile() {
+	public byte[] buildClassFile(final SimulaCoder simCoder) {
 		labelList.setLabelIdexes();
 		ClassDesc CD_ThisClass = currentClassDesc();
 		if(CoreGlobal2.verbose) IO.println("ProcedureDeclaration.buildClassFile: "+CD_ThisClass);
@@ -576,7 +576,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			try {
 				if(CoreGlobal2.verbose)
 					IO.println("ProcedureDeclaration.buildClassFile: TRY: "+CD_ThisClass);
-				return tryBuildClassFile(CD_ThisClass);
+				return tryBuildClassFile(simCoder, CD_ThisClass);
 			} catch(IllegalArgumentException e) {
 				boolean feasibleToReTry = false;
 				String msg = e.getMessage();
@@ -601,7 +601,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	 * @param CD_ThisClass this class descriptor
 	 * @return class file bytes
 	 */
-	private byte[] tryBuildClassFile(ClassDesc CD_ThisClass) {
+	private byte[] tryBuildClassFile(final SimulaCoder simCoder, final ClassDesc CD_ThisClass) {
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
 				classBuilder -> {
 					classBuilder
@@ -617,14 +617,14 @@ public class ProcedureDeclaration extends BlockDeclaration {
 								codeBuilder -> buildMethod_RESULT(codeBuilder));
 					
 					for (Parameter par:parameterList)
-						par.buildDeclaration(classBuilder,this);
+						par.buildDeclaration(simCoder, classBuilder,this);
 					
 					if(this.hasAccumLabel())
 						for (LabelDeclaration lab : labelList.getAccumLabels())
-							lab.buildDeclaration(classBuilder,this);
+							lab.buildDeclaration(simCoder, classBuilder,this);
 					
 					for (Declaration decl : declarationList)
-						decl.buildDeclaration(classBuilder,this);
+						decl.buildDeclaration(simCoder, classBuilder,this);
 					
 					if(parameterList.size() > 0)
 						classBuilder
@@ -635,9 +635,9 @@ public class ProcedureDeclaration extends BlockDeclaration {
 
 					classBuilder
 						.withMethod("<init>", MTD_Constructor(true), ClassFile.ACC_PUBLIC,
-							codeBuilder -> buildConstructor(codeBuilder))
+							codeBuilder -> buildConstructor(simCoder, codeBuilder))
 						.withMethodBody("_STM", MethodTypeDesc.ofDescriptor("()Lsimula/runtime/RTS_RTObject;"), ClassFile.ACC_PUBLIC,
-							codeBuilder -> buildMethod_STM(codeBuilder));
+							codeBuilder -> buildMethod_STM(simCoder, codeBuilder));
 				}
 		);
 		return(bytes);
@@ -704,7 +704,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// 	   }
 	/// </pre>
 	/// @param methodBuilder the MethodBuilder to use.
-	private void buildConstructor(MethodBuilder methodBuilder) {
+	private void buildConstructor(final SimulaCoder simCoder, final MethodBuilder methodBuilder) {
 		methodBuilder
 			.withFlags(ClassFile.ACC_PUBLIC)
 			.with(SignatureAttribute.of(MethodSignature.parseFrom(edConstructorSignature())))
@@ -758,7 +758,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 						
 					// Add Declaration Code to Constructor
 					for (Declaration decl : declarationList) {
-						decl.buildDeclarationCode(codeBuilder);
+						decl.buildDeclarationCode(simCoder, codeBuilder);
 					}
 		
 					// _STM();
@@ -986,10 +986,10 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	}
 		
 	@Override
-	public void buildDeclaration(ClassBuilder classBuilder, BlockDeclaration encloser) {
+	public void buildDeclaration(final SimulaCoder simCoder, final ClassBuilder classBuilder, final BlockDeclaration encloser) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		try {
-			this.createJavaClassFile();
+			this.createJavaClassFile(simCoder);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -1007,12 +1007,12 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// Generate byteCode for the '_STM' method.
 	/// @param codeBuilder the CodeBuilder
 	@Override
-	protected void build_STM_BODY(CodeBuilder codeBuilder, Label begScope, Label endScope) {
+	protected void build_STM_BODY(SimulaCoder simCoder, CodeBuilder codeBuilder, Label begScope, Label endScope) {
 		labelContextStack.push(labelContext);
 		labelContext = this;
 		for (Statement stm : statements) {
 			if(!(stm instanceof DummyStatement)) Util.buildLineNumber(codeBuilder,stm.firstLineNumber());
-			stm.buildByteCode(codeBuilder);
+			stm.buildByteCode(simCoder, codeBuilder);
 		}
 		labelContext = labelContextStack.pop();
 	}

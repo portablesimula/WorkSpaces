@@ -19,6 +19,7 @@ import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Expression;
 import simula.core.syntaxClass.expression.TypeConversion;
@@ -242,7 +243,7 @@ public final class SwitchStatement extends Statement {
 	
     	/// ClassFile coding utility: buildByteCode.
     	/// @param codeBuilder the codeBuilder to use.
-     	private void buildByteCode(CodeBuilder codeBuilder) {
+     	private void buildByteCode(final SimulaCoder simCoder, CodeBuilder codeBuilder) {
         	for(SwitchInterval casePair:this.caseKeyList) {
         		if(casePair==null) {
         			//JavaSourceFileCoder.code("default:");
@@ -266,7 +267,7 @@ public final class SwitchStatement extends Statement {
         			}
         		}
         	}
-        	this.statement.buildByteCode(codeBuilder);
+        	this.statement.buildByteCode(simCoder, codeBuilder);
         	codeBuilder.goto_(endLabel);
     	}
     	
@@ -342,8 +343,8 @@ public final class SwitchStatement extends Statement {
     }
 
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
-		buildSwitchKeyTest(codeBuilder);
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
+		buildSwitchKeyTest(simCoder, codeBuilder);
 		lookupSwitchCases = new Vector<SwitchCase>();
 		int index = 1;
 		for(SwitchWhenPart when:switchCases) {
@@ -354,11 +355,11 @@ public final class SwitchStatement extends Statement {
 		defaultTarget = codeBuilder.newLabel(); // beginning of the default handler block.
 		endLabel = codeBuilder.newLabel();
 
-		switchKey.buildEvaluation(null, codeBuilder);
+		switchKey.buildEvaluation(simCoder, null, codeBuilder);
 		codeBuilder
 			.lookupswitch(defaultTarget, lookupSwitchCases);
         for(SwitchWhenPart when:switchCases) {
-        	when.buildByteCode(codeBuilder);
+        	when.buildByteCode(simCoder, codeBuilder);
         }
         if(!has_NONE_case) {
 			codeBuilder.labelBinding(defaultTarget);
@@ -368,14 +369,14 @@ public final class SwitchStatement extends Statement {
 	
 	/// ClassFile coding utility: buildSwitchKeyTest.
 	/// @param codeBuilder the codeBuilder to use.
-	private void buildSwitchKeyTest(CodeBuilder codeBuilder) {
+	private void buildSwitchKeyTest(final SimulaCoder simCoder, final CodeBuilder codeBuilder) {
 		Label L1 = codeBuilder.newLabel();
 		Label L2 = codeBuilder.newLabel();
-		switchKey.buildEvaluation(null, codeBuilder);
-		lowKey.buildEvaluation(null, codeBuilder);
+		switchKey.buildEvaluation(simCoder, null, codeBuilder);
+		lowKey.buildEvaluation(simCoder, null, codeBuilder);
 		codeBuilder.if_icmplt(L1);
-		switchKey.buildEvaluation(null, codeBuilder);
-		hiKey.buildEvaluation(null, codeBuilder);
+		switchKey.buildEvaluation(simCoder, null, codeBuilder);
+		hiKey.buildEvaluation(simCoder, null, codeBuilder);
 		codeBuilder.if_icmple(L2);
 		codeBuilder.labelBinding(L1);
 		Util.buildSimulaRuntimeError("Switch key outside key interval", codeBuilder);

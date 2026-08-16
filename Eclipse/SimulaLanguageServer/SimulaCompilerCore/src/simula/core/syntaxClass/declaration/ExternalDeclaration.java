@@ -175,9 +175,9 @@ public final class ExternalDeclaration extends Declaration {
 				Util.syntaxError(simBuilder, "Can't find attribute file: " + identifier.value + '[' + externalIdentifier + ']');
 			}
 			if (jarFile != null) {
-				if(AttributeFileIO.checkJarFiles(jarFile)) {
+				if(AttributeFileIO.checkJarFiles(jarFile.toString())) {
 					DeclarationScope scope = CoreGlobal.getCurrentScope();
-					Type moduleType = AttributeFileIO.readAttributeFile(simBuilder, identifier.value, jarFile, scope.getEnclosingBlock());
+					Type moduleType = AttributeFileIO.readAttributeEntry(simBuilder, identifier.value, jarFile, scope.getEnclosingBlock());
 					if(moduleType == null) {
 						if (expectedType != null) Util.syntaxError(simBuilder, "Missing external type: "+expectedType);
 					} else if(expectedType == null) {

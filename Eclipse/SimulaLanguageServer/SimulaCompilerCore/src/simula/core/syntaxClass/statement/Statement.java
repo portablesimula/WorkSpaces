@@ -15,6 +15,7 @@ import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.builder.token.LexToken;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.syntaxClass.declaration.LabelDeclaration;
@@ -209,7 +210,7 @@ public abstract class Statement extends SyntaxElement {
 
 	/// Build Java ByteCode.
 	@Override
-	public void buildByteCode(CodeBuilder codeBuilder) {
+	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		Util.IERR("Method buildByteCode need a redefinition in "+this.getClass().getSimpleName());
 	}
 

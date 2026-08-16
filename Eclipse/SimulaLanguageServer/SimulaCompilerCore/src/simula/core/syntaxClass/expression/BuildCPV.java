@@ -12,6 +12,7 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
 
 import simula.core.CoreGlobal;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.ProcedureSpecification;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -43,7 +44,7 @@ public abstract class BuildCPV {
 	/// @param virtual the virtual specification
 	/// @param remotelyAccessed true if remotely accessed.
 	/// @param codeBuilder the CodeBuilder
-	static void virtual(final VariableExpression variable,final VirtualSpecification virtual,final boolean remotelyAccessed,CodeBuilder codeBuilder) {
+	static void virtual(final SimulaCoder simCoder, final VariableExpression variable,final VirtualSpecification virtual,final boolean remotelyAccessed,CodeBuilder codeBuilder) {
 		if(! variable.hasArguments()) {
 			if(virtual.procedureSpec != null && virtual.procedureSpec.parameterList.size() > 0) {
 				Util.codingError(variable, "Missing parameter(s) to " + variable.identifier.value);
@@ -58,7 +59,7 @@ public abstract class BuildCPV {
 	        // 1: aload_0
 	        // 2: invokevirtual #20                 // Method L_0:()Lsimula/runtime/RTS_LABEL;
 			ClassDesc owner = BlockDeclaration.currentClassDesc();
-			variable.buildIdentifierAccess(false, codeBuilder);
+			variable.buildIdentifierAccess(simCoder, false, codeBuilder);
 			codeBuilder
 				.invokevirtual(owner, ident, MethodTypeDesc.ofDescriptor("()Lsimula/runtime/RTS_LABEL;"));
 
@@ -75,14 +76,14 @@ public abstract class BuildCPV {
 	    		// 42: pop
 		    	VariableExpression inspectedVariable = meaning.getInspectedVariable();
 		    	ClassDesc owner = meaning.declaredIn.getClassDesc();
-		    	inspectedVariable.buildIdentifierAccess(false, codeBuilder);
+		    	inspectedVariable.buildIdentifierAccess(simCoder, false, codeBuilder);
 				codeBuilder
 					.getfield(pool.fieldRefEntry(BlockDeclaration.currentClassDesc(), inspectedVariable.getJavaIdentifier(), inspectedVariable.type.toClassDesc()))
 					.invokevirtual(owner, ident, MethodTypeDesc.ofDescriptor("()Lsimula/runtime/RTS_PRCQNT;"));
 				if(virtual.procedureSpec != null) {
-					BuildCPV.buildCSVP(variable, virtual.procedureSpec, codeBuilder);					
+					BuildCPV.buildCSVP(simCoder, variable, virtual.procedureSpec, codeBuilder);					
 				} else {
-					BuildCPF.buildCPF(variable, codeBuilder);
+					BuildCPF.buildCPF(simCoder, variable, codeBuilder);
 				}
 			    
 			    ProcedureDeclaration prc=(ProcedureDeclaration)meaning.declaredAs;
@@ -102,8 +103,8 @@ public abstract class BuildCPV {
 					.invokevirtual(owner, ident, MethodTypeDesc.ofDescriptor("()Lsimula/runtime/RTS_PRCQNT;"));
 				
 				if(virtual.procedureSpec != null)
-					 buildCSVP(variable, virtual.procedureSpec, codeBuilder);					
-				else BuildCPF.buildCPF(variable, codeBuilder);
+					 buildCSVP(simCoder, variable, virtual.procedureSpec, codeBuilder);					
+				else BuildCPF.buildCPF(simCoder, variable, codeBuilder);
 				
 			    if(variable.backLink == null) codeBuilder.pop();
 		    }
@@ -119,7 +120,8 @@ public abstract class BuildCPV {
 	/// @param virtual Virtual Specification
 	/// @param backLink if not null, this procedure call is part of the backLink Expression/Statement.
 	/// @param codeBuilder the CodeBuilder to use
-	static void remoteVirtual(final Expression obj,final VariableExpression variable,final VirtualSpecification virtual,final SyntaxElement backLink,CodeBuilder codeBuilder) {
+	static void remoteVirtual(final SimulaCoder simCoder, final Expression obj,final VariableExpression variable,
+			final VirtualSpecification virtual, final SyntaxElement backLink, CodeBuilder codeBuilder) {
 		if(! variable.hasArguments()) {
 			if(virtual.procedureSpec != null && virtual.procedureSpec.parameterList.size() > 0)
 				Util.codingError(variable, "Missing parameter(s) to " + variable.identifier.value);
@@ -127,11 +129,11 @@ public abstract class BuildCPV {
 		//return("<Object>.<IDENT>.CPF().setPar(4).setpar(3.14)._ENT()");
 	    String ident=virtual.getSimpleVirtualIdentifier();
 		prepareForValueType(variable, codeBuilder);
-		obj.buildEvaluation(null, codeBuilder);
+		obj.buildEvaluation(simCoder, null, codeBuilder);
 		codeBuilder.invokevirtual(obj.type.toClassDesc(),ident, MethodTypeDesc.ofDescriptor("()Lsimula/runtime/RTS_PRCQNT;"));
 		if(virtual.procedureSpec != null)
-			 buildCSVP(variable, virtual.procedureSpec, codeBuilder);					
-		else BuildCPF.buildCPF(variable, codeBuilder);
+			 buildCSVP(simCoder, variable, virtual.procedureSpec, codeBuilder);					
+		else BuildCPF.buildCPF(simCoder, variable, codeBuilder);
 		
 	    if(backLink == null) codeBuilder.pop();
 	}
@@ -143,7 +145,8 @@ public abstract class BuildCPV {
 	/// @param variable the procedure variable
 	/// @param procedureSpec the procedure spec
 	/// @param codeBuilder the CodeBuilder
-	private static void buildCSVP(final VariableExpression variable,final ProcedureSpecification procedureSpec,CodeBuilder codeBuilder) {
+	private static void buildCSVP(final SimulaCoder simCoder, final VariableExpression variable,
+			final ProcedureSpecification procedureSpec, final CodeBuilder codeBuilder) {
 //        25: invokevirtual #46                 // Method simula/runtime/RTS_PRCQNT.CPF:()Lsimula/runtime/RTS_PROCEDURE;
 		
 //        28: bipush        7
@@ -168,7 +171,7 @@ public abstract class BuildCPV {
 				Parameter formalParameter = (Parameter) formalIterator.next();
 				Type formalType = formalParameter.type;
 				actualParameter = TypeConversion.testAndCreate(formalType, actualParameter);
-				actualParameter.buildEvaluation(null, codeBuilder);
+				actualParameter.buildEvaluation(simCoder, null, codeBuilder);
 				formalType.buildObjectValueOf(codeBuilder);
 				// s.append(".setPar(");
 				RTS.invokevirtual_PROCEDURE_setpar(codeBuilder);
