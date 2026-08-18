@@ -18,7 +18,7 @@ import java.util.Vector;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -225,7 +225,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		if (declarationKind == ObjectKind.CompoundStatement)
 			doCompoundStatementCoding(simCoder);
 		else if (this.isPreCompiledFromFile != null) {
-			if(CoreGlobal2.verbose) IO.println("Skip  doJavaCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);		
+			if(DocumentManager.verbose) IO.println("Skip  doJavaCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);		
 		} else doSubBlockCoding(simCoder);
 	}
 
@@ -332,7 +332,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	public byte[] buildClassFile(final SimulaCoder simCoder) {
 		labelList.setLabelIdexes();
 		ClassDesc CD_ThisClass = currentClassDesc();
-		if(CoreGlobal2.verbose) IO.println("SubBlock.buildClassFile: "+CD_ThisClass); 
+		if(DocumentManager.verbose) IO.println("SubBlock.buildClassFile: "+CD_ThisClass); 
 		ClassHierarchy.addClassToSuperClass(CD_ThisClass, RTS.CD.RTS_BASICIO);
 		
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
@@ -430,7 +430,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		}
 		CoreGlobal.enterScope(this);
 		if (this.isPreCompiledFromFile != null) {
-			if(CoreGlobal2.verbose) IO.println("Skip  buildClassFile: "+this.identifierValue());			
+			if(DocumentManager.verbose) IO.println("Skip  buildClassFile: "+this.identifierValue());			
 		} else {
 			try { createJavaClassFile(simCoder); } catch (IOException e) { e.printStackTrace();	}
 		}

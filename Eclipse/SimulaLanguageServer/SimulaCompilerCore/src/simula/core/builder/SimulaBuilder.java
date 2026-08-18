@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import simula.Option;
 import simula.core.DocumentManager;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.token.LexToken;
 import simula.core.builder.token.SimpleString;
 import simula.core.syntaxClass.declaration.DeclarationScope;
@@ -26,7 +26,7 @@ public class SimulaBuilder {
 	
     public SimulaLexer lexer;
     
-    public CoreGlobal2 simulaCompiler;
+    public DocumentManager simulaCompiler;
     
 	/// Compiler state: True while Parsing
 	public boolean duringParsing;
@@ -58,7 +58,7 @@ public class SimulaBuilder {
         lexer = new SimulaLexer(this, documentManager.sourceCode);
 
 		File desktop = new File(System.getProperty("user.home"), "Desktop");
-		if (CoreGlobal2.verbose) {
+		if (DocumentManager.verbose) {
 			// https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html
 			IO.println("------------  SIMULA ENVIRONMENT SUMMARY  ------------");
 			IO.println("Java Home            " + System.getProperty("java.home"));
@@ -181,7 +181,7 @@ public class SimulaBuilder {
 			if (Option.internal.TRACE_CHECKER_OUTPUT && programModule != null)
 				programModule.print(0);
 		}
-		if(CoreGlobal2.verbose) IO.println("SimulaBuilder.doChecking: " + documentManager.simBuilder.documentManager.sourceName + ": Semantic Checker completed");
+		if(DocumentManager.verbose) IO.println("SimulaBuilder.doChecking: " + documentManager.simBuilder.documentManager.sourceName + ": Semantic Checker completed");
 		documentManager.simBuilder.duringChecking = false;
 		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
 			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");

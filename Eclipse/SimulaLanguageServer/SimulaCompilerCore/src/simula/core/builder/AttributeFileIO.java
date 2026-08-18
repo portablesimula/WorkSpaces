@@ -15,7 +15,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.coder.JarFileBuilder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -113,7 +113,7 @@ public final class AttributeFileIO {
 				Util.generalWarning("Multiple declarations with the same name: "+module+" and "+d);
 			} else {
 				declarationList.add(module);
-				if (CoreGlobal2.verbose)
+				if (DocumentManager.verbose)
 					IO.println("***       Read External " + ObjectKind.edit(module.declarationKind) + ' ' + module.identifier
 							+ '[' + module.externalIdent + ']' +"  ==>  "+declarationList.debugName);
 			}
@@ -171,7 +171,7 @@ public final class AttributeFileIO {
 		else if(declarationKind == ObjectKind.Class) module = ClassDeclaration.readObject(simBuilder.documentManager, inpt);
 		else Util.IERR();
 		inpt.close();
-		if (CoreGlobal2.verbose)	Util.TRACE("*** ENDOF Read SimulaAttributeFile: " + fileID);
+		if (DocumentManager.verbose)	Util.TRACE("*** ENDOF Read SimulaAttributeFile: " + fileID);
 		module.isPreCompiledFromFile = fileID;
 		return module;
 	}

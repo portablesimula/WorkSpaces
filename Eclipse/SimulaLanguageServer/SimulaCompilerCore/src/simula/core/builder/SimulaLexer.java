@@ -11,7 +11,7 @@ import java.util.List;
 
 import simula.Option;
 import simula.core.CoreGlobal;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.token.CharacterConst;
 import simula.core.builder.token.Identifier;
 import simula.core.builder.token.IntegerConst;
@@ -390,7 +390,7 @@ public final class SimulaLexer {
 	private LexToken scanIdentifier() {
 		String name=scanName();
 	    if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanIdentifier: name=\""+name+"\"");
-	    String ident=(CoreGlobal2.CaseSensitive)?name:name.toLowerCase();
+	    String ident=(DocumentManager.CaseSensitive)?name:name.toLowerCase();
 	    switch(Character.toLowerCase(ident.charAt(0))) {
 	        case 'a':
 		        if(ident.equals("abstract"))	 return(javaKeyword(name)); // Java KeyWord

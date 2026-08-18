@@ -28,7 +28,7 @@ import java.util.Vector;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -389,7 +389,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public void doJavaCoding(final SimulaCoder simCoder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
-			if(CoreGlobal2.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
+			if(DocumentManager.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
 		} else {
 			switch (declarationKind) {
 				case ObjectKind.Procedure -> doProcedureCoding(simCoder);
@@ -434,7 +434,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
-			if(CoreGlobal2.verbose) IO.println("Skip  doProcedureCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);		
+			if(DocumentManager.verbose) IO.println("Skip  doProcedureCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);		
 			return;
 		}
 		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(simCoder, this);
@@ -567,14 +567,14 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public byte[] buildClassFile(final SimulaCoder simCoder) {
 		labelList.setLabelIdexes();
 		ClassDesc CD_ThisClass = currentClassDesc();
-		if(CoreGlobal2.verbose) IO.println("ProcedureDeclaration.buildClassFile: "+CD_ThisClass);
+		if(DocumentManager.verbose) IO.println("ProcedureDeclaration.buildClassFile: "+CD_ThisClass);
 		if(isPreCompiledFromFile != null) return getBytesFromFile();
 		ClassHierarchy.addClassToSuperClass(CD_ThisClass, RTS.CD.RTS_PROCEDURE);
 		
 		int count = 5;
 		while((count--) > 0) {
 			try {
-				if(CoreGlobal2.verbose)
+				if(DocumentManager.verbose)
 					IO.println("ProcedureDeclaration.buildClassFile: TRY: "+CD_ThisClass);
 				return tryBuildClassFile(simCoder, CD_ThisClass);
 			} catch(IllegalArgumentException e) {

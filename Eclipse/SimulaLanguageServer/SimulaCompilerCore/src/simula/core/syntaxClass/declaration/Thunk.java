@@ -20,7 +20,7 @@ import java.lang.constant.MethodTypeDesc;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.token.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
@@ -106,7 +106,7 @@ public final class Thunk extends DeclarationScope {
 	// ***********************************************************************************************
 	@Override
 	public byte[] buildClassFile(final SimulaCoder simCoder) {
-		if(CoreGlobal2.verbose) IO.println("Begin buildClassFile: "+CD_ThisClass);
+		if(DocumentManager.verbose) IO.println("Begin buildClassFile: "+CD_ThisClass);
 		ClassHierarchy.addClassToSuperClass(CD_ThisClass, RTS.CD.RTS_NAME);
 		
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,

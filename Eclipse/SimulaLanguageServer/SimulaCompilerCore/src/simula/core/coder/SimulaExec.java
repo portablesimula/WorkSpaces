@@ -6,7 +6,7 @@ import java.util.Vector;
 
 import simula.Option;
 import simula.core.DocumentManager;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.SimulaBuilder;
 import simula.core.syntaxClass.statement.ProgramModule;
 import simula.core.utilities.Util;
@@ -34,7 +34,7 @@ public class SimulaExec {
 		
 		addRTArguments(cmds);
 		
-		if(CoreGlobal2.noPopup) {
+		if(DocumentManager.noPopup) {
 			cmds.add("-noPopup");			
 		}
 		if (Option.internal.SOURCE_FILE != null) {
@@ -64,23 +64,23 @@ public class SimulaExec {
 	private static void doExecuteJarFile(SimulaCoder simCoder, String jarFile, Vector<String> arg) throws IOException {
 		ProgramModule programModule = simCoder.documentManager.simBuilder.syntaxTree;
 		if (!programModule.isExecutable()) {
-			if (CoreGlobal2.verbose)
+			if (DocumentManager.verbose)
 				IO.println("Separate Compilation - No Execution of .jar File: " + jarFile);
-		} else if (CoreGlobal2.noExecution) {
-			if (CoreGlobal2.verbose)
+		} else if (DocumentManager.noExecution) {
+			if (DocumentManager.verbose)
 				IO.println("Option 'noexec' ==> No Execution of .jar File: " + jarFile);
 		} else {
-			if (CoreGlobal2.verbose) {
+			if (DocumentManager.verbose) {
 				IO.println("------------  EXECUTION SUMMARY  ------------");
 				IO.println("Execute .jar File");
 			}
 			int exitValue3 = Util.execute(arg);
-			if (CoreGlobal2.verbose)
+			if (DocumentManager.verbose)
 				IO.println("END Execute .jar File. Exit value=" + exitValue3);
 			if(exitValue3 != 0) {
 				IO.println("SimulaCompiler.doCompile: Exit value = " + exitValue3);
 		    	Util.doListDirectory("SimulaCompiler.doExecuteJarFile: ", ""+simCoder.tempClassFileDir);
-		    	Util.doListDirectory("SimulaCompiler.doExecuteJarFile: ", ""+simCoder.tempClassFileDir + "/" + CoreGlobal2.packetName);
+		    	Util.doListDirectory("SimulaCompiler.doExecuteJarFile: ", ""+simCoder.tempClassFileDir + "/" + DocumentManager.packetName);
 		    	JarFileBuilder.listJarFile("SimulaCompiler.doExecuteJarFile: ",new File(jarFile));
 				throw new RuntimeException("Execution of "+jarFile+" failed. ExitValue = "+exitValue3);
 			}

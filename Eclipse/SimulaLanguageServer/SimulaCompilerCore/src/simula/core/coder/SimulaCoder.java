@@ -7,7 +7,7 @@ import java.util.Vector;
 import simula.Option;
 import simula.core.DocumentManager;
 import simula.core.CoreGlobal;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.SimulaBuilder;
 import simula.core.syntaxClass.statement.ProgramModule;
@@ -63,7 +63,7 @@ public class SimulaCoder {
 		deleteTempFiles(simulaTempDir);
 
 		// Create temp .class-Files Directory:
-		File tmpClassDir = new File(simulaTempDir, "classes/" + CoreGlobal2.packetName);
+		File tmpClassDir = new File(simulaTempDir, "classes/" + DocumentManager.packetName);
 		tmpClassDir.mkdirs();
 		tempClassFileDir = tmpClassDir.getParentFile();
 		LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempClassFileDir="+tempClassFileDir);
@@ -74,7 +74,7 @@ public class SimulaCoder {
 			File javatmp = Option.internal.keepJava;
 			if (javatmp == null)
 				javatmp = simulaTempDir;
-			File tmpJavaDir = new File(javatmp, "src/" + CoreGlobal2.packetName);
+			File tmpJavaDir = new File(javatmp, "src/" + DocumentManager.packetName);
 			tmpJavaDir.mkdirs();
 			this.tempJavaFileDir = tmpJavaDir;
 	    	LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempJavaFileDir="+this.tempJavaFileDir);
@@ -123,18 +123,18 @@ public class SimulaCoder {
 		}
 		
 //    	Util.doListDirectory("SimulaCoder.doCodeGeneration: ", ""+SimulaCoder.tempClassFileDir);
-//    	Util.doListDirectory("SimulaCoder.doCodeGeneration: ", ""+SimulaCoder.tempClassFileDir + "/" + CoreGlobal2.packetName);
+//    	Util.doListDirectory("SimulaCoder.doCodeGeneration: ", ""+SimulaCoder.tempClassFileDir + "/" + DocumentManager.packetName);
 		
 		if ((! documentManager.compileViaJavaSource)) {
 			if (Option.internal.TRACING) IO.println("BEGIN Generate .class Output Code");
 			// *** Generate .class files
 			programModule.createJavaClassFile(this);
-			if(CoreGlobal2.verbose) IO.println(documentManager.sourceName + ": Class Files Generated - Directly");
+			if(DocumentManager.verbose) IO.println(documentManager.sourceName + ": Class Files Generated - Directly");
 		} else {
 			if (Option.internal.TRACING) IO.println("BEGIN Generate .java Output Code");
 			// *** Generate .java intermediate code
 			programModule.doJavaCoding(this);
-			if(CoreGlobal2.verbose) IO.println("SimulaCompiler.doCompile: " + documentManager.sourceName + ": Java Source Files Generated");
+			if(DocumentManager.verbose) IO.println("SimulaCompiler.doCompile: " + documentManager.sourceName + ": Java Source Files Generated");
 			if (Option.internal.TRACING) {
 				IO.println("END Generate .java Output Code");
 				for (JavaSourceFileCoder javaClass : this.javaSourceFileCoders)
@@ -147,7 +147,7 @@ public class SimulaCoder {
 			throw new RuntimeException(msg);
 		}
 
-		if (CoreGlobal2.verbose) fileSummary();
+		if (DocumentManager.verbose) fileSummary();
 		if (Option.internal.DEBUGGING) {
 			IO.println("------------  CLASSPATH DETAILS  ------------");
 			IO.println("Java PathSeparator " + System.getProperty("path.separator"));
@@ -171,14 +171,14 @@ public class SimulaCoder {
 //		// ***************************************************************
 		this.generatedJarFile = JarFileBuilder.writeAttributeFile(this, programModule);
 		
-//		if (CoreGlobal2.verbose) printSummary(simBuilder);
+//		if (DocumentManager.verbose) printSummary(simBuilder);
 //		deleteTempFiles(SimulaCoder.tempClassFileDir);
 	}
 
 
 	/// Debug utility: listGeneratedClassFiles.
 	private void listGeneratedClassFiles() {
-		File classFiles = new File(tempClassFileDir, CoreGlobal2.packetName);
+		File classFiles = new File(tempClassFileDir, DocumentManager.packetName);
 		for (File classFile : classFiles.listFiles()) {
 			if(classFile.getName().endsWith(".class"))
 				Util.doListClassFile("" + classFile); // List generated .class file
@@ -188,12 +188,12 @@ public class SimulaCoder {
 	/// File Summary
 	private void fileSummary() {
 		IO.println("------------  CODER FILE SUMMARY  ------------");
-		IO.println("Package Name:    \"" + CoreGlobal2.packetName + "\"");
+		IO.println("Package Name:    \"" + DocumentManager.packetName + "\"");
 		IO.println("SourceFile Name: \"" + documentManager.sourceName + "\"");
 		IO.println("SourceFile Dir:  \"" + documentManager.sourceFileDir + "\"");
 		IO.println("TempDir .java:   \"" + tempJavaFileDir + "\"");
 		IO.println("TempDir .class:  \"" + tempClassFileDir + "\"");
-		IO.println("SimulaRtsLib:    \"" + CoreGlobal2.simulaRtsLib + "\"");
+		IO.println("SimulaRtsLib:    \"" + DocumentManager.simulaRtsLib + "\"");
 		IO.println("OutputDir:       \"" + documentManager.jarFileDir + "\"");
 	}
 

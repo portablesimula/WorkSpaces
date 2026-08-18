@@ -37,12 +37,6 @@ public class DocumentManager {
 	public SimulaCoder simCoder;
 	
 
-//	/// The Compiler Modes.
-//	public enum CompilerMode { 
-//    	/** Generate Java source and use Java compiler to generate JavaClass files. */					viaJavaSource,
-//    	/** Generate JavaClass files directly. No Java source files are generated. */ 					directClassFiles,
-//    }
-
 	/// The Compiler mode.
 //	public CompilerMode compilerMode;
 	public boolean compileViaJavaSource;
@@ -64,6 +58,41 @@ public class DocumentManager {
 	// If not found, jarFileDir is then searched
 	public File extLib = null;
 
+
+	// ***************************************************************
+	// *** Static variables
+	// ***************************************************************
+
+	/// The Simula release identification.
+	/// 
+	/// NOTE: When updating release id, change version in SimulaExtractor and RuntimeSystem
+	public static final String simulaReleaseID = "Simula-2.0";
+
+	/// Packet name used in generated .java files.
+	/// NOTE: Must be a single identifier.
+	public static String packetName = "simprog";
+
+	/// Where to find the Simula Runtime System.
+	public static File simulaRtsLib;
+	
+	/// Source file is case sensitive.
+	public static boolean CaseSensitive=false;
+	
+	/// Output messages about what the compiler is doing.
+	public static boolean verbose = false; 
+	
+	/// Generate warning messages
+	public static boolean WARNINGS=true;
+
+	/// TRUE:Do not create popUps at runtime
+	public static boolean noPopup = false; 
+	
+	/// true: Don't execute generated .jar file
+	public static boolean noExecution = false;
+	
+	/// false: Disable all language extensions. In other words,
+	/// follow the Simula Standard literally
+	public static boolean EXTENSIONS=true;
 	
     // Nøkkelen er filens URI (f.eks. file:///path/to/file.txt)
 //    private final ConcurrentHashMap<String, SourceDocumentItem> openDocuments = new ConcurrentHashMap<>();
@@ -323,7 +352,7 @@ public class DocumentManager {
 	/// Delete temporary .class files.
 	/// @param dir temporary .class directory
 	public static void deleteTempFiles(final File dir) {
-		if(CoreGlobal2.verbose) {
+		if(DocumentManager.verbose) {
 			IO.println("SimulaCompiler.deleteTempFiles:  Delete: " + dir);
 //			Thread.dumpStack();
 		}
@@ -337,7 +366,7 @@ public class DocumentManager {
 	             .sorted(Comparator.reverseOrder())
 	             .forEach(p -> {
 	                 try {
-	             		if(CoreGlobal2.verbose) {
+	             		if(DocumentManager.verbose) {
 	             			IO.println("SimulaCompiler.deleteTempFiles: Delete: " + p);
 	             		}
 	                     Files.delete(p);

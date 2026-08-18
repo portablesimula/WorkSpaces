@@ -14,7 +14,7 @@ import java.lang.constant.MethodTypeDesc;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.SyntaxTree;
 import simula.core.builder.token.Identifier;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
@@ -123,7 +123,7 @@ public class Type extends SyntaxElement {
 	/// @param classIdent the given class identifier
 	public Type(int keyWord, Identifier classIdent) {
 		super(null);
-		if(classIdent != null && !CoreGlobal2.CaseSensitive) classIdent.value = classIdent.value.toUpperCase();
+		if(classIdent != null && !DocumentManager.CaseSensitive) classIdent.value = classIdent.value.toUpperCase();
 		this.keyWord = keyWord;
 		this.classIdent = classIdent;
 		if(classIdent != null) {
@@ -502,7 +502,7 @@ public class Type extends SyntaxElement {
 					return("Lsimula/runtime/"+refIdent+";");
 				else if(refIdent.startsWith("RTS_"))
 					return("Lsimula/runtime/"+refIdent+";");
-				else return("L"+CoreGlobal2.packetName+"/"+refIdent+";");
+				else return("L"+DocumentManager.packetName+"/"+refIdent+";");
 			}
 			default: Util.IERR(); return null;
 		}
@@ -530,7 +530,7 @@ public class Type extends SyntaxElement {
 					return("Lsimula/runtime/"+refIdent+";");
 				else if(refIdent.startsWith("RTS_"))
 					return("Lsimula/runtime/"+refIdent+";");
-				else return("L"+CoreGlobal2.packetName+"/"+refIdent+";");
+				else return("L"+DocumentManager.packetName+"/"+refIdent+";");
 			}
 			default: Util.IERR(); return null;
 		}

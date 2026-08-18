@@ -22,7 +22,7 @@ import java.util.Vector;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -822,7 +822,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	public void doJavaCoding(final SimulaCoder simCoder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
-			if(CoreGlobal2.verbose) IO.println("Skip  doJavaCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);	
+			if(DocumentManager.verbose) IO.println("Skip  doJavaCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);	
 			return;
 		}
 		CoreGlobal.sourceLineNumber = firstLineNumber();
@@ -1043,7 +1043,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		int count = 5;
 		while((count--) > 0) {
 			try {
-				if(CoreGlobal2.verbose)
+				if(DocumentManager.verbose)
 					IO.println("ClassDeclaration.buildClassFile: TRY: "+CD_ThisClass+" extends "+CD_SuperClass);
 				return tryBuildClassFile(simCoder, CD_ThisClass, CD_SuperClass);
 			} catch(IllegalArgumentException e) {
@@ -1108,7 +1108,7 @@ public class ClassDeclaration extends BlockDeclaration {
 								codeBuilder -> buildIsMethodDetachUsed(codeBuilder));
 				}
 		);
-		if(CoreGlobal2.verbose)
+		if(DocumentManager.verbose)
 			IO.println("ClassDeclaration.buildClassFile: DONE: "+CD_ThisClass+" extends "+CD_SuperClass);
 		return(bytes);
 	}

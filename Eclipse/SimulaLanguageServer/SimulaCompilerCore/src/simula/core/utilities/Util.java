@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 
 import simula.Option;
 import simula.core.CoreGlobal;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.builder.token.LexToken;
@@ -81,21 +81,21 @@ public final class Util {
 	/// Print a error message.
 	/// @param msg the message
 	public static void generalWarning(final String msg) {
-		if(CoreGlobal2.WARNINGS) LOG.warning("General Warning: " + msg);
+		if(DocumentManager.WARNINGS) LOG.warning("General Warning: " + msg);
 //		simBuilder.addDiagnostic(diagnostic); // TODO: DETTE MÅ RETTES - 
 	}
 
 	/// Print a error message.
 	/// @param msg the message
 	public static void generalWarning(final int lineNumber, final String msg) {
-		if(CoreGlobal2.WARNINGS) LOG.error("Line " + lineNumber + ": General Error: " + msg);
+		if(DocumentManager.WARNINGS) LOG.error("Line " + lineNumber + ": General Error: " + msg);
 //		simBuilder.addDiagnostic(diagnostic); // TODO: DETTE MÅ RETTES - 
 	}
 
 	/// Print a warning message.
 	/// @param msg the message
 	public static void warning(final SimulaBuilder simBuilder, final String msg) {
-		if(CoreGlobal2.WARNINGS)	warning(simBuilder, simBuilder.getPrevParserToken(), msg);
+		if(DocumentManager.WARNINGS)	warning(simBuilder, simBuilder.getPrevParserToken(), msg);
 	}
 
 	/// Print a warning message.
@@ -110,7 +110,7 @@ public final class Util {
         SimPosition end = new SimPosition(token.lineNumber, token.column + token.length);
 		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new SimRange(start, end), msg);
 		
-		if(CoreGlobal2.WARNINGS) {
+		if(DocumentManager.WARNINGS) {
 			LOG.warning(diagnostic.toString());
 			simBuilder.addDiagnostic(diagnostic);
 		}
@@ -126,7 +126,7 @@ public final class Util {
         SimPosition end = new SimPosition(last.lineNumber, last.column + last.length);
 		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new SimRange(start, end), msg);
 
-		if(CoreGlobal2.WARNINGS) {
+		if(DocumentManager.WARNINGS) {
 			LOG.warning(diagnostic.toString());
 			elt.documentManager.simBuilder.addDiagnostic(diagnostic);
 		}
@@ -137,7 +137,7 @@ public final class Util {
 	public static void warning(final SimulaBuilder simBuilder, final SimPosition start, final SimPosition end, final String msg) {
 		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new SimRange(start, end), msg);
 
-		if(CoreGlobal2.WARNINGS) {
+		if(DocumentManager.WARNINGS) {
 			LOG.warning(diagnostic.toString());
 			simBuilder.addDiagnostic(diagnostic);
 		}
@@ -361,7 +361,7 @@ public final class Util {
 	/// @param s2 argument string
 	/// @return true if the two specified strings are equal to one another
 	public static boolean equals(String s1,String s2) {
-		if(CoreGlobal2.CaseSensitive)
+		if(DocumentManager.CaseSensitive)
 			 return(s1.equals(s2));			
 		else return(s1.equalsIgnoreCase(s2));
 	}
@@ -493,7 +493,7 @@ public final class Util {
 	/// @param cmdarray command array
 	/// @return exit value
 	public static int execute(final String... cmdarray) {
-		if (CoreGlobal2.verbose) {
+		if (DocumentManager.verbose) {
 			String line = "";
 			for (int i = 0; i < cmdarray.length; i++)
 				line = line + " " + cmdarray[i];

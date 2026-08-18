@@ -5,7 +5,7 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.core.syntaxClass.declaration;
 
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.DocumentManager;
 import simula.core.builder.token.Identifier;
 import simula.core.syntaxClass.OverLoad;
@@ -101,7 +101,7 @@ public final class StandardClass extends ClassDeclaration {
 			initProcess(documentManager);
 			initMAIN_PROGRAM(documentManager);
 			
-		if(CoreGlobal2.EXTENSIONS) {
+		if(DocumentManager.EXTENSIONS) {
 			initCatchingErrors(documentManager);
 			initDEC_Lib(documentManager);
 			initDrawing(documentManager);
@@ -141,7 +141,7 @@ public final class StandardClass extends ClassDeclaration {
 		// **************************************
 		// *** Additional Text Procedures ***
 		// **************************************
-		if(CoreGlobal2.EXTENSIONS) {
+		if(DocumentManager.EXTENSIONS) {
 			typeText.addStandardProcedure(documentManager, ObjectKind.MemberMethod,Type.Text,"trim"); 
 			typeText.addStandardProcedure(documentManager, ObjectKind.MemberMethod,Type.Character,"loadChar",parameter(documentManager, "i",Type.Integer)); 
 			typeText.addStandardProcedure(documentManager, ObjectKind.MemberMethod,null,"storeChar",parameter(documentManager, "c",Type.Character),parameter(documentManager, "i",Type.Integer)); 
@@ -318,7 +318,7 @@ public final class StandardClass extends ClassDeclaration {
 		// **************************************
 		// *** Additional Standard Procedures ***
 		// **************************************
-		if(CoreGlobal2.EXTENSIONS) {
+		if(DocumentManager.EXTENSIONS) {
 			
 			String[] mtd4 = { "(I)Lsimula/runtime/RTS_TXT;", "(F)Lsimula/runtime/RTS_TXT;","(D)Lsimula/runtime/RTS_TXT;","(Z)Lsimula/runtime/RTS_TXT;","(C)Lsimula/runtime/RTS_TXT;" };
 			String[] mtd5 = { "(FI)Lsimula/runtime/RTS_TXT;", "(DI)Lsimula/runtime/RTS_TXT;" };
@@ -717,7 +717,7 @@ public final class StandardClass extends ClassDeclaration {
 		Inbytefile.addStandardProcedure(documentManager, ObjectKind.MemberMethod,Type.Boolean,"close");  
 		Inbytefile.addStandardProcedure(documentManager, ObjectKind.MemberMethod,Type.Integer,"inbyte");  
 		Inbytefile.addStandardProcedure(documentManager, ObjectKind.MemberMethod,Type.Text,"intext",parameter(documentManager, "t",Type.Text));
-		if(CoreGlobal2.EXTENSIONS) {
+		if(DocumentManager.EXTENSIONS) {
 			Inbytefile.addStandardProcedure(documentManager, ObjectKind.MemberMethod,Type.Integer,"in2byte");  // Extension to Simula Standard
 		}
 	}  
@@ -745,7 +745,7 @@ public final class StandardClass extends ClassDeclaration {
 		Outbytefile.addStandardProcedure(documentManager, ObjectKind.MemberMethod,null,"outbyte",parameter(documentManager, "x",Type.Integer));   
 		Outbytefile.addStandardProcedure(documentManager, ObjectKind.MemberMethod,null,"outtext",parameter(documentManager, "t",Type.Text));  
 		Outbytefile.addStandardProcedure(documentManager, ObjectKind.MemberMethod,Type.Boolean,"checkpoint");  
-		if(CoreGlobal2.EXTENSIONS) {
+		if(DocumentManager.EXTENSIONS) {
 			Outbytefile.addStandardProcedure(documentManager, ObjectKind.MemberMethod,null,"out2byte",parameter(documentManager, "x",Type.Integer));   			
 		}
 	}  

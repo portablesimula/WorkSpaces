@@ -13,7 +13,7 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
 import simula.Option;
 import simula.core.CoreGlobal;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.DocumentManager;
 import simula.core.builder.token.Identifier;
 import simula.core.coder.SimulaCoder;
@@ -168,8 +168,8 @@ public abstract class DeclarationScope extends Declaration  {
 //				IO.println("DeclarationScope.findMeaning: Undefined variable: " + identifierValue());
 //				Util.error("Undefined variable: " + identifierValue());
 //			}
-			if(CoreGlobal2.CaseSensitive) {
-				CoreGlobal2.WARNINGS = true;
+			if(DocumentManager.CaseSensitive) {
+				DocumentManager.WARNINGS = true;
 				Util.warning(this, "Undefined variable: " + identifierValue() + "  Could be because SimulaCompiler.CaseSensitive == true");
 			}
 			UndefinedDeclaration undef = new UndefinedDeclaration(documentManager, identifier);
@@ -388,9 +388,9 @@ public abstract class DeclarationScope extends Declaration  {
 	/// @throws IOException  if something went wrong.
     public void createJavaClassFile(final SimulaCoder simCoder) throws IOException {
     	if (this.isPreCompiledFromFile != null) {
-			if(CoreGlobal2.verbose) IO.println("Skip  buildClassFile: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);			
+			if(DocumentManager.verbose) IO.println("Skip  buildClassFile: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);			
     	} else if (CLASSFILE_ALREADY_GENERATED) {
-			if(CoreGlobal2.verbose) IO.println("Skip  buildClassFile: " + this.identifierValue() + " -- It is already generated");			
+			if(DocumentManager.verbose) IO.println("Skip  buildClassFile: " + this.identifierValue() + " -- It is already generated");			
     	} else {
     		CLASSFILE_ALREADY_GENERATED = true;
     		buildAndLoadOrAddClassFile(simCoder);
@@ -402,7 +402,7 @@ public abstract class DeclarationScope extends Declaration  {
     /// @throws IOException if something went wrong.
     protected void buildAndLoadOrAddClassFile(final SimulaCoder simCoder) throws IOException {
 		if (this.isPreCompiledFromFile != null) {
-			if(CoreGlobal2.verbose) IO.println("Skip  buildClassFile: "+this.identifierValue());
+			if(DocumentManager.verbose) IO.println("Skip  buildClassFile: "+this.identifierValue());
 		} else {
 	    	byte[] bytes = doBuildClassFile(simCoder);
 	    	writeClassFile(simCoder, bytes);
@@ -437,7 +437,7 @@ public abstract class DeclarationScope extends Declaration  {
     /// @throws IOException if something went wrong
     protected void writeClassFile(final SimulaCoder simCoder, final byte[] bytes) throws IOException {
     	if(bytes != null) {
-    		String entryName = CoreGlobal2.packetName + "/" + externalIdent + ".class";
+    		String entryName = DocumentManager.packetName + "/" + externalIdent + ".class";
     		String fileName = simCoder.tempClassFileDir.toString() + '/' + entryName;
 //    		IO.println("DeclarationScope.writeClassFile: " + entryName);
 //    		IO.println("DeclarationScope.writeClassFile: " + fileName);
@@ -453,12 +453,12 @@ public abstract class DeclarationScope extends Declaration  {
     /// @param bytes the classFile bytes.
     /// @throws IOException if something went wrong.
 	private void listGeneratedClassFile(final SimulaCoder simCoder, final byte[] bytes) throws IOException {
-        File outputFile = new File(simCoder.tempClassFileDir + "\\" + CoreGlobal2.packetName + "\\" + externalIdent + ".class");
+        File outputFile = new File(simCoder.tempClassFileDir + "\\" + DocumentManager.packetName + "\\" + externalIdent + ".class");
         outputFile.getParentFile().mkdirs();
         try (FileOutputStream oupt = new FileOutputStream(outputFile)) {
 			oupt.write(bytes); //oupt.flush(); oupt.close();
 		}
-        if(CoreGlobal2.verbose) IO.println("ClassFile written to: " + outputFile + "  nBytes="+bytes.length);
+        if(DocumentManager.verbose) IO.println("ClassFile written to: " + outputFile + "  nBytes="+bytes.length);
 
         Util.doListClassFile("" + outputFile); // List generated .class file
         outputFile.delete();

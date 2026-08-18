@@ -15,7 +15,7 @@ import java.lang.constant.MethodTypeDesc;
 
 import simula.Option;
 import simula.core.CoreGlobal;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
@@ -149,7 +149,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
-			if(CoreGlobal2.verbose) IO.println("Skip  doJavaCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);	
+			if(DocumentManager.verbose) IO.println("Skip  doJavaCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);	
 			return;
 		}
 		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(simCoder, this);
@@ -224,7 +224,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		CoreGlobal.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
-			if(CoreGlobal2.verbose)
+			if(DocumentManager.verbose)
 				IO.println("Skip  buildClassFile: " + this.identifierValue()+" extends " + this.prefix + " -- It is read from " + isPreCompiledFromFile);		
 		} else {
 			try { createJavaClassFile(simCoder); } catch (IOException e) { e.printStackTrace(); }
@@ -265,7 +265,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		labelList.setLabelIdexes();
 		ClassDesc CD_ThisClass = currentClassDesc();
 		ClassDesc CD_SuperClass = superClassDesc();
-		if(CoreGlobal2.verbose) IO.println("Begin buildClassFile: PrefixecBlock " + CD_ThisClass + " extends " + CD_SuperClass);
+		if(DocumentManager.verbose) IO.println("Begin buildClassFile: PrefixecBlock " + CD_ThisClass + " extends " + CD_SuperClass);
 		
 		ClassHierarchy.addClassToSuperClass(CD_ThisClass, this.superClassDesc());
 		

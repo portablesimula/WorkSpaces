@@ -7,7 +7,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
 import simula.Option;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.utilities.LOG;
 import simula.core.utilities.Util;
@@ -17,8 +17,8 @@ public class JavaCoding {
 	/// Call Java compiler 'javac'
 	/// @throws IOException if something went wrong.
 	static void doCallJavaCompiler(SimulaCoder simCoder) throws IOException {
-		String classPath = CoreGlobal2.simulaRtsLib.toString();
-		File rtsLib = new File(CoreGlobal2.simulaRtsLib, "simula/runtime");
+		String classPath = DocumentManager.simulaRtsLib.toString();
+		File rtsLib = new File(DocumentManager.simulaRtsLib, "simula/runtime");
 		boolean rtsExist = rtsLib.exists();
 		boolean rtsCread = rtsLib.canRead();
 		if (!(rtsExist && rtsCread)) {
@@ -55,7 +55,7 @@ public class JavaCoding {
 				IO.println(javaClass.getClassOutputFileName(simCoder));
 //			list(SimulaCoder.tempClassFileDir);
 		}
-		if(CoreGlobal2.verbose) IO.println("JavaCoding.doCompile: " + simCoder.documentManager.sourceName + ": Class Files Generated - From Java Source");
+		if(DocumentManager.verbose) IO.println("JavaCoding.doCompile: " + simCoder.documentManager.sourceName + ": Class Files Generated - From Java Source");
 		if (exitValue != 0) {
 			Util.generalError("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
 			IO.println("\nCompiler terminated after error(s) during Java Compilation");
@@ -96,13 +96,13 @@ public class JavaCoding {
 		}
 		
 
-		String rtsLib = CoreGlobal2.simulaRtsLib.toString();
+		String rtsLib = DocumentManager.simulaRtsLib.toString();
 		clazzPath = clazzPath + ';' + rtsLib;
 		arguments.add("-classpath");
 		arguments.add(clazzPath);
 		arguments.add("-d");
 		arguments.add(simCoder.tempClassFileDir.toString()); // Specifies output directory.
-		if (!CoreGlobal2.WARNINGS)
+		if (!DocumentManager.WARNINGS)
 			arguments.add("-nowarn");
 		for (JavaSourceFileCoder javaClass : simCoder.javaSourceFileCoders)
 			arguments.add(javaClass.javaOutputFile.toString()); // Add .java Files
@@ -132,14 +132,14 @@ public class JavaCoding {
 		if (Option.internal.TRACING)
 			IO.println("JavaCoding.callJavacCompiler: classPath=\"" + classPath + "\"");
 		String clazzPath = simCoder.tempClassFileDir.toString();
-		String rtsLib = CoreGlobal2.simulaRtsLib.toString();
+		String rtsLib = DocumentManager.simulaRtsLib.toString();
 		clazzPath = clazzPath + ';' + rtsLib;
 		cmds.add("-classpath");
 		cmds.add(clazzPath);
 
 		cmds.add("-d");
 		cmds.add(simCoder.tempClassFileDir.toString()); // Specifies output directory.
-		if (!CoreGlobal2.WARNINGS)
+		if (!DocumentManager.WARNINGS)
 			cmds.add("-nowarn");
 		for (JavaSourceFileCoder javaClass : simCoder.javaSourceFileCoders) {
 			cmds.add(javaClass.javaOutputFile.toString()); // Add .java Files

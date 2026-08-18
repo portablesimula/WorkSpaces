@@ -12,7 +12,7 @@ import java.lang.classfile.constantpool.FieldRefEntry;
 
 import simula.Option;
 import simula.core.CoreGlobal;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
@@ -119,7 +119,7 @@ public final class RemoteVariable extends Expression {
 			if(objType.keyWord != Type.T_UNDEF)
 				Util.semanticError(obj, "doRemoteChecking: Object Expression (" + obj + ") is not a ref() type rather " + objType);
 		} else if (qual.hasLocalClasses) {
-			if (CoreGlobal2.EXTENSIONS)
+			if (DocumentManager.EXTENSIONS)
 				 Util.warning(obj, "Illegal remote access into object of class with local classes.");
 			else Util.semanticError(obj, "Illegal remote access into object of class with local classes.");
 		}

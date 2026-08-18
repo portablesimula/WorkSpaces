@@ -31,7 +31,7 @@ import simula.Option;
 import simula.core.DocumentManager;
 import simula.core.builder.AttributeFileIO;
 import simula.core.builder.SimulaBuilder;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.syntaxClass.statement.ProgramModule;
 import simula.core.utilities.LOG;
@@ -105,13 +105,13 @@ public class JarFileBuilder {
 		}
 
 		Manifest manifest = new Manifest();
-		String packetName = CoreGlobal2.packetName;
+		String packetName = DocumentManager.packetName;
 		mainEntry = packetName + '/' + programModule.getIdentifier().value;
 		mainEntry = mainEntry.replace('/', '.');
 		if (Option.internal.TRACING)
 			IO.println("Output " + outputJarFile + " MANIFEST'mainEntry=\"" + mainEntry + "\"");
 		manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-		manifest.getMainAttributes().putValue("Created-By", CoreGlobal2.simulaReleaseID + " (Portable Simula)");
+		manifest.getMainAttributes().putValue("Created-By", DocumentManager.simulaReleaseID + " (Portable Simula)");
 		if (programModule.isExecutable()) {
 			manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, mainEntry);
 		} else {
@@ -148,14 +148,14 @@ public class JarFileBuilder {
 	private File close(final SimulaCoder simCoder) throws IOException {
 		if(TESTING) {
 			IO.println("JarFileBuilder.close: BEGIN: ");
-	    	Util.doListDirectory("JarFileBuilder.close: BEGIN: ", ""+simCoder.tempClassFileDir + "/" + CoreGlobal2.packetName);
+	    	Util.doListDirectory("JarFileBuilder.close: BEGIN: ", ""+simCoder.tempClassFileDir + "/" + DocumentManager.packetName);
 		}
-		writeFileToJarFile(new File(simCoder.tempClassFileDir, CoreGlobal2.packetName), simCoder.tempClassFileDir.toString().length());			
+		writeFileToJarFile(new File(simCoder.tempClassFileDir, DocumentManager.packetName), simCoder.tempClassFileDir.toString().length());			
 		if (programModule.isExecutable()) {
 			if(TESTING) IO.println("JarFileBuilder.close: Executable "+programModule);
 			// Add the Runtime System
-			File rtsHome = new File(CoreGlobal2.simulaRtsLib, "simula/runtime");
-			writeFileToJarFile(rtsHome, CoreGlobal2.simulaRtsLib.toString().length());
+			File rtsHome = new File(DocumentManager.simulaRtsLib, "simula/runtime");
+			writeFileToJarFile(rtsHome, DocumentManager.simulaRtsLib.toString().length());
 		} else {
 			String id = programModule.getIdentifier().value;
 			String kind = (programModule.mainModule instanceof ClassDeclaration) ? "Class " : "Procedure ";
@@ -164,12 +164,12 @@ public class JarFileBuilder {
         
         jarOutputStream.close();
 		if(TESTING) IO.println("JarFileBuilder.close: "+jarOutputStream);
-		if(CoreGlobal2.verbose) IO.println("JarFileBuilder.close: " + simCoder.documentManager.sourceName + ": JarFile " + outputJarFile);
+		if(DocumentManager.verbose) IO.println("JarFileBuilder.close: " + simCoder.documentManager.sourceName + ": JarFile " + outputJarFile);
 		
 		if(TESTING) {
 			IO.println("JarFileBuilder.close: END: ");
 			listJarFile("JarFileBuilder.close: END: ", outputJarFile);
-	    	Util.doListDirectory("JarFileBuilder.close: END: ", ""+simCoder.tempClassFileDir + "/" + CoreGlobal2.packetName);
+	    	Util.doListDirectory("JarFileBuilder.close: END: ", ""+simCoder.tempClassFileDir + "/" + DocumentManager.packetName);
 		}
 
 		LOG.info("END Create .jar File: " + outputJarFile);
@@ -188,7 +188,7 @@ public class JarFileBuilder {
 			LOOP2:while ((entry = jarInputStream.getNextJarEntry()) != null) {
 
 				String entryName = entry.getName();
-				if (!entryName.startsWith(CoreGlobal2.packetName)) continue LOOP2;
+				if (!entryName.startsWith(DocumentManager.packetName)) continue LOOP2;
 				if (!entryName.endsWith(".class"))				      continue LOOP2;
 
 				// Write entry to tempClassFileDir

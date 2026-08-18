@@ -9,7 +9,7 @@ import java.lang.classfile.CodeBuilder;
 
 import simula.Option;
 import simula.core.CoreGlobal;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.DocumentManager;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
@@ -131,7 +131,7 @@ public abstract class Statement extends SyntaxElement {
 		    case KeyWord.FOR:		 statement = ForStatement.of(simBuilder.documentManager); break;
 		    case KeyWord.WHILE:		 statement = WhileStatement.of(simBuilder.documentManager); break;
 		    case KeyWord.INSPECT:	 statement = ConnectionStatement.of(simBuilder.documentManager); break;
-		    case KeyWord.SWITCH:	 if(CoreGlobal2.EXTENSIONS) {
+		    case KeyWord.SWITCH:	 if(DocumentManager.EXTENSIONS) {
 		    							 statement = SwitchStatement.of(simBuilder.documentManager);
 		    						 } break;
 		    case KeyWord.ACTIVATE,

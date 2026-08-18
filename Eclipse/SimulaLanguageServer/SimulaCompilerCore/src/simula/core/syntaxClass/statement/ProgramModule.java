@@ -10,7 +10,7 @@ import java.util.Vector;
 
 import simula.Option;
 import simula.core.CoreGlobal;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.DocumentManager;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
@@ -80,8 +80,8 @@ public final class ProgramModule extends Statement {
 	/// Returns the relative file name.
 	/// @return the relative file name
 	public String getRelativeAttributeFileName() {
-		if(mainModule.declarationKind==ObjectKind.Class) return(CoreGlobal2.packetName+"/CLASS.AF");
-		if(mainModule.declarationKind==ObjectKind.Procedure) return(CoreGlobal2.packetName+"/PROCEDURE.AF");
+		if(mainModule.declarationKind==ObjectKind.Class) return(DocumentManager.packetName+"/CLASS.AF");
+		if(mainModule.declarationKind==ObjectKind.Procedure) return(DocumentManager.packetName+"/PROCEDURE.AF");
 		else return(null);
 	}
 	  
@@ -166,7 +166,7 @@ public final class ProgramModule extends Statement {
 				if(! textAfterEnd.equals(";")) Util.warning(simBuilder, start, end, "Text after Program end: \"" + textAfterEnd + '"');
 			}
 			
-			if(CoreGlobal2.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
+			if(DocumentManager.verbose) Util.TRACE("ProgramModule: END NEW SimulaProgram: "+toString());
 //		} catch(Throwable e) {
 //			e.printStackTrace();
 //			Util.IERR();

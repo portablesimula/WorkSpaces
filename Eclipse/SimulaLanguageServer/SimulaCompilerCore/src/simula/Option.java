@@ -7,7 +7,7 @@ package simula;
 
 import java.io.File;
 
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.DocumentManager;
 import simula.core.utilities.Util;
 
@@ -111,8 +111,8 @@ public final class Option {
 
 	public static void print(String title) {
 		IO.println("------------  Option.print: " + title + "  ------------");
-		IO.println("DocumentManager.packetName      " + CoreGlobal2.packetName);
-		IO.println("DocumentManager.simulaRtsLib    " + CoreGlobal2.simulaRtsLib);
+		IO.println("DocumentManager.packetName      " + DocumentManager.packetName);
+		IO.println("DocumentManager.simulaRtsLib    " + DocumentManager.simulaRtsLib);
 		
 //		IO.println("SimulaBuilder.jarFileDir         " + SimulaCoder.jarFileDir);
 //		IO.println("SimulaBuilder.simulaTempDir     " + SimulaCoder.simulaTempDir);
@@ -124,9 +124,9 @@ public final class Option {
 	/// Kalles før parsing og checking
 	public static void decodeArguments(String[] argv) {
 //		IO.println("Option.decodeArguments: ");
-		CoreGlobal2.verbose = false;
-		CoreGlobal2.WARNINGS = true;
-		CoreGlobal2.EXTENSIONS = true;
+		DocumentManager.verbose = false;
+		DocumentManager.WARNINGS = true;
+		DocumentManager.EXTENSIONS = true;
 
 		// Parse command line arguments.
 		for(int i=0;i<argv.length;i++) {
@@ -134,13 +134,13 @@ public final class Option {
 //			IO.println("Option.decodeArguments: arg: " + arg);
 			switch(arg) {
 //				case "-help": help(); break;
-				case "-caseSensitive": CoreGlobal2.CaseSensitive = true; break;
+				case "-caseSensitive": DocumentManager.CaseSensitive = true; break;
 //				case "-compilerMode": Option.setCompilerMode(argv[++i]); break;
 //				case "-noexec": SimulaCompiler.noExecution=true; break;
-				case "-noextension": CoreGlobal2.EXTENSIONS = false; break;
-				case "-noPopup": CoreGlobal2.noPopup = true; break;
-				case "-nowarn": CoreGlobal2.WARNINGS = false; break;
-				case "-verbose": CoreGlobal2.verbose = true; break;
+				case "-noextension": DocumentManager.EXTENSIONS = false; break;
+				case "-noPopup": DocumentManager.noPopup = true; break;
+				case "-nowarn": DocumentManager.WARNINGS = false; break;
+				case "-verbose": DocumentManager.verbose = true; break;
 //				case "-version": printVersion(); break;
 //				case "-select": setSelectors(argv[++i]); break;				
 //				case "-keepJava": Option.internal.keepJava = new File(argv[++i]); break;
@@ -161,16 +161,16 @@ public final class Option {
 			String arg=argv[i];
 			if (arg.charAt(0) == '-') { // command line option
 				if (arg.equalsIgnoreCase("-compilerMode")) Option.setCompilerMode(documentManager, argv[++i]);
-				else if (arg.equalsIgnoreCase("-noexec")) CoreGlobal2.noExecution = true;
+				else if (arg.equalsIgnoreCase("-noexec")) DocumentManager.noExecution = true;
 //				else if (arg.equalsIgnoreCase("-noextension")) SimulaCompiler.EXTENSIONS=false;
-				else if (arg.equalsIgnoreCase("-noPopup")) CoreGlobal2.noPopup = true;
-				else if (arg.equalsIgnoreCase("-nowarn")) CoreGlobal2.WARNINGS = false;
-				else if (arg.equalsIgnoreCase("-verbose")) CoreGlobal2.verbose = true;
+				else if (arg.equalsIgnoreCase("-noPopup")) DocumentManager.noPopup = true;
+				else if (arg.equalsIgnoreCase("-nowarn")) DocumentManager.WARNINGS = false;
+				else if (arg.equalsIgnoreCase("-verbose")) DocumentManager.verbose = true;
 //				else if (arg.equalsIgnoreCase("-version")) printVersion();
 //				else if (arg.equalsIgnoreCase("-select")) setSelectors(argv[++i]);				
 				else if (arg.equalsIgnoreCase("-keepJava")) Option.internal.keepJava = new File(argv[++i]);
 
-				else if (arg.equalsIgnoreCase("-simulaRtsLib")) CoreGlobal2.simulaRtsLib = new File(argv[++i]);
+				else if (arg.equalsIgnoreCase("-simulaRtsLib")) DocumentManager.simulaRtsLib = new File(argv[++i]);
 				else if (arg.equalsIgnoreCase("-output")) documentManager.jarFileDir = new File(argv[++i]);
 				else if (arg.equalsIgnoreCase("-extLib")) documentManager.extLib = new File(argv[++i]);
 				
@@ -193,12 +193,12 @@ public final class Option {
 		Option.editorUIScale = "1.0";
 //		Option.selectedTheme = Palette.themeNames[0];
 //		CompilerMode compilerMode=CompilerMode.viaJavaSource;
-//		CoreGlobal2.compilerMode = CoreGlobal2.CompilerMode.directClassFiles;
-		CoreGlobal2.CaseSensitive = false;
-		CoreGlobal2.verbose = false;
-		CoreGlobal2.noExecution = false;
-		CoreGlobal2.WARNINGS = true;
-		CoreGlobal2.EXTENSIONS = true;
+//		DocumentManager.compilerMode = DocumentManager.CompilerMode.directClassFiles;
+		DocumentManager.CaseSensitive = false;
+		DocumentManager.verbose = false;
+		DocumentManager.noExecution = false;
+		DocumentManager.WARNINGS = true;
+		DocumentManager.EXTENSIONS = true;
 		
 		Option.internal.InitCompilerOptions();
 	}
