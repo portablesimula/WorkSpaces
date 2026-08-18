@@ -16,7 +16,7 @@ import java.util.Vector;
 
 import simula.Option;
 import simula.core.CoreGlobal;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
@@ -132,8 +132,8 @@ public final class VariableExpression extends Expression {
 
 	/// Create a new Variable.
 	/// @param identifier the variable's identifier
-	public VariableExpression(final SimulaBuilder simBuilder, final Identifier identifier) {
-		super(simBuilder);
+	public VariableExpression(final DocumentManager documentManager, final Identifier identifier) {
+		super(documentManager);
 		this.identifier = identifier;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW Variable: " + identifier);
@@ -184,7 +184,7 @@ public final class VariableExpression extends Expression {
 	public static VariableExpression expectVariable(final SimulaBuilder simBuilder, final Identifier identifier) {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse Variable: current=" + Parse.getCurrentParserToken(simBuilder));
-		VariableExpression variable = new VariableExpression(simBuilder, identifier);
+		VariableExpression variable = new VariableExpression(simBuilder.documentManager, identifier);
 		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
 //			IO.println("VariableExpression.expectVariable: GOT BEGPAR");
 			variable.params = new Vector<Expression>();
@@ -266,7 +266,7 @@ public final class VariableExpression extends Expression {
 					checkedParams = new Vector<Expression>();
 					for (Expression actualParameter : params) {
 						actualParameter.doChecking();
-						Expression checkedParameter = TypeConversion.testAndCreate(Type.Integer, actualParameter);
+						Expression checkedParameter = TypeConversion.testAndCreate(documentManager, Type.Integer, actualParameter);
 						checkedParameter.backLink = this;
 						checkedParams.add(checkedParameter);
 					}
@@ -286,13 +286,13 @@ public final class VariableExpression extends Expression {
 					paramIterator = cdecl.new ClassParameterIterator();
 				} else if (declaredAs instanceof ProcedureDeclaration) {
 					paramIterator = ((ProcedureDeclaration) declaredAs).parameterList.iterator();
-					if(CoreGlobal2.compilerMode != CoreGlobal2.CompilerMode.viaJavaSource) {
+					if(! documentManager.compileViaJavaSource) {
 						if(declaredAs instanceof StandardProcedure prc) {
 							if(prc.identifierValue().equalsIgnoreCase("histd")) ; // NOTHING
 							else if(prc.identifierValue().equalsIgnoreCase("discrete")) ; // NOTHING
 							else if(prc.identifierValue().equalsIgnoreCase("linear")) ; // NOTHING
 							else {
-								ProcedureSpecification overLoadMatch = prc.getOverLoadMatch(params);
+								ProcedureSpecification overLoadMatch = prc.getOverLoadMatch(documentManager, params);
 								if(overLoadMatch != null)
 									overloadedType = overLoadMatch.type;
 							}
@@ -342,7 +342,7 @@ public final class VariableExpression extends Expression {
 								}
 							}
 						}
-						Expression checkedParameter = TypeConversion.testAndCreate(formalType, actualParameter);
+						Expression checkedParameter = TypeConversion.testAndCreate(documentManager, formalType, actualParameter);
 						checkedParameter.backLink = this;
 						checkedParams.add(checkedParameter);
 					}
@@ -368,7 +368,7 @@ public final class VariableExpression extends Expression {
 						if (kind == Parameter.Kind.Array) {
 							if (!actualParameter.type.isArithmeticType())
 								Util.semanticError(this, "Illegal index-type");
-							Expression checkedParameter = TypeConversion.testAndCreate(Type.Integer, actualParameter);
+							Expression checkedParameter = TypeConversion.testAndCreate(documentManager, Type.Integer, actualParameter);
 							checkedParameter.backLink = this;
 							checkedParams.add(checkedParameter);
 						} else
@@ -500,7 +500,7 @@ public final class VariableExpression extends Expression {
 	@Override
 	public String put(final String rightPart) {
 		ASSERT_SEMANTICS_CHECKED();
-		String edited = this.editVariable(rightPart); // Is a Destination
+		String edited = this.editVariable(documentManager.simCoder, rightPart); // Is a Destination
 		return (edited);
 	}
 
@@ -512,7 +512,7 @@ public final class VariableExpression extends Expression {
 	public String get() {
 		ASSERT_SEMANTICS_CHECKED();
 		String rightPart = null;
-		String result = this.editVariable(rightPart); // Not a destination
+		String result = this.editVariable(documentManager.simCoder, rightPart); // Not a destination
 		return (result);
 	}
 
@@ -522,7 +522,7 @@ public final class VariableExpression extends Expression {
 	/// Java Coding Utility: Edit this Variable.
 	/// @param rightPart When destination, this is the right part of the assignment
 	/// @return the resulting Java source code
-	private String editVariable(final String rightPart) {
+	private String editVariable(final SimulaCoder simCoder, final String rightPart) {
 		ASSERT_SEMANTICS_CHECKED();
 		boolean destination = (rightPart != null);
 		if(meaning == null) Util.IERR("NO MEANING: " + identifier.value);
@@ -592,7 +592,7 @@ public final class VariableExpression extends Expression {
 					if (par.mode == Parameter.Mode.value)
 						Util.codingError(this, "Parameter " + this + " by Value is not allowed - Rewrite Program");
 					else // Procedure By Reference or Name.
-						s.append(CallProcedure.formal(this, par));
+						s.append(CallProcedure.formal(simCoder, this, par));
 					if (rightPart != null) {
 						s.append('=').append(rightPart);
 					}
@@ -648,7 +648,7 @@ public final class VariableExpression extends Expression {
 				} else {
 					ProcedureDeclaration procedure = (ProcedureDeclaration) declaredAs;
 					if (procedure.myVirtual != null)
-						return CallProcedure.virtual(this, procedure.myVirtual.virtualSpec, remotelyAccessed);
+						return CallProcedure.virtual(simCoder, this, procedure.myVirtual.virtualSpec, remotelyAccessed);
 					else
 						return CallProcedure.normal(this);
 				}
@@ -664,7 +664,7 @@ public final class VariableExpression extends Expression {
 				if (rightPart != null)
 					Util.IERR();
 				VirtualSpecification virtual = (VirtualSpecification) declaredAs;
-				return CallProcedure.virtual(this, virtual, remotelyAccessed);
+				return CallProcedure.virtual(simCoder, this, virtual, remotelyAccessed);
 
 			case ObjectKind.UndefinedDeclaration:
 				if (rightPart != null)
@@ -987,8 +987,8 @@ public final class VariableExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O.
-	public VariableExpression() {
-		super(null);
+	public VariableExpression(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -1017,14 +1017,14 @@ public final class VariableExpression extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the VariableExpression object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static VariableExpression readObject(AttributeInputStream inpt) throws IOException {
-		VariableExpression var = new VariableExpression();
+	public static VariableExpression readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		VariableExpression var = new VariableExpression(documentManager);
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 		// *** SyntaxElement
 		var.astData = readAstData(inpt);
 		// *** Expression
 		var.type = inpt.readType();
-		var.backLink = (SyntaxElement) inpt.readObj();
+		var.backLink = (SyntaxElement) inpt.readObj(documentManager);
 		// *** VariableExpression
 		var.identifier = inpt.readIdentifier();
 		var.remotelyAccessed = inpt.readBoolean();
@@ -1033,7 +1033,7 @@ public final class VariableExpression extends Expression {
 		if(n > 0) {
 			var.params = new Vector<Expression>();
 			for(int i=0;i<n;i++)
-				var.params.add((Expression) inpt.readObj());
+				var.params.add((Expression) inpt.readObj(documentManager));
 		}
 		
 		Util.TRACE_INPUT("readVariableExpression: " + var);

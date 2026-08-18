@@ -13,10 +13,10 @@ import java.lang.constant.MethodTypeDesc;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.SimulaBuilder;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.Parameter;
@@ -48,8 +48,8 @@ public class ForWhileElement extends ForListElement {
 	/// @param forStatement the ForStatement
 	/// @param expr1 first expression 
 	/// @param expr2 second expression
-	public ForWhileElement(final SimulaBuilder simBuilder, final ForStatement forStatement, final Expression expr1, final Expression expr2) {
-		super(simBuilder, forStatement, expr1);
+	public ForWhileElement(final DocumentManager documentManager, final ForStatement forStatement, final Expression expr1, final Expression expr2) {
+		super(documentManager, forStatement, expr1);
 		this.expr2 = expr2;
 	}
 
@@ -58,7 +58,7 @@ public class ForWhileElement extends ForListElement {
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN WhileElement(" + this + ").doChecking - Current Scope Chain: " + CoreGlobal.getCurrentScope().edScopeChain());
 		expr1.doChecking();
-		expr1 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr1);
+		expr1 = TypeConversion.testAndCreate(documentManager, forStatement.controlVariable.type, expr1);
 //		expr1.doChecking();
 		expr1.backLink = forStatement; // To ensure _RESULT from functions
 		expr2.doChecking();
@@ -84,17 +84,17 @@ public class ForWhileElement extends ForListElement {
 	}
 
 	@Override
-	public void doSimplifiedJavaCoding() {
+	public void doSimplifiedJavaCoding(final SimulaCoder simCoder) {
 		String cv = forStatement.controlVariable.toJavaCode();
 		String cond = this.expr2.toJavaCode();
 		// ------------------------------------------------------------
 		// cv=expr1; while(cond) { Statements ... cv=expr1; }
 		// ------------------------------------------------------------
-		JavaSourceFileCoder.code(cv + "=" + this.expr1.toJavaCode() + ";");
-		JavaSourceFileCoder.code("while(" + cond + ") {");
-		forStatement.doStatement.doJavaCoding();
-		JavaSourceFileCoder.code(cv + "=" + this.expr1.toJavaCode() + ";");
-		JavaSourceFileCoder.code("}");
+		JavaSourceFileCoder.code(simCoder,cv + "=" + this.expr1.toJavaCode() + ";");
+		JavaSourceFileCoder.code(simCoder,"while(" + cond + ") {");
+		forStatement.doStatement.doJavaCoding(simCoder);
+		JavaSourceFileCoder.code(simCoder,cv + "=" + this.expr1.toJavaCode() + ";");
+		JavaSourceFileCoder.code(simCoder,"}");
 	}
 
 	@Override
@@ -149,7 +149,7 @@ public class ForWhileElement extends ForListElement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ForWhileElement() {}
+	private ForWhileElement(final DocumentManager documentManager) { super(documentManager);}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -168,15 +168,15 @@ public class ForWhileElement extends ForListElement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ForWhileElement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ForWhileElement readObject(AttributeInputStream inpt) throws IOException {
-		ForWhileElement elt = new ForWhileElement();
+	public static ForWhileElement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		ForWhileElement elt = new ForWhileElement(documentManager);
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
 		// *** SyntaxElement
 		elt.astData = readAstData(inpt);
 		// *** ForListElement
-		elt.forStatement = (ForStatement) inpt.readObj();
-		elt.expr1 = (Expression) inpt.readObj();
-		elt.expr2 = (Expression) inpt.readObj();
+		elt.forStatement = (ForStatement) inpt.readObj(documentManager);
+		elt.expr1 = (Expression) inpt.readObj(documentManager);
+		elt.expr2 = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("ForWhileElement: " + elt);
 		return(elt);
 	}

@@ -115,8 +115,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// Create a new ProcedureDeclaration.
 	/// @param identifier procedure identifier
 	/// @param declarationKind procedure or switch
-	protected ProcedureDeclaration(final SimulaBuilder simBuilder, final Identifier identifier,final int declarationKind) {
-		super(simBuilder, identifier);
+	protected ProcedureDeclaration(final DocumentManager documentManager, final Identifier identifier,final int declarationKind) {
+		super(documentManager, identifier);
 		this.declarationKind = declarationKind;
 	}
 
@@ -144,8 +144,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @param type procedure's type
 	/// @return a newly created ProcedureDeclaration
 	public static ProcedureDeclaration expectProcedureDeclaration(final SimulaBuilder simBuilder, final Type type) {
-		ProcedureDeclaration proc = new ProcedureDeclaration(simBuilder, null, ObjectKind.Procedure);
-		proc.sourceFileName = DocumentManager.sourceFileName;
+		ProcedureDeclaration proc = new ProcedureDeclaration(simBuilder.documentManager, null, ObjectKind.Procedure);
+		proc.sourceFileName = simBuilder.documentManager.sourceFileName;
 //		proc.OLD_lineNumber = simBuilder.getSourceLineNumber();
 		proc.type = type;
 		if (Option.internal.TRACE_PARSE)
@@ -201,7 +201,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					}
 				if (parameter == null) {
 					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
-					parameter = new Parameter(simBuilder, identifier);
+					parameter = new Parameter(simBuilder.documentManager, identifier);
 				}
 				parameter.setMode(mode);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
@@ -254,7 +254,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					if (Util.equals(identifier,par.identifier)) { parameter = par; break; }
 				if (parameter == null) {
 					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
-					parameter = new Parameter(simBuilder, identifier);
+					parameter = new Parameter(simBuilder.documentManager, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
@@ -321,7 +321,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		CoreGlobal.enterScope(this);
 			LabelList.accumLabelList(this);
 			if(type != null) {
-				this.result = new SimpleVariableDeclaration(null, type, new Identifier("_RESULT"));
+				this.result = new SimpleVariableDeclaration(documentManager, type, new Identifier("_RESULT"));
 				declarationList.add(result);
 			}
 			int prfx = 0;// prefixLevel();
@@ -346,7 +346,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 								Util.semanticError(this, "Virtual match has wrong heading. Parameter " + (i+1) + " does not match the specification");	
 					}
 				} 
-				myVirtual = new VirtualMatch(simBuilder, virtualSpec, this);
+				myVirtual = new VirtualMatch(documentManager, virtualSpec, this);
 				ClassDeclaration decl = (ClassDeclaration) declaredIn;
 				decl.virtualMatchList.add(myVirtual);
 				if (decl == virtualSpec.declaredIn) virtualSpec.hasDefaultMatch = true;
@@ -386,13 +386,13 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	// *** Coding: doJavaCoding
 	// ***********************************************************************************************
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(CoreGlobal2.verbose) IO.println("Skip  doJavaCoding: "+this.identifier+" -- It is read from "+isPreCompiledFromFile);		
 		} else {
 			switch (declarationKind) {
-				case ObjectKind.Procedure -> doProcedureCoding();
+				case ObjectKind.Procedure -> doProcedureCoding(simCoder);
 				default -> Util.IERR();
 			}
 		}
@@ -430,46 +430,46 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	// *** Coding: PROCEDURE
 	// ***********************************************************************************************
 	/// Generate java source code for this Procedure.
-	private void doProcedureCoding() {
+	private void doProcedureCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(CoreGlobal2.verbose) IO.println("Skip  doProcedureCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);		
 			return;
 		}
-		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
+		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(simCoder, this);
 		CoreGlobal.enterScope(this);
 			labelList.setLabelIdexes();
-			JavaSourceFileCoder.code("@SuppressWarnings(\"unchecked\")");
-			JavaSourceFileCoder.code("public final class " + getJavaIdentifier() + " extends RTS_PROCEDURE {");
-			JavaSourceFileCoder.debug("// ProcedureDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
+			JavaSourceFileCoder.code(simCoder,"@SuppressWarnings(\"unchecked\")");
+			JavaSourceFileCoder.code(simCoder,"public final class " + getJavaIdentifier() + " extends RTS_PROCEDURE {");
+			JavaSourceFileCoder.debug(simCoder,"// ProcedureDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
 						+ ", firstLine=" + firstLineNumber() + ", lastLine=" + lastLineNumber() + ", hasLocalClasses="
 						+ ((hasLocalClasses) ? "true" : "false") + ", System=" + ((isQPSystemBlock()) ? "true" : "false"));
 			if (isQPSystemBlock())
-				JavaSourceFileCoder.code("public boolean isQPSystemBlock() { return(true); }");
+				JavaSourceFileCoder.code(simCoder,"public boolean isQPSystemBlock() { return(true); }");
 			if ( declarationKind == ObjectKind.Procedure && type != null) {
-				JavaSourceFileCoder.code("@Override");
-				JavaSourceFileCoder.code("public Object _RESULT() { return(" + this.result.identifier.value + "); }");
+				JavaSourceFileCoder.code(simCoder,"@Override");
+				JavaSourceFileCoder.code(simCoder,"public Object _RESULT() { return(" + this.result.identifier.value + "); }");
 			}
-			JavaSourceFileCoder.debug("// Declare parameters as attributes");
+			JavaSourceFileCoder.debug(simCoder,"// Declare parameters as attributes");
 			boolean hasParameter = false;
 			for (Parameter par : parameterList) {
 				String tp = par.toJavaType();
 				hasParameter = true;
-				JavaSourceFileCoder.code("public " + tp + ' ' + par.externalIdent + ';');
+				JavaSourceFileCoder.code(simCoder,"public " + tp + ' ' + par.externalIdent + ';');
 			}
 			if(this.hasAccumLabel()) {
-				JavaSourceFileCoder.debug("// Declare local labels");
+				JavaSourceFileCoder.debug(simCoder,"// Declare local labels");
 				for (LabelDeclaration lab : labelList.getAccumLabels())
-					lab.declareLocalLabel(this);
+					lab.declareLocalLabel(simCoder, this);
 			}
-			JavaSourceFileCoder.debug("// Declare locals as attributes");
-			for (Declaration decl : declarationList) decl.doJavaCoding();
-			if (declarationKind == ObjectKind.Procedure && hasParameter) doCodePrepareFormal();
-			doCodeConstructor();
-			codeProcedureBody();
-			javaCoder.codeProgramInfo();
-			JavaSourceFileCoder.code("}", "End of Procedure");
+			JavaSourceFileCoder.debug(simCoder,"// Declare locals as attributes");
+			for (Declaration decl : declarationList) decl.doJavaCoding(simCoder);
+			if (declarationKind == ObjectKind.Procedure && hasParameter) doCodePrepareFormal(simCoder);
+			doCodeConstructor(simCoder);
+			codeProcedureBody(simCoder);
+			javaCoder.codeProgramInfo(simCoder);
+			JavaSourceFileCoder.code(simCoder,"}", "End of Procedure");
 		CoreGlobal.exitScope();
 		javaCoder.closeJavaOutput();
 	}
@@ -478,30 +478,30 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	// *** Coding Utility: doCodeConstructor
 	// ***********************************************************************************************
 	/// Generate Java source code for the constructor.
-	private void doCodeConstructor() {
-		JavaSourceFileCoder.debug("// Normal Constructor");
-		JavaSourceFileCoder.code("public " + getJavaIdentifier() + edFormalParameterList(false, true));
-		JavaSourceFileCoder.code("super(_SL);");
-		JavaSourceFileCoder.debug("// Parameter assignment to locals");
+	private void doCodeConstructor(final SimulaCoder simCoder) {
+		JavaSourceFileCoder.debug(simCoder,"// Normal Constructor");
+		JavaSourceFileCoder.code(simCoder,"public " + getJavaIdentifier() + edFormalParameterList(false, true));
+		JavaSourceFileCoder.code(simCoder,"super(_SL);");
+		JavaSourceFileCoder.debug(simCoder,"// Parameter assignment to locals");
 		for (Parameter par : parameterList)
-			JavaSourceFileCoder.code("this." + par.externalIdent + " = s" + par.externalIdent + ';');
-		JavaSourceFileCoder.code("BBLK();");
-		JavaSourceFileCoder.debug("// Declaration Code");
-		for (Declaration decl : declarationList) decl.doDeclarationCoding();
-		JavaSourceFileCoder.code("_STM();");
-		JavaSourceFileCoder.code("}");
+			JavaSourceFileCoder.code(simCoder,"this." + par.externalIdent + " = s" + par.externalIdent + ';');
+		JavaSourceFileCoder.code(simCoder,"BBLK();");
+		JavaSourceFileCoder.debug(simCoder,"// Declaration Code");
+		for (Declaration decl : declarationList) decl.doDeclarationCoding(simCoder);
+		JavaSourceFileCoder.code(simCoder,"_STM();");
+		JavaSourceFileCoder.code(simCoder,"}");
 	}
 
 	// ***********************************************************************************************
 	// *** Coding Utility: doCodePrepareFormal
 	// ***********************************************************************************************
 	/// Generate Java source code prepared for 'call formal procedure'.
-	private void doCodePrepareFormal() {
-		JavaSourceFileCoder.debug("// Parameter Transmission in case of Formal/Virtual Procedure Call");
-		JavaSourceFileCoder.code("@Override");
-		JavaSourceFileCoder.code("public " + getJavaIdentifier() + " setPar(Object param) {");
-		JavaSourceFileCoder.code("try {");
-		JavaSourceFileCoder.code("switch(_nParLeft--) {");
+	private void doCodePrepareFormal(final SimulaCoder simCoder) {
+		JavaSourceFileCoder.debug(simCoder,"// Parameter Transmission in case of Formal/Virtual Procedure Call");
+		JavaSourceFileCoder.code(simCoder,"@Override");
+		JavaSourceFileCoder.code(simCoder,"public " + getJavaIdentifier() + " setPar(Object param) {");
+		JavaSourceFileCoder.code(simCoder,"try {");
+		JavaSourceFileCoder.code(simCoder,"switch(_nParLeft--) {");
 		int nPar = 0;
 		for (Parameter par : parameterList) {
 			String tp = par.toJavaType();
@@ -526,36 +526,36 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					default -> typeValue = ("(" + tp + ")param");
 				}
 			}
-			JavaSourceFileCoder.code("case " + ( parameterList.size() - (nPar++)) + ": " + par.externalIdent + "=" + typeValue + "; break;");
+			JavaSourceFileCoder.code(simCoder,"case " + ( parameterList.size() - (nPar++)) + ": " + par.externalIdent + "=" + typeValue + "; break;");
 		}
-		JavaSourceFileCoder.code("default: throw new RTS_SimulaRuntimeError(\"Too many parameters\");");
-		JavaSourceFileCoder.code("}");
-		JavaSourceFileCoder.code("}");
-		JavaSourceFileCoder.code("catch(ClassCastException e) { throw new RTS_SimulaRuntimeError(\"Wrong type of parameter: \"+param,e);}");
-		JavaSourceFileCoder.code("return(this);");
-		JavaSourceFileCoder.code("}");
-		JavaSourceFileCoder.debug("// Constructor in case of Formal/Virtual Procedure Call");
-		JavaSourceFileCoder.code("public " + getJavaIdentifier() + "(RTS_RTObject _SL) {");
-		JavaSourceFileCoder.code("super(_SL,"+parameterList.size()+");","Expecting "+parameterList.size()+" parameters");
-		JavaSourceFileCoder.code("}");
+		JavaSourceFileCoder.code(simCoder,"default: throw new RTS_SimulaRuntimeError(\"Too many parameters\");");
+		JavaSourceFileCoder.code(simCoder,"}");
+		JavaSourceFileCoder.code(simCoder,"}");
+		JavaSourceFileCoder.code(simCoder,"catch(ClassCastException e) { throw new RTS_SimulaRuntimeError(\"Wrong type of parameter: \"+param,e);}");
+		JavaSourceFileCoder.code(simCoder,"return(this);");
+		JavaSourceFileCoder.code(simCoder,"}");
+		JavaSourceFileCoder.debug(simCoder,"// Constructor in case of Formal/Virtual Procedure Call");
+		JavaSourceFileCoder.code(simCoder,"public " + getJavaIdentifier() + "(RTS_RTObject _SL) {");
+		JavaSourceFileCoder.code(simCoder,"super(_SL,"+parameterList.size()+");","Expecting "+parameterList.size()+" parameters");
+		JavaSourceFileCoder.code(simCoder,"}");
 	}
 
 	// ***********************************************************************************************
 	// *** Coding Utility: codeProcedureBody -- Redefined in SwitchDeclaration
 	// ***********************************************************************************************
 	/// Coding Utility: codeProcedureBody. Redefined in SwitchDeclaration.
-	protected void codeProcedureBody() {
-		boolean duringSTM_Coding=SimulaCoder.duringSTM_Coding;
-		SimulaCoder.duringSTM_Coding=false;
-		JavaSourceFileCoder.debug("// Procedure Statements");
-		JavaSourceFileCoder.code("@Override");
-		JavaSourceFileCoder.code("public " + getJavaIdentifier() + " _STM() {");
-		SimulaCoder.duringSTM_Coding=true;
-		codeSTMBody();
-		JavaSourceFileCoder.code("EBLK();");
-		JavaSourceFileCoder.code("return(this);");
-		JavaSourceFileCoder.code("}", "End of Procedure BODY");
-		SimulaCoder.duringSTM_Coding=duringSTM_Coding;
+	protected void codeProcedureBody(final SimulaCoder simCoder) {
+		boolean duringSTM_Coding=simCoder.duringSTM_Coding;
+		simCoder.duringSTM_Coding=false;
+		JavaSourceFileCoder.debug(simCoder,"// Procedure Statements");
+		JavaSourceFileCoder.code(simCoder,"@Override");
+		JavaSourceFileCoder.code(simCoder,"public " + getJavaIdentifier() + " _STM() {");
+		simCoder.duringSTM_Coding=true;
+		codeSTMBody(simCoder);
+		JavaSourceFileCoder.code(simCoder,"EBLK();");
+		JavaSourceFileCoder.code(simCoder,"return(this);");
+		JavaSourceFileCoder.code(simCoder,"}", "End of Procedure BODY");
+		simCoder.duringSTM_Coding=duringSTM_Coding;
 	}
 
 
@@ -605,7 +605,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
 				classBuilder -> {
 					classBuilder
-						.with(SourceFileAttribute.of(DocumentManager.sourceFileName))
+						.with(SourceFileAttribute.of(simCoder.documentManager.sourceFileName))
 						.withFlags(ClassFile.ACC_PUBLIC + ClassFile.ACC_FINAL + ClassFile.ACC_SUPER)
 						.withSuperclass(RTS.CD.RTS_PROCEDURE);
 					
@@ -1084,8 +1084,6 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
-	/// Default constructor used by Attribute File I/O
-	public ProcedureDeclaration() {	super(null, null); }
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -1116,9 +1114,9 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static ProcedureDeclaration readObject(AttributeInputStream inpt) throws IOException {
+	public static ProcedureDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
 		Identifier identifier = inpt.readIdentifier();
-		ProcedureDeclaration pro = new ProcedureDeclaration(null, identifier, ObjectKind.Procedure);
+		ProcedureDeclaration pro = new ProcedureDeclaration(documentManager, identifier, ObjectKind.Procedure);
 		pro.OBJECT_SEQU = inpt.readSEQU(pro);
 
 		// *** SyntaxElement
@@ -1133,7 +1131,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		pro.hasLocalClasses = inpt.readBoolean();
 		
 		// *** ProcedurekDeclaration
-		pro.parameterList = (ObjectList<Parameter>) inpt.readObjectList();
+		pro.parameterList = (ObjectList<Parameter>) inpt.readObjectList(documentManager);
 
 		pro.isPreCompiledFromFile = inpt.jarFileName;
 //		Util.TRACE_INPUT("END Read ProcedureDeclaration: Procedure "+identifierValue() + ", Declared in: "+pro.declaredIn);

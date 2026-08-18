@@ -15,8 +15,8 @@ import java.lang.constant.MethodTypeDesc;
 
 import simula.Option;
 import simula.core.CoreGlobal;
-import simula.core.DocumentManager;
 import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -76,8 +76,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// ***********************************************************************************************
 	/// PrefixedBlock.
 	/// @param isMainModule true: this is the main module.
-	private PrefixedBlockDeclaration(final SimulaBuilder simBuilder, final boolean isMainModule) {
-		super(simBuilder, null);
+	private PrefixedBlockDeclaration(final DocumentManager documentManager, final boolean isMainModule) {
+		super(documentManager, null);
 //		if(isMainModule)
 //			modifyIdentifier(Global.sourceName);
 //		else modifyIdentifier("PBLK" + firstLineNumber());
@@ -91,13 +91,13 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	/// @param isMainModule true if main module
 	/// @return the resulting PrefixedBlockDeclaration
 	public static PrefixedBlockDeclaration expectPrefixedBlock(final SimulaBuilder simBuilder, final VariableExpression blockPrefix,boolean isMainModule) {
-		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(simBuilder, isMainModule);
+		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(simBuilder.documentManager, isMainModule);
 		block.declarationKind=ObjectKind.PrefixedBlock;
 		Util.ASSERT(blockPrefix != null,"blockPrefix == null");
 		block.blockPrefix = blockPrefix;
 		block.prefix = blockPrefix.identifier;
 		block.isMainModule=isMainModule;
-		String ID = (isMainModule)? DocumentManager.sourceName : block.prefix.value + "_Begin";
+		String ID = (isMainModule)? simBuilder.documentManager.sourceName : block.prefix.value + "_Begin";
 		block.modifyIdentifier(new Identifier(ID));
 		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse PrefixedBlock");
 		
@@ -145,56 +145,56 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// *** Coding: doJavaCoding
 	// ***********************************************************************************************
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(CoreGlobal2.verbose) IO.println("Skip  doJavaCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);	
 			return;
 		}
-		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
+		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(simCoder, this);
 		CoreGlobal.enterScope(this);
 			labelList.setLabelIdexes();
-			boolean duringSTM_Coding=SimulaCoder.duringSTM_Coding;
-			SimulaCoder.duringSTM_Coding=false;
-			JavaSourceFileCoder.code("@SuppressWarnings(\"unchecked\")");
+			boolean duringSTM_Coding=simCoder.duringSTM_Coding;
+			simCoder.duringSTM_Coding=false;
+			JavaSourceFileCoder.code(simCoder,"@SuppressWarnings(\"unchecked\")");
 			String line = "public final class " + getJavaIdentifier();
 			if (prefix != null) {
 				ClassDeclaration prefixClass = getPrefixClass();
 				if(prefixClass != null) line = line + " extends " +prefixClass.getJavaIdentifier();
 			}
 			else line = line + " extends RTS_BASICIO";
-			JavaSourceFileCoder.code(line + " {");
-			JavaSourceFileCoder.debug("// PrefixedBlockDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
+			JavaSourceFileCoder.code(simCoder,line + " {");
+			JavaSourceFileCoder.debug(simCoder,"// PrefixedBlockDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
 					+ ", firstLine=" + firstLineNumber() + ", lastLine=" + lastLineNumber() + ", hasLocalClasses="
 					+ ((hasLocalClasses) ? "true" : "false") + ", System=" + ((isQPSystemBlock()) ? "true" : "false")
 					+ ", detachUsed=" + ((detachUsed) ? "true" : "false"));
 			if (isQPSystemBlock())
-				JavaSourceFileCoder.code("public boolean isQPSystemBlock() { return(true); }");
+				JavaSourceFileCoder.code(simCoder,"public boolean isQPSystemBlock() { return(true); }");
 			if (isDetachUsed())
-				JavaSourceFileCoder.code("public boolean isDetachUsed() { return(true); }");
-			JavaSourceFileCoder.debug("// Declare parameters as attributes");
+				JavaSourceFileCoder.code(simCoder,"public boolean isDetachUsed() { return(true); }");
+			JavaSourceFileCoder.debug(simCoder,"// Declare parameters as attributes");
 			for (Parameter par : parameterList) {
 				String tp = par.toJavaType();
-				JavaSourceFileCoder.code("public " + tp + ' ' + par.externalIdent + ';');
+				JavaSourceFileCoder.code(simCoder,"public " + tp + ' ' + par.externalIdent + ';');
 			}
 			if(this.hasAccumLabel()) {
-				JavaSourceFileCoder.debug("// Declare local labels");
+				JavaSourceFileCoder.debug(simCoder,"// Declare local labels");
 				for (LabelDeclaration lab : labelList.getAccumLabels())
-					lab.declareLocalLabel(this);
+					lab.declareLocalLabel(simCoder, this);
 			}
-			JavaSourceFileCoder.debug("// Declare locals as attributes");
-			for (Declaration decl : declarationList) decl.doJavaCoding();
-			for (VirtualMatch match : virtualMatchList)	match.doJavaCoding();
-			doCodeConstructor();
-			SimulaCoder.duringSTM_Coding=true;
-			codeClassStatements();
-			SimulaCoder.duringSTM_Coding=duringSTM_Coding;
+			JavaSourceFileCoder.debug(simCoder,"// Declare locals as attributes");
+			for (Declaration decl : declarationList) decl.doJavaCoding(simCoder);
+			for (VirtualMatch match : virtualMatchList)	match.doJavaCoding(simCoder);
+			doCodeConstructor(simCoder);
+			simCoder.duringSTM_Coding=true;
+			codeClassStatements(simCoder);
+			simCoder.duringSTM_Coding=duringSTM_Coding;
 	
-			if (this.isMainModule) codeMethodMain();
+			if (this.isMainModule) codeMethodMain(simCoder);
 			
-			javaCoder.codeProgramInfo();
-			JavaSourceFileCoder.code("}", "End of Class");
+			javaCoder.codeProgramInfo(simCoder);
+			JavaSourceFileCoder.code(simCoder,"}", "End of Class");
 		CoreGlobal.exitScope();
 		javaCoder.closeJavaOutput();
 	}
@@ -203,19 +203,19 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// *** Coding Utility: doCodeConstructor
 	// ***********************************************************************************************
 	/// Coding Utility: Code the constructor.
-	private void doCodeConstructor() {
-		JavaSourceFileCoder.debug("// Normal Constructor");
-		JavaSourceFileCoder.code("public " + getJavaIdentifier() + edFormalParameterList());
+	private void doCodeConstructor(final SimulaCoder simCoder) {
+		JavaSourceFileCoder.debug(simCoder,"// Normal Constructor");
+		JavaSourceFileCoder.code(simCoder,"public " + getJavaIdentifier() + edFormalParameterList());
 		if (prefix != null) {
 			ClassDeclaration prefixClass = this.getPrefixClass();
-			if(prefixClass != null) JavaSourceFileCoder.code("super" + prefixClass.edCompleteParameterList());
-		} else JavaSourceFileCoder.code("super(staticLink);");
-		JavaSourceFileCoder.debug("// Parameter assignment to locals");
+			if(prefixClass != null) JavaSourceFileCoder.code(simCoder,"super" + prefixClass.edCompleteParameterList());
+		} else JavaSourceFileCoder.code(simCoder,"super(staticLink);");
+		JavaSourceFileCoder.debug(simCoder,"// Parameter assignment to locals");
 		for (Parameter par : parameterList)
-			JavaSourceFileCoder.code("this." + par.externalIdent + " = s" + par.externalIdent + ';');
-		JavaSourceFileCoder.debug("// Declaration Code");
-		for (Declaration decl : declarationList) decl.doDeclarationCoding();
-		JavaSourceFileCoder.code("}");
+			JavaSourceFileCoder.code(simCoder,"this." + par.externalIdent + " = s" + par.externalIdent + ';');
+		JavaSourceFileCoder.debug(simCoder,"// Declaration Code");
+		for (Declaration decl : declarationList) decl.doDeclarationCoding(simCoder);
+		JavaSourceFileCoder.code(simCoder,"}");
 	}
 
 	
@@ -272,7 +272,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
 				classBuilder -> {
 					classBuilder
-						.with(SourceFileAttribute.of(DocumentManager.sourceFileName))
+						.with(SourceFileAttribute.of(simCoder.documentManager.sourceFileName))
 						.withFlags(ClassFile.ACC_PUBLIC + ClassFile.ACC_SUPER)
 						.withSuperclass(this.superClassDesc());
 
@@ -361,8 +361,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Private Constructor used by Attribute File I/O.
-	private PrefixedBlockDeclaration() {
-		super(null, null);
+	private PrefixedBlockDeclaration(final DocumentManager documentManager) {
+		super(documentManager, null);
 	}
 
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -407,8 +407,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static PrefixedBlockDeclaration readObject(AttributeInputStream inpt) throws IOException {
-		PrefixedBlockDeclaration pbl = new PrefixedBlockDeclaration();
+	public static PrefixedBlockDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		PrefixedBlockDeclaration pbl = new PrefixedBlockDeclaration(documentManager);
 		pbl.identifier = inpt.readIdentifier();
 		pbl.declarationKind = ObjectKind.Class;
 		pbl.OBJECT_SEQU = inpt.readSEQU(pbl);
@@ -423,24 +423,24 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		// *** DeclarationScope
 		pbl.sourceFileName = inpt.readString();
 		pbl.hasLocalClasses = inpt.readBoolean();
-		pbl.labelList = LabelList.readLabelList(inpt);
-		pbl.declarationList = DeclarationList.readObject(inpt);
+		pbl.labelList = LabelList.readLabelList(documentManager, inpt);
+		pbl.declarationList = DeclarationList.readObject(documentManager, inpt);
 
 		// *** BlockDeclaration
 		pbl.isMainModule = inpt.readBoolean();
-		pbl.statements = (ObjectList<Statement>) inpt.readObjectList();
+		pbl.statements = (ObjectList<Statement>) inpt.readObjectList(documentManager);
 		
 		// *** ClassDeclaration
 		pbl.prefix = inpt.readIdentifier();
 		pbl.detachUsed = inpt.readBoolean();
-		pbl.parameterList = (ObjectList<Parameter>) inpt.readObjectList();
-		pbl.virtualSpecList = (ObjectList<VirtualSpecification>) inpt.readObjectList();
-		pbl.hiddenList = (ObjectList<HiddenSpecification>) inpt.readObjectList();
-		pbl.protectedList = (ObjectList<ProtectedSpecification>) inpt.readObjectList();
-		pbl.statements1 = (ObjectList<Statement>) inpt.readObjectList();
+		pbl.parameterList = (ObjectList<Parameter>) inpt.readObjectList(documentManager);
+		pbl.virtualSpecList = (ObjectList<VirtualSpecification>) inpt.readObjectList(documentManager);
+		pbl.hiddenList = (ObjectList<HiddenSpecification>) inpt.readObjectList(documentManager);
+		pbl.protectedList = (ObjectList<ProtectedSpecification>) inpt.readObjectList(documentManager);
+		pbl.statements1 = (ObjectList<Statement>) inpt.readObjectList(documentManager);
 		
 		// *** PrefixedBlockDeclaration
-		pbl.blockPrefix = (VariableExpression) inpt.readObj();
+		pbl.blockPrefix = (VariableExpression) inpt.readObj(documentManager);
 		
 		pbl.isPreCompiledFromFile = inpt.jarFileName;
 		Util.TRACE_INPUT("END Read PrefixedBlockDeclaration: " + pbl.identifierValue() + ", Declared in: " + pbl.declaredIn);

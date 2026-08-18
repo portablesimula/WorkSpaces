@@ -7,9 +7,9 @@ package simula.core.syntaxClass;
 
 import java.io.IOException;
 
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.syntaxClass.declaration.Declaration;
@@ -44,8 +44,8 @@ public final class ProtectedSpecification extends SyntaxElement {
     /// Create a new ProtectedSpecification.
     /// @param definedIn the class it is defined in
     /// @param identifier the protected identifier
-	public ProtectedSpecification(final SimulaBuilder simBuilder, final ClassDeclaration definedIn,final Identifier identifier) {
-		super(simBuilder);
+	public ProtectedSpecification(final DocumentManager documentManager, final ClassDeclaration definedIn,final Identifier identifier) {
+		super(documentManager);
 		this.definedIn=definedIn;
 		this.identifier=identifier;
 	}
@@ -109,8 +109,8 @@ public final class ProtectedSpecification extends SyntaxElement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ProtectedSpecification() {
-		super(null);
+	private ProtectedSpecification(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 	
 	@Override
@@ -129,14 +129,14 @@ public final class ProtectedSpecification extends SyntaxElement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ProtectedSpecification readObject(AttributeInputStream inpt) throws IOException {
-		ProtectedSpecification spec = new ProtectedSpecification();
+	public static ProtectedSpecification readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		ProtectedSpecification spec = new ProtectedSpecification(documentManager);
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
 		// *** SyntaxElement
 		spec.astData = readAstData(inpt);
 		// *** ProtectedSpecification
 		spec.identifier = inpt.readIdentifier();
-		spec.definedIn = (ClassDeclaration) inpt.readObj();
+		spec.definedIn = (ClassDeclaration) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("ProtectedSpecification: " + spec.identifier.value);
 		return(spec);
 	}

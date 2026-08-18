@@ -10,10 +10,10 @@ import java.lang.classfile.CodeBuilder;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.SimulaBuilder;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.LabelDeclaration;
 import simula.core.utilities.ObjectKind;
@@ -49,8 +49,9 @@ public final class LabeledStatement extends Statement {
 	/// @param labels the label identifiers
 	/// @param statement the labeled statement
 //	LabeledStatement(final int line,final ObjectList<LabelDeclaration> labels,final Statement statement) {
-	LabeledStatement(final SimulaBuilder simBuilder, final ObjectList<LabelDeclaration> labels, final Statement statement) {
-		super(simBuilder);
+	LabeledStatement(final DocumentManager documentManager, final ObjectList<LabelDeclaration> labels, final Statement statement) {
+		super(documentManager);
+//		SimulaBuilder simBuilder = documentManager.simBuilder;
 		this.labels = labels;
 		this.statement = statement;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": LabeledStatement: "+this);
@@ -67,10 +68,10 @@ public final class LabeledStatement extends Statement {
 	}
 
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
-		JavaSourceFileCoder.code("{");
+		JavaSourceFileCoder.code(simCoder,"{");
 		for (LabelDeclaration decl:labels) {
 			String comment = "DeclaredIn: "+decl.declaredIn.identifier;
 			if(decl.movedTo != null) comment = comment+" -> "+decl.movedTo;
@@ -78,10 +79,10 @@ public final class LabeledStatement extends Statement {
 			labelcode="_SIM_LABEL("+decl.index+");";
 			if(statement instanceof BlockStatement stat && stat.isCompoundStatement())
 				     stat.addLeadingLabel(labelcode);
-				else JavaSourceFileCoder.code(labelcode,comment);
+				else JavaSourceFileCoder.code(simCoder,labelcode,comment);
 		}
-		statement.doJavaCoding();
-		JavaSourceFileCoder.code("}");
+		statement.doJavaCoding(simCoder);
+		JavaSourceFileCoder.code(simCoder,"}");
 	}
 
 	@Override
@@ -118,8 +119,8 @@ public final class LabeledStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private LabeledStatement() {
-		super(null);
+	private LabeledStatement(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -139,14 +140,14 @@ public final class LabeledStatement extends Statement {
 	/// @return the LabeledStatement object read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static LabeledStatement readObject(AttributeInputStream inpt) throws IOException {
-		LabeledStatement stm = new LabeledStatement();
+	public static LabeledStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		LabeledStatement stm = new LabeledStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		stm.astData = readAstData(inpt);
 		// *** LabeledStatement
-		stm.statement = (Statement) inpt.readObj();
-		stm.labels = (ObjectList<LabelDeclaration>) inpt.readObjectList();
+		stm.statement = (Statement) inpt.readObj(documentManager);
+		stm.labels = (ObjectList<LabelDeclaration>) inpt.readObjectList(documentManager);
 		Util.TRACE_INPUT("LabeledStatement: " + stm);
 		return(stm);
 	}

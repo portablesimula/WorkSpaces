@@ -11,9 +11,9 @@ import java.lang.classfile.Label;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.SimulaBuilder;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -62,17 +62,18 @@ public final class RelationalOperation extends Expression {
 	/// @param lhs the left hand side
 	/// @param opr the relation
 	/// @param rhs the right hand side
-	RelationalOperation(final SimulaBuilder simBuilder, final Expression lhs,final int opr,final Expression rhs) {
-		super(simBuilder);
+	RelationalOperation(final DocumentManager documentManager, final Expression lhs,final int opr,final Expression rhs) {
+		super(documentManager);
+//		SimulaBuilder simBuilder = documentManager.simBuilder;
 		this.type = Type.Boolean;
 		this.lhs = lhs; this.opr = opr; this.rhs = rhs;
 		if (this.lhs == null) {
 			Util.semanticError(this, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression(simBuilder);
+			this.lhs = new MissingExpression(documentManager);
 		}
 		if (this.rhs == null) {
 			Util.semanticError(this, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression(simBuilder);
+			this.rhs = new MissingExpression(documentManager);
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
@@ -100,8 +101,8 @@ public final class RelationalOperation extends Expression {
 					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
 					Util.semanticError(this, "RelationalOperation: Illegal types: " + type1 + " " + opr + " " + type2);
 				}
-				lhs = (Expression) TypeConversion.testAndCreate(atype, lhs);
-				rhs = (Expression) TypeConversion.testAndCreate(atype, rhs);
+				lhs = (Expression) TypeConversion.testAndCreate(documentManager, atype, lhs);
+				rhs = (Expression) TypeConversion.testAndCreate(documentManager, atype, rhs);
 				break;
 			}
 			case KeyWord.EQR: case KeyWord.NER: {
@@ -264,8 +265,8 @@ public final class RelationalOperation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private RelationalOperation() {
-		super(null);
+	private RelationalOperation(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -288,18 +289,18 @@ public final class RelationalOperation extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static RelationalOperation readObject(AttributeInputStream inpt) throws IOException {
-		RelationalOperation expr = new RelationalOperation();
+	public static RelationalOperation readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		RelationalOperation expr = new RelationalOperation(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		expr.astData = readAstData(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
 		// *** RelationalOperation
-		expr.lhs = (Expression) inpt.readObj();
+		expr.lhs = (Expression) inpt.readObj(documentManager);
 		expr.opr = inpt.readShort();
-		expr.rhs = (Expression) inpt.readObj();
+		expr.rhs = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("readRelationalOperation: " + expr);
 		return(expr);
 	}

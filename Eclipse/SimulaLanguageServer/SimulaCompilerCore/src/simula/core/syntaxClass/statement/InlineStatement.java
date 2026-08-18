@@ -8,8 +8,8 @@ package simula.core.syntaxClass.statement;
 import java.lang.classfile.CodeBuilder;
 
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.SimulaBuilder;
 import simula.core.coder.SimulaCoder;
 import simula.core.utilities.RTS;
 import simula.core.utilities.Util;
@@ -36,8 +36,8 @@ public final class InlineStatement extends Statement {
 	
 	/// Create a new InlineStatement.
 	/// @param kind the kind code string.
-	public InlineStatement(final SimulaBuilder simBuilder, String kind) {
-		super(simBuilder);
+	public InlineStatement(final DocumentManager documentManager, String kind) {
+		super(documentManager);
 		this.kind = kind;
 		SET_SEMANTICS_CHECKED();
 	}
@@ -49,13 +49,13 @@ public final class InlineStatement extends Statement {
 	}
 
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
-		if(kind.equalsIgnoreCase("detach")) JavaSourceFileCoder.code("detach();","Process'detach");
-		else if(kind.equalsIgnoreCase("terminate")) JavaSourceFileCoder.code("terminate();","Process'terminate");
-		else if(kind.equals("try")) JavaSourceFileCoder.code("try {");
-		else if(kind.equals("catch")) JavaSourceFileCoder.code("} catch(RuntimeException e) { _CUR=this; _onError(e,onError_0()); }");
+		if(kind.equalsIgnoreCase("detach")) JavaSourceFileCoder.code(simCoder,"detach();","Process'detach");
+		else if(kind.equalsIgnoreCase("terminate")) JavaSourceFileCoder.code(simCoder,"terminate();","Process'terminate");
+		else if(kind.equals("try")) JavaSourceFileCoder.code(simCoder,"try {");
+		else if(kind.equals("catch")) JavaSourceFileCoder.code(simCoder,"} catch(RuntimeException e) { _CUR=this; _onError(e,onError_0()); }");
 		else Util.IERR();
 	}
 

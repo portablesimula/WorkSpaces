@@ -68,12 +68,12 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Create a new MaybeBlockDeclaration, i.e. CompoundStatement or SubBlock.
 	/// @param identifier block identifier
-	public MaybeBlockDeclaration(final SimulaBuilder simBuilder, final Identifier identifier) {
-		super(simBuilder, identifier);
+	public MaybeBlockDeclaration(final DocumentManager documentManager, final Identifier identifier) {
+		super(documentManager, identifier);
 		if(identifier != null)
 			modifyIdentifier(identifier);
 //		else modifyIdentifier("Block" + firstLineNumber());
-		else modifyIdentifier(new Identifier("Block" + simBuilder.getSourceLineNumber()));
+		else modifyIdentifier(new Identifier("Block" + documentManager.simBuilder.getSourceLineNumber()));
 	}
 
 //	// ***********************************************************************************************
@@ -135,7 +135,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 					moveLabelsFrom(this); // Label is also declaration
 			}
 		}
-		BlockStatement block = new BlockStatement(simBuilder, this, debugName);
+		BlockStatement block = new BlockStatement(simBuilder.documentManager, this, debugName);
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) IO.println("MaybeBlockDeclaration.expectMaybeBlock: ENDOF " + debugName + "  " + block);
 		CoreGlobal.setScope(declaredIn);
 		if (Option.internal.TRACE_PARSE)
@@ -220,33 +220,33 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// *** Coding: doJavaCoding
 	// ***********************************************************************************************
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if (declarationKind == ObjectKind.CompoundStatement)
-			doCompoundStatementCoding();
+			doCompoundStatementCoding(simCoder);
 		else if (this.isPreCompiledFromFile != null) {
 			if(CoreGlobal2.verbose) IO.println("Skip  doJavaCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);		
-		} else doSubBlockCoding();
+		} else doSubBlockCoding(simCoder);
 	}
 
 	// ***********************************************************************************************
 	// *** Coding: CompoundStatement as Java Subblock
 	// ***********************************************************************************************
 	/// Java Coding utility: Code compound statement
-	private void doCompoundStatementCoding() {
+	private void doCompoundStatementCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		Util.ASSERT(declarationList.isEmpty(), "Invariant");
 		Util.ASSERT(labelList == null || labelList.declaredLabelSize() == 0, "Invariant");
 		CoreGlobal.enterScope(this);
-		JavaSourceFileCoder.code("{");
+		JavaSourceFileCoder.code(simCoder,"{");
 		if(labelcodeList!=null) {
 			for(String labCode:labelcodeList) {
-				JavaSourceFileCoder.code(labCode);
+				JavaSourceFileCoder.code(simCoder,labCode);
 			}
 		}
-		for (Statement stm : statements) stm.doJavaCoding();
-		JavaSourceFileCoder.code("}");
+		for (Statement stm : statements) stm.doJavaCoding(simCoder);
+		JavaSourceFileCoder.code(simCoder,"}");
 		CoreGlobal.exitScope();
 	}
 
@@ -254,35 +254,35 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// *** Coding: SUBBLOCK ==> .java file
 	// ***********************************************************************************************
 	/// Java Coding utility: Code sub-block
-	private void doSubBlockCoding() {
+	private void doSubBlockCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
-		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
+		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(simCoder, this);
 		CoreGlobal.enterScope(this);
 			labelList.setLabelIdexes();
-			boolean duringSTM_Coding=SimulaCoder.duringSTM_Coding;
-			SimulaCoder.duringSTM_Coding=false;
-			JavaSourceFileCoder.code("@SuppressWarnings(\"unchecked\")");
-			JavaSourceFileCoder.code("public final class " + getJavaIdentifier() + " extends RTS_BASICIO" + " {");
-			JavaSourceFileCoder.debug("// SubBlock: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel() + ", firstLine="
+			boolean duringSTM_Coding=simCoder.duringSTM_Coding;
+			simCoder.duringSTM_Coding=false;
+			JavaSourceFileCoder.code(simCoder,"@SuppressWarnings(\"unchecked\")");
+			JavaSourceFileCoder.code(simCoder,"public final class " + getJavaIdentifier() + " extends RTS_BASICIO" + " {");
+			JavaSourceFileCoder.debug(simCoder,"// SubBlock: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel() + ", firstLine="
 					+ firstLineNumber() + ", lastLine=" + lastLineNumber() + ", hasLocalClasses="
 					+ ((hasLocalClasses) ? "true" : "false") + ", System=" + ((isQPSystemBlock()) ? "true" : "false"));
 			if (isQPSystemBlock())
-				JavaSourceFileCoder.code("public boolean isQPSystemBlock() { return(true); }");
+				JavaSourceFileCoder.code(simCoder,"public boolean isQPSystemBlock() { return(true); }");
 			if(this.hasAccumLabel()) {
-				JavaSourceFileCoder.debug("// Declare local labels");
+				JavaSourceFileCoder.debug(simCoder,"// Declare local labels");
 				for (LabelDeclaration lab : labelList.getAccumLabels())
-					lab.declareLocalLabel(this);
+					lab.declareLocalLabel(simCoder, this);
 			}
-			JavaSourceFileCoder.debug("// Declare locals as attributes");
-			for (Declaration decl : declarationList) decl.doJavaCoding();
-			doCodeConstructor();
-			SimulaCoder.duringSTM_Coding=true;
-			doCodeStatements();
-			SimulaCoder.duringSTM_Coding=duringSTM_Coding;
-			if (this.isMainModule) codeMethodMain();
-			javaCoder.codeProgramInfo();
-			JavaSourceFileCoder.code("}", "End of SubBlock");
+			JavaSourceFileCoder.debug(simCoder,"// Declare locals as attributes");
+			for (Declaration decl : declarationList) decl.doJavaCoding(simCoder);
+			doCodeConstructor(simCoder);
+			simCoder.duringSTM_Coding=true;
+			doCodeStatements(simCoder);
+			simCoder.duringSTM_Coding=duringSTM_Coding;
+			if (this.isMainModule) codeMethodMain(simCoder);
+			javaCoder.codeProgramInfo(simCoder);
+			JavaSourceFileCoder.code(simCoder,"}", "End of SubBlock");
 		CoreGlobal.exitScope();
 		javaCoder.closeJavaOutput();
 	}
@@ -291,28 +291,28 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// *** Coding Utility: doCodeConstructor
 	// ***********************************************************************************************
 	/// Java Coding utility: Code constructor
-	private void doCodeConstructor() {
-		JavaSourceFileCoder.debug("// Normal Constructor");
-		JavaSourceFileCoder.code("public " + getJavaIdentifier() + "(RTS_RTObject staticLink) {");
-		JavaSourceFileCoder.code("super(staticLink);");
-		JavaSourceFileCoder.code("BBLK();");
-		JavaSourceFileCoder.debug("// Declaration Code");
-		for (Declaration decl : declarationList) decl.doDeclarationCoding();
-		JavaSourceFileCoder.code("}");
+	private void doCodeConstructor(final SimulaCoder simCoder) {
+		JavaSourceFileCoder.debug(simCoder,"// Normal Constructor");
+		JavaSourceFileCoder.code(simCoder,"public " + getJavaIdentifier() + "(RTS_RTObject staticLink) {");
+		JavaSourceFileCoder.code(simCoder,"super(staticLink);");
+		JavaSourceFileCoder.code(simCoder,"BBLK();");
+		JavaSourceFileCoder.debug(simCoder,"// Declaration Code");
+		for (Declaration decl : declarationList) decl.doDeclarationCoding(simCoder);
+		JavaSourceFileCoder.code(simCoder,"}");
 	}
 
 	// ***********************************************************************************************
 	// *** Coding Utility: doCodeStatements
 	// ***********************************************************************************************
 	/// Java Coding utility: Code statements
-	private void doCodeStatements() {
-		JavaSourceFileCoder.debug("// " + declarationKind + " Statements");
-		JavaSourceFileCoder.code("@Override");
-		JavaSourceFileCoder.code("public RTS_RTObject _STM() {");
-		codeSTMBody();
-		JavaSourceFileCoder.code("EBLK();");
-		JavaSourceFileCoder.code("return(this);");
-		JavaSourceFileCoder.code("}", "End of " + declarationKind + " Statements");
+	private void doCodeStatements(final SimulaCoder simCoder) {
+		JavaSourceFileCoder.debug(simCoder,"// " + declarationKind + " Statements");
+		JavaSourceFileCoder.code(simCoder,"@Override");
+		JavaSourceFileCoder.code(simCoder,"public RTS_RTObject _STM() {");
+		codeSTMBody(simCoder);
+		JavaSourceFileCoder.code(simCoder,"EBLK();");
+		JavaSourceFileCoder.code(simCoder,"return(this);");
+		JavaSourceFileCoder.code(simCoder,"}", "End of " + declarationKind + " Statements");
 	}
 	
 	// ***********************************************************************************************
@@ -338,7 +338,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
 				classBuilder -> {
 					classBuilder
-						.with(SourceFileAttribute.of(DocumentManager.sourceFileName))
+						.with(SourceFileAttribute.of(simCoder.documentManager.sourceFileName))
 						.withFlags(ClassFile.ACC_PUBLIC + ClassFile.ACC_FINAL + ClassFile.ACC_SUPER)
 						.withSuperclass(RTS.CD.RTS_BASICIO);
 
@@ -536,7 +536,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 
 	/// Default constructor used by Attribute File I/O
-	public MaybeBlockDeclaration() { super(null, null); }
+	public MaybeBlockDeclaration(final DocumentManager documentManager) { super(documentManager, null); }
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -573,9 +573,9 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static MaybeBlockDeclaration readObject(AttributeInputStream inpt,int declarationKind) throws IOException {
+	public static MaybeBlockDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt, final int declarationKind) throws IOException {
 		DeclarationScope scope = CoreGlobal.getCurrentScope();
-		MaybeBlockDeclaration blk = new MaybeBlockDeclaration();
+		MaybeBlockDeclaration blk = new MaybeBlockDeclaration(documentManager);
 		blk.declarationKind = declarationKind;
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
 		// *** SyntaxElement
@@ -585,18 +585,18 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		blk.identifier = inpt.readIdentifier();
 		blk.externalIdent = inpt.readString();
 		blk.type = inpt.readType();
-		blk.declaredIn = (DeclarationScope) inpt.readObj();
+		blk.declaredIn = (DeclarationScope) inpt.readObj(documentManager);
 
 		// *** DeclarationScope
 		blk.sourceFileName = inpt.readString();
 		blk.hasLocalClasses = inpt.readBoolean();
-		blk.labelList = LabelList.readLabelList(inpt);
-		blk.declarationList = DeclarationList.readObject(inpt);
+		blk.labelList = LabelList.readLabelList(documentManager, inpt);
+		blk.declarationList = DeclarationList.readObject(documentManager, inpt);
 
 		// *** BlockDeclaration
 		if (declarationKind == ObjectKind.CompoundStatement) {
 			blk.isMainModule = inpt.readBoolean();
-			blk.statements = (ObjectList<Statement>) inpt.readObjectList();
+			blk.statements = (ObjectList<Statement>) inpt.readObjectList(documentManager);
 		}
 
 		CoreGlobal.setScope(scope);

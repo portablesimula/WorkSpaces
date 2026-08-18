@@ -13,9 +13,9 @@ import java.lang.classfile.constantpool.FieldRefEntry;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
@@ -74,8 +74,8 @@ public final class RemoteVariable extends Expression {
 	/// Create a new RemoteVariable
 	/// @param obj object expression
 	/// @param var the variable
-	RemoteVariable(final SimulaBuilder simBuilder, final Expression obj, final VariableExpression var) {
-		super(simBuilder);
+	RemoteVariable(final DocumentManager documentManager, final Expression obj, final VariableExpression var) {
+		super(documentManager);
 		this.obj = obj;
 		this.var = var;
 		obj.backLink = var.backLink = this;
@@ -131,7 +131,7 @@ public final class RemoteVariable extends Expression {
 			if (remoteAttribute == null) {
 				if(objType.keyWord != Type.T_UNDEF)
 					Util.semanticError(obj, "RemoteVariable.doRemoteChecking: " + ident.value + " is not an attribute of "	+ objType.getRefIdent().value);
-				UndefinedDeclaration undef = new UndefinedDeclaration(null, ident);
+				UndefinedDeclaration undef = new UndefinedDeclaration(documentManager, ident);
 				remoteAttribute = new Meaning(undef, CoreGlobal.getCurrentScope()); // Error Recovery
 			}
 			var.setRemotelyAccessed(remoteAttribute);
@@ -196,9 +196,9 @@ public final class RemoteVariable extends Expression {
 	public String toJavaCode() {
 		ASSERT_SEMANTICS_CHECKED();
 		if (callRemoteProcedure != null)
-			return (CallProcedure.remote(obj, callRemoteProcedure, var, backLink));
+			return (CallProcedure.remote(documentManager.simCoder, obj, callRemoteProcedure, var, backLink));
 		else if (callRemoteVirtual != null)
-			return (CallProcedure.remoteVirtual(obj, var, callRemoteVirtual));
+			return (CallProcedure.remoteVirtual(documentManager.simCoder, obj, var, callRemoteVirtual));
 		else if (accessRemoteArray)
 			return (doAccessRemoteArray(obj, var));
 		Expression constantElement=remoteAttribute.getConstant();
@@ -292,7 +292,7 @@ public final class RemoteVariable extends Expression {
 			for(Expression expr:variable.checkedParams)
 				expr.buildEvaluation(simCoder, null, codeBuilder);
 
-		codeBuilder.invokestatic(RTS.CD.RTS_TXT, pro.identifierValue(), pro.getMethodTypeDesc(beforeDot,variable.checkedParams));
+		codeBuilder.invokestatic(RTS.CD.RTS_TXT, pro.identifierValue(), pro.getMethodTypeDesc(simCoder.documentManager, beforeDot, variable.checkedParams));
 		if(pro.type != null && backLink == null) {
 			codeBuilder.pop();
 		}
@@ -307,8 +307,8 @@ public final class RemoteVariable extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private RemoteVariable() {
-		super(null);
+	private RemoteVariable(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -330,17 +330,17 @@ public final class RemoteVariable extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static RemoteVariable readObject(AttributeInputStream inpt) throws IOException {
-		RemoteVariable rem = new RemoteVariable();
+	public static RemoteVariable readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		RemoteVariable rem = new RemoteVariable(documentManager);
 		rem.OBJECT_SEQU = inpt.readSEQU(rem);
 		// *** SyntaxElement
 		rem.astData = readAstData(inpt);
 		// *** SyntaxElement
 		rem.type = inpt.readType();
-		rem.backLink = (SyntaxElement) inpt.readObj();
+		rem.backLink = (SyntaxElement) inpt.readObj(documentManager);
 		// *** RemoteVariable
-		rem.obj = (Expression) inpt.readObj();
-		rem.var = (VariableExpression) inpt.readObj();
+		rem.obj = (Expression) inpt.readObj(documentManager);
+		rem.var = (VariableExpression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("readRemoteVariable: " + rem);
 		return(rem);
 	}

@@ -10,10 +10,10 @@ import java.lang.classfile.CodeBuilder;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.SimulaBuilder;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.BlockDeclaration;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
@@ -59,8 +59,9 @@ public final class BlockStatement extends Statement {
 //	private static int SEQU = 1;
 	/// Create a new BlockStatement.
 	/// @param blockDeclaration the BlockDeclaration
-	public BlockStatement(final SimulaBuilder simBuilder, final BlockDeclaration blockDeclaration, String debugName1) {
-		super(simBuilder);
+	public BlockStatement(final DocumentManager documentManager, final BlockDeclaration blockDeclaration, String debugName1) {
+		super(documentManager);
+//		SimulaBuilder simBuilder = documentManager.simBuilder;
 //		debugName = "ZZZ_BlockStatement: "+SEQU++;
 		this.blockDeclaration = blockDeclaration;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": BlockStatement: "+this);
@@ -91,7 +92,7 @@ public final class BlockStatement extends Statement {
 	}
 	
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		if(blockDeclaration.declarationKind!=ObjectKind.CompoundStatement) {
@@ -110,12 +111,12 @@ public final class BlockStatement extends Statement {
 			if(blockDeclaration.declarationKind==ObjectKind.PrefixedBlock && ((ClassDeclaration)blockDeclaration).isDetachUsed())
 				s.append("._START();");
 			else s.append("._STM();");
-			JavaSourceFileCoder.code(s.toString());
+			JavaSourceFileCoder.code(simCoder,s.toString());
 		}
-		boolean duringSTM_Coding=SimulaCoder.duringSTM_Coding;
-		SimulaCoder.duringSTM_Coding=false;
-		blockDeclaration.doJavaCoding();
-		SimulaCoder.duringSTM_Coding=duringSTM_Coding;
+		boolean duringSTM_Coding = simCoder.duringSTM_Coding;
+		simCoder.duringSTM_Coding=false;
+		blockDeclaration.doJavaCoding(simCoder);
+		simCoder.duringSTM_Coding=duringSTM_Coding;
 	}
 
 	@Override
@@ -145,8 +146,8 @@ public final class BlockStatement extends Statement {
 	// ***********************************************************************************************
 
 	/// Default constructor used by Attribute File I/O
-	private BlockStatement() {
-		super(null);
+	private BlockStatement(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -164,13 +165,13 @@ public final class BlockStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the BlockStatement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static BlockStatement readObject(AttributeInputStream inpt) throws IOException {
-		BlockStatement stm = new BlockStatement();
+	public static BlockStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		BlockStatement stm = new BlockStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		stm.astData = readAstData(inpt);
 		// *** BlockStatement
-		stm.blockDeclaration = (BlockDeclaration) inpt.readObj();
+		stm.blockDeclaration = (BlockDeclaration) inpt.readObj(documentManager);
 
 		Util.TRACE_INPUT("BlockStatement: " + stm);
 		return(stm);

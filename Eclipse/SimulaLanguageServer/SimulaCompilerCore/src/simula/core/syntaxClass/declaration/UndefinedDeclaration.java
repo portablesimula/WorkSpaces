@@ -14,9 +14,9 @@ import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
 
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
@@ -36,8 +36,8 @@ public class UndefinedDeclaration extends Declaration {
 	/// Create a new UndefinedDeclaration.
 	/// 
 	/// @param identifier the variable identifier
-	public UndefinedDeclaration(final SimulaBuilder simBuilder, final Identifier identifier) {
-		super(simBuilder, identifier);
+	public UndefinedDeclaration(final DocumentManager documentManager, final Identifier identifier) {
+		super(documentManager, identifier);
 		this.declarationKind = ObjectKind.UndefinedDeclaration;
 		this.type = Type.Undef;
 	}
@@ -53,7 +53,7 @@ public class UndefinedDeclaration extends Declaration {
 	}
 
 	@Override
-	public void doDeclarationCoding() {
+	public void doDeclarationCoding(final SimulaCoder simCoder) {
 		// NOTHING
 	}
 
@@ -118,8 +118,8 @@ public class UndefinedDeclaration extends Declaration {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public UndefinedDeclaration() {
-		super(null, null);
+	public UndefinedDeclaration(final DocumentManager documentManager) {
+		super(documentManager, null);
 		this.declarationKind = ObjectKind.SimpleVariableDeclaration;
 	}
 
@@ -147,8 +147,8 @@ public class UndefinedDeclaration extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static UndefinedDeclaration readObject(AttributeInputStream inpt) throws IOException {
-		UndefinedDeclaration var = new UndefinedDeclaration();
+	public static UndefinedDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		UndefinedDeclaration var = new UndefinedDeclaration(documentManager);
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
 		// *** SyntaxElement
@@ -158,7 +158,7 @@ public class UndefinedDeclaration extends Declaration {
 		var.identifier = inpt.readIdentifier();
 		var.externalIdent = inpt.readString();
 		var.type = inpt.readType();
-		var.declaredIn = (DeclarationScope) inpt.readObj();
+		var.declaredIn = (DeclarationScope) inpt.readObj(documentManager);
 		
 //		// *** SimpleVariableDeclaration
 //		var.constant = inpt.readBoolean();

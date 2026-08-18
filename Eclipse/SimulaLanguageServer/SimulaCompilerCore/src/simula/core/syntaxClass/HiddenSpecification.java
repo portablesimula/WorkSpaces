@@ -7,9 +7,9 @@ package simula.core.syntaxClass;
 
 import java.io.IOException;
 
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.utilities.ObjectKind;
@@ -50,8 +50,8 @@ public final class HiddenSpecification extends SyntaxElement {
 	/// Create a new HiddenSpecification.
 	/// @param definedIn  the class where Hidden is specified
 	/// @param identifier the hidden identifier
-	public HiddenSpecification(final SimulaBuilder simBuilder, final ClassDeclaration definedIn, final Identifier identifier) {
-		super(simBuilder);
+	public HiddenSpecification(final DocumentManager documentManager, final ClassDeclaration definedIn, final Identifier identifier) {
+		super(documentManager);
 		this.definedIn = definedIn;
 		this.identifier = identifier;
 	}
@@ -136,8 +136,8 @@ public final class HiddenSpecification extends SyntaxElement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private HiddenSpecification() {
-		super(null);
+	private HiddenSpecification(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 	
 	@Override
@@ -156,8 +156,8 @@ public final class HiddenSpecification extends SyntaxElement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static HiddenSpecification readObject(AttributeInputStream inpt) throws IOException {
-		HiddenSpecification spec = new HiddenSpecification();
+	public static HiddenSpecification readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		HiddenSpecification spec = new HiddenSpecification(documentManager);
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
 		// *** SyntaxElement
 //		spec.astData = readAstData(inpt);
@@ -165,7 +165,7 @@ public final class HiddenSpecification extends SyntaxElement {
 
 		// *** HiddenSpecification
 		spec.identifier = inpt.readIdentifier();
-		spec.definedIn = (ClassDeclaration) inpt.readObj();
+		spec.definedIn = (ClassDeclaration) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("HiddenSpecification: " + spec.identifier.value);
 		return(spec);
 	}

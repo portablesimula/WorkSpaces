@@ -11,6 +11,7 @@ import java.lang.classfile.Label;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
@@ -46,12 +47,13 @@ public final class UnaryOperation extends Expression {
 	/// Create a new UnaryOperation.
 	/// @param oprator the unary operator.
 	/// @param operand the operand Expression
-	private UnaryOperation(final SimulaBuilder simBuilder, final int oprator,final Expression operand) {
-		super(simBuilder);
+	private UnaryOperation(final DocumentManager documentManager, final int oprator,final Expression operand) {
+		super(documentManager);
+		SimulaBuilder simBuilder = documentManager.simBuilder;
 		this.oprator = oprator; this.operand = operand;
 		if(this.operand==null)
 		{ Util.syntaxError(simBuilder, "Missing operand after unary "+KeyWord.edit(oprator));
-		  this.operand=new MissingExpression(simBuilder);
+		  this.operand=new MissingExpression(documentManager);
 		}
 		this.operand.backLink=this;
 	}
@@ -69,7 +71,7 @@ public final class UnaryOperation extends Expression {
 				}  
 			} catch(Exception e) {}
 		}
-		return(new UnaryOperation(simBuilder, oprator, operand));
+		return(new UnaryOperation(simBuilder.documentManager, oprator, operand));
 	}
 	
 //	@Override
@@ -158,8 +160,8 @@ public final class UnaryOperation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private UnaryOperation() {
-		super(null);
+	private UnaryOperation(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -181,17 +183,17 @@ public final class UnaryOperation extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the UnaryOperation object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static UnaryOperation readObject(AttributeInputStream inpt) throws IOException {
-		UnaryOperation expr = new UnaryOperation();
+	public static UnaryOperation readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		UnaryOperation expr = new UnaryOperation(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		expr.astData = readAstData(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
 		// *** UnaryOperation
 		expr.oprator = inpt.readShort();
-		expr.operand = (Expression) inpt.readObj();
+		expr.operand = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("readUnaryOperation: " + expr);
 		return(expr);
 	}

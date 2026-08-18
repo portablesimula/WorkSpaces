@@ -151,8 +151,8 @@ public class ClassDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Create a new ClassDeclaration.
 	/// @param identifier the given identifier
-	protected ClassDeclaration(final SimulaBuilder simBuilder, Identifier identifier) {
-		super(simBuilder, identifier);
+	protected ClassDeclaration(final DocumentManager documentManager, final Identifier identifier) {
+		super(documentManager, identifier);
 		this.declarationKind = ObjectKind.Class;
 	}
 
@@ -189,7 +189,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			}
 		}
 //		LexToken first = (identifier != null)? identifier : simBuilder.getPrevParserToken();
-		ClassDeclaration cls = new ClassDeclaration(simBuilder, null);
+		ClassDeclaration cls = new ClassDeclaration(simBuilder.documentManager, null);
 		cls.sourceFileName = simBuilder.documentManager.documentUri;
 		if(identifier != null) cls.prefix = identifier;
 		cls.declaredIn.hasLocalClasses = true;
@@ -238,7 +238,7 @@ public class ClassDeclaration extends BlockDeclaration {
 					}
 				if (parameter == null) {
 					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
-					parameter = new Parameter(simBuilder, identifier);
+					parameter = new Parameter(simBuilder.documentManager, identifier);
 				}
 				parameter.setMode(Parameter.Mode.value);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
@@ -286,7 +286,7 @@ public class ClassDeclaration extends BlockDeclaration {
 					}
 				if (parameter == null) {
 					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
-					parameter = new Parameter(simBuilder, identifier);
+					parameter = new Parameter(simBuilder.documentManager, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
@@ -341,9 +341,9 @@ public class ClassDeclaration extends BlockDeclaration {
 		do {
 			Identifier identifier = Parse.expectIdentifier(simBuilder);
 			if (hidden)
-				cls.hiddenList.add(new HiddenSpecification(simBuilder, cls, identifier));
+				cls.hiddenList.add(new HiddenSpecification(simBuilder.documentManager, cls, identifier));
 			if (prtected)
-				cls.protectedList.add(new ProtectedSpecification(simBuilder, cls, identifier));
+				cls.protectedList.add(new ProtectedSpecification(simBuilder.documentManager, cls, identifier));
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		Parse.expect(simBuilder, KeyWord.SEMICOLON);
 	}
@@ -377,13 +377,13 @@ public class ClassDeclaration extends BlockDeclaration {
 			cls.parseBlock(simBuilder);
 			if(! cls.hasInner()) {
 //				IO.println("ClassDeclaration.expectClassBody: ADD IMPLICIT INNER");
-				cls.statements.add(new InnerStatement(simBuilder, false)); // Implicit INNER
+				cls.statements.add(new InnerStatement(simBuilder.documentManager, false)); // Implicit INNER
 			}
 		} else {
 			if(Parse.getCurrentParserToken(simBuilder).keyWord != KeyWord.SEMICOLON)
 				cls.statements.add(Statement.acceptStatement(simBuilder));
 			if(! cls.hasInner())
-				cls.statements.add(new InnerStatement(simBuilder, false)); // Implicit INNER
+				cls.statements.add(new InnerStatement(simBuilder.documentManager, false)); // Implicit INNER
 		}
 	}
 
@@ -819,54 +819,54 @@ public class ClassDeclaration extends BlockDeclaration {
 	// *** Coding: doJavaCoding
 	// ***********************************************************************************************
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		ASSERT_SEMANTICS_CHECKED();
 		if (this.isPreCompiledFromFile != null) {
 			if(CoreGlobal2.verbose) IO.println("Skip  doJavaCoding: " + this.identifierValue() + " -- It is read from " + isPreCompiledFromFile);	
 			return;
 		}
 		CoreGlobal.sourceLineNumber = firstLineNumber();
-		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(this);
+		JavaSourceFileCoder javaCoder = new JavaSourceFileCoder(simCoder, this);
 		CoreGlobal.enterScope(this);
 			labelList.setLabelIdexes();
-			JavaSourceFileCoder.code("@SuppressWarnings(\"unchecked\")");
+			JavaSourceFileCoder.code(simCoder,"@SuppressWarnings(\"unchecked\")");
 			String line = "public class " + getJavaIdentifier();
 			line = line + " extends " + getPrefixClass().getJavaIdentifier();
-			JavaSourceFileCoder.code(line + " {");
-			JavaSourceFileCoder.debug("// ClassDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
+			JavaSourceFileCoder.code(simCoder,line + " {");
+			JavaSourceFileCoder.debug(simCoder,"// ClassDeclaration: Kind=" + declarationKind + ", BlockLevel=" + getRTBlockLevel()
 					+ ", PrefixLevel=" + prefixLevel() + ", firstLine=" + firstLineNumber() + ", lastLine=" + lastLineNumber()
 					+ ", hasLocalClasses=" + ((hasLocalClasses) ? "true" : "false") + ", System="
 					+ ((isQPSystemBlock()) ? "true" : "false") + ", detachUsed=" + ((detachUsed) ? "true" : "false"));
 			if (isQPSystemBlock())
-				JavaSourceFileCoder.code("public boolean isQPSystemBlock() { return(true); }");
+				JavaSourceFileCoder.code(simCoder,"public boolean isQPSystemBlock() { return(true); }");
 			if (isDetachUsed())
-				JavaSourceFileCoder.code("public boolean isDetachUsed() { return(true); }");
-			JavaSourceFileCoder.debug("// Declare parameters as attributes");
+				JavaSourceFileCoder.code(simCoder,"public boolean isDetachUsed() { return(true); }");
+			JavaSourceFileCoder.debug(simCoder,"// Declare parameters as attributes");
 			for (Parameter par : parameterList) {
 				String tp = par.toJavaType();
 //				IO.println("ClassDeclaration.doJavaCoding: externalIdent="+par.externalIdent);
 //				Util.STOP();
-				JavaSourceFileCoder.code("public " + tp + ' ' + par.externalIdent + ';');
+				JavaSourceFileCoder.code(simCoder,"public " + tp + ' ' + par.externalIdent + ';');
 			}
 			if(this.hasAccumLabel()) {
-				JavaSourceFileCoder.debug("// Declare local labels");
+				JavaSourceFileCoder.debug(simCoder,"// Declare local labels");
 				for (LabelDeclaration lab : labelList.getAccumLabels())
-					lab.declareLocalLabel(this);
+					lab.declareLocalLabel(simCoder, this);
 			}
-			JavaSourceFileCoder.debug("// Declare locals as attributes");
+			JavaSourceFileCoder.debug(simCoder,"// Declare locals as attributes");
 			for (Declaration decl : declarationList)
-				decl.doJavaCoding();
+				decl.doJavaCoding(simCoder);
 	
 			for (VirtualSpecification virtual : virtualSpecList) {
 				if (!virtual.hasDefaultMatch)
-					virtual.doJavaCoding();
+					virtual.doJavaCoding(simCoder);
 			}
 			for (VirtualMatch match : virtualMatchList)
-				match.doJavaCoding();
-			doCodeConstructor();
-			codeClassStatements();
-			javaCoder.codeProgramInfo();
-			JavaSourceFileCoder.code("}", "End of Class");
+				match.doJavaCoding(simCoder);
+			doCodeConstructor(simCoder);
+			codeClassStatements(simCoder);
+			javaCoder.codeProgramInfo(simCoder);
+			JavaSourceFileCoder.code(simCoder,"}", "End of Class");
 		CoreGlobal.exitScope();
 		javaCoder.closeJavaOutput();
 	}
@@ -875,25 +875,25 @@ public class ClassDeclaration extends BlockDeclaration {
 	// *** Coding Utility: doCodeConstructor
 	// ***********************************************************************************************
 	/// Java Coding Utility: Code the constructor.
-	private void doCodeConstructor() {
-		JavaSourceFileCoder.debug("// Normal Constructor");
-		JavaSourceFileCoder.code("public " + getJavaIdentifier() + edFormalParameterList());
+	private void doCodeConstructor(final SimulaCoder simCoder) {
+		JavaSourceFileCoder.debug(simCoder,"// Normal Constructor");
+		JavaSourceFileCoder.code(simCoder,"public " + getJavaIdentifier() + edFormalParameterList());
 		if (prefix != null) {
 			ClassDeclaration prefixClass = this.getPrefixClass();
-			JavaSourceFileCoder.code("super" + prefixClass.edCompleteParameterList());
+			JavaSourceFileCoder.code(simCoder,"super" + prefixClass.edCompleteParameterList());
 		} else
-			JavaSourceFileCoder.code("super(staticLink);");
-		JavaSourceFileCoder.debug("// Parameter assignment to locals");
+			JavaSourceFileCoder.code(simCoder,"super(staticLink);");
+		JavaSourceFileCoder.debug(simCoder,"// Parameter assignment to locals");
 		for (Parameter par : parameterList)
-			JavaSourceFileCoder.code("this." + par.externalIdent + " = s" + par.externalIdent + ';');
+			JavaSourceFileCoder.code(simCoder,"this." + par.externalIdent + " = s" + par.externalIdent + ';');
 
 		if (!hasRealPrefix())
-			JavaSourceFileCoder.code("BBLK(); // Iff no prefix");
+			JavaSourceFileCoder.code(simCoder,"BBLK(); // Iff no prefix");
 
-		JavaSourceFileCoder.debug("// Declaration Code");
+		JavaSourceFileCoder.debug(simCoder,"// Declaration Code");
 		for (Declaration decl : declarationList)
-			decl.doDeclarationCoding();
-		JavaSourceFileCoder.code("}");
+			decl.doDeclarationCoding(simCoder);
+		JavaSourceFileCoder.code(simCoder,"}");
 	}
 
 	// ***********************************************************************************************
@@ -923,34 +923,34 @@ public class ClassDeclaration extends BlockDeclaration {
 	// *** Java Coding Utility: codeStatements
 	// ***********************************************************************************************
 	@Override
-	public void codeStatements() {
-		codeStatementsBeforeInner();
-		codeStatementsAfterInner();
+	public void codeStatements(final SimulaCoder simCoder) {
+		codeStatementsBeforeInner(simCoder);
+		codeStatementsAfterInner(simCoder);
 	}
 
 	// ***********************************************************************************************
 	// *** Coding Utility: codeStatementsBeforeInner
 	// ***********************************************************************************************
 	/// Java coding utility: codeStatementsBeforeInner
-	private void codeStatementsBeforeInner() {
+	private void codeStatementsBeforeInner(final SimulaCoder simCoder) {
 		if (hasRealPrefix()) {
 			ClassDeclaration prfx = this.getPrefixClass();
-			if (prfx != null) prfx.codeStatementsBeforeInner();
+			if (prfx != null) prfx.codeStatementsBeforeInner(simCoder);
 		}
-		if(statements1 != null) for (Statement stm : statements1) stm.doJavaCoding();
-		JavaSourceFileCoder.code("// BEGIN " + identifierValue() + " INNER PART");
+		if(statements1 != null) for (Statement stm : statements1) stm.doJavaCoding(simCoder);
+		JavaSourceFileCoder.code(simCoder,"// BEGIN " + identifierValue() + " INNER PART");
 	}
 
 	// ***********************************************************************************************
 	// *** Coding Utility: codeStatementsAfterInner
 	// ***********************************************************************************************
 	/// Java coding utility: codeStatementsAfterInner
-	private void codeStatementsAfterInner() {
-		JavaSourceFileCoder.code("// ENDOF " + identifierValue() + " INNER PART");
-		for (Statement stm : statements) stm.doJavaCoding();
+	private void codeStatementsAfterInner(final SimulaCoder simCoder) {
+		JavaSourceFileCoder.code(simCoder,"// ENDOF " + identifierValue() + " INNER PART");
+		for (Statement stm : statements) stm.doJavaCoding(simCoder);
 		if (hasRealPrefix()) {
 			ClassDeclaration prfx = this.getPrefixClass();
-			if (prfx != null) prfx.codeStatementsAfterInner();
+			if (prfx != null) prfx.codeStatementsAfterInner(simCoder);
 		}
 	}
 
@@ -958,18 +958,18 @@ public class ClassDeclaration extends BlockDeclaration {
 	// *** Coding Utility: codeClassStatements
 	// ***********************************************************************************************
 	/// Java coding utility: Code class statements.
-	protected void codeClassStatements() {
-		boolean duringSTM_Coding = SimulaCoder.duringSTM_Coding;
-		SimulaCoder.duringSTM_Coding = false;
-		JavaSourceFileCoder.debug("// Class Statements");
-		JavaSourceFileCoder.code("@Override");
-		JavaSourceFileCoder.code("public " + getJavaIdentifier() + " _STM() {");
-		SimulaCoder.duringSTM_Coding = true;
-		codeSTMBody();
-		JavaSourceFileCoder.code("EBLK();");
-		JavaSourceFileCoder.code("return(this);");
-		JavaSourceFileCoder.code("}", "End of Class Statements");
-		SimulaCoder.duringSTM_Coding = duringSTM_Coding;
+	protected void codeClassStatements(final SimulaCoder simCoder) {
+		boolean duringSTM_Coding = simCoder.duringSTM_Coding;
+		simCoder.duringSTM_Coding = false;
+		JavaSourceFileCoder.debug(simCoder,"// Class Statements");
+		JavaSourceFileCoder.code(simCoder,"@Override");
+		JavaSourceFileCoder.code(simCoder,"public " + getJavaIdentifier() + " _STM() {");
+		simCoder.duringSTM_Coding = true;
+		codeSTMBody(simCoder);
+		JavaSourceFileCoder.code(simCoder,"EBLK();");
+		JavaSourceFileCoder.code(simCoder,"return(this);");
+		JavaSourceFileCoder.code(simCoder,"}", "End of Class Statements");
+		simCoder.duringSTM_Coding = duringSTM_Coding;
 	}
 
 	// ***********************************************************************************************
@@ -1075,7 +1075,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
 				classBuilder -> {
 					classBuilder
-						.with(SourceFileAttribute.of(DocumentManager.sourceFileName))
+						.with(SourceFileAttribute.of(simCoder.documentManager.sourceFileName))
 						.withFlags(ClassFile.ACC_PUBLIC + ClassFile.ACC_SUPER)
 						.withSuperclass(CD_SuperClass);
 	
@@ -1470,9 +1470,9 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static ClassDeclaration readObject(AttributeInputStream inpt) throws IOException {
+	public static ClassDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
 		Identifier identifier = inpt.readIdentifier();
-		ClassDeclaration cls = new ClassDeclaration(null, identifier);
+		ClassDeclaration cls = new ClassDeclaration(documentManager, identifier);
 		Util.TRACE_INPUT("BEGIN Read ClassDeclaration: " + identifier.value + ", Declared in: " + cls.declaredIn);
 		cls.declarationKind = ObjectKind.Class;
 		cls.OBJECT_SEQU = inpt.readSEQU(cls);
@@ -1488,21 +1488,21 @@ public class ClassDeclaration extends BlockDeclaration {
 		// *** DeclarationScope
 		cls.sourceFileName = inpt.readString();
 		cls.hasLocalClasses = inpt.readBoolean();
-		cls.labelList = LabelList.readLabelList(inpt);
-		cls.declarationList = DeclarationList.readObject(inpt);
+		cls.labelList = LabelList.readLabelList(documentManager, inpt);
+		cls.declarationList = DeclarationList.readObject(documentManager, inpt);
 
 		// *** BlockDeclaration
 		cls.isMainModule = inpt.readBoolean();
-		cls.statements = (ObjectList<Statement>) inpt.readObjectList();
+		cls.statements = (ObjectList<Statement>) inpt.readObjectList(documentManager);
 		
 		// *** ClassDeclaration
 		cls.prefix = inpt.readIdentifier();
 		cls.detachUsed = inpt.readBoolean();
-		cls.parameterList = (ObjectList<Parameter>) inpt.readObjectList();
-		cls.virtualSpecList = (ObjectList<VirtualSpecification>) inpt.readObjectList();
-		cls.hiddenList = (ObjectList<HiddenSpecification>) inpt.readObjectList();
-		cls.protectedList = (ObjectList<ProtectedSpecification>) inpt.readObjectList();
-		cls.statements1 = (ObjectList<Statement>) inpt.readObjectList();
+		cls.parameterList = (ObjectList<Parameter>) inpt.readObjectList(documentManager);
+		cls.virtualSpecList = (ObjectList<VirtualSpecification>) inpt.readObjectList(documentManager);
+		cls.hiddenList = (ObjectList<HiddenSpecification>) inpt.readObjectList(documentManager);
+		cls.protectedList = (ObjectList<ProtectedSpecification>) inpt.readObjectList(documentManager);
+		cls.statements1 = (ObjectList<Statement>) inpt.readObjectList(documentManager);
 
 		cls.isPreCompiledFromFile = inpt.jarFileName;
 		Util.TRACE_INPUT("END Read ClassDeclaration: " + identifier.value + ", Declared in: " + cls.declaredIn);

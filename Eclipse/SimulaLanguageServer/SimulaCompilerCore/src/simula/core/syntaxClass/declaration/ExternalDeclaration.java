@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeFileIO;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
@@ -104,15 +105,15 @@ public final class ExternalDeclaration extends Declaration {
 	/// Create a new ExternalDeclaration.
 	/// @param identifier the identifier.
 	/// @param extIdentitier the external identifier.
-	private ExternalDeclaration(final SimulaBuilder simBuilder, Identifier identifier,String extIdentitier) {
-		super(simBuilder, identifier);
+	private ExternalDeclaration(final DocumentManager documentManager, Identifier identifier,String extIdentitier) {
+		super(documentManager, identifier);
 		this.declarationKind = ObjectKind.ExternalDeclaration;
 		this.externalIdent = extIdentitier;
 	}
 	
 	/// Private Constructor used by Attribute File I/O.
-	private ExternalDeclaration() {
-		super(null, null);
+	private ExternalDeclaration(final DocumentManager documentManager) {
+		super(documentManager, null);
 		this.declarationKind = ObjectKind.ExternalDeclaration;
 	}
 
@@ -164,18 +165,18 @@ public final class ExternalDeclaration extends Declaration {
 				}
 				simBuilder.getNextParserToken();
 			}
-			ExternalDeclaration externalDeclaration = new ExternalDeclaration(simBuilder, identifier, externalIdentifier);
+			ExternalDeclaration externalDeclaration = new ExternalDeclaration(simBuilder.documentManager, identifier, externalIdentifier);
 			externalDeclaration.type = expectedType;
 			declarations.add(externalDeclaration);
 //			IO.println("ExternalDeclaration.expectExternalDeclaration: externalDeclaration: " + externalDeclaration);
 
-			File jarFile = JarFileBuilder.findJarFile(identifier.value, externalIdentifier);
+			File jarFile = JarFileBuilder.findJarFile(simBuilder, identifier.value, externalIdentifier);
 //			IO.println("ExternalDeclaration.expectExternalDeclaration: jarFile: " + jarFile);
 			if(jarFile == null) {
 				Util.syntaxError(simBuilder, "Can't find attribute file: " + identifier.value + '[' + externalIdentifier + ']');
 			}
 			if (jarFile != null) {
-				if(AttributeFileIO.checkJarFiles(jarFile.toString())) {
+				if(AttributeFileIO.checkJarFiles(simBuilder, jarFile.toString())) {
 					DeclarationScope scope = CoreGlobal.getCurrentScope();
 					Type moduleType = AttributeFileIO.readAttributeEntry(simBuilder, identifier.value, jarFile, scope.getEnclosingBlock());
 					if(moduleType == null) {
@@ -280,8 +281,8 @@ public final class ExternalDeclaration extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ExternalDeclaration readObject(AttributeInputStream inpt) throws IOException {
-		ExternalDeclaration ext = new ExternalDeclaration();
+	public static ExternalDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		ExternalDeclaration ext = new ExternalDeclaration(documentManager);
 		ext.OBJECT_SEQU = inpt.readSEQU(ext);
 
 		// *** SyntaxElement

@@ -128,7 +128,7 @@ public final class Util {
 
 		if(CoreGlobal2.WARNINGS) {
 			LOG.warning(diagnostic.toString());
-			elt.simBuilder.addDiagnostic(diagnostic);
+			elt.documentManager.simBuilder.addDiagnostic(diagnostic);
 		}
 	}
 
@@ -185,7 +185,7 @@ public final class Util {
 		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new SimRange(start, end), msg);
 		
 		LOG.error(diagnostic.toString());
-		elt.simBuilder.addError(diagnostic);
+		elt.documentManager.simBuilder.addError(diagnostic);
 	}
 	
 	/// Error during Code generation:
@@ -198,7 +198,7 @@ public final class Util {
 		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new SimRange(start, end), msg);
 		
 		LOG.error(diagnostic.toString());
-		elt.simBuilder.addError(diagnostic);
+		elt.documentManager.simBuilder.addError(diagnostic);
 	}
 
 	/// Exit with Thread.dumpStack

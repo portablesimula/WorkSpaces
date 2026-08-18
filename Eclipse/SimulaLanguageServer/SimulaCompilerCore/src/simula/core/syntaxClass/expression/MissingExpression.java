@@ -8,9 +8,9 @@ package simula.core.syntaxClass.expression;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.SimulaBuilder;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -34,8 +34,8 @@ import simula.core.utilities.Util;
 public final class MissingExpression extends Expression {
 
 	/// Create a new MissingExpression.
-	public MissingExpression(final SimulaBuilder simBuilder) {
-		super(simBuilder);
+	public MissingExpression(final DocumentManager documentManager) {
+		super(documentManager);
 		this.type = Type.Undef;
 	}
 
@@ -73,10 +73,10 @@ public final class MissingExpression extends Expression {
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
-	/// Default constructor used by Attribute File I/O
-	private MissingExpression() {
-		super(null);
-	}
+//	/// Default constructor used by Attribute File I/O
+//	private MissingExpression(final DocumentManager documentManager) {
+//		super(documentManager);
+//	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -94,14 +94,14 @@ public final class MissingExpression extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the UnaryOperation object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static MissingExpression readObject(AttributeInputStream inpt) throws IOException {
-		MissingExpression expr = new MissingExpression();
+	public static MissingExpression readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		MissingExpression expr = new MissingExpression(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		expr.astData = readAstData(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
 		// *** UnaryOperation
 		Util.TRACE_INPUT("readMissingExpression: " + expr);
 		return(expr);

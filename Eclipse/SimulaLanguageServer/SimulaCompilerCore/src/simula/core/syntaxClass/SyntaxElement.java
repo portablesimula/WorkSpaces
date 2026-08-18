@@ -9,17 +9,14 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.LexTokenRange;
-import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.Declaration;
-import simula.core.syntaxClass.declaration.Parameter;
-import simula.core.syntaxClass.declaration.StandardClass;
-import simula.core.syntaxClass.declaration.StandardProcedure;
 import simula.core.utilities.Html;
 import simula.core.utilities.Util;
 import simula.lsp.util.AstData;
@@ -96,7 +93,8 @@ public abstract class SyntaxElement {
 	public AstData astData; // DETTE MÅ SKRIVES
 
 	/// The associated AST Builder
-	public SimulaBuilder simBuilder;
+//	public SimulaBuilder simBuilder;
+	public DocumentManager documentManager;
 	
 	public LexToken firstParserToken;
 	public LexToken lastParserToken;
@@ -117,11 +115,13 @@ public abstract class SyntaxElement {
 	public int OBJECT_SEQU;
 	
 	/// Create a new SyntaxElement.
-	protected SyntaxElement(SimulaBuilder simBuilder) {
+	protected SyntaxElement(DocumentManager documentManager) {
+		if(documentManager == null && (!(this instanceof Type))) Util.IERR("documentManager == null for "+this.getClass());
 //		OLD_lineNumber = Global.sourceLineNumber;
-		this.simBuilder= simBuilder;
-		if(simBuilder != null) {
-			this.firstParserToken = this.lastParserToken = simBuilder.getCurrentParserToken();
+//		this.simBuilder= simBuilder;
+		this.documentManager= documentManager;
+		if(documentManager != null && documentManager.simBuilder != null) {
+			this.firstParserToken = this.lastParserToken = documentManager.simBuilder.getCurrentParserToken();
 		}
 	}
 
@@ -190,12 +190,12 @@ public abstract class SyntaxElement {
 	}
 
 	/// Output possible declaration Java code.
-	public void doDeclarationCoding() {}
+	public void doDeclarationCoding(final SimulaCoder simCoder) {}
 
 	/// Output Java code.
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
-		JavaSourceFileCoder.code(toJavaCode());
+		JavaSourceFileCoder.code(simCoder,toJavaCode());
 	}
 
 	/// Generate Java code for this Syntax Class.
@@ -291,7 +291,7 @@ public abstract class SyntaxElement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static SyntaxElement readObject(AttributeInputStream inpt) throws IOException {
+	public static SyntaxElement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
 		Util.IERR("Method 'readObject' needs a redefiniton");
 		return(null);
 	}

@@ -12,9 +12,9 @@ import java.lang.classfile.constantpool.FieldRefEntry;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.SimulaBuilder;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -65,18 +65,18 @@ public final class AssignmentOperation extends Expression {
 	/// @param lhs the left hand side
 	/// @param opr the operation
 	/// @param rhs the right hand side
-	public AssignmentOperation(final SimulaBuilder simBuilder, final Expression lhs, final int opr, final Expression rhs) {
-		super(simBuilder);
+	public AssignmentOperation(final DocumentManager documentManager, final Expression lhs, final int opr, final Expression rhs) {
+		super(documentManager);
 		this.lhs = lhs;
 		this.opr = opr;
 		this.rhs = rhs;
 		if (this.lhs == null) {
-			Util.syntaxError(simBuilder, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression(simBuilder);
+			Util.syntaxError(documentManager.simBuilder, "Missing operand before " + KeyWord.edit(opr));
+			this.lhs = new MissingExpression(documentManager);
 		}
 		if (this.rhs == null) {
-			Util.syntaxError(simBuilder, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression(simBuilder);
+			Util.syntaxError(documentManager.simBuilder, "Missing operand after " + KeyWord.edit(opr));
+			this.rhs = new MissingExpression(documentManager);
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
@@ -115,7 +115,7 @@ public final class AssignmentOperation extends Expression {
 		}
 		if (opr == KeyWord.ASSIGNVALUE)
 			this.textValueAssignment = (toType.keyWord == Type.T_TEXT);
-		rhs = (Expression) TypeConversion.testAndCreate(toType, rhs);
+		rhs = (Expression) TypeConversion.testAndCreate(documentManager, toType, rhs);
 		this.type = toType;
 		if (this.type == null)
 			Util.semanticError(rhs, "doAssignmentChecking: Illegal types: " + toType + " := " + fromType);
@@ -457,8 +457,8 @@ public final class AssignmentOperation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private AssignmentOperation() {
-		super(null);
+	private AssignmentOperation(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -481,18 +481,18 @@ public final class AssignmentOperation extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the AssignmentOperation read from the stream.
 	/// @throws IOException if something went wrong.
-	public static AssignmentOperation readObject(AttributeInputStream inpt) throws IOException {
-		AssignmentOperation expr = new AssignmentOperation();
+	public static AssignmentOperation readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		AssignmentOperation expr = new AssignmentOperation(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		expr.astData = readAstData(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
 		// *** AssignmentOperation
-		expr.lhs = (Expression) inpt.readObj();
+		expr.lhs = (Expression) inpt.readObj(documentManager);
 		expr.opr = inpt.readShort();
-		expr.rhs = (Expression) inpt.readObj();
+		expr.rhs = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("readAssignmentOperation: " + expr);
 		return(expr);
 	}

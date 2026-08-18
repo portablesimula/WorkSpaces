@@ -10,6 +10,7 @@ import java.lang.classfile.CodeBuilder;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
@@ -96,16 +97,16 @@ public final class TextExpression extends Expression {
 	/// Create a new TextExpression
 	/// @param lhs left hand side
 	/// @param rhs rigth hand side
-	TextExpression(final SimulaBuilder simBuilder, final Expression lhs, final Expression rhs) {
-		super(simBuilder);
+	TextExpression(final DocumentManager documentManager, final Expression lhs, final Expression rhs) {
+		super(documentManager); SimulaBuilder simBuilder = documentManager.simBuilder;
 		this.lhs = lhs; this.rhs = rhs;
 		if (this.lhs == null) {
 			Util.syntaxError(simBuilder, "Missing operand before &");
-			this.lhs = new MissingExpression(simBuilder);
+			this.lhs = new MissingExpression(documentManager);
 		}
 		if (this.rhs == null) {
 			Util.syntaxError(simBuilder, "Missing operand after &");
-			this.rhs = new MissingExpression(simBuilder);
+			this.rhs = new MissingExpression(documentManager);
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
@@ -160,8 +161,8 @@ public final class TextExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private TextExpression() {
-		super(null);
+	private TextExpression(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -183,17 +184,17 @@ public final class TextExpression extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static TextExpression readObject(AttributeInputStream inpt) throws IOException {
-		TextExpression expr = new TextExpression();
+	public static TextExpression readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		TextExpression expr = new TextExpression(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		expr.astData = readAstData(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
 		// *** TextExpression
-		expr.lhs = (Expression) inpt.readObj();
-		expr.rhs = (Expression) inpt.readObj();
+		expr.lhs = (Expression) inpt.readObj(documentManager);
+		expr.rhs = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("readTextExpression: " + expr);
 		return(expr);
 	}

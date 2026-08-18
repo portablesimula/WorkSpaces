@@ -20,6 +20,7 @@ import java.util.Vector;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -116,8 +117,8 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param identifier the array identifier
 	/// @param type the array type
 	/// @param boundPairList The list of BoundPair
-	private ArrayDeclaration(final SimulaBuilder simBuilder, final Identifier identifier, final Type type, final Vector<BoundPair> boundPairList) {
-		super(simBuilder, identifier);
+	private ArrayDeclaration(final DocumentManager documentManager, final Identifier identifier, final Type type, final Vector<BoundPair> boundPairList) {
+		super(documentManager, identifier);
 		this.declarationKind = ObjectKind.ArrayDeclaration;
 		this.type = type;
 		this.boundPairList = boundPairList;
@@ -167,13 +168,13 @@ public final class ArrayDeclaration extends Declaration {
 				Expression LB = Expression.expectExpression(simBuilder, "lowerbound");
 				Parse.expect(simBuilder, KeyWord.COLON);
 				Expression UB = Expression.expectExpression(simBuilder, "upperbound");
-				boundPairList.add(new BoundPair(LB, UB));
+				boundPairList.add(new BoundPair(simBuilder.documentManager, LB, UB));
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
 			Parse.expect(simBuilder, KeyWord.ENDPAR);
 			simBuilder.setParsingBoundPairList(false);
 			for (Enumeration<Identifier> e = identList.elements(); e.hasMoreElements();) {
 				Identifier identifier = e.nextElement();
-				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(simBuilder, identifier, type, boundPairList);
+				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(simBuilder.documentManager, identifier, type, boundPairList);
 //				IO.println("ArrayDecleration.expectArrayDeclaration: NEW "+arrayDeclaration);
 				declarations.add(arrayDeclaration);
 			}				
@@ -189,6 +190,7 @@ public final class ArrayDeclaration extends Declaration {
 	///    BoundPair = ArithmeticExpression : ArithmeticExpression
 	/// </pre>
 	private static class BoundPair {
+		final DocumentManager documentManager;
 		/// The lower bound expression.
 		Expression LB;
 		/// The upper bound expression.
@@ -197,7 +199,8 @@ public final class ArrayDeclaration extends Declaration {
 		/// Create a new BoundPair.
 		/// @param LB The lower bound expression
 		/// @param UB The upper bound expression
-		BoundPair(final Expression LB, final Expression UB) {
+		BoundPair(final DocumentManager documentManager, final Expression LB, final Expression UB) {
+			this.documentManager = documentManager;
 			this.LB = LB;
 			this.UB = UB;
 		}
@@ -206,8 +209,8 @@ public final class ArrayDeclaration extends Declaration {
 		private void doChecking() {
 			LB.doChecking();
 			UB.doChecking();
-			LB = (Expression) TypeConversion.testAndCreate(Type.Integer, LB);
-			UB = (Expression) TypeConversion.testAndCreate(Type.Integer, UB);
+			LB = (Expression) TypeConversion.testAndCreate(documentManager, Type.Integer, LB);
+			UB = (Expression) TypeConversion.testAndCreate(documentManager, Type.Integer, UB);
 		}
 
 		@Override
@@ -231,7 +234,7 @@ public final class ArrayDeclaration extends Declaration {
 	}
 
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		// --------------------------------------------------------------------
@@ -239,11 +242,11 @@ public final class ArrayDeclaration extends Declaration {
 		// --------------------------------------------------------------------
 		String arrType = this.type.toJavaArrayType();
 		String arrayIdent = this.getJavaIdentifier();
-		JavaSourceFileCoder.code("public " + arrType + " " + arrayIdent + "=null;");
+		JavaSourceFileCoder.code(simCoder,"public " + arrType + " " + arrayIdent + "=null;");
 	}
 
 	@Override
-	public void doDeclarationCoding() {
+	public void doDeclarationCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
 		// --------------------------------------------------------------------
@@ -261,7 +264,7 @@ public final class ArrayDeclaration extends Declaration {
 			sb.append("new RTS_BOUNDS(").append(boundPair.LB.toJavaCode()).append(',').append(boundPair.UB.toJavaCode()).append(')');
 		}
 		sb.append(");");
-		JavaSourceFileCoder.code(sb.toString());
+		JavaSourceFileCoder.code(simCoder,sb.toString());
 	}
 
 
@@ -555,8 +558,8 @@ public final class ArrayDeclaration extends Declaration {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public ArrayDeclaration() {
-		super(null, null);
+	public ArrayDeclaration(final DocumentManager documentManager) {
+		super(documentManager, null);
 		this.declarationKind = ObjectKind.ArrayDeclaration;
 	}
 
@@ -586,8 +589,8 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ArrayDeclaration readObject(AttributeInputStream inpt) throws IOException {
-		ArrayDeclaration arr = new ArrayDeclaration();
+	public static ArrayDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		ArrayDeclaration arr = new ArrayDeclaration(documentManager);
 		arr.OBJECT_SEQU = inpt.readSEQU(arr);
 
 		// *** SyntaxElement
@@ -602,9 +605,9 @@ public final class ArrayDeclaration extends Declaration {
 		arr.nDim = inpt.readShort();
 		arr.boundPairList = new Vector<BoundPair>();
 		for(int i=0;i<arr.nDim;i++) {
-			Expression LB = (Expression) inpt.readObj();
-			Expression UB = (Expression) inpt.readObj();
-			arr.boundPairList.add(new BoundPair(LB,UB));
+			Expression LB = (Expression) inpt.readObj(documentManager);
+			Expression UB = (Expression) inpt.readObj(documentManager);
+			arr.boundPairList.add(new BoundPair(documentManager, LB, UB));
 		}
 		Util.TRACE_INPUT("Array: " + arr);
 		return(arr);

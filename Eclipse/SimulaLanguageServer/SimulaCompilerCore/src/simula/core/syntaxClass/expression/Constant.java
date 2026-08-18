@@ -11,6 +11,7 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.MethodTypeDesc;
 
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
@@ -46,8 +47,8 @@ public final class Constant extends Expression {
 	/// Create a new Constant.
 	/// @param type the constant's type
 	/// @param value the constant's value
-	public Constant(final SimulaBuilder simBuilder, final Type type,final Object value) {
-		super(simBuilder);
+	public Constant(final DocumentManager documentManager, final Type type,final Object value) {
+		super(documentManager);
 		this.type=type;
 		this.value = value;
 	}
@@ -57,7 +58,7 @@ public final class Constant extends Expression {
 	/// @return the resulting Constant
     static Constant createRealType(final SimulaBuilder simBuilder, final float value) {
     	Type type=Type.Real;
-    	return(new Constant(simBuilder, type,value));
+    	return(new Constant(simBuilder.documentManager, type,value));
     }
 	
 	/// Create a long real type Constant.
@@ -65,7 +66,7 @@ public final class Constant extends Expression {
 	/// @return the resulting Constant
     static Constant createLongRealType(final SimulaBuilder simBuilder, final double value) {
     	Type type = Type.LongReal;
-    	return(new Constant(simBuilder, type,value));
+    	return(new Constant(simBuilder.documentManager, type,value));
     }
     
     /// Returns the type of this number.
@@ -106,7 +107,7 @@ public final class Constant extends Expression {
 			} }
 		}
 		if(result==null) Util.IERR();
-		return(new Constant(simBuilder, type,result));
+		return(new Constant(simBuilder.documentManager, type,result));
     }
   
     /// Simplify this Constant.
@@ -152,7 +153,7 @@ public final class Constant extends Expression {
 			} }
 		}
 		if(result==null) Util.IERR();
-		return(new Constant(simBuilder, type,result));
+		return(new Constant(simBuilder.documentManager, type,result));
     }
     
 	@Override
@@ -319,8 +320,8 @@ public final class Constant extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private Constant() {
-		super(null);
+	private Constant(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -341,14 +342,14 @@ public final class Constant extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the Constant read from the stream.
 	/// @throws IOException if something went wrong.
-	public static Constant readObject(AttributeInputStream inpt) throws IOException {
-		Constant cnst = new Constant();
+	public static Constant readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		Constant cnst = new Constant(documentManager);
 		cnst.OBJECT_SEQU = inpt.readSEQU(cnst);
 		// *** SyntaxElement
 		cnst.astData = readAstData(inpt);
 		// *** Expression
 		cnst.type = inpt.readType();
-		cnst.backLink = (SyntaxElement) inpt.readObj();
+		cnst.backLink = (SyntaxElement) inpt.readObj(documentManager);
 		// *** Constant
 		cnst.value=inpt.readConstant();
 		Util.TRACE_INPUT("Constant: "+cnst);

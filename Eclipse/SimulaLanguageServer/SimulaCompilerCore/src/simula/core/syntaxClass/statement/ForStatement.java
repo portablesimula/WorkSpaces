@@ -14,6 +14,7 @@ import java.util.Iterator;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -157,19 +158,24 @@ public final class ForStatement extends Statement {
 
 	/// Create a new ForStatement.
 	/// @param line the source line number
-	ForStatement(final SimulaBuilder simBuilder) {
-		super(simBuilder);
+	private ForStatement(final DocumentManager documentManager) {
+		super(documentManager);
+	}
+	
+	static ForStatement of(final DocumentManager documentManager) {
+		ForStatement stm = new ForStatement(documentManager);
+		SimulaBuilder simBuilder = documentManager.simBuilder;
 		simBuilder.consume(KeyWord.FOR); //  (add it to tokenList)
 
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ForStatement");
-		controlVariable = new VariableExpression(simBuilder, Parse.expectIdentifier(simBuilder));
+		stm.controlVariable = new VariableExpression(documentManager, Parse.expectIdentifier(simBuilder));
 		LexToken prevToken = Parse.getCurrentParserToken(simBuilder);
 		if (!Parse.accept(simBuilder, KeyWord.ASSIGNVALUE))
 			Parse.expect(simBuilder, KeyWord.ASSIGNREF);
-		assignmentOperator = prevToken.keyWord;
+		stm.assignmentOperator = prevToken.keyWord;
 		do {
-			forList.add(expectForListElement(simBuilder));
+			stm.forList.add(stm.expectForListElement(simBuilder));
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		Parse.expect(simBuilder, KeyWord.DO);
 		Statement doStatement = Statement.acceptStatement(simBuilder);
@@ -177,9 +183,10 @@ public final class ForStatement extends Statement {
 			Util.syntaxError(simBuilder, "No statement following DO in For statement");
 			doStatement = DummyStatement.ofImplicit(simBuilder);
 		}
-		this.doStatement = doStatement;
+		stm.doStatement = doStatement;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line " + this.firstLineNumber() + ": ForStatement: " + this);
+			Util.TRACE("Line " + stm.firstLineNumber() + ": ForStatement: " + stm);
+		return stm;
 	}
 
 	/// Parse a for-list element.
@@ -189,13 +196,13 @@ public final class ForStatement extends Statement {
 			Parse.TRACE("Parse ForListElement");
 		Expression expr1 = Expression.expectExpression(simBuilder, "for list");
 		if (Parse.accept(simBuilder, KeyWord.WHILE))
-			return (new ForWhileElement(simBuilder, this, expr1, Expression.expectExpression(simBuilder, "for while")));
+			return (new ForWhileElement(documentManager, this, expr1, Expression.expectExpression(simBuilder, "for while")));
 		if (Parse.accept(simBuilder, KeyWord.STEP)) {
 			Expression expr2 = Expression.expectExpression(simBuilder, "for step");
 			Parse.expect(simBuilder, KeyWord.UNTIL);
-			return (new StepUntilElement(simBuilder, this, expr1, expr2, Expression.expectExpression(simBuilder, "for until")));
+			return (new StepUntilElement(documentManager, this, expr1, expr2, Expression.expectExpression(simBuilder, "for until")));
 		} else
-			return (new ForListElement(simBuilder, this, expr1));
+			return (new ForListElement(documentManager, this, expr1));
 	}
 
 	@Override
@@ -219,10 +226,10 @@ public final class ForStatement extends Statement {
 	}
 
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		ForListElement singleElement = getSingleOptimizableElement();
 		if (singleElement != null) {
-			singleElement.doSimplifiedJavaCoding();
+			singleElement.doSimplifiedJavaCoding(simCoder);
 			return;
 		}
 
@@ -242,7 +249,7 @@ public final class ForStatement extends Statement {
 		ASSERT_SEMANTICS_CHECKED();
 		boolean refType = controlVariable.type.isReferenceType();
 		String CB = "CB_" + firstLineNumber();
-		JavaSourceFileCoder.code("for(boolean " + CB + ":new FOR_List(");
+		JavaSourceFileCoder.code(simCoder,"for(boolean " + CB + ":new FOR_List(");
 		char del = ' ';
 		for (ForListElement elt : forList) {
 			String classIdent = (refType) ? elt.expr1.type.getJavaRefIdent(elt.expr1) : "Number";
@@ -251,12 +258,12 @@ public final class ForStatement extends Statement {
 				case Type.T_BOOLEAN -> classIdent = "Boolean"; // AD'HOC
 				case Type.T_TEXT -> classIdent = "RTS_TXT"; // AD'HOC
 			}
-			JavaSourceFileCoder.code("   " + del + elt.edCode(classIdent, elt.expr1.type));
+			JavaSourceFileCoder.code(simCoder,"   " + del + elt.edCode(classIdent, elt.expr1.type));
 			del = ',';
 		}
-		JavaSourceFileCoder.code("   )) { if(!" + CB + ") continue;");
-		doStatement.doJavaCoding();
-		JavaSourceFileCoder.code("}");
+		JavaSourceFileCoder.code(simCoder,"   )) { if(!" + CB + ") continue;");
+		doStatement.doJavaCoding(simCoder);
+		JavaSourceFileCoder.code(simCoder,"}");
 	}
 
 	/// Check if this ForListElement is a single optimizable element.
@@ -387,10 +394,6 @@ public final class ForStatement extends Statement {
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
-	/// Default constructor used by Attribute File I/O
-	private ForStatement() {
-		super(null);
-	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -411,16 +414,16 @@ public final class ForStatement extends Statement {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static ForStatement readObject(AttributeInputStream inpt) throws IOException {
-		ForStatement stm = new ForStatement();
+	public static ForStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		ForStatement stm = new ForStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		stm.astData = readAstData(inpt);
 		// *** ForStatement
-		stm.controlVariable = (VariableExpression) inpt.readObj();
+		stm.controlVariable = (VariableExpression) inpt.readObj(documentManager);
 		stm.assignmentOperator = inpt.readShort();
-		stm.forList = (ObjectList<ForListElement>) inpt.readObjectList();
-		stm.doStatement = (Statement) inpt.readObj();
+		stm.forList = (ObjectList<ForListElement>) inpt.readObjectList(documentManager);
+		stm.doStatement = (Statement) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("ForStatement: " + stm);
 		return(stm);
 	}

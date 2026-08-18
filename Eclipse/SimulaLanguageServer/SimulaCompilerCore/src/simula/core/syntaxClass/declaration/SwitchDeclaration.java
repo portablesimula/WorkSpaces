@@ -15,6 +15,7 @@ import java.util.Vector;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
@@ -53,8 +54,9 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 
 	/// Create a new SwitchDeclaration.
 	/// @param ident switch identifier
-	public SwitchDeclaration(SimulaBuilder simBuilder, final Identifier ident) {
-		super(simBuilder, ident, ObjectKind.Procedure);
+	public SwitchDeclaration(DocumentManager documentManager, final Identifier ident) {
+		super(documentManager, ident, ObjectKind.Procedure);
+		SimulaBuilder simBuilder = documentManager.simBuilder;
 		Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
 		syntaxElements.add(this);
 		if (Option.internal.TRACE_PARSE)
@@ -65,7 +67,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse SwitchDeclaration(3), switchList=" + switchList);
-		new Parameter(simBuilder, new Identifier("_SW"), Type.Integer, Parameter.Kind.Simple).into(parameterList);
+		new Parameter(documentManager, new Identifier("_SW"), Type.Integer, Parameter.Kind.Simple).into(parameterList);
 		CoreGlobal.setScope(declaredIn);
 
 		for(Expression expr:switchList) syntaxElements.add(expr);
@@ -84,7 +86,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		if(virtSpec==null) {
 			// Switch attributes are implicit specified 'protected'
 			if(declaredIn.declarationKind==ObjectKind.Class)
-				((ClassDeclaration)declaredIn).protectedList.add(new ProtectedSpecification(null, (ClassDeclaration)CoreGlobal.getCurrentScope(),identifier));
+				((ClassDeclaration)declaredIn).protectedList.add(new ProtectedSpecification(documentManager, (ClassDeclaration)CoreGlobal.getCurrentScope(),identifier));
 		}
 	}
 
@@ -92,24 +94,24 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 	// *** Coding Utility: doCodeSwitchBody
 	// ***********************************************************************************************
 	@Override
-	protected void codeProcedureBody() {
-		boolean duringSTM_Coding=SimulaCoder.duringSTM_Coding;
-		SimulaCoder.duringSTM_Coding=false;
-		JavaSourceFileCoder.debug("// Switch Body");
-		JavaSourceFileCoder.code("@Override");
-		JavaSourceFileCoder.code("public " + getJavaIdentifier() + " _STM() {");
-		SimulaCoder.duringSTM_Coding=true;
-		JavaSourceFileCoder.code("switch(p__SW-1) {");
+	protected void codeProcedureBody(final SimulaCoder simCoder) {
+		boolean duringSTM_Coding=simCoder.duringSTM_Coding;
+		simCoder.duringSTM_Coding=false;
+		JavaSourceFileCoder.debug(simCoder,"// Switch Body");
+		JavaSourceFileCoder.code(simCoder,"@Override");
+		JavaSourceFileCoder.code(simCoder,"public " + getJavaIdentifier() + " _STM() {");
+		simCoder.duringSTM_Coding=true;
+		JavaSourceFileCoder.code(simCoder,"switch(p__SW-1) {");
 		int n = 0;
 		for (Expression expr : ((SwitchDeclaration) this).switchList) {
-			JavaSourceFileCoder.code("case " + (n++) + ": _RESULT=" + expr.toJavaCode() + "; break;");				
+			JavaSourceFileCoder.code(simCoder,"case " + (n++) + ": _RESULT=" + expr.toJavaCode() + "; break;");				
 		}
-		JavaSourceFileCoder.code("default: throw new RTS_SimulaRuntimeError(\"Illegal switch index: \"+p__SW);");
-		JavaSourceFileCoder.code("}");
-		JavaSourceFileCoder.code("EBLK();");
-		JavaSourceFileCoder.code("return(this);");
-		JavaSourceFileCoder.code("}","End of Switch BODY");
-		SimulaCoder.duringSTM_Coding=duringSTM_Coding;
+		JavaSourceFileCoder.code(simCoder,"default: throw new RTS_SimulaRuntimeError(\"Illegal switch index: \"+p__SW);");
+		JavaSourceFileCoder.code(simCoder,"}");
+		JavaSourceFileCoder.code(simCoder,"EBLK();");
+		JavaSourceFileCoder.code(simCoder,"return(this);");
+		JavaSourceFileCoder.code(simCoder,"}","End of Switch BODY");
+		simCoder.duringSTM_Coding=duringSTM_Coding;
 	}
 
 	// ***********************************************************************************************
@@ -138,7 +140,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		
 		int n = 0;
 		for (Expression expr : ((SwitchDeclaration) this).switchList) {
-			//JavaSourceFileCoder.code("case " + (n++) + ": _RESULT=" + expr.toJavaCode() + "; break;");
+			//JavaSourceFileCoder.code(simCoder,"case " + (n++) + ": _RESULT=" + expr.toJavaCode() + "; break;");
 			Label lab = tableSwitchCases.get(n++).target();
 			codeBuilder
 				.labelBinding(lab)

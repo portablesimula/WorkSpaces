@@ -170,7 +170,7 @@ public abstract class BuildCPV {
 				Expression actualParameter = actualIterator.next();
 				Parameter formalParameter = (Parameter) formalIterator.next();
 				Type formalType = formalParameter.type;
-				actualParameter = TypeConversion.testAndCreate(formalType, actualParameter);
+				actualParameter = TypeConversion.testAndCreate(simCoder.documentManager, formalType, actualParameter);
 				actualParameter.buildEvaluation(simCoder, null, codeBuilder);
 				formalType.buildObjectValueOf(codeBuilder);
 				// s.append(".setPar(");

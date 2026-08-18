@@ -11,6 +11,7 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
@@ -71,8 +72,9 @@ public final class LocalObject extends Expression {
 
 	/// Create a new LocalObject
 	/// @param ident class-identifier
-	private LocalObject(final SimulaBuilder simBuilder, final Identifier ident) {
-		super(simBuilder);
+	private LocalObject(final DocumentManager documentManager, final Identifier ident) {
+		super(documentManager);
+//		SimulaBuilder simBuilder = documentManager.simBuilder;
 		this.classIdentifier = ident;
 		this.type=Type.Ref(classIdentifier);
 		if (Option.internal.TRACE_PARSE)
@@ -85,7 +87,7 @@ public final class LocalObject extends Expression {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse ThisObjectExpression, current=" + Parse.getCurrentParserToken(simBuilder));
 		Identifier classIdentifier = Parse.expectIdentifier(simBuilder);
-		Expression expr = new LocalObject(simBuilder, classIdentifier);
+		Expression expr = new LocalObject(simBuilder.documentManager, classIdentifier);
 		return(expr);
 	}
 
@@ -179,8 +181,8 @@ public final class LocalObject extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public LocalObject() {
-		super(null);
+	public LocalObject(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -201,14 +203,14 @@ public final class LocalObject extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static LocalObject readObject(AttributeInputStream inpt) throws IOException {
-		LocalObject expr = new LocalObject();
+	public static LocalObject readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		LocalObject expr = new LocalObject(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		expr.astData = readAstData(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
 		// *** LocalObject
 		expr.classIdentifier = inpt.readIdentifier();
 		Util.TRACE_INPUT("readLocalObject: " + expr);

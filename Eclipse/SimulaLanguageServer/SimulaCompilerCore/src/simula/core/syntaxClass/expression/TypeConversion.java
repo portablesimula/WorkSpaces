@@ -10,7 +10,7 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.constant.MethodTypeDesc;
 
 import simula.core.CoreGlobal;
-import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.token.Identifier;
@@ -36,8 +36,8 @@ public final class TypeConversion extends Expression {
 	/// Create a new TypeConversion.
 	/// @param type the new type
 	/// @param expression the expression
-	public TypeConversion(final Type type,final Expression expression) {
-		super(null);
+	public TypeConversion(final DocumentManager documentManager, final Type type,final Expression expression) {
+		super(documentManager);
 		this.type=type;
 		this.expression = expression; expression.backLink=this;
 	    this.doChecking();
@@ -96,7 +96,7 @@ public final class TypeConversion extends Expression {
 	/// @param toType convert to toType
 	/// @param expression the expression
 	/// @return the resulting expression
-	public static Expression testAndCreate(final Type toType,final Expression expression) {
+	public static Expression testAndCreate(final DocumentManager documentManager, final Type toType,final Expression expression) {
 		Type fromType=expression.type;
 		Identifier qual=(fromType==null)?null:fromType.getRefIdent();
 		if(qual != null) {
@@ -106,7 +106,7 @@ public final class TypeConversion extends Expression {
 				Util.semanticError(expression, "Incompatible types: "+expression+" of type "+expression.type+" can't be converted to "+toType);
 			}
 		}
-		if (testCastNeccessary(toType, expression)) {
+		if (testCastNeccessary(documentManager, toType, expression)) {
 			if(expression instanceof Constant constant) {
 				Number val=(Number)constant.value;
 				switch(toType.keyWord) {
@@ -118,15 +118,15 @@ public final class TypeConversion extends Expression {
 					case Type.T_LONG_REAL: val=val.doubleValue(); break;
 					default: Util.IERR();
 				}
-				Constant c=new Constant(null, toType, val); c.doChecking();
+				Constant c=new Constant(documentManager, toType, val); c.doChecking();
 				return(c);
 			}
-			if(CoreGlobal2.compilerMode != CoreGlobal2.CompilerMode.viaJavaSource) {
+			if(! documentManager.compileViaJavaSource) {
 				if(toType instanceof OverLoad otp) {
-					return (new TypeConversion(otp.type[0], expression));
+					return (new TypeConversion(documentManager, otp.type[0], expression));
 				}				
 			}
-			return (new TypeConversion(toType, expression));
+			return (new TypeConversion(documentManager, toType, expression));
 		}
 		return (expression);
 	}
@@ -135,10 +135,10 @@ public final class TypeConversion extends Expression {
 	/// @param toType the desired type
 	/// @param expression the expression
 	/// @return true: a type cast is necessary
-	private static boolean testCastNeccessary(Type toType,final Expression expression) {
+	private static boolean testCastNeccessary(final DocumentManager documentManager, final Type toType, final Expression expression) {
 		if (toType == null)	return false;
 		if(expression instanceof MissingExpression) return false;
-		if(CoreGlobal2.compilerMode != CoreGlobal2.CompilerMode.viaJavaSource) {
+		if(! documentManager.compileViaJavaSource) {
 			if(toType instanceof OverLoad otp) {
 				if(!otp.contains(expression.type)) {
 					return(true); // Ad'Hoc
@@ -223,7 +223,7 @@ public final class TypeConversion extends Expression {
 					case Type.T_INTEGER: codeBuilder.i2f(); break;
 					case Type.T_LONG_REAL: codeBuilder.d2f(); break;
 					default:
-						if(CoreGlobal2.compilerMode != CoreGlobal2.CompilerMode.viaJavaSource && fromType instanceof OverLoad otp) {
+						if((! documentManager.compileViaJavaSource) && fromType instanceof OverLoad otp) {
 							if(!otp.contains(Type.Real)) Util.IERR();
 						} else if (fromType.keyWord != Type.T_REAL) Util.IERR();
 				} break;
@@ -233,7 +233,7 @@ public final class TypeConversion extends Expression {
 					case Type.T_INTEGER: codeBuilder.i2d(); break;
 					case Type.T_REAL: codeBuilder.f2d(); break;
 					default:
-						if(CoreGlobal2.compilerMode != CoreGlobal2.CompilerMode.viaJavaSource && fromType instanceof OverLoad otp) {
+						if((! documentManager.compileViaJavaSource) && fromType instanceof OverLoad otp) {
 							if(!otp.contains(Type.LongReal)) Util.IERR();
 						} else if (fromType.keyWord != Type.T_LONG_REAL) Util.IERR();
 				}
@@ -254,8 +254,8 @@ public final class TypeConversion extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private TypeConversion() {
-		super(null);
+	private TypeConversion(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -276,16 +276,16 @@ public final class TypeConversion extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the TypeConversion object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static TypeConversion readObject(AttributeInputStream inpt) throws IOException {
-		TypeConversion expr = new TypeConversion();
+	public static TypeConversion readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		TypeConversion expr = new TypeConversion(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		expr.astData = readAstData(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
 		// *** TypeConversion
-		expr.expression = (Expression) inpt.readObj();
+		expr.expression = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("readTypeConversion: " + expr);
 		return(expr);
 	}

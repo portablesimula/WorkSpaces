@@ -13,12 +13,14 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.HiddenSpecification;
 import simula.core.syntaxClass.ProcedureSpecification;
 import simula.core.syntaxClass.ProtectedSpecification;
@@ -82,8 +84,8 @@ public final class VirtualSpecification extends Declaration {
 	/// @param kind the vitual Kind
 	/// @param prefixLevel the prefix level of the class with this virtual specification
 	/// @param procedureSpec the ProcedureSpecification or null if not present
-	VirtualSpecification(final SimulaBuilder simBuilder, final Identifier identifier, final Type type, final int kind, final int prefixLevel, final ProcedureSpecification procedureSpec) {
-		super(simBuilder, identifier);
+	VirtualSpecification(final DocumentManager documentManager, final Identifier identifier, final Type type, final int kind, final int prefixLevel, final ProcedureSpecification procedureSpec) {
+		super(documentManager, identifier);
 		this.declarationKind = ObjectKind.VirtualSpecification;
 		this.externalIdent = identifierValue();
 		this.type = type;
@@ -133,9 +135,9 @@ public final class VirtualSpecification extends Declaration {
 					Parse.expect(simBuilder, KeyWord.PROCEDURE);
 					procedureSpec = ProcedureSpecification.expectProcedureSpecification(simBuilder, type);						
 					cls.virtualSpecList
-							.add(new VirtualSpecification(simBuilder, identifier, type, Kind.Procedure, cls.prefixLevel(), procedureSpec));
+							.add(new VirtualSpecification(simBuilder.documentManager, identifier, type, Kind.Procedure, cls.prefixLevel(), procedureSpec));
 				} else {
-					cls.virtualSpecList.add(new VirtualSpecification(simBuilder, identifier, type, Kind.Procedure, cls.prefixLevel(), null));
+					cls.virtualSpecList.add(new VirtualSpecification(simBuilder.documentManager, identifier, type, Kind.Procedure, cls.prefixLevel(), null));
 					if (Parse.accept(simBuilder, KeyWord.COMMA))
 						expectIdentifierList(simBuilder, cls, type, Kind.Procedure);
 					else
@@ -159,7 +161,7 @@ public final class VirtualSpecification extends Declaration {
 	private static void expectIdentifierList(final SimulaBuilder simBuilder, final ClassDeclaration cls, final Type type, final int kind) {
 		do {
 			Identifier identifier = Parse.expectIdentifier(simBuilder);
-			cls.virtualSpecList.add(new VirtualSpecification(simBuilder, identifier, type, kind, cls.prefixLevel(), null));
+			cls.virtualSpecList.add(new VirtualSpecification(simBuilder.documentManager, identifier, type, kind, cls.prefixLevel(), null));
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		Parse.expect(simBuilder, KeyWord.SEMICOLON);
 	}
@@ -175,7 +177,7 @@ public final class VirtualSpecification extends Declaration {
 		// Label and switch attributes are implicit specified 'protected'
 		if (kind == Kind.Label || kind == Kind.Switch)
 			((ClassDeclaration) declaredIn).protectedList
-					.add(new ProtectedSpecification(null, (ClassDeclaration) declaredIn, identifier));
+					.add(new ProtectedSpecification(documentManager, (ClassDeclaration) declaredIn, identifier));
 		SET_SEMANTICS_CHECKED();
 	}
 
@@ -229,11 +231,11 @@ public final class VirtualSpecification extends Declaration {
 	}
 
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		ASSERT_SEMANTICS_CHECKED();
 		String matchCode = "{ throw new RTS_SimulaRuntimeError(\"No Virtual Match: " + identifierValue() + "\"); }";
 		String qnt = (kind == Kind.Label) ? "RTS_LABEL " : "RTS_PRCQNT ";
-		JavaSourceFileCoder.code("public " + qnt + getVirtualIdentifier() + matchCode);
+		JavaSourceFileCoder.code(simCoder,"public " + qnt + getVirtualIdentifier() + matchCode);
 	}
 
 	/// Build the default virtual match method RTS_LABEL or RTS_PRCQNT.
@@ -281,8 +283,8 @@ public final class VirtualSpecification extends Declaration {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private VirtualSpecification() {
-		super(null, null);
+	private VirtualSpecification(final DocumentManager documentManager) {
+		super(documentManager, null);
 		this.declarationKind = ObjectKind.VirtualSpecification;
 	}
 	
@@ -304,8 +306,8 @@ public final class VirtualSpecification extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static SyntaxElement readObject(AttributeInputStream inpt) throws IOException {
-		VirtualSpecification virt = new VirtualSpecification();
+	public static SyntaxElement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		VirtualSpecification virt = new VirtualSpecification(documentManager);
 		virt.OBJECT_SEQU = inpt.readSEQU(virt);
 		// *** VirtualSpecification
 		virt.identifier = inpt.readIdentifier();
@@ -313,7 +315,7 @@ public final class VirtualSpecification extends Declaration {
 		virt.type = inpt.readType();
 		virt.kind = inpt.readShort();
 		virt.prefixLevel = inpt.readShort();
-		virt.procedureSpec = ProcedureSpecification.readProcedureSpec(inpt);
+		virt.procedureSpec = ProcedureSpecification.readProcedureSpec(documentManager, inpt);
 		Util.TRACE_INPUT("VirtualSpec: " + virt);
 		return(virt);
 	}

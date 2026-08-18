@@ -15,7 +15,6 @@ import java.util.Vector;
 
 import simula.Option;
 import simula.core.CoreGlobal;
-import simula.core.DocumentManager;
 import simula.core.CoreGlobal2;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.BlockDeclaration;
@@ -51,12 +50,12 @@ public final class JavaSourceFileCoder {
 
 	/// Create a new JavaSourceFileCoder.
 	/// @param blockDeclaration argument
-	public JavaSourceFileCoder(final BlockDeclaration blockDeclaration) {
+	public JavaSourceFileCoder(final SimulaCoder simCoder, final BlockDeclaration blockDeclaration) {
 		this.blockDeclaration = blockDeclaration;
-		SimulaCoder.javaSourceFileCoders.add(this);
+		simCoder.javaSourceFileCoders.add(this);
 		enclosingJavaCoder = CoreGlobal.currentJavaFileCoder;
 		CoreGlobal.currentJavaFileCoder = this;
-		javaOutputFile = new File(SimulaCoder.tempJavaFileDir, blockDeclaration.getJavaIdentifier() + ".java");
+		javaOutputFile = new File(simCoder.tempJavaFileDir, blockDeclaration.getJavaIdentifier() + ".java");
 		LOG.info("JavaSourceFileCoder: javaOutputFile: " + javaOutputFile);
 		try {
 			javaOutputFile.getParentFile().mkdirs();
@@ -64,9 +63,9 @@ public final class JavaSourceFileCoder {
 				Util.TRACE("Output: " + javaOutputFile.getCanonicalPath());
 //			writer = new OutputStreamWriter(new FileOutputStream(javaOutputFile), CoreGlobal._CHARSET);
 			writer = new OutputStreamWriter(new FileOutputStream(javaOutputFile));
-			JavaSourceFileCoder.code("package " + CoreGlobal2.packetName + ";");
-			JavaSourceFileCoder.code("// " + CoreGlobal2.simulaReleaseID + " Compiled at " + new Date());
-			JavaSourceFileCoder.code("import simula.runtime.*;");
+			JavaSourceFileCoder.code(simCoder,"package " + CoreGlobal2.packetName + ";");
+			JavaSourceFileCoder.code(simCoder,"// " + CoreGlobal2.simulaReleaseID + " Compiled at " + new Date());
+			JavaSourceFileCoder.code(simCoder,"import simula.runtime.*;");
 		} catch (IOException e) {
 			throw new RuntimeException("Writing .java output failed", e);
 		}
@@ -103,23 +102,23 @@ public final class JavaSourceFileCoder {
 	/// To optimize, it is safe to drop such lines
 	/// 
 	/// @param line a debug code line
-	public static void debug(final String line) {
-		code(line);
+	public static void debug(final SimulaCoder simCoder, final String line) {
+		code(simCoder, line);
 	}
 
 	/// Output a code line without comment.
 	/// 
 	/// @param line a code line
-	public static void code(final String line) {
-		CoreGlobal.currentJavaFileCoder.write(CoreGlobal.sourceLineNumber, line, CoreGlobal.currentJavaFileCoder.modid());
+	public static void code(final SimulaCoder simCoder, final String line) {
+		CoreGlobal.currentJavaFileCoder.write(simCoder, CoreGlobal.sourceLineNumber, line, CoreGlobal.currentJavaFileCoder.modid());
 	}
 
 	/// Output a code line with comment.
 	/// 
 	/// @param line a code line
 	/// @param comment a comment string
-	public static void code(final String line, final String comment) {
-		code(line + " // " + comment);
+	public static void code(final SimulaCoder simCoder, final String line, final String comment) {
+		code(simCoder, line + " // " + comment);
 	}
 
 	/// Current Java line number
@@ -135,12 +134,12 @@ public final class JavaSourceFileCoder {
 	/// @param sourceLineNumber the source line number
 	/// @param line the code line string
 	/// @param modid module identifier
-	private void write(final int sourceLineNumber, final String line, final String modid) {
+	private void write(final SimulaCoder simCoder, final int sourceLineNumber, final String line, final String modid) {
 //		Util.ASSERT(sourceLineNumber > 0, "Invariant: sourceLineNumber="+sourceLineNumber);
 		try {
 			currentJavaLineNumber++;
 			if (prevLineNumber != sourceLineNumber) {
-				String s0 = edIndent() + edLineNumberLine(sourceLineNumber, modid);
+				String s0 = edIndent() + edLineNumberLine(simCoder, sourceLineNumber, modid);
 				appendLine(currentJavaLineNumber, sourceLineNumber);
 				if (Option.internal.TRACE_CODING)
 					IO.println("CODE " + sourceLineNumber + ": " + s0);
@@ -173,9 +172,9 @@ public final class JavaSourceFileCoder {
 	/// @param simulaLine Simula line number
 	/// @param modid the module identifier
 	/// @return the resulting Java source line
-	private String edLineNumberLine(final int simulaLine, final String modid) {
+	private String edLineNumberLine(final SimulaCoder simCoder, final int simulaLine, final String modid) {
 		StringBuilder sb = new StringBuilder();
-		if (SimulaCoder.duringSTM_Coding && Option.internal.GNERATE_LINE_CALLS) {
+		if (simCoder.duringSTM_Coding && Option.internal.GNERATE_LINE_CALLS) {
 			sb.append("RTS_UTIL._LINE(\"").append(modid).append("\",").append(simulaLine).append("); ");
 		}
 		sb.append("// JavaLine ").append(currentJavaLineNumber).append(" <== SourceLine ").append(simulaLine);
@@ -201,13 +200,13 @@ public final class JavaSourceFileCoder {
 	}
 
 	/// Output program info. I.e. identifier and lineMap.
-	public void codeProgramInfo() {
+	public void codeProgramInfo(SimulaCoder simCoder) {
 		appendLine(currentJavaLineNumber, blockDeclaration.lastLineNumber());
 		// public static RTS_PROGINFO _INFO=new
 		// RTS_PROGINFO("file.sim","MainProgram",1,4,12,5,14,12,32,14,37,16);
 		StringBuilder s = new StringBuilder();
 		s.append(edIndent() + "public static RTS_PROGINFO _INFO=new RTS_PROGINFO(\"");
-		s.append(DocumentManager.sourceFileName);
+		s.append(simCoder.documentManager.sourceFileName);
 		s.append("\",\"");
 		s.append(ObjectKind.edit(blockDeclaration.declarationKind) + " " + blockDeclaration.identifierValue());
 		s.append('"');

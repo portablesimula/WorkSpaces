@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
@@ -80,8 +81,9 @@ public final class ProcedureSpecification extends SyntaxElement {
 	/// @param identifier procedure-identifier
 	/// @param type procedure's type or null
 	/// @param pList the parameter lList
-	public ProcedureSpecification(final SimulaBuilder simBuilder, final Identifier identifier, final Type type, final ObjectList<Parameter> pList) {
-		super(simBuilder);
+	public ProcedureSpecification(final DocumentManager documentManager, final Identifier identifier, final Type type, final ObjectList<Parameter> pList) {
+		super(documentManager);
+//		SimulaBuilder simBuilder = documentManager.simBuilder;
 		this.identifier = identifier;
 		this.type = type;
 		this.parameterList = pList;
@@ -117,7 +119,7 @@ public final class ProcedureSpecification extends SyntaxElement {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("END ProcedureSpecification: " + block);
 		CoreGlobal.setScope(block.declaredIn);
-		ProcedureSpecification procedureSpecification = new ProcedureSpecification(simBuilder, block.identifier, type, block.parameterList);
+		ProcedureSpecification procedureSpecification = new ProcedureSpecification(simBuilder.documentManager, block.identifier, type, block.parameterList);
 		return (procedureSpecification);
 	}
 
@@ -150,8 +152,8 @@ public final class ProcedureSpecification extends SyntaxElement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public ProcedureSpecification() {
-		super(null);
+	public ProcedureSpecification(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	/// Write a ProcedureSpecification.
@@ -175,13 +177,13 @@ public final class ProcedureSpecification extends SyntaxElement {
 	/// @return the ProcedureSpecification read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static ProcedureSpecification readProcedureSpec(AttributeInputStream inpt) throws IOException {
+	public static ProcedureSpecification readProcedureSpec(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
 		boolean present = inpt.readBoolean();
 		if(!present) return(null);
-		ProcedureSpecification spec = new ProcedureSpecification();
+		ProcedureSpecification spec = new ProcedureSpecification(documentManager);
 		spec.identifier = inpt.readIdentifier();
 		spec.type = inpt.readType();
-		spec.parameterList = (ObjectList<Parameter>) inpt.readObjectList();
+		spec.parameterList = (ObjectList<Parameter>) inpt.readObjectList(documentManager);
 		
 		Util.TRACE_INPUT("END Read ProcedureSpecification: " + spec.identifier.value);
 		return(spec);

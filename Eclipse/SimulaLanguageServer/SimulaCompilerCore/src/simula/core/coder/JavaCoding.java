@@ -7,10 +7,8 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
 import simula.Option;
-import simula.core.DocumentManager;
 import simula.core.CoreGlobal2;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.SimulaBuilder;
 import simula.core.utilities.LOG;
 import simula.core.utilities.Util;
 
@@ -53,11 +51,11 @@ public class JavaCoding {
 			exitValue = callJavacCompiler(simCoder, classPath);
 		if (Option.internal.DEBUGGING) {
 			IO.println("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
-			for (JavaSourceFileCoder javaClass : SimulaCoder.javaSourceFileCoders)
+			for (JavaSourceFileCoder javaClass : simCoder.javaSourceFileCoders)
 				IO.println(javaClass.getClassOutputFileName(simCoder));
 //			list(SimulaCoder.tempClassFileDir);
 		}
-		if(CoreGlobal2.verbose) IO.println("JavaCoding.doCompile: " + DocumentManager.sourceName + ": Class Files Generated - From Java Source");
+		if(CoreGlobal2.verbose) IO.println("JavaCoding.doCompile: " + simCoder.documentManager.sourceName + ": Class Files Generated - From Java Source");
 		if (exitValue != 0) {
 			Util.generalError("Java " + msg + " Compiler returns exit=" + exitValue + "\n");
 			IO.println("\nCompiler terminated after error(s) during Java Compilation");
@@ -73,7 +71,7 @@ public class JavaCoding {
 	/// @throws IOException if something went wrong
 	private static int callJavaSystemCompiler(final SimulaCoder simCoder, final JavaCompiler compiler, final String classPath) throws IOException {
 //    	IO.println("JavaCoding.callJavaSystemCompiler: sourceFileDir=" + documentManager.sourceFileDir);
-//    	IO.println("JavaCoding.callJavaSystemCompiler: outputDir=" + SimulaCoder.outputDir);
+//    	IO.println("JavaCoding.callJavaSystemCompiler: jarFileDir=" + SimulaCoder.jarFileDir);
 //    	IO.println("JavaCoding.callJavaSystemCompiler: tempClassFileDir=" + SimulaCoder.tempClassFileDir);
 //    	IO.println("JavaCoding.callJavaSystemCompiler: tempClassFileDir=" + JavaCoding.simulaRtsLib);
 //    	IO.println("JavaCoding.callJavaSystemCompiler: userHome=" + System.getProperty("user.home"));
@@ -106,7 +104,7 @@ public class JavaCoding {
 		arguments.add(simCoder.tempClassFileDir.toString()); // Specifies output directory.
 		if (!CoreGlobal2.WARNINGS)
 			arguments.add("-nowarn");
-		for (JavaSourceFileCoder javaClass : SimulaCoder.javaSourceFileCoders)
+		for (JavaSourceFileCoder javaClass : simCoder.javaSourceFileCoders)
 			arguments.add(javaClass.javaOutputFile.toString()); // Add .java Files
 		int nArg = arguments.size();
 		String[] args = new String[nArg];
@@ -143,13 +141,13 @@ public class JavaCoding {
 		cmds.add(simCoder.tempClassFileDir.toString()); // Specifies output directory.
 		if (!CoreGlobal2.WARNINGS)
 			cmds.add("-nowarn");
-		for (JavaSourceFileCoder javaClass : SimulaCoder.javaSourceFileCoders) {
+		for (JavaSourceFileCoder javaClass : simCoder.javaSourceFileCoders) {
 			cmds.add(javaClass.javaOutputFile.toString()); // Add .java Files
 		}
 		int exitValue = Util.execute(cmds);
 		if (Option.internal.TRACING) {
 			IO.println("END Generate .class Output Code. Exit value=" + exitValue);
-			for (JavaSourceFileCoder javaClass : SimulaCoder.javaSourceFileCoders)
+			for (JavaSourceFileCoder javaClass : simCoder.javaSourceFileCoders)
 				IO.println(javaClass.getClassOutputFileName(simCoder));
 		}
 		return (exitValue);

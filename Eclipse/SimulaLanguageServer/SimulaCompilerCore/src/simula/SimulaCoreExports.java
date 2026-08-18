@@ -38,7 +38,7 @@ public class SimulaCoreExports {
     	SimulaBuilder simBuilder = documentManager.simBuilder;
 
     	String[] args = argv.toArray(new String[0]);
-		Option.decodeArguments2(args);
+		Option.decodeArguments2(documentManager, args);
 
 //    	SimulaCompiler simulaCompiler = new SimulaCompiler(documentManager);
 //    	simulaCompiler.doCompile();

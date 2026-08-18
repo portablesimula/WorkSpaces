@@ -11,6 +11,7 @@ import java.lang.classfile.Label;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -48,16 +49,22 @@ public final class WhileStatement extends Statement {
 
 	/// Create a new WhileStatement.
 	/// @param line the source line number
-	WhileStatement(final SimulaBuilder simBuilder) {
-		super(simBuilder);
+	private WhileStatement(final DocumentManager documentManager) {
+		super(documentManager);
+	}
+	
+	static WhileStatement of(final DocumentManager documentManager) {
+		WhileStatement stm = new WhileStatement(documentManager);
+		SimulaBuilder simBuilder = documentManager.simBuilder;
 		simBuilder.consume(KeyWord.WHILE); //  (add it to tokenList)
 
 //		if (Option.internal.TRACE_PARSE)
 //			Util.TRACE("Parse WhileStatement: line="+line+", current=" + PsiParse.currentLexToken(simBuilder));
-		condition = Expression.expectExpression(simBuilder, "while");
+		stm.condition = Expression.expectExpression(simBuilder, "while");
 		Parse.expect(simBuilder, KeyWord.DO);
-		doStatement = Statement.acceptStatement(simBuilder);
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+firstLineNumber()+": WhileStatement: "+this);
+		stm.doStatement = Statement.acceptStatement(simBuilder);
+		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+stm.firstLineNumber()+": WhileStatement: "+stm);
+		return stm;
 	}
 
 	@Override
@@ -71,14 +78,14 @@ public final class WhileStatement extends Statement {
 	}
 
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
-		JavaSourceFileCoder.code("while(" + condition.toJavaCode() + ") {");
-		doStatement.doJavaCoding();
+		JavaSourceFileCoder.code(simCoder,"while(" + condition.toJavaCode() + ") {");
+		doStatement.doJavaCoding(simCoder);
 		if(isWhileTrueDo())
-			JavaSourceFileCoder.code("if(_CTX==null) break; // Ad'Hoc to prevent JAVAC error: 'dead code' and terminate");
-		JavaSourceFileCoder.code("}");
+			JavaSourceFileCoder.code(simCoder,"if(_CTX==null) break; // Ad'Hoc to prevent JAVAC error: 'dead code' and terminate");
+		JavaSourceFileCoder.code(simCoder,"}");
 	}
 	
 	/// Check if this while statement is a 'while true do'.
@@ -116,10 +123,6 @@ public final class WhileStatement extends Statement {
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
-	/// Default constructor used by Attribute File I/O
-	private WhileStatement() {
-		super(null);
-	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -137,14 +140,14 @@ public final class WhileStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the WhileStatement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static WhileStatement readObject(AttributeInputStream inpt) throws IOException {
-		WhileStatement stm = new WhileStatement();
+	public static WhileStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		WhileStatement stm = new WhileStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		stm.astData = readAstData(inpt);
 		// *** WhileStatement
-		stm.condition  = (Expression) inpt.readObj();
-		stm.doStatement = (Statement) inpt.readObj();
+		stm.condition  = (Expression) inpt.readObj(documentManager);
+		stm.doStatement = (Statement) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("WhileStatement: " + stm);
 		return(stm);
 	}

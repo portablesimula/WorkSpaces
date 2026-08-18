@@ -14,6 +14,7 @@ import java.util.Vector;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -108,41 +109,48 @@ public final class SwitchStatement extends Statement {
 
 	/// Create a new SwitchStatement.
 	/// @param line the source line number
-	SwitchStatement(final SimulaBuilder simBuilder) {
-		super(simBuilder);
+	/// Default constructor used by Attribute File I/O
+	private SwitchStatement(final DocumentManager documentManager) {
+		super(documentManager);
+	}
+	
+	static SwitchStatement of(final DocumentManager documentManager) {
+		SwitchStatement stm = new SwitchStatement(documentManager);
+		SimulaBuilder simBuilder = documentManager.simBuilder;
 		simBuilder.consume(KeyWord.SWITCH); //  (add it to tokenList)
 
 //		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);
 		Parse.expect(simBuilder, KeyWord.BEGPAR);
-		lowKey = Expression.expectExpression(simBuilder, "lowkey");
+		stm.lowKey = Expression.expectExpression(simBuilder, "lowkey");
 		Parse.expect(simBuilder, KeyWord.COLON);
-		hiKey = Expression.expectExpression(simBuilder, "hikey");
+		stm.hiKey = Expression.expectExpression(simBuilder, "hikey");
 		Parse.expect(simBuilder, KeyWord.ENDPAR);
-		switchKey = Expression.expectExpression(simBuilder, "switch");
-		switchKey.backLink=this;
+		stm.switchKey = Expression.expectExpression(simBuilder, "switch");
+		stm.switchKey.backLink=stm;
 		Parse.expect(simBuilder, KeyWord.BEGIN);
-		has_NONE_case=false;
+		stm.has_NONE_case=false;
 		while (Parse.accept(simBuilder, KeyWord.WHEN)) {
 			Vector<SwitchInterval> caseKeyList=new Vector<SwitchInterval>();
 			if (Parse.accept(simBuilder, KeyWord.NONE)) {
 				caseKeyList.add(null);
-				if(has_NONE_case) Util.syntaxError(simBuilder, "NONE Case is already used");
-				has_NONE_case=true;
+				if(stm.has_NONE_case) Util.syntaxError(simBuilder, "NONE Case is already used");
+				stm.has_NONE_case=true;
 			}
 			else {
-				caseKeyList.add(expectCasePair(simBuilder));
-				while(Parse.accept(simBuilder, KeyWord.COMMA)) caseKeyList.add(expectCasePair(simBuilder));
+				caseKeyList.add(stm.expectCasePair(simBuilder));
+				while(Parse.accept(simBuilder, KeyWord.COMMA)) caseKeyList.add(stm.expectCasePair(simBuilder));
 			}
 			Parse.expect(simBuilder, KeyWord.DO);
 			
 			Statement statement = Statement.acceptStatement(simBuilder);
 			
 			Parse.accept(simBuilder, KeyWord.SEMICOLON);
-			SwitchWhenPart whenPart = new SwitchWhenPart(caseKeyList, statement);
-			switchCases.add(whenPart);
+			SwitchWhenPart whenPart = stm.new SwitchWhenPart(caseKeyList, statement);
+			stm.switchCases.add(whenPart);
 		}
 		Parse.expect(simBuilder, KeyWord.END);
-		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+firstLineNumber()+": SwitchStatement: "+this);
+		if (Option.internal.TRACE_PARSE)	Util.TRACE("Line "+stm.firstLineNumber()+": SwitchStatement: "+stm);
+		return stm;
 	}
 
 	/// Parse Utility: Expect case pair.
@@ -200,21 +208,21 @@ public final class SwitchStatement extends Statement {
 	
     	/// Coding Utility: Edit this when-part.
     	/// @param first true if this when-part is the first being edited
-    	private void doCoding(final boolean first)	{
+    	private void doCoding(final SimulaCoder simCoder, final boolean first)	{
     		ASSERT_SEMANTICS_CHECKED();
     		for(SwitchInterval casePair:caseKeyList)
     		if(casePair==null)
-    			 JavaSourceFileCoder.code("default:");
+    			 JavaSourceFileCoder.code(simCoder,"default:");
     		else {
     			int low=casePair.lowCase.getInt();
     			if(casePair.hiCase!=null) {
         			int hi=casePair.hiCase.getInt();
         			for(int i=low;i<=hi;i++)
-        			JavaSourceFileCoder.code("case "+i+": ");
-    			} else JavaSourceFileCoder.code("case "+low+": ");
+        			JavaSourceFileCoder.code(simCoder,"case "+i+": ");
+    			} else JavaSourceFileCoder.code(simCoder,"case "+low+": ");
     		}
-    		statement.doJavaCoding();
-    		JavaSourceFileCoder.code("break;");
+    		statement.doJavaCoding(simCoder);
+    		JavaSourceFileCoder.code(simCoder,"break;");
     	}
        	
     	/// ClassFile coding utility: initLookupSwitchCases.
@@ -246,7 +254,7 @@ public final class SwitchStatement extends Statement {
      	private void buildByteCode(final SimulaCoder simCoder, CodeBuilder codeBuilder) {
         	for(SwitchInterval casePair:this.caseKeyList) {
         		if(casePair==null) {
-        			//JavaSourceFileCoder.code("default:");
+        			//JavaSourceFileCoder.code(simCoder,"default:");
     				codeBuilder.labelBinding(defaultTarget);
         		}
         		else {
@@ -255,13 +263,13 @@ public final class SwitchStatement extends Statement {
         			if(casePair.hiCase!=null) {
         				int hi=casePair.hiCase.getInt();
         				for(int i=low;i<=hi;i++) {
-        					//JavaSourceFileCoder.code("case "+i+": ");
+        					//JavaSourceFileCoder.code(simCoder,"case "+i+": ");
             				SwitchCase switchCase=lookupSwitchCases.get(tableIndex-1);
             				codeBuilder.labelBinding(switchCase.target());
             				tableIndex++;
         				}
         			} else{
-        				//JavaSourceFileCoder.code("case "+low+": ");
+        				//JavaSourceFileCoder.code(simCoder,"case "+low+": ");
         				SwitchCase switchCase=lookupSwitchCases.get(tableIndex-1);
         				codeBuilder.labelBinding(switchCase.target());
         			}
@@ -313,9 +321,9 @@ public final class SwitchStatement extends Statement {
     	lowKey.doChecking(); hiKey.doChecking();
     	switchKey.doChecking();
 		if(switchKey.type.keyWord == Type.T_CHARACTER) {
-			switchKey=TypeConversion.testAndCreate(Type.Character,switchKey);
+			switchKey=TypeConversion.testAndCreate(documentManager, Type.Character,switchKey);
 		} else
-			switchKey=TypeConversion.testAndCreate(Type.Integer,switchKey);
+			switchKey=TypeConversion.testAndCreate(documentManager, Type.Integer,switchKey);
     	for(SwitchWhenPart when:switchCases) {
     		for(SwitchInterval casePair:when.caseKeyList)
 			if(casePair!=null) {
@@ -329,17 +337,17 @@ public final class SwitchStatement extends Statement {
 	
 	
 	@Override
-    public void doJavaCoding() {
+    public void doJavaCoding(final SimulaCoder simCoder) {
     	CoreGlobal.sourceLineNumber=firstLineNumber();
 	    ASSERT_SEMANTICS_CHECKED();
 	    StringBuilder sb=new StringBuilder();
 	    sb.append("if(").append(switchKey.toJavaCode()).append("<").append(lowKey.toJavaCode());
 	    sb.append(" || ").append(switchKey.toJavaCode()).append(">").append(hiKey.toJavaCode());
 	    sb.append(") throw new RTS_SimulaRuntimeError(\"Switch key outside key interval\");");
-	    JavaSourceFileCoder.code(sb.toString());
-        JavaSourceFileCoder.code("switch("+switchKey.toJavaCode()+") { // BEGIN SWITCH STATEMENT");
-        for(SwitchWhenPart when:switchCases) when.doCoding(false);
-        JavaSourceFileCoder.code("} // END SWITCH STATEMENT");
+	    JavaSourceFileCoder.code(simCoder,sb.toString());
+        JavaSourceFileCoder.code(simCoder,"switch("+switchKey.toJavaCode()+") { // BEGIN SWITCH STATEMENT");
+        for(SwitchWhenPart when:switchCases) when.doCoding(simCoder, false);
+        JavaSourceFileCoder.code(simCoder,"} // END SWITCH STATEMENT");
     }
 
 	@Override
@@ -410,10 +418,6 @@ public final class SwitchStatement extends Statement {
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
-	/// Default constructor used by Attribute File I/O
-	private SwitchStatement() {
-		super(null);
-	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -432,14 +436,14 @@ public final class SwitchStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static SwitchStatement readObject(AttributeInputStream inpt) throws IOException {
-		SwitchStatement stm = new SwitchStatement();
+	public static SwitchStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		SwitchStatement stm = new SwitchStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		stm.astData = readAstData(inpt);
-		stm.lowKey = (Expression) inpt.readObj();
-		stm.hiKey = (Expression) inpt.readObj();
-		stm.switchKey = (Expression) inpt.readObj();
+		stm.lowKey = (Expression) inpt.readObj(documentManager);
+		stm.hiKey = (Expression) inpt.readObj(documentManager);
+		stm.switchKey = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("SwitchStatement: " + stm);
 		return(stm);
 	}

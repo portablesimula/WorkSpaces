@@ -31,21 +31,38 @@ public class DocumentManager {
 	final public String documentUri;
 	final public File sourceFileDir;
 	public int documentVersion;
-//	final public String sourceName; // The source file name without .sim
 	public String sourceCode;
 	
 	public SimulaBuilder simBuilder;
 	public SimulaCoder simCoder;
 	
-	
+
+//	/// The Compiler Modes.
+//	public enum CompilerMode { 
+//    	/** Generate Java source and use Java compiler to generate JavaClass files. */					viaJavaSource,
+//    	/** Generate JavaClass files directly. No Java source files are generated. */ 					directClassFiles,
+//    }
+
+	/// The Compiler mode.
+//	public CompilerMode compilerMode;
+	public boolean compileViaJavaSource;
+
 	/// The source file name.
-	public static String sourceFileName;
+	public String sourceFileName;
 
 	/// The source file name without .sim
-	public static String sourceName;
+	public String sourceName;
 	
 	/// The set of external .jar files.
-	public static Vector<String> externalJarFileNames;
+	public Vector<String> externalJarFileNames;
+
+	// Specifies where to place generated executable .jar file;
+	// Also used to search for precompiled .jar attribute files
+	public File jarFileDir = null;
+	
+	// Specifies where to search for precompiled classes and procedures
+	// If not found, jarFileDir is then searched
+	public File extLib = null;
 
 	
     // Nøkkelen er filens URI (f.eks. file:///path/to/file.txt)
@@ -59,10 +76,26 @@ public class DocumentManager {
     	this.sourceCode = sourceCode;
     	sourceFileName = this.documentUri;
 		sourceName = getSourceName(this.documentUri);
-		DocumentManager.externalJarFileNames = new Vector<String>();
-		StandardClass.INITIATE();
+		externalJarFileNames = new Vector<String>();
+		compileViaJavaSource = false;
+		StandardClass.INITIATE(this);
+		createJarFilesDirectory();
     }
     
+    private void createJarFilesDirectory() {
+    	// Create output .jar-files Directory
+//		IO.println("DocumentManager.createJarFilesDirectory: sourceFileDir=" + documentManager.sourceFileDir);
+//		IO.println("DocumentManager.createJarFilesDirectory: jarFileDir=" + SimulaCoder.jarFileDir);
+    	if(this.jarFileDir == null) {
+    		File userDir = new File(System.getProperty("user.dir"));
+    		this.jarFileDir = new File(userDir,"bin");
+    	}
+    	LOG.info("DocumentManager.createJarFilesDirectory: jarFileDir=" + this.jarFileDir);
+    	this.jarFileDir.mkdirs();
+    	if (! this.jarFileDir.canWrite()) {
+    		Util.IERR("SimulaCompiler.setOutputDir: Unable to write to " + this.jarFileDir);
+    	}    	
+    }
     private String getSourceName(String documentUri) {
     	String sourceName = Util.getBaseName(documentUri);
 		if (!Util.isJavaIdentifier(sourceName)) {
@@ -263,7 +296,7 @@ public class DocumentManager {
 //		ProgramModule  programModule = this.getSyntaxTree();
 //		if (Option.internal.TRACING)
 //			IO.println("BEGIN Semantic Checker");
-//		simBuilder.duringChecking = true;
+//		documentManager.simBuilder.duringChecking = true;
 //		programModule.doChecking();
 //		if (Option.internal.TRACING) {
 //			IO.println("END Semantic Checker: \"" + programModule + "\"");
@@ -271,7 +304,7 @@ public class DocumentManager {
 //				programModule.print(0);
 //		}
 //		if(SimulaCompiler.verbose) IO.println("SimulaCompiler.doCompile: " + SimulaCompiler.sourceName + ": Semantic Checker completed");
-//		simBuilder.duringChecking = false;
+//		documentManager.simBuilder.duringChecking = false;
 //		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
 //			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");
 //			programModule.printTree(1);

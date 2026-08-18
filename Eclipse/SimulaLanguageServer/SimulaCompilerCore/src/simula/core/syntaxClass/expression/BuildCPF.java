@@ -92,7 +92,7 @@ public abstract class BuildCPF {
 //							actualParameter=new Constant(null, Type.Integer, decl.firstLineNumber());
 							int lno = var.firstLineNumber() + 1;
 							if(lno <= 0) Util.IERR("BuildCPF.buildCPF: Illegal lineNumber: " + lno + " for argument " + decl);
-							actualParameter=new Constant(null, Type.Integer, lno);
+							actualParameter=new Constant(simCoder.documentManager, Type.Integer, lno);
 							actualParameter.doChecking();
 						}
 					}

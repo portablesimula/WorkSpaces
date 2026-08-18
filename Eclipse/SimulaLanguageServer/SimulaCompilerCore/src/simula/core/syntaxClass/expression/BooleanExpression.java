@@ -11,6 +11,7 @@ import java.lang.classfile.Label;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
@@ -120,16 +121,17 @@ public final class BooleanExpression extends Expression {
 	/// @param lhs left hand side
 	/// @param opr Boolean operation
 	/// @param rhs right hand side
-	BooleanExpression(final SimulaBuilder simBuilder, Expression lhs, int opr, Expression rhs) {
-		super(simBuilder);
+	BooleanExpression(final DocumentManager documentManager, Expression lhs, int opr, Expression rhs) {
+		super(documentManager);
+		SimulaBuilder simBuilder = documentManager.simBuilder;
 		this.lhs = lhs; this.opr = opr; this.rhs = rhs;
 		if (this.lhs == null) {
 			Util.syntaxError(simBuilder, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression(simBuilder);
+			this.lhs = new MissingExpression(documentManager);
 		}
 		if (this.rhs == null) {
 			Util.syntaxError(simBuilder, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression(simBuilder);
+			this.rhs = new MissingExpression(documentManager);
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
@@ -257,8 +259,8 @@ public final class BooleanExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private BooleanExpression() {
-		super(null);
+	private BooleanExpression(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -281,18 +283,18 @@ public final class BooleanExpression extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the BooleanExpression read from the stream.
 	/// @throws IOException if something went wrong.
-	public static BooleanExpression readObject(AttributeInputStream inpt) throws IOException {
-		BooleanExpression expr = new BooleanExpression();
+	public static BooleanExpression readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		BooleanExpression expr = new BooleanExpression(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		expr.astData = readAstData(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
 		// *** BooleanExpression
-		expr.lhs = (Expression) inpt.readObj();
+		expr.lhs = (Expression) inpt.readObj(documentManager);
 		expr.opr = inpt.readShort();
-		expr.rhs = (Expression) inpt.readObj();
+		expr.rhs = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("readBooleanExpression: " + expr);
 		return(expr);
 	}

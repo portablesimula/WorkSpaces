@@ -10,9 +10,9 @@ import java.lang.classfile.CodeBuilder;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
@@ -76,8 +76,9 @@ public final class QualifiedObject extends Expression {
 	/// Create a new QualifiedObject
 	/// @param lhs left hand side
 	/// @param classIdentifier class identifier
-	QualifiedObject(final SimulaBuilder simBuilder, final Expression lhs, final Identifier classIdentifier) {
-		super(simBuilder);
+	QualifiedObject(final DocumentManager documentManager, final Expression lhs, final Identifier classIdentifier) {
+		super(documentManager);
+//		SimulaBuilder simBuilder = documentManager.simBuilder;
 		this.lhs = lhs;
 		this.classIdentifier = classIdentifier;
 		lhs.backLink = this;
@@ -131,8 +132,8 @@ public final class QualifiedObject extends Expression {
 	// *** Externalization
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private QualifiedObject() {
-		super(null);
+	private QualifiedObject(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -154,16 +155,16 @@ public final class QualifiedObject extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the QualifiedObject object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static QualifiedObject readObject(AttributeInputStream inpt) throws IOException {
-		QualifiedObject expr = new QualifiedObject();
+	public static QualifiedObject readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		QualifiedObject expr = new QualifiedObject(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		expr.astData = readAstData(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
 		// *** QualifiedObject
-		expr.lhs = (Expression) inpt.readObj();
+		expr.lhs = (Expression) inpt.readObj(documentManager);
 		expr.classIdentifier = inpt.readIdentifier();
 		Util.TRACE_INPUT("readQualifiedObject: " + expr);
 		return(expr);

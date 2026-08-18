@@ -15,10 +15,10 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.ProtectedSpecification;
@@ -51,8 +51,8 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// Create a new Label Declaration.
 	/// 
 	/// @param identifier label identifier
-	public LabelDeclaration(final SimulaBuilder simBuilder, final Identifier identifier) {
-		super(simBuilder, Type.Label, identifier);
+	public LabelDeclaration(final DocumentManager documentManager, final Identifier identifier) {
+		super(documentManager, Type.Label, identifier);
 		this.externalIdent = "_LABEL_" + identifierValue();
 		this.declarationKind = ObjectKind.LabelDeclaration;
 	}
@@ -70,7 +70,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 			// Label attributes are implicit specified 'protected'
 			if (declaredIn.declarationKind == ObjectKind.Class)
 				((ClassDeclaration) declaredIn).protectedList
-						.add(new ProtectedSpecification(null, (ClassDeclaration) declaredIn, identifier));
+						.add(new ProtectedSpecification(documentManager, (ClassDeclaration) declaredIn, identifier));
 		} else {
 			// This Label is a Virtual Match
 			ClassDeclaration decl = (ClassDeclaration) declaredIn;
@@ -82,7 +82,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	
 	/// Declare a local Label.
 	/// @param encloser the BlockDeclaration to update.
-	public void declareLocalLabel(BlockDeclaration encloser) {
+	public void declareLocalLabel(final SimulaCoder simCoder, final BlockDeclaration encloser) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		String ident = getJavaIdentifier();
 		int prefixLevel=0;
@@ -94,12 +94,12 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		VirtualSpecification virtSpec = VirtualSpecification.getVirtualSpecification(this);
 		if (virtSpec != null) {
 			if(this.isLatestVirtualLabel(encloser)) {
-				JavaSourceFileCoder.code("    public RTS_LABEL " + virtSpec.getVirtualIdentifier()
+				JavaSourceFileCoder.code(simCoder,"    public RTS_LABEL " + virtSpec.getVirtualIdentifier()
 					+ " { return(new RTS_LABEL(this," + prefixLevel + ',' + index + ",\"" + identifierValue() + "\")); }",
 					" // Virtual Label #" + index + '=' + identifierValue() + " At PrefixLevel " + prefixLevel);
 			}
 		} else {
-			JavaSourceFileCoder.code(
+			JavaSourceFileCoder.code(simCoder,
 					"final RTS_LABEL " + ident + "=new RTS_LABEL(this," +prefixLevel + ',' + index + ",\"" + identifierValue() + "\");",
 					"Local Label #" + index + '=' + identifierValue() + " At PrefixLevel " + prefixLevel);
 		}
@@ -230,11 +230,6 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
-	public LabelDeclaration(final Identifier identifier) {
-		super(null, Type.Label, identifier);
-		this.externalIdent = "_LABEL_" + identifierValue();
-		this.declarationKind = ObjectKind.LabelDeclaration;
-	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -264,9 +259,9 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static LabelDeclaration readObject(AttributeInputStream inpt) throws IOException {
+	public static LabelDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
 		Identifier identifier = inpt.readIdentifier();
-		LabelDeclaration lab = new LabelDeclaration(identifier);
+		LabelDeclaration lab = new LabelDeclaration(documentManager, identifier);
 		lab.OBJECT_SEQU = inpt.readSEQU(lab);
 
 		// *** SyntaxElement
@@ -279,11 +274,11 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 		
 		// *** SimpleVariableDeclaration
 		lab.constant = inpt.readBoolean();
-		lab.constantElement = (Expression) inpt.readObj();
+		lab.constantElement = (Expression) inpt.readObj(documentManager);
 
 		// *** LabelDeclaration
 		lab.index = inpt.readShort();
-		lab.movedTo = (DeclarationScope) inpt.readObj();
+		lab.movedTo = (DeclarationScope) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("readLabelDeclaration: " + lab);
 		return(lab);
 	}

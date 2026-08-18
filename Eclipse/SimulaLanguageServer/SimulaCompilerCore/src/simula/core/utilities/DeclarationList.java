@@ -8,6 +8,7 @@ package simula.core.utilities;
 import java.io.IOException;
 import java.util.Vector;
 
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.token.Identifier;
@@ -88,13 +89,13 @@ public final class DeclarationList extends Vector<Declaration> {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the DeclarationList object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static DeclarationList readObject(AttributeInputStream inpt) throws IOException {
+	public static DeclarationList readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
 		String identifier = inpt.readString();
 		DeclarationList list = new DeclarationList(identifier);
 		int n = inpt.readShort();
 		if(n > 0) {
 			for (int i = 0; i < n; i++) {
-				Declaration dcl = (Declaration) inpt.readObj();
+				Declaration dcl = (Declaration) inpt.readObj(documentManager);
 				list.add(dcl);
 			}
 		}

@@ -5,11 +5,11 @@ import java.io.File;
 public class CoreGlobal2 {
 //	DocumentManager documentManager;
 
-	/// The Compiler Modes.
-	public enum CompilerMode { 
-    	/** Generate Java source and use Java compiler to generate JavaClass files. */					viaJavaSource,
-    	/** Generate JavaClass files directly. No Java source files are generated. */ 					directClassFiles,
-    }
+//	/// The Compiler Modes.
+//	public enum CompilerMode { 
+//    	/** Generate Java source and use Java compiler to generate JavaClass files. */					viaJavaSource,
+//    	/** Generate JavaClass files directly. No Java source files are generated. */ 					directClassFiles,
+//    }
 
 	// ***************************************************************
 	// *** Static variables
@@ -20,8 +20,8 @@ public class CoreGlobal2 {
 	/// NOTE: When updating release id, change version in SimulaExtractor and RuntimeSystem
 	public static final String simulaReleaseID = "Simula-2.0";
 
-	/// The Compiler mode.
-	public static CompilerMode compilerMode;
+//	/// The Compiler mode.
+//	public static CompilerMode compilerMode;
 //	
 //	/// The source file name.
 //	public static String sourceFileName;

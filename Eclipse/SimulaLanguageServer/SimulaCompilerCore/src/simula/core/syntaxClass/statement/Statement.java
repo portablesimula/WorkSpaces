@@ -10,6 +10,7 @@ import java.lang.classfile.CodeBuilder;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
@@ -62,8 +63,8 @@ import simula.core.utilities.Util;
 public abstract class Statement extends SyntaxElement {
 	
 	/// Create a new Statement.
-	protected Statement(final SimulaBuilder simBuilder) {
-		super(simBuilder);
+	protected Statement(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 	
 	/// Parse a statement.
@@ -81,7 +82,7 @@ public abstract class Statement extends SyntaxElement {
 //			IO.println("\n\nStatement.acceptStatement: MAYBE LABEL IDENTIFIER: " + mayBeLabel);
 			if(Parse.accept(simBuilder, KeyWord.COLON)) {
 				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
-				LabelDeclaration label = new LabelDeclaration(simBuilder, mayBeLabel);
+				LabelDeclaration label = new LabelDeclaration(simBuilder.documentManager, mayBeLabel);
 				labels.add(label);
 				DeclarationScope scope = CoreGlobal.getCurrentScope();
 				if(scope.labelList == null) scope.labelList = new LabelList(scope); 
@@ -99,7 +100,7 @@ public abstract class Statement extends SyntaxElement {
 		if (labels != null) {
 //			IO.println("Statement.acceptStatement: LABELS: " + labels);
 //			IO.println("Statement.acceptStatement: prevParserToken: " + simBuilder.prevParserToken());
-			statement = new LabeledStatement(simBuilder, labels, statement);
+			statement = new LabeledStatement(simBuilder.documentManager, labels, statement);
 //			IO.println("Statement.acceptStatement: DONE LabeledStatement: " + statement);				
 		}
 //		IO.println("Statement.acceptStatement: DONE: " + statement);
@@ -119,23 +120,23 @@ public abstract class Statement extends SyntaxElement {
 				if(Option.TRACE_ACCEPT_STATEMENT > 1)
 					IO.println("\nStatement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
 
-				MaybeBlockDeclaration block = new MaybeBlockDeclaration(simBuilder, null);
+				MaybeBlockDeclaration block = new MaybeBlockDeclaration(simBuilder.documentManager, null);
 				block.expectMaybeBlock(simBuilder);
-				statement = new BlockStatement(simBuilder, block, "Statement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
+				statement = new BlockStatement(simBuilder.documentManager, block, "Statement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
 				break;
 				
-			case KeyWord.IF:		 statement = new ConditionalStatement(simBuilder); break;
+			case KeyWord.IF:		 statement = ConditionalStatement.of(simBuilder.documentManager); break;
 		    case KeyWord.GO,
-		         KeyWord.GOTO:		 statement = new GotoStatement(simBuilder, keyWord); break;
-		    case KeyWord.FOR:		 statement = new ForStatement(simBuilder); break;
-		    case KeyWord.WHILE:		 statement = new WhileStatement(simBuilder); break;
-		    case KeyWord.INSPECT:	 statement = new ConnectionStatement(simBuilder); break;
+		         KeyWord.GOTO:		 statement = new GotoStatement(simBuilder.documentManager, keyWord); break;
+		    case KeyWord.FOR:		 statement = ForStatement.of(simBuilder.documentManager); break;
+		    case KeyWord.WHILE:		 statement = WhileStatement.of(simBuilder.documentManager); break;
+		    case KeyWord.INSPECT:	 statement = ConnectionStatement.of(simBuilder.documentManager); break;
 		    case KeyWord.SWITCH:	 if(CoreGlobal2.EXTENSIONS) {
-		    							 statement = new SwitchStatement(simBuilder);
+		    							 statement = SwitchStatement.of(simBuilder.documentManager);
 		    						 } break;
 		    case KeyWord.ACTIVATE,
-		         KeyWord.REACTIVATE: statement = new ActivationStatement(simBuilder); break;
-		    case KeyWord.INNER:		 statement = new InnerStatement(simBuilder, true); break;
+		         KeyWord.REACTIVATE: statement = ActivationStatement.of(simBuilder.documentManager); break;
+		    case KeyWord.INNER:		 statement = new InnerStatement(simBuilder.documentManager, true); break;
 		    case KeyWord.SEMICOLON:	 statement = DummyStatement.ofExplicit(simBuilder); break;
 		    case KeyWord.END:	  // statement = DummyStatement.ofImplicit(simBuilder); break; // Dummy Statement, keep END
 		    case KeyWord.EOF:		 statement = DummyStatement.ofImplicit(simBuilder); break; // Dummy Statement, keep EOF
@@ -174,16 +175,16 @@ public abstract class Statement extends SyntaxElement {
 							
 						if (Parse.accept(simBuilder, KeyWord.BEGIN)) {
 							PrefixedBlockDeclaration prfblk = PrefixedBlockDeclaration.expectPrefixedBlock(simBuilder, var,false);
-							statement = new BlockStatement(simBuilder, prfblk, "Statement.acceptIdentifierStatement: GOT VariableExpression: "+var);
+							statement = new BlockStatement(simBuilder.documentManager, prfblk, "Statement.acceptIdentifierStatement: GOT VariableExpression: "+var);
 //							IO.println("Statement.acceptUnlabeledStatement: GOT BlockStatement: "+statement);
 							break;
 		      			} else {
-		      				statement = new StandaloneExpression(simBuilder, expr);
+		      				statement = new StandaloneExpression(simBuilder.documentManager, expr);
 //							IO.println("Statement.acceptUnlabeledStatement: GOT StandaloneExpression(1): "+statement);
 		      				break;
 	      				}
 	      			} else {
-	      				statement = new StandaloneExpression(simBuilder, expr);
+	      				statement = new StandaloneExpression(simBuilder.documentManager, expr);
 //						IO.println("Statement.acceptUnlabeledStatement: GOT StandaloneExpression(2): "+statement);
 	      				break;
 	      			}
@@ -202,10 +203,10 @@ public abstract class Statement extends SyntaxElement {
 	}
 
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
-		JavaSourceFileCoder.code(toJavaCode() + ';');
+		JavaSourceFileCoder.code(simCoder,toJavaCode() + ';');
 	}
 
 	/// Build Java ByteCode.

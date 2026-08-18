@@ -11,6 +11,7 @@ import java.util.Vector;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
@@ -73,8 +74,8 @@ public abstract class Declaration extends SyntaxElement {
 	// ***********************************************************************************************
 	/// Create a new Declaration.
 	/// @param identifier the given identifier
-	protected Declaration(final SimulaBuilder simBuilder, final Identifier identifier) {
-		super(simBuilder);
+	protected Declaration(final DocumentManager documentManager, final Identifier identifier) {
+		super(documentManager);
 		this.identifier = identifier;
 		if(identifier != null) this.externalIdent = identifierValue(); // May be overwritten
 		declaredIn = CoreGlobal.getCurrentScope();
@@ -127,9 +128,9 @@ public abstract class Declaration extends SyntaxElement {
 			}
 		}
 		if (error)
-			Util.syntaxError(simBuilder, identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
+			Util.syntaxError(documentManager.simBuilder, identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
 		else if (warning)
-			Util.warning(simBuilder, identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
+			Util.warning(documentManager.simBuilder, identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
 	}
 
 	/// Parse a declaration and add it to the given declaration list.
@@ -172,7 +173,7 @@ public abstract class Declaration extends SyntaxElement {
 				Parse.saveCurrentToken(simBuilder);
 				return null;
 			}
-			decl = new SwitchDeclaration(simBuilder, ident);
+			decl = new SwitchDeclaration(simBuilder.documentManager, ident);
 		} else if (Parse.accept(simBuilder, KeyWord.EXTERNAL)) {
 			Vector<SyntaxElement> ext = ExternalDeclaration.expectExternalDeclaration(simBuilder);	
 			return ext;

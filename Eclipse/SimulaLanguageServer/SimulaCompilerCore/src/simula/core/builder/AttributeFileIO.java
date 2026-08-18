@@ -15,7 +15,6 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
-import simula.core.DocumentManager;
 import simula.core.CoreGlobal2;
 import simula.core.coder.JarFileBuilder;
 import simula.core.syntaxClass.SyntaxElement;
@@ -91,7 +90,7 @@ public final class AttributeFileIO {
 		try (JarFile jarFile = new JarFile(file)) {
 //			JarFileBuilder.listJarFile("AttributeFileIO.readAttributeFile: ", file);
 			
-			DocumentManager.externalJarFileNames.add(file.toString());
+			simBuilder.documentManager.externalJarFileNames.add(file.toString());
 //			IO.println("AttributeFileIO.readAttributeFile: " + DocumentManager.externalJarFileNames);
 			
 			Manifest manifest = jarFile.getManifest();
@@ -129,9 +128,9 @@ public final class AttributeFileIO {
 	/// Check if the jarFile is already included.
 	/// @param jarFile the jarFile.
 	/// @return false: if the jarFile is already included.
-	public static boolean checkJarFiles(String jarFileName) {
+	public static boolean checkJarFiles(final SimulaBuilder simBuilder, final String jarFileName) {
 //		for(File f:SimulaCompiler.externalJarFiles) if(f.equals(jarFile)) {
-		for(String f:DocumentManager.externalJarFileNames) if(f.equals(jarFileName)) {
+		for(String f:simBuilder.documentManager.externalJarFileNames) if(f.equals(jarFileName)) {
 			Util.generalWarning("External already included: "+jarFileName);
 			return(false);
 		}
@@ -149,17 +148,17 @@ public final class AttributeFileIO {
 		String vers = inpt.readString();
 		if(!(vers.equals(version))) Util.generalError("Malformed SimulaAttributeFile: " + fileID);
 
-		ClassHierarchy.readObject(inpt);
+		ClassHierarchy.readObject(simBuilder.documentManager, inpt);
 
 		int declarationKind = inpt.readKind();
 		while(declarationKind == ObjectKind.ExternalDeclaration) {
-			ExternalDeclaration xdecl = ExternalDeclaration.readObject(inpt);
+			ExternalDeclaration xdecl = ExternalDeclaration.readObject(simBuilder.documentManager, inpt);
 			/// Read external Attribute file.
-			File jarFile = JarFileBuilder.findJarFile(xdecl.identifierValue(), xdecl.externalIdent);
+			File jarFile = JarFileBuilder.findJarFile(simBuilder, xdecl.identifierValue(), xdecl.externalIdent);
 			if (jarFile == null) {
 				Util.syntaxError(simBuilder, "Can't find attribute file: " + xdecl.identifier + '[' + xdecl.externalIdent + ']');
 			} else {
-				if(checkJarFiles(jarFile.toString())) {
+				if(checkJarFiles(simBuilder, jarFile.toString())) {
 					BlockDeclaration enclosure = StandardClass.BASICIO;
 					AttributeFileIO.readAttributeEntry(simBuilder, xdecl.identifierValue(), jarFile, enclosure);
 				}
@@ -168,8 +167,8 @@ public final class AttributeFileIO {
 		}
 		
 		BlockDeclaration module=null;
-		if(declarationKind == ObjectKind.Procedure)  module = ProcedureDeclaration.readObject(inpt);
-		else if(declarationKind == ObjectKind.Class) module = ClassDeclaration.readObject(inpt);
+		if(declarationKind == ObjectKind.Procedure)  module = ProcedureDeclaration.readObject(simBuilder.documentManager, inpt);
+		else if(declarationKind == ObjectKind.Class) module = ClassDeclaration.readObject(simBuilder.documentManager, inpt);
 		else Util.IERR();
 		inpt.close();
 		if (CoreGlobal2.verbose)	Util.TRACE("*** ENDOF Read SimulaAttributeFile: " + fileID);

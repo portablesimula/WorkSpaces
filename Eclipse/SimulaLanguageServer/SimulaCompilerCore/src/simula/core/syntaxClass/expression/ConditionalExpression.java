@@ -11,9 +11,9 @@ import java.lang.classfile.Label;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.SimulaBuilder;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -51,8 +51,9 @@ public final class ConditionalExpression extends Expression {
 	/// @param condition the condition
 	/// @param thenExpression then branch expression
 	/// @param elseExpression else branch expression
-	ConditionalExpression(final SimulaBuilder simBuilder, final Type type, final Expression condition, final Expression thenExpression, final Expression elseExpression) {
-		super(simBuilder);
+	ConditionalExpression(final DocumentManager documentManager, final Type type, final Expression condition, final Expression thenExpression, final Expression elseExpression) {
+		super(documentManager);
+//		SimulaBuilder simBuilder = documentManager.simBuilder;
 		this.condition = condition;
 		this.thenExpression = thenExpression; thenExpression.backLink=this;
 		this.elseExpression = elseExpression; elseExpression.backLink=this;
@@ -72,8 +73,8 @@ public final class ConditionalExpression extends Expression {
 		thenExpression.doChecking();
 		elseExpression.doChecking();
 		Type expectedType=commonTypeConversion(thenExpression.type,elseExpression.type);
-		thenExpression = TypeConversion.testAndCreate(expectedType, thenExpression);
-		elseExpression = TypeConversion.testAndCreate(expectedType, elseExpression);
+		thenExpression = TypeConversion.testAndCreate(documentManager, expectedType, thenExpression);
+		elseExpression = TypeConversion.testAndCreate(documentManager, expectedType, elseExpression);
 		thenExpression.doChecking(); // In case TypeConversion was added
 		elseExpression.doChecking(); // In case TypeConversion was added
 		this.type=expectedType;
@@ -140,8 +141,8 @@ public final class ConditionalExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ConditionalExpression() {
-		super(null);
+	private ConditionalExpression(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -164,18 +165,18 @@ public final class ConditionalExpression extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ConditionalExpression read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ConditionalExpression readObject(AttributeInputStream inpt) throws IOException {
-		ConditionalExpression expr = new ConditionalExpression();
+	public static ConditionalExpression readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		ConditionalExpression expr = new ConditionalExpression(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		expr.astData = readAstData(inpt);
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
 		// *** ConditionalExpression
-		expr.condition = (Expression) inpt.readObj();
-		expr.thenExpression = (Expression) inpt.readObj();
-		expr.elseExpression = (Expression) inpt.readObj();
+		expr.condition = (Expression) inpt.readObj(documentManager);
+		expr.thenExpression = (Expression) inpt.readObj(documentManager);
+		expr.elseExpression = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("readConditionalExpression: " + expr);
 		return(expr);
 	}

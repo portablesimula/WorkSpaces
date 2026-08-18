@@ -10,6 +10,7 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
 import java.lang.classfile.CodeBuilder;
 
+import simula.core.DocumentManager;
 import simula.core.builder.token.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
@@ -142,23 +143,23 @@ public class BuildCP {
 					case ObjectKind.MemberMethod -> {
 						var.buildIdentifierAccess(simCoder, false, codeBuilder);
 						codeBuilder
-							.invokevirtual(owner, prx.identifierValue(), prx.getMethodTypeDesc(null,variable.checkedParams));
+							.invokevirtual(owner, prx.identifierValue(), prx.getMethodTypeDesc(simCoder.documentManager,null, variable.checkedParams));
 					}
 					case ObjectKind.ContextFreeMethod -> {
 						codeBuilder
-							.invokestatic(owner, prx.identifierValue(), prx.getMethodTypeDesc(null,variable.checkedParams));
+							.invokestatic(owner, prx.identifierValue(), prx.getMethodTypeDesc(simCoder.documentManager, null,variable.checkedParams));
 					}
 					default -> Util.IERR();
 				}
 			} else beforeDot.buildEvaluation(simCoder, null, codeBuilder);
 		} else beforeDot.buildEvaluation(simCoder, null, codeBuilder);
 		// PUSH Parameter values onto the stack
-		checkForExtraParameter(variable);
+		checkForExtraParameter(simCoder.documentManager, variable);
 		if(variable.checkedParams != null) for(Expression par:variable.checkedParams) {
 			par.buildEvaluation(simCoder, null, codeBuilder);
 		}
 		ClassDesc owner=ClassDesc.of("simula.runtime."+pro.declaredIn.externalIdent);
-		codeBuilder.invokevirtual(owner, pro.identifierValue(), pro.getMethodTypeDesc(null,variable.checkedParams));
+		codeBuilder.invokevirtual(owner, pro.identifierValue(), pro.getMethodTypeDesc(simCoder.documentManager, null, variable.checkedParams));
 		if(pro.type != null && variable.backLink == null)
 			pro.type.pop(codeBuilder);
 	}
@@ -178,7 +179,7 @@ public class BuildCP {
 			callRemoteStandardProcedure(simCoder, inspectedVariable, pro, variable, codeBuilder);
 		} else {
 			// PUSH Parameter values onto the stack
-			boolean xpar = checkForExtraParameter(variable);
+			boolean xpar = checkForExtraParameter(simCoder.documentManager, variable);
 			boolean withFollowSL = meaning.declaredIn.buildCTX(codeBuilder);
 			if(withFollowSL) codeBuilder.checkcast(meaning.declaredIn.getClassDesc());
 			if (variable.checkedParams != null) {
@@ -195,7 +196,7 @@ public class BuildCP {
 			}
 			ClassDesc owner = meaning.declaredIn.getClassDesc();
 			codeBuilder
-				.invokevirtual(owner, pro.identifierValue(), pro.getMethodTypeDesc(null,variable.checkedParams));
+				.invokevirtual(owner, pro.identifierValue(), pro.getMethodTypeDesc(simCoder.documentManager, null,variable.checkedParams));
 			if(pro.type != null && variable.backLink == null)
 				pro.type.pop(codeBuilder);
 		}
@@ -228,7 +229,7 @@ public class BuildCP {
 			MTD = MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_REALTYPE_ARRAY;Lsimula/runtime/RTS_NAME;)I");
 		} else if(pro.identifier.equalsIgnoreCase("linear")) {
 			MTD = MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_REALTYPE_ARRAY;Lsimula/runtime/RTS_REALTYPE_ARRAY;Lsimula/runtime/RTS_NAME;)D");
-		} else MTD = pro.getMethodTypeDesc(null,variable.checkedParams);
+		} else MTD = pro.getMethodTypeDesc(simCoder.documentManager, null,variable.checkedParams);
 		codeBuilder
 			.invokestatic(owner, pro.identifierValue(), MTD);
 		if(pro.type != null && variable.backLink == null) {
@@ -242,18 +243,18 @@ public class BuildCP {
 	/// Check for Extra Parameter sourceLineNumber
 	/// @param variable the variable
 	/// @return true: if extra parameter 'sourceLineNumber' is pushed.
-	private static boolean checkForExtraParameter(VariableExpression variable) {
+	private static boolean checkForExtraParameter(final DocumentManager documentManager, final VariableExpression variable) {
 		Identifier id = variable.identifier;
 		if (id.equalsIgnoreCase("detach")) {
 			variable.checkedParams = new Vector<Expression>();
 			// Push extra parameter 'sourceLineNumber'
-			Constant c = new Constant(null, Type.Integer, variable.firstLineNumber());
+			Constant c = new Constant(documentManager, Type.Integer, variable.firstLineNumber());
 			variable.checkedParams.add(c);
 			return true;
 		} else if( id.equalsIgnoreCase("call") | id.equalsIgnoreCase("resume")) {
 			if(variable.checkedParams.size() == 1) {
 				// Push extra parameter 'sourceLineNumber'
-				Constant c = new Constant(null, Type.Integer, variable.firstLineNumber());
+				Constant c = new Constant(documentManager, Type.Integer, variable.firstLineNumber());
 				variable.checkedParams.add(c);
 				return true;
 			}

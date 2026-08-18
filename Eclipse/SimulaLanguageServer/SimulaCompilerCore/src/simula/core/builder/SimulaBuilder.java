@@ -5,12 +5,10 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import simula.Option;
-import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.CoreGlobal2;
 import simula.core.builder.token.LexToken;
 import simula.core.builder.token.SimpleString;
-import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.syntaxClass.declaration.MaybeBlockDeclaration;
 import simula.core.syntaxClass.declaration.StandardClass;
@@ -126,7 +124,7 @@ public class SimulaBuilder {
 //		Util.IERR("STOP HER INTILL VIDERE");	
 		if(builderTerminateNormally) {	
 //			simulaCompiler.doChecking(this);
-			this.doChecking(this);
+			this.doChecking();
 		} else {
 			Util.IERR("");
 		}
@@ -139,12 +137,12 @@ public class SimulaBuilder {
 	// ***************************************************************
 	public boolean doParsing(SimulaBuilder simBuilder) {
 		boolean builderTerminateNormally = false;
-		simBuilder.duringParsing = true;
+		documentManager.simBuilder.duringParsing = true;
     	LOG.info("SimulaBuilder.doParsing: BEGIN");
     	
         // Do the actual Building
 		simBuilder.getNextParserToken();
-		simBuilder.syntaxTree = new ProgramModule(simBuilder);
+		simBuilder.syntaxTree = new ProgramModule(simBuilder.documentManager);
         try {
         	simBuilder.syntaxTree.doBuild();
         	builderTerminateNormally = true;
@@ -167,14 +165,14 @@ public class SimulaBuilder {
 	// ***************************************************************
 	// *** Semantic Checker
 	// ***************************************************************
-	public void doChecking(SimulaBuilder simBuilder) {
+	public void doChecking() {
 		if (Option.internal.TRACING)
 			IO.println("BEGIN Semantic Checker");
-		simBuilder.duringParsing = false;
-		simBuilder.duringChecking = true;
+		documentManager.simBuilder.duringParsing = false;
+		documentManager.simBuilder.duringChecking = true;
     	LOG.info("SimulaBuilder.doChecking: BEGIN");
 		StandardClass.ENVIRONMENT.doChecking();
-		ProgramModule programModule = simBuilder.syntaxTree;
+		ProgramModule programModule = documentManager.simBuilder.syntaxTree;
 		programModule.doChecking();
 		
 //		programModule.doChecking();
@@ -183,15 +181,15 @@ public class SimulaBuilder {
 			if (Option.internal.TRACE_CHECKER_OUTPUT && programModule != null)
 				programModule.print(0);
 		}
-		if(CoreGlobal2.verbose) IO.println("SimulaBuilder.doChecking: " + DocumentManager.sourceName + ": Semantic Checker completed");
-		simBuilder.duringChecking = false;
+		if(CoreGlobal2.verbose) IO.println("SimulaBuilder.doChecking: " + documentManager.simBuilder.documentManager.sourceName + ": Semantic Checker completed");
+		documentManager.simBuilder.duringChecking = false;
 		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
 			IO.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");
 			programModule.printTree(1);
 		}
 		
 		if (Util.nError > 0) {
-			String msg="Compiler terminate " + DocumentManager.sourceName + " after " + Util.nError + " errors during semantic checking";
+			String msg="Compiler terminate " + documentManager.simBuilder.documentManager.sourceName + " after " + Util.nError + " errors during semantic checking";
 			IO.println(msg);
 //			Thread.dumpStack();
 			throw new RuntimeException(msg);

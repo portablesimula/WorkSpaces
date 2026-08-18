@@ -11,10 +11,10 @@ import java.lang.constant.MethodTypeDesc;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.SimulaBuilder;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -49,8 +49,9 @@ public class ForListElement extends SyntaxElement {
 	/// Create a new ForListElement.
 	/// @param forStatement the ForStatement
 	/// @param expr1 The first expression
-	public ForListElement(final SimulaBuilder simBuilder, final ForStatement forStatement, final Expression expr1) {
-		super(simBuilder);
+	public ForListElement(final DocumentManager documentManager, final ForStatement forStatement, final Expression expr1) {
+		super(documentManager);
+//		SimulaBuilder simBuilder = documentManager.simBuilder;
 		this.forStatement = forStatement;
 		this.expr1 = expr1;
 		if (Option.internal.TRACE_PARSE)
@@ -63,7 +64,7 @@ public class ForListElement extends SyntaxElement {
 			Util.TRACE("BEGIN ForListElement(" + this + ").doChecking - Current Scope Chain: "
 					+ CoreGlobal.getCurrentScope().edScopeChain());
 		expr1.doChecking();
-		expr1 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr1);
+		expr1 = TypeConversion.testAndCreate(documentManager, forStatement.controlVariable.type, expr1);
 //		expr1.doChecking();
 		expr1.backLink = forStatement; // To ensure _RESULT from functions
 	}
@@ -86,7 +87,7 @@ public class ForListElement extends SyntaxElement {
 	}
 
 	/// Perform simplified JavaCoding.
-	public void doSimplifiedJavaCoding() {
+	public void doSimplifiedJavaCoding(final SimulaCoder simCoder) {
 		String cv = forStatement.controlVariable.toJavaCode();
 		String val = this.expr1.toJavaCode();
 		if (expr1.type != forStatement.controlVariable.type) {
@@ -103,9 +104,9 @@ public class ForListElement extends SyntaxElement {
 				}
 			}
 		}
-		JavaSourceFileCoder.code(cv + "=" + val + "; {");
-		forStatement.doStatement.doJavaCoding();
-		JavaSourceFileCoder.code("}");
+		JavaSourceFileCoder.code(simCoder,cv + "=" + val + "; {");
+		forStatement.doStatement.doJavaCoding(simCoder);
+		JavaSourceFileCoder.code(simCoder,"}");
 	}
 
 	/// Build SingleElement ByteCoding
@@ -121,7 +122,7 @@ public class ForListElement extends SyntaxElement {
 		forStatement.controlVariable.buildIdentifierAccess(simCoder, true, codeBuilder);
 		expr1.buildEvaluation(simCoder, null, codeBuilder); // evaluate expr1
 		
-		// JavaSourceFileCoder.code(cv + "=" + val + "; {");
+		// JavaSourceFileCoder.code(simCoder,cv + "=" + val + "; {");
 		codeBuilder.putfield(decl.getFieldRefEntry(codeBuilder.constantPool()));
 
 		forStatement.doStatement.buildByteCode(simCoder, codeBuilder);
@@ -159,8 +160,8 @@ public class ForListElement extends SyntaxElement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	protected ForListElement() {
-		super(null);
+	protected ForListElement(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -179,14 +180,14 @@ public class ForListElement extends SyntaxElement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ForListElement readObject(AttributeInputStream inpt) throws IOException {
-		ForListElement elt = new ForListElement();
+	public static ForListElement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		ForListElement elt = new ForListElement(documentManager);
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
 		// *** SyntaxElement
 		elt.astData = readAstData(inpt);
 		// *** ForListElement
-		elt.forStatement = (ForStatement) inpt.readObj();
-		elt.expr1 = (Expression) inpt.readObj();
+		elt.forStatement = (ForStatement) inpt.readObj(documentManager);
+		elt.expr1 = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("ForListElement: " + elt);
 		return(elt);
 	}

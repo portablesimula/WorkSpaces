@@ -8,8 +8,7 @@ package simula;
 import java.io.File;
 
 import simula.core.CoreGlobal2;
-import simula.core.CoreGlobal2.CompilerMode;
-import simula.core.coder.SimulaCoder;
+import simula.core.DocumentManager;
 import simula.core.utilities.Util;
 
 /// Compile Time Options.
@@ -115,7 +114,7 @@ public final class Option {
 		IO.println("DocumentManager.packetName      " + CoreGlobal2.packetName);
 		IO.println("DocumentManager.simulaRtsLib    " + CoreGlobal2.simulaRtsLib);
 		
-//		IO.println("SimulaBuilder.outputDir         " + SimulaCoder.outputDir);
+//		IO.println("SimulaBuilder.jarFileDir         " + SimulaCoder.jarFileDir);
 //		IO.println("SimulaBuilder.simulaTempDir     " + SimulaCoder.simulaTempDir);
 //		IO.println("SimulaBuilder.tempJavaFileDir   " + SimulaCoder.tempJavaFileDir);
 //		IO.println("SimulaBuilder.tempClassFileDir  " + SimulaCoder.tempClassFileDir);
@@ -146,7 +145,7 @@ public final class Option {
 //				case "-select": setSelectors(argv[++i]); break;				
 //				case "-keepJava": Option.internal.keepJava = new File(argv[++i]); break;
 
-//				case "-output": SimulaCoder.outputDir = new File(argv[++i]); break;
+//				case "-output": SimulaCoder.jarFileDir = new File(argv[++i]); break;
 //				case "-extLib": SimulaCoder.extLib = new File(argv[++i]); break;
 				default: IO.println("Simula ERROR: Unknown option " + arg);
 			}
@@ -154,14 +153,14 @@ public final class Option {
 	}
 
 	/// Kalles av 'run' før coding og exec
-	public static void decodeArguments2(String[] argv) {
+	public static void decodeArguments2(DocumentManager documentManager, String[] argv) {
 //		IO.println("Option.decodeArguments2: ");
 
 		// Parse command line arguments.
 		for(int i=0;i<argv.length;i++) {
 			String arg=argv[i];
 			if (arg.charAt(0) == '-') { // command line option
-				if (arg.equalsIgnoreCase("-compilerMode")) Option.setCompilerMode(argv[++i]);
+				if (arg.equalsIgnoreCase("-compilerMode")) Option.setCompilerMode(documentManager, argv[++i]);
 				else if (arg.equalsIgnoreCase("-noexec")) CoreGlobal2.noExecution = true;
 //				else if (arg.equalsIgnoreCase("-noextension")) SimulaCompiler.EXTENSIONS=false;
 				else if (arg.equalsIgnoreCase("-noPopup")) CoreGlobal2.noPopup = true;
@@ -172,8 +171,8 @@ public final class Option {
 				else if (arg.equalsIgnoreCase("-keepJava")) Option.internal.keepJava = new File(argv[++i]);
 
 				else if (arg.equalsIgnoreCase("-simulaRtsLib")) CoreGlobal2.simulaRtsLib = new File(argv[++i]);
-				else if (arg.equalsIgnoreCase("-output")) SimulaCoder.outputDir = new File(argv[++i]);
-				else if (arg.equalsIgnoreCase("-extLib")) SimulaCoder.extLib = new File(argv[++i]);
+				else if (arg.equalsIgnoreCase("-output")) documentManager.jarFileDir = new File(argv[++i]);
+				else if (arg.equalsIgnoreCase("-extLib")) documentManager.extLib = new File(argv[++i]);
 				
 				// Special RT Options
 //				else if (arg.equalsIgnoreCase("-source")) Option.SOURCE_FILE=argv[++i];
@@ -194,7 +193,7 @@ public final class Option {
 		Option.editorUIScale = "1.0";
 //		Option.selectedTheme = Palette.themeNames[0];
 //		CompilerMode compilerMode=CompilerMode.viaJavaSource;
-		CoreGlobal2.compilerMode = CoreGlobal2.CompilerMode.directClassFiles;
+//		CoreGlobal2.compilerMode = CoreGlobal2.CompilerMode.directClassFiles;
 		CoreGlobal2.CaseSensitive = false;
 		CoreGlobal2.verbose = false;
 		CoreGlobal2.noExecution = false;
@@ -206,11 +205,11 @@ public final class Option {
 
 	/// Editor Utility: Set Compiler Mode.
 	/// @param id the mode String.
-	public static void setCompilerMode(String id) {
+	public static void setCompilerMode(DocumentManager documentManager, String id) {
 		if(id.equals("viaJavaSource")) {
-			CoreGlobal2.compilerMode = CompilerMode.viaJavaSource;
+			documentManager.compileViaJavaSource = true;
 		} else if(id.equals("directClassFiles")) {
-			CoreGlobal2.compilerMode = CompilerMode.directClassFiles;
+			documentManager.compileViaJavaSource = false;
 		}
 	}
 

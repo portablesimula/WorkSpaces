@@ -10,6 +10,7 @@ import java.lang.classfile.CodeBuilder;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -51,8 +52,9 @@ public final class StandaloneExpression extends Statement {
 	/// @param expression the expression
 //	StandaloneExpression(final PsiBuilder simBuilder, final int line,final Expression expression) {
 //		super(line);
-	StandaloneExpression(final SimulaBuilder simBuilder, final Expression expression) {
-		super(simBuilder);
+	StandaloneExpression(final DocumentManager documentManager, final Expression expression) {
+		super(documentManager);
+		SimulaBuilder simBuilder = documentManager.simBuilder;
 //		IO.println("\nNEW StandaloneExpression: expr="+expression);
 //		simBuilder.printPSI("NEW StandaloneExpression: expr="+expression);
 		this.lastParserToken = expression.lastParserToken;
@@ -64,7 +66,7 @@ public final class StandaloneExpression extends Statement {
 		LexToken prevToken = null;
 		while ((prevToken = Parse.acceptParserToken(simBuilder, KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF)) != null) { 
 //			IO.println("NEW StandaloneExpression: prevToken="+prevToken);
-			this.expression = new AssignmentOperation(simBuilder, this.expression, prevToken.keyWord, expectStandaloneExpression(simBuilder));
+			this.expression = new AssignmentOperation(simBuilder.documentManager, this.expression, prevToken.keyWord, expectStandaloneExpression(simBuilder));
 		}		
 		
 //		IO.println("\nEND NEW StandaloneExpression: expr="+expression);
@@ -85,7 +87,7 @@ public final class StandaloneExpression extends Statement {
 		LexToken prevToken = null;
 		while ((prevToken = Parse.acceptParserToken(simBuilder, KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) != null) {
 			int opr=prevToken.keyWord;
-			retExpr=new AssignmentOperation(simBuilder, retExpr, opr, expectStandaloneExpression(simBuilder));
+			retExpr=new AssignmentOperation(simBuilder.documentManager, retExpr, opr, expectStandaloneExpression(simBuilder));
 		}
 //		IO.println("StandaloneExpression.expectStandaloneExpression: RETURN: "+retExpr+" ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 		return retExpr;
@@ -105,9 +107,9 @@ public final class StandaloneExpression extends Statement {
 	}
 	
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber=firstLineNumber();
-		JavaSourceFileCoder.code(toJavaCode() + ';');
+		JavaSourceFileCoder.code(simCoder,toJavaCode() + ';');
 	}
 
 	@Override
@@ -159,8 +161,8 @@ public final class StandaloneExpression extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private StandaloneExpression() {
-		super(null);
+	private StandaloneExpression(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -178,13 +180,13 @@ public final class StandaloneExpression extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the StandaloneExpression object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static StandaloneExpression readObject(AttributeInputStream inpt) throws IOException {
-		StandaloneExpression stm = new StandaloneExpression();
+	public static StandaloneExpression readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		StandaloneExpression stm = new StandaloneExpression(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		stm.astData = readAstData(inpt);
 		// *** StandaloneExpression
-		stm.expression = (Expression) inpt.readObj();
+		stm.expression = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("StandaloneExpression: " + stm);
 		return(stm);
 	}

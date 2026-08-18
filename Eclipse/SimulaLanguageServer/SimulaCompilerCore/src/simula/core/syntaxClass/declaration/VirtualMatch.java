@@ -10,8 +10,9 @@ import java.lang.classfile.ClassFile;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.MethodTypeDesc;
 
+import simula.core.DocumentManager;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.SimulaBuilder;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.RTS;
@@ -34,8 +35,8 @@ public final class VirtualMatch extends Declaration {
 	/// Create a new VirtualMatch.
 	/// @param virtualSpec the virtual specification
 	/// @param match a matching ProcedureDeclaration
-	VirtualMatch(final SimulaBuilder simBuilder, final VirtualSpecification virtualSpec, final ProcedureDeclaration match) {
-		super(simBuilder, virtualSpec.identifier);
+	VirtualMatch(final DocumentManager documentManager, final VirtualSpecification virtualSpec, final ProcedureDeclaration match) {
+		super(documentManager, virtualSpec.identifier);
 		this.declarationKind = ObjectKind.VirtualMatch;
 		// NOTE: Called during Checking
 		this.virtualSpec = virtualSpec;
@@ -43,11 +44,11 @@ public final class VirtualMatch extends Declaration {
 	}
 
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		String matchCode = "{ throw new RTS_SimulaRuntimeError(\"No Virtual Match: " + identifierValue() + "\"); }";
 		if (match != null)
 			matchCode = "{ return(new RTS_PRCQNT(this," + match.getJavaIdentifier() + ".class)); }";
-		JavaSourceFileCoder.code("    public RTS_PRCQNT " + virtualSpec.getVirtualIdentifier() + " " + matchCode);
+		JavaSourceFileCoder.code(simCoder,"    public RTS_PRCQNT " + virtualSpec.getVirtualIdentifier() + " " + matchCode);
 	}
 
 	/// Build virtual match method.

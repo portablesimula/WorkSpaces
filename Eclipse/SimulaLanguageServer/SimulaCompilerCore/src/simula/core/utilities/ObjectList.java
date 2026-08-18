@@ -8,6 +8,7 @@ package simula.core.utilities;
 import java.io.IOException;
 import java.util.Vector;
 
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.syntaxClass.SyntaxElement;
@@ -47,14 +48,14 @@ public class ObjectList<E> extends Vector<E> {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ObjectList object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ObjectList<?> read(AttributeInputStream inpt) throws IOException {
+	public static ObjectList<?> read(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
 		ObjectList<?> list = null;
 		int n = inpt.readShort();
 		if (n >= 0)
 			list = new ObjectList<Object>();
 		if(n > 0) {
 			for (int i = 0; i < n; i++)
-				list.add(inpt.readObj());
+				list.add(inpt.readObj(documentManager));
 		}
 		return list;
 	}

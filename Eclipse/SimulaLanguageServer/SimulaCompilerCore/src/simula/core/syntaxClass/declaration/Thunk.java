@@ -52,8 +52,8 @@ public final class Thunk extends DeclarationScope {
 	/// Create a new Thunk object.
 	/// @param kind the kind code
 	/// @param expr the Thunk expression.
-	private Thunk(int kind,Expression expr) {
-		super(expr.simBuilder, new Identifier(DocumentManager.sourceName + "$THUNK$" + (++OBJECT_SEQU)));
+	private Thunk(final DocumentManager documentManager, final int kind, final Expression expr) {
+		super(expr.documentManager, new Identifier(documentManager.sourceName + "$THUNK$" + (++OBJECT_SEQU)));
 		this.declarationKind = ObjectKind.Thunk;
 		this.kind = kind;
 		this.expr = expr;
@@ -91,7 +91,7 @@ public final class Thunk extends DeclarationScope {
 		//        return("+apar.toJavaCode()+");
 		//     }
 		//  }	
-		Thunk thunk = new Thunk(kind,expr);
+		Thunk thunk = new Thunk(simCoder.documentManager, kind, expr);
 		try { thunk.createJavaClassFile(simCoder); } catch (IOException e) { e.printStackTrace(); }
 		ClassDesc CD_THUNK=thunk.getClassDesc();
 		codeBuilder
@@ -112,7 +112,7 @@ public final class Thunk extends DeclarationScope {
 		byte[] bytes = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchy.getResolver())).build(CD_ThisClass,
 				classBuilder -> {
 					classBuilder
-						.with(SourceFileAttribute.of(DocumentManager.sourceFileName))
+						.with(SourceFileAttribute.of(simCoder.documentManager.sourceFileName))
 						.withFlags(ClassFile.ACC_PUBLIC + ClassFile.ACC_SUPER + ClassFile.ACC_FINAL)
 						.withSuperclass(RTS.CD.RTS_NAME)
 						.with(SignatureAttribute.of(ClassSignature.parseFrom("Lsimula/runtime/RTS_NAME<"+Type.toJVMClassType(expr.type,kind)+">;")))

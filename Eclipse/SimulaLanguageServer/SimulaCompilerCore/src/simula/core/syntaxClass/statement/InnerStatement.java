@@ -10,6 +10,7 @@ import java.lang.classfile.CodeBuilder;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.SimulaBuilder;
@@ -38,8 +39,9 @@ public final class InnerStatement extends Statement {
 
 	/// Create a new InnerStatement.
 	/// @param line the source line number
-	public InnerStatement(final SimulaBuilder simBuilder, boolean explicit) {
-		super(simBuilder);
+	public InnerStatement(final DocumentManager documentManager, boolean explicit) {
+		super(documentManager);
+		SimulaBuilder simBuilder = documentManager.simBuilder;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": InnerStatement: "+this);
 //		IO.println("NEW InnerStatement: Line "+firstLineNumber()+": InnerStatement: "+this+ "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 //		Thread.dumpStack();
@@ -64,7 +66,7 @@ public final class InnerStatement extends Statement {
 	}
 	
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber=firstLineNumber();
 		// No code !
 	}
@@ -94,8 +96,8 @@ public final class InnerStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public InnerStatement() {
-		super(null);
+	public InnerStatement(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -112,8 +114,8 @@ public final class InnerStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the InnerStatement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static InnerStatement readObject(AttributeInputStream inpt) throws IOException {
-		InnerStatement stm = new InnerStatement();
+	public static InnerStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		InnerStatement stm = new InnerStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		stm.astData = readAstData(inpt);

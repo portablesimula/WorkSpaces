@@ -10,6 +10,7 @@ import java.lang.classfile.CodeBuilder;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -56,8 +57,9 @@ public final class GotoStatement extends Statement {
 
 	/// Create a new GotoStatement.
 	/// @param line source line
-	GotoStatement(final SimulaBuilder simBuilder, final int keyWord) {
-		super(simBuilder);
+	GotoStatement(final DocumentManager documentManager, final int keyWord) {
+		super(documentManager);
+		SimulaBuilder simBuilder = documentManager.simBuilder;
 		simBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to tokenList)
 		if(keyWord != KeyWord.GOTO) {
 	        if (!Parse.accept(simBuilder, KeyWord.TO))
@@ -81,12 +83,12 @@ public final class GotoStatement extends Statement {
 	}
 
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
   		Type type = label.type;
 		Util.ASSERT(type.keyWord == Type.T_LABEL, "Invariant");
-		JavaSourceFileCoder.code("_GOTO(" + label.toJavaCode() + ");","GOTO EVALUATED LABEL");
+		JavaSourceFileCoder.code(simCoder,"_GOTO(" + label.toJavaCode() + ");","GOTO EVALUATED LABEL");
 	}
 	
 	@Override
@@ -124,8 +126,8 @@ public final class GotoStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public GotoStatement() {
-		super(null);
+	public GotoStatement(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -143,13 +145,13 @@ public final class GotoStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the GotoStatement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static GotoStatement readObject(AttributeInputStream inpt) throws IOException {
-		GotoStatement stm = new GotoStatement();
+	public static GotoStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		GotoStatement stm = new GotoStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		stm.astData = readAstData(inpt);
 		// *** GotoStatement
-		stm.label = (Expression) inpt.readObj();
+		stm.label = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("GotoStatement: " + stm);
 		return(stm);
 	}

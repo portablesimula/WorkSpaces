@@ -8,6 +8,7 @@ package simula.core.syntaxClass.expression;
 import java.util.Iterator;
 
 import simula.core.CoreGlobal;
+import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.ProcedureSpecification;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -65,10 +66,11 @@ public final class CallProcedure {
 	/// @param func Function Designator, may be subscripted
 	/// @param backLink if not null, this procedure call is part of the backLink Expression/Statement.
 	/// @return piece of Java source code
-	static String remote(final Expression obj,final ProcedureDeclaration procedure,final VariableExpression func,final SyntaxElement backLink) {
+	static String remote(final SimulaCoder simCoder, final Expression obj, final ProcedureDeclaration procedure,
+			final VariableExpression func, final SyntaxElement backLink) {
 		if(procedure.myVirtual!=null) {
 			// Call Remote Virtual Procedure
-			return(remoteVirtual(obj,func,procedure.myVirtual.virtualSpec));
+			return(remoteVirtual(simCoder, obj, func, procedure.myVirtual.virtualSpec));
 		} else if(procedure.declarationKind==ObjectKind.ContextFreeMethod) {
 			// Call Remote Method
 			return(asRemoteMethod(obj,procedure,func));
@@ -189,11 +191,11 @@ public final class CallProcedure {
 	/// @param variable the procedure variable
 	/// @param par declared as parameter 'par'
 	/// @return piece of Java source code
-	static String formal(final VariableExpression variable,final Parameter par) {
+	static String formal(final SimulaCoder simCoder, final VariableExpression variable, final Parameter par) {
 		//return("<IDENT>.CPF().setPar(4).setpar(3.14)._ENT()");
 		String ident=variable.edIdentifierAccess(false);
 		if(par.mode==Parameter.Mode.name) ident=ident+".get()";
-		return(codeCPF(ident,variable,null));
+		return(codeCPF(simCoder, ident, variable, null));
 	}
 
 	// ********************************************************************
@@ -204,7 +206,7 @@ public final class CallProcedure {
 	/// @param virtual the virtual specification
 	/// @param remotelyAccessed true if remotely accessed.
 	/// @return piece of Java source code
-	static String virtual(final VariableExpression variable,final VirtualSpecification virtual,final boolean remotelyAccessed) {
+	static String virtual(final SimulaCoder simCoder, final VariableExpression variable, final VirtualSpecification virtual, final boolean remotelyAccessed) {
 		//return("<IDENT>.CPF().setPar(4).setpar(3.14)._ENT()");
 	    String ident=virtual.getVirtualIdentifier();
 	    if(virtual.kind==VirtualSpecification.Kind.Label) return(ident);
@@ -215,7 +217,7 @@ public final class CallProcedure {
 		    String staticLink=variable.meaning.edQualifiedStaticLink();
 	        ident=staticLink+"."+ident;
 	    }
-	    return(codeCPF(ident,variable,virtual.procedureSpec));
+	    return(codeCPF(simCoder, ident, variable, virtual.procedureSpec));
 	}
 
 	// ********************************************************************
@@ -226,10 +228,10 @@ public final class CallProcedure {
 	/// @param variable the procedure variable
 	/// @param virtual Virtual Specification
 	/// @return piece of Java source code
-	static String remoteVirtual(final Expression obj,final VariableExpression variable,final VirtualSpecification virtual) {
+	static String remoteVirtual(final SimulaCoder simCoder, final Expression obj, final VariableExpression variable, final VirtualSpecification virtual) {
 		//return("<Object>.<IDENT>.CPF().setPar(4).setpar(3.14)._ENT()");
 		String ident=obj.get()+'.'+virtual.getVirtualIdentifier();
-		return(codeCPF(ident,variable,virtual.procedureSpec));
+		return(codeCPF(simCoder, ident, variable, virtual.procedureSpec));
 	}
 	
 	// ********************************************************************
@@ -240,7 +242,7 @@ public final class CallProcedure {
 	/// @param variable the procedure variable
 	/// @param procedureSpec the procedure spec
 	/// @return the resulting Java source code
-	private static String codeCPF(final String ident,final VariableExpression variable,final ProcedureSpecification procedureSpec) {
+	private static String codeCPF(final SimulaCoder simCoder, final String ident, final VariableExpression variable, final ProcedureSpecification procedureSpec) {
 		if(! variable.hasArguments()) {
 			if(procedureSpec != null && procedureSpec.parameterList.size() > 0)
 				Util.codingError(variable, "Missing parameter(s) to " + variable.identifier.value);
@@ -263,7 +265,7 @@ public final class CallProcedure {
 //								actualParameter=new Constant(null, Type.Integer, decl.firstLineNumber());
 								int lno = var.firstLineNumber() + 1;
 								if(lno <= 0) Util.IERR("CallProcedure.codeCPF: Illegal lineNumber: " + lno);
-								actualParameter=new Constant(null, Type.Integer, lno);
+								actualParameter=new Constant(simCoder.documentManager, Type.Integer, lno);
 							actualParameter.doChecking();
 							}
 						}

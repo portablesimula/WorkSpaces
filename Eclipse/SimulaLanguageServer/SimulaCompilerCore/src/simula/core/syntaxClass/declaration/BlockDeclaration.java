@@ -16,6 +16,7 @@ import java.util.Vector;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
@@ -101,8 +102,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// 
 	/// Used by expectMaybeBlock, i.e. CompoundStatement, SubBlock or PrefixedBlock.
 	/// @param identifier the given identifier
-	protected BlockDeclaration(final SimulaBuilder simBuilder, Identifier identifier) {
-		super(simBuilder, identifier);
+	protected BlockDeclaration(final DocumentManager documentManager, Identifier identifier) {
+		super(documentManager, identifier);
 	}
 
 	/// Create a new BlockDeclaration.
@@ -110,8 +111,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// This constructor is only used by ClassDeclaration. ProcedureDeclaration and MaybeBlockDeclaration.
 	/// @param identifier the block identifier
 	/// @param declarationKind the declaration kind
-	private BlockDeclaration(final SimulaBuilder simBuilder, final Identifier identifier,final int declarationKind) {
-		super(simBuilder, identifier);
+	private BlockDeclaration(final DocumentManager documentManager, final Identifier identifier,final int declarationKind) {
+		super(documentManager, identifier);
 		this.declarationKind = declarationKind;
 	}
 	
@@ -126,7 +127,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// @param pList the parameter list
 	protected static void expectFormalParameterPart(final SimulaBuilder simBuilder, final Vector<Parameter> pList) {
 		do { // ParameterPart = Parameter ; { Parameter ; }
-			new Parameter(simBuilder, Parse.expectIdentifier(simBuilder)).into(pList);
+			new Parameter(simBuilder.documentManager, Parse.expectIdentifier(simBuilder)).into(pList);
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		Parse.expect(simBuilder, KeyWord.ENDPAR);
 	}
@@ -268,26 +269,26 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	// *** Coding Utility: codeSTMBody
 	// ***********************************************************************************************
 	/// ClassFile coding utility: Code STM body
-	protected void codeSTMBody() {
+	protected void codeSTMBody(final SimulaCoder simCoder) {
 //		IO.println("BlockDeclaration.codeSTMBody: ");
 		if (hasAccumLabel()) {
-			JavaSourceFileCoder.code(externalIdent + " _THIS=(" + externalIdent + ")_CUR;");
-			JavaSourceFileCoder.code("_LOOP:while(_JTX>=0) {");
-			JavaSourceFileCoder.code("try {");
-			JavaSourceFileCoder.code("_JUMPTABLE(_JTX,"+labelList.accumLabelSize()+");","For ByteCode Engineering");			
+			JavaSourceFileCoder.code(simCoder,externalIdent + " _THIS=(" + externalIdent + ")_CUR;");
+			JavaSourceFileCoder.code(simCoder,"_LOOP:while(_JTX>=0) {");
+			JavaSourceFileCoder.code(simCoder,"try {");
+			JavaSourceFileCoder.code(simCoder,"_JUMPTABLE(_JTX,"+labelList.accumLabelSize()+");","For ByteCode Engineering");			
 			CoreGlobal.currentJavaFileCoder.mustDoByteCodeEngineering=true;
 		}
-		codeStatements();
+		codeStatements(simCoder);
 		if (hasAccumLabel()) {
-			JavaSourceFileCoder.code("break _LOOP;");
-			JavaSourceFileCoder.code("}");
-			JavaSourceFileCoder.code("catch(RTS_LABEL q) {");
+			JavaSourceFileCoder.code(simCoder,"break _LOOP;");
+			JavaSourceFileCoder.code(simCoder,"}");
+			JavaSourceFileCoder.code(simCoder,"catch(RTS_LABEL q) {");
 			
-			JavaSourceFileCoder.code("RTS_RTObject._TREAT_GOTO_CATCH_BLOCK(_THIS, q);");
+			JavaSourceFileCoder.code(simCoder,"RTS_RTObject._TREAT_GOTO_CATCH_BLOCK(_THIS, q);");
 			
-			JavaSourceFileCoder.code("_JTX=q.index; continue _LOOP;","EG. GOTO Lx");
-			JavaSourceFileCoder.code("}");
-			JavaSourceFileCoder.code("}");
+			JavaSourceFileCoder.code(simCoder,"_JTX=q.index; continue _LOOP;","EG. GOTO Lx");
+			JavaSourceFileCoder.code(simCoder,"}");
+			JavaSourceFileCoder.code(simCoder,"}");
 		}
 	}
 
@@ -295,14 +296,14 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	// *** Coding Utility: codeStatements
 	// ***********************************************************************************************
 	/// ClassFile coding utility: Code statements
-	protected void codeStatements() {
-		boolean duringSTM_Coding=SimulaCoder.duringSTM_Coding;
-		SimulaCoder.duringSTM_Coding=true;
+	protected void codeStatements(final SimulaCoder simCoder) {
+		boolean duringSTM_Coding=simCoder.duringSTM_Coding;
+		simCoder.duringSTM_Coding=true;
 		for (Statement stm : statements) {
 //			IO.println("BlockDeclaration.codeStatements: "+stm.getClass().getSimpleName()+"  "+stm);
-			stm.doJavaCoding();
+			stm.doJavaCoding(simCoder);
 		}
-		SimulaCoder.duringSTM_Coding=duringSTM_Coding;
+		simCoder.duringSTM_Coding=duringSTM_Coding;
 	}
 
     
@@ -310,7 +311,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	// *** Coding Utility: codeStatements
 	// ***********************************************************************************************
 	/// ClassFile coding utility: Code Method Main
-    protected void codeMethodMain() {
+    protected void codeMethodMain(final SimulaCoder simCoder) {
     	// GENERATES:
     	//
     	// public static void main(String[] args) {
@@ -319,10 +320,10 @@ public abstract class BlockDeclaration extends DeclarationScope {
     	//	 RTS_UTIL.RUN_STM(new adHoc04(_CTX));
     	// } // End of main
     	String progid = this.externalIdent;
-		JavaSourceFileCoder.code("");
-		JavaSourceFileCoder.code("public static void main(String[] args) {");
-		JavaSourceFileCoder.debug("//System.setProperty(\"file.encoding\",\"UTF-8\");");
-		JavaSourceFileCoder.code("RTS_UTIL.BPRG(\""+progid+"\", args);");
+		JavaSourceFileCoder.code(simCoder,"");
+		JavaSourceFileCoder.code(simCoder,"public static void main(String[] args) {");
+		JavaSourceFileCoder.debug(simCoder,"//System.setProperty(\"file.encoding\",\"UTF-8\");");
+		JavaSourceFileCoder.code(simCoder,"RTS_UTIL.BPRG(\""+progid+"\", args);");
 		if(this instanceof PrefixedBlockDeclaration pblk) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("new " + getJavaIdentifier() + "(_CTX");
@@ -331,11 +332,11 @@ public abstract class BlockDeclaration extends DeclarationScope {
 					sb.append(',').append(par.toJavaCode());
 				}
 			} sb.append(")");
-			JavaSourceFileCoder.code("RTS_UTIL.RUN_STM(" + sb + ");");
+			JavaSourceFileCoder.code(simCoder,"RTS_UTIL.RUN_STM(" + sb + ");");
 		} else {
-			JavaSourceFileCoder.code("RTS_UTIL.RUN_STM(new " + getJavaIdentifier() + "(_CTX));");			
+			JavaSourceFileCoder.code(simCoder,"RTS_UTIL.RUN_STM(new " + getJavaIdentifier() + "(_CTX));");			
 		}
-		JavaSourceFileCoder.code("}", "End of main");
+		JavaSourceFileCoder.code(simCoder,"}", "End of main");
     }
 	
 	

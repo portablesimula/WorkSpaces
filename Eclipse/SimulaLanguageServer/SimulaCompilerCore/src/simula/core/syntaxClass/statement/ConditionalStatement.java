@@ -11,6 +11,7 @@ import java.lang.classfile.Label;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -54,28 +55,34 @@ public final class ConditionalStatement extends Statement {
 
 	/// Create a new ConditionalStatement.
 	/// @param line the source line number
-	ConditionalStatement(SimulaBuilder simBuilder) {
-		super(simBuilder);
+	private ConditionalStatement(final DocumentManager documentManager) {
+		super(documentManager);
+	}
+	
+	static ConditionalStatement of(final DocumentManager documentManager) {
+		ConditionalStatement conn = new ConditionalStatement(documentManager);
+		SimulaBuilder simBuilder = documentManager.simBuilder;
 		int lno = simBuilder.getSourceLineNumber();
 //		IO.println("NEW ConditionalStatement: "+simBuilder.getSourceLineNumber());
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN IfStatement: ");
 		simBuilder.consume(KeyWord.IF); //  (add it to tokenList)
 
-		condition = Expression.expectExpression(simBuilder, "if-condition");
+		conn.condition = Expression.expectExpression(simBuilder, "if-condition");
 		Parse.expect(simBuilder, KeyWord.THEN);
 		Statement elseStatement = null;
 		if (Parse.accept(simBuilder, KeyWord.ELSE)) {
-			thenStatement = DummyStatement.ofImplicit(simBuilder);
+			conn.thenStatement = DummyStatement.ofImplicit(simBuilder);
 			elseStatement = Statement.acceptStatement(simBuilder);
 		} else {
-		    thenStatement = Statement.acceptStatement(simBuilder);
+		    conn.thenStatement = Statement.acceptStatement(simBuilder);
 		    if (Parse.accept(simBuilder, KeyWord.ELSE)) {
 			    elseStatement = Statement.acceptStatement(simBuilder);
 		    }
 		}
-		this.elseStatement=elseStatement;
+		conn.elseStatement=elseStatement;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line " + simBuilder.getSourceLineNumber() + ": DONE IfStatement started at line: " + lno + ": " + this);
+			Util.TRACE("Line " + simBuilder.getSourceLineNumber() + ": DONE IfStatement started at line: " + lno + ": " + conn);
+		return conn;
 	}
 
 	@Override
@@ -110,17 +117,17 @@ public final class ConditionalStatement extends Statement {
 	}
 	
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber=firstLineNumber();
 		ASSERT_SEMANTICS_CHECKED();
-		JavaSourceFileCoder.code("if(_VALUE(" + condition.toJavaCode() + ")) {");
-		thenStatement.doJavaCoding();
+		JavaSourceFileCoder.code(simCoder,"if(_VALUE(" + condition.toJavaCode() + ")) {");
+		thenStatement.doJavaCoding(simCoder);
 		if (elseStatement != null) {
-			JavaSourceFileCoder.code("} else {");
-			elseStatement.doJavaCoding();
-			JavaSourceFileCoder.code("}");
+			JavaSourceFileCoder.code(simCoder,"} else {");
+			elseStatement.doJavaCoding(simCoder);
+			JavaSourceFileCoder.code(simCoder,"}");
 		} else
-			JavaSourceFileCoder.code("}");
+			JavaSourceFileCoder.code(simCoder,"}");
 	}
 
 	@Override
@@ -158,10 +165,10 @@ public final class ConditionalStatement extends Statement {
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
-	/// Default constructor used by Attribute File I/O
-	private ConditionalStatement() {
-		super(null);
-	}
+//	/// Default constructor used by Attribute File I/O
+//	private ConditionalStatement(final DocumentManager documentManager) {
+//		super(documentManager);
+//	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -180,15 +187,15 @@ public final class ConditionalStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ConditionalStatement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ConditionalStatement readObject(AttributeInputStream inpt) throws IOException {
-		ConditionalStatement stm = new ConditionalStatement();
+	public static ConditionalStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		ConditionalStatement stm = new ConditionalStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		stm.astData = readAstData(inpt);
 		// *** ConditionalStatement
-		stm.condition = (Expression) inpt.readObj();
-		stm.thenStatement = (Statement) inpt.readObj();
-		stm.elseStatement = (Statement) inpt.readObj();
+		stm.condition = (Expression) inpt.readObj(documentManager);
+		stm.thenStatement = (Statement) inpt.readObj(documentManager);
+		stm.elseStatement = (Statement) inpt.readObj(documentManager);
 
 		Util.TRACE_INPUT("ConditionalStatement: " + stm);
 		return(stm);

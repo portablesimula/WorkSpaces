@@ -14,6 +14,7 @@ import java.lang.constant.ClassDesc;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -123,21 +124,25 @@ public final class ConnectionStatement extends Statement {
 	Label endLabel;
 
 	/// Create a new ConnectionStatement.
+	private ConnectionStatement(final DocumentManager documentManager) {
+		super(documentManager);
+	}
 	/// 
 	/// Pre-Condition: INSPECT  is already read.
 	/// @param line the source line number
-	ConnectionStatement(final SimulaBuilder simBuilder) {
-		super(simBuilder);
+	static ConnectionStatement of(final DocumentManager documentManager) {
+		ConnectionStatement stm = new ConnectionStatement(documentManager);
+		SimulaBuilder simBuilder = documentManager.simBuilder;
 		simBuilder.consume(KeyWord.INSPECT); //  (add it to tokenList)
 
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ConnectionStatement");
-		objectExpression = Expression.expectExpression(simBuilder, "connected object");
-		objectExpression.backLink = this;
-		Identifier ident = new Identifier("_inspect_" + firstLineNumber() + '_' + (SEQUX++));
-		inspectedVariable = new VariableExpression(simBuilder, ident);
+		stm.objectExpression = Expression.expectExpression(simBuilder, "connected object");
+		stm.objectExpression.backLink = stm;
+		Identifier ident = new Identifier("_inspect_" + stm.firstLineNumber() + '_' + (SEQUX++));
+		stm.inspectedVariable = new VariableExpression(documentManager, ident);
 		DeclarationScope scope = CoreGlobal.getCurrentScope();
-		inspectVariableDeclaration = new InspectVariableDeclaration(simBuilder, Type.Ref("RTObject"), ident, scope, this);
+		stm.inspectVariableDeclaration = new InspectVariableDeclaration(documentManager, Type.Ref("RTObject"), ident, scope, stm);
 		
 		LOOP: while (scope instanceof ConnectionBlock
 				|| (scope instanceof MaybeBlockDeclaration && scope.declarationList.size() == 0 )) {
@@ -147,41 +152,42 @@ public final class ConnectionStatement extends Statement {
 		}
 			
 //		IO.println("NEW ConnectionStatement: add inspectVariableDeclaration to "+scope);
-		scope.declarationList.add(inspectVariableDeclaration);
-		inspectVariableDeclaration.declaredIn = scope;
+		scope.declarationList.add(stm.inspectVariableDeclaration);
+		stm.inspectVariableDeclaration.declaredIn = scope;
 
 		boolean hasDoPart=false;
 		boolean hasWhenPart=false;
 		if (Parse.accept(simBuilder, KeyWord.DO)) {
 			hasDoPart = true;
-			ConnectionBlock connectionBlock = new ConnectionBlock(simBuilder, inspectedVariable, null);
+			ConnectionBlock connectionBlock = new ConnectionBlock(documentManager, stm.inspectedVariable, null);
 			DeclarationScope prevScope = CoreGlobal.getCurrentScope();
 			CoreGlobal.setScope(connectionBlock);
 			Statement statement = Statement.acceptStatement(simBuilder);
 			CoreGlobal.setScope(prevScope);
 			
-			connectionPart.add(new ConnectionDoPart(simBuilder, this,connectionBlock, statement));
+			stm.connectionPart.add(new ConnectionDoPart(documentManager, stm,connectionBlock, statement));
 			connectionBlock.end();
 		} else {
 			while (Parse.accept(simBuilder, KeyWord.WHEN)) {
 				Identifier classIdentifier = Parse.expectIdentifier(simBuilder);
 				Parse.expect(simBuilder, KeyWord.DO);
-				ConnectionBlock connectionBlock = new ConnectionBlock(simBuilder, inspectedVariable, classIdentifier);
+				ConnectionBlock connectionBlock = new ConnectionBlock(documentManager, stm.inspectedVariable, classIdentifier);
 				hasWhenPart = true;
 				Statement statement = Statement.acceptStatement(simBuilder);
-				ConnectionWhenPart whenPart = new ConnectionWhenPart(simBuilder, this,classIdentifier, connectionBlock, statement);
-				connectionPart.add(whenPart);
+				ConnectionWhenPart whenPart = new ConnectionWhenPart(documentManager, stm,classIdentifier, connectionBlock, statement);
+				stm.connectionPart.add(whenPart);
 				connectionBlock.end();
 			}
 
 		}
-		if(!(hasDoPart | hasWhenPart)) Util.syntaxError(simBuilder, "Incomplete Inspect statement: "+objectExpression + ", missing DO or WHEN");
+		if(!(hasDoPart | hasWhenPart)) Util.syntaxError(simBuilder, "Incomplete Inspect statement: "+stm.objectExpression + ", missing DO or WHEN");
 		Statement otherwise = null;
 		if (Parse.accept(simBuilder, KeyWord.OTHERWISE)) otherwise = Statement.acceptStatement(simBuilder);
-		this.otherwise=otherwise;
-		this.hasWhenPart=hasWhenPart;
+		stm.otherwise=otherwise;
+		stm.hasWhenPart=hasWhenPart;
 		if (Option.internal.TRACE_PARSE)
-			Util.TRACE("Line "+this.firstLineNumber()+": ConnectionStatement: "+this);
+			Util.TRACE("Line "+stm.firstLineNumber()+": ConnectionStatement: "+stm);
+		return stm;
 	}
 
 	@Override
@@ -206,27 +212,26 @@ public final class ConnectionStatement extends Statement {
 	}
 
 	@Override
-	public void doJavaCoding() {
+	public void doJavaCoding(final SimulaCoder simCoder) {
 		CoreGlobal.sourceLineNumber = firstLineNumber();
 //		IO.println("ConnectionStatement.doJavaCoding: "+Global.sourceLineNumber);
 		ASSERT_SEMANTICS_CHECKED();
-		JavaSourceFileCoder.code("{");
-		JavaSourceFileCoder.debug("// BEGIN INSPECTION ");
-		Expression assignment = new AssignmentOperation(null, inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
-//		Expression assignment = new AssignmentOperation(this.psiTree, inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
+		JavaSourceFileCoder.code(simCoder,"{");
+		JavaSourceFileCoder.debug(simCoder,"// BEGIN INSPECTION ");
+		Expression assignment = new AssignmentOperation(documentManager, inspectedVariable, KeyWord.ASSIGNREF, objectExpression);
 		assignment.doChecking();
-		JavaSourceFileCoder.code(assignment.toJavaCode() + ';');
-		if (!hasWhenPart) JavaSourceFileCoder.code("if(" + inspectedVariable.toJavaCode() + "!=null) {","INSPECT " + inspectedVariable);
+		JavaSourceFileCoder.code(simCoder,assignment.toJavaCode() + ';');
+		if (!hasWhenPart) JavaSourceFileCoder.code(simCoder,"if(" + inspectedVariable.toJavaCode() + "!=null) {","INSPECT " + inspectedVariable);
 		boolean first = true;
-		for(ConnectionDoPart part:connectionPart) { part.doCoding(first);	first = false; }
-		if (!hasWhenPart) JavaSourceFileCoder.code("}");
+		for(ConnectionDoPart part:connectionPart) { part.doCoding(simCoder, first);	first = false; }
+		if (!hasWhenPart) JavaSourceFileCoder.code(simCoder,"}");
 		if (otherwise != null) {
-			JavaSourceFileCoder.code("else {","OTHERWISE ");
-			otherwise.doJavaCoding();
-			JavaSourceFileCoder.code("}","END OTHERWISE ");
+			JavaSourceFileCoder.code(simCoder,"else {","OTHERWISE ");
+			otherwise.doJavaCoding(simCoder);
+			JavaSourceFileCoder.code(simCoder,"}","END OTHERWISE ");
 		}
 		// JavaModule.debug("// END INSPECTION ");
-		JavaSourceFileCoder.code("}","END INSPECTION");
+		JavaSourceFileCoder.code(simCoder,"}","END INSPECTION");
 	}
 
 	@Override
@@ -295,10 +300,6 @@ public final class ConnectionStatement extends Statement {
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
-	/// Default constructor used by Attribute File I/O
-	private ConnectionStatement() {
-		super(null);
-	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -321,17 +322,17 @@ public final class ConnectionStatement extends Statement {
 	/// @return the ConnectionStatement object read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static ConnectionStatement readObject(AttributeInputStream inpt) throws IOException {
-		ConnectionStatement stm = new ConnectionStatement();
+	public static ConnectionStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		ConnectionStatement stm = new ConnectionStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		stm.astData = readAstData(inpt);
 		// *** ConnectionStatement
-		stm.objectExpression = (Expression) inpt.readObj();
-		stm.inspectedVariable = (VariableExpression) inpt.readObj();
-		stm.inspectVariableDeclaration = (InspectVariableDeclaration) inpt.readObj();
-		stm.connectionPart = (ObjectList<ConnectionDoPart>) inpt.readObjectList();
-		stm.otherwise = (Statement) inpt.readObj();
+		stm.objectExpression = (Expression) inpt.readObj(documentManager);
+		stm.inspectedVariable = (VariableExpression) inpt.readObj(documentManager);
+		stm.inspectVariableDeclaration = (InspectVariableDeclaration) inpt.readObj(documentManager);
+		stm.connectionPart = (ObjectList<ConnectionDoPart>) inpt.readObjectList(documentManager);
+		stm.otherwise = (Statement) inpt.readObj(documentManager);
 		stm.hasWhenPart = inpt.readBoolean();
 		Util.TRACE_INPUT("ConnectionStatement: " + stm);
 		return(stm);

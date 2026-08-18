@@ -14,7 +14,7 @@ import java.lang.constant.ClassDesc;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.CoreGlobal2;
-import simula.core.builder.SimulaBuilder;
+import simula.core.DocumentManager;
 import simula.core.builder.token.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.utilities.DeclarationList;
@@ -61,8 +61,8 @@ public abstract class DeclarationScope extends Declaration  {
 	/// Create a new DeclarationScope.
 	/// 
 	/// @param ident scope identifier
-	protected DeclarationScope(final SimulaBuilder simBuilder, final Identifier ident) {
-		super(simBuilder, ident);
+	protected DeclarationScope(final DocumentManager documentManager, final Identifier ident) {
+		super(documentManager, ident);
 		declarationList = new DeclarationList(getClass().getSimpleName() + ':' + identifierValue() + ":Line=" + CoreGlobal.sourceLineNumber);
 		declaredIn = CoreGlobal.getCurrentScope();
 		CoreGlobal.setScope(this);
@@ -172,7 +172,7 @@ public abstract class DeclarationScope extends Declaration  {
 				CoreGlobal2.WARNINGS = true;
 				Util.warning(this, "Undefined variable: " + identifierValue() + "  Could be because SimulaCompiler.CaseSensitive == true");
 			}
-			UndefinedDeclaration undef = new UndefinedDeclaration(null, identifier);
+			UndefinedDeclaration undef = new UndefinedDeclaration(documentManager, identifier);
 			meaning = new Meaning(undef, this); // Error Recovery
 		}
 		if(Option.internal.TRACE_FIND_MEANING > 0)

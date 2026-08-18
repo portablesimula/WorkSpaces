@@ -10,10 +10,10 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
 import simula.Option;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
@@ -47,8 +47,8 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 	/// @param classIdentifier the WHEN class-identifier
 	/// @param connectionBlock The associated connection block
 	/// @param statement the statement after DO
-	public ConnectionWhenPart(final SimulaBuilder simBuilder, final ConnectionStatement connectionStatement, final Identifier classIdentifier,final ConnectionBlock connectionBlock,final Statement statement) {
-		super(simBuilder, connectionStatement, connectionBlock, statement);
+	public ConnectionWhenPart(final DocumentManager documentManager, final ConnectionStatement connectionStatement, final Identifier classIdentifier,final ConnectionBlock connectionBlock,final Statement statement) {
+		super(documentManager, connectionStatement, connectionBlock, statement);
 		this.classIdentifier = classIdentifier;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW ConnectionDoPart: " + toString());
@@ -76,17 +76,17 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 	}
 
 	@Override
-	public void doCoding(final boolean first) {
+	public void doCoding(final SimulaCoder simCoder, final boolean first) {
 		ASSERT_SEMANTICS_CHECKED();
 		String prfx = (first) ? "" : "else ";
 		String cid = classDeclaration.getJavaIdentifier();
 		if (impossibleWhenPart) {
-			JavaSourceFileCoder.code(prfx,"WHEN " + cid + " DO -- IMPOSSIBLE REMOVED");
+			JavaSourceFileCoder.code(simCoder,prfx,"WHEN " + cid + " DO -- IMPOSSIBLE REMOVED");
 		} else {
 			String cvar = this.connectionBlock.connID;
-			JavaSourceFileCoder.code(prfx + "if(" + connectionStatement.inspectedVariable.toJavaCode() + " instanceof " + cid + "  " + cvar + ") {","WHEN "	+ cid + " DO ");
-			connectionBlock.doJavaCoding();
-			JavaSourceFileCoder.code("}");				
+			JavaSourceFileCoder.code(simCoder,prfx + "if(" + connectionStatement.inspectedVariable.toJavaCode() + " instanceof " + cid + "  " + cvar + ") {","WHEN "	+ cid + " DO ");
+			connectionBlock.doJavaCoding(simCoder);
+			JavaSourceFileCoder.code(simCoder,"}");				
 		}
 	}
 
@@ -117,7 +117,7 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ConnectionWhenPart() {}
+	private ConnectionWhenPart(final DocumentManager documentManager) { super(documentManager);}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -136,15 +136,15 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ConnectionDoPart object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ConnectionDoPart readObject(AttributeInputStream inpt) throws IOException {
-		ConnectionWhenPart whn = new ConnectionWhenPart();
+	public static ConnectionDoPart readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		ConnectionWhenPart whn = new ConnectionWhenPart(documentManager);
 		whn.OBJECT_SEQU = inpt.readSEQU(whn);
 		// *** SyntaxElement
 		whn.astData = readAstData(inpt);
 		// *** ConnectionDoPart
 		whn.classIdentifier = inpt.readIdentifier();
-		whn.connectionStatement = (ConnectionStatement) inpt.readObj();
-		whn.connectionBlock = (ConnectionBlock) inpt.readObj();
+		whn.connectionStatement = (ConnectionStatement) inpt.readObj(documentManager);
+		whn.connectionBlock = (ConnectionBlock) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("ConnectionDoPart: " + whn);
 		return(whn);
 	}

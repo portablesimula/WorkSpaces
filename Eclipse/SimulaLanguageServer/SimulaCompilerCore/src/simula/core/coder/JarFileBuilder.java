@@ -30,6 +30,7 @@ import java.util.jar.Manifest;
 import simula.Option;
 import simula.core.DocumentManager;
 import simula.core.builder.AttributeFileIO;
+import simula.core.builder.SimulaBuilder;
 import simula.core.CoreGlobal2;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.syntaxClass.statement.ProgramModule;
@@ -72,30 +73,30 @@ public class JarFileBuilder {
 	// *** CRERATE AND WRITE ATTRIBUTE .jar FILE INLINE
 	// ***************************************************************
 	public static File writeAttributeFile(final SimulaCoder simCoder, final ProgramModule programModule) throws IOException {
-		SimulaCoder.jarFileBuilder = new JarFileBuilder();
-		SimulaCoder.jarFileBuilder.open(programModule);
+		simCoder.jarFileBuilder = new JarFileBuilder();
+		simCoder.jarFileBuilder.open(simCoder, programModule);
 		String entryName = programModule.getRelativeAttributeFileName();
 		if (entryName != null) {
 			byte[] bytes = AttributeFileIO.buildAttrEntry(programModule);
-			SimulaCoder.jarFileBuilder.writeEntryToJarOutput(entryName, bytes);
+			simCoder.jarFileBuilder.writeEntryToJarOutput(entryName, bytes);
 		}
 
 		// ***************************************************************
 		// *** ADD CLASS FILES PART OF OUTPUT .jar FILE INLINE
 		// ***************************************************************
-		return SimulaCoder.jarFileBuilder.close(simCoder);
+		return simCoder.jarFileBuilder.close(simCoder);
 	}
 	
 	/// Open the JarFileBuilder.
 	/// @param programModule the relevant ProgramModule
 	/// @throws IOException if something went wrong
-	private void open(final ProgramModule programModule) throws IOException {
+	private void open(final SimulaCoder simCoder, final ProgramModule programModule) throws IOException {
 		if(TESTING) IO.println("JarFileBuilder.open: " + programModule);
 //		if(jarOutputStream != null) Util.IERR();
 		this.programModule = programModule;
 		if (Option.internal.TRACING)
 			IO.println("BEGIN Create .jar File");
-		outputJarFile = new File(SimulaCoder.outputDir, programModule.getIdentifier().value + ".jar");
+		outputJarFile = new File(simCoder.documentManager.jarFileDir, programModule.getIdentifier().value + ".jar");
 		outputJarFile.getParentFile().mkdirs();
 
 		if(outputJarFile.exists()) {
@@ -121,7 +122,7 @@ public class JarFileBuilder {
 		jarOutputStream = new JarOutputStream(new FileOutputStream(outputJarFile), manifest);
 		if(TESTING) IO.println("JarFileBuilder.open: "+jarOutputStream);
 		
-		if(CoreGlobal2.compilerMode != CoreGlobal2.CompilerMode.viaJavaSource) {
+		if(! simCoder.documentManager.compileViaJavaSource) {
 			// Add initial entry: 
 			String entryName = packetName + '/';
 			writeEntryToJarOutput(entryName, null);
@@ -163,7 +164,7 @@ public class JarFileBuilder {
         
         jarOutputStream.close();
 		if(TESTING) IO.println("JarFileBuilder.close: "+jarOutputStream);
-		if(CoreGlobal2.verbose) IO.println("JarFileBuilder.close: " + DocumentManager.sourceName + ": JarFile " + outputJarFile);
+		if(CoreGlobal2.verbose) IO.println("JarFileBuilder.close: " + simCoder.documentManager.sourceName + ": JarFile " + outputJarFile);
 		
 		if(TESTING) {
 			IO.println("JarFileBuilder.close: END: ");
@@ -239,26 +240,27 @@ public class JarFileBuilder {
 	/// @param identifier class or procedure identifier
 	/// @param externalIdentifier the external identifier if any
 	/// @return the resulting File or null
-	public static File findJarFile(final String identifier, final String externalIdentifier) {
+	public static File findJarFile(final SimulaBuilder simBuilder, final String identifier, final String externalIdentifier) {
+		DocumentManager documentManager = simBuilder.documentManager;
 		File jarFile = null;
 		try {
 			if (externalIdentifier == null || externalIdentifier.length() == 0) {
 				// If present search extLib
-				if (SimulaCoder.extLib != null) {
-					jarFile = new File(SimulaCoder.extLib, identifier + ".jar");
+				if (documentManager.extLib != null) {
+					jarFile = new File(documentManager.extLib, identifier + ".jar");
 					if (jarFile.exists()) {
 //						IO.println("JarFileBuilder.findJarFile: FOUND in extlib: " + jarFile);
 						return (jarFile);
 					}
 //					IO.println("JarFileBuilder.findJarFile: NOT FOUND in extlib: " + jarFile);
 				}
-				jarFile = new File(SimulaCoder.outputDir, identifier + ".jar");
-//				IO.println("JarFileBuilder.findJarFile: SimulaCoder.outputDir: " + SimulaCoder.outputDir);
+				jarFile = new File(documentManager.jarFileDir, identifier + ".jar");
+//				IO.println("JarFileBuilder.findJarFile: SimulaCoder.jarFileDir: " + documentManager.jarFileDir);
 				if (jarFile.exists()) {
-//					IO.println("JarFileBuilder.findJarFile: FOUND in outputDir: " + jarFile);
+//					IO.println("JarFileBuilder.findJarFile: FOUND in jarFileDir: " + jarFile);
 					return (jarFile);
 				}
-//				IO.println("JarFileBuilder.findJarFile: NOT FOUND in outputDir: " + jarFile);
+//				IO.println("JarFileBuilder.findJarFile: NOT FOUND in jarFileDir: " + jarFile);
 			} else {
 				jarFile = new File(externalIdentifier);
 				if (jarFile.exists()) {

@@ -10,9 +10,9 @@ import java.lang.classfile.CodeBuilder;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
@@ -94,8 +94,9 @@ public final class ObjectRelation extends Expression {
 	/// @param lhs left hand side
 	/// @param opr the operation: IN or IS
 	/// @param classIdentifier the right hand class identifier
-	ObjectRelation(final SimulaBuilder simBuilder, final Expression lhs, final int opr, final Identifier classIdentifier) {
-		super(simBuilder);
+	ObjectRelation(final DocumentManager documentManager, final Expression lhs, final int opr, final Identifier classIdentifier) {
+		super(documentManager);
+//		SimulaBuilder simBuilder = documentManager.simBuilder;
 		this.lhs = lhs;
 		this.opr = opr;
 		this.classIdentifier = classIdentifier;
@@ -171,8 +172,8 @@ public final class ObjectRelation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ObjectRelation() {
-		super(null);
+	private ObjectRelation(final DocumentManager documentManager) {
+		super(documentManager);
 	}
 
 	@Override
@@ -195,13 +196,13 @@ public final class ObjectRelation extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ObjectRelation object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ObjectRelation readObject(AttributeInputStream inpt) throws IOException {
-		ObjectRelation expr = new ObjectRelation();
+	public static ObjectRelation readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		ObjectRelation expr = new ObjectRelation(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		expr.astData = readAstData(inpt);
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj();
-		expr.lhs = (Expression) inpt.readObj();
+		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
+		expr.lhs = (Expression) inpt.readObj(documentManager);
 		expr.opr = inpt.readShort();
 		expr.classIdentifier = inpt.readIdentifier();
 		Util.TRACE_INPUT("readObjectRelation: " + expr);

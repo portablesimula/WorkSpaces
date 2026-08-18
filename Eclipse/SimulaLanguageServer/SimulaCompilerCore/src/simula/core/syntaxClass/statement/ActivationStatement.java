@@ -10,6 +10,7 @@ import java.lang.classfile.CodeBuilder;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
@@ -102,27 +103,32 @@ public final class ActivationStatement extends Statement {
 
 	/// Create a new ActivationStatement.
 	/// @param line the source line number
-	ActivationStatement(final SimulaBuilder simBuilder) {
-		super(simBuilder);
+	private ActivationStatement(final DocumentManager documentManager) {
+		super(documentManager);
+	}
+	static ActivationStatement of(final DocumentManager documentManager) {
+		ActivationStatement stm = new ActivationStatement(documentManager);
+		SimulaBuilder simBuilder = documentManager.simBuilder;
 		LexToken activator = Parse.getCurrentParserToken(simBuilder);
-		REAC = activator.keyWord == KeyWord.REACTIVATE;
+		stm.REAC = activator.keyWord == KeyWord.REACTIVATE;
 		simBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to tokenList)
 		if (Option.internal.TRACE_PARSE) Parse.TRACE("Parse ActivationStatement");
-		object1 = Expression.expectExpression(simBuilder, "process");
-		object1.backLink = this;
-		code = ActivationCode.direct;
+		stm.object1 = Expression.expectExpression(simBuilder, "process");
+		stm.object1.backLink = stm;
+		stm.code = ActivationCode.direct;
 		LexToken prevToken = Parse.getCurrentParserToken(simBuilder);
 		if (Parse.accept(simBuilder, KeyWord.AT) || Parse.accept(simBuilder, KeyWord.DELAY)) {
-			code = (prevToken.keyWord == KeyWord.AT) ? ActivationCode.at : ActivationCode.delay;
-			time = Expression.expectExpression(simBuilder, "at/delay");
-			time.backLink = this;
-			if (Parse.accept(simBuilder, KeyWord.PRIOR)) prior = true;
+			stm.code = (prevToken.keyWord == KeyWord.AT) ? ActivationCode.at : ActivationCode.delay;
+			stm.time = Expression.expectExpression(simBuilder, "at/delay");
+			stm.time.backLink = stm;
+			if (Parse.accept(simBuilder, KeyWord.PRIOR)) stm.prior = true;
 		} else if (Parse.accept(simBuilder, KeyWord.BEFORE) || Parse.accept(simBuilder, KeyWord.AFTER)) {
-			code = (prevToken.keyWord == KeyWord.BEFORE) ? ActivationCode.before : ActivationCode.after;
-			object2 = Expression.expectExpression(simBuilder, "before/after");
-			object2.backLink = this;
+			stm.code = (prevToken.keyWord == KeyWord.BEFORE) ? ActivationCode.before : ActivationCode.after;
+			stm.object2 = Expression.expectExpression(simBuilder, "before/after");
+			stm.object2.backLink = stm;
 		}
-		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": ActivationStatement: "+this);
+		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+stm.firstLineNumber()+": ActivationStatement: "+stm);
+		return stm;
 	}
 
 	@Override
@@ -138,9 +144,9 @@ public final class ActivationStatement extends Statement {
 	public String toJavaCode() {
 		Type refProcess = Type.Ref("Process");
 		if (object1 != null)
-			object1 = TypeConversion.testAndCreate(refProcess, object1);
+			object1 = TypeConversion.testAndCreate(documentManager, refProcess, object1);
 		if (object2 != null)
-			object2 = TypeConversion.testAndCreate(refProcess, object2);
+			object2 = TypeConversion.testAndCreate(documentManager, refProcess, object2);
 		switch (code) {
 		    case at:     return (edActivateAt());
 		    case delay:	 return (edActivateDelay());
@@ -200,14 +206,14 @@ public final class ActivationStatement extends Statement {
 	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		Type refProcess = Type.Ref("Process");
 		if (object1 != null) {
-			object1 = TypeConversion.testAndCreate(refProcess, object1);
+			object1 = TypeConversion.testAndCreate(documentManager, refProcess, object1);
 			object1.backLink = this;
 		}
 		if (object2 != null) {
-			object2 = TypeConversion.testAndCreate(refProcess, object2);
+			object2 = TypeConversion.testAndCreate(documentManager, refProcess, object2);
 			object2.backLink = this;
 		}
-		if(time != null) 	 time = TypeConversion.testAndCreate(Type.LongReal, time);
+		if(time != null) 	 time = TypeConversion.testAndCreate(documentManager, Type.LongReal, time);
 
 		switch (code) {
 		    case at:     buildActivateAt(simCoder, codeBuilder); break;
@@ -314,10 +320,6 @@ public final class ActivationStatement extends Statement {
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
-	/// Default constructor used by Attribute File I/O
-	private ActivationStatement() {
-		super(null);
-	}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -338,16 +340,16 @@ public final class ActivationStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ActivationStatement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ActivationStatement readObject(AttributeInputStream inpt) throws IOException {
-		ActivationStatement stm = new ActivationStatement();
+	public static ActivationStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		ActivationStatement stm = new ActivationStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		stm.astData = readAstData(inpt);
 		// *** ActivationStatement
 		stm.REAC = inpt.readBoolean();
-		stm.object1 = (Expression) inpt.readObj();
-		stm.object2 = (Expression) inpt.readObj();
-		stm.time = (Expression) inpt.readObj();
+		stm.object1 = (Expression) inpt.readObj(documentManager);
+		stm.object2 = (Expression) inpt.readObj(documentManager);
+		stm.time = (Expression) inpt.readObj(documentManager);
 		stm.prior = inpt.readBoolean();
 		Util.TRACE_INPUT("ActivationStatement: " + stm);
 		return(stm);

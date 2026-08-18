@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Vector;
 
 import simula.Option;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.syntaxClass.SyntaxElement;
@@ -311,17 +312,17 @@ public class LabelList {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the LabelList object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static LabelList readLabelList(AttributeInputStream inpt) throws IOException {
+	public static LabelList readLabelList(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
 		boolean present = inpt.readBoolean();
 		LabelList labelList = null;
 		if(present) {
-			DeclarationScope declaredIn = (DeclarationScope) inpt.readObj();
+			DeclarationScope declaredIn = (DeclarationScope) inpt.readObj(documentManager);
 			labelList = new LabelList(declaredIn);
 			int n = inpt.readShort();
 			if(TRACING)
 				IO.println("LabelList.readLabelList: Read Label List: "+n);
 			for(int i=0;i<n;i++) {
-				LabelDeclaration lab = (LabelDeclaration) inpt.readObj();
+				LabelDeclaration lab = (LabelDeclaration) inpt.readObj(documentManager);
 				labelList.add(lab);
 			}
 		}

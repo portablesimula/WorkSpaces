@@ -8,6 +8,7 @@ package simula.core.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
@@ -40,18 +41,19 @@ public final class DummyStatement extends Statement {
 //		super(line);
 //		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": DummyStatement: "+this);
 //	}
-	private DummyStatement(final SimulaBuilder simBuilder) {
-		super(simBuilder);
+	private DummyStatement(final DocumentManager documentManager) {
+		super(documentManager);
+//		SimulaBuilder simBuilder = documentManager.simBuilder;
 	}
 
 	public static DummyStatement ofExplicit(final SimulaBuilder simBuilder) {
 		simBuilder.consume(KeyWord.SEMICOLON); //  (add it to tokenList)
-		DummyStatement dummyStatement = new DummyStatement(simBuilder);		
+		DummyStatement dummyStatement = new DummyStatement(simBuilder.documentManager);		
 		return dummyStatement;
 	}
 
 	public static DummyStatement ofImplicit(final SimulaBuilder simBuilder) {
-		DummyStatement dummyStatement = new DummyStatement(simBuilder);		
+		DummyStatement dummyStatement = new DummyStatement(simBuilder.documentManager);		
 		return dummyStatement;
 	}
 
@@ -63,9 +65,9 @@ public final class DummyStatement extends Statement {
 	}
 
 	@Override
-	public void doJavaCoding() { /* No Coding */
+	public void doJavaCoding(final SimulaCoder simCoder) { /* No Coding */
 		ASSERT_SEMANTICS_CHECKED();
-		JavaSourceFileCoder.code(";");
+		JavaSourceFileCoder.code(simCoder,";");
 	}
 
 	@Override
@@ -104,8 +106,8 @@ public final class DummyStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the DummyStatement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static DummyStatement readObject(AttributeInputStream inpt) throws IOException {
-		DummyStatement stm = new DummyStatement(null);
+	public static DummyStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		DummyStatement stm = new DummyStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		stm.astData = readAstData(inpt);

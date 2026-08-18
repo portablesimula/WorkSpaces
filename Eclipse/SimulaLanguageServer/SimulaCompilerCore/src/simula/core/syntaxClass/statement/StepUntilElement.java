@@ -11,10 +11,10 @@ import java.lang.classfile.Label;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.MethodTypeDesc;
 
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.SimulaBuilder;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.BlockDeclaration;
@@ -49,8 +49,8 @@ public class StepUntilElement extends ForListElement {
 	/// @param expr1 The first expression
 	/// @param expr2 The second expression
 	/// @param expr3 The third expression
-	public StepUntilElement(final SimulaBuilder simBuilder, final ForStatement forStatement, final Expression expr1, final Expression expr2, final Expression expr3) {
-		super(simBuilder, forStatement, expr1);
+	public StepUntilElement(final DocumentManager documentManager, final ForStatement forStatement, final Expression expr1, final Expression expr2, final Expression expr3) {
+		super(documentManager, forStatement, expr1);
 		this.expr2 = expr2;
 		this.expr3 = expr3;
 	}
@@ -58,15 +58,15 @@ public class StepUntilElement extends ForListElement {
 	@Override
 	public void doChecking() {
 		expr1.doChecking();
-		expr1 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr1);
+		expr1 = TypeConversion.testAndCreate(documentManager, forStatement.controlVariable.type, expr1);
 //		expr1.doChecking();
 		expr1.backLink = forStatement; // To ensure _RESULT from functions
 		expr2.doChecking();
-		expr2 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr2);
+		expr2 = TypeConversion.testAndCreate(documentManager, forStatement.controlVariable.type, expr2);
 //		expr2.doChecking();
 		expr2.backLink = forStatement; // To ensure _RESULT from functions
 		expr3.doChecking();
-		expr3 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr3);
+		expr3 = TypeConversion.testAndCreate(documentManager, forStatement.controlVariable.type, expr3);
 //		expr3.doChecking();
 		expr3.backLink = forStatement; // To ensure _RESULT from functions
 	}
@@ -86,10 +86,10 @@ public class StepUntilElement extends ForListElement {
 	}
 
 	@Override
-	public void doSimplifiedJavaCoding() {
+	public void doSimplifiedJavaCoding(final SimulaCoder simCoder) {
 		Number num2 = expr2.getNumber();
 		if(num2 == null) {
-			generalCase();
+			generalCase(simCoder);
 			return;
 		}
 		int step = num2.intValue();
@@ -115,9 +115,9 @@ public class StepUntilElement extends ForListElement {
 				incrClause = cv + "=" + cv + step;
 		}
 		JavaSourceFileCoder
-				.code("for(" + cv + "=" + this.expr1.toJavaCode() + ";" + stepClause + incrClause + ") {");
-		forStatement.doStatement.doJavaCoding();
-		JavaSourceFileCoder.code("}");
+				.code(simCoder, "for(" + cv + "=" + this.expr1.toJavaCode() + ";" + stepClause + incrClause + ") {");
+		forStatement.doStatement.doJavaCoding(simCoder);
+		JavaSourceFileCoder.code(simCoder,"}");
 	}
 	
 	/// Used to make deltaID unique.
@@ -138,15 +138,15 @@ public class StepUntilElement extends ForListElement {
 	/// 			controlVariable = controlVariable + DELTA;
 	/// 		}  // end while;
 	/// </pre>
-	private void generalCase() {
+	private void generalCase(final SimulaCoder simCoder) {
 		String cv = forStatement.controlVariable.toJavaCode();
 		String deltaType=expr2.type.toJavaType();
 		String deltaID = "DELTA_" + (DELTA_SEQU++);
-		JavaSourceFileCoder.debug("// ForStatement:");
+		JavaSourceFileCoder.debug(simCoder,"// ForStatement:");
 		
-		JavaSourceFileCoder.code(deltaType + " " + deltaID + ';');
-		JavaSourceFileCoder.code(cv + " = " + this.expr1.toJavaCode() + ";");
-		JavaSourceFileCoder.code(deltaID + " = " + this.expr2.toJavaCode() + ";");
+		JavaSourceFileCoder.code(simCoder,deltaType + " " + deltaID + ';');
+		JavaSourceFileCoder.code(simCoder,cv + " = " + this.expr1.toJavaCode() + ";");
+		JavaSourceFileCoder.code(simCoder,deltaID + " = " + this.expr2.toJavaCode() + ";");
 		
 		String deltaSign = null;
 		switch(expr2.type.keyWord) {
@@ -155,13 +155,13 @@ public class StepUntilElement extends ForListElement {
 			case Type.T_LONG_REAL: deltaSign = "RTS_UTIL.dsign("+deltaID+")"; break;
 			default: Util.IERR();
 		}
-		JavaSourceFileCoder.code("while( "+ deltaSign + " * ( " + cv + " - (" + this.expr3.toJavaCode() + ") ) <= 0 ) {");
+		JavaSourceFileCoder.code(simCoder,"while( "+ deltaSign + " * ( " + cv + " - (" + this.expr3.toJavaCode() + ") ) <= 0 ) {");
 		
-		forStatement.doStatement.doJavaCoding();
+		forStatement.doStatement.doJavaCoding(simCoder);
 		
-		JavaSourceFileCoder.code(deltaID + " = " + this.expr2.toJavaCode() + ";");
-		JavaSourceFileCoder.code(cv + " = " + cv + " + " + deltaID + ';');
-		JavaSourceFileCoder.code("}","end while");
+		JavaSourceFileCoder.code(simCoder,deltaID + " = " + this.expr2.toJavaCode() + ";");
+		JavaSourceFileCoder.code(simCoder,cv + " = " + cv + " + " + deltaID + ';');
+		JavaSourceFileCoder.code(simCoder,"}","end while");
 	}
 
 	
@@ -360,7 +360,7 @@ public class StepUntilElement extends ForListElement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private StepUntilElement() {}
+	private StepUntilElement(final DocumentManager documentManager) { super(documentManager);}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -380,16 +380,16 @@ public class StepUntilElement extends ForListElement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static StepUntilElement readObject(AttributeInputStream inpt) throws IOException {
-		StepUntilElement elt = new StepUntilElement();
+	public static StepUntilElement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		StepUntilElement elt = new StepUntilElement(documentManager);
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
 		// *** SyntaxElement
 		elt.astData = readAstData(inpt);
 		// *** ForListElement
-		elt.forStatement = (ForStatement) inpt.readObj();
-		elt.expr1 = (Expression) inpt.readObj();
-		elt.expr2 = (Expression) inpt.readObj();
-		elt.expr3 = (Expression) inpt.readObj();
+		elt.forStatement = (ForStatement) inpt.readObj(documentManager);
+		elt.expr1 = (Expression) inpt.readObj(documentManager);
+		elt.expr2 = (Expression) inpt.readObj(documentManager);
+		elt.expr3 = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("StepUntilElement: " + elt);
 		return(elt);
 	}

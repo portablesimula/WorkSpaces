@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import simula.core.DocumentManager;
 import simula.core.builder.token.Identifier;
 import simula.core.syntaxClass.HiddenSpecification;
 import simula.core.syntaxClass.ProtectedSpecification;
@@ -206,8 +207,8 @@ public class AttributeInputStream {
     /// Reads and returns an Object list from the underlying DataInputStream.
     /// @return the Object list read.
     /// @throws IOException if an I/O error occurs.
-	public ObjectList<?> readObjectList() throws IOException {
-		return ObjectList.read(this);
+	public ObjectList<?> readObjectList(final DocumentManager documentManager) throws IOException {
+		return ObjectList.read(documentManager, this);
 	}
 
 	/// Reads and returns an Object sequence number from the underlying DataInputStream.
@@ -224,7 +225,7 @@ public class AttributeInputStream {
     /// Reads and returns an Object from the underlying DataInputStream.
     /// @return the Object read.
     /// @throws IOException if an I/O error occurs.
-	public SyntaxElement readObj() throws IOException {
+	public SyntaxElement readObj(final DocumentManager documentManager) throws IOException {
 		int kind = readKind();
 		switch(kind) {
 		case ObjectKind.NULL:
@@ -238,7 +239,7 @@ public class AttributeInputStream {
 			if(TRACE) IO.println("AttributeInputStream.readObj: "+obj);
 			return(obj);
 		default:
-			obj = readObj(kind,this);
+			obj = readObj(documentManager, kind, this);
 			Util.ASSERT(obj.OBJECT_SEQU != 0, "Invariant: OBJECT_SEQU="+obj.OBJECT_SEQU);
 			objectReference.put(obj.OBJECT_SEQU, obj);
 			obj.OBJECT_SEQU = 0;
@@ -253,69 +254,69 @@ public class AttributeInputStream {
 	/// @param inpt the AttributeInputStream to read from.
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	private SyntaxElement readObj(int kind,AttributeInputStream inpt) throws IOException {
+	private SyntaxElement readObj(final DocumentManager documentManager, final int kind, final AttributeInputStream inpt) throws IOException {
 		switch(kind) {
 			case ObjectKind.NULL:						return null;
 			
-			case ObjectKind.StandardClass:				return StandardClass.readObject(inpt);
-			case ObjectKind.ConnectionBlock:			return ConnectionBlock.readObject(inpt);
-			case ObjectKind.CompoundStatement:			return MaybeBlockDeclaration.readObject(inpt,ObjectKind.CompoundStatement);
-			case ObjectKind.SubBlock:					return MaybeBlockDeclaration.readObject(inpt,ObjectKind.SubBlock);
-			case ObjectKind.Procedure:					return ProcedureDeclaration.readObject(inpt);
-//			case ObjectKind.Switch:						return SwitchDeclaration.readObject(inpt);
-//			case ObjectKind.MemberMethod:				return MemberMethod.readObject(inpt);
-//			case ObjectKind.ContextFreeMethod:			return ContextFreeMethod.readObject(inpt);
-			case ObjectKind.Class:						return ClassDeclaration.readObject(inpt);
-			case ObjectKind.PrefixedBlock:				return PrefixedBlockDeclaration.readObject(inpt);
-//			case ObjectKind.SimulaProgram:				return SimulaProgram.readObject(inpt);
-			case ObjectKind.ArrayDeclaration:			return ArrayDeclaration.readObject(inpt);
-			case ObjectKind.VirtualSpecification:		return VirtualSpecification.readObject(inpt);
-//			case ObjectKind.VirtualMatch:				return VirtualMatch.readObject(inpt);
-			case ObjectKind.Parameter:					return Parameter.readObject(inpt);
-//			case ObjectKind.Thunk:						return Thunk.readObject(inpt);
-			case ObjectKind.LabelDeclaration:			return LabelDeclaration.readObject(inpt);
-			case ObjectKind.SimpleVariableDeclaration:	return SimpleVariableDeclaration.readObject(inpt);
-			case ObjectKind.InspectVariableDeclaration:	return InspectVariableDeclaration.readObject(inpt);
-			case ObjectKind.ExternalDeclaration:		return ExternalDeclaration.readObject(inpt);
-			case ObjectKind.HiddenSpecification:		return HiddenSpecification.readObject(inpt);
-			case ObjectKind.ProtectedSpecification:		return ProtectedSpecification.readObject(inpt);
-			case ObjectKind.UndefinedDeclaration:		return UndefinedDeclaration.readObject(inpt);
+			case ObjectKind.StandardClass:				return StandardClass.readObject(documentManager, inpt);
+			case ObjectKind.ConnectionBlock:			return ConnectionBlock.readObject(documentManager, inpt);
+			case ObjectKind.CompoundStatement:			return MaybeBlockDeclaration.readObject(documentManager, inpt,ObjectKind.CompoundStatement);
+			case ObjectKind.SubBlock:					return MaybeBlockDeclaration.readObject(documentManager, inpt,ObjectKind.SubBlock);
+			case ObjectKind.Procedure:					return ProcedureDeclaration.readObject(documentManager, inpt);
+//			case ObjectKind.Switch:						return SwitchDeclaration.readObject(documentManager, inpt);
+//			case ObjectKind.MemberMethod:				return MemberMethod.readObject(documentManager, inpt);
+//			case ObjectKind.ContextFreeMethod:			return ContextFreeMethod.readObject(documentManager, inpt);
+			case ObjectKind.Class:						return ClassDeclaration.readObject(documentManager, inpt);
+			case ObjectKind.PrefixedBlock:				return PrefixedBlockDeclaration.readObject(documentManager, inpt);
+//			case ObjectKind.SimulaProgram:				return SimulaProgram.readObject(documentManager, inpt);
+			case ObjectKind.ArrayDeclaration:			return ArrayDeclaration.readObject(documentManager, inpt);
+			case ObjectKind.VirtualSpecification:		return VirtualSpecification.readObject(documentManager, inpt);
+//			case ObjectKind.VirtualMatch:				return VirtualMatch.readObject(documentManager, inpt);
+			case ObjectKind.Parameter:					return Parameter.readObject(documentManager, inpt);
+//			case ObjectKind.Thunk:						return Thunk.readObject(documentManager, inpt);
+			case ObjectKind.LabelDeclaration:			return LabelDeclaration.readObject(documentManager, inpt);
+			case ObjectKind.SimpleVariableDeclaration:	return SimpleVariableDeclaration.readObject(documentManager, inpt);
+			case ObjectKind.InspectVariableDeclaration:	return InspectVariableDeclaration.readObject(documentManager, inpt);
+			case ObjectKind.ExternalDeclaration:		return ExternalDeclaration.readObject(documentManager, inpt);
+			case ObjectKind.HiddenSpecification:		return HiddenSpecification.readObject(documentManager, inpt);
+			case ObjectKind.ProtectedSpecification:		return ProtectedSpecification.readObject(documentManager, inpt);
+			case ObjectKind.UndefinedDeclaration:		return UndefinedDeclaration.readObject(documentManager, inpt);
 
-			case ObjectKind.ActivationStatement:		return ActivationStatement.readObject(inpt);
-			case ObjectKind.BlockStatement:				return BlockStatement.readObject(inpt);
-			case ObjectKind.ConditionalStatement:		return ConditionalStatement.readObject(inpt);
-			case ObjectKind.ConnectionStatement:		return ConnectionStatement.readObject(inpt);
-			case ObjectKind.ConnectionDoPart:			return ConnectionDoPart.readObject(inpt);
-			case ObjectKind.ConnectionWhenPart:			return ConnectionWhenPart.readObject(inpt);
-			case ObjectKind.DummyStatement:				return DummyStatement.readObject(inpt);
-			case ObjectKind.ForStatement:				return ForStatement.readObject(inpt);
-			case ObjectKind.ForListElement:				return ForListElement.readObject(inpt);
-			case ObjectKind.ForWhileElement:			return ForWhileElement.readObject(inpt);
-			case ObjectKind.StepUntilElement:			return StepUntilElement.readObject(inpt);
-			case ObjectKind.GotoStatement:				return GotoStatement.readObject(inpt);
-//			case ObjectKind.InlineStatement:			return InlineStatement.readObject(inpt);
-			case ObjectKind.InnerStatement:				return InnerStatement.readObject(inpt);
-			case ObjectKind.LabeledStatement:			return LabeledStatement.readObject(inpt);
-//			case ObjectKind.ProgramModule:				return ProgramModule.readObject(inpt);
-			case ObjectKind.StandaloneExpression:		return StandaloneExpression.readObject(inpt);
-			case ObjectKind.SwitchStatement:			return SwitchStatement.readObject(inpt);
-			case ObjectKind.WhileStatement:				return WhileStatement.readObject(inpt);
+			case ObjectKind.ActivationStatement:		return ActivationStatement.readObject(documentManager, inpt);
+			case ObjectKind.BlockStatement:				return BlockStatement.readObject(documentManager, inpt);
+			case ObjectKind.ConditionalStatement:		return ConditionalStatement.readObject(documentManager, inpt);
+			case ObjectKind.ConnectionStatement:		return ConnectionStatement.readObject(documentManager, inpt);
+			case ObjectKind.ConnectionDoPart:			return ConnectionDoPart.readObject(documentManager, inpt);
+			case ObjectKind.ConnectionWhenPart:			return ConnectionWhenPart.readObject(documentManager, inpt);
+			case ObjectKind.DummyStatement:				return DummyStatement.readObject(documentManager, inpt);
+			case ObjectKind.ForStatement:				return ForStatement.readObject(documentManager, inpt);
+			case ObjectKind.ForListElement:				return ForListElement.readObject(documentManager, inpt);
+			case ObjectKind.ForWhileElement:			return ForWhileElement.readObject(documentManager, inpt);
+			case ObjectKind.StepUntilElement:			return StepUntilElement.readObject(documentManager, inpt);
+			case ObjectKind.GotoStatement:				return GotoStatement.readObject(documentManager, inpt);
+//			case ObjectKind.InlineStatement:			return InlineStatement.readObject(documentManager, inpt);
+			case ObjectKind.InnerStatement:				return InnerStatement.readObject(documentManager, inpt);
+			case ObjectKind.LabeledStatement:			return LabeledStatement.readObject(documentManager, inpt);
+//			case ObjectKind.ProgramModule:				return ProgramModule.readObject(documentManager, inpt);
+			case ObjectKind.StandaloneExpression:		return StandaloneExpression.readObject(documentManager, inpt);
+			case ObjectKind.SwitchStatement:			return SwitchStatement.readObject(documentManager, inpt);
+			case ObjectKind.WhileStatement:				return WhileStatement.readObject(documentManager, inpt);
 
-			case ObjectKind.ArithmeticExpression:		return ArithmeticExpression.readObject(inpt);
-			case ObjectKind.AssignmentOperation:		return AssignmentOperation.readObject(inpt);
-			case ObjectKind.BooleanExpression:			return BooleanExpression.readObject(inpt);
-			case ObjectKind.ConditionalExpression:		return ConditionalExpression.readObject(inpt);
-			case ObjectKind.Constant:					return Constant.readObject(inpt);
-			case ObjectKind.LocalObject:				return LocalObject.readObject(inpt);
-			case ObjectKind.ObjectGenerator:			return ObjectGenerator.readObject(inpt);
-			case ObjectKind.ObjectRelation:				return ObjectRelation.readObject(inpt);
-			case ObjectKind.QualifiedObject:			return QualifiedObject.readObject(inpt);
-			case ObjectKind.RelationalOperation:		return RelationalOperation.readObject(inpt);
-			case ObjectKind.RemoteVariable:				return RemoteVariable.readObject(inpt);
-			case ObjectKind.TextExpression:				return TextExpression.readObject(inpt);
-			case ObjectKind.TypeConversion:				return TypeConversion.readObject(inpt);
-			case ObjectKind.UnaryOperation:				return UnaryOperation.readObject(inpt);
-			case ObjectKind.VariableExpression:			return VariableExpression.readObject(inpt);
+			case ObjectKind.ArithmeticExpression:		return ArithmeticExpression.readObject(documentManager, inpt);
+			case ObjectKind.AssignmentOperation:		return AssignmentOperation.readObject(documentManager, inpt);
+			case ObjectKind.BooleanExpression:			return BooleanExpression.readObject(documentManager, inpt);
+			case ObjectKind.ConditionalExpression:		return ConditionalExpression.readObject(documentManager, inpt);
+			case ObjectKind.Constant:					return Constant.readObject(documentManager, inpt);
+			case ObjectKind.LocalObject:				return LocalObject.readObject(documentManager, inpt);
+			case ObjectKind.ObjectGenerator:			return ObjectGenerator.readObject(documentManager, inpt);
+			case ObjectKind.ObjectRelation:				return ObjectRelation.readObject(documentManager, inpt);
+			case ObjectKind.QualifiedObject:			return QualifiedObject.readObject(documentManager, inpt);
+			case ObjectKind.RelationalOperation:		return RelationalOperation.readObject(documentManager, inpt);
+			case ObjectKind.RemoteVariable:				return RemoteVariable.readObject(documentManager, inpt);
+			case ObjectKind.TextExpression:				return TextExpression.readObject(documentManager, inpt);
+			case ObjectKind.TypeConversion:				return TypeConversion.readObject(documentManager, inpt);
+			case ObjectKind.UnaryOperation:				return UnaryOperation.readObject(documentManager, inpt);
+			case ObjectKind.VariableExpression:			return VariableExpression.readObject(documentManager, inpt);
 
 		}	
 		Util.IERR("IMPOSSIBLE "+ObjectKind.edit(kind));

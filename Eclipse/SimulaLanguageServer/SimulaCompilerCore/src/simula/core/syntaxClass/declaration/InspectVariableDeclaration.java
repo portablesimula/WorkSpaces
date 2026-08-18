@@ -15,9 +15,9 @@ import java.lang.constant.ClassDesc;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
@@ -49,8 +49,8 @@ public class InspectVariableDeclaration extends Declaration {
 	/// @param identifier the variable identifier
 	/// @param connectionScope the connectionScope
 	/// @param connectionStatement the connectionStatement
-	public InspectVariableDeclaration(final SimulaBuilder simBuilder, final Type type, final Identifier identifier,final DeclarationScope connectionScope, final ConnectionStatement connectionStatement) {
-		super(simBuilder, identifier);
+	public InspectVariableDeclaration(final DocumentManager documentManager, final Type type, final Identifier identifier,final DeclarationScope connectionScope, final ConnectionStatement connectionStatement) {
+		super(documentManager, identifier);
 		this.declarationKind = ObjectKind.InspectVariableDeclaration;
 		this.type = type;
 		this.connectionScope = connectionScope;
@@ -129,8 +129,8 @@ public class InspectVariableDeclaration extends Declaration {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public InspectVariableDeclaration() {
-		super(null, null);
+	public InspectVariableDeclaration(final DocumentManager documentManager) {
+		super(documentManager, null);
 		this.declarationKind = ObjectKind.InspectVariableDeclaration;
 	}
 
@@ -158,8 +158,8 @@ public class InspectVariableDeclaration extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static InspectVariableDeclaration readObject(AttributeInputStream inpt) throws IOException {
-		InspectVariableDeclaration var = new InspectVariableDeclaration();
+	public static InspectVariableDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+		InspectVariableDeclaration var = new InspectVariableDeclaration(documentManager);
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
 		// *** SyntaxElement
@@ -169,11 +169,11 @@ public class InspectVariableDeclaration extends Declaration {
 		var.identifier = inpt.readIdentifier();
 		var.externalIdent = inpt.readString();
 		var.type = inpt.readType();
-		var.declaredIn = (DeclarationScope) inpt.readObj();
+		var.declaredIn = (DeclarationScope) inpt.readObj(documentManager);
 		
 		// *** InspectVariableDeclaration
-		var.connectionScope = (DeclarationScope) inpt.readObj();
-		var.connectionStatement = (ConnectionStatement) inpt.readObj();
+		var.connectionScope = (DeclarationScope) inpt.readObj(documentManager);
+		var.connectionStatement = (ConnectionStatement) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("Variable: " + var.OBJECT_SEQU + " " + var);
 		return(var);
 	}

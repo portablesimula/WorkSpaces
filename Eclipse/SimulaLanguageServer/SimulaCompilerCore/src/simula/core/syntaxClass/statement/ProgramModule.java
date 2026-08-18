@@ -10,8 +10,8 @@ import java.util.Vector;
 
 import simula.Option;
 import simula.core.CoreGlobal;
-import simula.core.DocumentManager;
 import simula.core.CoreGlobal2;
+import simula.core.DocumentManager;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.token.Identifier;
@@ -94,14 +94,14 @@ public final class ProgramModule extends Statement {
 	}
 
 	/// Create a new ProgramModule.
-	public ProgramModule(SimulaBuilder simBuilder) {
-		super(simBuilder);
+	public ProgramModule(DocumentManager documentManager) {
+		super(documentManager);
 		Identifier sysinID = new Identifier("sysin");
-		sysin = new  VariableExpression(null, sysinID);
+		sysin = new  VariableExpression(documentManager, sysinID);
 		sysin.meaning = StandardClass.BASICIO.findMeaning(sysinID);
 		sysin.SET_SEMANTICS_CHECKED();
 		Identifier sysoutID = new Identifier("sysout");
-		sysout = new VariableExpression(null, sysoutID);
+		sysout = new VariableExpression(documentManager, sysoutID);
 		sysout.meaning = StandardClass.BASICIO.findMeaning(sysoutID);
 		sysout.SET_SEMANTICS_CHECKED();
 //		IO.println("NEW ProgramModule: sysout.meaning="+sysout.meaning);
@@ -109,11 +109,12 @@ public final class ProgramModule extends Statement {
 	
 	public void doBuild() {
 //		try	{
+			SimulaBuilder simBuilder = documentManager.simBuilder;
 			if(Option.internal.TRACE_PARSE) Parse.TRACE("Parse Program");
 			CoreGlobal.setScope(StandardClass.BASICIO);		  // BASICIO Begin
-			new ConnectionBlock(null, sysin, null)            //    Inspect sysin do
+			new ConnectionBlock(documentManager, sysin, null)            //    Inspect sysin do
 			     .setClassDeclaration(StandardClass.Infile);
-			new ConnectionBlock(null, sysout, null)           //    Inspect sysout do
+			new ConnectionBlock(documentManager, sysout, null)           //    Inspect sysout do
 			     .setClassDeclaration(StandardClass.Printfile);
 			CoreGlobal.getCurrentScope().sourceBlockLevel=0;
 			
@@ -136,14 +137,14 @@ public final class ProgramModule extends Statement {
 			    else {
 //			    	IO.println("ProgramModule.doBuild: IDENTIFIER ...");
 			    	Parse.saveCurrentToken(simBuilder);
-			    	mainModule = doParseProgram(simBuilder);
+			    	mainModule = doParseProgram();
 			    }
 			}
 			else if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, null);
 			else {
 				Type type=Parse.acceptType(simBuilder);
 			    if(Parse.accept(simBuilder, KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type);
-			    else mainModule = doParseProgram(simBuilder);
+			    else mainModule = doParseProgram();
 			}
 			
 			StandardClass.BASICIO.declarationList.add(mainModule);
@@ -174,10 +175,10 @@ public final class ProgramModule extends Statement {
 	
 	/// Parse Simula Program by expecting a Statement.
 	/// @return the Program Statement.
-	private DeclarationScope doParseProgram(final SimulaBuilder simBuilder) {
-//		BlockDeclaration mainBlock = new MaybeBlockDeclaration(simBuilder, "MainBlock: " + Global.sourceName);
-		String sourceName = DocumentManager.sourceName;
-		BlockDeclaration mainBlock = new MaybeBlockDeclaration(simBuilder, new Identifier(sourceName));
+	private DeclarationScope doParseProgram() {
+		SimulaBuilder simBuilder = documentManager.simBuilder;
+		String sourceName = documentManager.sourceName;
+		BlockDeclaration mainBlock = new MaybeBlockDeclaration(documentManager, new Identifier(sourceName));
 		
 		mainBlock.isMainModule = true;
 		mainBlock.declarationKind = ObjectKind.SimulaProgram;
@@ -201,7 +202,7 @@ public final class ProgramModule extends Statement {
 	}
   
 	@Override
-	public void doJavaCoding() { mainModule.doJavaCoding(); }
+	public void doJavaCoding(final SimulaCoder simCoder) { mainModule.doJavaCoding(simCoder); }
 
 	/// Create Java ClassFile.
 	/// @throws IOException if something went wrong
