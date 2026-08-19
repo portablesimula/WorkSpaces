@@ -20,7 +20,7 @@ import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.BlockDeclaration;
@@ -307,7 +307,7 @@ public final class ConnectionStatement extends Statement {
 		oupt.writeKind(ObjectKind.ConnectionStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** ConnectionStatement
 		oupt.writeObj(objectExpression);
 		oupt.writeObj(inspectedVariable);
@@ -326,7 +326,7 @@ public final class ConnectionStatement extends Statement {
 		ConnectionStatement stm = new ConnectionStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		
 		// *** ConnectionStatement
 		stm.objectExpression = (Expression) inpt.readObj(documentManager);
 		stm.inspectedVariable = (VariableExpression) inpt.readObj(documentManager);

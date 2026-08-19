@@ -15,7 +15,7 @@ import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Expression;
@@ -278,7 +278,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		oupt.writeShort(OBJECT_SEQU);
 		
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		
 		// *** Declaration
 		//oupt.writeIdentifier(identifier);
@@ -311,7 +311,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
 		
 		// *** SyntaxElement
-		blk.astData = readAstData(inpt);
+		
 
 		// *** Declaration
 		//blk.identifier = inpt.readIdentifier();

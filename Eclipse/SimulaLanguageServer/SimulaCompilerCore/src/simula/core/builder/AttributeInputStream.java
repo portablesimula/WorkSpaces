@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import simula.core.DocumentManager;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.syntaxClass.HiddenSpecification;
 import simula.core.syntaxClass.ProtectedSpecification;
 import simula.core.syntaxClass.SyntaxElement;

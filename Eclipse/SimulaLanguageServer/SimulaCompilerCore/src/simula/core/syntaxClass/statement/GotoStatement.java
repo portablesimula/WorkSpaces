@@ -136,7 +136,7 @@ public final class GotoStatement extends Statement {
 		oupt.writeKind(ObjectKind.GotoStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** GotoStatement
 		oupt.writeObj(label);
 	}
@@ -149,7 +149,7 @@ public final class GotoStatement extends Statement {
 		GotoStatement stm = new GotoStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		
 		// *** GotoStatement
 		stm.label = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("GotoStatement: " + stm);

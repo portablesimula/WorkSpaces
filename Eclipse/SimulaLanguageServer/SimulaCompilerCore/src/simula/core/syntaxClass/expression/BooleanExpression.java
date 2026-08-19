@@ -269,7 +269,7 @@ public final class BooleanExpression extends Expression {
 		oupt.writeKind(ObjectKind.BooleanExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -287,7 +287,7 @@ public final class BooleanExpression extends Expression {
 		BooleanExpression expr = new BooleanExpression(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
-		expr.astData = readAstData(inpt);
+		
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);

@@ -22,11 +22,11 @@ import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.Identifier;
-import simula.core.builder.token.LexToken;
+import simula.core.builder.util.Identifier;
+import simula.core.builder.util.LexPosition;
+import simula.core.builder.util.LexRange;
+import simula.core.builder.util.LexToken;
 import simula.core.syntaxClass.SyntaxElement;
-import simula.lsp.util.SimPosition;
-import simula.lsp.util.SimRange;
 
 /// A set of all static Utility Methods
 /// 
@@ -106,9 +106,9 @@ public final class Util {
         if(token.keyWord == KeyWord.NEWLINE) // CRLF or LF ==> ERROR
         	Util.IERR("Util.warning: Warning not inside text line");
         }
-        SimPosition start = new SimPosition(token.lineNumber, token.column);
-        SimPosition end = new SimPosition(token.lineNumber, token.column + token.length);
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new SimRange(start, end), msg);
+        LexPosition start = new LexPosition(token.lineNumber, token.column);
+        LexPosition end = new LexPosition(token.lineNumber, token.column + token.length);
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new LexRange(start, end), msg);
 		
 		if(DocumentManager.WARNINGS) {
 			LOG.warning(diagnostic.toString());
@@ -119,12 +119,12 @@ public final class Util {
 	/// Print a warning message.
 	/// @param msg the message
 	public static void warning(final SyntaxElement elt, final String msg) {
-        LexToken first = elt.getFirstLexToken();
-        LexToken last = elt.getLastLexToken();
-        
-        SimPosition start = new SimPosition(first.lineNumber, first.column);
-        SimPosition end = new SimPosition(last.lineNumber, last.column + last.length);
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new SimRange(start, end), msg);
+//        LexToken first = elt.getFirstLexToken();
+//        LexToken last = elt.getLastLexToken();
+//        LexPosition start = new LexPosition(first.lineNumber, first.column);
+//        LexPosition end = new LexPosition(last.lineNumber, last.column + last.length);
+//		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new LexRange(start, end), msg);
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, elt.lexRange, msg);
 
 		if(DocumentManager.WARNINGS) {
 			LOG.warning(diagnostic.toString());
@@ -134,8 +134,8 @@ public final class Util {
 
 	/// Print a warning message.
 	/// @param msg the message
-	public static void warning(final SimulaBuilder simBuilder, final SimPosition start, final SimPosition end, final String msg) {
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new SimRange(start, end), msg);
+	public static void warning(final SimulaBuilder simBuilder, final LexPosition start, final LexPosition end, final String msg) {
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new LexRange(start, end), msg);
 
 		if(DocumentManager.WARNINGS) {
 			LOG.warning(diagnostic.toString());
@@ -168,21 +168,21 @@ public final class Util {
         if(token.keyWord == KeyWord.NEWLINE) // CRLF or LF ==> ERROR
         	Util.IERR("Util.warning: Error not inside text line");
         }
-        SimPosition start = new SimPosition(token.lineNumber, token.column);
-        SimPosition end = new SimPosition(token.lineNumber, token.column + token.length);
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new SimRange(start, end), msg);
+        LexPosition start = new LexPosition(token.lineNumber, token.column);
+        LexPosition end = new LexPosition(token.lineNumber, token.column + token.length);
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new LexRange(start, end), msg);
 		
 		LOG.error(diagnostic.toString());
 		simBuilder.addError(diagnostic);
 	}
 	
 	public static void semanticError(final SyntaxElement elt, final String msg) {
-        LexToken first = elt.getFirstLexToken();
-        LexToken last = elt.getLastLexToken();
-        
-        SimPosition start = new SimPosition(first.lineNumber, first.column);
-        SimPosition end = new SimPosition(last.lineNumber, last.column + last.length);
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new SimRange(start, end), msg);
+//        LexToken first = elt.getFirstLexToken();
+//        LexToken last = elt.getLastLexToken();
+//        LexPosition start = new LexPosition(first.lineNumber, first.column);
+//        LexPosition end = new LexPosition(last.lineNumber, last.column + last.length);
+//		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new LexRange(start, end), msg);
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, elt.lexRange, msg);
 		
 		LOG.error(diagnostic.toString());
 		elt.documentManager.simBuilder.addError(diagnostic);
@@ -190,12 +190,12 @@ public final class Util {
 	
 	/// Error during Code generation:
 	public static void codingError(final SyntaxElement elt, final String msg) {
-        LexToken first = elt.getFirstLexToken();
-        LexToken last = elt.getLastLexToken();
-        
-        SimPosition start = new SimPosition(first.lineNumber, first.column);
-        SimPosition end = new SimPosition(last.lineNumber, last.column + last.length);
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new SimRange(start, end), msg);
+//        LexToken first = elt.getFirstLexToken();
+//        LexToken last = elt.getLastLexToken();
+//        LexPosition start = new LexPosition(first.lineNumber, first.column);
+//        LexPosition end = new LexPosition(last.lineNumber, last.column + last.length);
+//		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new LexRange(start, end), msg);
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, elt.lexRange, msg);
 		
 		LOG.error(diagnostic.toString());
 		elt.documentManager.simBuilder.addError(diagnostic);

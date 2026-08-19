@@ -3,7 +3,7 @@ package simula.core.builder;
 import java.util.List;
 
 import simula.core.DocumentManager;
-import simula.core.builder.token.LexToken;
+import simula.core.builder.util.LexToken;
 import simula.core.utilities.SimulaDiagnostic;
 
 /// @author Øystein Myhre Andersen

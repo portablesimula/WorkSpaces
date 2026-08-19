@@ -11,7 +11,7 @@ import java.util.Vector;
 import java.lang.classfile.CodeBuilder;
 
 import simula.core.DocumentManager;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;

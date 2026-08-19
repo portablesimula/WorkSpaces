@@ -1,8 +1,8 @@
 package simula.core.builder;
 
 import simula.SimTextDocumentContentChangeEvent;
-import simula.lsp.util.SimPosition;
-import simula.lsp.util.SimRange;
+import simula.core.builder.util.LexPosition;
+import simula.core.builder.util.LexRange;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class DocumentTextUpdater {
         }
 
         // If a range is provided, it is an incremental update.
-        SimRange range = change.getRange();
+        LexRange range = change.getRange();
         int startOffset = getOffset(text, range.getStart());
         int endOffset = getOffset(text, range.getEnd());
 
@@ -42,7 +42,7 @@ public class DocumentTextUpdater {
     }
 
     /// Translates an LSP Line/Character position into a 0-indexed flat string index.
-    private static int getOffset(String text, SimPosition position) {
+    private static int getOffset(String text, LexPosition position) {
         int targetLine = position.getLine();
         int targetChar = position.getCharacter();
         

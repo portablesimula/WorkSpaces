@@ -1,6 +1,6 @@
-package simula.lsp.util;
+package simula.core.builder.util;
 
-public class SimPosition {
+public class LexPosition {
 	  
 	  /// Line position in a document (zero-based).
 	  private int line;
@@ -8,10 +8,10 @@ public class SimPosition {
 	  /// Character offset on a line in a document (zero-based).
 	  private int character;
 
-	  public SimPosition() {
+	  public LexPosition() {
 	  }
 
-	  public SimPosition(final int line, final int character) {
+	  public LexPosition(final int line, final int character) {
 	    this.line = line;
 	    this.character = character;
 	  }
@@ -55,7 +55,7 @@ public class SimPosition {
 	      return false;
 	    if (getClass() != obj.getClass())
 	      return false;
-	    SimPosition other = (SimPosition) obj;
+	    LexPosition other = (LexPosition) obj;
 	    if (other.line != this.line)
 	      return false;
 	    if (other.character != this.character)

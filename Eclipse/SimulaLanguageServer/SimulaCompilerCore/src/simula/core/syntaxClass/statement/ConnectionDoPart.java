@@ -12,7 +12,7 @@ import simula.Option;
 import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -111,7 +111,7 @@ public class ConnectionDoPart extends SyntaxElement {
 		oupt.writeKind(ObjectKind.ConnectionDoPart);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** ConnectionDoPart
 		oupt.writeObj(connectionStatement);
 		oupt.writeObj(connectionBlock);
@@ -125,7 +125,7 @@ public class ConnectionDoPart extends SyntaxElement {
 		ConnectionDoPart dop = new ConnectionDoPart(documentManager);
 		dop.OBJECT_SEQU = inpt.readSEQU(dop);
 		// *** SyntaxElement
-		dop.astData = readAstData(inpt);
+
 		// *** ConnectionDoPart
 		dop.connectionStatement = (ConnectionStatement) inpt.readObj(documentManager);
 		dop.connectionBlock = (ConnectionBlock) inpt.readObj(documentManager);

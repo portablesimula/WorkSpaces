@@ -16,7 +16,7 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -191,7 +191,7 @@ public final class LocalObject extends Expression {
 		oupt.writeKind(ObjectKind.LocalObject);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -207,7 +207,7 @@ public final class LocalObject extends Expression {
 		LocalObject expr = new LocalObject(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
-		expr.astData = readAstData(inpt);
+		
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);

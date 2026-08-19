@@ -11,7 +11,7 @@ import java.util.Vector;
 import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.syntaxClass.declaration.Declaration;
 
 /// Declaration List.

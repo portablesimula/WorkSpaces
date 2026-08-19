@@ -13,7 +13,7 @@ import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -182,7 +182,7 @@ public final class ObjectRelation extends Expression {
 		oupt.writeKind(ObjectKind.ObjectRelation);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -199,7 +199,7 @@ public final class ObjectRelation extends Expression {
 	public static ObjectRelation readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
 		ObjectRelation expr = new ObjectRelation(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
-		expr.astData = readAstData(inpt);
+		
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
 		expr.lhs = (Expression) inpt.readObj(documentManager);

@@ -22,7 +22,7 @@ import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.HiddenSpecification;
 import simula.core.syntaxClass.ProtectedSpecification;
@@ -371,7 +371,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		oupt.writeIdentifier(identifier);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		
 		// *** Declaration
 		//oupt.writeIdentifier(identifier);
@@ -413,7 +413,6 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		pbl.declarationKind = ObjectKind.Class;
 		pbl.OBJECT_SEQU = inpt.readSEQU(pbl);
 		// *** SyntaxElement
-		pbl.astData = readAstData(inpt);
 
 		// *** Declaration
 		//pbl.identifier = inpt.readIdentifier();

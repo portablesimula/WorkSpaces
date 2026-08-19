@@ -106,7 +106,7 @@ public final class InnerStatement extends Statement {
 		oupt.writeKind(ObjectKind.InnerStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 //		Util.IERR("");
 	}
 
@@ -118,7 +118,7 @@ public final class InnerStatement extends Statement {
 		InnerStatement stm = new InnerStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		
 		Util.TRACE_INPUT("InnerStatement: " + stm);
 //		Util.IERR("");
 		return(stm);

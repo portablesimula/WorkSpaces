@@ -467,7 +467,7 @@ public final class AssignmentOperation extends Expression {
 		oupt.writeKind(ObjectKind.AssignmentOperation);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -485,7 +485,7 @@ public final class AssignmentOperation extends Expression {
 		AssignmentOperation expr = new AssignmentOperation(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
-		expr.astData = readAstData(inpt);
+		
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);

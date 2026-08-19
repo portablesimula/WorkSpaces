@@ -18,13 +18,12 @@ import java.util.Vector;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.statement.BlockStatement;
 import simula.core.syntaxClass.statement.DummyStatement;
@@ -545,7 +544,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		
 		// *** Declaration
 		oupt.writeIdentifier(identifier);
@@ -579,7 +578,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		blk.declarationKind = declarationKind;
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
 		// *** SyntaxElement
-		blk.astData = readAstData(inpt);
+		
 
 		// *** Declaration
 		blk.identifier = inpt.readIdentifier();

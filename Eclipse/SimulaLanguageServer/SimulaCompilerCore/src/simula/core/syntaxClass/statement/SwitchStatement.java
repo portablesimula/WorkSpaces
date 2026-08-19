@@ -425,7 +425,7 @@ public final class SwitchStatement extends Statement {
 		oupt.writeKind(ObjectKind.SwitchStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** SwitchStatement
 		oupt.writeObj(lowKey);
 		oupt.writeObj(hiKey);
@@ -440,7 +440,7 @@ public final class SwitchStatement extends Statement {
 		SwitchStatement stm = new SwitchStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		
 		stm.lowKey = (Expression) inpt.readObj(documentManager);
 		stm.hiKey = (Expression) inpt.readObj(documentManager);
 		stm.switchKey = (Expression) inpt.readObj(documentManager);

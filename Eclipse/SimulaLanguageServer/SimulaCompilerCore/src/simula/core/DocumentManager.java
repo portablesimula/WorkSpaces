@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import simula.SimTextDocumentContentChangeEvent;
 import simula.core.builder.DocumentTextUpdater;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.LexToken;
+import simula.core.builder.util.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.statement.ProgramModule;

@@ -5,7 +5,7 @@
 /// page: https://creativecommons.org/licenses/by/4.0/
 package simula.core.syntaxClass;
 
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 
 /// Utility class OverLoad.
 /// 

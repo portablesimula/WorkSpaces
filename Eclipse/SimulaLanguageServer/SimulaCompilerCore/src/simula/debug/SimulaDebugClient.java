@@ -1,10 +1,10 @@
-package simula.lsp.client;
+package simula.debug;
 
 import simula.SimTextDocumentContentChangeEvent;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.lsp.util.SimPosition;
-import simula.lsp.util.SimRange;
+import simula.core.builder.util.LexPosition;
+import simula.core.builder.util.LexRange;
 
 import java.util.List;
 import java.util.Vector;
@@ -115,10 +115,10 @@ public class SimulaDebugClient {
 //	    didChangeTextDocumentParams.setTextDocument(versionedTextDocumentIdentifier);
 	    
 	    List<SimTextDocumentContentChangeEvent> contentChanges = new Vector<SimTextDocumentContentChangeEvent>();
-	    SimRange range = new SimRange(new SimPosition(4, 14), new SimPosition(4, 14));
+	    LexRange range = new LexRange(new LexPosition(4, 14), new LexPosition(4, 14));
 	    SimTextDocumentContentChangeEvent change = new SimTextDocumentContentChangeEvent(range, "(");
 	    contentChanges.add(change);
-	    range = new SimRange(new SimPosition(4, 26), new SimPosition(4, 26));
+	    range = new LexRange(new LexPosition(4, 26), new LexPosition(4, 26));
 	    change = new SimTextDocumentContentChangeEvent(range, "no ");
 	    contentChanges.add(change);
 //	    didChangeTextDocumentParams.setContentChanges(contentChanges);

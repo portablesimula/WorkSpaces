@@ -17,7 +17,7 @@ import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.utilities.ObjectKind;
@@ -130,7 +130,7 @@ public class UndefinedDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 
 		// *** Declaration
 		oupt.writeIdentifier(identifier);
@@ -152,7 +152,7 @@ public class UndefinedDeclaration extends Declaration {
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
 		// *** SyntaxElement
-		var.astData = readAstData(inpt);
+		
 
 		// *** Declaration
 		var.identifier = inpt.readIdentifier();

@@ -15,8 +15,8 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.Identifier;
-import simula.core.builder.token.LexToken;
+import simula.core.builder.util.Identifier;
+import simula.core.builder.util.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Constant;
@@ -327,7 +327,7 @@ public final class ActivationStatement extends Statement {
 		oupt.writeKind(ObjectKind.ActivationStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** ActivationStatement
 		oupt.writeBoolean(REAC);
 		oupt.writeObj(object1);
@@ -344,7 +344,7 @@ public final class ActivationStatement extends Statement {
 		ActivationStatement stm = new ActivationStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		
 		// *** ActivationStatement
 		stm.REAC = inpt.readBoolean();
 		stm.object1 = (Expression) inpt.readObj(documentManager);

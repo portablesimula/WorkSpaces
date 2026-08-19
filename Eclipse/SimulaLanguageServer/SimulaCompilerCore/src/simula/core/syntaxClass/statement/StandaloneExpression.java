@@ -16,7 +16,7 @@ import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.LexToken;
+import simula.core.builder.util.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.AssignmentOperation;
@@ -57,7 +57,8 @@ public final class StandaloneExpression extends Statement {
 		SimulaBuilder simBuilder = documentManager.simBuilder;
 //		IO.println("\nNEW StandaloneExpression: expr="+expression);
 //		simBuilder.printPSI("NEW StandaloneExpression: expr="+expression);
-		this.lastParserToken = expression.lastParserToken;
+//		this.lastParserToken = expression.lastParserToken;
+		this.lexRange = expression.lexRange;
 		this.expression = expression;
 		if (Option.internal.TRACE_PARSE) {
 			Util.TRACE("Line "+firstLineNumber()+": StandaloneExpression: "+this);
@@ -171,7 +172,7 @@ public final class StandaloneExpression extends Statement {
 		oupt.writeKind(ObjectKind.StandaloneExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** StandaloneExpression
 		oupt.writeObj(expression);
 	}
@@ -184,7 +185,7 @@ public final class StandaloneExpression extends Statement {
 		StandaloneExpression stm = new StandaloneExpression(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+
 		// *** StandaloneExpression
 		stm.expression = (Expression) inpt.readObj(documentManager);
 		Util.TRACE_INPUT("StandaloneExpression: " + stm);

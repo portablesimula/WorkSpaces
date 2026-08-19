@@ -1,15 +1,15 @@
 package simula.core.utilities;
 
-import simula.lsp.util.SimRange;
+import simula.core.builder.util.LexRange;
 
 public class SimulaDiagnostic {
 	public enum Severity { Error, Warning, Information, Hint }
 	Severity severity;
-	SimRange range;
+	LexRange range;
 	String mss;
 
 	
-	public SimulaDiagnostic(Severity severity, SimRange range, String mss) {
+	public SimulaDiagnostic(Severity severity, LexRange range, String mss) {
 		this.severity = severity;
 		this.range = range;
 		this.mss = mss;

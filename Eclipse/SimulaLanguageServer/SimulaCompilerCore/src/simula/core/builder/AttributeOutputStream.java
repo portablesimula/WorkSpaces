@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import simula.core.CoreGlobal;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
 import simula.core.utilities.ObjectKind;

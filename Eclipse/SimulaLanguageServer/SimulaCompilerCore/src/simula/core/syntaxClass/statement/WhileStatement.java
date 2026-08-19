@@ -130,7 +130,7 @@ public final class WhileStatement extends Statement {
 		oupt.writeKind(ObjectKind.WhileStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** WhileStatement
 		oupt.writeObj(condition);
 		oupt.writeObj(doStatement);
@@ -144,7 +144,7 @@ public final class WhileStatement extends Statement {
 		WhileStatement stm = new WhileStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		
 		// *** WhileStatement
 		stm.condition  = (Expression) inpt.readObj(documentManager);
 		stm.doStatement = (Statement) inpt.readObj(documentManager);

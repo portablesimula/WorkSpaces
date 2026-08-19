@@ -13,7 +13,7 @@ import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.OverLoad;
 import simula.core.syntaxClass.SyntaxElement;
@@ -264,7 +264,7 @@ public final class TypeConversion extends Expression {
 		oupt.writeKind(ObjectKind.TypeConversion);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -280,7 +280,7 @@ public final class TypeConversion extends Expression {
 		TypeConversion expr = new TypeConversion(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
-		expr.astData = readAstData(inpt);
+		
 		// *** Expression
 		expr.type = inpt.readType();
 		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);

@@ -28,14 +28,13 @@ import java.util.Vector;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.Identifier;
-import simula.core.builder.token.LexToken;
+import simula.core.builder.util.Identifier;
+import simula.core.builder.util.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.expression.Constant;
@@ -1093,7 +1092,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 		
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 
 		// *** Declaration
 		oupt.writeString(externalIdent);
@@ -1120,7 +1119,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		pro.OBJECT_SEQU = inpt.readSEQU(pro);
 
 		// *** SyntaxElement
-		pro.astData = readAstData(inpt);
+		
 
 		// *** Declaration
 		pro.externalIdent = inpt.readString();

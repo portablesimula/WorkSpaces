@@ -1,22 +1,22 @@
-package simula.lsp.util;
+package simula.core.builder.util;
 
-public class SimRange {
+public class LexRange {
 	  /**
 	   * The range's start position
 	   */
 	  
-	  private SimPosition start;
+	  private LexPosition start;
 
 	  /**
 	   * The range's end position
 	   */
 	  
-	  private SimPosition end;
+	  private LexPosition end;
 
-	  public SimRange() {
+	  public LexRange() {
 	  }
 
-	  public SimRange( final SimPosition start,  final SimPosition end) {
+	  public LexRange( final LexPosition start,  final LexPosition end) {
 	    this.start = start;
 	    this.end = end;
 	  }
@@ -25,14 +25,14 @@ public class SimRange {
 	   * The range's start position
 	   */
 	  
-	  public SimPosition getStart() {
+	  public LexPosition getStart() {
 	    return this.start;
 	  }
 
 	  /**
 	   * The range's start position
 	   */
-	  public void setStart( final SimPosition start) {
+	  public void setStart( final LexPosition start) {
 	    this.start = start;
 	  }
 
@@ -40,14 +40,14 @@ public class SimRange {
 	   * The range's end position
 	   */
 	  
-	  public SimPosition getEnd() {
+	  public LexPosition getEnd() {
 	    return this.end;
 	  }
 
 	  /**
 	   * The range's end position
 	   */
-	  public void setEnd( final SimPosition end) {
+	  public void setEnd( final LexPosition end) {
 	    this.end = end;
 	  }
 
@@ -64,7 +64,7 @@ public class SimRange {
 	      return false;
 	    if (getClass() != obj.getClass())
 	      return false;
-	    SimRange other = (SimRange) obj;
+	    LexRange other = (LexRange) obj;
 	    if (this.start == null) {
 	      if (other.start != null)
 	        return false;

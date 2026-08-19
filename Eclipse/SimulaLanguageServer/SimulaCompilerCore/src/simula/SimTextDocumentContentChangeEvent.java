@@ -1,11 +1,11 @@
 package simula;
 
-import simula.lsp.util.SimRange;
+import simula.core.builder.util.LexRange;
 
 public class SimTextDocumentContentChangeEvent {
 	
 	/// The range of the document that changed.
-	private SimRange range;
+	private LexRange range;
 
 	/// The new text of the range/document.
 	private String text;
@@ -17,18 +17,18 @@ public class SimTextDocumentContentChangeEvent {
 		this.text = text;
 	}
 
-	public SimTextDocumentContentChangeEvent(final SimRange range, final String text) {
+	public SimTextDocumentContentChangeEvent(final LexRange range, final String text) {
 		this(text);
 		this.range = range;
 	}
 
 	/// The range of the document that changed.
-	public SimRange getRange() {
+	public LexRange getRange() {
 		return this.range;
 	}
 
 	/// The range of the document that changed.
-	public void setRange(final SimRange range) {
+	public void setRange(final LexRange range) {
 		this.range = range;
 	}
 

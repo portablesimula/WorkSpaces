@@ -129,7 +129,7 @@ public final class LabeledStatement extends Statement {
 		oupt.writeKind(ObjectKind.LabeledStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** LabeledStatement
 		oupt.writeObj(statement);
 		oupt.writeObjectList(labels);
@@ -144,7 +144,7 @@ public final class LabeledStatement extends Statement {
 		LabeledStatement stm = new LabeledStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		
 		// *** LabeledStatement
 		stm.statement = (Statement) inpt.readObj(documentManager);
 		stm.labels = (ObjectList<LabelDeclaration>) inpt.readObjectList(documentManager);

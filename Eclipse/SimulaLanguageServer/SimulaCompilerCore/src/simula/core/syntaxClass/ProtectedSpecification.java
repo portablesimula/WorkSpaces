@@ -10,7 +10,7 @@ import java.io.IOException;
 import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.syntaxClass.declaration.Declaration;
 import simula.core.syntaxClass.declaration.VirtualSpecification;
@@ -119,7 +119,7 @@ public final class ProtectedSpecification extends SyntaxElement {
 		oupt.writeKind(ObjectKind.ProtectedSpecification);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** ProtectedSpecification
 		oupt.writeIdentifier(identifier);
 		oupt.writeObj(definedIn);
@@ -133,7 +133,7 @@ public final class ProtectedSpecification extends SyntaxElement {
 		ProtectedSpecification spec = new ProtectedSpecification(documentManager);
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
 		// *** SyntaxElement
-		spec.astData = readAstData(inpt);
+		
 		// *** ProtectedSpecification
 		spec.identifier = inpt.readIdentifier();
 		spec.definedIn = (ClassDeclaration) inpt.readObj(documentManager);

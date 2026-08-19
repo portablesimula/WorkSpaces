@@ -13,13 +13,13 @@ import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.LexTokenRange;
-import simula.core.builder.token.LexToken;
+import simula.core.builder.util.LexPosition;
+import simula.core.builder.util.LexRange;
+import simula.core.builder.util.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.Declaration;
 import simula.core.utilities.Html;
 import simula.core.utilities.Util;
-import simula.lsp.util.AstData;
 
 /// The class SyntaxElement.
 /// 
@@ -90,18 +90,13 @@ import simula.lsp.util.AstData;
 /// 
 /// @author Øystein Myhre Andersen
 public abstract class SyntaxElement {
-	public AstData astData; // DETTE MÅ SKRIVES
 
-	/// The associated AST Builder
+	/// The associated Document Manager
 //	public SimulaBuilder simBuilder;
 	public DocumentManager documentManager;
 	
-	public LexToken firstParserToken;
-	public LexToken lastParserToken;
-	
-	/// Set by PsiBuilder.doneTokenRange
-	/// The associated lexTokenRange
-	public LexTokenRange lexTokenRange;
+	/// Not present for System or External modules
+	public LexRange lexRange;
 
 	/// Controls semantic checking.
 	/// 
@@ -121,33 +116,45 @@ public abstract class SyntaxElement {
 //		this.simBuilder= simBuilder;
 		this.documentManager= documentManager;
 		if(documentManager != null && documentManager.simBuilder != null) {
-			this.firstParserToken = this.lastParserToken = documentManager.simBuilder.getCurrentParserToken();
+//			this.firstParserToken = this.lastParserToken = documentManager.simBuilder.getCurrentParserToken();
+			LexToken current = documentManager.simBuilder.getCurrentParserToken();
+			LexPosition firstLexPosition = new LexPosition(current.lineNumber, current.column);
+			LexPosition lastLexPosition = new LexPosition(current.lineNumber, current.column + current.length);
+			this.lexRange = new LexRange(firstLexPosition, lastLexPosition);
 		}
 	}
 
-	/// The first source line number
-	public LexToken getFirstLexToken() {
-//		IO.println("SyntaxElement.getFirstLexToken: "+this.getClass());
-//		return lexTokenRange.getFirstLexToken();			
-		return firstParserToken;			
-	}
-
-	/// The last source line number
-	public LexToken getLastLexToken() {
-//		return lexTokenRange.getLastLexToken();			
-		return lastParserToken;			
-	}
+//	/// The first source line number
+//	public LexToken getFirstLexToken() {
+////		IO.println("SyntaxElement.getFirstLexToken: "+this.getClass());
+////		return lexTokenRange.getFirstLexToken();			
+//		return firstParserToken;			
+//	}
+//
+//	/// The last source line number
+//	public LexToken getLastLexToken() {
+////		return lexTokenRange.getLastLexToken();			
+//		return lastParserToken;			
+//	}
 
 	/// The first source line number
 	public int firstLineNumber() {
-		if(firstParserToken == null) return 0;
-		return firstParserToken.firstLineNumber();			
+//		if(firstParserToken == null) return 0;
+//		return firstParserToken.firstLineNumber();			
+//		if(firstLexPosition == null) return 0;
+//		return firstLexPosition.getLine();			
+		if(lexRange == null) return 0;
+		return lexRange.getStart().getLine();			
 	}
 
 	/// The last source line number
 	public int lastLineNumber() {
-		if(lastParserToken == null) return 0;
-		return lastParserToken.lastLineNumber();			
+//		if(lastParserToken == null) return 0;
+//		return lastParserToken.lastLineNumber();			
+//		if(lastLexPosition == null) return 0;
+//		return lastLexPosition.getLine();			
+		if(lexRange == null) return 0;
+		return lexRange.getEnd().getLine();			
 	}
 	
 	/// Perform semantic checking.
@@ -268,17 +275,6 @@ public abstract class SyntaxElement {
 	// ***********************************************************************************************
 	// *** Attribute File I/O
 	// ***********************************************************************************************
-
-	public void writeAstData(AttributeOutputStream oupt) throws IOException {
-		oupt.writeShort(firstLineNumber());
-		oupt.writeShort(lastLineNumber());
-	}
-
-	public static AstData readAstData(AttributeInputStream inpt) throws IOException {
-		int firstLineNumber = inpt.readShort();
-		int lastLineNumber = inpt.readShort();
-		return new AstData("ExternalClass", firstLineNumber, lastLineNumber);
-	}
 
 	/// Write a SyntaxElement object to a AttributeOutputStream.
 	/// @param oupt the AttributeOutputStream to write to.

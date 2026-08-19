@@ -176,7 +176,7 @@ public final class ConditionalStatement extends Statement {
 		oupt.writeKind(ObjectKind.ConditionalStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** ConditionalStatement
 		oupt.writeObj(condition);
 		oupt.writeObj(thenStatement);
@@ -191,7 +191,7 @@ public final class ConditionalStatement extends Statement {
 		ConditionalStatement stm = new ConditionalStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		
 		// *** ConditionalStatement
 		stm.condition = (Expression) inpt.readObj(documentManager);
 		stm.thenStatement = (Statement) inpt.readObj(documentManager);

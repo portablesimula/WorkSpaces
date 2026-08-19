@@ -99,7 +99,7 @@ public final class DummyStatement extends Statement {
 		oupt.writeKind(ObjectKind.DummyStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 	}
 
 	/// Read and return a DummyStatement object.
@@ -110,7 +110,7 @@ public final class DummyStatement extends Statement {
 		DummyStatement stm = new DummyStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		
 		Util.TRACE_INPUT("DummyStatement: " + stm);
 		return(stm);
 	}

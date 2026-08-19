@@ -20,7 +20,7 @@ import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.LexToken;
+import simula.core.builder.util.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.BlockDeclaration;
@@ -401,7 +401,7 @@ public final class ForStatement extends Statement {
 		oupt.writeKind(ObjectKind.ForStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** ForStatement
 		oupt.writeObj(controlVariable);
 		oupt.writeShort(assignmentOperator);
@@ -418,7 +418,7 @@ public final class ForStatement extends Statement {
 		ForStatement stm = new ForStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		
 		// *** ForStatement
 		stm.controlVariable = (VariableExpression) inpt.readObj(documentManager);
 		stm.assignmentOperator = inpt.readShort();

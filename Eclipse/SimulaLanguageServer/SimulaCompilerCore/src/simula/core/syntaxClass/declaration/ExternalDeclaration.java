@@ -16,9 +16,9 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.Identifier;
-import simula.core.builder.token.LexToken;
-import simula.core.builder.token.SimpleString;
+import simula.core.builder.util.Identifier;
+import simula.core.builder.util.LexToken;
+import simula.core.builder.util.SimpleString;
 import simula.core.coder.JarFileBuilder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -269,7 +269,7 @@ public final class ExternalDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 
 		// *** Declaration
 		oupt.writeIdentifier(identifier);
@@ -286,7 +286,6 @@ public final class ExternalDeclaration extends Declaration {
 		ext.OBJECT_SEQU = inpt.readSEQU(ext);
 
 		// *** SyntaxElement
-		ext.astData = readAstData(inpt);
 
 		// *** Declaration
 		ext.identifier = inpt.readIdentifier();

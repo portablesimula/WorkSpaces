@@ -94,9 +94,10 @@ public class JarFileBuilder {
 		if(TESTING) IO.println("JarFileBuilder.open: " + programModule);
 //		if(jarOutputStream != null) Util.IERR();
 		this.programModule = programModule;
+		String programID = programModule.getIdentifier().tokenText;
 		if (Option.internal.TRACING)
-			IO.println("BEGIN Create .jar File");
-		outputJarFile = new File(simCoder.documentManager.jarFileDir, programModule.getIdentifier().value + ".jar");
+			IO.println("BEGIN Create .jar File: " + programID);
+		outputJarFile = new File(simCoder.documentManager.jarFileDir, programID + ".jar");
 		outputJarFile.getParentFile().mkdirs();
 
 		if(outputJarFile.exists()) {
@@ -106,7 +107,7 @@ public class JarFileBuilder {
 
 		Manifest manifest = new Manifest();
 		String packetName = DocumentManager.packetName;
-		mainEntry = packetName + '/' + programModule.getIdentifier().value;
+		mainEntry = packetName + '/' + programID;
 		mainEntry = mainEntry.replace('/', '.');
 		if (Option.internal.TRACING)
 			IO.println("Output " + outputJarFile + " MANIFEST'mainEntry=\"" + mainEntry + "\"");

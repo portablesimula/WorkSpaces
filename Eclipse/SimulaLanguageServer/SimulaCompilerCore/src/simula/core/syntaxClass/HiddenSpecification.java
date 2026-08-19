@@ -10,7 +10,7 @@ import java.io.IOException;
 import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.Util;
@@ -146,7 +146,7 @@ public final class HiddenSpecification extends SyntaxElement {
 		oupt.writeKind(ObjectKind.HiddenSpecification);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** HiddenSpecification
 		oupt.writeIdentifier(identifier);
 		oupt.writeObj(definedIn);
@@ -160,8 +160,6 @@ public final class HiddenSpecification extends SyntaxElement {
 		HiddenSpecification spec = new HiddenSpecification(documentManager);
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
 		// *** SyntaxElement
-//		spec.astData = readAstData(inpt);
-		spec.astData = readAstData(inpt);
 
 		// *** HiddenSpecification
 		spec.identifier = inpt.readIdentifier();

@@ -22,7 +22,7 @@ import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -260,7 +260,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		oupt.writeShort(OBJECT_SEQU);
 
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 
 		// *** Declaration
 		oupt.writeIdentifier(identifier);
@@ -282,7 +282,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
 		// *** SyntaxElement
-		var.astData = readAstData(inpt);
+		
 
 		// *** Declaration
 		var.identifier = inpt.readIdentifier();

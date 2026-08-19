@@ -170,7 +170,7 @@ public class ForListElement extends SyntaxElement {
 		oupt.writeKind(ObjectKind.ForListElement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** ForListElement
 		oupt.writeObj(forStatement);
 		oupt.writeObj(expr1);
@@ -184,7 +184,7 @@ public class ForListElement extends SyntaxElement {
 		ForListElement elt = new ForListElement(documentManager);
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
 		// *** SyntaxElement
-		elt.astData = readAstData(inpt);
+		
 		// *** ForListElement
 		elt.forStatement = (ForStatement) inpt.readObj(documentManager);
 		elt.expr1 = (Expression) inpt.readObj(documentManager);

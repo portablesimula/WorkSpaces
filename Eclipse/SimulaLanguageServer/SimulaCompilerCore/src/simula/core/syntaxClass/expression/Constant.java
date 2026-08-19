@@ -330,7 +330,7 @@ public final class Constant extends Expression {
 		oupt.writeKind(ObjectKind.Constant);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -346,7 +346,7 @@ public final class Constant extends Expression {
 		Constant cnst = new Constant(documentManager);
 		cnst.OBJECT_SEQU = inpt.readSEQU(cnst);
 		// *** SyntaxElement
-		cnst.astData = readAstData(inpt);
+
 		// *** Expression
 		cnst.type = inpt.readType();
 		cnst.backLink = (SyntaxElement) inpt.readObj(documentManager);

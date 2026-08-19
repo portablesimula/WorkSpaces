@@ -16,7 +16,7 @@ import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.DocumentManager;
 import simula.core.builder.SyntaxTree;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.syntaxClass.declaration.ConnectionBlock;
 import simula.core.syntaxClass.declaration.Declaration;

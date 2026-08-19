@@ -14,8 +14,9 @@ import simula.core.DocumentManager;
 import simula.core.DocumentManager;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.Identifier;
-import simula.core.builder.token.LexToken;
+import simula.core.builder.util.Identifier;
+import simula.core.builder.util.LexPosition;
+import simula.core.builder.util.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -33,7 +34,6 @@ import simula.core.syntaxClass.expression.VariableExpression;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.ObjectKind;
 import simula.core.utilities.Util;
-import simula.lsp.util.SimPosition;
 
 /// Simula Program Module.
 /// 
@@ -75,7 +75,9 @@ public final class ProgramModule extends Statement {
 
 	/// Returns the mainModule identifier.
 	/// @return the mainModule identifier
-	public Identifier getIdentifier() { return(mainModule.identifier); }
+	public Identifier getIdentifier() {
+		return(mainModule.identifier);
+	}
 
 	/// Returns the relative file name.
 	/// @return the relative file name
@@ -161,8 +163,8 @@ public final class ProgramModule extends Statement {
 				}
 				String textAfterEnd = Util.printable(sb.toString());
 //				IO.println("NEW ProgramModule: TextAfterEnd: " + Util.printable(textAfterEnd));
-				SimPosition start = simBuilder.tokenList.get(mrk-1).getPosition();
-				SimPosition end = simBuilder.tokenList.get(n-1).getPosition();
+				LexPosition start = simBuilder.tokenList.get(mrk-1).getPosition();
+				LexPosition end = simBuilder.tokenList.get(n-1).getPosition();
 				if(! textAfterEnd.equals(";")) Util.warning(simBuilder, start, end, "Text after Program end: \"" + textAfterEnd + '"');
 			}
 			

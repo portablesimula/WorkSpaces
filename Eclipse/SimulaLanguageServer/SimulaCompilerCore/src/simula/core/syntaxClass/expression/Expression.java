@@ -12,12 +12,12 @@ import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.CharacterConst;
-import simula.core.builder.token.Identifier;
-import simula.core.builder.token.IntegerConst;
-import simula.core.builder.token.LexToken;
-import simula.core.builder.token.LongRealConst;
-import simula.core.builder.token.RealConst;
+import simula.core.builder.util.CharacterConst;
+import simula.core.builder.util.Identifier;
+import simula.core.builder.util.IntegerConst;
+import simula.core.builder.util.LexToken;
+import simula.core.builder.util.LongRealConst;
+import simula.core.builder.util.RealConst;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -110,8 +110,6 @@ public abstract class Expression extends SyntaxElement {
 	/// Expression  =  SimpleExpression
 	/// 	        |  IF  BooleanExpression  THEN  SimpleExpression  ELSE  Expression
 	/// </pre>
-	/// 
-	/// NOTE: Possible start of an expression. MUST start a LexTokenRange !
 	/// 
 	/// @return Expression or null if no expression is found.
 	public static Expression acceptExpression(SimulaBuilder simBuilder) {

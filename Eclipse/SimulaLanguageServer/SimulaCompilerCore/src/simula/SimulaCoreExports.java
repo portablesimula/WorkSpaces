@@ -8,7 +8,7 @@ import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.TokenManager;
-import simula.core.builder.token.LexToken;
+import simula.core.builder.util.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.coder.SimulaExec;
 import simula.core.utilities.LOG;

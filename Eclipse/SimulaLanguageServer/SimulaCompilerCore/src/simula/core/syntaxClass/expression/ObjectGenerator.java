@@ -19,7 +19,7 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -274,7 +274,7 @@ public final class ObjectGenerator extends Expression {
 		oupt.writeKind(ObjectKind.ObjectGenerator);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -296,7 +296,7 @@ public final class ObjectGenerator extends Expression {
 		ObjectGenerator gen = new ObjectGenerator(documentManager);
 		gen.OBJECT_SEQU = inpt.readSEQU(gen);
 		// *** SyntaxElement
-		gen.astData = readAstData(inpt);
+
 		// *** Expression
 		gen.type = inpt.readType();
 		gen.backLink = (SyntaxElement) inpt.readObj(documentManager);

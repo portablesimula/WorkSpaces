@@ -13,10 +13,9 @@ import java.lang.classfile.constantpool.FieldRefEntry;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;
@@ -317,7 +316,7 @@ public final class RemoteVariable extends Expression {
 		oupt.writeKind(ObjectKind.RemoteVariable);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -334,7 +333,7 @@ public final class RemoteVariable extends Expression {
 		RemoteVariable rem = new RemoteVariable(documentManager);
 		rem.OBJECT_SEQU = inpt.readSEQU(rem);
 		// *** SyntaxElement
-		rem.astData = readAstData(inpt);
+
 		// *** SyntaxElement
 		rem.type = inpt.readType();
 		rem.backLink = (SyntaxElement) inpt.readObj(documentManager);

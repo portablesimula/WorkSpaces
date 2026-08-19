@@ -14,8 +14,8 @@ import java.lang.constant.ClassDesc;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
+import simula.core.builder.util.Identifier;
 import simula.core.DocumentManager;
-import simula.core.builder.token.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.utilities.DeclarationList;
 import simula.core.utilities.LOG;
@@ -73,6 +73,7 @@ public abstract class DeclarationScope extends Declaration  {
 	/// Modify the identifier of this class, procedure, ...
 	/// @param identifier the new identifier
 	public void modifyIdentifier(final Identifier identifier) {
+//		IO.println("DeclarationScope.modifyIdentifier: " + identifier);
 		this.identifier = identifier;
 		checkAlreadyDefined();
 		if (declarationKind == ObjectKind.ContextFreeMethod) externalIdent = this.identifierValue();

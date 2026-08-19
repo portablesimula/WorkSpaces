@@ -21,7 +21,7 @@ import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.OverLoad;
 import simula.core.syntaxClass.ProcedureSpecification;
@@ -997,7 +997,7 @@ public final class VariableExpression extends Expression {
 		oupt.writeKind(ObjectKind.VariableExpression);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** Expression
 		oupt.writeType(type);
 		oupt.writeObj(backLink);
@@ -1021,7 +1021,7 @@ public final class VariableExpression extends Expression {
 		VariableExpression var = new VariableExpression(documentManager);
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 		// *** SyntaxElement
-		var.astData = readAstData(inpt);
+		
 		// *** Expression
 		var.type = inpt.readType();
 		var.backLink = (SyntaxElement) inpt.readObj(documentManager);

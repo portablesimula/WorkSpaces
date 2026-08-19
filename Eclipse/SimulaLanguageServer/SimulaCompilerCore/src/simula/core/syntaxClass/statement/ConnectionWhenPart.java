@@ -14,7 +14,7 @@ import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.Type;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
@@ -125,7 +125,7 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 		oupt.writeKind(ObjectKind.ConnectionWhenPart);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** ConnectionWhenPart
 		oupt.writeIdentifier(classIdentifier);
 		oupt.writeObj(connectionStatement);
@@ -140,7 +140,7 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 		ConnectionWhenPart whn = new ConnectionWhenPart(documentManager);
 		whn.OBJECT_SEQU = inpt.readSEQU(whn);
 		// *** SyntaxElement
-		whn.astData = readAstData(inpt);
+
 		// *** ConnectionDoPart
 		whn.classIdentifier = inpt.readIdentifier();
 		whn.connectionStatement = (ConnectionStatement) inpt.readObj(documentManager);

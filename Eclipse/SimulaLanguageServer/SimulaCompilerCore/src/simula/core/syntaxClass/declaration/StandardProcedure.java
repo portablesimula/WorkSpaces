@@ -11,7 +11,7 @@ import java.util.Vector;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.builder.token.Identifier;
+import simula.core.builder.util.Identifier;
 import simula.core.syntaxClass.OverLoad;
 import simula.core.syntaxClass.ProcedureSpecification;
 import simula.core.syntaxClass.Type;

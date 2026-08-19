@@ -22,14 +22,13 @@ import java.util.Vector;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.token.Identifier;
-import simula.core.builder.token.LexToken;
+import simula.core.builder.util.Identifier;
+import simula.core.builder.util.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.HiddenSpecification;
 import simula.core.syntaxClass.ProtectedSpecification;
@@ -1436,7 +1435,6 @@ public class ClassDeclaration extends BlockDeclaration {
 		oupt.writeShort(OBJECT_SEQU);
 		
 		// *** SyntaxElement
-		writeAstData(oupt);
 		
 		// *** Declaration
 		//oupt.writeIdentifier(identifier);
@@ -1478,7 +1476,6 @@ public class ClassDeclaration extends BlockDeclaration {
 		cls.OBJECT_SEQU = inpt.readSEQU(cls);
 		
 		// *** SyntaxElement
-		cls.astData = readAstData(inpt);
 		
 		// *** Declaration
 		//identifier = inpt.readString();

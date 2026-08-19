@@ -156,7 +156,7 @@ public final class BlockStatement extends Statement {
 		oupt.writeKind(ObjectKind.BlockStatement);
 		oupt.writeShort(OBJECT_SEQU);
 		// *** SyntaxElement
-		writeAstData(oupt);
+		
 		// *** BlockStatement
 		oupt.writeObj(blockDeclaration);
 	}
@@ -169,7 +169,7 @@ public final class BlockStatement extends Statement {
 		BlockStatement stm = new BlockStatement(documentManager);
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
-		stm.astData = readAstData(inpt);
+		
 		// *** BlockStatement
 		stm.blockDeclaration = (BlockDeclaration) inpt.readObj(documentManager);
 
