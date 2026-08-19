@@ -12,12 +12,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import simula.SimTextDocumentContentChangeEvent;
 import simula.core.builder.DocumentTextUpdater;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.util.LexToken;
+import simula.core.builder.export.LexToken;
+import simula.core.builder.export.SimulaDiagnostic;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.statement.ProgramModule;
 import simula.core.utilities.LOG;
-import simula.core.utilities.SimulaDiagnostic;
 import simula.core.utilities.Util;
 
 /// Vi må lagre innholdet til dokumentene som er åpne i editoren.

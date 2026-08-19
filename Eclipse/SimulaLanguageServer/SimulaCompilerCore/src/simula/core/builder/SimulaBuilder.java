@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import simula.Option;
 import simula.core.DocumentManager;
-import simula.core.builder.util.LexToken;
+import simula.core.builder.export.LexToken;
+import simula.core.builder.export.SimulaDiagnostic;
 import simula.core.builder.util.SimpleString;
 import simula.core.DocumentManager;
 import simula.core.syntaxClass.declaration.DeclarationScope;
@@ -16,7 +17,6 @@ import simula.core.syntaxClass.statement.ProgramModule;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.LOG;
 import simula.core.utilities.ObjectKind;
-import simula.core.utilities.SimulaDiagnostic;
 import simula.core.utilities.Util;
 import simula.exception.EOTException;
 
@@ -188,8 +188,8 @@ public class SimulaBuilder {
 			programModule.printTree(1);
 		}
 		
-		if (Util.nError > 0) {
-			String msg="Compiler terminate " + documentManager.simBuilder.documentManager.sourceName + " after " + Util.nError + " errors during semantic checking";
+		if (nErrors > 0) {
+			String msg="Compiler terminate " + documentManager.simBuilder.documentManager.sourceName + " after " + nErrors + " errors during semantic checking";
 			IO.println(msg);
 //			Thread.dumpStack();
 			throw new RuntimeException(msg);

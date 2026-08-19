@@ -1,8 +1,9 @@
-package simula.core.builder.util;
+package simula.core.builder.export;
 
 import simula.Option;
 import simula.core.builder.SimulaLexer;
 import simula.core.builder.TokenManager;
+import simula.core.builder.util.LexPosition;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.Util;
 

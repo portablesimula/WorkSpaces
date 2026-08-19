@@ -3,8 +3,8 @@ package simula.core.builder;
 import java.util.List;
 
 import simula.core.DocumentManager;
-import simula.core.builder.util.LexToken;
-import simula.core.utilities.SimulaDiagnostic;
+import simula.core.builder.export.LexToken;
+import simula.core.builder.export.SimulaDiagnostic;
 
 /// @author Øystein Myhre Andersen
 /// @author Google AI

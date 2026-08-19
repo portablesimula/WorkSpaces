@@ -6,5 +6,6 @@ module SimulaCore {
 	
 	exports simula;
 	exports simula.runtime;
+	exports simula.core.builder.export;
 //	exports simula.compiler.utilities;
 }

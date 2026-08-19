@@ -13,12 +13,11 @@ import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
+import simula.core.builder.export.LexToken;
 import simula.core.builder.util.LexPosition;
 import simula.core.builder.util.LexRange;
-import simula.core.builder.util.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.Declaration;
-import simula.core.utilities.Html;
 import simula.core.utilities.Util;
 
 /// The class SyntaxElement.
@@ -256,20 +255,6 @@ public abstract class SyntaxElement {
 		while ((i--) > 0)
 			s = s + "    ";
 		return (s);
-	}
-
-//	public String edPsi(String phrase) {
-//		int lno = firstLineNumber();
-//		StringBuilder sb = new StringBuilder("Line ").append(lno);
-//		int lastLine = this.lastLineNumber();
-//		if(lastLine != lno) sb.append('-').append(lastLine);
-//		sb.append(": ").append(getClass().getSimpleName()).append(": ").append(phrase);
-//		return sb.toString();
-//	}
-	public String edPsi(String phrase) {
-		int lno = firstLineNumber();
-		int lastLine = this.lastLineNumber();
-		return Html.edPsi(lno, lastLine, getClass().getSimpleName() + ": " + phrase);
 	}
 
 	// ***********************************************************************************************

@@ -5,6 +5,7 @@ import javax.lang.model.SourceVersion;
 import simula.Option;
 import simula.core.builder.SimulaLexer;
 import simula.core.builder.TokenManager;
+import simula.core.builder.export.LexToken;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.Util;
 

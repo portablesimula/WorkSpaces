@@ -2,8 +2,8 @@ package simula.core.builder;
 
 import java.io.Reader;
 
+import simula.core.builder.export.LexToken;
 import simula.core.builder.util.Identifier;
-import simula.core.builder.util.LexToken;
 import simula.core.syntaxClass.Type;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.LOG;

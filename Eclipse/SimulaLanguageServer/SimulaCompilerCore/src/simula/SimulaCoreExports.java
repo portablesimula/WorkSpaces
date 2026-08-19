@@ -8,11 +8,11 @@ import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.TokenManager;
-import simula.core.builder.util.LexToken;
+import simula.core.builder.export.LexToken;
+import simula.core.builder.export.SimulaDiagnostic;
 import simula.core.coder.SimulaCoder;
 import simula.core.coder.SimulaExec;
 import simula.core.utilities.LOG;
-import simula.core.utilities.SimulaDiagnostic;
 import simula.core.utilities.Util;
 
 public class SimulaCoreExports {

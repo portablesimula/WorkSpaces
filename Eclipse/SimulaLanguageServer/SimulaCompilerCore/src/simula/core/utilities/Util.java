@@ -22,10 +22,11 @@ import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.SimulaBuilder;
+import simula.core.builder.export.LexToken;
+import simula.core.builder.export.SimulaDiagnostic;
 import simula.core.builder.util.Identifier;
 import simula.core.builder.util.LexPosition;
 import simula.core.builder.util.LexRange;
-import simula.core.builder.util.LexToken;
 import simula.core.syntaxClass.SyntaxElement;
 
 /// A set of all static Utility Methods
@@ -53,30 +54,17 @@ public final class Util {
 		String sep ="";
 		for(int i=startIndex;i<n;i++) {
 			String methodName = elt[i].getMethodName();
-//			String className = elt[i].getClassName();
 			String fileName = elt[i].getFileName();
 			String className = fileName.replace(".java", "");
 			int line = elt[i].getLineNumber();
-			
 			String ref = "(" + fileName + ':' + line + ')';
-			
-//			sb.append(sep).append(className).append('.').append(methodName).append("[line ").append(line).append(']').append(elt[i]); sep=",  ";
 			sb.append(sep).append(className).append('.').append(methodName).append(ref); sep=",  ";
-//			sb.append(sep).append(elt[i]); sep=",";
 		}
 		return sb.toString();
 	}
 
-	/// Number of error messages.
-	public static int nError;
-
-//	/// Print a error message.
-//	/// @param msg the message
-//	public static void error(final String msg) {
-//		String err = edLINE(": OLD_Error: " + msg);
-//		nError++;
-//		printError(err);
-//	}
+//	/// Number of error messages.
+//	public static int nError;
 
 	/// Print a error message.
 	/// @param msg the message
@@ -119,13 +107,7 @@ public final class Util {
 	/// Print a warning message.
 	/// @param msg the message
 	public static void warning(final SyntaxElement elt, final String msg) {
-//        LexToken first = elt.getFirstLexToken();
-//        LexToken last = elt.getLastLexToken();
-//        LexPosition start = new LexPosition(first.lineNumber, first.column);
-//        LexPosition end = new LexPosition(last.lineNumber, last.column + last.length);
-//		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new LexRange(start, end), msg);
 		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, elt.lexRange, msg);
-
 		if(DocumentManager.WARNINGS) {
 			LOG.warning(diagnostic.toString());
 			elt.documentManager.simBuilder.addDiagnostic(diagnostic);
@@ -177,28 +159,16 @@ public final class Util {
 	}
 	
 	public static void semanticError(final SyntaxElement elt, final String msg) {
-//        LexToken first = elt.getFirstLexToken();
-//        LexToken last = elt.getLastLexToken();
-//        LexPosition start = new LexPosition(first.lineNumber, first.column);
-//        LexPosition end = new LexPosition(last.lineNumber, last.column + last.length);
-//		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new LexRange(start, end), msg);
 		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, elt.lexRange, msg);
-		
 		LOG.error(diagnostic.toString());
 		elt.documentManager.simBuilder.addError(diagnostic);
 	}
 	
 	/// Error during Code generation:
 	public static void codingError(final SyntaxElement elt, final String msg) {
-//        LexToken first = elt.getFirstLexToken();
-//        LexToken last = elt.getLastLexToken();
-//        LexPosition start = new LexPosition(first.lineNumber, first.column);
-//        LexPosition end = new LexPosition(last.lineNumber, last.column + last.length);
-//		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new LexRange(start, end), msg);
 		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, elt.lexRange, msg);
-		
 		LOG.error(diagnostic.toString());
-		elt.documentManager.simBuilder.addError(diagnostic);
+		elt.documentManager.simCoder.addError(diagnostic);
 	}
 
 	/// Exit with Thread.dumpStack
@@ -390,21 +360,6 @@ public final class Util {
 		if (input == null) return null;
 		StringBuilder sb = new StringBuilder();
 		for (char c : input.toCharArray()) {
-//			switch (c) {
-//				case '\t': sb.append("\\t"); break;
-//				case '\b': sb.append("\\b"); break;
-//				case '\n': sb.append("\\n"); break;
-//				case '\r': sb.append("\\r"); break;
-//				case '\f': sb.append("\\f"); break;
-//				case '\'': sb.append("\\'"); break;
-//				case '\"': sb.append("\\\""); break;
-//				case '\\': sb.append("\\\\"); break;
-//				default:
-//					if (Character.isISOControl(c)) {
-//						// Formats as u-code (ex: \u0000)
-//						sb.append(String.format("\\u%04x", (int) c));
-//					} else sb.append(c);
-//			}
 			sb.append(printable(c));
 		}
 		return sb.toString();

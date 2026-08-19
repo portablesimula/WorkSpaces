@@ -3,6 +3,7 @@ package simula.core.builder.util;
 import simula.Option;
 import simula.core.builder.SimulaLexer;
 import simula.core.builder.TokenManager;
+import simula.core.builder.export.LexToken;
 import simula.core.utilities.KeyWord;
 
 public class CharacterConst extends LexToken {

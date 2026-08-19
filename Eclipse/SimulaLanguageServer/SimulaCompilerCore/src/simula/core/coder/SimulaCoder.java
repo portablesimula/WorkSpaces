@@ -2,14 +2,15 @@ package simula.core.coder;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Vector;
 
 import simula.Option;
 import simula.core.DocumentManager;
 import simula.core.CoreGlobal;
-import simula.core.DocumentManager;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.SimulaBuilder;
+import simula.core.builder.export.SimulaDiagnostic;
 import simula.core.syntaxClass.statement.ProgramModule;
 import simula.core.utilities.LOG;
 import simula.core.utilities.ObjectKind;
@@ -42,6 +43,9 @@ public class SimulaCoder {
 	
 	/// The set of Java SourceFile Coders.
 	public Vector<JavaSourceFileCoder> javaSourceFileCoders;
+
+	public int nErrors;
+	public List<SimulaDiagnostic> diagnostics;
 
 	// ***************************************************************
 	// *** Static variables used during Code Generation
@@ -81,6 +85,15 @@ public class SimulaCoder {
 		}
 	}
 
+
+	public void addError(SimulaDiagnostic diagnostic) {
+		diagnostics.add(diagnostic);
+		nErrors++;
+	}
+
+	public void addDiagnostic(SimulaDiagnostic diagnostic) {
+		diagnostics.add(diagnostic);
+	}
 
 	/// Delete temporary .class files.
 	/// @param dir temporary .class directory
@@ -141,8 +154,8 @@ public class SimulaCoder {
 					IO.println(javaClass.javaOutputFile.toString());
 			}
 		}
-		if (Util.nError > 0) {
-			String msg="Compiler terminate " + documentManager.sourceName + " after " + Util.nError + " errors during code generation";
+		if (nErrors > 0) {
+			String msg="Compiler terminate " + documentManager.sourceName + " after " + nErrors + " errors during code generation";
 			IO.println(msg);
 			throw new RuntimeException(msg);
 		}
