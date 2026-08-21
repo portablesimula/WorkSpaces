@@ -446,7 +446,7 @@ public class EditorMenues extends JMenuBar {
 		TabbedTextHandler.maybeSaveCurrentFile();
 //		SourceTextPanel current=TabbedTextHandler.currentTextPanel;			
 		SourceModule current=Global.currentModule;
-//		PsiTree psiTree = current.currentModule.getPsiTree();
+//		PsiTree psiTree = current.currentModule.getTokenList();
 		String sourceFileName = current.getName();
 //		ProgramModule programModule = current.getSyntaxTree();
 //		
@@ -484,8 +484,8 @@ public class EditorMenues extends JMenuBar {
 //	private void doShowPsiTreeAction() {
 //		SwingUtilities.invokeLater(() -> {
 //			SourceModule current = Global.currentModule;
-//			current.buildPsiAndSyntaxTrees();
-//			current.getPsiTree().popUpPsiTree();
+//			current.buildInitialTokenList();
+//			current.getTokenList().popUpPsiTree();
 //		});
 //	}
 //	
@@ -500,7 +500,7 @@ public class EditorMenues extends JMenuBar {
 ////			SourceTextPanel current=SimulaEditor.currentTextPanel;
 ////			ProgramModule programModule = current.currentModule.getSyntaxTree();
 //			
-//			current.buildPsiAndSyntaxTrees();
+//			current.buildInitialTokenList();
 //			ProgramModule programModule = current.getSyntaxTree();
 //			DeclarationScope mainModule = programModule.mainModule;
 //			IO.println("EditorMenues.doShowSyntaxTreeAction: mainModule=" + mainModule.getClass());
@@ -517,8 +517,8 @@ public class EditorMenues extends JMenuBar {
 	private void doRenderFromPSIAction() {
 		SwingUtilities.invokeLater(() -> {
 			SourceModule current = Global.currentModule;
-			current.buildPsiAndSyntaxTrees();
-//			PsiTree psiTree = current.getPsiTree();
+			current.buildInitialTokenList();
+//			PsiTree psiTree = current.getTokenList();
 //			TabbedTextHandler.doNewTabbedPsiPanel(psiTree, "PSI:");
 			Util.IERR("");
 		});

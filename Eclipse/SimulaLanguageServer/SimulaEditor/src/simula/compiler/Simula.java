@@ -208,25 +208,7 @@ public final class Simula {
 			SimulaEditor editor = new SimulaEditor();
 			editor.setVisible(true);
 		} else {
-	        for(String fileName:fileNames) {
-				if(sourceFileDir != null) fileName = sourceFileDir + '/' + fileName;
-//				try {
-//					File file = new File(fileName);
-//					InputStreamReader reader = new InputStreamReader(new FileInputStream(file), Global._CHARSET);
-//					new SimulaCompiler(fileName, reader).doCompile();
-					
-					Util.IERR("SJEKK DETTE NØYE !!!");
-//					Global.initiate();
-			    	new SourceModule(new File(fileName));
-//					new SimulaCompiler(fileName).doCompile(Global.currentModule.getSyntaxTree());
-					Vector<String> args = new Vector<>(Arrays.asList(argv));
-					SimulaEditorClient.doOpen(fileName, args);
-
-
-//				} catch (IOException e) {
-//					Util.generalError("can't open " + fileName + ", reason: " + e);
-//				}
-			}
+			Util.IERR("");
 		}
 	}
 

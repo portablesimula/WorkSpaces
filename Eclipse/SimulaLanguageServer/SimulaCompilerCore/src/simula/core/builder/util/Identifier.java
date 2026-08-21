@@ -3,18 +3,20 @@ package simula.core.builder.util;
 import javax.lang.model.SourceVersion;
 
 import simula.Option;
+import simula.core.CoreGlobal;
 import simula.core.builder.SimulaLexer;
-import simula.core.builder.TokenManager;
 import simula.core.builder.export.LexToken;
+import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.Util;
 
 public class Identifier extends LexToken {
+	public DeclarationScope scope;
 	public String value;
 
 	public Identifier(int tokenStartLine, CharSequence sourceText, int column, int length, SimulaLexer lexer) {
 //		super(tokenStartLine, sourceText, startOffset, endOffset, KeyWord.CHARACTERKONST);
-		super(tokenStartLine, sourceText, column, length, KeyWord.IDENTIFIER, lexer);
+		super(tokenStartLine, sourceText, column, length, KeyWord.IDENTIFIER, "identifier", lexer);
 		this.value = this.edTokenText(lexer);
 		if(SourceVersion.isKeyword(value)) value = "_" + value;
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();
@@ -23,6 +25,7 @@ public class Identifier extends LexToken {
 	
 	public Identifier(String value) {
 		super(KeyWord.IDENTIFIER);
+		this.scope = CoreGlobal.getCurrentScope();
 		this.value = value;
 		this.tokenText = value;
 		if(value == null) Util.IERR("");
@@ -47,10 +50,6 @@ public class Identifier extends LexToken {
 	
 	public boolean equalsIgnoreCase(String other) {
 		return this.value.equalsIgnoreCase(other);
-	}
-
-	public int getLspTokenType() {
-		return TokenManager.OTHER.index; 
 	}
 
 	@Override

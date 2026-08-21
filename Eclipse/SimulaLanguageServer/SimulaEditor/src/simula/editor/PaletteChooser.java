@@ -6,7 +6,7 @@ import simula.compiler.SourceModule;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.psi.PsiBuilder;
-import simula.psi.PsiTree;
+import simula.psi.TokenList;
 
 import java.awt.*;
 
@@ -22,7 +22,7 @@ public class PaletteChooser extends JDialog {
 
     // --- BOTTOM PANEL (Demo text and Reset-button) ---
     JPanel bottomPanel = new JPanel(new BorderLayout());
-    PsiTextPanel demoPanel;
+    LspTextPanel demoPanel;
 
     // Theme Choosing
     private JComboBox<String> themeDropdown;
@@ -123,7 +123,7 @@ public class PaletteChooser extends JDialog {
     }
     
     private static int SEQU = 1;
-    private PsiTextPanel getDemoPanel() {
+    private LspTextPanel getDemoPanel() {
 //    	Option.internal.TRACE_NEW_LEXTOKEN = 1;
         String sourceText =
         		  " class Demo; begin\n"
@@ -133,14 +133,14 @@ public class PaletteChooser extends JDialog {
         		+ "       outtext\"line with error\");\n"
         		+ "    end;\n"
         		+ " end\n";
-    	PsiTree psiTree = getPsiTree(sourceText);
+    	TokenList psiTree = getTokenList(sourceText);
 //		demoPanel = new PsiTextPanel(SimulaEditor. Language.Simula, null);
-		demoPanel = new PsiTextPanel(new SourceModule(sourceText), null);
+		demoPanel = new LspTextPanel(new SourceModule(sourceText), null);
 		demoPanel.fillTextPane(0, psiTree);
 		return demoPanel;
     }
 
-	public PsiTree getPsiTree(String sourceText) {
+	public TokenList getTokenList(String sourceText) {
 		PsiBuilder psiBuilder = new PsiBuilder();
 		psiBuilder.start(sourceText);
 //		@SuppressWarnings("unused")
@@ -157,7 +157,7 @@ public class PaletteChooser extends JDialog {
         }
         
         if(demoPanel != null) {
-    		PsiTextPanel prevCard = demoPanel;
+    		LspTextPanel prevCard = demoPanel;
     		DEMO_SEQU++;
     		String ScreenID = "Screen" + DEMO_SEQU;
             // Flip to the specific panel instantly

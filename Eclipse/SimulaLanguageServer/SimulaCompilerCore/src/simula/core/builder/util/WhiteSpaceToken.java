@@ -2,7 +2,6 @@ package simula.core.builder.util;
 
 import simula.Option;
 import simula.core.builder.SimulaLexer;
-import simula.core.builder.TokenManager;
 import simula.core.builder.export.LexToken;
 import simula.core.utilities.KeyWord;
 
@@ -10,7 +9,7 @@ public class WhiteSpaceToken extends LexToken {
 	String value;
 
 	public WhiteSpaceToken(int tokenStartLine, CharSequence sourceText, int column, int length, SimulaLexer lexer) {
-		super(tokenStartLine, sourceText, column, length, KeyWord.WHITESPACES, lexer);
+		super(tokenStartLine, sourceText, column, length, KeyWord.WHITESPACES, "whiyeSpaces", lexer);
 		this.value = this.edTokenText(lexer);
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();
 	}
@@ -18,10 +17,6 @@ public class WhiteSpaceToken extends LexToken {
 	@Override
 	public String edText() {
 		return value;
-	}
-	
-	public int getLspTokenType() {
-		return TokenManager.OTHER.index; 
 	}
 
 }

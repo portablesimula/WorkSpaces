@@ -129,7 +129,7 @@ public class SimulaBuilder {
 			Util.IERR("");
 		}
 //		Util.IERR("STOP HER INTILL VIDERE");	
-		
+		documentManager.publishDiagnostics(diagnostics);
 	}
 
 	// ***************************************************************

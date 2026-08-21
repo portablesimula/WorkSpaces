@@ -1,15 +1,18 @@
-package simula.core.builder;
+package simula.core.builder.export;
 
+import java.util.Arrays;
 import java.util.List;
 
 import simula.core.DocumentManager;
-import simula.core.builder.export.LexToken;
-import simula.core.builder.export.SimulaDiagnostic;
+import simula.core.builder.SimulaTokenType;
 
 /// @author Øystein Myhre Andersen
 /// @author Google AI
 public class TokenManager {
-	
+
+    public static List<String> tokenTypes = Arrays.asList("class", "procedure", "parameter", "identifier", "variable",
+			  "keyword", "comment", "string", "constant", "symbol", "whiyeSpaces");
+
 	// Standard Token Types defined by VSCode:
 	//
 	// TokenType		Description

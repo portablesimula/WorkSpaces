@@ -7,7 +7,6 @@ package simula.core;
 
 import java.io.File;
 import java.util.Stack;
-import simula.SimulaCoreClient;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.utilities.ClassHierarchy;
@@ -22,8 +21,6 @@ public final class CoreGlobal {
     
 	public static boolean TRACE_LEXER = false;
 	public static boolean TRACE_COMMENTS = false;
-	
-	public static SimulaCoreClient simulaCoreClient;
 
 	// ===============================================================================================
 	

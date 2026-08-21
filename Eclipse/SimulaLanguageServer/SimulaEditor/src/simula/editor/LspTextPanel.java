@@ -36,7 +36,7 @@ import simula.core.builder.export.LexToken;
 import simula.editor.SimulaEditor.Language;
 //import simula.psi.LexToken;
 //import simula.psi.PsiElement;
-import simula.psi.PsiTree;
+import simula.psi.TokenList;
 //import simula.psi.PsiTreeIterator;
 
 import java.awt.BorderLayout;
@@ -54,7 +54,7 @@ import java.util.Set;
 /// @author Øystein Myhre Andersen
 /// @author Google AI
 @SuppressWarnings({ "serial", "unused" })
-public class PsiTextPanel extends TabTextPanel {
+public class LspTextPanel extends TabTextPanel {
 	/// DEBUG on/off
 	private static final boolean DEBUG=false;//true;
 	
@@ -175,9 +175,7 @@ public class PsiTextPanel extends TabTextPanel {
 	/// Create a new PsiTextPanel.
 	/// @param sourceFile the source file
 	/// @param popupMenu the popupMenu
-//    PsiTextPanel(File sourceFile, SimulaEditor.Language lang, JPopupMenu popupMenu) {
-//    PsiTextPanel(PsiTree psiTree, Language lang, JPopupMenu popupMenu) {
-    PsiTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
+LspTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
     	super(sourceModule, popupMenu);
 //   	this.currentModule = new SourceModule(this, sourceFile);
 //    	this.sourceFile=sourceFile;
@@ -187,39 +185,39 @@ public class PsiTextPanel extends TabTextPanel {
 //    	Palette.updatePalette(null, true);
 //    	Palette.init();
 
-//        editTextPane = new TooltipTextPane(); editTextPane.setEditable(false);
-//        editTextPane.addMouseListener(mouseListener);
-//        ToolTipManager.sharedInstance().registerComponent(editTextPane);
-//        ToolTipManager.sharedInstance().setDismissDelay(20000); // 20 sekunder
-//        
-//        lineNumbers = new TooltipTextPane(); lineNumbers.setEditable(false);
-////        lineNumbers.addMouseListener(mouseListener);
-////        ToolTipManager.sharedInstance().registerComponent(lineNumbers);
-//        lineNumbers.setForeground(Palette.TextPaneForeground);
-//        lineNumbers.setBackground(Palette.TextPaneBackground);
+        editTextPane = new TooltipTextPane(); editTextPane.setEditable(false);
+        editTextPane.addMouseListener(mouseListener);
+        ToolTipManager.sharedInstance().registerComponent(editTextPane);
+        ToolTipManager.sharedInstance().setDismissDelay(20000); // 20 sekunder
         
-//        JPanel extra=new JPanel();
-//        
-//        doc=new DefaultStyledDocument(); addStylesToSourceDocument(doc);
-//        
-//        doc.putProperty(DefaultEditorKit.EndOfLineStringProperty,"\n");
-//    	doc.addUndoableEditListener(undoListener);
-//    	doc.addDocumentListener(documentListener);
-//        editTextPane.setStyledDocument(doc);
-//        editTextPane.setEditable(true);
-//        editTextPane.setForeground(Palette.TextPaneForeground);
-//        editTextPane.setBackground(Palette.TextPaneBackground);
-//        
-//        
-//        extra.setLayout(new BorderLayout());
-//        extra.add(lineNumbers,BorderLayout.WEST);
-//        extra.add(editTextPane,BorderLayout.CENTER);
-//       
-//        styleScrollPane = new JScrollPane(extra);        
-//        styleScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-//        
-//        this.setLayout(new BorderLayout());
-//        this.add(styleScrollPane,BorderLayout.CENTER);
+        lineNumbers = new TooltipTextPane(); lineNumbers.setEditable(false);
+//        lineNumbers.addMouseListener(mouseListener);
+//        ToolTipManager.sharedInstance().registerComponent(lineNumbers);
+        lineNumbers.setForeground(Palette.TextPaneForeground);
+        lineNumbers.setBackground(Palette.TextPaneBackground);
+        
+        JPanel extra=new JPanel();
+        
+        doc=new DefaultStyledDocument(); addStylesToSourceDocument(doc);
+        
+        doc.putProperty(DefaultEditorKit.EndOfLineStringProperty,"\n");
+    	doc.addUndoableEditListener(undoListener);
+    	doc.addDocumentListener(documentListener);
+        editTextPane.setStyledDocument(doc);
+        editTextPane.setEditable(true);
+        editTextPane.setForeground(Palette.TextPaneForeground);
+        editTextPane.setBackground(Palette.TextPaneBackground);
+        
+        
+        extra.setLayout(new BorderLayout());
+        extra.add(lineNumbers,BorderLayout.WEST);
+        extra.add(editTextPane,BorderLayout.CENTER);
+       
+        styleScrollPane = new JScrollPane(extra);        
+        styleScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        
+        this.setLayout(new BorderLayout());
+        this.add(styleScrollPane,BorderLayout.CENTER);
     }
     
 
@@ -241,57 +239,52 @@ public class PsiTextPanel extends TabTextPanel {
     /// Fill the text pane with text delivered from the psiTree.
     /// @param caretPosition the caretPosition after the operations
     /// @param preScanner the scanner to use
-    void fillTextPane(int caretPosition, PsiTree psiTree) {
+    void fillTextPane(int caretPosition, TokenList tokenList) {
 		int lineNumber=1;
 		StyledDocument lin = new DefaultStyledDocument(); addStylesToLineDocument(lin);
         editTextPane.setEditable(false);
     	doc.removeUndoableEditListener(undoListener);
 		try {
 			doc.remove(0, doc.getLength());
-			
-//			PsiTreeIterator iterator = new PsiTreeIterator(psiTree);
-			
 			Set<String> errorLines = null;
-			// Standard traversal loop
+			tokenList.fillLineAndTextPanel();
+			Util.IERR("NOT IMPL");
 			
-			
-//			while (iterator.hasNext()) {
-//			    PsiElement elt = iterator.next();
-			for(LexToken elt:psiTree.tokenList) {
-			    
+//			// Standard traversal loop  ====================== GAMMEL KODE:
+//			for(LexToken elt:psiTree.tokenList) {
 //				IO.println("PsiTextPanel.fillTextPane: GOT NEXT: " + elt);
-			    if(elt != null) {
-			    	if(elt instanceof LexToken lexToken) {
-			    		if(lexToken.keyWord == KeyWord.EOF) {
-				    	    SimpleAttributeSet attrs = lexToken.getTooltipAttrs(errorLines);
-					    	if(attrs != null) {
-			    				lin.insertString(lin.getLength(),edLineNumber(lineNumber++), attrs);					    		
-			    				errorLines = null;
-					    	}
-			    		} else if(lexToken.keyWord == KeyWord.NEWLINE) {
-							if(Option.PSI_VERIFY && elt.firstLineNumber() != lineNumber) {
-								Util.IERR("GOT NEWLINE: " + lexToken + " -- PSI VERIFIER FAILED: " + elt.firstLineNumber() + " != lineNumber=" + lineNumber);
-							}
-		    				String lineString = edLineNumber(lineNumber++);
-			    			// Should only be here AFTER a complete line is rendered
-				    	    SimpleAttributeSet attrs = lexToken.getTooltipAttrs(errorLines);
-					    	if(attrs != null) {
-			    				lin.insertString(lin.getLength(),lineString, attrs);					    		
-			    				errorLines = null;
-			    			} else {
-				    			lin.insertString(lin.getLength(),lineString, styleLineNumber);
-			    			}
-			    		}
-			        	errorLines = lexToken.accumErrors(errorLines);
-			    	    SimpleAttributeSet attrs = lexToken.getTooltipAttrs(null);
-				    	if(attrs != null) {
-					    	doc.insertString(doc.getLength(), elt.getText(), attrs);
-				    	} else {
-					    	doc.insertString(doc.getLength(), elt.getText(), elt.getStyle(this));				    		
-				    	}
-			    	}
-			    }
-		    }
+//			    if(elt != null) {
+//			    	if(elt instanceof LexToken lexToken) {
+//			    		if(lexToken.keyWord == KeyWord.EOF) {
+//				    	    SimpleAttributeSet attrs = lexToken.getTooltipAttrs(errorLines);
+//					    	if(attrs != null) {
+//			    				lin.insertString(lin.getLength(),edLineNumber(lineNumber++), attrs);					    		
+//			    				errorLines = null;
+//					    	}
+//			    		} else if(lexToken.keyWord == KeyWord.NEWLINE) {
+//							if(Option.LSP_VERIFY && elt.firstLineNumber() != lineNumber) {
+//								Util.IERR("GOT NEWLINE: " + lexToken + " -- PSI VERIFIER FAILED: " + elt.firstLineNumber() + " != lineNumber=" + lineNumber);
+//							}
+//		    				String lineString = edLineNumber(lineNumber++);
+//			    			// Should only be here AFTER a complete line is rendered
+//				    	    SimpleAttributeSet attrs = lexToken.getTooltipAttrs(errorLines);
+//					    	if(attrs != null) {
+//			    				lin.insertString(lin.getLength(),lineString, attrs);					    		
+//			    				errorLines = null;
+//			    			} else {
+//				    			lin.insertString(lin.getLength(),lineString, styleLineNumber);
+//			    			}
+//			    		}
+//			        	errorLines = lexToken.accumErrors(errorLines);
+//			    	    SimpleAttributeSet attrs = lexToken.getTooltipAttrs(null);
+//				    	if(attrs != null) {
+//					    	doc.insertString(doc.getLength(), elt.getText(), attrs);
+//				    	} else {
+//					    	doc.insertString(doc.getLength(), elt.getText(), elt.getStyle(this));				    		
+//				    	}
+//			    	}
+//			    }
+//		    }
 		} catch (BadLocationException ble) {
 			System.err.println("Couldn't insert text into text pane.");
 		}
@@ -319,8 +312,8 @@ public class PsiTextPanel extends TabTextPanel {
 //	    fillTextPane(new StringReader(txt),pos+count);
     	int caretPosition = pos+count;
     	
-		Global.currentModule.buildPsiAndSyntaxTrees();
-		PsiTree psiTree = Global.currentModule.getPsiTree();
+		Global.currentModule.buildInitialTokenList();
+		TokenList psiTree = Global.currentModule.getTokenList();
 		
         fillTextPane(caretPosition, psiTree);
 //    	Util.IERR("DETTE MÅ RETTES - ");

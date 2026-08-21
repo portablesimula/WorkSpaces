@@ -4,12 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import simula.SimTextDocumentContentChangeEvent;
+import simula.SimulaCoreClient;
 import simula.core.builder.DocumentTextUpdater;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.export.LexToken;
@@ -27,6 +29,11 @@ import simula.core.utilities.Util;
 /// @author Øystein Myhre Andersen
 /// @author Google AI
 public class DocumentManager {
+	
+    // Nøkkelen er filens URI (f.eks. file:///path/to/file.txt)
+    private static final ConcurrentHashMap<String, DocumentManager> openDocuments = new ConcurrentHashMap<>();
+	
+	public static SimulaCoreClient simulaCoreClient;
 
 	final public String documentUri;
 	final public File sourceFileDir;
@@ -93,10 +100,6 @@ public class DocumentManager {
 	/// false: Disable all language extensions. In other words,
 	/// follow the Simula Standard literally
 	public static boolean EXTENSIONS=true;
-	
-    // Nøkkelen er filens URI (f.eks. file:///path/to/file.txt)
-//    private final ConcurrentHashMap<String, SourceDocumentItem> openDocuments = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<String, DocumentManager> openDocuments = new ConcurrentHashMap<>();
 
     public DocumentManager(String documentUri, int documentVersion, String sourceCode) {
     	this.documentUri = documentUri;
@@ -301,7 +304,42 @@ public class DocumentManager {
 
 		System.out.println("Document closed on client side: " + documentUri);
 	}
+
+	public void publishDiagnostics(List<SimulaDiagnostic> diagnostics) {
+		DocumentManager.simulaCoreClient.publishDiagnostics(documentUri, diagnostics);
+	}
+
 	
+	/// The textDocument/semanticTokens/full request is sent from the client
+	/// to the server to return the semantic tokens for a whole file.
+	public static List<Integer> semanticTokensFull(String documentUri) {
+    	DocumentManager documentManager = openDocuments.get(documentUri);
+    	List<LexToken> tokenList = documentManager.simBuilder.tokenList;
+        List<Integer> encodedData = new ArrayList<>();
+        int prevLine = 0;
+        int prevChar = 0;
+    	for(LexToken lexToken:tokenList) {
+            int deltaLine = lexToken.lineNumber - prevLine;
+            // If it is on the same line, char offset is relative to the previous token's start char
+            int deltaChar = (deltaLine == 0) ? (lexToken.column - prevChar) : lexToken.column;
+
+            encodedData.add(deltaLine);
+            encodedData.add(deltaChar);
+            encodedData.add(lexToken.length);
+            encodedData.add(lexToken.tokenTypeIndex);
+            
+//            encodedData.add(lexToken.tokenModifiersBitmask);
+            encodedData.add(0);
+
+            // Update trackers for next iteration
+            prevLine = lexToken.lineNumber;
+            prevChar = lexToken.column;
+    		
+    	}
+//		Util.IERR("");
+		return encodedData;
+	}
+
 
 	public void tryCreateBuilder() {
     	LOG.info("DocumentManager.tryCreateBuilder: BEGIN");

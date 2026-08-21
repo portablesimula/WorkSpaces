@@ -4,36 +4,52 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.undo.UndoManager;
 
-import simula.core.builder.export.LexToken;
+import client.SimulaEditorClient;
 import simula.core.builder.export.SimulaDiagnostic;
-
+import simula.core.builder.export.TokenManager;
+import simula.SimulaCoreExports;
 //import simula.compiler.syntaxClass.declaration.StandardClass;
 //import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-import simula.editor.PsiTextPanel;
-import simula.editor.SourceTextPanel;
 import simula.editor.TabTextPanel;
 import simula.psi.PsiBuilder;
-import simula.psi.PsiTree;
+import simula.psi.TokenList;
 import simula.editor.SimulaEditor.Language;
 //import simula.psi.PsiBuilder;
 //import simula.psi.PsiTree;
 
 public class SourceModule {
+	
+    // Nøkkelen er filens URI (f.eks. file:///path/to/file.txt)
+    private static final ConcurrentHashMap<String, SourceModule> openDocuments = new ConcurrentHashMap<>();
+    public static SourceModule getSourceModule(String documentUri)  {
+    	return openDocuments.get(documentUri);
+    }
+	
+	String documentUri;
+	
 	public File sourceFile;
 	private String sourceText;
 //	private String tabName;
 	
-	PsiTree psiTree;
+//	TokenList psiTree;
 //	private ProgramModule syntaxTree; // Root of Syntax Tree
-	List<LexToken> tokens;
-	List<SimulaDiagnostic> diagnostics;
+	TokenList tokenList;
 	
+	List<SimulaDiagnostic> diagnostics;
+	public static void publishDiagnostics(String uri, List<SimulaDiagnostic> diagnostics) {
+		SourceModule sourceModule = SourceModule.getSourceModule(uri);
+		sourceModule.diagnostics = diagnostics;
+//		Util.IERR("NOT IMPL");
+	}
+
 	/// Current language.
     public Language lang;
 
@@ -69,13 +85,15 @@ public class SourceModule {
 //	UndoManager getUndoManager() { return(undoManager); }
 	
 
-	public SourceModule(String sourceText) {
-		this.sourceText = sourceText;
-		Global.currentModule = this;
-	}
+//	public SourceModule(String sourceText) {
+//		this.sourceText = sourceText;
+//		Global.currentModule = this;
+//	}
 	
 	public SourceModule(File sourceFile) {
 		this.sourceFile = sourceFile;
+		this.documentUri = sourceFile.toString();
+    	openDocuments.put(documentUri, this);
 		Global.currentModule = this;
 		
 		if(sourceFile != null) {
@@ -92,6 +110,10 @@ public class SourceModule {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+//			Vector<String> args = new Vector<String>();
+//			SimulaEditorClient.doOpen(documentUri, args);
+
 		}
 
 //		// Update moduleMap
@@ -167,70 +189,69 @@ public class SourceModule {
 	}
 	
 	public void dropPsiAndSyntaxTrees() {
-		psiTree = null;
+		tokenList = null;
 //		syntaxTree = null;
 	}
 
-	public void buildPsiAndSyntaxTrees() {
-		PsiBuilder psiBuilder = new PsiBuilder();
+	public void buildInitialTokenList() {
+//		PsiBuilder psiBuilder = new PsiBuilder();
 		try {
 //			psiBuilder.start(getOriginalText());
-			psiBuilder.start(getUpdatedText());
-    		IO.println("SourceModule.buildPsiAndSyntaxTrees: " + getUpdatedText().replace("\n", "\\n").replace("\r", "\\r"));
+//			psiBuilder.start(getUpdatedText());
+			Vector<String> args = new Vector<String>();
+			SimulaEditorClient.doOpen(this.documentUri.toString(), args);
+    		IO.println("SourceModule.buildInitialTokenList: " + getUpdatedText().replace("\n", "\\n").replace("\r", "\\r"));
+    		this.tokenList = new TokenList(this, SimulaCoreExports.semanticTokensFull(documentUri));
+    		if(Option.LSP_VERIFY) {
+    			tokenList.verifyTokenList();
+    		}
+//    		Util.IERR("");
 //			syntaxTree = new ProgramModule(psiBuilder);
 		} catch (Exception e) {
-			IO.println("SourceModule.buildPsiAndSyntaxTrees: GOT EXCEPTION: " + e.getMessage());
+			IO.println("SourceModule.buildInitialTokenList: GOT EXCEPTION: " + e.getMessage());
 			e.printStackTrace();
 		}
 			
 //		StandardClass.ENVIRONMENT.doChecking();
 //		Global.duringParsing = false;
 //		syntaxTree.doChecking();
-		psiTree = psiBuilder.getRoot();
-		if(Option.PSI_VERIFY) {
-			checkPsiText(psiTree);
-		}
+//		psiTree = psiBuilder.getRoot();
+//		if(Option.LSP_VERIFY) {
+//			checkPsiText(psiTree);
+//		}
 	}
 
-	public PsiTree getPsiTree() {
-		if(psiTree == null) buildPsiAndSyntaxTrees();
-		return psiTree;
+	public TokenList getTokenList() {
+		if(tokenList == null) buildInitialTokenList();
+		return tokenList;
 	}
 	
 //	public ProgramModule getSyntaxTree() {
-//		if(syntaxTree == null) buildPsiAndSyntaxTrees();
+//		if(syntaxTree == null) buildInitialTokenList();
 //		return syntaxTree;
 //	}
 	
-	private void checkPsiText(PsiTree psiTree) {
-//		if(! psiTree.getText().equals(textPanel.getText())) {
-//		try {
-			String txt1 = psiTree.getText().replace("\t", "");
-			String txt2 = getUpdatedText().replace("\t", "");
-			if(! txt1.equals(txt2)) {
-				compare(psiTree.getText(), getUpdatedText());
-				if(textPanel != null) {
-					String curTxt = getUpdatedText().replace("\r", "\\r").replace("\n", "\\n");
-					String psiTxt = (psiTree.getText()).replace("\r", "\\r").replace("\n", "\\n");
-					IO.println("EditorMenues.doRenderSyntaxTreeAction: curTxt: \""+curTxt+'"');
-					IO.println("EditorMenues.doRenderSyntaxTreeAction: psiTxt: \""+psiTxt+'"');
-					compare(curTxt, psiTxt);
-				} else {
-					String curTxt = (getUpdatedText()).replace("\r", "\\r").replace("\n", "\\n").replace("\t", "\\t");
-					String psiTxt = (psiTree.getText()).replace("\r", "\\r").replace("\n", "\\n").replace("\t", "\\t");
-					IO.println("EditorMenues.doRenderSyntaxTreeAction: curTxt: ]"+curTxt+'[');
-					IO.println("EditorMenues.doRenderSyntaxTreeAction: psiTxt: ]"+psiTxt+'[');
-					compare(curTxt, psiTxt);
-				}
-				Util.IERR("Resulting text differ from original text");
-//				Util.STOP();
-			}
-//			else IO.println("EditorMenues.doRenderSyntaxTreeAction: DONE - OK");
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
+//	private void checkPsiText(PsiTree psiTree) {
+//		String txt1 = psiTree.getText().replace("\t", "");
+//		String txt2 = getUpdatedText().replace("\t", "");
+//		if(! txt1.equals(txt2)) {
+//			compare(psiTree.getText(), getUpdatedText());
+//			if(textPanel != null) {
+//				String curTxt = getUpdatedText().replace("\r", "\\r").replace("\n", "\\n");
+//				String psiTxt = (psiTree.getText()).replace("\r", "\\r").replace("\n", "\\n");
+//				IO.println("EditorMenues.doRenderSyntaxTreeAction: curTxt: \""+curTxt+'"');
+//				IO.println("EditorMenues.doRenderSyntaxTreeAction: psiTxt: \""+psiTxt+'"');
+//				compare(curTxt, psiTxt);
+//			} else {
+//				String curTxt = (getUpdatedText()).replace("\r", "\\r").replace("\n", "\\n").replace("\t", "\\t");
+//				String psiTxt = (psiTree.getText()).replace("\r", "\\r").replace("\n", "\\n").replace("\t", "\\t");
+//				IO.println("EditorMenues.doRenderSyntaxTreeAction: curTxt: ]"+curTxt+'[');
+//				IO.println("EditorMenues.doRenderSyntaxTreeAction: psiTxt: ]"+psiTxt+'[');
+//				compare(curTxt, psiTxt);
+//			}
+//			Util.IERR("Resulting text differ from original text");
 //		}
-	}
+//	}
 	
 	private void compare(String s1, String s2) {
 		if(s1.length() != s2.length()) IO.println("EditorMenues.doRenderSyntaxTreeAction: Different length: "+s1.length()+" "+s2.length());

@@ -1,5 +1,9 @@
 package simula;
 
+import java.util.List;
+
+import simula.core.builder.export.SimulaDiagnostic;
+
 public interface SimulaCoreClient {
 	/// See: Eclipse LSP API
 	/// - org.eclipse.lsp4j.MessageType
@@ -13,6 +17,9 @@ public interface SimulaCoreClient {
 	///      ...
 	
 	enum messageType { Debug, Error, Info, Log, Warning }
+	
+	/// Diagnostics notifications are sent from the server to the client to signal results of validation runs.
+	abstract public void publishDiagnostics(String uri, List<SimulaDiagnostic> diagnostics);
 
 	/// The show message notification is sent from a server to a client to ask the client to display a particular message in the user interface.
 	/// void showMessage(MessageParams messageParams)

@@ -194,7 +194,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		cls.declaredIn.hasLocalClasses = true;
 		if (cls.prefix == null)
 			cls.prefix = StandardClass.CLASS.identifier;
-		cls.modifyIdentifier(Parse.expectIdentifier(simBuilder, "PsiTextPanel.styleNameClassIdent"));
+		cls.modifyIdentifier(Parse.expectIdentifier(simBuilder));
 		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
 			expectFormalParameterPart(simBuilder, cls.parameterList);
 			Parse.expect(simBuilder, KeyWord.SEMICOLON);

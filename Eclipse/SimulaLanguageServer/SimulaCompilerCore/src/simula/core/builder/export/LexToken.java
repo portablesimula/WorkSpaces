@@ -1,13 +1,16 @@
 package simula.core.builder.export;
 
+import java.util.Arrays;
+import java.util.List;
+
 import simula.Option;
 import simula.core.builder.SimulaLexer;
-import simula.core.builder.TokenManager;
 import simula.core.builder.util.LexPosition;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.Util;
 
 public class LexToken {
+	public int tokenTypeIndex;
     CharSequence sourceText; // Pointer to the Whole FILE
     public int lineNumber;
 //    public int startOffset;
@@ -15,28 +18,35 @@ public class LexToken {
     public int column; // Zero based column within current line
     public int length;
 	public int keyWord;
-	public String styleName;
+//	public String styleName;
 	
 	public String tokenText; // Copied from an interval of SourceText
 	
 	public static LexToken prevToken;
 	public static int lineNumberBeforeScanBasic; // TESTING SCANNER
+	
+    public void setTokenTypeIndex(String tokenType) {
+    	tokenTypeIndex = TokenManager.tokenTypes.indexOf(tokenType);
+    	if(tokenTypeIndex < 0) Util.IERR("Undefined token type: "+tokenType);
+     }
 
-	public LexToken(int tokenStartLine, CharSequence sourceText, int column, int length, int keyWord, SimulaLexer lexer) {
-		this(tokenStartLine, sourceText, column, length, keyWord, null, lexer);
-	}
+
+//	public LexToken(int tokenStartLine, CharSequence sourceText, int column, int length, int keyWord, SimulaLexer lexer) {
+//		this(tokenStartLine, sourceText, column, length, keyWord, "keyword", lexer);
+//	}
 	
 	public LexPosition getPosition() {
 		return new LexPosition(lineNumber, column);
 	}
 	
-	public LexToken(int tokenStartLine, CharSequence sourceText, int column, int length, int keyWord, String styleName, SimulaLexer lexer) {
+	public LexToken(int tokenStartLine, CharSequence sourceText, int column, int length, int keyWord, String tokenType, SimulaLexer lexer) {
 		this.lineNumber = tokenStartLine;
 		this.sourceText = sourceText;
 		this.column = column;
 		this.length = length;
 		this.keyWord = keyWord;
-		this.styleName = styleName;
+//		this.styleName = styleName;
+		this.setTokenTypeIndex(tokenType);
 		
 //		IO.println("NEW LexToken: lineNumber: "+lineNumber+", column:"+column+", length:"+length);
 		
@@ -103,10 +113,6 @@ public class LexToken {
 		if(keyWord == KeyWord.COMMENT_KEY) return false;
 		if(keyWord == KeyWord.COMMENT_TEXT) return false;
 		return true;
-	}
-	
-	public int getLspTokenType() {
-		return TokenManager.OTHER.index; 
 	}
 
 //	public String getOriginalText() {

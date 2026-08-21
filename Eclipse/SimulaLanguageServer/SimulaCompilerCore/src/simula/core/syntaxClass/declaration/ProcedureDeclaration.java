@@ -150,7 +150,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ProcedureDeclaration, type=" + type);
 //		proc.modifyIdentifier(PsiParse.expectIdentifier(simBuilder, PsiTextPanel.styleNameProcedure).edText());
-		proc.modifyIdentifier(Parse.expectIdentifier(simBuilder, "PsiTextPanel.styleNameProcedure"));
+		proc.modifyIdentifier(Parse.expectIdentifier(simBuilder));
 //		IO.println("ProcedureDeclaration.expectProcedureDeclaration: "+proc.identifierValue());
 		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
 			expectFormalParameterPart(simBuilder, proc.parameterList);

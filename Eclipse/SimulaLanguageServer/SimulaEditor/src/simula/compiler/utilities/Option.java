@@ -36,7 +36,7 @@ import simula.editor.Palette;
 /// 
 /// @author Øystein Myhre Andersen
 public final class Option {
-	public static boolean PSI_VERIFY = true;
+	public static boolean LSP_VERIFY = true;
 
 //	public static boolean TESTING_CLOSEABLE_TAB = true;
 //	public static boolean TESTING_EOF = true;

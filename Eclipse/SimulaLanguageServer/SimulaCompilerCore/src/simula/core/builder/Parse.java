@@ -203,11 +203,11 @@ public class Parse {
 	
 	/// Test to accept an identifier.
 	/// @return the identifier or null
-	public static Identifier acceptIdentifier(final SimulaBuilder simBuilder, String styleName) {
-		Identifier token = (Identifier) Parse.acceptParserToken(simBuilder, KeyWord.IDENTIFIER);
-		token.styleName = styleName;
-		return (token);
-	}
+//	public static Identifier acceptIdentifier(final SimulaBuilder simBuilder, String styleName) {
+//		Identifier token = (Identifier) Parse.acceptParserToken(simBuilder, KeyWord.IDENTIFIER);
+//		token.styleName = styleName;
+//		return (token);
+//	}
 
 	public static Identifier acceptIdentifier(final SimulaBuilder simBuilder) {
 		Identifier token = (Identifier) Parse.acceptParserToken(simBuilder, KeyWord.IDENTIFIER);
@@ -218,10 +218,10 @@ public class Parse {
 	/// 
 	/// If failing to do so, an error is printed.
 	/// @return the identifier or null
-	public static Identifier expectIdentifier(final SimulaBuilder simBuilder, String styleName) {
-        Identifier ident = acceptIdentifier(simBuilder, styleName);
-		return ident;
-	} 
+//	public static Identifier expectIdentifier(final SimulaBuilder simBuilder, String styleName) {
+//        Identifier ident = acceptIdentifier(simBuilder, styleName);
+//		return ident;
+//	} 
 	
 	public static Identifier expectIdentifier(final SimulaBuilder simBuilder) {
         Identifier ident = acceptIdentifier(simBuilder);

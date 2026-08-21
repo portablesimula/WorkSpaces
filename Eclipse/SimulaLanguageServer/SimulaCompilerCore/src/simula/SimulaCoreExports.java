@@ -7,9 +7,6 @@ import java.util.Vector;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.TokenManager;
-import simula.core.builder.export.LexToken;
-import simula.core.builder.export.SimulaDiagnostic;
 import simula.core.coder.SimulaCoder;
 import simula.core.coder.SimulaExec;
 import simula.core.utilities.LOG;
@@ -26,7 +23,7 @@ public class SimulaCoreExports {
 		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
 
 		CoreGlobal.initiate();
-		CoreGlobal.simulaCoreClient = client;
+		DocumentManager.simulaCoreClient = client;
     	String[] args = argv.toArray(new String[0]);
 		Option.decodeArguments(args);
 	}
@@ -111,17 +108,17 @@ public class SimulaCoreExports {
 		DocumentManager.didClose(documentUri);
 	}
 
-	
-    public static List<LexToken> getTokenList(String documentUri) {
-        LOG.info("TokenManager.semanticTokensFullBody: BEGIN");
-		Util.IERR("NOT IMPL");
-		return TokenManager.getTokenList(documentUri);
-    }
-	
-    public static List<SimulaDiagnostic> getDiagnostics(String documentUri) {
-        LOG.info("TokenManager.semanticTokensFullBody: BEGIN");
-		Util.IERR("NOT IMPL");
-		return TokenManager.getDiagnostics(documentUri);
-    }
+	/// The textDocument/semanticTokens/full request is sent from the client to the server to return
+	/// the semantic tokens for a whole file.
+	///	@ProtocolSince("3.16.0")
+	///	@JsonRequest(value="textDocument/semanticTokens/full", useSegment = false)
+	///	default CompletableFuture<SemanticTokens> semanticTokensFull(SemanticTokensParams params) {
+	///		throw new UnsupportedOperationException();
+	///	}
+	public static List<Integer> semanticTokensFull(final String documentUri) {
+    	LOG.info("DocumentManager.semanticTokensFull: BEGIN");
+//		Util.IERR("NOT IMPL");
+		return DocumentManager.semanticTokensFull(documentUri);
+	}
 
 }

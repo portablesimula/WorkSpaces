@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Set;
+import java.util.Vector;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -31,12 +32,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import client.SimulaEditorClient;
 import simula.compiler.SourceModule;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.editor.SimulaEditor.Language;
-import simula.psi.PsiTree;
+import simula.psi.TokenList;
 
 /// @author Google AI
 /// @author Øystein Myhre Andersen
@@ -144,9 +146,9 @@ public class TabbedTextHandler {
 		    		IO.println("TabbedTextHandler.doNewTabbedPanel: textPanel: " + currentModule.textPanel);
 //					currentTextPanel = psiTextPanel;
 //		    		psiTextPanel.fillTextPane(reader,0);
-//					currentModule.buildPsiAndSyntaxTrees();
-					PsiTree psiTree = currentModule.getPsiTree();
-		    		PsiTextPanel psiTextPanel = new PsiTextPanel(currentModule, SimulaEditor.menuBar.popupMenu);
+//					currentModule.buildInitialTokenList();
+					TokenList psiTree = currentModule.getTokenList();
+		    		LspTextPanel psiTextPanel = new LspTextPanel(currentModule, SimulaEditor.menuBar.popupMenu);
 		    		psiTextPanel.fillTextPane(0, psiTree);
 					currentTextPanel = psiTextPanel;
 
@@ -182,10 +184,10 @@ public class TabbedTextHandler {
     /// Create a new Tab with text generated from the given psi tree.
     /// @param file the file
     /// @param lang the language
-    static void doNewTabbedPsiPanel(PsiTree psiTree, String prefix) {
+    static void doNewTabbedPsiPanel(TokenList psiTree, String prefix) {
     	if(tabbedPane == null) doOpenTabbedPane();
     	SwingUtilities.invokeLater(() -> {
-    		PsiTextPanel psiTextPanel=new PsiTextPanel(Global.currentModule, SimulaEditor.menuBar.popupMenu);
+    		LspTextPanel psiTextPanel=new LspTextPanel(Global.currentModule, SimulaEditor.menuBar.popupMenu);
     		String tabName = prefix + Global.currentModule.getTabName();
 
 			tabbedPane.addTab(null, psiTextPanel); // Add content first, will be replaced
@@ -369,9 +371,10 @@ public class TabbedTextHandler {
 //			SourceModule currentModule = Global.currentModule;
 //			SourceModule currentModule = new SourceModule(file, SimulaEditor.Language.Simula); 
 			
-//			currentModule.buildPsiAndSyntaxTrees();
-//			PsiTree psiTree = currentModule.getPsiTree();
-//			doNewTabbedPsiPanel(psiTree, "");
+			currentModule.buildInitialTokenList();
+
+//			PsiTree psiTree = currentModule.getTokenList();
+			doNewTabbedPsiPanel(currentModule.getTokenList(), "");
 //        	Global.setCurrentWorkspace(fileChooser.getCurrentDirectory());
 			Util.IERR("");
 			break;

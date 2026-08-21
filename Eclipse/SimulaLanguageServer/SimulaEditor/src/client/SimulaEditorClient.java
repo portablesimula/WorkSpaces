@@ -3,12 +3,21 @@ package client;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Vector;
 
 import simula.SimulaCoreClient;
 import simula.SimulaCoreExports;
+import simula.compiler.SourceModule;
+import simula.core.builder.export.SimulaDiagnostic;
 
 public class SimulaEditorClient implements SimulaCoreClient {
+
+	@Override
+	public void publishDiagnostics(String uri, List<SimulaDiagnostic> diagnostics) {
+		SourceModule.publishDiagnostics(uri, diagnostics);
+//		Util.IERR("NOT IMPL");
+	}
 
 	@Override
 	public void showMessage(messageType type, String message) {
@@ -24,6 +33,8 @@ public class SimulaEditorClient implements SimulaCoreClient {
 //		try {
 		// Remove time, date, and headers from Logger output.
 		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
+		IO.println("SimulaEditorClient.doOpen: " + fileName);
+//		Thread.dumpStack();
 		
 		SimulaCoreExports.initiate(new SimulaEditorClient(), argv);
 		String uri = fileName;

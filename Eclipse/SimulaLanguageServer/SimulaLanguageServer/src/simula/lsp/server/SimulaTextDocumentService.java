@@ -14,6 +14,7 @@ public class SimulaTextDocumentService implements TextDocumentService {
 
     public SimulaTextDocumentService(SimulaLanguageServer myLanguageServer) {
 		// TODO Auto-generated constructor stub
+    	semanticTokensFull(null);
 	}
 
 	// Document lifecycle notification: Client opened a file
