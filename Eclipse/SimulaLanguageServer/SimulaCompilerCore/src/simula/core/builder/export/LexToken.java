@@ -26,8 +26,7 @@ public class LexToken {
 	public static int lineNumberBeforeScanBasic; // TESTING SCANNER
 	
     public void setTokenTypeIndex(String tokenType) {
-    	tokenTypeIndex = TokenManager.tokenTypes.indexOf(tokenType);
-    	if(tokenTypeIndex < 0) Util.IERR("Undefined token type: "+tokenType);
+    	tokenTypeIndex = TokenManager.getTokenTypeIndex(tokenType);
      }
 
 

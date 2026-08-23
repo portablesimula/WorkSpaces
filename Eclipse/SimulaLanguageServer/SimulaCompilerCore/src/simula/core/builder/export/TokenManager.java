@@ -5,13 +5,11 @@ import java.util.List;
 
 import simula.core.DocumentManager;
 import simula.core.builder.SimulaTokenType;
+import simula.core.utilities.Util;
 
 /// @author Øystein Myhre Andersen
 /// @author Google AI
 public class TokenManager {
-
-    public static List<String> tokenTypes = Arrays.asList("class", "procedure", "parameter", "identifier", "variable",
-			  "keyword", "comment", "string", "constant", "symbol", "whiyeSpaces");
 
 	// Standard Token Types defined by VSCode:
 	//
@@ -38,6 +36,55 @@ public class TokenManager {
 	// regexp			Regular expressions
 	// operator			Math/logic operators
 	
+
+//    public static List<String> tokenTypes = Arrays.asList("class", "procedure", "parameter", "identifier", "variable",
+//			  "keyword", "comment", "string", "constant", "symbol", "whiyeSpaces");
+
+	/// NOTE: SEE: simula.editor.LspTextPanel
+	public static List<String> tokenTypes = Arrays.asList(
+        SimulaTokenTypes.Keyword,    // Index: 0
+        SimulaTokenTypes.Class,      // Index: 1  Class identifier
+        SimulaTokenTypes.Attribute,  // Index: 2  Class attribute
+        SimulaTokenTypes.Procedure,  // Index: 3  Procedure identifier
+        SimulaTokenTypes.Variable,   // Index: 4  Variable identifier
+        SimulaTokenTypes.Parameter,  // Index: 5  Class/Procedure Parameter identifier
+        SimulaTokenTypes.String,     // Index: 6  String constant
+        SimulaTokenTypes.Character,  // Index: 7  Character constant
+        SimulaTokenTypes.Number,     // Index: 8
+        SimulaTokenTypes.Operator,   // Index: 9  LT, EQ, ...
+        SimulaTokenTypes.Label,      // Index: 10
+        SimulaTokenTypes.Comment,    // Index: 11
+        SimulaTokenTypes.WhiteSpace, // Index: 12
+        SimulaTokenTypes.Symbol      // Index: 13
+    );
+
+    public static final int SimulaTokenKeyword    = 0;
+    public static final int SimulaTokenClass      = 1; //  Class identifier
+    public static final int SimulaTokenAttribute  = 2; //  Class attribute
+    public static final int SimulaTokenProcedure  = 3; //  Procedure identifier
+    public static final int SimulaTokenVariable   = 4; //  Variable identifier
+    public static final int SimulaTokenParameter  = 5; //  Class/Procedure Parameter identifier
+    public static final int SimulaTokenString     = 6; //  String constant
+    public static final int SimulaTokenCharacter  = 7; //  Character constant
+    public static final int SimulaTokenNumber     = 8; //
+    public static final int SimulaTokenOperator   = 9; //  LT, EQ, ...
+    public static final int SimulaTokenLabel      = 10; //
+    public static final int SimulaTokenComment    = 11; //
+    public static final int SimulaTokenWhiteSpace = 12; //
+    public static final int SimulaTokenSymbol     = 13; //
+
+    public static String getTokenType(int tokenTypeIndex) {
+    	String tokenType = TokenManager.tokenTypes.get(tokenTypeIndex);
+    	return tokenType;
+     }
+	
+    public static int getTokenTypeIndex(String tokenType) {
+    	int tokenTypeIndex = TokenManager.tokenTypes.indexOf(tokenType);
+    	if(tokenTypeIndex < 0) Util.IERR("Undefined token type: "+tokenType);
+    	return tokenTypeIndex;
+     }
+    
+    
 //	class SimulaTokenType {
 //		String VSCode_TokenType;
 //		int index;

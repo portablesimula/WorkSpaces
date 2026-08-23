@@ -7,6 +7,7 @@ import java.util.Vector;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.SimulaBuilder;
+import simula.core.builder.export.TokenManager;
 import simula.core.coder.SimulaCoder;
 import simula.core.coder.SimulaExec;
 import simula.core.utilities.LOG;
@@ -63,6 +64,56 @@ public class SimulaCoreExports {
 	
 	// ==============================================================================================================
 	
+//    @Override
+//    public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
+//        return CompletableFuture.supplyAsync(() -> {
+//            ServerCapabilities caps = new ServerCapabilities();
+//            caps.setTextDocumentSync(TextDocumentSyncKind.Full); // Konfigurer sync
+//            caps.setCompletionProvider(new CompletionOptions()); // Aktiver auto-fullføring
+//            return new InitializeResult(caps);
+//        });
+//    }
+	
+	
+///	The initialize request is sent as the first request from the client to the server.
+///	If the server receives requests or notifications before the initialize request,
+/// it should act as follows:
+///
+///	- for a request, the response should be errored with: ResponseErrorCode.ServerNotInitialized.
+///   The message can be picked by the server.
+/// 
+///	- notifications should be dropped, except for the exit notification.
+///   This will allow the client to exit a server without an initialize request.
+/// 
+///	Until the server has responded to the initialize request with an InitializeResult,
+/// the client must not send any additional requests or notifications to the server.
+///
+///	During the initialize request, the server is allowed to send the notifications window/showMessage,
+/// window/logMessage, and telemetry/event, as well as the request window/showMessageRequest, to the client.
+/// 
+/// +------------------+                   +----------------------+
+/// |  VS Code Client  |                   |  Eclipse JDT Server  |
+/// +------------------+                   +----------------------+
+///          |                                         |
+///          |  1. Spawns Java process with args       |
+///          |---------------------------------------->| (JVM Starts up)
+///          |                                         |
+///          |  2. Sends "initialize" JSON-RPC request |
+///          |---------------------------------------->| `JDTLanguageServer.initialize()`
+///          |                                         | Maps capabilities & workspace
+///          |                                         |
+///          |  3. Responds with Server Capabilities   |
+///          |<----------------------------------------| `InitializeResult` sent back
+///          |                                         |
+///          |                                         |
+///          |  4. Responds with Notification          |
+///          |---------------------------------------->| `Initialized` sent back ?????
+///          |                                         |
+///	CompletableFuture<InitializeResult> initialize(InitializeParams params)
+	public static boolean initialize(List<String> tokenTypes) {
+		TokenManager.tokenTypes = tokenTypes;
+		return true;
+	}
 	
 	/// The document open notification is sent from the client to the server to
 	/// signal newly opened text documents. The document's truth is now managed

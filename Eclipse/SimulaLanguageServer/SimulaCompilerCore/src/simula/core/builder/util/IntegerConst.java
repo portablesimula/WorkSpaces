@@ -3,6 +3,7 @@ package simula.core.builder.util;
 import simula.Option;
 import simula.core.builder.SimulaLexer;
 import simula.core.builder.export.LexToken;
+import simula.core.builder.export.SimulaTokenTypes;
 import simula.core.utilities.KeyWord;
 
 public class IntegerConst extends LexToken {
@@ -10,7 +11,7 @@ public class IntegerConst extends LexToken {
 
 	public IntegerConst(int tokenStartLine, CharSequence sourceText, int column, int length, long value, SimulaLexer lexer) {
 //		super(tokenStartLine, sourceText, startOffset, endOffset, KeyWord.INTEGERKONST);
-		super(tokenStartLine, sourceText, column, length, KeyWord.INTEGERKONST, "constant", lexer);
+		super(tokenStartLine, sourceText, column, length, KeyWord.INTEGERKONST, SimulaTokenTypes.Number, lexer);
 		this.value = value;
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();
 	}

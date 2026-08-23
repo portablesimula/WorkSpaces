@@ -33,6 +33,7 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.core.builder.export.LexToken;
+import simula.core.builder.export.TokenManager;
 import simula.editor.SimulaEditor.Language;
 //import simula.psi.LexToken;
 //import simula.psi.PsiElement;
@@ -43,7 +44,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.io.Reader;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /// The Source text Panel.
@@ -175,7 +179,7 @@ public class LspTextPanel extends TabTextPanel {
 	/// Create a new PsiTextPanel.
 	/// @param sourceFile the source file
 	/// @param popupMenu the popupMenu
-LspTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
+	LspTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
     	super(sourceModule, popupMenu);
 //   	this.currentModule = new SourceModule(this, sourceFile);
 //    	this.sourceFile=sourceFile;
@@ -239,52 +243,74 @@ LspTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
     /// Fill the text pane with text delivered from the psiTree.
     /// @param caretPosition the caretPosition after the operations
     /// @param preScanner the scanner to use
-    void fillTextPane(int caretPosition, TokenList tokenList) {
+    /// @throws IOException 
+    void fillTextPane(int caretPosition, TokenList tokenList) throws IOException {
 		int lineNumber=1;
-		StyledDocument lin = new DefaultStyledDocument(); addStylesToLineDocument(lin);
+		StyledDocument lin = new DefaultStyledDocument();
+		addStylesToLineDocument(lin);
         editTextPane.setEditable(false);
     	doc.removeUndoableEditListener(undoListener);
 		try {
 			doc.remove(0, doc.getLength());
 			Set<String> errorLines = null;
-			tokenList.fillLineAndTextPanel();
-			Util.IERR("NOT IMPL");
 			
-//			// Standard traversal loop  ====================== GAMMEL KODE:
-//			for(LexToken elt:psiTree.tokenList) {
-//				IO.println("PsiTextPanel.fillTextPane: GOT NEXT: " + elt);
-//			    if(elt != null) {
-//			    	if(elt instanceof LexToken lexToken) {
-//			    		if(lexToken.keyWord == KeyWord.EOF) {
-//				    	    SimpleAttributeSet attrs = lexToken.getTooltipAttrs(errorLines);
-//					    	if(attrs != null) {
-//			    				lin.insertString(lin.getLength(),edLineNumber(lineNumber++), attrs);					    		
-//			    				errorLines = null;
-//					    	}
-//			    		} else if(lexToken.keyWord == KeyWord.NEWLINE) {
-//							if(Option.LSP_VERIFY && elt.firstLineNumber() != lineNumber) {
-//								Util.IERR("GOT NEWLINE: " + lexToken + " -- PSI VERIFIER FAILED: " + elt.firstLineNumber() + " != lineNumber=" + lineNumber);
-//							}
-//		    				String lineString = edLineNumber(lineNumber++);
-//			    			// Should only be here AFTER a complete line is rendered
-//				    	    SimpleAttributeSet attrs = lexToken.getTooltipAttrs(errorLines);
-//					    	if(attrs != null) {
-//			    				lin.insertString(lin.getLength(),lineString, attrs);					    		
-//			    				errorLines = null;
-//			    			} else {
-//				    			lin.insertString(lin.getLength(),lineString, styleLineNumber);
-//			    			}
-//			    		}
-//			        	errorLines = lexToken.accumErrors(errorLines);
-//			    	    SimpleAttributeSet attrs = lexToken.getTooltipAttrs(null);
-//				    	if(attrs != null) {
-//					    	doc.insertString(doc.getLength(), elt.getText(), attrs);
-//				    	} else {
-//					    	doc.insertString(doc.getLength(), elt.getText(), elt.getStyle(this));				    		
-//				    	}
-//			    	}
-//			    }
-//		    }
+//			tokenList.fillLineAndTextPanel(this, lin, doc, styleLineNumber);
+			String originalText = sourceModule.getOriginalText();
+//			String originalText = sourceModule.getUpdatedText();
+
+			int prevLine = -1;
+			int currentLine = 0;
+			int currentStartChar = 0;
+			int beginIndex = 0;
+			int x = 0;
+			List<Integer> tokens = tokenList.tokens;
+			while(x < tokens.size()) {
+				int deltaLine = tokens.get(x++);
+				int deltaStart = tokens.get(x++);
+				int length = tokens.get(x++);
+				int tokenTypeIndex = tokens.get(x++);
+				int tokenModifiersBitmask = tokens.get(x++);
+
+				// 1. Calculate absolute line location
+				currentLine += deltaLine;
+
+				// 2. Calculate absolute character index within that line
+				if (deltaLine == 0) {
+					currentStartChar += deltaStart;
+				} else {
+					currentStartChar = deltaStart;
+				}
+				beginIndex += deltaStart; 
+				String tokenText = originalText.substring(beginIndex, beginIndex + length);
+				// Print tracking information
+				System.out.printf("Token at [Line %d, Char %d] (Len: %d, TypeId: %d:%s) -> \"%s\"%n", 
+						currentLine, currentStartChar, length, tokenTypeIndex, TokenManager.tokenTypes.get(tokenTypeIndex), tokenText);
+
+
+				if (currentLine != prevLine) {
+					prevLine = currentLine;
+					String lineString = edLineNumber(currentLine+1);
+					// Should only be here AFTER a complete line is rendered
+					SimpleAttributeSet attrs = getTooltipAttrs(currentLine, errorLines);
+					if(attrs != null) {
+						lin.insertString(lin.getLength(),lineString, attrs);					    		
+						errorLines = null;
+					} else {
+						lin.insertString(lin.getLength(),lineString, styleLineNumber);
+					}
+				}
+
+//				errorLines = lexToken.accumErrors(errorLines);
+//				SimpleAttributeSet attrs = lexToken.getTooltipAttrs(null);
+//				if(attrs != null) {
+//					doc.insertString(doc.getLength(), tokenText, attrs);
+//				} else {
+					doc.insertString(doc.getLength(), tokenText, getStyle(tokenTypeIndex));				    		
+//				}
+
+				//          Util.IERR("");
+			}
+			
 		} catch (BadLocationException ble) {
 			System.err.println("Couldn't insert text into text pane.");
 		}
@@ -320,9 +346,59 @@ LspTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
 //    	Util.STOP();
 	}
     
+    
 	// ****************************************************************
 	// *** Utilities
 	// ****************************************************************
+	public SimpleAttributeSet getTooltipAttrs(int lineNumber, Set<String> errorLines) {
+	    	
+//	    	if(errorLines != null || getErrors() != null) {
+//	    		IO.println("\n\nPsiTextPanel.getTooltipText: BEGIN: errorLines: "+errorLines);
+//	    		IO.println("PsiTextPanel.getTooltipText: BEGIN: lexErrors: "+getErrors());
+//	    	}
+	    	errorLines = accumErrors(lineNumber, errorLines);
+	    	
+	    	if(errorLines == null) return null;
+//	    	IO.println("PsiTextPanel.getTooltipText: RENDER: errorLines: "+errorLines);
+	    	
+	    	String tooltipText = null;
+	    	if(errorLines.size() == 1) {
+//	    		tooltipText = errorLines.firstElement();
+	    		for(String msg:errorLines) {
+	    			tooltipText = msg;
+	    		}    		
+	    	} else {
+	    		String res = "<html>Multiple markers on this line:<ul>";
+	    		for(String msg:errorLines) {
+	    			res = res + "<li>" + msg + "</li>";
+	    		}
+//	        	IO.println("PsiTextPanel.getTooltipText: RESULT: "+res);
+	        	tooltipText = res + "</ul>";
+	    	}
+
+			SimpleAttributeSet attrs = new SimpleAttributeSet();
+	        StyleConstants.setFontFamily(attrs, "Courier New");
+			StyleConstants.setForeground(attrs, Palette.ErrorForeground);
+			StyleConstants.setBackground(attrs, Palette.ErrorBackground);
+	        StyleConstants.setBold(attrs, true);
+			attrs.addAttribute("tooltip", tooltipText);
+	    	return attrs;
+	    }
+
+
+	    public Set<String> accumErrors(int lineNumber, Set<String> errorLines) {
+	    	Set<String> errors = null; // getErrors(lineNumber);
+	    	if(errors != null) {
+	    		if(errorLines == null) errorLines = new HashSet<String>();
+	    		errorLines.addAll(errors);
+	    	}
+	    	return errorLines;
+	    }
+
+	// ****************************************************************
+	// *** Utilities
+	// ****************************************************************
+
 	/// Utility: Edit right justified line number string.
 	/// 
 	/// @param n the length of line number field
@@ -432,10 +508,31 @@ LspTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
         styleConstant = doc.getStyle(styleNameConstant);
     	styleClassIdent = doc.getStyle(styleNameClassIdent);
     	styleProcedure = doc.getStyle(styleNameProcedure);
-       styleError=doc.getStyle(styleNameError);
+    	styleError=doc.getStyle(styleNameError);
 //        styleLineNumber=doc.getStyle("lineNumber");
     }
-    
+ 
+    /// NOTE: SEE: simula.core.builder.export.TokenManager
+	public Style getStyle(int tokenTypeIndex) {
+		switch(tokenTypeIndex) {
+			case TokenManager.SimulaTokenKeyword:	 return styleKeyword;
+		    case TokenManager.SimulaTokenClass:	     return styleClassIdent;
+		    case TokenManager.SimulaTokenAttribute:  return styleRegular;
+		    case TokenManager.SimulaTokenProcedure:  return styleProcedure;
+		    case TokenManager.SimulaTokenVariable:   return styleRegular;
+		    case TokenManager.SimulaTokenParameter:  return styleRegular;
+		    case TokenManager.SimulaTokenString:     return styleConstant;
+		    case TokenManager.SimulaTokenCharacter:  return styleConstant;
+		    case TokenManager.SimulaTokenNumber:     return styleConstant;
+		    case TokenManager.SimulaTokenOperator:   return styleRegular;
+		    case TokenManager.SimulaTokenLabel:      return styleRegular;
+		    case TokenManager.SimulaTokenComment:    return styleComment;
+		    case TokenManager.SimulaTokenWhiteSpace: return styleRegular;
+		    case TokenManager.SimulaTokenSymbol:     return styleRegular;
+		}
+		return styleRegular;
+	}	
+
     @Override
     public String toString() {
     	String s="SourceTextPanel(";

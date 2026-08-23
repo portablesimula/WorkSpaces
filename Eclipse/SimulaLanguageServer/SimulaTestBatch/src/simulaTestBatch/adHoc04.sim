@@ -1,4 +1,5 @@
 Simset
+
 begin text t;
 %	outtext("Hello World !");
 	if false then outtext("*** error: (3)") else;

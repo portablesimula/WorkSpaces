@@ -10,15 +10,22 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import simula.Option;
 import simula.SimTextDocumentContentChangeEvent;
 import simula.SimulaCoreClient;
+import simula.core.SemanticTokenGenerator.LexerToken;
+import simula.core.SemanticTokenGenerator.SemanticToken;
+import simula.core.SemanticTokenGenerator.TokenType;
 import simula.core.builder.DocumentTextUpdater;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.export.LexToken;
 import simula.core.builder.export.SimulaDiagnostic;
+import simula.core.builder.export.TokenListVerifyer;
+import simula.core.builder.export.TokenManager;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.statement.ProgramModule;
+import simula.core.utilities.KeyWord;
 import simula.core.utilities.LOG;
 import simula.core.utilities.Util;
 
@@ -310,35 +317,122 @@ public class DocumentManager {
 	}
 
 	
+	private final static boolean TESTING = true;
 	/// The textDocument/semanticTokens/full request is sent from the client
 	/// to the server to return the semantic tokens for a whole file.
 	public static List<Integer> semanticTokensFull(String documentUri) {
+		if(TESTING) IO.println("DocumentManager.semanticTokensFull: " + documentUri);
     	DocumentManager documentManager = openDocuments.get(documentUri);
-    	List<LexToken> tokenList = documentManager.simBuilder.tokenList;
+    	List<LexToken> lexTokenList = documentManager.simBuilder.tokenList;
+    	List<Integer> encodedData = generateSemanticTokens(lexTokenList);
+//		Util.IERR("DO VERIFY");
+		if(Option.LEX_VERIFY) {
+			TokenListVerifyer.verifyTokenList(documentManager.sourceCode, encodedData, lexTokenList);
+		}
+		return encodedData;
+	}
+	
+	private static List<Integer> generateSemanticTokens(List<LexToken> lexTokenList) {
+		IO.println("DocumentManager.generateSemanticTokens: " + lexTokenList.size());
         List<Integer> encodedData = new ArrayList<>();
-        int prevLine = 0;
-        int prevChar = 0;
-    	for(LexToken lexToken:tokenList) {
-            int deltaLine = lexToken.lineNumber - prevLine;
-            // If it is on the same line, char offset is relative to the previous token's start char
-            int deltaChar = (deltaLine == 0) ? (lexToken.column - prevChar) : lexToken.column;
+        
+        int currentLine = 0;
+        int lastTokenLine = 0;
+        int lastDeltaStart = 0;
 
+        for (LexToken lexToken : lexTokenList) {
+            if (lexToken.keyWord == KeyWord.NEWLINE) { currentLine++; continue; }
+            if (lexToken.keyWord == KeyWord.WHITESPACES) { continue; }
+
+            // Beregn relative verdier (deltas)
+            // deltaLine: Antall linjer nedover fra starten av det forrige tokenet.
+            // deltaStart: Antall tegn til høyre fra starten av det forrige tokenet (eller fra starten av linjen hvis deltaLine > 0).
+            int deltaLine = currentLine - lastTokenLine;
+            int deltaStart = (deltaLine == 0) ? (lexToken.column - lastDeltaStart) : lexToken.column;
+            if(deltaLine == 0) {
+            	// Fortsett på samme linje
+            	deltaStart = lexToken.column - lastDeltaStart;
+            	IO.println("\nFortsett på samme linje: deltaStart = lexToken.column - lastDeltaStart: " + deltaStart);
+            } else {
+            	// Start NEWLINE
+            	deltaStart = lexToken.column;
+            	IO.println("\nStart NEWLINE: deltaStart = lexToken.column: " + deltaStart);
+            }
+
+            // Map din interne TokenType til en semantisk ID indeks (eksempelverdier)
+//            int semanticTypeIndex = mapToSemanticTypeIndex(lexToken.type);
+//            int semanticTypeIndex = lexToken.tokenTypeIndex;
+
+            // Legg til det semantiske tokenet
+//            semanticTokens.add(new SemanticToken(deltaLine, deltaStart, lexToken.length, semanticTypeIndex));
             encodedData.add(deltaLine);
-            encodedData.add(deltaChar);
+            encodedData.add(deltaStart);
             encodedData.add(lexToken.length);
             encodedData.add(lexToken.tokenTypeIndex);
             
-//            encodedData.add(lexToken.tokenModifiersBitmask);
+//          encodedData.add(lexToken.tokenModifiersBitmask);
             encodedData.add(0);
+            
+            
+            if(TESTING) {
+            	IO.println(""+lexToken);
+ 	    		String str = Util.printable(lexToken.tokenText);
+ 	    		IO.println("==> DeltaLine " + deltaLine + ": " + TokenManager.tokenTypes.get(lexToken.tokenTypeIndex)
+ 	    		+ "[deltaStart:" + deltaStart + ", lng:" + lexToken.length + "] Text: \"" + str + '"');
+             }
+            
 
-            // Update trackers for next iteration
-            prevLine = lexToken.lineNumber;
-            prevChar = lexToken.column;
+            // Oppdater historikk for neste iterasjon
+            lastTokenLine = currentLine;
+            lastDeltaStart = lexToken.column;
+//            lastDeltaStart = deltaStart;
+        	IO.println("Fortsett: lastDeltaStart: " + lastDeltaStart);
+        }
+
+        return encodedData;
+    }
+
+	private static List<Integer> OLD_generateSemanticTokens(List<LexToken> lexTokenList) {
+        List<Integer> encodedData = new ArrayList<>();
+        int prevLine = 0;
+        int prevChar = 0;
+    	for(LexToken lexToken:lexTokenList) {
+//            int deltaLine = lexToken.lineNumber - prevLine;
+//            // If it is on the same line, char offset is relative to the previous token's start char
+//            int deltaChar = (deltaLine == 0) ? (lexToken.column - prevChar) : lexToken.column;
+
+//            IO.println("DocumentManager.semanticTokensFull: " + KeyWord.edit(lexToken.keyWord));
+            if(lexToken.keyWord != KeyWord.NEWLINE && lexToken.keyWord != KeyWord.WHITESPACES) {
+                int deltaLine = lexToken.lineNumber - prevLine;
+                // If it is on the same line, char offset is relative to the previous token's start char
+                int deltaChar = (deltaLine == 0) ? (lexToken.column - prevChar) : lexToken.column;
+	            encodedData.add(deltaLine);
+	            encodedData.add(deltaChar);
+	            encodedData.add(lexToken.length);
+	            encodedData.add(lexToken.tokenTypeIndex);
+	            
+//              encodedData.add(lexToken.tokenModifiersBitmask);
+	            encodedData.add(0);
+
+	            if(TESTING) {
+		    		String str = Util.printable(lexToken.getText());
+		    		IO.println("DeltaLine " + deltaLine + ": " + TokenManager.tokenTypes.get(lexToken.tokenTypeIndex)
+		    		+ "[deltaChar:" + deltaChar + ", lng:" + lexToken.length + "] Text: \"" + str + '"');
+	            }
+	            
+	            // Update trackers for next iteration
+	            prevLine = lexToken.lineNumber;
+	            prevChar = lexToken.column;
+	 
+            }
+            
+//            // Update trackers for next iteration
+//            prevLine = lexToken.lineNumber;
+//            prevChar = lexToken.column;
     		
     	}
-//		Util.IERR("");
 		return encodedData;
-	}
+    }
 
 
 	public void tryCreateBuilder() {

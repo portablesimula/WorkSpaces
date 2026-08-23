@@ -149,7 +149,12 @@ public class TabbedTextHandler {
 //					currentModule.buildInitialTokenList();
 					TokenList psiTree = currentModule.getTokenList();
 		    		LspTextPanel psiTextPanel = new LspTextPanel(currentModule, SimulaEditor.menuBar.popupMenu);
-		    		psiTextPanel.fillTextPane(0, psiTree);
+				try {
+					psiTextPanel.fillTextPane(0, psiTree);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 					currentTextPanel = psiTextPanel;
 
 					break;
@@ -192,11 +197,16 @@ public class TabbedTextHandler {
 
 			tabbedPane.addTab(null, psiTextPanel); // Add content first, will be replaced
 			int index = tabbedPane.getTabCount() - 1;
-			tabbedPane.setTabComponentAt(index, new ClosableTabPanel("WW_"+tabName, tabbedPane, psiTextPanel));
+			tabbedPane.setTabComponentAt(index, new ClosableTabPanel(tabName, tabbedPane, psiTextPanel));
 			tabbedPane.setSelectedIndex(index);
 
     		Global.currentModule.fileChanged=false;
-    		psiTextPanel.fillTextPane(0, psiTree);
+    		try {
+				psiTextPanel.fillTextPane(0, psiTree);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     		SimulaEditor.menuBar.updateMenuItems();
     	});
     }
@@ -376,7 +386,7 @@ public class TabbedTextHandler {
 //			PsiTree psiTree = currentModule.getTokenList();
 			doNewTabbedPsiPanel(currentModule.getTokenList(), "");
 //        	Global.setCurrentWorkspace(fileChooser.getCurrentDirectory());
-			Util.IERR("");
+//			Util.IERR("");
 			break;
 		case Jar:
 			IO.println("EditorMenues.doOpenFileAction: "+file);
