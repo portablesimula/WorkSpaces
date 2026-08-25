@@ -6,7 +6,7 @@ import simula.compiler.SourceModule;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.psi.PsiBuilder;
-import simula.psi.TokenList;
+import simula.psi.SemanticTokens;
 
 import java.awt.*;
 
@@ -133,14 +133,14 @@ public class PaletteChooser extends JDialog {
         		+ "       outtext\"line with error\");\n"
         		+ "    end;\n"
         		+ " end\n";
-    	TokenList psiTree = getTokenList(sourceText);
+    	SemanticTokens psiTree = getTokenList(sourceText);
 //		demoPanel = new PsiTextPanel(SimulaEditor. Language.Simula, null);
 		demoPanel = new LspTextPanel(new SourceModule(sourceText), null);
 		demoPanel.fillTextPane(0, psiTree);
 		return demoPanel;
     }
 
-	public TokenList getTokenList(String sourceText) {
+	public SemanticTokens getTokenList(String sourceText) {
 		PsiBuilder psiBuilder = new PsiBuilder();
 		psiBuilder.start(sourceText);
 //		@SuppressWarnings("unused")

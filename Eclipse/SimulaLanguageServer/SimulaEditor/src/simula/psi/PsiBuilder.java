@@ -9,7 +9,7 @@ public class PsiBuilder {
 		Util.IERR("");
 	}
 
-	public TokenList getRoot() {
+	public SemanticTokens getRoot() {
 		// TODO Auto-generated method stub
 		Util.IERR("");
 		return null;

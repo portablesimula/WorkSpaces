@@ -3,14 +3,13 @@ package simula.psi;
 import java.util.List;
 import simula.compiler.SourceModule;
 import simula.compiler.utilities.Util;
-import simula.core.builder.export.TokenManager;
 
-public class TokenList {
+public class SemanticTokens {
 //	public List<LexToken> tokenList;
 	private SourceModule sourceModule;
 	public List<Integer> tokens;
 	
-	public TokenList(SourceModule sourceModule, List<Integer> tokens) {
+	public SemanticTokens(SourceModule sourceModule, List<Integer> tokens) {
 		this.sourceModule = sourceModule;
 		this.tokens = tokens;
 	}

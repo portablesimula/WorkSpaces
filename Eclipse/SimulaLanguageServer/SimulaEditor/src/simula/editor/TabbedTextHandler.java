@@ -38,7 +38,7 @@ import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.editor.SimulaEditor.Language;
-import simula.psi.TokenList;
+import simula.psi.SemanticTokens;
 
 /// @author Google AI
 /// @author Øystein Myhre Andersen
@@ -147,7 +147,7 @@ public class TabbedTextHandler {
 //					currentTextPanel = psiTextPanel;
 //		    		psiTextPanel.fillTextPane(reader,0);
 //					currentModule.buildInitialTokenList();
-					TokenList psiTree = currentModule.getTokenList();
+					SemanticTokens psiTree = currentModule.getTokenList();
 		    		LspTextPanel psiTextPanel = new LspTextPanel(currentModule, SimulaEditor.menuBar.popupMenu);
 				try {
 					psiTextPanel.fillTextPane(0, psiTree);
@@ -189,7 +189,7 @@ public class TabbedTextHandler {
     /// Create a new Tab with text generated from the given psi tree.
     /// @param file the file
     /// @param lang the language
-    static void doNewTabbedPsiPanel(TokenList psiTree, String prefix) {
+    static void doNewTabbedPsiPanel(SemanticTokens psiTree, String prefix) {
     	if(tabbedPane == null) doOpenTabbedPane();
     	SwingUtilities.invokeLater(() -> {
     		LspTextPanel psiTextPanel=new LspTextPanel(Global.currentModule, SimulaEditor.menuBar.popupMenu);

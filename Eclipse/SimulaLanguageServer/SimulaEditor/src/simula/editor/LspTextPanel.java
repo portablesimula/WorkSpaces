@@ -37,7 +37,7 @@ import simula.core.builder.export.TokenManager;
 import simula.editor.SimulaEditor.Language;
 //import simula.psi.LexToken;
 //import simula.psi.PsiElement;
-import simula.psi.TokenList;
+import simula.psi.SemanticTokens;
 //import simula.psi.PsiTreeIterator;
 
 import java.awt.BorderLayout;
@@ -78,13 +78,13 @@ public class LspTextPanel extends TabTextPanel {
 	/** Style name */ public final static String styleNameProcedure = "procedure";
 	/** Style name */ public final static String styleNameError = "error";
  	
-	/** Style */ public Style styleRegular;
-	/** Style */ public Style styleKeyword;
-	/** Style */ public Style styleComment;
-	/** Style */ public Style styleConstant;
-	/** Style */ public Style styleClassIdent;
-	/** Style */ public Style styleProcedure;
-	/** Style */ public Style styleError;
+	/** Style */ public static Style styleRegular;
+	/** Style */ public static Style styleKeyword;
+	/** Style */ public static Style styleComment;
+	/** Style */ public static Style styleConstant;
+	/** Style */ public static Style styleClassIdent;
+	/** Style */ public static Style styleProcedure;
+	/** Style */ public static Style styleError;
 	/** Style */ private Style styleLineNumber;
 	
 //	/// The popup Menu.
@@ -244,7 +244,103 @@ public class LspTextPanel extends TabTextPanel {
     /// @param caretPosition the caretPosition after the operations
     /// @param preScanner the scanner to use
     /// @throws IOException 
-    void fillTextPane(int caretPosition, TokenList tokenList) throws IOException {
+    private static final String NEWLINE = "\r\n";
+    void fillTextPane(int caretPosition, SemanticTokens tokenList) throws IOException {
+		int lineNumber=1;
+		StyledDocument lin = new DefaultStyledDocument();
+		addStylesToLineDocument(lin);
+        editTextPane.setEditable(false);
+    	doc.removeUndoableEditListener(undoListener);
+		try {
+			doc.remove(0, doc.getLength());
+			Set<String> errorLines = null;
+			
+//			tokenList.fillLineAndTextPanel(this, lin, doc, styleLineNumber);
+			String originalText = sourceModule.getOriginalText();
+//			String originalText = sourceModule.getUpdatedText();
+
+//		    reconstruct(doc, originalText, tokenList.tokens);
+//		    public static void reconstruct(StyledDocument doc, String originalText, List<Integer> semanticTokens) throws BadLocationException {
+		    	List<Integer> semanticTokens = tokenList.tokens;
+		        int sourcePos = 0;
+//		        int lineNumber = 0;
+		        int prevTextLength = 0;
+
+		 		IO.println("\nTokenListVerifyer.verifyTokenList: SOURCE:"+Util.printable(originalText));
+		        int x = 0;
+		        int lexTokenIndex = 0;
+				while(x < semanticTokens.size()) {
+		            int deltaLine = semanticTokens.get(x++);
+		            int deltaStartChar = semanticTokens.get(x++);
+		            int length = semanticTokens.get(x++);
+		            int tokenTypeIndex = semanticTokens.get(x++);
+		            @SuppressWarnings("unused")
+					int tokenModifiersBitmask = semanticTokens.get(x++);
+		            if (deltaLine > 0) {
+		            	while((deltaLine--) > 0) {
+		            		
+		                    // result.append(NEWLINE);
+		    				doc.insertString(doc.getLength(), NEWLINE, styleRegular);				    		
+		                    
+		            		IO.println("APPEND tokenText|" + Util.printable(NEWLINE) + "| ==> |" + Util.printable(NEWLINE) + '|');
+		               	    sourcePos += NEWLINE.length();
+		            	}
+		                prevTextLength = 0;
+		        		IO.println("\nStart NEWLINE: sourcePos="+sourcePos+", TAIL|"+Util.printable(originalText.substring(sourcePos)));
+		            }
+
+		            // 3. Pad missing characters on the current line
+		            int gap = deltaStartChar - prevTextLength;
+		            if(gap != 0) {
+		        		IO.println("\nPAD SPACE Characters: gap = " + gap);  
+		        		while((gap--) > 0) {
+		        			
+		                    // result.append(" ");
+		    				doc.insertString(doc.getLength(), " ", styleRegular);				    		
+
+		                    
+		            		IO.println("APPEND tokenText| | ==> |" + Util.printable(" ") + '|');
+		            	    sourcePos++;
+		            		IO.println("UPDATE LINE: sourcePos="+sourcePos+", TAIL|"+Util.printable(originalText.substring(sourcePos)));
+		        		}
+		            }
+
+		            // 4. Insert the token text
+		    		IO.println("\nINSERT TEXT: length = " + length + ", TAIL|"+Util.printable(originalText.substring(sourcePos)));
+		            String tokenText = originalText.substring(sourcePos, sourcePos + length);
+		            
+		            
+//		            result.append(tokenText);
+//					errorLines = lexToken.accumErrors(errorLines);
+//					SimpleAttributeSet attrs = lexToken.getTooltipAttrs(null);
+//					if(attrs != null) {
+//						doc.insertString(doc.getLength(), tokenText, attrs);
+//					} else {
+						doc.insertString(doc.getLength(), tokenText, getStyle(tokenTypeIndex));				    		
+//					}
+
+		            
+		            
+//		    		IO.println("APPEND tokenText|" + Util.printable(tokenText) + "| ==> |" + Util.printable(""+result) + '|');
+		            sourcePos += length;
+
+		        	prevTextLength = length;
+		        }
+//		    }
+
+
+			
+		} catch (BadLocationException ble) {
+			System.err.println("Couldn't insert text into text pane.");
+		}
+		if(lineNumber>500) Global.currentModule.AUTO_REFRESH=false;
+		lineNumbers.setStyledDocument(lin);
+    	doc.addUndoableEditListener(undoListener);
+        editTextPane.setEditable(true);
+	    editTextPane.setCaretPosition(caretPosition);
+    }
+
+    void SAVED_fillTextPane(int caretPosition, SemanticTokens tokenList) throws IOException {
 		int lineNumber=1;
 		StyledDocument lin = new DefaultStyledDocument();
 		addStylesToLineDocument(lin);
@@ -321,6 +417,7 @@ public class LspTextPanel extends TabTextPanel {
 	    editTextPane.setCaretPosition(caretPosition);
     }
 
+
 	// ****************************************************************
 	// *** doRefresh
 	// ****************************************************************
@@ -339,7 +436,7 @@ public class LspTextPanel extends TabTextPanel {
     	int caretPosition = pos+count;
     	
 		Global.currentModule.buildInitialTokenList();
-		TokenList psiTree = Global.currentModule.getTokenList();
+		SemanticTokens psiTree = Global.currentModule.getTokenList();
 		
         fillTextPane(caretPosition, psiTree);
 //    	Util.IERR("DETTE MÅ RETTES - ");
@@ -513,7 +610,7 @@ public class LspTextPanel extends TabTextPanel {
     }
  
     /// NOTE: SEE: simula.core.builder.export.TokenManager
-	public Style getStyle(int tokenTypeIndex) {
+	public static Style getStyle(int tokenTypeIndex) {
 		switch(tokenTypeIndex) {
 			case TokenManager.SimulaTokenKeyword:	 return styleKeyword;
 		    case TokenManager.SimulaTokenClass:	     return styleClassIdent;

@@ -20,6 +20,7 @@ import simula.core.builder.util.KeyWordToken;
 import simula.core.builder.util.LongRealConst;
 import simula.core.builder.util.RealConst;
 import simula.core.builder.util.SimpleString;
+import simula.core.builder.util.TabToken;
 import simula.core.builder.util.WhiteSpaceToken;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.Util;
@@ -322,8 +323,10 @@ public final class SimulaLexer {
 	            case '\"': return(scanTextConstant());
 	            case '0':case '1':case '2':case '3':case '4':
 	            case '5':case '6':case '7':case '8':case '9':return(scanNumber());
+	            
+	            case '\t': return(newTabToken());
 		    	  
-	            case '\n': return(newNewlineToken());            	
+	            case '\n': return(newNewlineToken());
 
 	            case '\r': if(getNext()=='\n') return (newNewlineToken());
 				    pushBackPos(1); // NOTE: No break or return ==> default
@@ -1650,6 +1653,14 @@ public final class SimulaLexer {
        	}
         return newlineToken;
     }
+	  
+    /// Create a new Tab \t Token
+    /// @param keyWord the KeyWord
+    /// @param value the value
+    /// @return the newly created Token
+	private LexToken newTabToken() {
+		return new TabToken(currentLineNumber, sourceText, currentColumn, nextPos - tokenStartPos, this);
+	}
 	  
     /// Create a new Integer Token
     /// @param keyWord the KeyWord

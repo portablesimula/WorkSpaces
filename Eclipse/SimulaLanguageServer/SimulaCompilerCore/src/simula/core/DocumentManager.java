@@ -13,9 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import simula.Option;
 import simula.SimTextDocumentContentChangeEvent;
 import simula.SimulaCoreClient;
-import simula.core.SemanticTokenGenerator.LexerToken;
-import simula.core.SemanticTokenGenerator.SemanticToken;
-import simula.core.SemanticTokenGenerator.TokenType;
 import simula.core.builder.DocumentTextUpdater;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.export.LexToken;
@@ -338,33 +335,50 @@ public class DocumentManager {
         
         int currentLine = 0;
         int lastTokenLine = 0;
-        int lastDeltaStart = 0;
-
-        for (LexToken lexToken : lexTokenList) {
-            if (lexToken.keyWord == KeyWord.NEWLINE) { currentLine++; continue; }
-            if (lexToken.keyWord == KeyWord.WHITESPACES) { continue; }
+        int lastChar = 0;
+        
+        LOOP:for (LexToken lexToken : lexTokenList) {
+            if (lexToken.keyWord == KeyWord.WHITESPACES) { continue LOOP; }
+            if (lexToken.keyWord == KeyWord.NEWLINE) {
+            	currentLine++;
+            	lastChar = 0;
+            	continue LOOP;
+            }
 
             // Beregn relative verdier (deltas)
             // deltaLine: Antall linjer nedover fra starten av det forrige tokenet.
             // deltaStart: Antall tegn til høyre fra starten av det forrige tokenet (eller fra starten av linjen hvis deltaLine > 0).
             int deltaLine = currentLine - lastTokenLine;
-            int deltaStart = (deltaLine == 0) ? (lexToken.column - lastDeltaStart) : lexToken.column;
-            if(deltaLine == 0) {
-            	// Fortsett på samme linje
-            	deltaStart = lexToken.column - lastDeltaStart;
-            	IO.println("\nFortsett på samme linje: deltaStart = lexToken.column - lastDeltaStart: " + deltaStart);
+            
+            int deltaStart = 0;
+            boolean DETAILED = false;
+            if(DETAILED) {
+            	if(deltaLine == 0) {
+            		// Fortsett på samme linje
+            		// meaning the current token is on the same line as the previous token),
+            		// deltaStart is relative to the start character (column offset) of the previous token.
+            		//
+            		// |  token  token   token    | lexToken.column = 17, lastChar = 9
+            		// |         ------->         | deltaStart = lexToken.column - lastChar = 17 - 9 = 8
+            		deltaStart = lexToken.column - lastChar;
+            		IO.println("\nFortsett på samme linje: deltaStart = lexToken.column - lastDeltaStart: " + deltaStart);
+            	} else {
+            		// Start NEWLINE
+                	// meaning the current token is on a new line relative to the previous token),
+                	// deltaStart is relative to 0 (the absolute beginning/left margin of that new line).
+            		//
+            		// |  token  token   token    | lexToken.column = 17, lastChar = 9
+            		// |         ------->         | deltaStart = lexToken.column - lastChar = 17 - 9 = 8
+            		deltaStart = lexToken.column - lastChar;
+            		deltaStart = lexToken.column;
+            		IO.println("\nStart NEWLINE: deltaStart = lexToken.column: " + deltaStart);
+            	}
+
             } else {
-            	// Start NEWLINE
-            	deltaStart = lexToken.column;
-            	IO.println("\nStart NEWLINE: deltaStart = lexToken.column: " + deltaStart);
+            	deltaStart = lexToken.column - lastChar;
             }
 
-            // Map din interne TokenType til en semantisk ID indeks (eksempelverdier)
-//            int semanticTypeIndex = mapToSemanticTypeIndex(lexToken.type);
-//            int semanticTypeIndex = lexToken.tokenTypeIndex;
-
             // Legg til det semantiske tokenet
-//            semanticTokens.add(new SemanticToken(deltaLine, deltaStart, lexToken.length, semanticTypeIndex));
             encodedData.add(deltaLine);
             encodedData.add(deltaStart);
             encodedData.add(lexToken.length);
@@ -384,56 +398,13 @@ public class DocumentManager {
 
             // Oppdater historikk for neste iterasjon
             lastTokenLine = currentLine;
-            lastDeltaStart = lexToken.column;
-//            lastDeltaStart = deltaStart;
-        	IO.println("Fortsett: lastDeltaStart: " + lastDeltaStart);
+            lastChar = lexToken.column;
+            lastChar = lexToken.column;
+        	IO.println("Fortsett: lastChar: " + lastChar);
         }
 
         return encodedData;
     }
-
-	private static List<Integer> OLD_generateSemanticTokens(List<LexToken> lexTokenList) {
-        List<Integer> encodedData = new ArrayList<>();
-        int prevLine = 0;
-        int prevChar = 0;
-    	for(LexToken lexToken:lexTokenList) {
-//            int deltaLine = lexToken.lineNumber - prevLine;
-//            // If it is on the same line, char offset is relative to the previous token's start char
-//            int deltaChar = (deltaLine == 0) ? (lexToken.column - prevChar) : lexToken.column;
-
-//            IO.println("DocumentManager.semanticTokensFull: " + KeyWord.edit(lexToken.keyWord));
-            if(lexToken.keyWord != KeyWord.NEWLINE && lexToken.keyWord != KeyWord.WHITESPACES) {
-                int deltaLine = lexToken.lineNumber - prevLine;
-                // If it is on the same line, char offset is relative to the previous token's start char
-                int deltaChar = (deltaLine == 0) ? (lexToken.column - prevChar) : lexToken.column;
-	            encodedData.add(deltaLine);
-	            encodedData.add(deltaChar);
-	            encodedData.add(lexToken.length);
-	            encodedData.add(lexToken.tokenTypeIndex);
-	            
-//              encodedData.add(lexToken.tokenModifiersBitmask);
-	            encodedData.add(0);
-
-	            if(TESTING) {
-		    		String str = Util.printable(lexToken.getText());
-		    		IO.println("DeltaLine " + deltaLine + ": " + TokenManager.tokenTypes.get(lexToken.tokenTypeIndex)
-		    		+ "[deltaChar:" + deltaChar + ", lng:" + lexToken.length + "] Text: \"" + str + '"');
-	            }
-	            
-	            // Update trackers for next iteration
-	            prevLine = lexToken.lineNumber;
-	            prevChar = lexToken.column;
-	 
-            }
-            
-//            // Update trackers for next iteration
-//            prevLine = lexToken.lineNumber;
-//            prevChar = lexToken.column;
-    		
-    	}
-		return encodedData;
-    }
-
 
 	public void tryCreateBuilder() {
     	LOG.info("DocumentManager.tryCreateBuilder: BEGIN");

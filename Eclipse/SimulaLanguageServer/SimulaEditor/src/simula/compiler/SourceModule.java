@@ -22,7 +22,7 @@ import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
 import simula.editor.TabTextPanel;
 import simula.psi.PsiBuilder;
-import simula.psi.TokenList;
+import simula.psi.SemanticTokens;
 import simula.editor.SimulaEditor.Language;
 //import simula.psi.PsiBuilder;
 //import simula.psi.PsiTree;
@@ -43,7 +43,7 @@ public class SourceModule {
 	
 //	TokenList psiTree;
 //	private ProgramModule syntaxTree; // Root of Syntax Tree
-	TokenList tokenList;
+	SemanticTokens tokenList;
 	
 	List<SimulaDiagnostic> diagnostics;
 	public static void publishDiagnostics(String uri, List<SimulaDiagnostic> diagnostics) {
@@ -203,7 +203,7 @@ public class SourceModule {
 			Vector<String> args = new Vector<String>();
 			SimulaEditorClient.doOpen(this.documentUri.toString(), args);
     		IO.println("SourceModule.buildInitialTokenList: " + getUpdatedText().replace("\n", "\\n").replace("\r", "\\r"));
-    		this.tokenList = new TokenList(this, SimulaCoreExports.semanticTokensFull(documentUri));
+    		this.tokenList = new SemanticTokens(this, SimulaCoreExports.semanticTokensFull(documentUri));
 //    		if(Option.LSP_VERIFY) {
 //    			TokenListVerifyer.verifyTokenList(getUpdatedText(), tokenList.tokens);
 //    		}
@@ -223,7 +223,7 @@ public class SourceModule {
 //		}
 	}
 
-	public TokenList getTokenList() {
+	public SemanticTokens getTokenList() {
 		if(tokenList == null) buildInitialTokenList();
 		return tokenList;
 	}
