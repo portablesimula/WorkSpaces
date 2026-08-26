@@ -2,13 +2,14 @@ package simula.editor;
 
 import javax.swing.*;
 
+import simula.SimulaCoreExports;
 import simula.compiler.SourceModule;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
-import simula.psi.PsiBuilder;
 import simula.psi.SemanticTokens;
 
 import java.awt.*;
+import java.io.IOException;
 
 /// @author Google AI
 /// @author Øystein Myhre Andersen
@@ -133,20 +134,27 @@ public class PaletteChooser extends JDialog {
         		+ "       outtext\"line with error\");\n"
         		+ "    end;\n"
         		+ " end\n";
-    	SemanticTokens psiTree = getTokenList(sourceText);
+//    	SemanticTokens psiTree = getTokenList(sourceText);
 //		demoPanel = new PsiTextPanel(SimulaEditor. Language.Simula, null);
-		demoPanel = new LspTextPanel(new SourceModule(sourceText), null);
-		demoPanel.fillTextPane(0, psiTree);
+        
+        String documentUri = "#DEMO/demo.sim";
+        SimulaCoreExports.didOpen(documentUri, 1, sourceText);
+//        List<Integer> semTokens = SimulaCoreExports.semanticTokensFull(documentUri);
+        SourceModule demoModule = SourceModule.getSourceModule(documentUri);
+		demoPanel = new LspTextPanel(demoModule, null);
+    	SemanticTokens psiTree = demoModule.getTokenList();
+		try { demoPanel.fillTextPane(0, psiTree);
+		} catch (IOException e) { e.printStackTrace(); }
 		return demoPanel;
     }
 
-	public SemanticTokens getTokenList(String sourceText) {
-		PsiBuilder psiBuilder = new PsiBuilder();
-		psiBuilder.start(sourceText);
-//		@SuppressWarnings("unused")
-//		ProgramModule programModule = new ProgramModule(psiBuilder);
-		return psiBuilder.getRoot();
-	}
+//	private SemanticTokens getTokenList(String sourceText) {
+//		PsiBuilder psiBuilder = new PsiBuilder();
+//		psiBuilder.start(sourceText);
+////		@SuppressWarnings("unused")
+////		ProgramModule programModule = new ProgramModule(psiBuilder);
+//		return psiBuilder.getRoot();
+//	}
 
     // Oppdaterer visningen når du bytter tema i dropdownmenyen
     private void updateThemeColors() {

@@ -242,7 +242,7 @@ public class Palette {
     	HoverBackground      = Color.decode(properties.getProperty("hover.background",      "#FFFF00"));
 	}
 
-	private static void initOldSimulaEditor(Properties properties) {
+	public static void initOldSimulaEditor(Properties properties) {
     	TextPaneForeground   = Color.decode(properties.getProperty("textPane.foreground",   "#000003")); // Black
     	TextPaneBackground   = Color.decode(properties.getProperty("textPane.background",   "#FFFFFF")); // White
     	LineNumberForeground = Color.decode(properties.getProperty("lineNumber.foreground", "#CCCCFF")); // 
@@ -293,6 +293,7 @@ public class Palette {
 		        } catch (IOException e) {}
 			}
 		}
+		Util.IERR("loadThemeProperties: " + themeName);
 		if(themeName.equals(themeNames[0])) initAtomLight(properties);
 		else if(themeName.equals(themeNames[1])) initAtomDark(properties);
 		else if(themeName.equals(themeNames[2])) initLightMode(properties);

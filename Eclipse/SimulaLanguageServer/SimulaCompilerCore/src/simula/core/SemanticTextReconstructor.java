@@ -12,6 +12,9 @@ public class SemanticTextReconstructor {
 	private static boolean TESTING = true;
     private static final String NEWLINE = "\r\n";
 
+	// ****************************************************************
+	// *** reconstruct  -- SEE: LspTextPanel.fillTextPane
+	// ****************************************************************
     public static String reconstruct(String originalText, List<Integer> semanticTokens, List<LexToken> lexTokenList) {
         StringBuilder result = new StringBuilder();
         int sourcePos = 0;

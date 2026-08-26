@@ -7,25 +7,15 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.swing.text.Style;
 import javax.swing.undo.UndoManager;
 
 import client.SimulaEditorClient;
 import simula.core.builder.export.SimulaDiagnostic;
-import simula.core.builder.export.TokenListVerifyer;
-import simula.core.builder.export.TokenManager;
 import simula.SimulaCoreExports;
-//import simula.compiler.syntaxClass.declaration.StandardClass;
-//import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.Global;
-import simula.compiler.utilities.Option;
-import simula.compiler.utilities.Util;
 import simula.editor.TabTextPanel;
-import simula.psi.PsiBuilder;
 import simula.psi.SemanticTokens;
 import simula.editor.SimulaEditor.Language;
-//import simula.psi.PsiBuilder;
-//import simula.psi.PsiTree;
 
 public class SourceModule {
 	
@@ -47,6 +37,7 @@ public class SourceModule {
 	
 	List<SimulaDiagnostic> diagnostics;
 	public static void publishDiagnostics(String uri, List<SimulaDiagnostic> diagnostics) {
+		IO.println("SourceModule.publishDiagnostics: " + uri + " " + diagnostics);
 		SourceModule sourceModule = SourceModule.getSourceModule(uri);
 		sourceModule.diagnostics = diagnostics;
 //		Util.IERR("NOT IMPL");
@@ -67,6 +58,13 @@ public class SourceModule {
     
     /// Indicates that refresh is needed.
     public boolean refreshNeeded = false;
+    
+//    /// Used by PaletteChooser
+//    public SourceModule(String sourceText) {
+//    	this.sourceText = sourceText;
+//		Global.currentModule = this;
+//    	this.getTokenList();
+//    }
 
 	// ****************************************************************
 	// *** doRefresh

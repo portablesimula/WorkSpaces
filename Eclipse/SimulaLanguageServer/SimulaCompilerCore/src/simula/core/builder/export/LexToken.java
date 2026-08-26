@@ -1,8 +1,5 @@
 package simula.core.builder.export;
 
-import java.util.Arrays;
-import java.util.List;
-
 import simula.Option;
 import simula.core.builder.SimulaLexer;
 import simula.core.builder.util.LexPosition;
@@ -10,7 +7,6 @@ import simula.core.utilities.KeyWord;
 import simula.core.utilities.Util;
 
 public class LexToken {
-	public int tokenTypeIndex;
     CharSequence sourceText; // Pointer to the Whole FILE
     public int lineNumber;
 //    public int startOffset;
@@ -19,6 +15,7 @@ public class LexToken {
     public int length;
 	public int keyWord;
 //	public String styleName;
+	public int tokenTypeIndex;
 	
 	public String tokenText; // Copied from an interval of SourceText
 	

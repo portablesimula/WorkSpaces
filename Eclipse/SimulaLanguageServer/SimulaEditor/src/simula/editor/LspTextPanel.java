@@ -24,6 +24,8 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
+import javax.swing.text.TabSet;
+import javax.swing.text.TabStop;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
@@ -42,6 +44,7 @@ import simula.psi.SemanticTokens;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
@@ -202,7 +205,9 @@ public class LspTextPanel extends TabTextPanel {
         
         JPanel extra=new JPanel();
         
-        doc=new DefaultStyledDocument(); addStylesToSourceDocument(doc);
+        doc=new DefaultStyledDocument();
+//        setTabStopsToSourceDocument(doc);
+        addStylesToSourceDocument(doc);
         
         doc.putProperty(DefaultEditorKit.EndOfLineStringProperty,"\n");
     	doc.addUndoableEditListener(undoListener);
@@ -223,7 +228,6 @@ public class LspTextPanel extends TabTextPanel {
         this.setLayout(new BorderLayout());
         this.add(styleScrollPane,BorderLayout.CENTER);
     }
-    
 
 //	public String getText() {
 //		try {
@@ -238,7 +242,7 @@ public class LspTextPanel extends TabTextPanel {
 //	}
     
 	// ****************************************************************
-	// *** fillTextPane
+	// *** fillTextPane  -- SEE: SemanticTextReconstructor.reconstruct  LspTextPanel.fillTextPane
 	// ****************************************************************
     /// Fill the text pane with text delivered from the psiTree.
     /// @param caretPosition the caretPosition after the operations
@@ -246,7 +250,6 @@ public class LspTextPanel extends TabTextPanel {
     /// @throws IOException 
     private static final String NEWLINE = "\r\n";
     void fillTextPane(int caretPosition, SemanticTokens tokenList) throws IOException {
-		int lineNumber=1;
 		StyledDocument lin = new DefaultStyledDocument();
 		addStylesToLineDocument(lin);
         editTextPane.setEditable(false);
@@ -259,143 +262,62 @@ public class LspTextPanel extends TabTextPanel {
 			String originalText = sourceModule.getOriginalText();
 //			String originalText = sourceModule.getUpdatedText();
 
-//		    reconstruct(doc, originalText, tokenList.tokens);
-//		    public static void reconstruct(StyledDocument doc, String originalText, List<Integer> semanticTokens) throws BadLocationException {
-		    	List<Integer> semanticTokens = tokenList.tokens;
-		        int sourcePos = 0;
-//		        int lineNumber = 0;
-		        int prevTextLength = 0;
-
-		 		IO.println("\nTokenListVerifyer.verifyTokenList: SOURCE:"+Util.printable(originalText));
-		        int x = 0;
-		        int lexTokenIndex = 0;
-				while(x < semanticTokens.size()) {
-		            int deltaLine = semanticTokens.get(x++);
-		            int deltaStartChar = semanticTokens.get(x++);
-		            int length = semanticTokens.get(x++);
-		            int tokenTypeIndex = semanticTokens.get(x++);
-		            @SuppressWarnings("unused")
-					int tokenModifiersBitmask = semanticTokens.get(x++);
-		            if (deltaLine > 0) {
-		            	while((deltaLine--) > 0) {
-		            		
-		                    // result.append(NEWLINE);
-		    				doc.insertString(doc.getLength(), NEWLINE, styleRegular);				    		
-		                    
-		            		IO.println("APPEND tokenText|" + Util.printable(NEWLINE) + "| ==> |" + Util.printable(NEWLINE) + '|');
-		               	    sourcePos += NEWLINE.length();
-		            	}
-		                prevTextLength = 0;
-		        		IO.println("\nStart NEWLINE: sourcePos="+sourcePos+", TAIL|"+Util.printable(originalText.substring(sourcePos)));
-		            }
-
-		            // 3. Pad missing characters on the current line
-		            int gap = deltaStartChar - prevTextLength;
-		            if(gap != 0) {
-		        		IO.println("\nPAD SPACE Characters: gap = " + gap);  
-		        		while((gap--) > 0) {
-		        			
-		                    // result.append(" ");
-		    				doc.insertString(doc.getLength(), " ", styleRegular);				    		
-
-		                    
-		            		IO.println("APPEND tokenText| | ==> |" + Util.printable(" ") + '|');
-		            	    sourcePos++;
-		            		IO.println("UPDATE LINE: sourcePos="+sourcePos+", TAIL|"+Util.printable(originalText.substring(sourcePos)));
-		        		}
-		            }
-
-		            // 4. Insert the token text
-		    		IO.println("\nINSERT TEXT: length = " + length + ", TAIL|"+Util.printable(originalText.substring(sourcePos)));
-		            String tokenText = originalText.substring(sourcePos, sourcePos + length);
-		            
-		            
-//		            result.append(tokenText);
-//					errorLines = lexToken.accumErrors(errorLines);
-//					SimpleAttributeSet attrs = lexToken.getTooltipAttrs(null);
-//					if(attrs != null) {
-//						doc.insertString(doc.getLength(), tokenText, attrs);
-//					} else {
-						doc.insertString(doc.getLength(), tokenText, getStyle(tokenTypeIndex));				    		
-//					}
-
-		            
-		            
-//		    		IO.println("APPEND tokenText|" + Util.printable(tokenText) + "| ==> |" + Util.printable(""+result) + '|');
-		            sourcePos += length;
-
-		        	prevTextLength = length;
-		        }
-//		    }
-
-
-			
-		} catch (BadLocationException ble) {
-			System.err.println("Couldn't insert text into text pane.");
-		}
-		if(lineNumber>500) Global.currentModule.AUTO_REFRESH=false;
-		lineNumbers.setStyledDocument(lin);
-    	doc.addUndoableEditListener(undoListener);
-        editTextPane.setEditable(true);
-	    editTextPane.setCaretPosition(caretPosition);
-    }
-
-    void SAVED_fillTextPane(int caretPosition, SemanticTokens tokenList) throws IOException {
-		int lineNumber=1;
-		StyledDocument lin = new DefaultStyledDocument();
-		addStylesToLineDocument(lin);
-        editTextPane.setEditable(false);
-    	doc.removeUndoableEditListener(undoListener);
-		try {
-			doc.remove(0, doc.getLength());
-			Set<String> errorLines = null;
-			
-//			tokenList.fillLineAndTextPanel(this, lin, doc, styleLineNumber);
-			String originalText = sourceModule.getOriginalText();
-//			String originalText = sourceModule.getUpdatedText();
-
-			int prevLine = -1;
-			int currentLine = 0;
-			int currentStartChar = 0;
-			int beginIndex = 0;
-			int x = 0;
-			List<Integer> tokens = tokenList.tokens;
-			while(x < tokens.size()) {
-				int deltaLine = tokens.get(x++);
-				int deltaStart = tokens.get(x++);
-				int length = tokens.get(x++);
-				int tokenTypeIndex = tokens.get(x++);
-				int tokenModifiersBitmask = tokens.get(x++);
-
-				// 1. Calculate absolute line location
-				currentLine += deltaLine;
-
-				// 2. Calculate absolute character index within that line
-				if (deltaLine == 0) {
-					currentStartChar += deltaStart;
-				} else {
-					currentStartChar = deltaStart;
-				}
-				beginIndex += deltaStart; 
-				String tokenText = originalText.substring(beginIndex, beginIndex + length);
-				// Print tracking information
-				System.out.printf("Token at [Line %d, Char %d] (Len: %d, TypeId: %d:%s) -> \"%s\"%n", 
-						currentLine, currentStartChar, length, tokenTypeIndex, TokenManager.tokenTypes.get(tokenTypeIndex), tokenText);
-
-
-				if (currentLine != prevLine) {
-					prevLine = currentLine;
-					String lineString = edLineNumber(currentLine+1);
-					// Should only be here AFTER a complete line is rendered
-					SimpleAttributeSet attrs = getTooltipAttrs(currentLine, errorLines);
-					if(attrs != null) {
-						lin.insertString(lin.getLength(),lineString, attrs);					    		
-						errorLines = null;
-					} else {
-						lin.insertString(lin.getLength(),lineString, styleLineNumber);
-					}
-				}
-
+	    	List<Integer> semanticTokens = tokenList.tokens;
+	        int sourcePos = 0;
+	        int lineNumber = 1;
+	        int prevTextLength = 0;
+	
+	 		IO.println("\nTokenListVerifyer.verifyTokenList: SOURCE:"+Util.printable(originalText));
+	        int x = 0;
+	        int lexTokenIndex = 0;
+			while(x < semanticTokens.size()) {
+	            int deltaLine = semanticTokens.get(x++);
+	            int deltaStartChar = semanticTokens.get(x++);
+	            int length = semanticTokens.get(x++);
+	            int tokenTypeIndex = semanticTokens.get(x++);
+	            @SuppressWarnings("unused")
+				int tokenModifiersBitmask = semanticTokens.get(x++);
+	            if (deltaLine > 0) {
+	            	while((deltaLine--) > 0) {
+						String lineString = edLineNumber(lineNumber++);
+						SimpleAttributeSet attrs = getTooltipAttrs(lineNumber, errorLines);
+						if(attrs != null) {
+							lin.insertString(lin.getLength(),lineString, attrs);					    		
+							errorLines = null;
+						} else lin.insertString(lin.getLength(),lineString, styleLineNumber);
+						if(lineNumber > 500) Global.currentModule.AUTO_REFRESH = false;
+	            		
+	                    // result.append(NEWLINE);
+	    				doc.insertString(doc.getLength(), NEWLINE, styleRegular);				    		
+	                    
+	            		IO.println("APPEND tokenText|" + Util.printable(NEWLINE) + "| ==> |" + Util.printable(NEWLINE) + '|');
+	               	    sourcePos += NEWLINE.length();
+	            	}
+	                prevTextLength = 0;
+	        		IO.println("\nStart NEWLINE:" + lineNumber + " sourcePos="+sourcePos+", TAIL|"+Util.printable(originalText.substring(sourcePos)));
+	            }
+	
+	            // 3. Pad missing characters on the current line
+	            int gap = deltaStartChar - prevTextLength;
+	            if(gap != 0) {
+	        		IO.println("\nPAD SPACE Characters: gap = " + gap);  
+	        		while((gap--) > 0) {
+	        			
+	                    // result.append(" ");
+	    				doc.insertString(doc.getLength(), " ", styleRegular);				    		
+	
+	                    
+	            		IO.println("APPEND tokenText| | ==> |" + Util.printable(" ") + '|');
+	            	    sourcePos++;
+	            		IO.println("UPDATE LINE: sourcePos="+sourcePos+", TAIL|"+Util.printable(originalText.substring(sourcePos)));
+	        		}
+	            }
+	
+	            // 4. Insert the token text
+	    		IO.println("\nINSERT TEXT: length = " + length + ", TAIL|"+Util.printable(originalText.substring(sourcePos)));
+	            String tokenText = originalText.substring(sourcePos, sourcePos + length);
+					
+//		        result.append(tokenText);
 //				errorLines = lexToken.accumErrors(errorLines);
 //				SimpleAttributeSet attrs = lexToken.getTooltipAttrs(null);
 //				if(attrs != null) {
@@ -404,19 +326,56 @@ public class LspTextPanel extends TabTextPanel {
 					doc.insertString(doc.getLength(), tokenText, getStyle(tokenTypeIndex));				    		
 //				}
 
-				//          Util.IERR("");
-			}
-			
+		            
+		            
+//		    	IO.println("APPEND tokenText|" + Util.printable(tokenText) + "| ==> |" + Util.printable(""+result) + '|');
+		           sourcePos += length;
+
+		        prevTextLength = length;
+		    }
 		} catch (BadLocationException ble) {
 			System.err.println("Couldn't insert text into text pane.");
 		}
-		if(lineNumber>500) Global.currentModule.AUTO_REFRESH=false;
 		lineNumbers.setStyledDocument(lin);
     	doc.addUndoableEditListener(undoListener);
         editTextPane.setEditable(true);
 	    editTextPane.setCaretPosition(caretPosition);
+        setTabStopsToSourceDocument(editTextPane, doc);
+    }
+    
+    private void setTabStopsToSourceDocument(JTextPane textPane, StyledDocument doc) {
+    	int charactersPerTab = 4;
+    	FontMetrics metrics = textPane.getFontMetrics(textPane.getFont());
+    	// Calculate the pixel width of a single character
+    	int chareWidth = metrics.charWidth('X'); 
+    	IO.println("chareWidth: "+chareWidth);
+    	int tabWidth = chareWidth * charactersPerTab;
+    	// Create an array of sequential tab stops 
+    	TabStop[] tabs = new TabStop[100]; 
+    	for (int i = 0; i < tabs.length; i++) {
+    	    tabs[i] = new TabStop((i + 1) * tabWidth);
+    	}
+    	TabSet tabSet = new TabSet(tabs);
+    	SimpleAttributeSet attributes = new SimpleAttributeSet();
+    	StyleConstants.setTabSet(attributes, tabSet);
+
+    	// Update document attributes
+    	doc.setParagraphAttributes(0, doc.getLength(), attributes, false);
+
     }
 
+//    private void addLine(StyledDocument lin, int currentLine, Set<String> errorLines) throws BadLocationException {
+//		String lineString = edLineNumber(currentLine+1);
+//		// Should only be here AFTER a complete line is rendered
+//		SimpleAttributeSet attrs = getTooltipAttrs(currentLine, errorLines);
+//		if(attrs != null) {
+//			lin.insertString(lin.getLength(),lineString, attrs);					    		
+//			errorLines = null;
+//		} else {
+//			lin.insertString(lin.getLength(),lineString, styleLineNumber);
+//		}
+//    	
+//    }
 
 	// ****************************************************************
 	// *** doRefresh
