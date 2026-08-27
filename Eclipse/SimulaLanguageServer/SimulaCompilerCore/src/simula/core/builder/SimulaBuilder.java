@@ -4,10 +4,14 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
+import simula.Comn;
 import simula.Option;
 import simula.core.DocumentManager;
 import simula.core.builder.export.LexToken;
 import simula.core.builder.export.SimulaDiagnostic;
+import simula.core.builder.export.TokenListVerifyer;
+import simula.core.builder.export.TokenManager;
 import simula.core.builder.util.SimpleString;
 import simula.core.DocumentManager;
 import simula.core.syntaxClass.declaration.DeclarationScope;
@@ -46,15 +50,16 @@ public class SimulaBuilder {
 	public ProgramModule syntaxTree; // Root of Syntax Tree
 	public int nErrors;
 	public List<SimulaDiagnostic> diagnostics;
-	public List<LexToken> tokenList;
-
+	public List<LexToken> lexTokenList;
+	public List<Integer> semTokenList;
+	
 	public SimulaBuilder(DocumentManager documentManager) {
 		this.documentManager = documentManager;
 		documentManager.simBuilder = this;
     	// INIT:
 		this.nErrors = 0;
-    	this.diagnostics = new ArrayList<>();
-    	this.tokenList   = new ArrayList<>();
+    	this.diagnostics  = new ArrayList<>();
+    	this.lexTokenList = new ArrayList<>();
         lexer = new SimulaLexer(this, documentManager.sourceCode);
 
 		File desktop = new File(System.getProperty("user.home"), "Desktop");
@@ -93,12 +98,13 @@ public class SimulaBuilder {
 	public void doBuilding() {
 		boolean builderTerminateNormally = this.doParsing(this);
     	
-    	if(Option.LEX_VERIFY) {
+    	if(Option.LEX_VERIFY && (!Option.TESTING_VERIFY)) {
 //        	IO.println("SimulaBuilder: documentManager.sourceCode: "+documentManager.sourceCode);
     		StringBuilder sb = new StringBuilder();
-    		for(LexToken token : tokenList)	sb.append(token.getText());
-    		String reconstr = Util.printable(sb.toString());
-    		String original = Util.printable(documentManager.sourceCode);
+    		for(LexToken lexToken : lexTokenList)
+    			sb.append(lexToken.getText());
+    		String reconstr = Comn.printable(sb.toString());
+    		String original = Comn.printable(documentManager.sourceCode);
     		int lng1 = original.length();
     		if(! reconstr.equals(original)) {
     			int lng2 = reconstr.length();
@@ -128,7 +134,12 @@ public class SimulaBuilder {
 		} else {
 			Util.IERR("");
 		}
-//		Util.IERR("STOP HER INTILL VIDERE");	
+    	this.semTokenList = TokenManager.generateSemanticTokens(lexTokenList);
+		if(Option.LEX_VERIFY) {
+			TokenListVerifyer.verifyTokenList(documentManager.sourceCode, semTokenList, lexTokenList);
+//			TokenListVerifyer.verifyTokenList(documentManager.modifiedSourceCode, semTokenList, lexTokenList);
+		}
+//		Util.IERR("STOP HER INTILL VIDERE: BYGG og CHECK SemTokenList ??");	
 		documentManager.publishDiagnostics(diagnostics);
 	}
 
@@ -256,7 +267,7 @@ public class SimulaBuilder {
 
 	/// Save current Token
 	public void saveCurrentToken() {
-		rollBackIndex = tokenList.size() - 1;
+		rollBackIndex = lexTokenList.size() - 1;
 		
 		currentParserToken = prevParserToken;
 		prevParserToken = null;
@@ -266,11 +277,11 @@ public class SimulaBuilder {
 //		IO.println("PsiBuilder.rollBackTo: "+prev);
 //		IO.println("PsiBuilder.rollBackTo: CurrentParserToken: "+getCurrentParserToken());
 //		IO.println("PsiBuilder.rollBackTo: =========== tokenList: BAKLENGS");
-		int n = tokenList.size();
+		int n = lexTokenList.size();
 		rollBackIndex = -1;
 		LOOP:for(int i=n-1;i>=0;i--) {
 //			IO.println("PsiBuilder.rollBackTo: token "+i+": "+tokenList.get(i));	
-			if(tokenList.get(i) == prev) {
+			if(lexTokenList.get(i) == prev) {
 //				IO.println("PsiBuilder.rollBackTo: FOUND: " + i + ": " + prev);	
 				rollBackIndex = i + 1;
 				break LOOP;
@@ -286,9 +297,9 @@ public class SimulaBuilder {
 	public LexToken getNextParserToken() {
 		prevParserToken = currentParserToken;
 		if(rollBackIndex > 0) {
-			do { currentParserToken = tokenList.get(rollBackIndex++);
+			do { currentParserToken = lexTokenList.get(rollBackIndex++);
 			} while(! currentParserToken.isParserToken());
-			if(rollBackIndex >= tokenList.size()) rollBackIndex = 0;
+			if(rollBackIndex >= lexTokenList.size()) rollBackIndex = 0;
 //			IO.println("PsiBuilder.getNextParserToken: currentParserToken="+currentParserToken);
     	} else currentParserToken = lexer.getNextParserToken(); // And then advance the lexer.	
     	return currentParserToken;
@@ -359,8 +370,8 @@ public class SimulaBuilder {
 	
 	public void printTokenList(String title) {
 		IO.println("======================================== BEGIN TOKEN LIST: " + title + " ============================ ");
-		for(LexToken token:tokenList) {
-			IO.println(""+token);
+		for(LexToken lexToken:lexTokenList) {
+			IO.println(""+lexToken);
 		}
 		IO.println("======================================== ENDOF TOKEN LIST: " + title + " ============================ ");		
 	}

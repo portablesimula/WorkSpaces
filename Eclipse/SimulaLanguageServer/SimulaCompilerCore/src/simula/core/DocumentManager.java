@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import simula.Comn;
 import simula.Option;
 import simula.SimTextDocumentContentChangeEvent;
 import simula.SimulaCoreClient;
@@ -109,7 +110,11 @@ public class DocumentManager {
     	this.documentUri = documentUri;
     	this.sourceFileDir = new File(documentUri).getParentFile();
     	this.documentVersion = documentVersion;
-    	this.sourceCode = sourceCode;
+    	if(Option.TESTING_VERIFY) {
+	    	this.sourceCode = modifySourceCode(sourceCode);
+    	} else {
+        	this.sourceCode = sourceCode;    		
+    	}
     	sourceFileName = this.documentUri;
 		sourceName = getSourceName(this.documentUri);
 		externalJarFileNames = new Vector<String>();
@@ -118,7 +123,33 @@ public class DocumentManager {
 		createJarFilesDirectory();
     }
     
-    private void createJarFilesDirectory() {
+    private String modifySourceCode(String sourceCode) {
+    	// CRLF replaced by LF and Line trailing blanks removed
+    	StringBuilder sb = new StringBuilder();
+    	int nBlanks = 0;
+    	for (int i = 0; i < sourceCode.length(); i++) {
+    	    char c = sourceCode.charAt(i);
+    	    switch(c) {
+	    	    case '\r': break;
+	    	    case '\n': nBlanks = 0; sb.append(c); break;
+	    	    case '\t': // Fall through
+	    	    default:
+	        	    if(c != '\t' && Character.isWhitespace(c)) {
+	        	    	nBlanks++;
+	        	    } else {
+		    	    	while((nBlanks--) > 0) sb.append(' ');
+		    	             sb.append(c); nBlanks = 0;
+	        	    }
+    	    }
+    	    
+    	}
+    	IO.println("DocumentManager.modifySourceCode: Original: |" + Comn.printable(sourceCode) + '|');
+    	IO.println("DocumentManager.modifySourceCode: Modified: |" + Comn.printable(sb.toString()) + '|');
+//    	Util.IERR("");
+		return sb.toString();
+	}
+
+	private void createJarFilesDirectory() {
     	// Create output .jar-files Directory
 //		IO.println("DocumentManager.createJarFilesDirectory: sourceFileDir=" + documentManager.sourceFileDir);
 //		IO.println("DocumentManager.createJarFilesDirectory: jarFileDir=" + SimulaCoder.jarFileDir);
@@ -149,7 +180,7 @@ public class DocumentManager {
 
 	/// Get the text document's Token List.
 	public List<LexToken> getTokenList() {
-		return simBuilder.tokenList;
+		return simBuilder.lexTokenList;
 	}
 
 	/// Get the text document's getDiagnostic List.
@@ -320,92 +351,16 @@ public class DocumentManager {
 	public static List<Integer> semanticTokensFull(String documentUri) {
 		if(TESTING) IO.println("DocumentManager.semanticTokensFull: " + documentUri);
     	DocumentManager documentManager = openDocuments.get(documentUri);
-    	List<LexToken> lexTokenList = documentManager.simBuilder.tokenList;
-    	List<Integer> encodedData = generateSemanticTokens(lexTokenList);
+//    	List<LexToken> lexTokenList = documentManager.simBuilder.lexTokenList;
+//    	List<Integer> encodedData = generateSemanticTokens(lexTokenList);
+    	List<Integer> encodedData = documentManager.simBuilder.semTokenList;
 //		Util.IERR("DO VERIFY");
-		if(Option.LEX_VERIFY) {
-			TokenListVerifyer.verifyTokenList(documentManager.sourceCode, encodedData, lexTokenList);
-		}
+//		if(Option.LEX_VERIFY) {
+//			TokenListVerifyer.verifyTokenList(documentManager.sourceCode, encodedData, lexTokenList);
+//		}
 		return encodedData;
 	}
 	
-	private static List<Integer> generateSemanticTokens(List<LexToken> lexTokenList) {
-		IO.println("DocumentManager.generateSemanticTokens: " + lexTokenList.size());
-        List<Integer> encodedData = new ArrayList<>();
-        
-        int currentLine = 0;
-        int lastTokenLine = 0;
-        int lastChar = 0;
-        
-        LOOP:for (LexToken lexToken : lexTokenList) {
-            if (lexToken.keyWord == KeyWord.WHITESPACES) { continue LOOP; }
-            if (lexToken.keyWord == KeyWord.NEWLINE) {
-            	currentLine++;
-            	lastChar = 0;
-            	continue LOOP;
-            }
-
-            // Beregn relative verdier (deltas)
-            // deltaLine: Antall linjer nedover fra starten av det forrige tokenet.
-            // deltaStart: Antall tegn til høyre fra starten av det forrige tokenet (eller fra starten av linjen hvis deltaLine > 0).
-            int deltaLine = currentLine - lastTokenLine;
-            
-            int deltaStart = 0;
-            boolean DETAILED = false;
-            if(DETAILED) {
-            	if(deltaLine == 0) {
-            		// Fortsett på samme linje
-            		// meaning the current token is on the same line as the previous token),
-            		// deltaStart is relative to the start character (column offset) of the previous token.
-            		//
-            		// |  token  token   token    | lexToken.column = 17, lastChar = 9
-            		// |         ------->         | deltaStart = lexToken.column - lastChar = 17 - 9 = 8
-            		deltaStart = lexToken.column - lastChar;
-            		IO.println("\nFortsett på samme linje: deltaStart = lexToken.column - lastDeltaStart: " + deltaStart);
-            	} else {
-            		// Start NEWLINE
-                	// meaning the current token is on a new line relative to the previous token),
-                	// deltaStart is relative to 0 (the absolute beginning/left margin of that new line).
-            		//
-            		// |  token  token   token    | lexToken.column = 17, lastChar = 9
-            		// |         ------->         | deltaStart = lexToken.column - lastChar = 17 - 9 = 8
-            		deltaStart = lexToken.column - lastChar;
-            		deltaStart = lexToken.column;
-            		IO.println("\nStart NEWLINE: deltaStart = lexToken.column: " + deltaStart);
-            	}
-
-            } else {
-            	deltaStart = lexToken.column - lastChar;
-            }
-
-            // Legg til det semantiske tokenet
-            encodedData.add(deltaLine);
-            encodedData.add(deltaStart);
-            encodedData.add(lexToken.length);
-            encodedData.add(lexToken.tokenTypeIndex);
-            
-//          encodedData.add(lexToken.tokenModifiersBitmask);
-            encodedData.add(0);
-            
-            
-            if(TESTING) {
-            	IO.println(""+lexToken);
- 	    		String str = Util.printable(lexToken.tokenText);
- 	    		IO.println("==> DeltaLine " + deltaLine + ": " + TokenManager.tokenTypes.get(lexToken.tokenTypeIndex)
- 	    		+ "[deltaStart:" + deltaStart + ", lng:" + lexToken.length + "] Text: \"" + str + '"');
-             }
-            
-
-            // Oppdater historikk for neste iterasjon
-            lastTokenLine = currentLine;
-            lastChar = lexToken.column;
-            lastChar = lexToken.column;
-        	IO.println("Fortsett: lastChar: " + lastChar);
-        }
-
-        return encodedData;
-    }
-
 	public void tryCreateBuilder() {
     	LOG.info("DocumentManager.tryCreateBuilder: BEGIN");
 //		String sourceText = this.getText();
@@ -413,7 +368,7 @@ public class DocumentManager {
 		// TRY BUILD SYNTAX TREE ...
 		try {
 			newSimBuilder.doBuilding();
-//    		IO.println("DocumentManager.tryCreateBuilder: " + Util.printable(sourceText));
+//    		IO.println("DocumentManager.tryCreateBuilder: " + Comn.printable(sourceText));
     		simBuilder = newSimBuilder;
 		} catch (Exception e) {
 			IO.println("DocumentManager.tryCreateBuilder: GOT EXCEPTION: " + e.getMessage());

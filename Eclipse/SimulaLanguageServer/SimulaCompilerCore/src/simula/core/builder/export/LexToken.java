@@ -1,5 +1,6 @@
 package simula.core.builder.export;
 
+import simula.Comn;
 import simula.Option;
 import simula.core.builder.SimulaLexer;
 import simula.core.builder.util.LexPosition;
@@ -104,11 +105,14 @@ public class LexToken {
 	}
 
 	public boolean isParserToken() {
-		if(keyWord == KeyWord.NEWLINE) return false;
-		if(keyWord == KeyWord.WHITESPACES) return false;
-		if(keyWord == KeyWord.COMMENT_KEY) return false;
-		if(keyWord == KeyWord.COMMENT_TEXT) return false;
-		return true;
+		switch(keyWord) {
+			case KeyWord.TAB_CHAR,
+				 KeyWord.NEWLINE,
+				 KeyWord.WHITESPACES, 
+				 KeyWord.COMMENT_KEY,
+				 KeyWord.COMMENT_TEXT: return false;
+			default: return true;
+		}
 	}
 
 //	public String getOriginalText() {
@@ -137,14 +141,14 @@ public class LexToken {
 	}
 	
 	public String edToken(SimulaLexer lexer) {
-		String str = Util.printable(edTokenText(lexer));
+		String str = Comn.printable(edTokenText(lexer));
 		return "Line " + lineNumber + ": " + KeyWord.edit(keyWord) + "[col:" + column + ", lng:" + length + "]=\"" + str + '"';
 	}
 
 	@Override
 	public String toString() {
 		if(tokenText == null) Util.IERR("");
-		String str = (tokenText == null)? "UNKNOWN" :  Util.printable(tokenText);
+		String str = (tokenText == null)? "UNKNOWN" :  Comn.printable(tokenText);
 		return "Line " + lineNumber + ": " + KeyWord.edit(keyWord) + "[col:" + column + ", lng:" + length + "] Text: \"" + str + '"';
 	}
 

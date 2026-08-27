@@ -53,4 +53,10 @@ public class SimulaEditorClient implements SimulaCoreClient {
 
 	}
 
+	@Override
+	public void initialized() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

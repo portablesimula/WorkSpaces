@@ -113,7 +113,8 @@ public class KeyWord {
 	/** Other Symbol */ public final static int LONGREALKONST  = 95;
 	/** Other Symbol */ public final static int TEXTKONST      = 96;
 	/** Other Symbol */ public final static int COMMENT_TEXT   = 97;
-	/** Other Symbol */ public final static int BAD_CHARACTERS = 98;
+	/** Other Symbol */ public final static int TAB_CHAR       = 98;
+	/** Other Symbol */ public final static int BAD_CHARACTERS = 99;
 
 	/// Returns the corresponding String.
 	/// @param key the argument key.
@@ -217,6 +218,7 @@ public class KeyWord {
 			case NEWLINE:        return("NEWLINE");
 			case STRING:         return("STRING");
 			case WHITESPACES:    return("WHITESPACES");
+			case TAB_CHAR:       return("TAB_CHAR");
 			case EOF:            return("EOF");
 		}
 		return("Unknown KeyWord:" + key);

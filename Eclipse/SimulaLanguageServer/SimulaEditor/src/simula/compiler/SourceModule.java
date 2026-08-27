@@ -11,6 +11,7 @@ import javax.swing.undo.UndoManager;
 
 import client.SimulaEditorClient;
 import simula.core.builder.export.SimulaDiagnostic;
+import simula.Comn;
 import simula.SimulaCoreExports;
 import simula.compiler.utilities.Global;
 import simula.editor.TabTextPanel;
@@ -186,6 +187,11 @@ public class SourceModule {
 	public String getOriginalText() throws IOException {
 //		return Files.readString(sourceFile.toPath());
 		return this.sourceText;
+	}
+	
+	public String getModifiedText() throws IOException {
+//		return Files.readString(sourceFile.toPath());
+		return Comn.modifySourceCode(this.sourceText);
 	}
 	
 	public void dropPsiAndSyntaxTrees() {

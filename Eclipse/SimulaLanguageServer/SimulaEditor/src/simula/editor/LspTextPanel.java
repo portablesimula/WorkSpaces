@@ -29,6 +29,7 @@ import javax.swing.text.TabStop;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
+import simula.Comn;
 import simula.compiler.SourceModule;
 import simula.compiler.utilities.Global;
 //import simula.compiler.utilities.KeyWord;
@@ -241,6 +242,8 @@ public class LspTextPanel extends TabTextPanel {
 //		return null;
 //	}
     
+	private static boolean TESTING = false;
+	private static boolean TRACE = true;
 	// ****************************************************************
 	// *** fillTextPane  -- SEE: SemanticTextReconstructor.reconstruct  LspTextPanel.fillTextPane
 	// ****************************************************************
@@ -248,7 +251,6 @@ public class LspTextPanel extends TabTextPanel {
     /// @param caretPosition the caretPosition after the operations
     /// @param preScanner the scanner to use
     /// @throws IOException 
-    private static final String NEWLINE = "\r\n";
     void fillTextPane(int caretPosition, SemanticTokens tokenList) throws IOException {
 		StyledDocument lin = new DefaultStyledDocument();
 		addStylesToLineDocument(lin);
@@ -259,7 +261,8 @@ public class LspTextPanel extends TabTextPanel {
 			Set<String> errorLines = null;
 			
 //			tokenList.fillLineAndTextPanel(this, lin, doc, styleLineNumber);
-			String originalText = sourceModule.getOriginalText();
+			String originalText = sourceModule.getModifiedText();
+//			String originalText = sourceModule.getOriginalText();
 //			String originalText = sourceModule.getUpdatedText();
 
 	    	List<Integer> semanticTokens = tokenList.tokens;
@@ -267,7 +270,7 @@ public class LspTextPanel extends TabTextPanel {
 	        int lineNumber = 1;
 	        int prevTextLength = 0;
 	
-	 		IO.println("\nTokenListVerifyer.verifyTokenList: SOURCE:"+Util.printable(originalText));
+	 		IO.println("\nLspTextPanel.fillTextPane: SOURCE:"+Comn.printable(originalText));
 	        int x = 0;
 	        int lexTokenIndex = 0;
 			while(x < semanticTokens.size()) {
@@ -288,33 +291,30 @@ public class LspTextPanel extends TabTextPanel {
 						if(lineNumber > 500) Global.currentModule.AUTO_REFRESH = false;
 	            		
 	                    // result.append(NEWLINE);
-	    				doc.insertString(doc.getLength(), NEWLINE, styleRegular);				    		
-	                    
-	            		IO.println("APPEND tokenText|" + Util.printable(NEWLINE) + "| ==> |" + Util.printable(NEWLINE) + '|');
-	               	    sourcePos += NEWLINE.length();
+	    				doc.insertString(doc.getLength(), "\n", styleRegular);				    		
+	            		if(TRACE) IO.println("APPEND tokenText|" + Comn.printable('\n') + "| ==> |" + Comn.printable(doc.getText(0, doc.getLength())) + '|');
+	               	    sourcePos ++;
 	            	}
 	                prevTextLength = 0;
-	        		IO.println("\nStart NEWLINE:" + lineNumber + " sourcePos="+sourcePos+", TAIL|"+Util.printable(originalText.substring(sourcePos)));
+	                if(TESTING) IO.println("\nStart NEWLINE:" + lineNumber + " sourcePos="+sourcePos+", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
 	            }
 	
 	            // 3. Pad missing characters on the current line
 	            int gap = deltaStartChar - prevTextLength;
 	            if(gap != 0) {
-	        		IO.println("\nPAD SPACE Characters: gap = " + gap);  
+	            	if(TESTING) IO.println("\nPAD SPACE Characters: gap = " + gap);  
 	        		while((gap--) > 0) {
 	        			
 	                    // result.append(" ");
 	    				doc.insertString(doc.getLength(), " ", styleRegular);				    		
-	
-	                    
-	            		IO.println("APPEND tokenText| | ==> |" + Util.printable(" ") + '|');
+	            		if(TRACE) IO.println("APPEND tokenText| | ==> |" + Comn.printable(doc.getText(0, doc.getLength())) + '|');
 	            	    sourcePos++;
-	            		IO.println("UPDATE LINE: sourcePos="+sourcePos+", TAIL|"+Util.printable(originalText.substring(sourcePos)));
+	            	    if(TESTING) IO.println("UPDATE LINE: sourcePos="+sourcePos+", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
 	        		}
 	            }
 	
 	            // 4. Insert the token text
-	    		IO.println("\nINSERT TEXT: length = " + length + ", TAIL|"+Util.printable(originalText.substring(sourcePos)));
+	            if(TESTING) IO.println("\nINSERT TEXT: length = " + length + ", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
 	            String tokenText = originalText.substring(sourcePos, sourcePos + length);
 					
 //		        result.append(tokenText);
@@ -324,11 +324,12 @@ public class LspTextPanel extends TabTextPanel {
 //					doc.insertString(doc.getLength(), tokenText, attrs);
 //				} else {
 					doc.insertString(doc.getLength(), tokenText, getStyle(tokenTypeIndex));				    		
+            		if(TRACE) IO.println("APPEND tokenText|" + Comn.printable(tokenText) + "| ==> |" + Comn.printable(doc.getText(0, doc.getLength())) + '|');
 //				}
 
 		            
 		            
-//		    	IO.println("APPEND tokenText|" + Util.printable(tokenText) + "| ==> |" + Util.printable(""+result) + '|');
+//		    	IO.println("APPEND tokenText|" + Comn.printable(tokenText) + "| ==> |" + Comn.printable(""+result) + '|');
 		           sourcePos += length;
 
 		        prevTextLength = length;

@@ -8,6 +8,7 @@ package simula.core.syntaxClass.statement;
 import java.io.IOException;
 import java.util.Vector;
 
+import simula.Comn;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
@@ -153,18 +154,18 @@ public final class ProgramModule extends Statement {
 			
 			LexToken token = Parse.getCurrentParserToken(simBuilder);
 			if(token != null && token.keyWord != KeyWord.EOF) {
-				int mrk = simBuilder.tokenList.size();
+				int mrk = simBuilder.lexTokenList.size();
 				while(!simBuilder.eof()) simBuilder.getNextParserToken(); // consume tokens  (add it to tokenList)
-				int n = simBuilder.tokenList.size();
+				int n = simBuilder.lexTokenList.size();
 				StringBuilder sb = new StringBuilder();
 				for(int i=mrk-1;i<n;i++) {
 //					IO.println("NEW ProgramModule: tokenAfter: " + simBuilder.tokenList.get(i));
-					sb.append(simBuilder.tokenList.get(i).getText());
+					sb.append(simBuilder.lexTokenList.get(i).getText());
 				}
-				String textAfterEnd = Util.printable(sb.toString());
-//				IO.println("NEW ProgramModule: TextAfterEnd: " + Util.printable(textAfterEnd));
-				LexPosition start = simBuilder.tokenList.get(mrk-1).getPosition();
-				LexPosition end = simBuilder.tokenList.get(n-1).getPosition();
+				String textAfterEnd = Comn.printable(sb.toString());
+//				IO.println("NEW ProgramModule: TextAfterEnd: " + Comn.printable(textAfterEnd));
+				LexPosition start = simBuilder.lexTokenList.get(mrk-1).getPosition();
+				LexPosition end = simBuilder.lexTokenList.get(n-1).getPosition();
 				if(! textAfterEnd.equals(";")) Util.warning(simBuilder, start, end, "Text after Program end: \"" + textAfterEnd + '"');
 			}
 			

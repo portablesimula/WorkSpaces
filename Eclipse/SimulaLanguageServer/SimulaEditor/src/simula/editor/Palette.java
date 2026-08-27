@@ -293,7 +293,7 @@ public class Palette {
 		        } catch (IOException e) {}
 			}
 		}
-		Util.IERR("loadThemeProperties: " + themeName);
+//		Util.IERR("loadThemeProperties: " + themeName);
 		if(themeName.equals(themeNames[0])) initAtomLight(properties);
 		else if(themeName.equals(themeNames[1])) initAtomDark(properties);
 		else if(themeName.equals(themeNames[2])) initLightMode(properties);

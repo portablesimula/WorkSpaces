@@ -2,6 +2,7 @@ package simula.core;
 
 import java.util.List;
 
+import simula.Comn;
 import simula.Option;
 import simula.core.builder.export.LexToken;
 import simula.core.utilities.KeyWord;
@@ -10,7 +11,6 @@ import simula.core.utilities.Util;
 public class SemanticTextReconstructor {
 
 	private static boolean TESTING = true;
-    private static final String NEWLINE = "\r\n";
 
 	// ****************************************************************
 	// *** reconstruct  -- SEE: LspTextPanel.fillTextPane
@@ -21,7 +21,7 @@ public class SemanticTextReconstructor {
         int lineNumber = 0;
         int prevTextLength = 0;
 
- 		IO.println("\nTokenListVerifyer.verifyTokenList: SOURCE:"+Util.printable(originalText));
+ 		IO.println("\nTokenListVerifyer.verifyTokenList: SOURCE:"+Comn.printable(originalText));
         int x = 0;
         int lexTokenIndex = 0;
 		while(x < semanticTokens.size()) {
@@ -47,20 +47,20 @@ public class SemanticTextReconstructor {
         		// |    token    | lexToken.column = 17, lastChar = 9
         		// |--->         | deltaStart = lexToken.column - lastChar = 17 - 9 = 8
             	while((deltaLine--) > 0) {
-                    result.append(NEWLINE);
-            		IO.println("APPEND tokenText|" + Util.printable(NEWLINE) + "| ==> |" + Util.printable(""+result) + '|');
-     				if(TESTING) {
+                    result.append('\n');
+            		IO.println("APPEND tokenText|" + Comn.printable('\n') + "| ==> |" + Comn.printable(""+result) + '|');
+            		if(TESTING && (!Option.TESTING_VERIFY)) {
 	                    lineNumber++;            		
-	                    Util.ASSERT(lexToken.keyWord == KeyWord.NEWLINE, "Not a NEWLINE Token");
-	                    String checkText = originalText.substring(sourcePos, sourcePos + NEWLINE.length());
-	    				if(! checkText.equals(NEWLINE)) Util.IERR("Bad NEWLINE: " + Util.printable(checkText) + ", lexToken=" + lexToken);
+	                    Util.ASSERT(lexToken.keyWord == KeyWord.NEWLINE, "Not a NEWLINE Token: " + lexToken);
+	                    String checkText = originalText.substring(sourcePos, sourcePos + 1);
+	    				if(! checkText.equals('\n')) Util.IERR("Bad NEWLINE: " + Comn.printable(checkText) + ", lexToken=" + lexToken);
 	                    lexToken = lexTokenList.get(lexTokenIndex++);
 	                    IO.println("UPDATE NEWLINE lexToken: " + lexToken);
     				}
-               	    sourcePos += NEWLINE.length();
+               	    sourcePos ++;
             	}
                 prevTextLength = 0;
-        		IO.println("\nStart NEWLINE: sourcePos="+sourcePos+", TAIL|"+Util.printable(originalText.substring(sourcePos)));
+        		IO.println("\nStart NEWLINE: sourcePos="+sourcePos+", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
             } else {
                 // token.deltaLine == 0
         		// Fortsett på samme linje
@@ -69,7 +69,7 @@ public class SemanticTextReconstructor {
         		//
         		// |  prev   token    | lexToken.column = 17, lastChar = 9
         		// |  ------>         | deltaStart = lexToken.column - lastChar = 17 - 9 = 8
-        		IO.println("\nCONTINUE LINE: sourcePos="+sourcePos+", TAIL|"+Util.printable(originalText.substring(sourcePos)));
+        		IO.println("\nCONTINUE LINE: sourcePos="+sourcePos+", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
             }
 
             // 3. Pad missing characters on the current line
@@ -78,11 +78,11 @@ public class SemanticTextReconstructor {
         		IO.println("\nPAD SPACE Characters: gap = " + gap);  
         		while((gap--) > 0) {
                     result.append(" ");
-            		IO.println("APPEND tokenText| | ==> |" + Util.printable(""+result) + '|');
+            		IO.println("APPEND tokenText| | ==> |" + Comn.printable(""+result) + '|');
             	    sourcePos++;
-            		IO.println("UPDATE LINE: sourcePos="+sourcePos+", TAIL|"+Util.printable(originalText.substring(sourcePos)));
+            		IO.println("UPDATE LINE: sourcePos="+sourcePos+", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
         		}
-        		if(TESTING) {
+        		if(TESTING && (!Option.TESTING_VERIFY)) {
                     Util.ASSERT(lexToken.keyWord == KeyWord.WHITESPACES, "Not a WHITESPACES Token");
                     while(lexToken.keyWord == KeyWord.WHITESPACES) {
                     	lexToken = lexTokenList.get(lexTokenIndex++);
@@ -92,15 +92,18 @@ public class SemanticTextReconstructor {
             }
 
             // 4. Insert the token text
-    		IO.println("\nINSERT TEXT: length = " + length + ", TAIL|"+Util.printable(originalText.substring(sourcePos)));
+    		IO.println("\nINSERT TEXT: length = " + length + ", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
             String tokenText = originalText.substring(sourcePos, sourcePos + length);
             result.append(tokenText);
-    		IO.println("APPEND tokenText|" + Util.printable(tokenText) + "| ==> |" + Util.printable(""+result) + '|');
+    		IO.println("APPEND tokenText|" + Comn.printable(tokenText) + "| ==> |" + Comn.printable(""+result) + '|');
             sourcePos += length;
 			if(Option.LEX_VERIFY) {
-        		IO.println("AFTER INSERT: sourcePos="+sourcePos+", TAIL|"+Util.printable(originalText.substring(sourcePos)));
+        		IO.println("AFTER INSERT: sourcePos="+sourcePos+", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
 				String lexTokenText = lexToken.getText();
-				if(! tokenText.equals(lexTokenText)) Util.IERR("Bad TEXT: " + Util.printable(tokenText) + ", lexToken=" + lexToken);
+				if(! tokenText.equals(lexTokenText)) {
+			    	IO.println("TokenListVerifyer.verifyTokenList: Original: |" + Comn.printable(originalText) + '|');
+					Util.IERR("Bad TEXT: " + Comn.printable(tokenText) + ", lexToken=" + lexToken);
+				}
 			}
 
             // 5. Update buffer character tracking
