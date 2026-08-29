@@ -145,7 +145,7 @@ public final class Util {
 	}
 	
 	public static void syntaxError(final SimulaBuilder simBuilder, final LexToken token, final String msg) {
-		Thread.dumpStack();
+//		Thread.dumpStack();
         if(Option.LEX_VERIFY) {
         // SJEKK AT SimPosition er inne på linja !!!
         if(token.keyWord == KeyWord.NEWLINE) // CRLF or LF ==> ERROR

@@ -146,7 +146,7 @@ public class TabbedTextHandler {
 		    		IO.println("TabbedTextHandler.doNewTabbedPanel: textPanel: " + currentModule.textPanel);
 //					currentTextPanel = psiTextPanel;
 //		    		psiTextPanel.fillTextPane(reader,0);
-//					currentModule.buildInitialTokenList();
+//					currentModule.doOpenSimulaModule();
 					SemanticTokens psiTree = currentModule.getTokenList();
 		    		LspTextPanel psiTextPanel = new LspTextPanel(currentModule, SimulaEditor.menuBar.popupMenu);
 				try {
@@ -348,7 +348,8 @@ public class TabbedTextHandler {
     // ****************************************************************
 	/// Open file action
 	public static void doNewFileAction() {
-		new SourceModule(SourceModule.emptyProgram);
+		String emptyProgram = "begin\n\nend;\n";
+		new SourceModule(emptyProgram);
 		Global.currentModule.lang = SimulaEditor.Language.Simula;
 		TabbedTextHandler.doNewTabbedPanel(null, "");		
 	}
@@ -381,7 +382,7 @@ public class TabbedTextHandler {
 //			SourceModule currentModule = Global.currentModule;
 //			SourceModule currentModule = new SourceModule(file, SimulaEditor.Language.Simula); 
 			
-			currentModule.buildInitialTokenList();
+			currentModule.doOpenSimulaModule();
 
 //			PsiTree psiTree = currentModule.getTokenList();
 			doNewTabbedPsiPanel(currentModule.getTokenList(), "");

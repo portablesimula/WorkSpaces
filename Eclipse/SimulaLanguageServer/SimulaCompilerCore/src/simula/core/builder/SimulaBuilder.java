@@ -98,34 +98,34 @@ public class SimulaBuilder {
 	public void doBuilding() {
 		boolean builderTerminateNormally = this.doParsing(this);
     	
-    	if(Option.LEX_VERIFY && (!Option.TESTING_VERIFY)) {
-//        	IO.println("SimulaBuilder: documentManager.sourceCode: "+documentManager.sourceCode);
-    		StringBuilder sb = new StringBuilder();
-    		for(LexToken lexToken : lexTokenList)
-    			sb.append(lexToken.getText());
-    		String reconstr = Comn.printable(sb.toString());
-    		String original = Comn.printable(documentManager.sourceCode);
-    		int lng1 = original.length();
-    		if(! reconstr.equals(original)) {
-    			int lng2 = reconstr.length();
-    			LOG.error("SimulaBuilder: VERIFIER FAILED: Reconstructed text differ from original text");
-    			LOG.error("Original Text(lng:"+lng1+"): " + original);
-    			LOG.error("Reconstr Text(lng:"+lng2+"): " + reconstr);
-    			int n = Math.min(lng1, lng2);
-    			LOOP:for(int i=0;i<n;i++) {
-    				if(reconstr.charAt(i) != original.charAt(i)) { 
-    	    			LOG.error("First deviation at pos " + i + ", original: " + original.charAt(i) + ", reconstr: " + reconstr.charAt(i));
-    					break LOOP;
-    				}
-    			}
-    			if(lng1 != lng2) {
-    				int pos = Math.max(0, n - 100);
-        			LOG.error("Original Tail: " + original.substring(pos));
-        			LOG.error("Reconstr Tail: " + reconstr.substring(pos));
-    			}
-    			Util.IERR("");
-    		}
-    	}
+//    	if(Option.LEX_VERIFY && (!Option.TESTING_VERIFY)) {
+////        	IO.println("SimulaBuilder: documentManager.sourceCode: "+documentManager.sourceCode);
+//    		StringBuilder sb = new StringBuilder();
+//    		for(LexToken lexToken : lexTokenList)
+//    			sb.append(lexToken.getText());
+//    		String reconstr = Comn.printable(sb.toString());
+//    		String original = Comn.printable(documentManager.sourceCode);
+//    		int lng1 = original.length();
+//    		if(! reconstr.equals(original)) {
+//    			int lng2 = reconstr.length();
+//    			LOG.error("SimulaBuilder: VERIFIER FAILED: Reconstructed text differ from original text");
+//    			LOG.error("Original Text(lng:"+lng1+"): " + original);
+//    			LOG.error("Reconstr Text(lng:"+lng2+"): " + reconstr);
+//    			int n = Math.min(lng1, lng2);
+//    			LOOP:for(int i=0;i<n;i++) {
+//    				if(reconstr.charAt(i) != original.charAt(i)) { 
+//    	    			LOG.error("First deviation at pos " + i + ", original: " + original.charAt(i) + ", reconstr: " + reconstr.charAt(i));
+//    					break LOOP;
+//    				}
+//    			}
+//    			if(lng1 != lng2) {
+//    				int pos = Math.max(0, n - 100);
+//        			LOG.error("Original Tail: " + original.substring(pos));
+//        			LOG.error("Reconstr Tail: " + reconstr.substring(pos));
+//    			}
+//    			Util.IERR("");
+//    		}
+//    	}
 
 //		Util.IERR("STOP HER INTILL VIDERE");	
 		if(builderTerminateNormally) {	

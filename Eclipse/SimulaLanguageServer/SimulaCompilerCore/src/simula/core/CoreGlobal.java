@@ -19,8 +19,8 @@ import simula.core.utilities.ClassHierarchy;
 /// @author Øystein Myhre Andersen
 public final class CoreGlobal {
     
-	public static boolean TRACE_LEXER = false;
-	public static boolean TRACE_COMMENTS = false;
+//	public static boolean TRACE_LEXER = false;
+//	public static boolean TRACE_COMMENTS = false;
 
 	// ===============================================================================================
 	

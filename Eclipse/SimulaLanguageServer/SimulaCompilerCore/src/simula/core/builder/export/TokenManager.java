@@ -132,7 +132,7 @@ public class TokenManager {
 	private final static boolean TESTING = true;
 	
 	public static List<Integer> generateSemanticTokens(List<LexToken> lexTokenList) {
-		IO.println("DocumentManager.generateSemanticTokens: " + lexTokenList.size());
+		if(Option.internal.TRACE_NEW_SEMTOKEN > 0) IO.println("DocumentManager.generateSemanticTokens: " + lexTokenList.size());
         List<Integer> encodedData = new ArrayList<>();
         
         int currentLine = 0;
@@ -145,29 +145,20 @@ public class TokenManager {
             int deltaStart = 0; // Number of characters to the right from the start of the previous token
                                 // or from the start of the line if deltaLine > 0.
             
-            if(Option.TESTING_VERIFY) {
+//            if(Option.TESTING_VERIFY) {
 //	            if (lexToken.keyWord == KeyWord.WHITESPACES) { continue LOOP; }
 //	            if (lexToken.keyWord == KeyWord.NEWLINE) { continue LOOP; }
 	            currentLine = lexToken.lineNumber;
-            } else {
-	            if (lexToken.keyWord == KeyWord.WHITESPACES) { continue LOOP; }
-	            if (lexToken.keyWord == KeyWord.NEWLINE) {
-	            	currentLine++;
-	            	continue LOOP;
-	            }
-            }
+//            } else {
+//	            if (lexToken.keyWord == KeyWord.WHITESPACES) { continue LOOP; }
+//	            if (lexToken.keyWord == KeyWord.NEWLINE) {
+//	            	currentLine++;
+//	            	continue LOOP;
+//	            }
+//            }
             
             deltaLine = currentLine - prevTokenLine;
-        	if(deltaLine == 0) {
-        		// Fortsett på samme linje
-        		// meaning the current token is on the same line as the previous token),
-        		// deltaStart is relative to the start character (column offset) of the previous token.
-        		//
-        		// |  token  token   token    | lexToken.column = 17, prevTokenColumn = 9
-        		// |         ------->         | deltaStart = lexToken.column - prevTokenColumn = 17 - 9 = 8
-        		deltaStart = lexToken.column - prevTokenColumn;
-        		IO.println("\nFortsett på samme linje: deltaStart = lexToken.column - lastDeltaStart: " + deltaStart);
-        	} else {
+            if(deltaLine > 0) {
         		// Start NEWLINE
             	// meaning the current token is on a new line relative to the previous token),
             	// deltaStart is relative to 0 (the absolute beginning/left margin of that new line).
@@ -175,7 +166,16 @@ public class TokenManager {
         		// |  token  token   token    | lexToken.column = 17, prevTokenColumn = 9
         		// |         ------->         | deltaStart = lexToken.column - prevTokenColumn = 17 - 9 = 8
         		deltaStart = lexToken.column;
-        		IO.println("\nStart NEWLINE: deltaStart = lexToken.column: " + deltaStart);
+        		if(Option.internal.TRACE_NEW_SEMTOKEN > 1) IO.println("\nStart NEWLINE: deltaStart = lexToken.column: " + deltaStart);            	
+            } else {
+        		// Fortsett på samme linje
+        		// meaning the current token is on the same line as the previous token),
+        		// deltaStart is relative to the start character (column offset) of the previous token.
+        		//
+        		// |  token  token   token    | lexToken.column = 17, prevTokenColumn = 9
+        		// |         ------->         | deltaStart = lexToken.column - prevTokenColumn = 17 - 9 = 8
+        		deltaStart = lexToken.column - prevTokenColumn;
+        		if(Option.internal.TRACE_NEW_SEMTOKEN > 1) IO.println("\nCONTINUE LINE: deltaStart = lexToken.column - lastDeltaStart: " + deltaStart);
         	}
 
             // Legg til det semantiske tokenet
@@ -187,17 +187,22 @@ public class TokenManager {
 //          encodedData.add(lexToken.tokenModifiersBitmask);
             encodedData.add(0);
             
-            if(TESTING) {
-            	IO.println(""+lexToken);
- 	    		String str = Comn.printable(lexToken.tokenText);
- 	    		IO.println("==> DeltaLine " + deltaLine + ": " + TokenManager.tokenTypes.get(lexToken.tokenTypeIndex)
- 	    		+ "[deltaStart:" + deltaStart + ", lng:" + lexToken.length + "] Text: \"" + str + '"');
-             }
+            if(Option.internal.TRACE_NEW_SEMTOKEN > 0) {
+        		String str = Comn.printable(lexToken.tokenText);
+        		String sem = ("DeltaLine " + deltaLine + ": " + TokenManager.tokenTypes.get(lexToken.tokenTypeIndex)
+        					+ "[deltaStart:" + deltaStart + ", lng:" + lexToken.length + "] Text: \"" + str + '"');
+            	if(Option.internal.TRACE_NEW_SEMTOKEN > 1) {
+            		IO.println(""+lexToken);
+            		IO.println("==> " + sem);
+            	} else {
+            		IO.println("NEW SemToken: " + sem);
+            	}
+            }
             
             // Oppdater historikk for neste iterasjon
             prevTokenLine = currentLine;
             prevTokenColumn = lexToken.column;
-        	IO.println("Fortsett: prevTokenColumn: " + prevTokenColumn);
+            if(Option.internal.TRACE_NEW_SEMTOKEN > 1) IO.println("Fortsett: prevTokenColumn: " + prevTokenColumn);
         }
 
         return encodedData;

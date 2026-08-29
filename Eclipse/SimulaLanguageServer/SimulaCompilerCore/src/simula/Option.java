@@ -18,7 +18,7 @@ import simula.core.utilities.Util;
 /// 
 /// @author Øystein Myhre Andersen
 public final class Option {
-	public static boolean TESTING_VERIFY = true;
+//	public static boolean TESTING_VERIFY = true;
 	
 	public static boolean LEX_VERIFY = true;
 
@@ -54,8 +54,8 @@ public final class Option {
 		// Lexer Trace Options
 		/** Debug option */	public static int TRACE_LEXER = 0;
 		/** Debug option */	public static int TRACE_NEW_LEXTOKEN = 0;
-		/** Debug option */	public static boolean TRACE_ADVANCE_LEXER = false;//true;
-		/** Debug option */	public static boolean TRACE_COMMENTS = false;
+//		/** Debug option */	public static boolean TRACE_ADVANCE_LEXER = false;//true;
+//		/** Debug option */	public static boolean TRACE_COMMENTS = false;
 
 		// Parser Trace Options
 		/** Debug option */	public static boolean TRACE_PARSE = false;
@@ -68,6 +68,11 @@ public final class Option {
 		/** Debug option */	public static boolean TRACE_CHECKER = false;
 		/** Debug option */	public static boolean TRACE_CHECKER_OUTPUT = false;
 		/** Debug option */	public static int     TRACE_FIND_MEANING = 0;
+		
+		// Semantic Token Trace Options
+		/** Debug option */	public static int TRACE_NEW_SEMTOKEN = 0;
+		/** Debug option */	public static int TRACE_VERIFY_TOKEN = 0;
+		
 
 		// Java Coder Options
 		/** Debug option */	public static boolean TRACE_CODING = false;         // Only when .java output
@@ -92,7 +97,7 @@ public final class Option {
 
 			// Scanner Trace Options
 			Option.internal.TRACE_LEXER = 0;
-			Option.internal.TRACE_COMMENTS = false;
+//			Option.internal.TRACE_COMMENTS = false;
 
 			// Parser Trace Options
 			Option.internal.TRACE_PARSE = false;

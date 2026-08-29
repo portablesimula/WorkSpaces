@@ -54,9 +54,9 @@ public class Comn {
     	    }
     	    
     	}
-    	IO.println("DocumentManager.modifySourceCode: Original: |" + printable(sourceCode) + '|');
-    	IO.println("DocumentManager.modifySourceCode: Modified: |" + printable(sb.toString()) + '|');
-//    	Util.IERR("");
+    	IO.println("Comn.modifySourceCode: Original: |" + Comn.printable(sourceCode) + '|');
+    	IO.println("Comn.modifySourceCode: Modified: |" + Comn.printable(sb.toString()) + '|');
+
 		return sb.toString();
 	}
 

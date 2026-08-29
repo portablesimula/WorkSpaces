@@ -245,7 +245,7 @@ public class LspTextPanel extends TabTextPanel {
 	private static boolean TESTING = false;
 	private static boolean TRACE = true;
 	// ****************************************************************
-	// *** fillTextPane  -- SEE: SemanticTextReconstructor.reconstruct  LspTextPanel.fillTextPane
+	// *** fillTextPane  -- SEE: TokenListVerifyer.reconstruct
 	// ****************************************************************
     /// Fill the text pane with text delivered from the psiTree.
     /// @param caretPosition the caretPosition after the operations
@@ -259,18 +259,13 @@ public class LspTextPanel extends TabTextPanel {
 		try {
 			doc.remove(0, doc.getLength());
 			Set<String> errorLines = null;
-			
-//			tokenList.fillLineAndTextPanel(this, lin, doc, styleLineNumber);
-			String originalText = sourceModule.getModifiedText();
-//			String originalText = sourceModule.getOriginalText();
-//			String originalText = sourceModule.getUpdatedText();
-
+			String modifiedText = sourceModule.getModifiedText();
 	    	List<Integer> semanticTokens = tokenList.tokens;
 	        int sourcePos = 0;
 	        int lineNumber = 1;
 	        int prevTextLength = 0;
 	
-	 		IO.println("\nLspTextPanel.fillTextPane: SOURCE:"+Comn.printable(originalText));
+	 		IO.println("\nLspTextPanel.fillTextPane: SOURCE:"+Comn.printable(modifiedText));
 	        int x = 0;
 	        int lexTokenIndex = 0;
 			while(x < semanticTokens.size()) {
@@ -296,7 +291,7 @@ public class LspTextPanel extends TabTextPanel {
 	               	    sourcePos ++;
 	            	}
 	                prevTextLength = 0;
-	                if(TESTING) IO.println("\nStart NEWLINE:" + lineNumber + " sourcePos="+sourcePos+", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
+	                if(TESTING) IO.println("\nStart NEWLINE:" + lineNumber + " sourcePos="+sourcePos+", TAIL|"+Comn.printable(modifiedText.substring(sourcePos)));
 	            }
 	
 	            // 3. Pad missing characters on the current line
@@ -309,13 +304,13 @@ public class LspTextPanel extends TabTextPanel {
 	    				doc.insertString(doc.getLength(), " ", styleRegular);				    		
 	            		if(TRACE) IO.println("APPEND tokenText| | ==> |" + Comn.printable(doc.getText(0, doc.getLength())) + '|');
 	            	    sourcePos++;
-	            	    if(TESTING) IO.println("UPDATE LINE: sourcePos="+sourcePos+", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
+	            	    if(TESTING) IO.println("UPDATE LINE: sourcePos="+sourcePos+", TAIL|"+Comn.printable(modifiedText.substring(sourcePos)));
 	        		}
 	            }
 	
 	            // 4. Insert the token text
-	            if(TESTING) IO.println("\nINSERT TEXT: length = " + length + ", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
-	            String tokenText = originalText.substring(sourcePos, sourcePos + length);
+	            if(TESTING) IO.println("\nINSERT TEXT: length = " + length + ", TAIL|"+Comn.printable(modifiedText.substring(sourcePos)));
+	            String tokenText = modifiedText.substring(sourcePos, sourcePos + length);
 					
 //		        result.append(tokenText);
 //				errorLines = lexToken.accumErrors(errorLines);
@@ -395,7 +390,7 @@ public class LspTextPanel extends TabTextPanel {
 //	    fillTextPane(new StringReader(txt),pos+count);
     	int caretPosition = pos+count;
     	
-		Global.currentModule.buildInitialTokenList();
+//		Global.currentModule.doOpenSimulaModule();
 		SemanticTokens psiTree = Global.currentModule.getTokenList();
 		
         fillTextPane(caretPosition, psiTree);

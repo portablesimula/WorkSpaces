@@ -4,16 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.undo.UndoManager;
 
-import client.SimulaEditorClient;
 import simula.core.builder.export.SimulaDiagnostic;
 import simula.Comn;
 import simula.SimulaCoreExports;
 import simula.compiler.utilities.Global;
+import simula.compiler.utilities.Util;
 import simula.editor.TabTextPanel;
 import simula.psi.SemanticTokens;
 import simula.editor.SimulaEditor.Language;
@@ -21,9 +20,11 @@ import simula.editor.SimulaEditor.Language;
 public class SourceModule {
 	
     // Nøkkelen er filens URI (f.eks. file:///path/to/file.txt)
-    private static final ConcurrentHashMap<String, SourceModule> openDocuments = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, SourceModule> openModules = new ConcurrentHashMap<>();
     public static SourceModule getSourceModule(String documentUri)  {
-    	return openDocuments.get(documentUri);
+    	SourceModule res = openModules.get(documentUri);
+    	if(res == null) Util.IERR("No such Module: " + documentUri);
+    	return res;
     }
 	
 	String documentUri;
@@ -40,6 +41,7 @@ public class SourceModule {
 	public static void publishDiagnostics(String uri, List<SimulaDiagnostic> diagnostics) {
 		IO.println("SourceModule.publishDiagnostics: " + uri + " " + diagnostics);
 		SourceModule sourceModule = SourceModule.getSourceModule(uri);
+    	IO.println("SourceModule.publishDiagnostics: openModules: " + openModules);
 		sourceModule.diagnostics = diagnostics;
 //		Util.IERR("NOT IMPL");
 	}
@@ -87,14 +89,18 @@ public class SourceModule {
 	
 
 //	public SourceModule(String sourceText) {
-//		this.sourceText = sourceText;
-//		Global.currentModule = this;
 //	}
+	
+	public SourceModule(String documentUri) {
+		this.documentUri = documentUri;
+    	openModules.put(documentUri, this);
+//		Global.currentModule = this;	
+	}
 	
 	public SourceModule(File sourceFile) {
 		this.sourceFile = sourceFile;
 		this.documentUri = sourceFile.toString();
-    	openDocuments.put(documentUri, this);
+    	openModules.put(documentUri, this);
 		Global.currentModule = this;
 		
 		if(sourceFile != null) {
@@ -116,21 +122,47 @@ public class SourceModule {
 //			SimulaEditorClient.doOpen(documentUri, args);
 
 		}
+	}
 
-//		// Update moduleMap
-//		String tabName0 = getName();
-////		IO.println("SourceModule.getTabName: " + tabName0);
-//		tabName = tabName0;
-//		int sequ = 1;
-//		while(Global.moduleMap.containsKey(tabName)) {
-//			tabName = tabName0 + '(' + (sequ++) + ')';
-////			IO.println("SourceModule.getTabName: " + tabName0);
-//		}
-//		Global.moduleMap.put(tabName, this);
-//		SourceModule THIS = Global.moduleMap.get(tabName);
-//		if(THIS != this) {
-//			Util.STOP();
-//		}
+	public void doOpenSimulaModule() {
+		try {
+//			String uri = sourceFile.toString();
+			String uri = documentUri;
+			int version = 1;
+			String content = getModifiedText();
+			SimulaCoreExports.didOpen(uri, version, content);
+
+
+			IO.println("SourceModule.doOpenSimulaModule: " + getUpdatedText().replace("\n", "\\n").replace("\r", "\\r"));
+			this.tokenList = new SemanticTokens(this, SimulaCoreExports.semanticTokensFull(documentUri));
+		} catch (Exception e) {
+			IO.println("SourceModule.doOpenSimulaModule: GOT EXCEPTION: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	
+	/// Used by: PaletteChooser.getDemoPanel and ...
+	public void doOpenSimulaModule(String sourceText) {
+		try {
+			String uri = sourceFile.toString();
+			int version = 1;
+			IO.println("\nSourceModule.getModifiedText: ========================================");
+			String content = Comn.modifySourceCode(sourceText);
+			SimulaCoreExports.didOpen(uri, version, content);
+
+
+			IO.println("SourceModule.doOpenSimulaModule: " + getUpdatedText().replace("\n", "\\n").replace("\r", "\\r"));
+			this.tokenList = new SemanticTokens(this, SimulaCoreExports.semanticTokensFull(documentUri));
+		} catch (Exception e) {
+			IO.println("SourceModule.doOpenSimulaModule: GOT EXCEPTION: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+
+	public SemanticTokens getTokenList() {
+		if(tokenList == null) doOpenSimulaModule();
+		return tokenList;
 	}
 
 	/// Test if a file is a text file
@@ -146,90 +178,29 @@ public class SourceModule {
 		this.textPanel = textPanel;
 	}
 	
-//	public void setPsiTextPanel(PsiTextPanel psiTextPanel) {
-//		this.psiTextPanel = psiTextPanel;
-//	}
-	
 	public String getName() {
 		if(sourceFile != null) return sourceFile.getName();
 		return "Unnamed.sim";
 	}
 	
 	public String getTabName() {
-//		String tabName0 = getName();
-//		IO.println("SourceModule.getTabName: " + tabName0);
-//		String tabName = tabName0;
-//		int sequ = 1;
-//		while(tabNames.contains(tabName)) {
-//			tabName = tabName0 + '(' + (sequ++) + ')';
-//			IO.println("SourceModule.getTabName: " + tabName0);
-//		}
-//		tabNames.add(tabName);
-//		return tabName;
 		return getName();
 	}
 	
-	public static String emptyProgram = "begin\n\nend;\n";
-	
 	public String getUpdatedText() {
 		if(textPanel != null) {
-//			if(textPanel instanceof PsiTextPanel psiPanel) {
-//				return psiPanel.getText();
-//			}
-//			if(textPanel instanceof SourceTextPanel oldPanel) {
-//				return oldPanel.getText();
-//			}
 			return textPanel.getText();
 		}
 		return this.sourceText;
 	}
 	
 	public String getOriginalText() throws IOException {
-//		return Files.readString(sourceFile.toPath());
 		return this.sourceText;
 	}
 	
 	public String getModifiedText() throws IOException {
-//		return Files.readString(sourceFile.toPath());
+		IO.println("\nSourceModule.getModifiedText: ========================================");
 		return Comn.modifySourceCode(this.sourceText);
-	}
-	
-	public void dropPsiAndSyntaxTrees() {
-		tokenList = null;
-//		syntaxTree = null;
-	}
-
-	public void buildInitialTokenList() {
-//		PsiBuilder psiBuilder = new PsiBuilder();
-		try {
-//			psiBuilder.start(getOriginalText());
-//			psiBuilder.start(getUpdatedText());
-			Vector<String> args = new Vector<String>();
-			SimulaEditorClient.doOpen(this.documentUri.toString(), args);
-    		IO.println("SourceModule.buildInitialTokenList: " + getUpdatedText().replace("\n", "\\n").replace("\r", "\\r"));
-    		this.tokenList = new SemanticTokens(this, SimulaCoreExports.semanticTokensFull(documentUri));
-//    		if(Option.LSP_VERIFY) {
-//    			TokenListVerifyer.verifyTokenList(getUpdatedText(), tokenList.tokens);
-//    		}
-//    		Util.IERR("");
-//			syntaxTree = new ProgramModule(psiBuilder);
-		} catch (Exception e) {
-			IO.println("SourceModule.buildInitialTokenList: GOT EXCEPTION: " + e.getMessage());
-			e.printStackTrace();
-		}
-			
-//		StandardClass.ENVIRONMENT.doChecking();
-//		Global.duringParsing = false;
-//		syntaxTree.doChecking();
-//		psiTree = psiBuilder.getRoot();
-//		if(Option.LSP_VERIFY) {
-//			checkPsiText(psiTree);
-//		}
-	}
-
-	public SemanticTokens getTokenList() {
-		if(tokenList == null) buildInitialTokenList();
-		return tokenList;
 	}
     
     public String toString() {

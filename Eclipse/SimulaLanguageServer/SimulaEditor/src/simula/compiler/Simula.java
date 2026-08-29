@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Vector;
 
 import client.SimulaEditorClient;
+import simula.SimulaCoreExports;
 //import simula.compiler.parsing.SimulaScanner;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
@@ -161,8 +162,10 @@ public final class Simula {
 	/// Main entry.
 	/// @param argv arguments
 	public static void main(String[] argv) {
+		// Remove time, date, and headers from Logger output.
+		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
 		String sourceFileDir = null;
-		Vector<String> fileNames = new Vector<String>();
+//		Vector<String> fileNames = new Vector<String>();
 		Option.verbose=false;
 		Option.WARNINGS=true;
 		Option.EXTENSIONS=true;
@@ -171,7 +174,7 @@ public final class Simula {
 		// Parse command line arguments.
 		for(int i=0;i<argv.length;i++) {
 			String arg=argv[i];
-			if (arg.charAt(0) == '-') { // command line option
+//			if (arg.charAt(0) == '-') { // command line option
 				if (arg.equalsIgnoreCase("-help")) help();
 				else if (arg.equalsIgnoreCase("-caseSensitive")) Option.CaseSensitive=true;
 				else if (arg.equalsIgnoreCase("-compilerMode")) Option.setCompilerMode(argv[++i]);
@@ -194,12 +197,14 @@ public final class Simula {
 					IO.println("Simula ERROR: Unknown option " + arg);
 					help();
 				}
-			} else fileNames.add(arg);
+//			} else fileNames.add(arg);
 		}
 		
 	    if(!Option.internal.INLINE_TESTING) Global.simulaRtsLib=new File(Global.releaseHome, "/rts");
 	    
-		if (fileNames.isEmpty()) {
+	    Vector<String> args = new Vector<>(Arrays.asList(argv));
+		SimulaCoreExports.initiate(new SimulaEditorClient(), args);
+//		if (fileNames.isEmpty()) {
 			// *** STARTING SIMULA EDITOR ***
 			Global.sampleSourceDir = new File(Global.releaseHome, "/samples");
 			RTOption.InitRuntimeOptions();
@@ -207,9 +212,9 @@ public final class Simula {
 			SimulaEditor.setUIScale(); // Must be done before any Swing Component is created.
 			SimulaEditor editor = new SimulaEditor();
 			editor.setVisible(true);
-		} else {
-			Util.IERR("");
-		}
+//		} else {
+//			Util.IERR("");
+//		}
 	}
 
 	/// Print the current Simula Version and exit

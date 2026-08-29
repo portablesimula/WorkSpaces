@@ -6,9 +6,11 @@ import simula.SimulaCoreExports;
 import simula.compiler.SourceModule;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
+import simula.compiler.utilities.Util;
 import simula.psi.SemanticTokens;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 
 /// @author Google AI
@@ -126,7 +128,7 @@ public class PaletteChooser extends JDialog {
     private static int SEQU = 1;
     private LspTextPanel getDemoPanel() {
 //    	Option.internal.TRACE_NEW_LEXTOKEN = 1;
-        String sourceText =
+        String badSourceText =
         		  " class Demo; begin\n"
         		+ "    comment demo mockup: "+SEQU+";\n"
         		+ "    procedure p(x); integer x; begin\n"
@@ -134,15 +136,28 @@ public class PaletteChooser extends JDialog {
         		+ "       outtext\"line with error\");\n"
         		+ "    end;\n"
         		+ " end\n";
+        String okSourceText =
+      		  " class Demo; begin\n"
+      		+ "    comment demo mockup: "+SEQU+";\n"
+      		+ "    procedure p(x); integer x; begin\n"
+      		+ "       real pi = 3.14;\n"
+      		+ "       outtext(\"line without error\");\n"
+      		+ "    end;\n"
+      		+ " end\n";
 //    	SemanticTokens psiTree = getTokenList(sourceText);
 //		demoPanel = new PsiTextPanel(SimulaEditor. Language.Simula, null);
         
         String documentUri = "#DEMO/demo.sim";
-        SimulaCoreExports.didOpen(documentUri, 1, sourceText);
+        SourceModule sourceModule = new SourceModule(documentUri);
+//        SimulaCoreExports.didOpen(documentUri, 1, sourceText);
+        SimulaCoreExports.didOpen(documentUri, 1, okSourceText);
 //        List<Integer> semTokens = SimulaCoreExports.semanticTokensFull(documentUri);
         SourceModule demoModule = SourceModule.getSourceModule(documentUri);
+        IO.println("PaletteChooser.getDemoPanel: " + demoModule);
+//        demoModule.doOpenSimulaModule(sourceText);
 		demoPanel = new LspTextPanel(demoModule, null);
     	SemanticTokens psiTree = demoModule.getTokenList();
+    	Util.IERR("STOP HER INTILL VIDERE");
 		try { demoPanel.fillTextPane(0, psiTree);
 		} catch (IOException e) { e.printStackTrace(); }
 		return demoPanel;

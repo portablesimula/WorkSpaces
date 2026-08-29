@@ -110,8 +110,19 @@ public class DocumentManager {
     	this.documentUri = documentUri;
     	this.sourceFileDir = new File(documentUri).getParentFile();
     	this.documentVersion = documentVersion;
-    	if(Option.TESTING_VERIFY) {
-	    	this.sourceCode = modifySourceCode(sourceCode);
+    	if(Option.LEX_VERIFY) {
+    		IO.println("\nNEW DocumentManager: ========================================");
+	    	this.sourceCode = Comn.modifySourceCode(sourceCode);
+	    	if(Option.internal.TRACE_NEW_LEXTOKEN > 0) {
+		    	IO.println("DocumentManager.modifySourceCode: Original: |" + Comn.printable(sourceCode) + '|');
+		    	IO.println("DocumentManager.modifySourceCode: Modified: |" + Comn.printable(this.sourceCode) + '|');
+		   	}
+	    	if(! this.sourceCode.equals(sourceCode)) {
+	    		Util.generalWarning("NEW Document: " + documentUri
+	    				+ "\n Document text does not satisfy the rules required by Simula Lexer."
+	    				+ "\n Remove trailing blankes etc."
+	    				);
+	    	}
     	} else {
         	this.sourceCode = sourceCode;    		
     	}
@@ -122,32 +133,6 @@ public class DocumentManager {
 		StandardClass.INITIATE(this);
 		createJarFilesDirectory();
     }
-    
-    private String modifySourceCode(String sourceCode) {
-    	// CRLF replaced by LF and Line trailing blanks removed
-    	StringBuilder sb = new StringBuilder();
-    	int nBlanks = 0;
-    	for (int i = 0; i < sourceCode.length(); i++) {
-    	    char c = sourceCode.charAt(i);
-    	    switch(c) {
-	    	    case '\r': break;
-	    	    case '\n': nBlanks = 0; sb.append(c); break;
-	    	    case '\t': // Fall through
-	    	    default:
-	        	    if(c != '\t' && Character.isWhitespace(c)) {
-	        	    	nBlanks++;
-	        	    } else {
-		    	    	while((nBlanks--) > 0) sb.append(' ');
-		    	             sb.append(c); nBlanks = 0;
-	        	    }
-    	    }
-    	    
-    	}
-    	IO.println("DocumentManager.modifySourceCode: Original: |" + Comn.printable(sourceCode) + '|');
-    	IO.println("DocumentManager.modifySourceCode: Modified: |" + Comn.printable(sb.toString()) + '|');
-//    	Util.IERR("");
-		return sb.toString();
-	}
 
 	private void createJarFilesDirectory() {
     	// Create output .jar-files Directory
@@ -175,7 +160,10 @@ public class DocumentManager {
 
     /// Debug Utility
     public static DocumentManager getDocumentManager(String documentUri)  {
-    	return openDocuments.get(documentUri);
+    	DocumentManager res = openDocuments.get(documentUri);
+    	IO.println("DocumentManager.getDocumentManager: documentUri ==> " + res);
+    	if(res == null) Util.IERR("No such document: " + documentUri);
+    	return res;
     }
 
 	/// Get the text document's Token List.
@@ -255,6 +243,7 @@ public class DocumentManager {
     	}
     	DocumentManager documentManager = new DocumentManager(documentUri, version, sourceCode);
     	openDocuments.put(documentUri, documentManager);
+    	IO.println("\"DocumentManager.didOpen: openDocuments: " + openDocuments);
     	
     	documentManager.tryCreateBuilder();
 
@@ -267,7 +256,7 @@ public class DocumentManager {
 //	public static void didChange(DidChangeTextDocumentParams params, SimulaLanguageServer server) {
 	public static void didChange(final String documentUri, final List<SimTextDocumentContentChangeEvent> changes) {
     	LOG.info("DocumentManager.didChange: BEGIN");
-    	DocumentManager documentManager = openDocuments.get(documentUri);
+    	DocumentManager documentManager = getDocumentManager(documentUri);
 		
 //		String currentText = sourceItem.getText();
 		String currentText = documentManager.getText();
@@ -307,7 +296,7 @@ public class DocumentManager {
 //	public static void didSave(DidSaveTextDocumentParams params, SimulaLanguageServer server) {
 	public static void didSave(final String documentUri) {
 		
-    	DocumentManager documentManager = openDocuments.get(documentUri);
+    	DocumentManager documentManager = getDocumentManager(documentUri);
 		
 		String fullText =  documentManager.getText();
 
@@ -350,7 +339,7 @@ public class DocumentManager {
 	/// to the server to return the semantic tokens for a whole file.
 	public static List<Integer> semanticTokensFull(String documentUri) {
 		if(TESTING) IO.println("DocumentManager.semanticTokensFull: " + documentUri);
-    	DocumentManager documentManager = openDocuments.get(documentUri);
+    	DocumentManager documentManager = getDocumentManager(documentUri);
 //    	List<LexToken> lexTokenList = documentManager.simBuilder.lexTokenList;
 //    	List<Integer> encodedData = generateSemanticTokens(lexTokenList);
     	List<Integer> encodedData = documentManager.simBuilder.semTokenList;

@@ -350,6 +350,7 @@ public final class SimulaLexer {
 //    		IO.println("SimulaLexer.scanWhiteSpace: currentColumn: " + currentColumn);
 			if(current == '\r' && nextCharIs('\n')) break LOOP;
     		if(current == '\n') break LOOP;
+    		if(current == '\t') break LOOP;
     		if(Character.isWhitespace(current)) continue LOOP;
     		break LOOP;
     	}
@@ -1196,7 +1197,7 @@ public final class SimulaLexer {
     	LexToken commentToken = newKeyWordToken(KeyWord.COMMENT_KEY);
     	tokenQueueAdd("scanComment-START", commentToken);
 
-    	if (CoreGlobal.TRACE_LEXER) Util.TRACE("scanComment, " + edcurrent());
+//    	if (CoreGlobal.TRACE_LEXER) Util.TRACE("scanComment, " + edcurrent());
     	int nPhrase = 0; // Number of comment phrases
 
     	LOOP:while (true) {
@@ -1390,7 +1391,7 @@ public final class SimulaLexer {
 		if(TRACE_CURRENT_COLUMN) IO.println("SimulaLexer.scanEndComment(1): currentColumn="+currentColumn);
     	tokenStartPos = nextPos;
         
-        if (CoreGlobal.TRACE_LEXER) Util.TRACE("scanEndComment, " + edcurrent());
+//        if (CoreGlobal.TRACE_LEXER) Util.TRACE("scanEndComment, " + edcurrent());
         int nPhrase = 0; // Number of comment phrases
         
         LOOP:while (true) {

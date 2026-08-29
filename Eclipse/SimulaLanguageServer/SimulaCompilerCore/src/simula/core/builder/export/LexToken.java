@@ -55,10 +55,7 @@ public class LexToken {
 		
 		this.tokenText = edTokenText(lexer);
 
-//		if(endOffset <= startOffset) {
-//			if(keyWord != KeyWord.EOF)
-//				Util.IERR("NEW LexToken: Illegal Token: " + this.getClass().getSimpleName()+ " " + this);
-//		}
+//		IO.println("NEW LexToken: " + this);
 				
 		if(Option.LEX_VERIFY) {
 			if(keyWord != KeyWord.NEWLINE && this.getText().contains("\r"))
