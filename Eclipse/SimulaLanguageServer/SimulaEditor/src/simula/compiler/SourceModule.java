@@ -33,7 +33,7 @@ public class SourceModule {
 	private String sourceText;
 //	private String tabName;
 	
-//	TokenList psiTree;
+//	TokenList semTokens;
 //	private ProgramModule syntaxTree; // Root of Syntax Tree
 	SemanticTokens tokenList;
 	
@@ -91,10 +91,12 @@ public class SourceModule {
 //	public SourceModule(String sourceText) {
 //	}
 	
-	public SourceModule(String documentUri) {
+	public SourceModule(String documentUri, String sourceText) {
 		this.documentUri = documentUri;
+		this.sourceText = sourceText;
     	openModules.put(documentUri, this);
-//		Global.currentModule = this;	
+		Global.currentModule = this;
+    	this.lang = Language.Simula;
 	}
 	
 	public SourceModule(File sourceFile) {
@@ -140,26 +142,15 @@ public class SourceModule {
 			e.printStackTrace();
 		}
 	}
-	
-	/// Used by: PaletteChooser.getDemoPanel and ...
-	public void doOpenSimulaModule(String sourceText) {
-		try {
-			String uri = sourceFile.toString();
-			int version = 1;
-			IO.println("\nSourceModule.getModifiedText: ========================================");
-			String content = Comn.modifySourceCode(sourceText);
-			SimulaCoreExports.didOpen(uri, version, content);
 
-
-			IO.println("SourceModule.doOpenSimulaModule: " + getUpdatedText().replace("\n", "\\n").replace("\r", "\\r"));
-			this.tokenList = new SemanticTokens(this, SimulaCoreExports.semanticTokensFull(documentUri));
-		} catch (Exception e) {
-			IO.println("SourceModule.doOpenSimulaModule: GOT EXCEPTION: " + e.getMessage());
-			e.printStackTrace();
-		}
+	public void doCloseSimulaModule() {
+		IO.println("SourceModule.doCloseSimulaModule: " + openModules);
+        openModules.remove(documentUri);
+		IO.println("SourceModule.doCloseSimulaModule: " + openModules);
+//		Util.STOP();
 	}
 
-
+		
 	public SemanticTokens getTokenList() {
 		if(tokenList == null) doOpenSimulaModule();
 		return tokenList;

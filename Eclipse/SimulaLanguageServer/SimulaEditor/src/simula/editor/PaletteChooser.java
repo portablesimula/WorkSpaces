@@ -144,22 +144,21 @@ public class PaletteChooser extends JDialog {
       		+ "       outtext(\"line without error\");\n"
       		+ "    end;\n"
       		+ " end\n";
-//    	SemanticTokens psiTree = getTokenList(sourceText);
-//		demoPanel = new PsiTextPanel(SimulaEditor. Language.Simula, null);
-        
         String documentUri = "#DEMO/demo.sim";
-        SourceModule sourceModule = new SourceModule(documentUri);
-//        SimulaCoreExports.didOpen(documentUri, 1, sourceText);
-        SimulaCoreExports.didOpen(documentUri, 1, okSourceText);
-//        List<Integer> semTokens = SimulaCoreExports.semanticTokensFull(documentUri);
-        SourceModule demoModule = SourceModule.getSourceModule(documentUri);
+//        SourceModule demoModule = new SourceModule(documentUri, okSourceText);
+        SourceModule demoModule = new SourceModule(documentUri, badSourceText);
+        demoModule.doOpenSimulaModule();
         IO.println("PaletteChooser.getDemoPanel: " + demoModule);
-//        demoModule.doOpenSimulaModule(sourceText);
 		demoPanel = new LspTextPanel(demoModule, null);
-    	SemanticTokens psiTree = demoModule.getTokenList();
-    	Util.IERR("STOP HER INTILL VIDERE");
-		try { demoPanel.fillTextPane(0, psiTree);
+    	SemanticTokens semTokens = demoModule.getTokenList();
+    	demoModule.doCloseSimulaModule();
+    	SimulaCoreExports.didClose(documentUri);
+//    	Util.IERR("STOP HER INTILL VIDERE");
+//    	Util.STOP();
+    	
+		try { demoPanel.fillTextPane(0, semTokens);
 		} catch (IOException e) { e.printStackTrace(); }
+//    	Util.STOP();
 		return demoPanel;
     }
 

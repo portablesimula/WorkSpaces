@@ -38,6 +38,7 @@ import simula.compiler.utilities.Util;
 import simula.core.builder.export.LexToken;
 import simula.core.builder.export.TokenManager;
 import simula.editor.SimulaEditor.Language;
+import simula.psi.DiagnosticHandler;
 //import simula.psi.LexToken;
 //import simula.psi.PsiElement;
 import simula.psi.SemanticTokens;
@@ -247,7 +248,7 @@ public class LspTextPanel extends TabTextPanel {
 	// ****************************************************************
 	// *** fillTextPane  -- SEE: TokenListVerifyer.reconstruct
 	// ****************************************************************
-    /// Fill the text pane with text delivered from the psiTree.
+    /// Fill the text pane with text delivered from the semTokens.
     /// @param caretPosition the caretPosition after the operations
     /// @param preScanner the scanner to use
     /// @throws IOException 
@@ -312,8 +313,10 @@ public class LspTextPanel extends TabTextPanel {
 	            if(TESTING) IO.println("\nINSERT TEXT: length = " + length + ", TAIL|"+Comn.printable(modifiedText.substring(sourcePos)));
 	            String tokenText = modifiedText.substring(sourcePos, sourcePos + length);
 					
+	            
+	            
 //		        result.append(tokenText);
-//				errorLines = lexToken.accumErrors(errorLines);
+//	            Set<String> errorLines = DiagnosticHandler.accumErrors(sourceModule, 0, errorLines);
 //				SimpleAttributeSet attrs = lexToken.getTooltipAttrs(null);
 //				if(attrs != null) {
 //					doc.insertString(doc.getLength(), tokenText, attrs);
@@ -321,9 +324,6 @@ public class LspTextPanel extends TabTextPanel {
 					doc.insertString(doc.getLength(), tokenText, getStyle(tokenTypeIndex));				    		
             		if(TRACE) IO.println("APPEND tokenText|" + Comn.printable(tokenText) + "| ==> |" + Comn.printable(doc.getText(0, doc.getLength())) + '|');
 //				}
-
-		            
-		            
 //		    	IO.println("APPEND tokenText|" + Comn.printable(tokenText) + "| ==> |" + Comn.printable(""+result) + '|');
 		           sourcePos += length;
 
@@ -391,9 +391,9 @@ public class LspTextPanel extends TabTextPanel {
     	int caretPosition = pos+count;
     	
 //		Global.currentModule.doOpenSimulaModule();
-		SemanticTokens psiTree = Global.currentModule.getTokenList();
+		SemanticTokens semTokens = Global.currentModule.getTokenList();
 		
-        fillTextPane(caretPosition, psiTree);
+        fillTextPane(caretPosition, semTokens);
 //    	Util.IERR("DETTE MÅ RETTES - ");
 //    	Util.STOP();
 	}

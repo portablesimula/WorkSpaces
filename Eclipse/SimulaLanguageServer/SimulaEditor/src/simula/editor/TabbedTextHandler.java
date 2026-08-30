@@ -33,6 +33,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import client.SimulaEditorClient;
+import simula.Comn;
+import simula.SimulaCoreExports;
 import simula.compiler.SourceModule;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
@@ -90,54 +92,14 @@ public class TabbedTextHandler {
     /// Create a new Tab with text generated from the given file.
     /// @param file the file
     /// @param lang the language
-//    static void doNewTabbedPanel(File file, String prefix) {
-//    	if(tabbedPane == null) doOpenTabbedPane();
-//    	SwingUtilities.invokeLater(() -> {
-//    		SourceModule currentModule = Global.currentModule;
-//    		SimulaEditor.Language lang = currentModule.lang;
-//    		SourceTextPanel currentTextPanel = new SourceTextPanel(currentModule, SimulaEditor.menuBar.popupMenu);
-//    		currentModule.setTextPanel(currentTextPanel);
-//    		String tabName = prefix + Global.currentModule.getTabName();
-//
-//    		tabbedPane.addTab(null, currentTextPanel); // Add content first, will be replaced
-//    		int index = tabbedPane.getTabCount() - 1;
-//    		tabbedPane.setTabComponentAt(index, new ClosableTabPanel("ZZ_"+tabName, tabbedPane, currentTextPanel));
-//    		tabbedPane.setSelectedIndex(index);
-//    		
-//    		currentModule.fileChanged=false;
-//    		if(file == null) {
-//    			currentTextPanel.fillTextPane(new StringReader(SourceModule.emptyProgram),0);
-//    		} else {
-//    			switch(lang) {
-//					case Simula:
-//	    				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
-//	    				currentTextPanel.fillTextPane(reader,0);
-//	    				} catch(IOException e) { Util.IERR("Impossible",e); }
-//						break;
-//					case Jar:
-//	    				currentTextPanel.fillTextPane(getJarFileReader(file),0);
-//						break;
-//					case Text:
-//	    				try { Reader reader=new InputStreamReader(new FileInputStream(file),Global._CHARSET);
-//	    				currentTextPanel.fillTextPane(reader,0);
-//	    				} catch(IOException e) { Util.IERR("Impossible",e); }
-//						break;
-//					case Other:
-//					default:
-//	    				currentTextPanel.fillTextPane(getHexFileReader(file),0);
-//    			}
-//    		}
-//    		SimulaEditor.menuBar.updateMenuItems();
-//    	});
-//    }
-    static void doNewTabbedPanel(File file, String prefix) {
+    static void doNewTabbedPanel(String documentUri, String prefix) {
     	if(tabbedPane == null) doOpenTabbedPane();
     	SwingUtilities.invokeLater(() -> {
     		SourceModule currentModule = Global.currentModule;
     		SimulaEditor.Language lang = currentModule.lang;
     		String tabName = prefix + Global.currentModule.getTabName();
     		
-    		IO.println("TabbedTextHandler.doNewTabbedPanel: " + currentModule.getUpdatedText().replace("\n", "\\n").replace("\r", "\\r"));
+    		IO.println("TabbedTextHandler.doNewTabbedPanel: " + Comn.printable(currentModule.getUpdatedText()));
     		currentModule.fileChanged=false;
     		TabTextPanel currentTextPanel = null;
 			switch(lang) {
@@ -147,37 +109,37 @@ public class TabbedTextHandler {
 //					currentTextPanel = psiTextPanel;
 //		    		psiTextPanel.fillTextPane(reader,0);
 //					currentModule.doOpenSimulaModule();
-					SemanticTokens psiTree = currentModule.getTokenList();
+					SemanticTokens semTokens = currentModule.getTokenList();
 		    		LspTextPanel psiTextPanel = new LspTextPanel(currentModule, SimulaEditor.menuBar.popupMenu);
 				try {
-					psiTextPanel.fillTextPane(0, psiTree);
+					psiTextPanel.fillTextPane(0, semTokens);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-					currentTextPanel = psiTextPanel;
+				currentTextPanel = psiTextPanel;
+				break;
 
-					break;
-					
+				default:
+					File file = new File(documentUri);
+					SourceTextPanel sourceTextPanel = new SourceTextPanel(currentModule, SimulaEditor.menuBar.popupMenu);
+					currentTextPanel = sourceTextPanel;
+					switch(lang) {
+					case Jar:
+						sourceTextPanel.fillTextPane(getJarFileReader(file),0);
+						break;
+					case Text:
+						Reader reader = new StringReader(currentModule.getUpdatedText());
+						sourceTextPanel.fillTextPane(reader,0);
+						break;
+					case Other:
 					default:
-						SourceTextPanel sourceTextPanel = new SourceTextPanel(currentModule, SimulaEditor.menuBar.popupMenu);
-						currentTextPanel = sourceTextPanel;
-						switch(lang) {
-							case Jar:
-								sourceTextPanel.fillTextPane(getJarFileReader(file),0);
-								break;
-							case Text:
-					    		Reader reader = new StringReader(currentModule.getUpdatedText());
-								sourceTextPanel.fillTextPane(reader,0);
-								break;
-							case Other:
-							default:
-								sourceTextPanel.fillTextPane(getHexFileReader(file),0);
-						}
+						sourceTextPanel.fillTextPane(getHexFileReader(file),0);
+					}
 			}
     		tabbedPane.addTab(null, currentTextPanel); // Add content first, will be replaced
     		int index = tabbedPane.getTabCount() - 1;
-    		tabbedPane.setTabComponentAt(index, new ClosableTabPanel("ZZZ_"+tabName, tabbedPane, currentTextPanel));
+    		tabbedPane.setTabComponentAt(index, new ClosableTabPanel(tabName, tabbedPane, currentTextPanel));
     		tabbedPane.setSelectedIndex(index);
     		SimulaEditor.menuBar.updateMenuItems();
     	});
@@ -189,7 +151,7 @@ public class TabbedTextHandler {
     /// Create a new Tab with text generated from the given psi tree.
     /// @param file the file
     /// @param lang the language
-    static void doNewTabbedPsiPanel(SemanticTokens psiTree, String prefix) {
+    static void doNewTabbedPsiPanel(SemanticTokens semTokens, String prefix) {
     	if(tabbedPane == null) doOpenTabbedPane();
     	SwingUtilities.invokeLater(() -> {
     		LspTextPanel psiTextPanel=new LspTextPanel(Global.currentModule, SimulaEditor.menuBar.popupMenu);
@@ -202,7 +164,7 @@ public class TabbedTextHandler {
 
     		Global.currentModule.fileChanged=false;
     		try {
-				psiTextPanel.fillTextPane(0, psiTree);
+				psiTextPanel.fillTextPane(0, semTokens);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -349,9 +311,10 @@ public class TabbedTextHandler {
 	/// Open file action
 	public static void doNewFileAction() {
 		String emptyProgram = "begin\n\nend;\n";
-		new SourceModule(emptyProgram);
+		String documentUri = "Untitled";
+        SourceModule demoModule = new SourceModule(documentUri, emptyProgram);
 		Global.currentModule.lang = SimulaEditor.Language.Simula;
-		TabbedTextHandler.doNewTabbedPanel(null, "");		
+		TabbedTextHandler.doNewTabbedPanel(documentUri, "");
 	}
 
 	// ****************************************************************
@@ -363,8 +326,7 @@ public class TabbedTextHandler {
         JFileChooser fileChooser = new JFileChooser(Global.currentWorkspace);
         if (fileChooser.showOpenDialog(tabbedPane)==JFileChooser.APPROVE_OPTION) {
         	File file=fileChooser.getSelectedFile();
-        	
-        	doOpenFile(file);
+        	doOpenFile(file.getPath());
         }
 	}
 	
@@ -372,8 +334,9 @@ public class TabbedTextHandler {
     // *** doOpenFileAction
     // ****************************************************************
 	/// Open file action
-	public static void doOpenFile(File file) {
+	public static void doOpenFile(String documentUri) {
 		if(tabbedPane == null) doOpenTabbedPane();
+		File file = new File(documentUri);
 		if(!file.exists()) { Util.popUpError("Can't open file\n"+file); return; }
 		SourceModule currentModule = new SourceModule(file);
     	switch(Global.currentModule.lang){
@@ -384,7 +347,7 @@ public class TabbedTextHandler {
 			
 			currentModule.doOpenSimulaModule();
 
-//			PsiTree psiTree = currentModule.getTokenList();
+//			PsiTree semTokens = currentModule.getTokenList();
 			doNewTabbedPsiPanel(currentModule.getTokenList(), "");
 //        	Global.setCurrentWorkspace(fileChooser.getCurrentDirectory());
 //			Util.IERR("");
@@ -398,7 +361,7 @@ public class TabbedTextHandler {
 				break;
 			}
 		default:
-			doNewTabbedPanel(file, "");
+			doNewTabbedPanel(documentUri, "");
 			break;
     	}
 	}

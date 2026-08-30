@@ -155,7 +155,7 @@ public class SimulaCoreExports {
 	/// a file uri the truth now exists on disk).
 	public static void didClose(final String documentUri) {
     	LOG.info("DocumentManager.didClose: BEGIN");
-		Util.IERR("NOT IMPL");
+//		Util.IERR("NOT IMPL");
 		DocumentManager.didClose(documentUri);
 	}
 

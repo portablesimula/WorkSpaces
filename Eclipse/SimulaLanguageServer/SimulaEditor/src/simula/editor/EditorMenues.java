@@ -11,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 
@@ -31,15 +30,9 @@ import javax.swing.text.DefaultEditorKit;
 import javax.swing.undo.UndoManager;
 
 import simula.compiler.SourceModule;
-//import simula.compiler.SimulaCompiler;
-//import simula.compiler.syntaxClass.declaration.DeclarationScope;
-//import simula.compiler.syntaxClass.declaration.StandardClass;
-//import simula.compiler.syntaxClass.statement.ProgramModule;
 import simula.compiler.utilities.Global;
 import simula.compiler.utilities.Option;
 import simula.compiler.utilities.Util;
-//import simula.psi.PsiTree;
-//import simula.psi.SyntaxTree;
 
 /// The editor's menues.
 /// 
@@ -100,7 +93,7 @@ public class EditorMenues extends JMenuBar {
     /** Menu item */ private JMenuItem runtimeOption = new JMenuItem("Runtime Options");
 
     /** Menu */ private JMenu toolsMenu=new JMenu("Tools");
-    /** Menu item */ private JMenuItem psiTree = new JMenuItem("Show PSI Tree");
+    /** Menu item */ private JMenuItem semTokens = new JMenuItem("Show PSI Tree");
     /** Menu item */ private JMenuItem syntaxTree = new JMenuItem("Show Syntax Tree");
     /** Menu item */ private JMenuItem renderPsi = new JMenuItem("Render from PSI");
     /** Menu item */ private JMenuItem renderOld = new JMenuItem("Render from OLD");
@@ -185,7 +178,7 @@ public class EditorMenues extends JMenuBar {
 		helpMenu.add(about); about.addActionListener(actionListener);
 		helpMenu.add(more); more.addActionListener(actionListener);
 		this.add(toolsMenu);
-		toolsMenu.add(psiTree); psiTree.setEnabled(false); psiTree.addActionListener(actionListener);
+		toolsMenu.add(semTokens); semTokens.setEnabled(false); semTokens.addActionListener(actionListener);
 		toolsMenu.add(syntaxTree); syntaxTree.setEnabled(false); syntaxTree.addActionListener(actionListener);
 		toolsMenu.add(renderPsi); renderPsi.setEnabled(false); renderPsi.addActionListener(actionListener);
 		toolsMenu.add(renderOld); renderOld.setEnabled(false); renderOld.addActionListener(actionListener);
@@ -212,7 +205,7 @@ public class EditorMenues extends JMenuBar {
 		undo.setAccelerator(KeyStroke.getKeyStroke('Z', InputEvent.CTRL_DOWN_MASK));
 		//redo.setAccelerator(KeyStroke.getKeyStroke('Y', InputEvent.CTRL_DOWN_MASK));
 	    run.setAccelerator(KeyStroke.getKeyStroke('B', InputEvent.CTRL_DOWN_MASK));
-	    psiTree.setAccelerator(KeyStroke.getKeyStroke('T', InputEvent.CTRL_DOWN_MASK));
+	    semTokens.setAccelerator(KeyStroke.getKeyStroke('T', InputEvent.CTRL_DOWN_MASK));
 	    about.setAccelerator(KeyStroke.getKeyStroke('H', InputEvent.CTRL_DOWN_MASK));
 		newFile2.setAccelerator(KeyStroke.getKeyStroke('N', InputEvent.CTRL_DOWN_MASK));
 	    openFile2.setAccelerator(KeyStroke.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK));
@@ -317,7 +310,7 @@ public class EditorMenues extends JMenuBar {
 		autoRefresh.setEnabled(source);   autoRefresh2.setEnabled(source);
 		undo.setEnabled(canUndo);         undo2.setEnabled(canUndo);
 //		redo.setEnabled(canRedo);         redo2.setEnabled(canRedo);
-		psiTree.setEnabled(mayBuild);
+		semTokens.setEnabled(mayBuild);
 		syntaxTree.setEnabled(mayBuild);
 		renderPsi.setEnabled(mayBuild);
 		renderOld.setEnabled(mayBuild);
@@ -357,7 +350,7 @@ public class EditorMenues extends JMenuBar {
 			else if(item==compilerMode   || item==compilerMode2) Option.setCompilerMode();
 			else if(item==compilerOption || item==compilerOption2) Option.selectCompilerOptions();
 			else if(item==runtimeOption  || item==runtimeOption2) RTOption.selectRuntimeOptions();			
-//			else if(item==psiTree) doShowPsiTreeAction();
+//			else if(item==semTokens) doShowPsiTreeAction();
 //			else if(item==syntaxTree) doShowSyntaxTreeAction();
 			else if(item==renderPsi) doRenderFromPSIAction();
 			else if(item==renderOld) doRenderFromOLDAction();
@@ -446,7 +439,7 @@ public class EditorMenues extends JMenuBar {
 		TabbedTextHandler.maybeSaveCurrentFile();
 //		SourceTextPanel current=TabbedTextHandler.currentTextPanel;			
 		SourceModule current=Global.currentModule;
-//		PsiTree psiTree = current.currentModule.getTokenList();
+//		PsiTree semTokens = current.currentModule.getTokenList();
 		String sourceFileName = current.getName();
 //		ProgramModule programModule = current.getSyntaxTree();
 //		
@@ -518,8 +511,8 @@ public class EditorMenues extends JMenuBar {
 		SwingUtilities.invokeLater(() -> {
 			SourceModule current = Global.currentModule;
 //			current.doOpenSimulaModule();
-//			PsiTree psiTree = current.getTokenList();
-//			TabbedTextHandler.doNewTabbedPsiPanel(psiTree, "PSI:");
+//			PsiTree semTokens = current.getTokenList();
+//			TabbedTextHandler.doNewTabbedPsiPanel(semTokens, "PSI:");
 			Util.IERR("");
 		});
 //		Thread.dumpStack();
@@ -533,7 +526,7 @@ public class EditorMenues extends JMenuBar {
 		SwingUtilities.invokeLater(() -> {
 			SourceModule current = Global.currentModule;
 //			TabbedTextHandler.doNewTabbedPanel(current.sourceFile, "OLD:", Language.Simula);
-			TabbedTextHandler.doNewTabbedPanel(current.sourceFile, "OLD:");
+			TabbedTextHandler.doNewTabbedPanel(current.sourceFile.getPath(), "OLD:");
 		});
 		Thread.dumpStack();
 	}

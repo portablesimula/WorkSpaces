@@ -239,7 +239,7 @@ public class DocumentManager {
 //        public DocumentManager documentManager = DocumentManager.get(documentUri);
     	LOG.info("DocumentManager.didOpen: BEGIN");
     	if(openDocuments.get(documentUri) != null) {
-    		Util.IERR("DOKUMENTET FINNES FRA FØR");
+    		Util.IERR("DocumentManager.didOpen: DOKUMENTET FINNES FRA FØR: " + documentUri);
     	}
     	DocumentManager documentManager = new DocumentManager(documentUri, version, sourceCode);
     	openDocuments.put(documentUri, documentManager);
@@ -322,11 +322,8 @@ public class DocumentManager {
 	/// a file uri the truth now exists on disk).
 //	public static void didClose(DidCloseTextDocumentParams params, SimulaLanguageServer server) {
 	public static void didClose(final String documentUri) {
-		
-//    	DocumentManager documentManager = openDocuments.get(documentUri);
         openDocuments.remove(documentUri);
-
-		System.out.println("Document closed on client side: " + documentUri);
+		IO.println("Document closed on client side: " + documentUri);
 	}
 
 	public void publishDiagnostics(List<SimulaDiagnostic> diagnostics) {
