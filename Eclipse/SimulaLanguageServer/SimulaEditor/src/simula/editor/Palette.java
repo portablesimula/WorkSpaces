@@ -9,8 +9,8 @@ import java.util.Properties;
 
 import javax.swing.SwingUtilities;
 
-import simula.compiler.utilities.Option;
-import simula.compiler.utilities.Util;
+import simula.editor.utilities.Option;
+import simula.editor.utilities.Util;
 
 public class Palette {
 	

@@ -1,4 +1,4 @@
-package simula.compiler.utilities;
+package simula.editor.utilities;
 
 public enum StyleCode {
 	/** Regular */  regular,

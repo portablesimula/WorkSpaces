@@ -13,12 +13,9 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 import simula.compiler.SourceModule;
-//import simula.compiler.parsing.DefaultScanner;
-//import simula.compiler.parsing.SimulaScanner;
-import simula.compiler.utilities.Global;
-import simula.compiler.utilities.StyleCode;
-//import simula.compiler.utilities.Token;
-import simula.compiler.utilities.Util;
+import simula.editor.utilities.Global;
+import simula.editor.utilities.StyleCode;
+import simula.editor.utilities.Util;
 
 import java.awt.Color;
 import java.io.Reader;

@@ -23,10 +23,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
-import simula.compiler.utilities.ConsolePanel;
-import simula.compiler.utilities.Global;
-import simula.compiler.utilities.Option;
-import simula.compiler.utilities.Util;
+
+import simula.editor.utilities.ConsolePanel;
+import simula.editor.utilities.Global;
+import simula.editor.utilities.Option;
+import simula.editor.utilities.Util;
 
 /// The SimulaEditor.
 /// 

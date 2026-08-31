@@ -3,8 +3,8 @@ package simula.debug;
 import simula.SimTextDocumentContentChangeEvent;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.builder.util.LexPosition;
-import simula.core.builder.util.LexRange;
+import simula.core.builder.export.LexPosition;
+import simula.core.builder.export.LexRange;
 
 import java.util.List;
 import java.util.Vector;

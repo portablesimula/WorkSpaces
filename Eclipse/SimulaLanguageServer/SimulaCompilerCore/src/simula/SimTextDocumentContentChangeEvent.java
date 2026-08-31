@@ -1,6 +1,6 @@
 package simula;
 
-import simula.core.builder.util.LexRange;
+import simula.core.builder.export.LexRange;
 
 public class SimTextDocumentContentChangeEvent {
 	

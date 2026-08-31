@@ -13,12 +13,11 @@ import java.util.Vector;
 
 import client.SimulaEditorClient;
 import simula.SimulaCoreExports;
-//import simula.compiler.parsing.SimulaScanner;
-import simula.compiler.utilities.Global;
-import simula.compiler.utilities.Option;
-import simula.compiler.utilities.Util;
 import simula.editor.RTOption;
 import simula.editor.SimulaEditor;
+import simula.editor.utilities.Global;
+import simula.editor.utilities.Option;
+import simula.editor.utilities.Util;
 
 /// Simula Main class containing the 'main' entry.
 /// 

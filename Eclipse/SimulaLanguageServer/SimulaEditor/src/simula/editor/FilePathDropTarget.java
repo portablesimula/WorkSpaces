@@ -27,7 +27,7 @@ public class FilePathDropTarget extends TransferHandler {
         	LOOP:for (File file : files) {
         		IO.println(file.getAbsolutePath() + "\n");
         		SwingUtilities.invokeLater(() -> {
-        			TabbedTextHandler.doOpenFile(file);
+        			TabbedTextHandler.doOpenFile(file.getPath());
         		});
         		break LOOP;
         	}

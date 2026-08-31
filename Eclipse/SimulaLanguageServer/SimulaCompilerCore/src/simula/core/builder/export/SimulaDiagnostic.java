@@ -1,12 +1,10 @@
 package simula.core.builder.export;
 
-import simula.core.builder.util.LexRange;
-
 public class SimulaDiagnostic {
 	public enum Severity { Error, Warning, Information, Hint }
-	Severity severity;
-	LexRange range;
-	String mss;
+	public Severity severity;
+	public LexRange range;
+	public String mss;
 
 	
 	public SimulaDiagnostic(Severity severity, LexRange range, String mss) {

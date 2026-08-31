@@ -4,14 +4,12 @@ import javax.swing.*;
 
 import simula.SimulaCoreExports;
 import simula.compiler.SourceModule;
-import simula.compiler.utilities.Global;
-import simula.compiler.utilities.Option;
-import simula.compiler.utilities.Util;
-import simula.psi.SemanticTokens;
+import simula.editor.utilities.Global;
+import simula.editor.utilities.Option;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /// @author Google AI
 /// @author Øystein Myhre Andersen
@@ -25,7 +23,7 @@ public class PaletteChooser extends JDialog {
 
     // --- BOTTOM PANEL (Demo text and Reset-button) ---
     JPanel bottomPanel = new JPanel(new BorderLayout());
-    LspTextPanel demoPanel;
+    SimulaTextPanel demoPanel;
 
     // Theme Choosing
     private JComboBox<String> themeDropdown;
@@ -126,7 +124,7 @@ public class PaletteChooser extends JDialog {
     }
     
     private static int SEQU = 1;
-    private LspTextPanel getDemoPanel() {
+    private SimulaTextPanel getDemoPanel() {
 //    	Option.internal.TRACE_NEW_LEXTOKEN = 1;
         String badSourceText =
         		  " class Demo; begin\n"
@@ -149,8 +147,8 @@ public class PaletteChooser extends JDialog {
         SourceModule demoModule = new SourceModule(documentUri, badSourceText);
         demoModule.doOpenSimulaModule();
         IO.println("PaletteChooser.getDemoPanel: " + demoModule);
-		demoPanel = new LspTextPanel(demoModule, null);
-    	SemanticTokens semTokens = demoModule.getTokenList();
+		demoPanel = new SimulaTextPanel(demoModule, null);
+		List<Integer> semTokens = demoModule.getSemTokens();
     	demoModule.doCloseSimulaModule();
     	SimulaCoreExports.didClose(documentUri);
 //    	Util.IERR("STOP HER INTILL VIDERE");
@@ -162,14 +160,6 @@ public class PaletteChooser extends JDialog {
 		return demoPanel;
     }
 
-//	private SemanticTokens getTokenList(String sourceText) {
-//		PsiBuilder psiBuilder = new PsiBuilder();
-//		psiBuilder.start(sourceText);
-////		@SuppressWarnings("unused")
-////		ProgramModule programModule = new ProgramModule(psiBuilder);
-//		return psiBuilder.getRoot();
-//	}
-
     // Oppdaterer visningen når du bytter tema i dropdownmenyen
     private void updateThemeColors() {
 //    	IO.println("PaletteChooser.updateThemeColors: Palette.nColors=" + Palette.nColors + ", colorPanels=" + colorPanels.length);
@@ -179,7 +169,7 @@ public class PaletteChooser extends JDialog {
         }
         
         if(demoPanel != null) {
-    		LspTextPanel prevCard = demoPanel;
+    		SimulaTextPanel prevCard = demoPanel;
     		DEMO_SEQU++;
     		String ScreenID = "Screen" + DEMO_SEQU;
             // Flip to the specific panel instantly

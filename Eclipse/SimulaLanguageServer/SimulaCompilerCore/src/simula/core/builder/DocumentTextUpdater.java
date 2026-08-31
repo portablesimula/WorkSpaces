@@ -1,8 +1,8 @@
 package simula.core.builder;
 
 import simula.SimTextDocumentContentChangeEvent;
-import simula.core.builder.util.LexPosition;
-import simula.core.builder.util.LexRange;
+import simula.core.builder.export.LexPosition;
+import simula.core.builder.export.LexRange;
 
 import java.util.List;
 

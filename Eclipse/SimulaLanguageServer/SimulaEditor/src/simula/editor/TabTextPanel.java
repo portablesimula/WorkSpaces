@@ -24,8 +24,8 @@ import javax.swing.text.StyledDocument;
 import javax.swing.undo.UndoableEdit;
 
 import simula.compiler.SourceModule;
-import simula.compiler.utilities.Global;
-import simula.compiler.utilities.Util;
+import simula.editor.utilities.Global;
+import simula.editor.utilities.Util;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

@@ -3,7 +3,6 @@ package simula.core.builder.export;
 import simula.Comn;
 import simula.Option;
 import simula.core.builder.SimulaLexer;
-import simula.core.builder.util.LexPosition;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.Util;
 

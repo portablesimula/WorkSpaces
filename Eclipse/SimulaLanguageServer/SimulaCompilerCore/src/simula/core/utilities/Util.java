@@ -22,11 +22,11 @@ import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.SimulaBuilder;
+import simula.core.builder.export.LexPosition;
+import simula.core.builder.export.LexRange;
 import simula.core.builder.export.LexToken;
 import simula.core.builder.export.SimulaDiagnostic;
 import simula.core.builder.util.Identifier;
-import simula.core.builder.util.LexPosition;
-import simula.core.builder.util.LexRange;
 import simula.core.syntaxClass.SyntaxElement;
 
 /// A set of all static Utility Methods

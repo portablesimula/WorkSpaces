@@ -11,11 +11,11 @@ import javax.swing.undo.UndoManager;
 import simula.core.builder.export.SimulaDiagnostic;
 import simula.Comn;
 import simula.SimulaCoreExports;
-import simula.compiler.utilities.Global;
-import simula.compiler.utilities.Util;
+import simula.editor.DiagnosticHandler;
 import simula.editor.TabTextPanel;
-import simula.psi.SemanticTokens;
 import simula.editor.SimulaEditor.Language;
+import simula.editor.utilities.Global;
+import simula.editor.utilities.Util;
 
 public class SourceModule {
 	
@@ -33,16 +33,16 @@ public class SourceModule {
 	private String sourceText;
 //	private String tabName;
 	
-//	TokenList semTokens;
-//	private ProgramModule syntaxTree; // Root of Syntax Tree
-	SemanticTokens tokenList;
+	List<Integer> semTokens;
 	
-	List<SimulaDiagnostic> diagnostics;
+	public DiagnosticHandler diagnosticHandler;
+//	List<SimulaDiagnostic> diagnostics;
 	public static void publishDiagnostics(String uri, List<SimulaDiagnostic> diagnostics) {
 		IO.println("SourceModule.publishDiagnostics: " + uri + " " + diagnostics);
 		SourceModule sourceModule = SourceModule.getSourceModule(uri);
     	IO.println("SourceModule.publishDiagnostics: openModules: " + openModules);
-		sourceModule.diagnostics = diagnostics;
+//		sourceModule.diagnostics = diagnostics;
+    	sourceModule.diagnosticHandler = new DiagnosticHandler(sourceModule, diagnostics);
 //		Util.IERR("NOT IMPL");
 	}
 
@@ -74,8 +74,6 @@ public class SourceModule {
 	// ****************************************************************
     /// Do refresh action.
 	public void doRefresh() {
-//		if(textPanel instanceof PsiTextPanel psiPanel) psiPanel.doRefresh();
-//		if(textPanel instanceof SourceTextPanel oldPanel) oldPanel.doRefresh();
 		IO.println("SourceModule.doRefresh: " + this.getTabName() + "  " + textPanel.getClass().getSimpleName());
 		textPanel.doRefresh();
 	}
@@ -133,10 +131,8 @@ public class SourceModule {
 			int version = 1;
 			String content = getModifiedText();
 			SimulaCoreExports.didOpen(uri, version, content);
-
-
 			IO.println("SourceModule.doOpenSimulaModule: " + getUpdatedText().replace("\n", "\\n").replace("\r", "\\r"));
-			this.tokenList = new SemanticTokens(this, SimulaCoreExports.semanticTokensFull(documentUri));
+			this.semTokens = SimulaCoreExports.semanticTokensFull(documentUri);
 		} catch (Exception e) {
 			IO.println("SourceModule.doOpenSimulaModule: GOT EXCEPTION: " + e.getMessage());
 			e.printStackTrace();
@@ -151,9 +147,9 @@ public class SourceModule {
 	}
 
 		
-	public SemanticTokens getTokenList() {
-		if(tokenList == null) doOpenSimulaModule();
-		return tokenList;
+	public List<Integer> getSemTokens() {
+		if(semTokens == null) doOpenSimulaModule();
+		return semTokens;
 	}
 
 	/// Test if a file is a text file

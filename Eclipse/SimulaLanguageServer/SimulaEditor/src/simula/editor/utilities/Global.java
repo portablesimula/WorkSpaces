@@ -3,7 +3,7 @@
 /// 
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
-package simula.compiler.utilities;
+package simula.editor.utilities;
 
 import java.io.File;
 import java.io.FileInputStream;

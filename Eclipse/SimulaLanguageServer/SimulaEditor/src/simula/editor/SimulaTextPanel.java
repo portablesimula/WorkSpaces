@@ -31,18 +31,12 @@ import javax.swing.undo.UndoableEdit;
 
 import simula.Comn;
 import simula.compiler.SourceModule;
-import simula.compiler.utilities.Global;
-//import simula.compiler.utilities.KeyWord;
-import simula.compiler.utilities.Option;
-import simula.compiler.utilities.Util;
 import simula.core.builder.export.LexToken;
 import simula.core.builder.export.TokenManager;
 import simula.editor.SimulaEditor.Language;
-import simula.psi.DiagnosticHandler;
-//import simula.psi.LexToken;
-//import simula.psi.PsiElement;
-import simula.psi.SemanticTokens;
-//import simula.psi.PsiTreeIterator;
+import simula.editor.utilities.Global;
+import simula.editor.utilities.Option;
+import simula.editor.utilities.Util;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -63,7 +57,7 @@ import java.util.Set;
 /// @author Øystein Myhre Andersen
 /// @author Google AI
 @SuppressWarnings({ "serial", "unused" })
-public class LspTextPanel extends TabTextPanel {
+public class SimulaTextPanel extends TabTextPanel {
 	/// DEBUG on/off
 	private static final boolean DEBUG=false;//true;
 	
@@ -184,7 +178,7 @@ public class LspTextPanel extends TabTextPanel {
 	/// Create a new PsiTextPanel.
 	/// @param sourceFile the source file
 	/// @param popupMenu the popupMenu
-	LspTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
+	SimulaTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
     	super(sourceModule, popupMenu);
 //   	this.currentModule = new SourceModule(this, sourceFile);
 //    	this.sourceFile=sourceFile;
@@ -244,7 +238,7 @@ public class LspTextPanel extends TabTextPanel {
 //	}
     
 	private static boolean TESTING = false;
-	private static boolean TRACE = true;
+	private static boolean TRACE = false;//true;
 	// ****************************************************************
 	// *** fillTextPane  -- SEE: TokenListVerifyer.reconstruct
 	// ****************************************************************
@@ -252,7 +246,7 @@ public class LspTextPanel extends TabTextPanel {
     /// @param caretPosition the caretPosition after the operations
     /// @param preScanner the scanner to use
     /// @throws IOException 
-    void fillTextPane(int caretPosition, SemanticTokens tokenList) throws IOException {
+    void fillTextPane(int caretPosition, List<Integer> semTokens) throws IOException {
 		StyledDocument lin = new DefaultStyledDocument();
 		addStylesToLineDocument(lin);
         editTextPane.setEditable(false);
@@ -261,25 +255,28 @@ public class LspTextPanel extends TabTextPanel {
 			doc.remove(0, doc.getLength());
 			Set<String> errorLines = null;
 			String modifiedText = sourceModule.getModifiedText();
-	    	List<Integer> semanticTokens = tokenList.tokens;
+//	    	List<Integer> semTokens = tokenList.tokens;
 	        int sourcePos = 0;
 	        int lineNumber = 1;
 	        int prevTextLength = 0;
+            DiagnosticHandler diagnosticHandler = sourceModule.diagnosticHandler;
 	
 	 		IO.println("\nLspTextPanel.fillTextPane: SOURCE:"+Comn.printable(modifiedText));
 	        int x = 0;
 	        int lexTokenIndex = 0;
-			while(x < semanticTokens.size()) {
-	            int deltaLine = semanticTokens.get(x++);
-	            int deltaStartChar = semanticTokens.get(x++);
-	            int length = semanticTokens.get(x++);
-	            int tokenTypeIndex = semanticTokens.get(x++);
+	        int absColumn = 0;
+			while(x < semTokens.size()) {
+	            int deltaLine = semTokens.get(x++);
+	            int deltaStartChar = semTokens.get(x++);
+	            int length = semTokens.get(x++);
+	            int tokenTypeIndex = semTokens.get(x++);
 	            @SuppressWarnings("unused")
-				int tokenModifiersBitmask = semanticTokens.get(x++);
+				int tokenModifiersBitmask = semTokens.get(x++);
 	            if (deltaLine > 0) {
+            		absColumn = deltaStartChar;
 	            	while((deltaLine--) > 0) {
 						String lineString = edLineNumber(lineNumber++);
-						SimpleAttributeSet attrs = getTooltipAttrs(lineNumber, errorLines);
+						SimpleAttributeSet attrs = diagnosticHandler.getLineHoverAttrs(lineNumber);
 						if(attrs != null) {
 							lin.insertString(lin.getLength(),lineString, attrs);					    		
 							errorLines = null;
@@ -293,6 +290,8 @@ public class LspTextPanel extends TabTextPanel {
 	            	}
 	                prevTextLength = 0;
 	                if(TESTING) IO.println("\nStart NEWLINE:" + lineNumber + " sourcePos="+sourcePos+", TAIL|"+Comn.printable(modifiedText.substring(sourcePos)));
+	            } else {
+            		absColumn += deltaStartChar;
 	            }
 	
 	            // 3. Pad missing characters on the current line
@@ -316,14 +315,15 @@ public class LspTextPanel extends TabTextPanel {
 	            
 	            
 //		        result.append(tokenText);
-//	            Set<String> errorLines = DiagnosticHandler.accumErrors(sourceModule, 0, errorLines);
-//				SimpleAttributeSet attrs = lexToken.getTooltipAttrs(null);
-//				if(attrs != null) {
-//					doc.insertString(doc.getLength(), tokenText, attrs);
-//				} else {
+//	            errorLines = diagnosticHandler.accumErrors(sourceModule, 0, errorLines);
+//				SimpleAttributeSet attrs = diagnosticHandler.getTooltipAttrs(null);
+				SimpleAttributeSet attrs = diagnosticHandler.getTokenHoverAttrs(lineNumber, absColumn, length);
+				if(attrs != null) {
+					doc.insertString(doc.getLength(), tokenText, attrs);
+				} else {
 					doc.insertString(doc.getLength(), tokenText, getStyle(tokenTypeIndex));				    		
             		if(TRACE) IO.println("APPEND tokenText|" + Comn.printable(tokenText) + "| ==> |" + Comn.printable(doc.getText(0, doc.getLength())) + '|');
-//				}
+				}
 //		    	IO.println("APPEND tokenText|" + Comn.printable(tokenText) + "| ==> |" + Comn.printable(""+result) + '|');
 		           sourcePos += length;
 
@@ -391,62 +391,19 @@ public class LspTextPanel extends TabTextPanel {
     	int caretPosition = pos+count;
     	
 //		Global.currentModule.doOpenSimulaModule();
-		SemanticTokens semTokens = Global.currentModule.getTokenList();
+    	List<Integer> semTokens = Global.currentModule.getSemTokens();
 		
-        fillTextPane(caretPosition, semTokens);
+        try {
+			fillTextPane(caretPosition, semTokens);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 //    	Util.IERR("DETTE MÅ RETTES - ");
 //    	Util.STOP();
 	}
     
     
-	// ****************************************************************
-	// *** Utilities
-	// ****************************************************************
-	public SimpleAttributeSet getTooltipAttrs(int lineNumber, Set<String> errorLines) {
-	    	
-//	    	if(errorLines != null || getErrors() != null) {
-//	    		IO.println("\n\nPsiTextPanel.getTooltipText: BEGIN: errorLines: "+errorLines);
-//	    		IO.println("PsiTextPanel.getTooltipText: BEGIN: lexErrors: "+getErrors());
-//	    	}
-	    	errorLines = accumErrors(lineNumber, errorLines);
-	    	
-	    	if(errorLines == null) return null;
-//	    	IO.println("PsiTextPanel.getTooltipText: RENDER: errorLines: "+errorLines);
-	    	
-	    	String tooltipText = null;
-	    	if(errorLines.size() == 1) {
-//	    		tooltipText = errorLines.firstElement();
-	    		for(String msg:errorLines) {
-	    			tooltipText = msg;
-	    		}    		
-	    	} else {
-	    		String res = "<html>Multiple markers on this line:<ul>";
-	    		for(String msg:errorLines) {
-	    			res = res + "<li>" + msg + "</li>";
-	    		}
-//	        	IO.println("PsiTextPanel.getTooltipText: RESULT: "+res);
-	        	tooltipText = res + "</ul>";
-	    	}
-
-			SimpleAttributeSet attrs = new SimpleAttributeSet();
-	        StyleConstants.setFontFamily(attrs, "Courier New");
-			StyleConstants.setForeground(attrs, Palette.ErrorForeground);
-			StyleConstants.setBackground(attrs, Palette.ErrorBackground);
-	        StyleConstants.setBold(attrs, true);
-			attrs.addAttribute("tooltip", tooltipText);
-	    	return attrs;
-	    }
-
-
-	    public Set<String> accumErrors(int lineNumber, Set<String> errorLines) {
-	    	Set<String> errors = null; // getErrors(lineNumber);
-	    	if(errors != null) {
-	    		if(errorLines == null) errorLines = new HashSet<String>();
-	    		errorLines.addAll(errors);
-	    	}
-	    	return errorLines;
-	    }
-
 	// ****************************************************************
 	// *** Utilities
 	// ****************************************************************

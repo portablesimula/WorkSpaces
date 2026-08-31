@@ -1,7 +1,8 @@
 package simula.editor;
 
 import javax.swing.*;
-import simula.compiler.utilities.Global;
+
+import simula.editor.utilities.Global;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;

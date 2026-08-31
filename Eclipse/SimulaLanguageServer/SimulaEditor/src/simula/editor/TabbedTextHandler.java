@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
@@ -17,9 +16,9 @@ import java.nio.file.attribute.FileTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.Vector;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -32,15 +31,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import client.SimulaEditorClient;
 import simula.Comn;
-import simula.SimulaCoreExports;
 import simula.compiler.SourceModule;
-import simula.compiler.utilities.Global;
-import simula.compiler.utilities.Option;
-import simula.compiler.utilities.Util;
-import simula.editor.SimulaEditor.Language;
-import simula.psi.SemanticTokens;
+import simula.editor.utilities.Global;
+import simula.editor.utilities.Util;
 
 /// @author Google AI
 /// @author Øystein Myhre Andersen
@@ -92,25 +86,21 @@ public class TabbedTextHandler {
     /// Create a new Tab with text generated from the given file.
     /// @param file the file
     /// @param lang the language
-    static void doNewTabbedPanel(String documentUri, String prefix) {
+    static void doNewTabbedPanel(SourceModule sourceModule, String documentUri, String prefix) {
     	if(tabbedPane == null) doOpenTabbedPane();
     	SwingUtilities.invokeLater(() -> {
-    		SourceModule currentModule = Global.currentModule;
-    		SimulaEditor.Language lang = currentModule.lang;
-    		String tabName = prefix + Global.currentModule.getTabName();
+//    		SourceModule sourceModule = Global.currentModule;
+    		SimulaEditor.Language lang = sourceModule.lang;
+    		String tabName = prefix + sourceModule.getTabName();
     		
-    		IO.println("TabbedTextHandler.doNewTabbedPanel: " + Comn.printable(currentModule.getUpdatedText()));
-    		currentModule.fileChanged=false;
+    		IO.println("TabbedTextHandler.doNewTabbedPanel: " + Comn.printable(sourceModule.getUpdatedText()));
+    		sourceModule.fileChanged=false;
     		TabTextPanel currentTextPanel = null;
 			switch(lang) {
 				case Simula:
-//		    		PsiTextPanel psiTextPanel = new PsiTextPanel(currentModule, SimulaEditor.menuBar.popupMenu);
-		    		IO.println("TabbedTextHandler.doNewTabbedPanel: textPanel: " + currentModule.textPanel);
-//					currentTextPanel = psiTextPanel;
-//		    		psiTextPanel.fillTextPane(reader,0);
-//					currentModule.doOpenSimulaModule();
-					SemanticTokens semTokens = currentModule.getTokenList();
-		    		LspTextPanel psiTextPanel = new LspTextPanel(currentModule, SimulaEditor.menuBar.popupMenu);
+		    		IO.println("TabbedTextHandler.doNewTabbedPanel: textPanel: " + sourceModule.textPanel);
+		    		List<Integer> semTokens = sourceModule.getSemTokens();
+		    		SimulaTextPanel psiTextPanel = new SimulaTextPanel(sourceModule, SimulaEditor.menuBar.popupMenu);
 				try {
 					psiTextPanel.fillTextPane(0, semTokens);
 				} catch (IOException e) {
@@ -122,14 +112,14 @@ public class TabbedTextHandler {
 
 				default:
 					File file = new File(documentUri);
-					SourceTextPanel sourceTextPanel = new SourceTextPanel(currentModule, SimulaEditor.menuBar.popupMenu);
+					SourceTextPanel sourceTextPanel = new SourceTextPanel(sourceModule, SimulaEditor.menuBar.popupMenu);
 					currentTextPanel = sourceTextPanel;
 					switch(lang) {
 					case Jar:
 						sourceTextPanel.fillTextPane(getJarFileReader(file),0);
 						break;
 					case Text:
-						Reader reader = new StringReader(currentModule.getUpdatedText());
+						Reader reader = new StringReader(sourceModule.getUpdatedText());
 						sourceTextPanel.fillTextPane(reader,0);
 						break;
 					case Other:
@@ -151,10 +141,10 @@ public class TabbedTextHandler {
     /// Create a new Tab with text generated from the given psi tree.
     /// @param file the file
     /// @param lang the language
-    static void doNewTabbedPsiPanel(SemanticTokens semTokens, String prefix) {
+    static void doNewTabbedPsiPanel(List<Integer> semTokens, String prefix) {
     	if(tabbedPane == null) doOpenTabbedPane();
     	SwingUtilities.invokeLater(() -> {
-    		LspTextPanel psiTextPanel=new LspTextPanel(Global.currentModule, SimulaEditor.menuBar.popupMenu);
+    		SimulaTextPanel psiTextPanel=new SimulaTextPanel(Global.currentModule, SimulaEditor.menuBar.popupMenu);
     		String tabName = prefix + Global.currentModule.getTabName();
 
 			tabbedPane.addTab(null, psiTextPanel); // Add content first, will be replaced
@@ -312,9 +302,9 @@ public class TabbedTextHandler {
 	public static void doNewFileAction() {
 		String emptyProgram = "begin\n\nend;\n";
 		String documentUri = "Untitled";
-        SourceModule demoModule = new SourceModule(documentUri, emptyProgram);
+        SourceModule sourceModule = new SourceModule(documentUri, emptyProgram);
 		Global.currentModule.lang = SimulaEditor.Language.Simula;
-		TabbedTextHandler.doNewTabbedPanel(documentUri, "");
+		TabbedTextHandler.doNewTabbedPanel(sourceModule, documentUri, "");
 	}
 
 	// ****************************************************************
@@ -338,19 +328,12 @@ public class TabbedTextHandler {
 		if(tabbedPane == null) doOpenTabbedPane();
 		File file = new File(documentUri);
 		if(!file.exists()) { Util.popUpError("Can't open file\n"+file); return; }
-		SourceModule currentModule = new SourceModule(file);
-    	switch(Global.currentModule.lang){
+		SourceModule sourceModule = new SourceModule(file);
+    	switch(sourceModule.lang){
 		case Simula:
-//			SimulaEditor.doNewTabbedPanel(file,SimulaEditor.Language.Simula);
-//			SourceModule currentModule = Global.currentModule;
-//			SourceModule currentModule = new SourceModule(file, SimulaEditor.Language.Simula); 
-			
-			currentModule.doOpenSimulaModule();
-
-//			PsiTree semTokens = currentModule.getTokenList();
-			doNewTabbedPsiPanel(currentModule.getTokenList(), "");
+			sourceModule.doOpenSimulaModule();
+			doNewTabbedPsiPanel(sourceModule.getSemTokens(), "");
 //        	Global.setCurrentWorkspace(fileChooser.getCurrentDirectory());
-//			Util.IERR("");
 			break;
 		case Jar:
 			IO.println("EditorMenues.doOpenFileAction: "+file);
@@ -361,7 +344,7 @@ public class TabbedTextHandler {
 				break;
 			}
 		default:
-			doNewTabbedPanel(documentUri, "");
+			doNewTabbedPanel(sourceModule, documentUri, "");
 			break;
     	}
 	}
