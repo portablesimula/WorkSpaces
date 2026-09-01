@@ -253,14 +253,16 @@ public class SimulaTextPanel extends TabTextPanel {
     	doc.removeUndoableEditListener(undoListener);
 		try {
 			doc.remove(0, doc.getLength());
-			Set<String> errorLines = null;
+//			Set<String> errorLines = null;
 			String modifiedText = sourceModule.getModifiedText();
 //	    	List<Integer> semTokens = tokenList.tokens;
 	        int sourcePos = 0;
-	        int lineNumber = 1;
 	        int prevTextLength = 0;
             DiagnosticHandler diagnosticHandler = sourceModule.diagnosticHandler;
-	
+
+	        int lineNumber = 0;
+	        doRenderLine(diagnosticHandler, lin, lineNumber++);
+
 	 		IO.println("\nLspTextPanel.fillTextPane: SOURCE:"+Comn.printable(modifiedText));
 	        int x = 0;
 	        int lexTokenIndex = 0;
@@ -275,14 +277,7 @@ public class SimulaTextPanel extends TabTextPanel {
 	            if (deltaLine > 0) {
             		absColumn = deltaStartChar;
 	            	while((deltaLine--) > 0) {
-						String lineString = edLineNumber(lineNumber++);
-						SimpleAttributeSet attrs = diagnosticHandler.getLineHoverAttrs(lineNumber);
-						if(attrs != null) {
-							lin.insertString(lin.getLength(),lineString, attrs);					    		
-							errorLines = null;
-						} else lin.insertString(lin.getLength(),lineString, styleLineNumber);
-						if(lineNumber > 500) Global.currentModule.AUTO_REFRESH = false;
-	            		
+	            		doRenderLine(diagnosticHandler, lin, lineNumber++);
 	                    // result.append(NEWLINE);
 	    				doc.insertString(doc.getLength(), "\n", styleRegular);				    		
 	            		if(TRACE) IO.println("APPEND tokenText|" + Comn.printable('\n') + "| ==> |" + Comn.printable(doc.getText(0, doc.getLength())) + '|');
@@ -311,13 +306,7 @@ public class SimulaTextPanel extends TabTextPanel {
 	            // 4. Insert the token text
 	            if(TESTING) IO.println("\nINSERT TEXT: length = " + length + ", TAIL|"+Comn.printable(modifiedText.substring(sourcePos)));
 	            String tokenText = modifiedText.substring(sourcePos, sourcePos + length);
-					
-	            
-	            
-//		        result.append(tokenText);
-//	            errorLines = diagnosticHandler.accumErrors(sourceModule, 0, errorLines);
-//				SimpleAttributeSet attrs = diagnosticHandler.getTooltipAttrs(null);
-				SimpleAttributeSet attrs = diagnosticHandler.getTokenHoverAttrs(lineNumber, absColumn, length);
+				SimpleAttributeSet attrs = diagnosticHandler.getTokenHoverAttrs(lineNumber-1, absColumn, length);
 				if(attrs != null) {
 					doc.insertString(doc.getLength(), tokenText, attrs);
 				} else {
@@ -339,6 +328,16 @@ public class SimulaTextPanel extends TabTextPanel {
         setTabStopsToSourceDocument(editTextPane, doc);
     }
     
+	private void doRenderLine(DiagnosticHandler diagnosticHandler, StyledDocument lin, int lineNumber) throws BadLocationException {
+		SimpleAttributeSet attrs = diagnosticHandler.getLineHoverAttrs(lineNumber);
+		String lineString = edLineNumber(lineNumber+1);
+		if(attrs != null) {
+			lin.insertString(lin.getLength(),lineString, attrs);					    		
+//			errorLines = null;
+		} else lin.insertString(lin.getLength(),lineString, styleLineNumber);
+		if(lineNumber > 500) Global.currentModule.AUTO_REFRESH = false;
+	}
+
     private void setTabStopsToSourceDocument(JTextPane textPane, StyledDocument doc) {
     	int charactersPerTab = 4;
     	FontMetrics metrics = textPane.getFontMetrics(textPane.getFont());
@@ -359,19 +358,6 @@ public class SimulaTextPanel extends TabTextPanel {
     	doc.setParagraphAttributes(0, doc.getLength(), attributes, false);
 
     }
-
-//    private void addLine(StyledDocument lin, int currentLine, Set<String> errorLines) throws BadLocationException {
-//		String lineString = edLineNumber(currentLine+1);
-//		// Should only be here AFTER a complete line is rendered
-//		SimpleAttributeSet attrs = getTooltipAttrs(currentLine, errorLines);
-//		if(attrs != null) {
-//			lin.insertString(lin.getLength(),lineString, attrs);					    		
-//			errorLines = null;
-//		} else {
-//			lin.insertString(lin.getLength(),lineString, styleLineNumber);
-//		}
-//    	
-//    }
 
 	// ****************************************************************
 	// *** doRefresh

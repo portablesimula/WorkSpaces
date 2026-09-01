@@ -134,14 +134,14 @@ public class PaletteChooser extends JDialog {
         		+ "       outtext\"line with error\");\n"
         		+ "    end;\n"
         		+ " end\n";
-        String okSourceText =
-      		  " class Demo; begin\n"
-      		+ "    comment demo mockup: "+SEQU+";\n"
-      		+ "    procedure p(x); integer x; begin\n"
-      		+ "       real pi = 3.14;\n"
-      		+ "       outtext(\"line without error\");\n"
-      		+ "    end;\n"
-      		+ " end\n";
+//        String okSourceText =
+//      		  " class Demo; begin\n"
+//      		+ "    comment demo mockup: "+SEQU+";\n"
+//      		+ "    procedure p(x); integer x; begin\n"
+//      		+ "       real pi = 3.14;\n"
+//      		+ "       outtext(\"line without error\");\n"
+//      		+ "    end;\n"
+//      		+ " end\n";
         String documentUri = "#DEMO/demo.sim";
 //        SourceModule demoModule = new SourceModule(documentUri, okSourceText);
         SourceModule demoModule = new SourceModule(documentUri, badSourceText);

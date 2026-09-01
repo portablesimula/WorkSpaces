@@ -138,7 +138,9 @@ public class SimulaEditor extends JFrame {
         WelcomePanel welcomePanel = new WelcomePanel();
         mainCardPanel.add(welcomePanel,"Welcome");
 
-        autoRefresher=new AutoRefresher(); autoRefresher.start();
+        System.err.println("Dette må endres. Auto refresh må skrives på en annewn måte");
+        autoRefresher=new AutoRefresher();
+        // autoRefresher.start();
 
         // Set the Menus
         menuBar=new EditorMenues();

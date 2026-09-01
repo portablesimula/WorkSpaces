@@ -75,6 +75,7 @@ public class SourceModule {
     /// Do refresh action.
 	public void doRefresh() {
 		IO.println("SourceModule.doRefresh: " + this.getTabName() + "  " + textPanel.getClass().getSimpleName());
+		Thread.dumpStack();
 		textPanel.doRefresh();
 	}
 

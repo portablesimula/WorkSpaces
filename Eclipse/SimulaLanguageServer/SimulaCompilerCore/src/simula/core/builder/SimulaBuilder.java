@@ -200,7 +200,7 @@ public class SimulaBuilder {
 		}
 		
 		if (nErrors > 0) {
-			String msg="Compiler terminate " + documentManager.simBuilder.documentManager.sourceName + " after " + nErrors + " errors during semantic checking";
+			String msg="Compiler terminate " + documentManager.sourceName + " after " + nErrors + " errors during semantic checking";
 			Thread.dumpStack();
 			IO.println(msg);
 //			Thread.dumpStack();

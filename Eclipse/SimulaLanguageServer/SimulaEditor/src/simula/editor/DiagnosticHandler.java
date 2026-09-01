@@ -16,7 +16,7 @@ import simula.core.builder.export.LexRange;
 import simula.core.builder.export.SimulaDiagnostic;
 
 public class DiagnosticHandler {
-//	private SourceModule sourceModule;
+	private SourceModule sourceModule;
 //	private List<SimulaDiagnostic> diagnostics;
 	
 	class DiagnosticSet {
@@ -29,7 +29,7 @@ public class DiagnosticHandler {
 	Map<Integer, DiagnosticSet> lineMap = new HashMap<>();
 	
 	public DiagnosticHandler(SourceModule sourceModule, List<SimulaDiagnostic> diagnostics) {
-//		this.sourceModule = sourceModule;
+		this.sourceModule = sourceModule;
 //		this.diagnostics = diagnostics;
 		
 		for(SimulaDiagnostic diag:diagnostics) {
@@ -45,34 +45,40 @@ public class DiagnosticHandler {
 				set.add(diag);
 			}
 		}
+//		printDiagnosticSets("NEW DiagnosticHandler: ");
+	}
+	
+	@SuppressWarnings("unused")
+	private void printDiagnosticSets(String title) {
+		IO.println("================ " + title + " DiagnosticSets: " + sourceModule.getName());
+		for (Map.Entry<Integer, DiagnosticSet> entry : lineMap.entrySet()) {
+            Integer id = entry.getKey();
+            DiagnosticSet diagnosticSet = entry.getValue();
+
+            IO.println("Line: " + id + " -> Verdi: " + diagnosticSet);
+            for(SimulaDiagnostic diag : diagnosticSet.onLine) {
+            	IO.println("   " + diag);
+            }
+        }		
 	}
 
-	/// For a single semToken
-	public SimpleAttributeSet getTokenHoverAttrs(int lineNumber, int column, int length) {
-		List<String> errorLines = getErrors(lineNumber, column, length);
-    	return getHoverAttrs(errorLines);
-    }
-
-	/// For a complete line
-	public SimpleAttributeSet getLineHoverAttrs(int lineNumber) {
-		List<String> errorLines = getErrors(lineNumber);
-    	return getHoverAttrs(errorLines);
-    }
-
-	private List<String> getErrors(int line) {
+	/// Get Hoover attributes for a complete line
+	public SimpleAttributeSet getLineHoverAttrs(int line) {
 		DiagnosticSet set = lineMap.get(line);
 		if(set == null) return null;
-		List<String> res = new ArrayList<String>();
+		List<String> errorLines = new ArrayList<String>();
 		for(SimulaDiagnostic diag:set.onLine) {
-			res.add(diag.mss);
+			errorLines.add(diag.mss);
 		}
-		return res;
-	}
+    	return getHoverAttrs(errorLines);
+    }
 
-	private List<String> getErrors(int line, int column, int length) {
+	/// Get Hoover attributes for a single semToken
+	public SimpleAttributeSet getTokenHoverAttrs(int line, int column, int length) {
+//		IO.println("\nDiagnosticHandler.getTokenHoverAttrs: line="+line + ", column="+column + ", length="+length);
 		DiagnosticSet set = lineMap.get(line);
 		if(set == null) return null;
-		List<String> res = new ArrayList<String>();
+		List<String> errorLines = null;
 		int start1 = (line << 16) | column;
 		int slutt1 = start1 + length;
 		for(SimulaDiagnostic diag:set.onLine) {
@@ -81,11 +87,15 @@ public class DiagnosticHandler {
 			LexPosition end = range.getEnd();
 			int start2 = (start.getLine() << 16) | start.getCharacter();
 			int slutt2 = (end.getLine() << 16) | end.getCharacter();
-			if(overlaps(start1, slutt1, start2, slutt2))
-				res.add(diag.mss);
+			if(overlaps(start1, slutt1, start2, slutt2)) {
+//				IO.println("DiagnosticHandler.getTokenHoverAttrs: "+diag.mss);
+				if(errorLines == null)
+					errorLines = new ArrayList<String>();
+				errorLines.add(diag.mss);
+			}
 		}
-		return res;
-	}
+    	return getHoverAttrs(errorLines);
+    }
 
 	private static boolean overlaps(int start1, int slutt1, int start2, int slutt2) {
 		//
