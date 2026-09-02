@@ -3,7 +3,7 @@
 /// 
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
-package simula.editor;
+package simula.text;
 
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -24,6 +24,8 @@ import javax.swing.text.StyledDocument;
 import javax.swing.undo.UndoableEdit;
 
 import simula.compiler.SourceModule;
+import simula.editor.Palette;
+import simula.editor.SimulaEditor;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Util;
 
@@ -31,8 +33,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.Reader;
-import java.io.StringReader;
 
 /// The Source text Panel.
 /// 
@@ -69,8 +69,9 @@ public abstract class TabTextPanel extends JPanel {
     protected UndoableEditListener undoListener=new UndoableEditListener() {
 		public void undoableEditHappened(UndoableEditEvent e) {
 			UndoableEdit edit=e.getEdit();
+			IO.println("TabTextPanel'undoableEditHappened: " + edit);
 			Global.currentModule.undoManager.addEdit(edit);
-			Global.currentModule.fileChanged=true;
+			Global.currentModule.setFileChanged(true);
 			Global.currentModule.refreshNeeded=true;
 			SimulaEditor.menuBar.updateMenuItems();
 		}

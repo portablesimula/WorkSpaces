@@ -1,6 +1,9 @@
 package simula.editor;
 
 import javax.swing.*;
+
+import simula.text.TabbedTextHandler;
+
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.File;

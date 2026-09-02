@@ -1,13 +1,12 @@
-package simula.editor;
+package simula.text;
 
 import javax.swing.JTextPane;
 import javax.swing.JToolTip;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.StyledDocument;
 
-import java.awt.Color;
+import simula.editor.Palette;
+
 import java.awt.Font;
 import java.awt.event.MouseEvent;
 

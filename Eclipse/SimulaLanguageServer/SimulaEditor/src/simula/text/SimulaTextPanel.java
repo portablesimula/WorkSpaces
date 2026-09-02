@@ -3,7 +3,7 @@
 /// 
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
-package simula.editor;
+package simula.text;
 
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -33,6 +33,8 @@ import simula.Comn;
 import simula.compiler.SourceModule;
 import simula.core.builder.export.LexToken;
 import simula.core.builder.export.TokenManager;
+import simula.editor.DiagnosticHandler;
+import simula.editor.Palette;
 import simula.editor.SimulaEditor.Language;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Option;
@@ -178,7 +180,7 @@ public class SimulaTextPanel extends TabTextPanel {
 	/// Create a new PsiTextPanel.
 	/// @param sourceFile the source file
 	/// @param popupMenu the popupMenu
-	SimulaTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
+	public SimulaTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
     	super(sourceModule, popupMenu);
 //   	this.currentModule = new SourceModule(this, sourceFile);
 //    	this.sourceFile=sourceFile;
@@ -246,7 +248,7 @@ public class SimulaTextPanel extends TabTextPanel {
     /// @param caretPosition the caretPosition after the operations
     /// @param preScanner the scanner to use
     /// @throws IOException 
-    void fillTextPane(int caretPosition, List<Integer> semTokens) throws IOException {
+    public void fillTextPane(int caretPosition, List<Integer> semTokens) throws IOException {
 		StyledDocument lin = new DefaultStyledDocument();
 		addStylesToLineDocument(lin);
         editTextPane.setEditable(false);
@@ -334,7 +336,7 @@ public class SimulaTextPanel extends TabTextPanel {
 		if(attrs != null) {
 			lin.insertString(lin.getLength(),lineString, attrs);					    		
 //			errorLines = null;
-		} else lin.insertString(lin.getLength(),lineString, styleLineNumber);
+		} else lin.insertString(lin.getLength(), lineString, styleLineNumber);
 		if(lineNumber > 500) Global.currentModule.AUTO_REFRESH = false;
 	}
 

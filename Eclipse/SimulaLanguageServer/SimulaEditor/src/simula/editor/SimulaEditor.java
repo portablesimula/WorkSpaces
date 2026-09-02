@@ -28,6 +28,7 @@ import simula.editor.utilities.ConsolePanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Option;
 import simula.editor.utilities.Util;
+import simula.text.TabbedTextHandler;
 
 /// The SimulaEditor.
 /// 
@@ -44,7 +45,7 @@ public class SimulaEditor extends JFrame {
 	static JPanel mainCardPanel;
 	
 	/// The menu bar.
-	static EditorMenues menuBar;
+	public static EditorMenues menuBar;
 
 	/// The autoRefresher
 	static AutoRefresher autoRefresher;

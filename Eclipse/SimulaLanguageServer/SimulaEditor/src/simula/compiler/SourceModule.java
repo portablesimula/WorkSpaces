@@ -12,10 +12,10 @@ import simula.core.builder.export.SimulaDiagnostic;
 import simula.Comn;
 import simula.SimulaCoreExports;
 import simula.editor.DiagnosticHandler;
-import simula.editor.TabTextPanel;
 import simula.editor.SimulaEditor.Language;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Util;
+import simula.text.TabTextPanel;
 
 public class SourceModule {
 	
@@ -54,7 +54,12 @@ public class SourceModule {
 	public TabTextPanel textPanel; // OLD or PsiText
 	
     /// Indicates that the source file has changed.
-    public boolean fileChanged = false;
+    private boolean fileChanged = false;
+    public boolean getFileChanged() { return fileChanged; }
+    public void setFileChanged(boolean on) {
+//    	fileChanged = on;
+    	if(on) Thread.dumpStack();
+    }
 	
 	/// Signals auto refresh.
     public boolean AUTO_REFRESH=true;//false;
@@ -173,6 +178,10 @@ public class SourceModule {
 	
 	public String getTabName() {
 		return getName();
+	}
+	
+	public String getUri() {
+		return this.documentUri;
 	}
 	
 	public String getUpdatedText() {

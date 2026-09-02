@@ -1,4 +1,4 @@
-package simula.editor;
+package simula.text;
 
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
@@ -32,7 +32,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import simula.Comn;
+import simula.SimulaCoreExports;
 import simula.compiler.SourceModule;
+import simula.editor.ClosableTabPanel;
+import simula.editor.SimulaEditor;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Util;
 
@@ -41,7 +44,7 @@ import simula.editor.utilities.Util;
 public class TabbedTextHandler {
     
 	/// The tabbed pane.
-	static JTabbedPane tabbedPane;
+	public static JTabbedPane tabbedPane;
 
 //	/// The current SourceTextPanel
 //	static SourceTextPanel currentTextPanel;
@@ -61,8 +64,8 @@ public class TabbedTextHandler {
     /// Remove selected tab.
     static void removeSelectedTab() {
 		
-		Util.IERR("SJEKK DETTE");
-		Util.STOP();
+//		Util.IERR("SJEKK DETTE");
+//		Util.STOP();
     	tabbedPane.removeTabAt(tabbedPane.getSelectedIndex());
 
 //     	int index = tabbedPane.getSelectedIndex();
@@ -94,7 +97,7 @@ public class TabbedTextHandler {
     		String tabName = prefix + sourceModule.getTabName();
     		
     		IO.println("TabbedTextHandler.doNewTabbedPanel: " + Comn.printable(sourceModule.getUpdatedText()));
-    		sourceModule.fileChanged=false;
+    		sourceModule.setFileChanged(false);
     		TabTextPanel currentTextPanel = null;
 			switch(lang) {
 				case Simula:
@@ -152,7 +155,7 @@ public class TabbedTextHandler {
 			tabbedPane.setTabComponentAt(index, new ClosableTabPanel(tabName, tabbedPane, psiTextPanel));
 			tabbedPane.setSelectedIndex(index);
 
-    		Global.currentModule.fileChanged=false;
+    		Global.currentModule.setFileChanged(false);
     		try {
 				psiTextPanel.fillTextPane(0, semTokens);
 			} catch (IOException e) {
@@ -354,7 +357,8 @@ public class TabbedTextHandler {
     // ****************************************************************
 	/// Do save current source file.
 	/// @param saveAs true if a file chooser is wanted
-	static void doSaveCurrentFile(boolean saveAs) {
+	public static void doSaveCurrentFile(boolean saveAs) {
+		IO.println("TabbedTextHandler.doSaveCurrentFile: currentModule: " + Global.currentModule);
 //		SourceTextPanel current=currentTextPanel;
 		SourceModule currentModule = Global.currentModule;
 		
@@ -371,9 +375,9 @@ public class TabbedTextHandler {
 	        }
 	        currentModule.sourceFile=file;
 	        setSelectedTabTitle(file.getName());
-	        currentModule.fileChanged=true;
+	        currentModule.setFileChanged(true);
 		}
-    	if(Global.currentModule.fileChanged) try {
+    	if(Global.currentModule.getFileChanged()) try {
     		String fileName = currentModule.sourceFile.getPath();
     		Util.IERR("SJEKK DETTE: " + fileName);
     		Util.STOP();
@@ -382,7 +386,7 @@ public class TabbedTextHandler {
 //    		String text=current.editTextPane.getText();
     		String text=currentModule.getUpdatedText();
     		out.write(text); out.close();
-    		Global.currentModule.fileChanged = false;
+    		Global.currentModule.setFileChanged(false);
     	} catch (Exception e) { Util.IERR("Internal Error: "+e.getMessage()); }
     }
 	
@@ -390,16 +394,21 @@ public class TabbedTextHandler {
     // *** doCloseCurrentFileAction
     // ****************************************************************
 	/// Close current file acation.
-	static void doCloseCurrentFileAction() {
-			maybeSaveCurrentFile();
-			removeSelectedTab();
+	public static void doCloseCurrentFileAction() {
+		IO.println("TabbedTextHandler.doCloseCurrentFileAction: currentModule: " + Global.currentModule);
+		maybeSaveCurrentFile();
+		SourceModule current = Global.currentModule;
+		String documentUri = current.getUri();
+		SimulaCoreExports.didClose(documentUri);
+//		Util.STOP();
+		removeSelectedTab();
 	}
 	
     // ****************************************************************
     // *** doCloseAllAction
     // ****************************************************************
 	/// Close action.
-	static void doCloseAllAction() {
+	public static void doCloseAllAction() {
 		if(tabbedPane != null) {
 			while(tabbedPane.getSelectedIndex()>=0)
 			    doCloseCurrentFileAction();
@@ -410,7 +419,7 @@ public class TabbedTextHandler {
     // *** doExitAction
     // ****************************************************************
 	/// Exit action.
-	static void doExitAction() {
+	public static void doExitAction() {
 		doCloseAllAction();
 		System.exit(0);
 	}
@@ -421,11 +430,11 @@ public class TabbedTextHandler {
 	/// Maybe save current source file.
 	/// 
 	/// Also used by RunMeny.
-	static void maybeSaveCurrentFile() {
+	public static void maybeSaveCurrentFile() {
 //		SourceTextPanel current=currentTextPanel;
 //		if(current==null) return; if(!current.fileChanged) return;
 		SourceModule current=Global.currentModule;
-		if(current==null) return; if(!current.fileChanged) return;
+		if(current==null) return; if(!current.getFileChanged()) return;
 		if(saveDialog(current.sourceFile)==JOptionPane.YES_OPTION) doSaveCurrentFile(false);
 	}
 

@@ -322,8 +322,10 @@ public class DocumentManager {
 	/// a file uri the truth now exists on disk).
 //	public static void didClose(DidCloseTextDocumentParams params, SimulaLanguageServer server) {
 	public static void didClose(final String documentUri) {
+		IO.println("DocumentManager.didClose: openDocuments: " + openDocuments);
         openDocuments.remove(documentUri);
-		IO.println("Document closed on client side: " + documentUri);
+		IO.println("DocumentManager.didClose: " + documentUri);
+		IO.println("DocumentManager.didClose: openDocuments: " + openDocuments);
 	}
 
 	public void publishDiagnostics(List<SimulaDiagnostic> diagnostics) {

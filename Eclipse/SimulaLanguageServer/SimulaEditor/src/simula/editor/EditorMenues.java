@@ -33,6 +33,7 @@ import simula.compiler.SourceModule;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Option;
 import simula.editor.utilities.Util;
+import simula.text.TabbedTextHandler;
 
 /// The editor's menues.
 /// 
@@ -103,7 +104,7 @@ public class EditorMenues extends JMenuBar {
     /** Menu item */ private JMenuItem more = new JMenuItem("More Info");
     
     /// The popup menu.
-    JPopupMenu popupMenu;
+    public JPopupMenu popupMenu;
     /** Popup Menu item */ private JMenuItem newFile2 = new JMenuItem("New");
     /** Popup Menu item */ private JMenuItem openFile2 = new JMenuItem("Open");
     /** Popup Menu item */ private JMenuItem saveFile2 = new JMenuItem("Save");
@@ -273,7 +274,7 @@ public class EditorMenues extends JMenuBar {
 	// *** EditMenu: UpdateMenuItems
 	// ****************************************************************
 	/// Update menu items.
-	void updateMenuItems() {
+	public void updateMenuItems() {
 //		SourceTextPanel current=TabbedTextHandler.currentTextPanel;
 		SourceModule current=Global.currentModule;
 		boolean source=false;
@@ -290,7 +291,7 @@ public class EditorMenues extends JMenuBar {
 			if(editText!=null && editText.trim().length()!=0) text=true; 
 			if(current.lang==SimulaEditor.Language.Simula && text) mayRun=true;
 			if(current.lang==SimulaEditor.Language.Simula && editText!=null && editText.trim().length()!=0) text=true; 
-			fileChanged=current.fileChanged;
+			fileChanged=current.getFileChanged();
 			auto=source && current.AUTO_REFRESH;
 			UndoManager undoManager = current.undoManager;
 			canUndo=undoManager.canUndo();
@@ -367,7 +368,7 @@ public class EditorMenues extends JMenuBar {
 //		SourceTextPanel current=TabbedTextHandler.currentTextPanel;
 		SourceModule current=Global.currentModule;
 		current.undoManager.undo();
-		current.fileChanged=true; current.refreshNeeded=true;
+		current.setFileChanged(true); current.refreshNeeded=true;
 		updateMenuItems();
 	}
 	

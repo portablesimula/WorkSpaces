@@ -1,13 +1,17 @@
 package simula.editor;
 
 import javax.swing.*;
+
+import simula.compiler.SourceModule;
+import simula.text.SimulaTextPanel;
+
 import java.awt.*;
 import java.awt.event.*;
 
 /// @author Google AI
 /// @author Øystein Myhre Andersen
 @SuppressWarnings("serial")
-class ClosableTabPanel extends JPanel {
+public class ClosableTabPanel extends JPanel {
     private final JTabbedPane pane;
     private final Component content;
 
@@ -54,6 +58,15 @@ class ClosableTabPanel extends JPanel {
 
         // Close action
         button.addActionListener(e -> {
+        	IO.println("ClosableTabPanel'CloseAction: pasne: " + pane.getClass());
+        	IO.println("ClosableTabPanel'CloseAction: content: " + content.getClass());
+        	IO.println("ClosableTabPanel'CloseAction: " + content);
+        	if(content instanceof SimulaTextPanel simText) {
+        		SourceModule sourceModule = simText.sourceModule;
+            	IO.println("ClosableTabPanel'CloseAction: sourceModule: " + sourceModule);
+// ???         	sourceModule.doCloseSimulaModule();
+            }
+        	
             int index = pane.indexOfComponent(content);
             if (index != -1) {
                 pane.remove(index);

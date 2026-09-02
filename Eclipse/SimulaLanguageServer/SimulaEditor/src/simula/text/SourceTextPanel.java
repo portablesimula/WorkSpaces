@@ -3,7 +3,7 @@
 /// 
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
-package simula.editor;
+package simula.text;
 
 import javax.swing.JPopupMenu;
 import javax.swing.text.BadLocationException;
