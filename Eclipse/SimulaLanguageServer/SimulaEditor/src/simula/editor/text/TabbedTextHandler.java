@@ -1,4 +1,4 @@
-package simula.text;
+package simula.editor.text;
 
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
@@ -33,9 +33,9 @@ import javax.swing.event.ChangeListener;
 
 import simula.Comn;
 import simula.SimulaCoreExports;
-import simula.compiler.SourceModule;
 import simula.editor.ClosableTabPanel;
 import simula.editor.SimulaEditor;
+import simula.editor.SourceModule;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Util;
 
@@ -103,19 +103,21 @@ public class TabbedTextHandler {
 				case Simula:
 		    		IO.println("TabbedTextHandler.doNewTabbedPanel: textPanel: " + sourceModule.textPanel);
 		    		List<Integer> semTokens = sourceModule.getSemTokens();
-		    		SimulaTextPanel psiTextPanel = new SimulaTextPanel(sourceModule, SimulaEditor.menuBar.popupMenu);
+		    		SimulaTextPanel simTextPanel = new SimulaTextPanel(sourceModule, SimulaEditor.menuBar.popupMenu);
+		    		simTextPanel.open();
 				try {
-					psiTextPanel.fillTextPane(0, semTokens);
+					simTextPanel.fillTextPane(0, semTokens);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				currentTextPanel = psiTextPanel;
+				currentTextPanel = simTextPanel;
 				break;
 
 				default:
 					File file = new File(documentUri);
 					SourceTextPanel sourceTextPanel = new SourceTextPanel(sourceModule, SimulaEditor.menuBar.popupMenu);
+					sourceTextPanel.open();
 					currentTextPanel = sourceTextPanel;
 					switch(lang) {
 					case Jar:
@@ -139,25 +141,26 @@ public class TabbedTextHandler {
     }
 
     // ****************************************************************
-    // *** doNewTabbedPsiPanel
+    // *** doNewTabbedSimPanel
     // ****************************************************************
     /// Create a new Tab with text generated from the given psi tree.
     /// @param file the file
     /// @param lang the language
-    static void doNewTabbedPsiPanel(List<Integer> semTokens, String prefix) {
+    static void doNewTabbedSimPanel(List<Integer> semTokens, String prefix) {
     	if(tabbedPane == null) doOpenTabbedPane();
     	SwingUtilities.invokeLater(() -> {
-    		SimulaTextPanel psiTextPanel=new SimulaTextPanel(Global.currentModule, SimulaEditor.menuBar.popupMenu);
+    		SimulaTextPanel simTextPanel=new SimulaTextPanel(Global.currentModule, SimulaEditor.menuBar.popupMenu);
+    		simTextPanel.open();
     		String tabName = prefix + Global.currentModule.getTabName();
 
-			tabbedPane.addTab(null, psiTextPanel); // Add content first, will be replaced
+			tabbedPane.addTab(null, simTextPanel); // Add content first, will be replaced
 			int index = tabbedPane.getTabCount() - 1;
-			tabbedPane.setTabComponentAt(index, new ClosableTabPanel(tabName, tabbedPane, psiTextPanel));
+			tabbedPane.setTabComponentAt(index, new ClosableTabPanel(tabName, tabbedPane, simTextPanel));
 			tabbedPane.setSelectedIndex(index);
 
     		Global.currentModule.setFileChanged(false);
     		try {
-				psiTextPanel.fillTextPane(0, semTokens);
+				simTextPanel.fillTextPane(0, semTokens);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -277,7 +280,7 @@ public class TabbedTextHandler {
 
 				IO.println("SimulaEditor'changeSelectedComponent: " + selected.getClass());
 				Global.console.write("SimulaEditor'changeSelectedComponent: " + selected.getClass()+"\n");
-//				if(selected instanceof PsiTextPanel panel) {
+//				if(selected instanceof SimulaTextPanel panel) {
 //					currentTextPanel=panel;
 //					Global.currentModule = currentTextPanel.currentModule;
 //					SimulaEditor.menuBar.updateMenuItems();
@@ -335,7 +338,7 @@ public class TabbedTextHandler {
     	switch(sourceModule.lang){
 		case Simula:
 			sourceModule.doOpenSimulaModule();
-			doNewTabbedPsiPanel(sourceModule.getSemTokens(), "");
+			doNewTabbedSimPanel(sourceModule.getSemTokens(), "");
 //        	Global.setCurrentWorkspace(fileChooser.getCurrentDirectory());
 			break;
 		case Jar:

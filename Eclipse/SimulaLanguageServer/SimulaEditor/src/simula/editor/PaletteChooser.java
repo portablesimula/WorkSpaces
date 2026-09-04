@@ -3,10 +3,9 @@ package simula.editor;
 import javax.swing.*;
 
 import simula.SimulaCoreExports;
-import simula.compiler.SourceModule;
+import simula.editor.text.SimulaTextPanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Option;
-import simula.text.SimulaTextPanel;
 
 import java.awt.*;
 import java.io.IOException;

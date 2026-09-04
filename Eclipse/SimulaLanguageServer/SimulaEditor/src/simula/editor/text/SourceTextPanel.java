@@ -3,7 +3,7 @@
 /// 
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
-package simula.text;
+package simula.editor.text;
 
 import javax.swing.JPopupMenu;
 import javax.swing.text.BadLocationException;
@@ -12,7 +12,8 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
-import simula.compiler.SourceModule;
+
+import simula.editor.SourceModule;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.StyleCode;
 import simula.editor.utilities.Util;

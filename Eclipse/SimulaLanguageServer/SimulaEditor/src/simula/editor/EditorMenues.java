@@ -29,11 +29,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.undo.UndoManager;
 
-import simula.compiler.SourceModule;
+import simula.editor.text.TabbedTextHandler;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Option;
 import simula.editor.utilities.Util;
-import simula.text.TabbedTextHandler;
 
 /// The editor's menues.
 /// 
@@ -513,7 +512,7 @@ public class EditorMenues extends JMenuBar {
 //			SourceModule current = Global.currentModule;
 ////			current.doOpenSimulaModule();
 ////			PsiTree semTokens = current.getTokenList();
-////			TabbedTextHandler.doNewTabbedPsiPanel(semTokens, "PSI:");
+////			TabbedTextHandler.doNewTabbedSimPanel(semTokens, "PSI:");
 //			Util.IERR("");
 //		});
 ////		Thread.dumpStack();

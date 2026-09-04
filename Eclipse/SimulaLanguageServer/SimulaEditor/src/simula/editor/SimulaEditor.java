@@ -24,11 +24,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
+import simula.editor.text.TabbedTextHandler;
 import simula.editor.utilities.ConsolePanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Option;
 import simula.editor.utilities.Util;
-import simula.text.TabbedTextHandler;
 
 /// The SimulaEditor.
 /// 

@@ -2,8 +2,8 @@ package simula.editor;
 
 import javax.swing.*;
 
+import simula.editor.text.TabbedTextHandler;
 import simula.editor.utilities.Global;
-import simula.text.TabbedTextHandler;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;

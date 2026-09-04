@@ -10,23 +10,30 @@ public class LOG {
 
 	public static void error(String message) {
 		logger.severe(message);
+		DocumentManager.simulaCoreClient.logError(message);
 	}
 
 	public static void severe(String message) {
 		logger.severe(message);
+		DocumentManager.simulaCoreClient.logError(message);
 	}
 
 	public static void warning(String message) {
 		logger.warning(message);
+		DocumentManager.simulaCoreClient.logWarning(message);
 	}
 
 	public static void trace(String message) {
-		if(DocumentManager.verbose)
+		if(DocumentManager.verbose) {
 			logger.info(message);
+			DocumentManager.simulaCoreClient.logInfo(message);
+		}
 	}
 
 	public static void info(String message) {
-		if(DocumentManager.verbose)
-			logger.info(message);
+//		if(DocumentManager.verbose) {
+//			logger.info(message);
+			DocumentManager.simulaCoreClient.logInfo(message);
+//		}
 	}
 }

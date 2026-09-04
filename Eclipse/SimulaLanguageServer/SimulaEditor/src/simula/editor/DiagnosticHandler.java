@@ -10,7 +10,6 @@ import java.util.Set;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-import simula.compiler.SourceModule;
 import simula.core.builder.export.LexPosition;
 import simula.core.builder.export.LexRange;
 import simula.core.builder.export.SimulaDiagnostic;
@@ -108,7 +107,7 @@ public class DiagnosticHandler {
 	
 	private SimpleAttributeSet getHoverAttrs(List<String> errorLines) {
     	if(errorLines == null) return null;
-//    	IO.println("PsiTextPanel.getTooltipText: RENDER: errorLines: "+errorLines);
+//    	IO.println("SimulaTextPanel.getTooltipText: RENDER: errorLines: "+errorLines);
     	
     	String tooltipText = null;
     	if(errorLines.size() == 1) {
@@ -121,7 +120,7 @@ public class DiagnosticHandler {
     		for(String msg:errorLines) {
     			res = res + "<li>" + msg + "</li>";
     		}
-//        	IO.println("PsiTextPanel.getTooltipText: RESULT: "+res);
+//        	IO.println("SimulaTextPanel.getTooltipText: RESULT: "+res);
         	tooltipText = res + "</ul>";
     	}
 

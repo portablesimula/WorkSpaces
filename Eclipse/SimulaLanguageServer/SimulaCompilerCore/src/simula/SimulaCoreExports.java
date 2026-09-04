@@ -121,31 +121,31 @@ public class SimulaCoreExports {
 	/// using the document's uri.
     public static void didOpen(final String documentUri, final int version, final String sourceCode) {
 //        public DocumentManager documentManager = DocumentManager.get(documentUri);
-    	LOG.info("Core.didOpen: BEGIN");
+    	LOG.info("got Notification: didOpen: " + documentUri);
 	    DocumentManager.didOpen(documentUri, version, sourceCode);
     }
     
     /// The document change notification is sent from the client to the server to
 	/// signal changes to a text document.
 	public static void didChange(final String documentUri, final List<SimTextDocumentContentChangeEvent> changes) {
-    	LOG.info("DocumentManager.didChange: BEGIN");
-		Util.IERR("NOT IMPL");
+    	LOG.info("got Notification: didChange: " + documentUri);
+    	LOG.severe("SimulaCoreExports.didChange NOT IMPL");
     	DocumentManager.didChange(documentUri, changes);
 	}
 	
 	/// The document will save notification is sent from the client to the server
 	/// before the document is actually saved.
 	public static void willSave(final String documentUri, final String reason) {
-		LOG.info("Document is about to save: " + documentUri + " due to reason: " + reason);
-		Util.IERR("NOT IMPL");
+		LOG.info("got Notification: willSave: reason: " + reason + " URI=" + documentUri);
+    	LOG.severe("SimulaCoreExports.willSave NOT IMPL");
 		DocumentManager.willSave(documentUri, reason);
 	}
 	
 	/// The document save notification is sent from the client to the server when
 	/// the document is saved in the client.
 	public static void didSave(final String documentUri) {
-    	LOG.info("DocumentManager.didSave: BEGIN");
-		Util.IERR("NOT IMPL");
+    	LOG.info("got Notification: didSave: " + documentUri);
+    	LOG.severe("SimulaCoreExports.didSave NOT IMPL");
 		DocumentManager.didSave(documentUri);
 	}
 	
@@ -154,8 +154,8 @@ public class SimulaCoreExports {
 	/// exists where the document's uri points to (e.g. if the document's uri is
 	/// a file uri the truth now exists on disk).
 	public static void didClose(final String documentUri) {
-    	LOG.info("DocumentManager.didClose: BEGIN");
-//		Util.IERR("NOT IMPL");
+    	LOG.info("got Notification: didClose: " + documentUri);
+//    	LOG.severe("SimulaCoreExports.didClose NOT IMPL");
 		DocumentManager.didClose(documentUri);
 	}
 
@@ -167,8 +167,8 @@ public class SimulaCoreExports {
 	///		throw new UnsupportedOperationException();
 	///	}
 	public static List<Integer> semanticTokensFull(final String documentUri) {
-    	LOG.info("DocumentManager.semanticTokensFull: BEGIN");
-//		Util.IERR("NOT IMPL");
+    	LOG.info("got Request: semanticTokensFull: " + documentUri);
+    	LOG.severe("SimulaCoreExports.semanticTokensFull NOT IMPL");
 		return DocumentManager.semanticTokensFull(documentUri);
 	}
 

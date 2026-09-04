@@ -4,10 +4,9 @@
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
 
-package simula.compiler;
+package simula.editor.main;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Vector;
 

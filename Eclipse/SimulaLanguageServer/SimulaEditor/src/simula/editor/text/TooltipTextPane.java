@@ -1,4 +1,4 @@
-package simula.text;
+package simula.editor.text;
 
 import javax.swing.JTextPane;
 import javax.swing.JToolTip;

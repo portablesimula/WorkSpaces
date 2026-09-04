@@ -1,4 +1,4 @@
-package simula.compiler;
+package simula.editor;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,11 +11,10 @@ import javax.swing.undo.UndoManager;
 import simula.core.builder.export.SimulaDiagnostic;
 import simula.Comn;
 import simula.SimulaCoreExports;
-import simula.editor.DiagnosticHandler;
 import simula.editor.SimulaEditor.Language;
+import simula.editor.text.TabTextPanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Util;
-import simula.text.TabTextPanel;
 
 public class SourceModule {
 	
@@ -50,7 +49,7 @@ public class SourceModule {
     public Language lang;
 
 //	private SourceTextPanel textPanel;
-//	private PsiTextPanel psiTextPanel;
+//	private SimulaTextPanel simTextPanel;
 	public TabTextPanel textPanel; // OLD or PsiText
 	
     /// Indicates that the source file has changed.

@@ -2,8 +2,7 @@ package simula.editor;
 
 import javax.swing.*;
 
-import simula.compiler.SourceModule;
-import simula.text.SimulaTextPanel;
+import simula.editor.text.SimulaTextPanel;
 
 import java.awt.*;
 import java.awt.event.*;

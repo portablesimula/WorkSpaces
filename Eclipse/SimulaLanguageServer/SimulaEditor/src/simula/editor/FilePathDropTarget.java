@@ -2,7 +2,7 @@ package simula.editor;
 
 import javax.swing.*;
 
-import simula.text.TabbedTextHandler;
+import simula.editor.text.TabbedTextHandler;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;

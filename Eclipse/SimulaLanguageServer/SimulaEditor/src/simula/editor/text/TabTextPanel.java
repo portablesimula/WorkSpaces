@@ -3,7 +3,7 @@
 /// 
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
-package simula.text;
+package simula.editor.text;
 
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -23,9 +23,10 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import javax.swing.undo.UndoableEdit;
 
-import simula.compiler.SourceModule;
 import simula.editor.Palette;
 import simula.editor.SimulaEditor;
+import simula.editor.SourceModule;
+import simula.editor.utilities.ConsolePanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Util;
 
@@ -133,9 +134,12 @@ public abstract class TabTextPanel extends JPanel {
     	this.sourceModule = sourceModule;
     	this.sourceModule.textPanel = this;
     	this.popupMenu=popupMenu;
-    	
-    	boolean TESTING = true;
-    	if(TESTING) {
+//    	open();
+	}
+
+	public void open() {
+    	boolean TESTING_HOOVER = true;
+    	if(TESTING_HOOVER) {
           editTextPane = new TooltipTextPane(); editTextPane.setEditable(false);
           editTextPane.addMouseListener(mouseListener);
           ToolTipManager.sharedInstance().registerComponent(editTextPane);
@@ -159,7 +163,7 @@ public abstract class TabTextPanel extends JPanel {
 	        lineNumbers.setBackground(Palette.TextPaneBackground);
     	}
 
-        JPanel extra=new JPanel();
+        JPanel tabContent=new JPanel();
         
         doc=new DefaultStyledDocument(); addStylesToSourceDocument(doc);
         doc.putProperty(DefaultEditorKit.EndOfLineStringProperty,"\n");
@@ -173,11 +177,14 @@ public abstract class TabTextPanel extends JPanel {
         editTextPane.setForeground(Palette.TextPaneForeground);
         editTextPane.setBackground(Palette.TextPaneBackground);
         
-        extra.setLayout(new BorderLayout());
-        extra.add(lineNumbers,BorderLayout.WEST);
-        extra.add(editTextPane,BorderLayout.CENTER);
+    	ConsolePanel console = Global.console;
+        
+        tabContent.setLayout(new BorderLayout());
+        tabContent.add(lineNumbers,BorderLayout.WEST);
+        tabContent.add(editTextPane,BorderLayout.CENTER);
+        tabContent.add(console,BorderLayout.SOUTH);
        
-        styleScrollPane = new JScrollPane(extra);        
+        styleScrollPane = new JScrollPane(tabContent);        
         styleScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         
         this.setLayout(new BorderLayout());

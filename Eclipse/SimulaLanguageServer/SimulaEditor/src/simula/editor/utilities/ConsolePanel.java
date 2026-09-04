@@ -223,18 +223,20 @@ public final class ConsolePanel extends JPanel {
 	/// Write a string on this panel using styleRegular.
 	/// @param s a string to write
 	public void write(final String s) {
+//		Util.IERR("");
+		IO.println("ConsolePanel.write: " + s);
 		write(s, styleRegular);
 	}
 
 	/// Write a string on this panel using styleError.
 	/// @param s a string to write
-	void writeError(final String s) {
+	public void writeError(final String s) {
 		write(s, styleError);
 	}
 
 	/// Write a string on this panel using styleWarning.
 	/// @param s a string to write
-	void writeWarning(final String s) {
+	public void writeWarning(final String s) {
 		write(s, styleWarning);
 	}
 

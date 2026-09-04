@@ -3,6 +3,7 @@ package simula;
 import java.util.List;
 
 import simula.core.builder.export.SimulaDiagnostic;
+import simula.core.utilities.Util;
 
 public interface SimulaCoreClient {
 	/// See: Eclipse LSP API

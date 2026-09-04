@@ -20,13 +20,12 @@ import java.util.jar.JarFile;
 
 import javax.swing.ImageIcon;
 
-//import simula.compiler.JavaSourceFileCoder;
-import simula.compiler.SourceModule;
 //import simula.compiler.JarFileBuilder;
 //import simula.compiler.syntaxClass.declaration.DeclarationScope;
 //import simula.compiler.syntaxClass.declaration.StandardClass;
 import simula.editor.Palette;
 import simula.editor.RTOption;
+import simula.editor.SourceModule;
 
 /// Global Variables.
 /// 
@@ -167,6 +166,7 @@ public final class Global {
 
 	/// Initiate Global variables.
 	public static void initiate() {
+		console = new ConsolePanel();
     	currentModule = null;
 //    	moduleMap = new HashMap<>();
 		Object_SEQU = 8001;

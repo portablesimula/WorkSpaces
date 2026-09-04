@@ -3,11 +3,12 @@
 /// 
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
-package simula.text;
+package simula.editor.text;
 
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 import javax.swing.ToolTipManager;
 import javax.swing.event.DocumentEvent;
@@ -30,12 +31,13 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
 import simula.Comn;
-import simula.compiler.SourceModule;
 import simula.core.builder.export.LexToken;
 import simula.core.builder.export.TokenManager;
 import simula.editor.DiagnosticHandler;
 import simula.editor.Palette;
+import simula.editor.SourceModule;
 import simula.editor.SimulaEditor.Language;
+import simula.editor.utilities.ConsolePanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Option;
 import simula.editor.utilities.Util;
@@ -174,37 +176,32 @@ public class SimulaTextPanel extends TabTextPanel {
 //		}	
 //	};
 	
+	private static boolean TESTING_CONSOLE = true;
 	// ****************************************************************
 	// *** Constructor
 	// ****************************************************************
-	/// Create a new PsiTextPanel.
+	/// Create a new SimulaTextPanel.
 	/// @param sourceFile the source file
 	/// @param popupMenu the popupMenu
 	public SimulaTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
     	super(sourceModule, popupMenu);
-//   	this.currentModule = new SourceModule(this, sourceFile);
-//    	this.sourceFile=sourceFile;
-//    	this.lang=lang;
-//    	this.popupMenu=popupMenu;
-    	
-//    	Palette.updatePalette(null, true);
-//    	Palette.init();
+//    	open();
+	}
 
+	@Override
+	public void open() {
         editTextPane = new TooltipTextPane(); editTextPane.setEditable(false);
         editTextPane.addMouseListener(mouseListener);
         ToolTipManager.sharedInstance().registerComponent(editTextPane);
         ToolTipManager.sharedInstance().setDismissDelay(20000); // 20 sekunder
         
         lineNumbers = new TooltipTextPane(); lineNumbers.setEditable(false);
-//        lineNumbers.addMouseListener(mouseListener);
-//        ToolTipManager.sharedInstance().registerComponent(lineNumbers);
         lineNumbers.setForeground(Palette.TextPaneForeground);
         lineNumbers.setBackground(Palette.TextPaneBackground);
         
-        JPanel extra=new JPanel();
+        JPanel tabContent=new JPanel();
         
-        doc=new DefaultStyledDocument();
-//        setTabStopsToSourceDocument(doc);
+        doc = new DefaultStyledDocument();
         addStylesToSourceDocument(doc);
         
         doc.putProperty(DefaultEditorKit.EndOfLineStringProperty,"\n");
@@ -215,22 +212,36 @@ public class SimulaTextPanel extends TabTextPanel {
         editTextPane.setForeground(Palette.TextPaneForeground);
         editTextPane.setBackground(Palette.TextPaneBackground);
         
-        
-        extra.setLayout(new BorderLayout());
-        extra.add(lineNumbers,BorderLayout.WEST);
-        extra.add(editTextPane,BorderLayout.CENTER);
+        tabContent.setLayout(new BorderLayout());
+        tabContent.add(lineNumbers,BorderLayout.WEST);
+        tabContent.add(editTextPane,BorderLayout.CENTER);
+//        tabContent.add(console,BorderLayout.SOUTH);
        
-        styleScrollPane = new JScrollPane(extra);        
+        styleScrollPane = new JScrollPane(tabContent);        
         styleScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         
-        this.setLayout(new BorderLayout());
-        this.add(styleScrollPane,BorderLayout.CENTER);
+        if(TESTING_CONSOLE) {
+        	ConsolePanel console = Global.console;
+            JSplitPane splitPane = new JSplitPane(
+                JSplitPane.VERTICAL_SPLIT, // Stack panels vertically
+                styleScrollPane,           // Top component
+                console                    // Bottom component
+            );
+            splitPane.setResizeWeight(0.75);
+            splitPane.setOneTouchExpandable(true); // Add collapse/expand arrows to divider
+        	
+	        this.setLayout(new BorderLayout());
+	        this.add(splitPane,BorderLayout.CENTER);        	
+        } else {
+	        this.setLayout(new BorderLayout());
+	        this.add(styleScrollPane,BorderLayout.CENTER);
+        }
     }
 
 //	public String getText() {
 //		try {
 //			String text = doc.getText(0, doc.getLength());
-////			IO.println("PsiTextPanel.getText: |" + text.replace("\r", "\\r").replace("\n", "\\n")+'|');
+////			IO.println("SimulaTextPanel.getText: |" + text.replace("\r", "\\r").replace("\n", "\\n")+'|');
 //			return text;
 //		} catch (BadLocationException e) {
 //			// TODO Auto-generated catch block
