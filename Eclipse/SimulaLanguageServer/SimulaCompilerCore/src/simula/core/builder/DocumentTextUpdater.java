@@ -1,10 +1,10 @@
 package simula.core.builder;
 
-import simula.SimTextDocumentContentChangeEvent;
-import simula.core.builder.export.LexPosition;
-import simula.core.builder.export.LexRange;
-
 import java.util.List;
+
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 
 /// @author Øystein Myhre Andersen
 /// @author Google AI
@@ -15,15 +15,15 @@ public class DocumentTextUpdater {
     /// @param currentText The current complete source code text.
     /// @param changes     The list of changes sent by the client.
     /// @return The updated source code text.
-    public static String applyChanges(String currentText, List<SimTextDocumentContentChangeEvent> changes) {
+    public static String applyChanges(String currentText, List<TextDocumentContentChangeEvent> changes) {
         String updatedText = currentText;
-        for (SimTextDocumentContentChangeEvent change : changes) {
+        for (TextDocumentContentChangeEvent change : changes) {
             updatedText = applySingleChange(updatedText, change);
         }
         return updatedText;
     }
 
-    private static String applySingleChange(String text, SimTextDocumentContentChangeEvent change) {
+    private static String applySingleChange(String text, TextDocumentContentChangeEvent change) {
         // If range is null, it means TextDocumentSyncKind.Full is used.
         // The server must replace the entire content.
         if (change.getRange() == null) {
@@ -31,7 +31,7 @@ public class DocumentTextUpdater {
         }
 
         // If a range is provided, it is an incremental update.
-        LexRange range = change.getRange();
+        Range range = change.getRange();
         int startOffset = getOffset(text, range.getStart());
         int endOffset = getOffset(text, range.getEnd());
 
@@ -42,7 +42,7 @@ public class DocumentTextUpdater {
     }
 
     /// Translates an LSP Line/Character position into a 0-indexed flat string index.
-    private static int getOffset(String text, LexPosition position) {
+    private static int getOffset(String text, Position position) {
         int targetLine = position.getLine();
         int targetChar = position.getCharacter();
         

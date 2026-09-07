@@ -1,5 +1,7 @@
 package simula.core.builder.export;
 
+import org.eclipse.lsp4j.Position;
+
 import simula.Comn;
 import simula.Option;
 import simula.core.builder.SimulaLexer;
@@ -31,8 +33,8 @@ public class LexToken {
 //		this(tokenStartLine, sourceText, column, length, keyWord, "keyword", lexer);
 //	}
 	
-	public LexPosition getPosition() {
-		return new LexPosition(lineNumber, column);
+	public Position getPosition() {
+		return new Position(lineNumber, column);
 	}
 	
 	public LexToken(int tokenStartLine, CharSequence sourceText, int column, int length, int keyWord, String tokenType, SimulaLexer lexer) {

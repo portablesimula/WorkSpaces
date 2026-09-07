@@ -22,8 +22,8 @@ import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.export.LexPosition;
-import simula.core.builder.export.LexRange;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import simula.core.builder.export.LexToken;
 import simula.core.builder.export.SimulaDiagnostic;
 import simula.core.builder.util.Identifier;
@@ -94,9 +94,9 @@ public final class Util {
         if(token.keyWord == KeyWord.NEWLINE) // CRLF or LF ==> ERROR
         	Util.IERR("Util.warning: Warning not inside text line");
         }
-        LexPosition start = new LexPosition(token.lineNumber, token.column);
-        LexPosition end = new LexPosition(token.lineNumber, token.column + token.length);
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new LexRange(start, end), msg);
+        Position start = new Position(token.lineNumber, token.column);
+        Position end = new Position(token.lineNumber, token.column + token.length);
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new Range(start, end), msg);
 		
 		if(DocumentManager.WARNINGS) {
 			LOG.warning(diagnostic.toString());
@@ -116,8 +116,8 @@ public final class Util {
 
 	/// Print a warning message.
 	/// @param msg the message
-	public static void warning(final SimulaBuilder simBuilder, final LexPosition start, final LexPosition end, final String msg) {
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new LexRange(start, end), msg);
+	public static void warning(final SimulaBuilder simBuilder, final Position start, final Position end, final String msg) {
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new Range(start, end), msg);
 
 		if(DocumentManager.WARNINGS) {
 			LOG.warning(diagnostic.toString());
@@ -151,9 +151,9 @@ public final class Util {
         if(token.keyWord == KeyWord.NEWLINE) // CRLF or LF ==> ERROR
         	Util.IERR("Util.warning: Error not inside text line");
         }
-        LexPosition start = new LexPosition(token.lineNumber, token.column);
-        LexPosition end = new LexPosition(token.lineNumber, token.column + token.length);
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new LexRange(start, end), msg);
+        Position start = new Position(token.lineNumber, token.column);
+        Position end = new Position(token.lineNumber, token.column + token.length);
+		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new Range(start, end), msg);
 		
 		LOG.error(diagnostic.toString());
 		simBuilder.addError(diagnostic);

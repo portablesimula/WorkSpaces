@@ -1,13 +1,15 @@
 package simula.core.builder.export;
 
+import org.eclipse.lsp4j.Range;
+
 public class SimulaDiagnostic {
 	public enum Severity { Error, Warning, Information, Hint }
 	public Severity severity;
-	public LexRange range;
+	public Range range;
 	public String mss;
 
 	
-	public SimulaDiagnostic(Severity severity, LexRange range, String mss) {
+	public SimulaDiagnostic(Severity severity, Range range, String mss) {
 		this.severity = severity;
 		this.range = range;
 		this.mss = mss;

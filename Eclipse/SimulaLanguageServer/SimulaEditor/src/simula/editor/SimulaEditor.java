@@ -107,10 +107,8 @@ public class SimulaEditor extends JFrame {
 	// ****************************************************************
     /// Create a new SimulaEditor.
     public SimulaEditor() {
-		Global.initiate();
         try { setIconImage(Global.favicon.getImage()); } 
         catch (Exception e) {}// Util.IERR("Impossible",e); }
-		Global.console=new ConsolePanel();
     	String revision=Global.getSimulaProperty("simula.revision","?");
     	String dated=Global.getSimulaProperty("simula.setup.dated","?");
         String releaseID=Global.simulaReleaseID+'R'+revision;

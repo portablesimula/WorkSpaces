@@ -6,7 +6,7 @@ import org.eclipse.lsp4j.services.*;
 import java.util.concurrent.CompletableFuture;
 
 import simula.SimulaCoreClient;
-import simula.SimulaCoreExports;
+import simula.SimulaCoreInitialize;
 
 public class SimulaLanguageServer implements LanguageServer, LanguageClientAware {
 
@@ -26,7 +26,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         // LSP4J injects the client proxy right after the launcher starts
         this.client = client;
         SimulaCoreClient simulaCoreClient = new SimulaCoreClientProxy(client);
-        SimulaCoreExports.initiate(simulaCoreClient, "packetName");
+        SimulaCoreInitialize.connect(simulaCoreClient);
     }
 
     /// --- LanguageServer Implementation ---
@@ -59,10 +59,46 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
     ///          |  3. Responds with Server Capabilities   |
     ///          |<----------------------------------------| `InitializeResult` sent back
     ///          |                                         |
+    /// 
+	/// When the client starts the language server, it issues the initial initialize request.
+	/// The client wraps startup configurations inside the initializationOptions field
+	/// of the InitializeParams object.
+	/// [1] (https://github.com/eclipse-jdtls/eclipse.jdt.ls/issues/1957),
+	/// [2] (https://github.com/eclipse-lsp4j/lsp4j/blob/main/org.eclipse.lsp4j/src/main/java/org/eclipse/lsp4j/services/LanguageServer.java), 
+	/// [3] (https://github.com/eclipse-jdtls/eclipse.jdt.ls/issues/1785),
+	/// [4] (https://bugs.eclipse.org/bugs/show_bug.cgi?id=538245)
     @Override
     public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
+        // Retrieve the raw options object sent by the client
+        Object options = params.getInitializationOptions(); 
+        
+        // Parse it using a library like Gson into your configuration class
+        if (options != null) {
+//            MyConfig config = new Gson().fromJson(options.toString(), MyConfig.class);
+//            // Apply options to the server instance...
+        }
+        
         // 1. Capture what the client is capable of doing
         this.clientCapabilities = params.getCapabilities();
+        
+        // Pick up: 
+        ClientInfo clientInfo = params.getClientInfo();
+        
+        
+        /// The trace parameter accepts one of three specific string values:
+        /// 
+        ///  'off':      Tracing is completely disabled. The server should not send any $/logTrace notifications.
+        ///              If the parameter is omitted from InitializeParams entirely, it defaults to 'off'.
+        /// 
+        ///  'messages': The server logs basic communication events, such as when requests are received and
+        ///              when responses are sent, without dumping full payloads.
+        /// 
+        ///  'verbose':  The server logs granular execution details, full JSON-RPC payload messages, performance metrics, and deep debugging information.
+        /// 
+        String trace = params.getTrace();
+        
+//        CALL: SimulaCoreInitialize.initiate(...);
+        
 
         // 2. Define what your server supports back to the client
         ServerCapabilities serverCapabilities = new ServerCapabilities();

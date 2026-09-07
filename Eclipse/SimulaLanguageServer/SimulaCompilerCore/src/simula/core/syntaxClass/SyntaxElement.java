@@ -8,13 +8,14 @@ package simula.core.syntaxClass;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
+
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.export.LexPosition;
-import simula.core.builder.export.LexRange;
 import simula.core.builder.export.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.Declaration;
@@ -95,7 +96,7 @@ public abstract class SyntaxElement {
 	public DocumentManager documentManager;
 	
 	/// Not present for System or External modules
-	public LexRange lexRange;
+	public Range lexRange;
 
 	/// Controls semantic checking.
 	/// 
@@ -117,9 +118,9 @@ public abstract class SyntaxElement {
 		if(documentManager != null && documentManager.simBuilder != null) {
 //			this.firstParserToken = this.lastParserToken = documentManager.simBuilder.getCurrentParserToken();
 			LexToken current = documentManager.simBuilder.getCurrentParserToken();
-			LexPosition firstLexPosition = new LexPosition(current.lineNumber, current.column);
-			LexPosition lastLexPosition = new LexPosition(current.lineNumber, current.column + current.length);
-			this.lexRange = new LexRange(firstLexPosition, lastLexPosition);
+			Position firstLexPosition = new Position(current.lineNumber, current.column);
+			Position lastLexPosition = new Position(current.lineNumber, current.column + current.length);
+			this.lexRange = new Range(firstLexPosition, lastLexPosition);
 		}
 	}
 

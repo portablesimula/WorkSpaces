@@ -4,26 +4,23 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
+
 import simula.Comn;
 import simula.Option;
-import simula.SimTextDocumentContentChangeEvent;
 import simula.SimulaCoreClient;
 import simula.core.builder.DocumentTextUpdater;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.export.LexToken;
 import simula.core.builder.export.SimulaDiagnostic;
-import simula.core.builder.export.TokenListVerifyer;
-import simula.core.builder.export.TokenManager;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.statement.ProgramModule;
-import simula.core.utilities.KeyWord;
 import simula.core.utilities.LOG;
 import simula.core.utilities.Util;
 
@@ -254,7 +251,7 @@ public class DocumentManager {
     /// The document change notification is sent from the client to the server to
 	/// signal changes to a text document.
 //	public static void didChange(DidChangeTextDocumentParams params, SimulaLanguageServer server) {
-	public static void didChange(final String documentUri, final List<SimTextDocumentContentChangeEvent> changes) {
+	public static void didChange(final String documentUri, final List<TextDocumentContentChangeEvent> changes) {
     	LOG.info("DocumentManager.didChange: BEGIN");
     	DocumentManager documentManager = getDocumentManager(documentUri);
 		

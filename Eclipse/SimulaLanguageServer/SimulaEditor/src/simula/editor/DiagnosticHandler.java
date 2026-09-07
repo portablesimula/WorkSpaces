@@ -10,8 +10,8 @@ import java.util.Set;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-import simula.core.builder.export.LexPosition;
-import simula.core.builder.export.LexRange;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import simula.core.builder.export.SimulaDiagnostic;
 
 public class DiagnosticHandler {
@@ -32,7 +32,7 @@ public class DiagnosticHandler {
 //		this.diagnostics = diagnostics;
 		
 		for(SimulaDiagnostic diag:diagnostics) {
-			LexRange range = diag.range;
+			Range range = diag.range;
 			int firstLine = range.getStart().getLine();
 			int lastLine = range.getEnd().getLine();
 			for(int line = firstLine; line <= lastLine; line++) {
@@ -81,9 +81,9 @@ public class DiagnosticHandler {
 		int start1 = (line << 16) | column;
 		int slutt1 = start1 + length;
 		for(SimulaDiagnostic diag:set.onLine) {
-			LexRange range = diag.range;
-			LexPosition start = range.getStart();
-			LexPosition end = range.getEnd();
+			Range range = diag.range;
+			Position start = range.getStart();
+			Position end = range.getEnd();
 			int start2 = (start.getLine() << 16) | start.getCharacter();
 			int slutt2 = (end.getLine() << 16) | end.getCharacter();
 			if(overlaps(start1, slutt1, start2, slutt2)) {

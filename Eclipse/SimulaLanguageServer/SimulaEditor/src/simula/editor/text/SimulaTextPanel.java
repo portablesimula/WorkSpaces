@@ -63,7 +63,7 @@ import java.util.Set;
 @SuppressWarnings({ "serial", "unused" })
 public class SimulaTextPanel extends TabTextPanel {
 	/// DEBUG on/off
-	private static final boolean DEBUG=false;//true;
+	private static final boolean DEBUG = true;//false;//true;
 	
 //	public SourceModule currentModule;
 //
@@ -145,36 +145,47 @@ public class SimulaTextPanel extends TabTextPanel {
 //    	    if(e.getButton()==3) popupMenu.show(editTextPane,e.getX(),e.getY());
 //    	}
 //    };
-//
-//	// ****************************************************************
-//	// *** DocumentListener
-//	// ****************************************************************
-//    /// The DocumentListener.
-//	DocumentListener documentListener=new DocumentListener() {
-//		public void insertUpdate(DocumentEvent e)  { debugTrace("Insert",e); }
-//		public void removeUpdate(DocumentEvent e)  { debugTrace("Remove",e); }
-//		public void changedUpdate(DocumentEvent e) { debugTrace("Changed",e); }
-//		
-//		private void debugTrace(String id,DocumentEvent evt) {
-//			if(DEBUG) {
-//			    int ofst=evt.getOffset();
-//			    int lng=evt.getLength();
-//			    String styleName="UNKNOWN";
-//			    String lastText="UNKNOWN";
-//				try { // debugTrace
-//				    StyledDocument doc=(StyledDocument)editTextPane.getDocument();
-//				    if(id.equals("Insert")) lastText= doc.getText(ofst,lng);
-//				    if(id.equals("addition")) lastText= doc.getText(ofst,lng);
-//				    Element elt=doc.getCharacterElement(ofst);
-//				    if(elt instanceof LeafElement leaf) {
-//					    styleName=(String)leaf.getAttribute(StyleConstants.NameAttribute);
-//				    }
-//				    lastText=lastText.replace("\n","\\n");
-//				} catch (Exception ex) { Util.IERR("Impossible",ex); }			
-//				IO.println("DocumentListener: "+id + '[' + ofst + ',' + lng + "]="+styleName+"\"" + lastText + '"');
-//			}
-//		}	
-//	};
+
+	// ****************************************************************
+	// *** DocumentListener
+	// ****************************************************************
+    /// The DocumentListener.
+	DocumentListener documentListener=new DocumentListener() {
+		public void insertUpdate(DocumentEvent evt)  {
+			debugTrace("Insert",evt);
+		    int ofst=evt.getOffset();
+		    int lng=evt.getLength();
+//			Util.STOP();
+		}
+		public void removeUpdate(DocumentEvent e)  {
+			debugTrace("Remove",e);
+//			Util.STOP();
+		}
+		public void changedUpdate(DocumentEvent e) {
+			debugTrace("Changed",e);
+//			Util.STOP();
+		}
+		
+		private void debugTrace(String id,DocumentEvent evt) {
+			if(DEBUG) {
+			    int ofst=evt.getOffset();
+			    int lng=evt.getLength();
+			    String styleName="UNKNOWN";
+			    String lastText="UNKNOWN";
+				try { // debugTrace
+				    StyledDocument doc=(StyledDocument)editTextPane.getDocument();
+				    if(id.equals("Insert")) lastText= doc.getText(ofst,lng);
+				    if(id.equals("addition")) lastText= doc.getText(ofst,lng);
+				    Element elt=doc.getCharacterElement(ofst);
+				    if(elt instanceof LeafElement leaf) {
+					    styleName=(String)leaf.getAttribute(StyleConstants.NameAttribute);
+				    }
+				    lastText=lastText.replace("\n","\\n");
+				} catch (Exception ex) { Util.IERR("Impossible",ex); }			
+				IO.println("DocumentListener: "+id + '[' + ofst + ',' + lng + "]=Style:"+styleName+"\"" + lastText + '"');
+			}
+		}	
+	};
 	
 	private static boolean TESTING_CONSOLE = true;
 	// ****************************************************************

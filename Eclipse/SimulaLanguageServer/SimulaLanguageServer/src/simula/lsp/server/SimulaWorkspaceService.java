@@ -9,11 +9,21 @@ import java.util.concurrent.CompletableFuture;
 
 public class SimulaWorkspaceService implements WorkspaceService {
 
-    // Triggered when settings change in the client/IDE
-    @Override
+    /// Triggered when settings change in the client/IDE
+    /// 
+	/// If a user updates settings inside their IDE while the server is active,
+	/// the client pushes a	workspace/didChangeConfiguration notification to
+	/// the server containing the newly changed settings payload.
+	/// 
+	/// [1] (https://github.com/eclipse-jdtls/eclipse.jdt.ls/issues/3108),
+	/// [2] (https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/)
+	@Override
     public void didChangeConfiguration(DidChangeConfigurationParams params) {
-        // e.g., Update internal configuration objects 
-        Object settings = params.getSettings();
+        // Extract the modified settings map or object
+        Object updatedSettings = params.getSettings();
+        
+        // Update server behaviors dynamically
+//        applyNewSettings(updatedSettings);
     }
 
     // Triggered when files watched by the client are modified/deleted/created

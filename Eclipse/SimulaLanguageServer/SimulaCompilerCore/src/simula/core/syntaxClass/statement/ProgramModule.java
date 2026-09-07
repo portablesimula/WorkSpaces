@@ -15,7 +15,7 @@ import simula.core.DocumentManager;
 import simula.core.DocumentManager;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.export.LexPosition;
+import org.eclipse.lsp4j.Position;
 import simula.core.builder.export.LexToken;
 import simula.core.builder.util.Identifier;
 import simula.core.coder.SimulaCoder;
@@ -164,8 +164,8 @@ public final class ProgramModule extends Statement {
 				}
 				String textAfterEnd = Comn.printable(sb.toString());
 //				IO.println("NEW ProgramModule: TextAfterEnd: " + Comn.printable(textAfterEnd));
-				LexPosition start = simBuilder.lexTokenList.get(mrk-1).getPosition();
-				LexPosition end = simBuilder.lexTokenList.get(n-1).getPosition();
+				Position start = simBuilder.lexTokenList.get(mrk-1).getPosition();
+				Position end = simBuilder.lexTokenList.get(n-1).getPosition();
 				if(! textAfterEnd.equals(";")) Util.warning(simBuilder, start, end, "Text after Program end: \"" + textAfterEnd + '"');
 			}
 			

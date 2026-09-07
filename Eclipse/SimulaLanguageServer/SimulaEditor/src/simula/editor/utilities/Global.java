@@ -166,6 +166,7 @@ public final class Global {
 
 	/// Initiate Global variables.
 	public static void initiate() {
+		IO.println("Global.initiate: ");
 		console = new ConsolePanel();
     	currentModule = null;
 //    	moduleMap = new HashMap<>();

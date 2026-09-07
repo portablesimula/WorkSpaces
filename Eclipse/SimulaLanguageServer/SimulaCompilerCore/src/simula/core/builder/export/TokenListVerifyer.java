@@ -4,7 +4,6 @@ import java.util.List;
 
 import simula.Comn;
 import simula.Option;
-import simula.core.SemanticTextReconstructor;
 import simula.core.utilities.Util;
 
 /// Detailed Specification of deltaStart

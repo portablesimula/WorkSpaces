@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Vector;
 
 import simula.SimulaCoreExports;
+import simula.SimulaCoreInitialize;
 
 public class TestBatchLauncher {
 //	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
@@ -15,7 +16,9 @@ public class TestBatchLauncher {
 		// Remove time, date, and headers from Logger output.
 		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
 		
-		SimulaCoreExports.initiate(new TestBatchClient(), argv);
+//		SimulaCoreExports.initiate(new TestBatchClient(), argv);
+	    SimulaCoreInitialize.connect(new TestBatchClient());
+	    SimulaCoreInitialize.initiate(argv);
 		String uri = fileName;
 		int version = 1;
         try {

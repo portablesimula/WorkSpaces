@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Vector;
 
 import client.SimulaEditorClient;
-import simula.SimulaCoreExports;
+import simula.SimulaCoreInitialize;
 import simula.editor.RTOption;
 import simula.editor.SimulaEditor;
 import simula.editor.utilities.Global;
@@ -162,7 +162,7 @@ public final class Simula {
 	public static void main(String[] argv) {
 		// Remove time, date, and headers from Logger output.
 		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
-		String sourceFileDir = null;
+//		String sourceFileDir = null;
 //		Vector<String> fileNames = new Vector<String>();
 		Option.verbose=false;
 		Option.WARNINGS=true;
@@ -189,7 +189,7 @@ public final class Simula {
 				
 				// Special RT Options
 				else if (arg.equalsIgnoreCase("-source")) Option.internal.SOURCE_FILE=argv[++i];
-				else if (arg.equalsIgnoreCase("-sourceFileDir")) sourceFileDir=argv[++i];
+//				else if (arg.equalsIgnoreCase("-sourceFileDir")) sourceFileDir=argv[++i];
 				else if (arg.equalsIgnoreCase("-runtimeUserDir")) Option.internal.RUNTIME_USER_DIR=argv[++i];
 				else {
 					IO.println("Simula ERROR: Unknown option " + arg);
@@ -200,8 +200,15 @@ public final class Simula {
 		
 	    if(!Option.internal.INLINE_TESTING) Global.simulaRtsLib=new File(Global.releaseHome, "/rts");
 	    
+//		Global.console = new ConsolePanel();
+		Global.initiate();
+
+	    SimulaCoreInitialize.connect(new SimulaEditorClient());
+
 	    Vector<String> args = new Vector<>(Arrays.asList(argv));
-		SimulaCoreExports.initiate(new SimulaEditorClient(), args);
+	    SimulaCoreInitialize.initiate(args);
+		
+		
 //		if (fileNames.isEmpty()) {
 			// *** STARTING SIMULA EDITOR ***
 			Global.sampleSourceDir = new File(Global.releaseHome, "/samples");
