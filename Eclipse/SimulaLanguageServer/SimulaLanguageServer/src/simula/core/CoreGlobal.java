@@ -7,9 +7,14 @@ package simula.core;
 
 import java.io.File;
 import java.util.Stack;
+
+import org.eclipse.lsp4j.services.TextDocumentService;
+
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.utilities.ClassHierarchy;
+import simula.lsp.server.SimulaLanguageServer;
+import simula.lsp.server.SimulaTextDocumentService;
 
 /// Global Variables.
 /// 
@@ -23,6 +28,11 @@ public final class CoreGlobal {
 //	public static boolean TRACE_COMMENTS = false;
 
 	// ===============================================================================================
+	
+	public static SimulaLanguageServer simulaLanguageServer;
+	public static SimulaTextDocumentService getSimulaTextDocumentService() {
+		return (SimulaTextDocumentService) simulaLanguageServer.getTextDocumentService();
+	}
 	
 	/// The current source line number.
 	public static int sourceLineNumber;
@@ -38,6 +48,7 @@ public final class CoreGlobal {
 
 	/// Initiate Global variables.
 	public static void initiate() {
+		simulaLanguageServer = new SimulaLanguageServer();
 		Object_SEQU = 8001;
 //		includeQueue = null;
 		ClassHierarchy.init();

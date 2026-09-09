@@ -64,7 +64,7 @@ import java.util.Set;
 public class SimulaTextPanel extends TabTextPanel {
 	/// DEBUG on/off
 	private static final boolean DEBUG = true;//false;//true;
-	
+
 //	public SourceModule currentModule;
 //
 //	/// The line number side-panel.
@@ -187,15 +187,15 @@ public class SimulaTextPanel extends TabTextPanel {
 		}	
 	};
 	
-	private static boolean TESTING_CONSOLE = true;
+	private static boolean TESTING_CONSOLE = true;//false;// true;
 	// ****************************************************************
 	// *** Constructor
 	// ****************************************************************
 	/// Create a new SimulaTextPanel.
 	/// @param sourceFile the source file
 	/// @param popupMenu the popupMenu
-	public SimulaTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
-    	super(sourceModule, popupMenu);
+	public SimulaTextPanel(final SourceModule sourceModule, final ConsolePanel console, final JPopupMenu popupMenu) {
+    	super(sourceModule, console, popupMenu);
 //    	open();
 	}
 
@@ -231,8 +231,11 @@ public class SimulaTextPanel extends TabTextPanel {
         styleScrollPane = new JScrollPane(tabContent);        
         styleScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         
-        if(TESTING_CONSOLE) {
-        	ConsolePanel console = Global.console;
+//        if(TESTING_CONSOLE) {
+        if(console != null) {
+//        	ConsolePanel console = Global.console;
+//        	ConsolePanel console = new ConsolePanel(); // TESTING_CONSOLE
+        	Global.console = console;
             JSplitPane splitPane = new JSplitPane(
                 JSplitPane.VERTICAL_SPLIT, // Stack panels vertically
                 styleScrollPane,           // Top component

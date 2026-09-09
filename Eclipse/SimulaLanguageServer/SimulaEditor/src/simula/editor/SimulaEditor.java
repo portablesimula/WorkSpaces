@@ -21,6 +21,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
@@ -54,28 +55,28 @@ public class SimulaEditor extends JFrame {
 	public enum Language { /** Simula */Simula,/** Jar file */Jar,/** Text file */Text,/** other */ Other }
 
 
-	// ****************************************************************
-	// *** SimulaEditor: Main Entry for TESTING ONLY
-	// ****************************************************************
-	/// SimulaEditor: Main Entry for TESTING ONLY.
-	/// @param args the arguments
-	public static void main(String[] args) {
-		Global.packetName="simprog";
-		String userDir="C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula";
-		Global.simulaRtsLib=new File(userDir,"bin"); // To use Eclipse Project's simula.runtime  Download
-		RTOption.InitRuntimeOptions();
-		Option.InitCompilerOptions();
-		Global.sampleSourceDir=new File(userDir+"/src/simulaTestPrograms/samples");
-		Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-			public void uncaughtException(Thread thread, Throwable e) {
-				System.out.print("SimulaEditor.UncaughtExceptionHandler: GOT Exception: " + e);
-				e.printStackTrace();
-			}});
-		Option.internal.INLINE_TESTING=true;
-		setUIScale(); // Must be done before any Swing Component is created.
-		SimulaEditor editor=new SimulaEditor();
-		editor.setVisible(true);
-	}
+//	// ****************************************************************
+//	// *** SimulaEditor: Main Entry for TESTING ONLY
+//	// ****************************************************************
+//	/// SimulaEditor: Main Entry for TESTING ONLY.
+//	/// @param args the arguments
+//	public static void main(String[] args) {
+//		Global.packetName="simprog";
+//		String userDir="C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula";
+//		Global.simulaRtsLib=new File(userDir,"bin"); // To use Eclipse Project's simula.runtime  Download
+//		RTOption.InitRuntimeOptions();
+//		Option.InitCompilerOptions();
+//		Global.sampleSourceDir=new File(userDir+"/src/simulaTestPrograms/samples");
+//		Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+//			public void uncaughtException(Thread thread, Throwable e) {
+//				System.out.print("SimulaEditor.UncaughtExceptionHandler: GOT Exception: " + e);
+//				e.printStackTrace();
+//			}});
+//		Option.internal.INLINE_TESTING=true;
+//		setUIScale(); // Must be done before any Swing Component is created.
+//		SimulaEditor editor=new SimulaEditor();
+//		editor.setVisible(true);
+//	}
 
 	/// Set UI-Scale factor
 	/// See: https://docs.oracle.com/en/java/javase/25/troubleshoot/java-2d-properties.html
@@ -133,7 +134,7 @@ public class SimulaEditor extends JFrame {
     	cardLayout = new CardLayout();
     	mainCardPanel = new JPanel(cardLayout);
         getContentPane().add(mainCardPanel);
-        
+                
         WelcomePanel welcomePanel = new WelcomePanel();
         mainCardPanel.add(welcomePanel,"Welcome");
 

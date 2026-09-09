@@ -46,6 +46,8 @@ public abstract class TabTextPanel extends JPanel {
 	/// DEBUG on/off
 	private static final boolean DEBUG = false;//true;
 	
+	ConsolePanel console; // TESTING_CONSOLE
+	
 	public SourceModule sourceModule;
 
 	/// The line number side-panel.
@@ -130,10 +132,14 @@ public abstract class TabTextPanel extends JPanel {
 	/// @param lang the language
 	/// @param popupMenu the popupMenu
 //    SourceTextPanel(SimulaEditor.Language lang, JPopupMenu popupMenu) {
-    TabTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
+    TabTextPanel(final SourceModule sourceModule, final ConsolePanel console, final JPopupMenu popupMenu) {
     	this.sourceModule = sourceModule;
     	this.sourceModule.textPanel = this;
     	this.popupMenu=popupMenu;
+//    	this.console = new ConsolePanel(sourceModule.getName()); // TESTING_CONSOLE
+    	if(console != null) {
+    		this.console = Global.console = console;
+    	}
 //    	open();
 	}
 

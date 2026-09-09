@@ -42,6 +42,9 @@ public final class ConsolePanel extends JPanel {
 
 	/// The text pane.
 	private static JTextPane textPane;
+	
+	/// Debug name
+	public String debugName;
 
 	/// the StyledDocument showed in this panel
 	private StyledDocument doc;
@@ -74,8 +77,9 @@ public final class ConsolePanel extends JPanel {
 	private Reader consoleReader;
 
 	/// Create a new ConsolePanel.
-	public ConsolePanel() {
+	public ConsolePanel(String debugName) {
 		super(new BorderLayout());
+		this.debugName = debugName;
 		JScrollPane scrollPane;
 		textPane = new JTextPane();
 		textPane.addMouseListener(mouseListener);
@@ -224,19 +228,21 @@ public final class ConsolePanel extends JPanel {
 	/// @param s a string to write
 	public void write(final String s) {
 //		Util.IERR("");
-		IO.println("ConsolePanel.write: " + s);
+		IO.println("ConsolePanel.write: " + debugName + ": " + s);
 		write(s, styleRegular);
 	}
 
 	/// Write a string on this panel using styleError.
 	/// @param s a string to write
 	public void writeError(final String s) {
+		IO.println("ConsolePanel.writeError: " + debugName + ": " + s);
 		write(s, styleError);
 	}
 
 	/// Write a string on this panel using styleWarning.
 	/// @param s a string to write
 	public void writeWarning(final String s) {
+		IO.println("ConsolePanel.writeWarning: " + debugName + ": " + s);
 		write(s, styleWarning);
 	}
 

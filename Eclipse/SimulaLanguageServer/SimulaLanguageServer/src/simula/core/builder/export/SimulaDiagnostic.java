@@ -2,6 +2,8 @@ package simula.core.builder.export;
 
 import org.eclipse.lsp4j.Range;
 
+import simula.core.utilities.Util;
+
 public class SimulaDiagnostic {
 	public enum Severity { Error, Warning, Information, Hint }
 	public Severity severity;
@@ -19,7 +21,7 @@ public class SimulaDiagnostic {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(severity)
-		.append(" ").append(range)
+		.append(" ").append(Util.edRange(range))
 		.append(" ").append(mss);
 		return sb.toString();
 	}

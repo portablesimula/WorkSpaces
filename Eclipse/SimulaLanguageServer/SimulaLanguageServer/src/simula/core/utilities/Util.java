@@ -129,13 +129,13 @@ public final class Util {
 	/// Report an error message to the SimulaCoreClient.
 	/// @param msg the message
 	public static void generalError(final String msg) {
-		CoreGlobal.simulaCoreClient.error("General Error: " + msg);
+		DocumentManager.simulaCoreClient.error("General Error: " + msg);
 	}
 
 	/// Report an error message to the SimulaCoreClient.
 	/// @param msg the message
 	public static void generalError(final int lineNumber, final String msg) {
-		CoreGlobal.simulaCoreClient.error("Line " + lineNumber + ": General Error: " + msg);
+		DocumentManager.simulaCoreClient.error("Line " + lineNumber + ": General Error: " + msg);
 	}
 	
 	/// Print a error message.
@@ -163,6 +163,14 @@ public final class Util {
 		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, elt.lexRange, msg);
 		LOG.error(diagnostic.toString());
 		elt.documentManager.simBuilder.addError(diagnostic);
+	}
+	
+	public static String edRange(Range range) {
+		return "[start[" + edPosition(range.getStart()) + ", end[" + edPosition(range.getEnd()) + ']';
+	}
+	
+	public static String edPosition(Position position) {
+		return "[line:" + position.getLine() + ", column:" + position.getCharacter() + ']';
 	}
 	
 	/// Error during Code generation:

@@ -8,7 +8,6 @@ package simula;
 import java.io.File;
 
 import simula.core.DocumentManager;
-import simula.core.DocumentManager;
 import simula.core.utilities.Util;
 
 /// Compile Time Options.

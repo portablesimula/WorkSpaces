@@ -8,13 +8,19 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.undo.UndoManager;
 
+import org.eclipse.lsp4j.DidOpenTextDocumentParams;
+import org.eclipse.lsp4j.SemanticTokens;
+import org.eclipse.lsp4j.SemanticTokensParams;
+import org.eclipse.lsp4j.TextDocumentIdentifier;
+import org.eclipse.lsp4j.TextDocumentItem;
+import simula.core.CoreGlobal;
 import simula.core.builder.export.SimulaDiagnostic;
 import simula.Comn;
-import simula.SimulaCoreExports;
 import simula.editor.SimulaEditor.Language;
 import simula.editor.text.TabTextPanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Util;
+import simula.lsp.server.SimulaTextDocumentService;
 
 public class SourceModule {
 	
@@ -27,6 +33,7 @@ public class SourceModule {
     }
 	
 	String documentUri;
+	TextDocumentIdentifier documentID;
 	
 	public File sourceFile;
 	private String sourceText;
@@ -96,6 +103,7 @@ public class SourceModule {
 	
 	public SourceModule(String documentUri, String sourceText) {
 		this.documentUri = documentUri;
+		this.documentID = new TextDocumentIdentifier(documentUri);
 		this.sourceText = sourceText;
     	openModules.put(documentUri, this);
 		Global.currentModule = this;
@@ -105,6 +113,7 @@ public class SourceModule {
 	public SourceModule(File sourceFile) {
 		this.sourceFile = sourceFile;
 		this.documentUri = sourceFile.toString();
+		this.documentID = new TextDocumentIdentifier(documentUri);
     	openModules.put(documentUri, this);
 		Global.currentModule = this;
 		
@@ -131,13 +140,23 @@ public class SourceModule {
 
 	public void doOpenSimulaModule() {
 		try {
-//			String uri = sourceFile.toString();
-			String uri = documentUri;
+			SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
 			int version = 1;
 			String content = getModifiedText();
-			SimulaCoreExports.didOpen(uri, version, content);
-			IO.println("SourceModule.doOpenSimulaModule: " + getUpdatedText().replace("\n", "\\n").replace("\r", "\\r"));
-			this.semTokens = SimulaCoreExports.semanticTokensFull(documentUri);
+			TextDocumentItem textDocumentItem = new TextDocumentItem(documentUri, "Simula", version, content);
+			
+			DidOpenTextDocumentParams params = new DidOpenTextDocumentParams();
+			params.setTextDocument(textDocumentItem);
+//			IO.println("SourceModule.doOpenSimulaModule: " + params);
+			simulaTextDocumentService.didOpen(params);
+//			IO.println("SourceModule.doOpenSimulaModule: " + Util.printable(getUpdatedText()));
+			
+			SemanticTokensParams tokenParams = new SemanticTokensParams(documentID);
+//			tokenParams.setTextDocument(documentID);
+//			IO.println("SourceModule.doOpenSimulaModule: tokenParams: " + tokenParams);
+//			this.semTokens = simulaTextDocumentService.semanticTokensFull(documentUri);
+			SemanticTokens semTokens = simulaTextDocumentService.semanticTokensFull_Local(tokenParams);
+			this.semTokens = semTokens.getData();
 		} catch (Exception e) {
 			IO.println("SourceModule.doOpenSimulaModule: GOT EXCEPTION: " + e.getMessage());
 			e.printStackTrace();

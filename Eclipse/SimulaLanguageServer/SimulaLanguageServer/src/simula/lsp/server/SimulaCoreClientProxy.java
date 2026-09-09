@@ -6,8 +6,8 @@ import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.eclipse.lsp4j.services.LanguageClient;
 
-import simula.SimTextDocumentContentChangeEvent;
 import simula.SimulaCoreClient;
+import simula.core.builder.export.SimulaDiagnostic;
 
 public class SimulaCoreClientProxy implements SimulaCoreClient {
 	
@@ -34,10 +34,22 @@ public class SimulaCoreClientProxy implements SimulaCoreClient {
 	}
 
 
-    public static List<SimTextDocumentContentChangeEvent> convert(List<TextDocumentContentChangeEvent> changes) {
+    public static List<TextDocumentContentChangeEvent> convert(List<TextDocumentContentChangeEvent> changes) {
 		// TODO Auto-generated method stub
     	throw new RuntimeException("NOT IMPL");
 //		return null;
+	}
+
+	@Override
+	public void initialized() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void publishDiagnostics(String uri, List<SimulaDiagnostic> diagnostics) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

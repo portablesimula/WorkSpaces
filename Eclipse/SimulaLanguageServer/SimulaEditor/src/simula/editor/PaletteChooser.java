@@ -2,10 +2,13 @@ package simula.editor;
 
 import javax.swing.*;
 
-import simula.SimulaCoreExports;
+import org.eclipse.lsp4j.DidCloseTextDocumentParams;
+import org.eclipse.lsp4j.TextDocumentIdentifier;
+import simula.core.CoreGlobal;
 import simula.editor.text.SimulaTextPanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Option;
+import simula.lsp.server.SimulaTextDocumentService;
 
 import java.awt.*;
 import java.io.IOException;
@@ -147,10 +150,17 @@ public class PaletteChooser extends JDialog {
         SourceModule demoModule = new SourceModule(documentUri, badSourceText);
         demoModule.doOpenSimulaModule();
         IO.println("PaletteChooser.getDemoPanel: " + demoModule);
-		demoPanel = new SimulaTextPanel(demoModule, null);
+		demoPanel = new SimulaTextPanel(demoModule, null, null);
+		demoPanel.open();
 		List<Integer> semTokens = demoModule.getSemTokens();
     	demoModule.doCloseSimulaModule();
-    	SimulaCoreExports.didClose(documentUri);
+    	
+//    	SimulaExecutor.didClose(documentUri);
+		SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
+    	DidCloseTextDocumentParams params = new DidCloseTextDocumentParams(new TextDocumentIdentifier(documentUri));
+    	simulaTextDocumentService.didClose(params);
+    	
+    	
 //    	Util.IERR("STOP HER INTILL VIDERE");
 //    	Util.STOP();
     	

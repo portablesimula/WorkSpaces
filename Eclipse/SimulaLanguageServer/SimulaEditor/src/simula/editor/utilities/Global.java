@@ -167,7 +167,7 @@ public final class Global {
 	/// Initiate Global variables.
 	public static void initiate() {
 		IO.println("Global.initiate: ");
-		console = new ConsolePanel();
+		console = new ConsolePanel("Default");
     	currentModule = null;
 //    	moduleMap = new HashMap<>();
 		Object_SEQU = 8001;

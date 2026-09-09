@@ -31,13 +31,19 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.eclipse.lsp4j.DidCloseTextDocumentParams;
+import org.eclipse.lsp4j.TextDocumentIdentifier;
+
 import simula.Comn;
-import simula.SimulaCoreExports;
+import simula.core.CoreGlobal;
 import simula.editor.ClosableTabPanel;
 import simula.editor.SimulaEditor;
 import simula.editor.SourceModule;
+import simula.editor.utilities.ConsolePanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Util;
+import simula.lsp.server.SimulaExecutor;
+import simula.lsp.server.SimulaTextDocumentService;
 
 /// @author Google AI
 /// @author Øystein Myhre Andersen
@@ -103,7 +109,8 @@ public class TabbedTextHandler {
 				case Simula:
 		    		IO.println("TabbedTextHandler.doNewTabbedPanel: textPanel: " + sourceModule.textPanel);
 		    		List<Integer> semTokens = sourceModule.getSemTokens();
-		    		SimulaTextPanel simTextPanel = new SimulaTextPanel(sourceModule, SimulaEditor.menuBar.popupMenu);
+		    		ConsolePanel console = new ConsolePanel(sourceModule.getName());
+		    		SimulaTextPanel simTextPanel = new SimulaTextPanel(sourceModule, console, SimulaEditor.menuBar.popupMenu);
 		    		simTextPanel.open();
 				try {
 					simTextPanel.fillTextPane(0, semTokens);
@@ -146,10 +153,39 @@ public class TabbedTextHandler {
     /// Create a new Tab with text generated from the given psi tree.
     /// @param file the file
     /// @param lang the language
-    static void doNewTabbedSimPanel(List<Integer> semTokens, String prefix) {
+//    static void doNewTabbedSimPanel(List<Integer> semTokens, String prefix) {
+//    	if(tabbedPane == null) doOpenTabbedPane();
+//    	SwingUtilities.invokeLater(() -> {
+//    		SimulaTextPanel simTextPanel=new SimulaTextPanel(Global.currentModule, SimulaEditor.menuBar.popupMenu);
+//    		simTextPanel.open();
+//    		String tabName = prefix + Global.currentModule.getTabName();
+//
+//			tabbedPane.addTab(null, simTextPanel); // Add content first, will be replaced
+//			int index = tabbedPane.getTabCount() - 1;
+//			tabbedPane.setTabComponentAt(index, new ClosableTabPanel(tabName, tabbedPane, simTextPanel));
+//			tabbedPane.setSelectedIndex(index);
+//
+//    		Global.currentModule.setFileChanged(false);
+//    		try {
+//				simTextPanel.fillTextPane(0, semTokens);
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//    		SimulaEditor.menuBar.updateMenuItems();
+//    	});
+//    }
+
+    // ****************************************************************
+    // *** doFillTabbedSimPanel
+    // ****************************************************************
+    /// Create a new Tab with text generated from the given psi tree.
+    /// @param file the file
+    /// @param lang the language
+    static void doFillTabbedSimPanel(SimulaTextPanel simTextPanel, List<Integer> semTokens, String prefix) {
     	if(tabbedPane == null) doOpenTabbedPane();
     	SwingUtilities.invokeLater(() -> {
-    		SimulaTextPanel simTextPanel=new SimulaTextPanel(Global.currentModule, SimulaEditor.menuBar.popupMenu);
+//    		SimulaTextPanel simTextPanel=new SimulaTextPanel(Global.currentModule, SimulaEditor.menuBar.popupMenu);
     		simTextPanel.open();
     		String tabName = prefix + Global.currentModule.getTabName();
 
@@ -274,22 +310,15 @@ public class TabbedTextHandler {
 				Component selected=tabbedPane.getSelectedComponent();
 				IO.println("SimulaEditor'changeSelectedComponent: " + selected);
 				if(selected == null) {
+					Global.console = null;
 					SimulaEditor.reopenWelcomePane();
 					return;
 				}
 
 				IO.println("SimulaEditor'changeSelectedComponent: " + selected.getClass());
+	        	Global.console = ((TabTextPanel)selected).console;
+
 				Global.console.write("SimulaEditor'changeSelectedComponent: " + selected.getClass()+"\n");
-//				if(selected instanceof SimulaTextPanel panel) {
-//					currentTextPanel=panel;
-//					Global.currentModule = currentTextPanel.currentModule;
-//					SimulaEditor.menuBar.updateMenuItems();
-//				} else
-//				if(selected instanceof SourceTextPanel panel) {
-//					currentTextPanel=panel;
-//					Global.currentModule = currentTextPanel.currentModule;
-//					SimulaEditor.menuBar.updateMenuItems();
-//				}
 				if(selected instanceof TabTextPanel panel) {
 					Global.currentModule = panel.sourceModule;
 					IO.println("SimulaEditor'changeSelectedComponent: NEW currentModule: " + Global.currentModule);
@@ -337,8 +366,16 @@ public class TabbedTextHandler {
 		SourceModule sourceModule = new SourceModule(file);
     	switch(sourceModule.lang){
 		case Simula:
+//			sourceModule.doOpenSimulaModule();
+//			doNewTabbedSimPanel(sourceModule.getSemTokens(), "");
+			
+	    	if(tabbedPane == null) doOpenTabbedPane();
+	    	ConsolePanel console = new ConsolePanel(sourceModule.getName()); // TESTING_CONSOLE
+
+			SimulaTextPanel simTextPanel=new SimulaTextPanel(Global.currentModule, console, SimulaEditor.menuBar.popupMenu);
 			sourceModule.doOpenSimulaModule();
-			doNewTabbedSimPanel(sourceModule.getSemTokens(), "");
+			doFillTabbedSimPanel(simTextPanel, sourceModule.getSemTokens(), "");
+
 //        	Global.setCurrentWorkspace(fileChooser.getCurrentDirectory());
 			break;
 		case Jar:
@@ -402,7 +439,10 @@ public class TabbedTextHandler {
 		maybeSaveCurrentFile();
 		SourceModule current = Global.currentModule;
 		String documentUri = current.getUri();
-		SimulaCoreExports.didClose(documentUri);
+		SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
+    	DidCloseTextDocumentParams params = new DidCloseTextDocumentParams(new TextDocumentIdentifier(documentUri));
+    	simulaTextDocumentService.didClose(params);
+    	
 //		Util.STOP();
 		removeSelectedTab();
 	}

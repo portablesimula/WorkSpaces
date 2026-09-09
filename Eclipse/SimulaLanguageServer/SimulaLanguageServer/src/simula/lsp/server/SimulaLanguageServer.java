@@ -3,6 +3,8 @@ package simula.lsp.server;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.*;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import simula.SimulaCoreClient;
@@ -99,17 +101,62 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         
 //        CALL: SimulaCoreInitialize.initiate(...);
         
-
-        // 2. Define what your server supports back to the client
+        // 1. Create the container for server capabilities
         ServerCapabilities serverCapabilities = new ServerCapabilities();
-        serverCapabilities.setTextDocumentSync(TextDocumentSyncKind.Incremental);
-        serverCapabilities.setCompletionProvider(new CompletionOptions(true, null));
 
+        // 2. Define how you want documents to sync (Full text or Incremental changes)
+        //serverCapabilities.setTextDocumentSync(TextDocumentSyncKind.Full);
+        serverCapabilities.setTextDocumentSync(TextDocumentSyncKind.Incremental);
+        
+        // 3. Declare features your server supports
+        serverCapabilities.setCompletionProvider(new CompletionOptions(true, null));
+        serverCapabilities.setDefinitionProvider(true);
+        serverCapabilities.setHoverProvider(true);
+        serverCapabilities.setSemanticTokensProvider(getSemanticOptions());
+
+        // 4. Return the capabilities wrapped in an InitializeResult object
         InitializeResult result = new InitializeResult(serverCapabilities);
         return CompletableFuture.completedFuture(result);
     }
     
-    
+
+    // 1. Define the ordered array of Token Types. 
+    // The index positions (0, 1, 2...) are what the server will transmit later.
+    private static final List<String> SUPPORTED_TOKEN_TYPES = Arrays.asList(
+    		SemanticTokenTypes.Namespace,
+    		"namespace", // Index 0
+        "type",      // Index 1
+        "class",     // Index 2
+        "enum",      // Index 3
+        "interface", // Index 4
+        "struct",    // Index 5
+        "typeParameter", // Index 6
+        "parameter", // Index 7
+        "variable",  // Index 8
+        "property",  // Index 9
+        "macro",     // Index 10
+        "function",  // Index 11
+        "method"     // Index 12
+    );
+
+    // Leave modifiers empty for this baseline configuration
+    private static final List<String> SUPPORTED_TOKEN_MODIFIERS = Arrays.asList();
+
+    private SemanticTokensWithRegistrationOptions getSemanticOptions() {
+    	// Set up semantic tokens options with your token types and modifiers legend
+        SemanticTokensWithRegistrationOptions semanticOptions = new SemanticTokensWithRegistrationOptions();
+//        SemanticTokensLegend legend = new SemanticTokensLegend(
+//            Arrays.asList("class", "interface", "variable", "function"), 
+//            Arrays.asList("declaration", "readonly")
+//        );
+        SemanticTokensLegend legend = new SemanticTokensLegend(
+                SUPPORTED_TOKEN_TYPES, 
+                SUPPORTED_TOKEN_MODIFIERS
+            );
+        semanticOptions.setLegend(legend);
+        semanticOptions.setFull(true); // Enable full document semantic tokens
+        return semanticOptions;
+    }
     
     
     
