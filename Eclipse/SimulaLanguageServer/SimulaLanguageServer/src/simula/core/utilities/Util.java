@@ -15,6 +15,9 @@ import java.lang.constant.MethodTypeDesc;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Vector;
 import java.util.stream.Stream;
 
@@ -22,10 +25,17 @@ import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.SimulaBuilder;
+
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.MessageActionItem;
+import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.ShowMessageRequestParams;
+import org.eclipse.lsp4j.jsonrpc.validation.NonNull;
+
 import simula.core.builder.export.LexToken;
-import simula.core.builder.export.SimulaDiagnostic;
 import simula.core.builder.util.Identifier;
 import simula.core.syntaxClass.SyntaxElement;
 
@@ -96,8 +106,8 @@ public final class Util {
         }
         Position start = new Position(token.lineNumber, token.column);
         Position end = new Position(token.lineNumber, token.column + token.length);
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new Range(start, end), msg);
-		
+		Diagnostic diagnostic = new Diagnostic(new Range(start, end), msg, DiagnosticSeverity.Warning, "Simula.LSP");
+			  		
 		if(DocumentManager.WARNINGS) {
 			LOG.warning(diagnostic.toString());
 			simBuilder.addDiagnostic(diagnostic);
@@ -107,7 +117,8 @@ public final class Util {
 	/// Print a warning message.
 	/// @param msg the message
 	public static void warning(final SyntaxElement elt, final String msg) {
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, elt.lexRange, msg);
+//		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Warning, elt.lexRange, msg);
+		Diagnostic diagnostic = new Diagnostic(elt.lexRange, msg, DiagnosticSeverity.Warning, "Simula.LSP");
 		if(DocumentManager.WARNINGS) {
 			LOG.warning(diagnostic.toString());
 			elt.documentManager.simBuilder.addDiagnostic(diagnostic);
@@ -117,7 +128,8 @@ public final class Util {
 	/// Print a warning message.
 	/// @param msg the message
 	public static void warning(final SimulaBuilder simBuilder, final Position start, final Position end, final String msg) {
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Warning, new Range(start, end), msg);
+//		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Warning, new Range(start, end), msg);
+		Diagnostic diagnostic = new Diagnostic(new Range(start, end), msg, DiagnosticSeverity.Warning, "Simula.LSP");
 
 		if(DocumentManager.WARNINGS) {
 			LOG.warning(diagnostic.toString());
@@ -129,13 +141,31 @@ public final class Util {
 	/// Report an error message to the SimulaCoreClient.
 	/// @param msg the message
 	public static void generalError(final String msg) {
-		DocumentManager.simulaCoreClient.error("General Error: " + msg);
+//		DocumentManager.simulaLanguageClient.error("General Error: " + msg);
+		
+		// Constructing the dialog options
+		ShowMessageRequestParams params = new ShowMessageRequestParams();
+		params.setType(MessageType.Error);
+		params.setMessage("Util.generalError: "+msg);
+
+		MessageActionItem ok = new MessageActionItem("Ok");
+		MessageActionItem cancel = new MessageActionItem("Cancel");
+		MessageActionItem exit = new MessageActionItem("Exit");
+
+		params.setActions(Arrays.asList(ok, cancel, exit));
+
+		// Sent to the VS Code client over JSON-RPC, awaiting the user's choice
+		DocumentManager.simulaLanguageClient.showMessageRequest(params).thenAccept(selectedAction -> {
+		    if (selectedAction != null && "Ok".equals(selectedAction.getTitle())) {
+		        // Trigger project compilation/sync logic...
+		    }
+		});
 	}
 
 	/// Report an error message to the SimulaCoreClient.
 	/// @param msg the message
 	public static void generalError(final int lineNumber, final String msg) {
-		DocumentManager.simulaCoreClient.error("Line " + lineNumber + ": General Error: " + msg);
+		generalError("Line " + lineNumber + ": General Error: " + msg);
 	}
 	
 	/// Print a error message.
@@ -153,14 +183,16 @@ public final class Util {
         }
         Position start = new Position(token.lineNumber, token.column);
         Position end = new Position(token.lineNumber, token.column + token.length);
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, new Range(start, end), msg);
+//		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Error, new Range(start, end), msg);
+		Diagnostic diagnostic = new Diagnostic(new Range(start, end), msg, DiagnosticSeverity.Error, "Simula.LSP");
 		
 		LOG.error(diagnostic.toString());
 		simBuilder.addError(diagnostic);
 	}
 	
 	public static void semanticError(final SyntaxElement elt, final String msg) {
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, elt.lexRange, msg);
+//		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Error, elt.lexRange, msg);
+		Diagnostic diagnostic = new Diagnostic(elt.lexRange, msg, DiagnosticSeverity.Error, "Simula.LSP");
 		LOG.error(diagnostic.toString());
 		elt.documentManager.simBuilder.addError(diagnostic);
 	}
@@ -175,7 +207,8 @@ public final class Util {
 	
 	/// Error during Code generation:
 	public static void codingError(final SyntaxElement elt, final String msg) {
-		SimulaDiagnostic diagnostic = new SimulaDiagnostic(SimulaDiagnostic.Severity.Error, elt.lexRange, msg);
+//		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Error, elt.lexRange, msg);
+		Diagnostic diagnostic = new Diagnostic(elt.lexRange, msg, DiagnosticSeverity.Error, "Simula.LSP");
 		LOG.error(diagnostic.toString());
 		elt.documentManager.simCoder.addError(diagnostic);
 	}

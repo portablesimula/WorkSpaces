@@ -9,15 +9,16 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
+import org.eclipse.lsp4j.services.LanguageClient;
 
 import simula.Comn;
 import simula.Option;
-import simula.SimulaCoreClient;
 import simula.core.builder.DocumentTextUpdater;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.export.LexToken;
-import simula.core.builder.export.SimulaDiagnostic;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.statement.ProgramModule;
@@ -35,7 +36,7 @@ public class DocumentManager {
     // Nøkkelen er filens URI (f.eks. file:///path/to/file.txt)
     private static final ConcurrentHashMap<String, DocumentManager> openDocuments = new ConcurrentHashMap<>();
 	
-	public static SimulaCoreClient simulaCoreClient;
+	public static LanguageClient simulaLanguageClient;
 
 	final public String documentUri;
 	final public File sourceFileDir;
@@ -169,7 +170,7 @@ public class DocumentManager {
 	}
 
 	/// Get the text document's getDiagnostic List.
-	public List<SimulaDiagnostic> getDiagnostics() {
+	public List<Diagnostic> getDiagnostics() {
 		return simBuilder.diagnostics;
 	}
 
@@ -184,16 +185,16 @@ public class DocumentManager {
 //	}
 
 	/// Get the text document's diagnostics.
-	public List<SimulaDiagnostic> getDiagnostis() {
+	public List<Diagnostic> getDiagnostis() {
 		return simBuilder.diagnostics;
 	}
 	
-//	public void addDiagnostic(SimulaDiagnostic diagnostic) {
+//	public void addDiagnostic(Diagnostic diagnostic) {
 //		simBuilder.diagnostics.add(diagnostic);
 //	}
 
 //	/// Set the text document's diagnostics.
-//	public void setDiagnostics(final List<SimulaDiagnostic> diagnostics) {
+//	public void setDiagnostics(final List<Diagnostic> diagnostics) {
 //		this.diagnostics = diagnostics;
 //	}
 
@@ -325,8 +326,9 @@ public class DocumentManager {
 		IO.println("DocumentManager.didClose: openDocuments: " + openDocuments);
 	}
 
-	public void publishDiagnostics(List<SimulaDiagnostic> diagnostics) {
-		DocumentManager.simulaCoreClient.publishDiagnostics(documentUri, diagnostics);
+	public void publishDiagnostics(List<Diagnostic> diagnostics) {
+		PublishDiagnosticsParams params = new PublishDiagnosticsParams(documentUri, diagnostics);
+		DocumentManager.simulaLanguageClient.publishDiagnostics(params);
 	}
 
 	

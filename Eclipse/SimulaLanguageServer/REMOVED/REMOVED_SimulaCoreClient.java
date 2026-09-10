@@ -2,7 +2,8 @@ package simula;
 
 import java.util.List;
 
-import simula.core.builder.export.SimulaDiagnostic;
+import org.eclipse.lsp4j.Diagnostic;
+
 import simula.core.utilities.Util;
 
 public interface SimulaCoreClient {
@@ -27,7 +28,7 @@ public interface SimulaCoreClient {
 	abstract public void initialized();//(InitializedParams params);
 	
 	/// Diagnostics notifications are sent from the server to the client to signal results of validation runs.
-	abstract public void publishDiagnostics(String uri, List<SimulaDiagnostic> diagnostics);
+	abstract public void publishDiagnostics(String uri, List<Diagnostic> diagnostics);
 
 	/// The show message notification is sent from a server to a client to ask the client to display a particular message in the user interface.
 	/// void showMessage(MessageParams messageParams)

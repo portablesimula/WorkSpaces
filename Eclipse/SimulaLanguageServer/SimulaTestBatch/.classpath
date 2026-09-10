@@ -6,9 +6,9 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/SimulaLanguageServer"/>
 	<classpathentry kind="lib" path="C:/Program Files/Eclipse_LSP/gson-2.9.0.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/Eclipse_LSP/org.eclipse.lsp4j.jsonrpc-0.24.0.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/Eclipse_LSP/org.eclipse.lsp4j-1.0.0.jar" sourcepath="C:/Program Files/Eclipse_LSP/org.eclipse.lsp4j-1.0.0-sources"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SimulaLanguageServer"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

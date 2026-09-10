@@ -2,12 +2,12 @@ package simula.lsp.server;
 
 import java.util.List;
 
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.eclipse.lsp4j.services.LanguageClient;
 
 import simula.SimulaCoreClient;
-import simula.core.builder.export.SimulaDiagnostic;
 
 public class SimulaCoreClientProxy implements SimulaCoreClient {
 	
@@ -47,7 +47,7 @@ public class SimulaCoreClientProxy implements SimulaCoreClient {
 	}
 
 	@Override
-	public void publishDiagnostics(String uri, List<SimulaDiagnostic> diagnostics) {
+	public void publishDiagnostics(String uri, List<Diagnostic> diagnostics) {
 		// TODO Auto-generated method stub
 		
 	}

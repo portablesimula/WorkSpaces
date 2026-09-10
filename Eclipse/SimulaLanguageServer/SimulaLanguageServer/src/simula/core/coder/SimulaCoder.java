@@ -5,12 +5,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
+import org.eclipse.lsp4j.Diagnostic;
+
 import simula.Option;
 import simula.core.DocumentManager;
 import simula.core.CoreGlobal;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.export.SimulaDiagnostic;
 import simula.core.syntaxClass.statement.ProgramModule;
 import simula.core.utilities.LOG;
 import simula.core.utilities.ObjectKind;
@@ -45,7 +46,7 @@ public class SimulaCoder {
 	public Vector<JavaSourceFileCoder> javaSourceFileCoders;
 
 	public int nErrors;
-	public List<SimulaDiagnostic> diagnostics;
+	public List<Diagnostic> diagnostics;
 
 	// ***************************************************************
 	// *** Static variables used during Code Generation
@@ -86,12 +87,12 @@ public class SimulaCoder {
 	}
 
 
-	public void addError(SimulaDiagnostic diagnostic) {
+	public void addError(Diagnostic diagnostic) {
 		diagnostics.add(diagnostic);
 		nErrors++;
 	}
 
-	public void addDiagnostic(SimulaDiagnostic diagnostic) {
+	public void addDiagnostic(Diagnostic diagnostic) {
 		diagnostics.add(diagnostic);
 	}
 

@@ -10,29 +10,29 @@ import java.util.Set;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-import simula.core.builder.export.SimulaDiagnostic;
 
 public class DiagnosticHandler {
 	private SourceModule sourceModule;
 //	private List<SimulaDiagnostic> diagnostics;
 	
 	class DiagnosticSet {
-		Set<SimulaDiagnostic> onLine = new HashSet<SimulaDiagnostic>();
+		Set<Diagnostic> onLine = new HashSet<Diagnostic>();
 		int line;
 		public DiagnosticSet(int line) { this.line = line; }
-		public void add(SimulaDiagnostic diag) { onLine.add(diag); }
+		public void add(Diagnostic diag) { onLine.add(diag); }
 	}
 	
 	Map<Integer, DiagnosticSet> lineMap = new HashMap<>();
 	
-	public DiagnosticHandler(SourceModule sourceModule, List<SimulaDiagnostic> diagnostics) {
+	public DiagnosticHandler(SourceModule sourceModule, List<Diagnostic> diagnostics) {
 		this.sourceModule = sourceModule;
 //		this.diagnostics = diagnostics;
 		
-		for(SimulaDiagnostic diag:diagnostics) {
-			Range range = diag.range;
+		for(Diagnostic diag:diagnostics) {
+			Range range = diag.getRange();
 			int firstLine = range.getStart().getLine();
 			int lastLine = range.getEnd().getLine();
 			for(int line = firstLine; line <= lastLine; line++) {
@@ -55,7 +55,7 @@ public class DiagnosticHandler {
             DiagnosticSet diagnosticSet = entry.getValue();
 
             IO.println("Line: " + id + " -> Verdi: " + diagnosticSet);
-            for(SimulaDiagnostic diag : diagnosticSet.onLine) {
+            for(Diagnostic diag : diagnosticSet.onLine) {
             	IO.println("   " + diag);
             }
         }		
@@ -66,8 +66,8 @@ public class DiagnosticHandler {
 		DiagnosticSet set = lineMap.get(line);
 		if(set == null) return null;
 		List<String> errorLines = new ArrayList<String>();
-		for(SimulaDiagnostic diag:set.onLine) {
-			errorLines.add(diag.mss);
+		for(Diagnostic diag:set.onLine) {
+			errorLines.add(diag.getMessage().toString());
 		}
     	return getHoverAttrs(errorLines);
     }
@@ -80,8 +80,8 @@ public class DiagnosticHandler {
 		List<String> errorLines = null;
 		int start1 = (line << 16) | column;
 		int slutt1 = start1 + length;
-		for(SimulaDiagnostic diag:set.onLine) {
-			Range range = diag.range;
+		for(Diagnostic diag:set.onLine) {
+			Range range = diag.getRange();
 			Position start = range.getStart();
 			Position end = range.getEnd();
 			int start2 = (start.getLine() << 16) | start.getCharacter();
@@ -90,7 +90,7 @@ public class DiagnosticHandler {
 //				IO.println("DiagnosticHandler.getTokenHoverAttrs: "+diag.mss);
 				if(errorLines == null)
 					errorLines = new ArrayList<String>();
-				errorLines.add(diag.mss);
+				errorLines.add(diag.getMessage().toString());
 			}
 		}
     	return getHoverAttrs(errorLines);

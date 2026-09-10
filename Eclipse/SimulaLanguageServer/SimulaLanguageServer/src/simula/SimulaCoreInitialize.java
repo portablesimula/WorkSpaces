@@ -3,6 +3,7 @@ package simula;
 import java.util.Vector;
 
 import org.eclipse.lsp4j.InitializeParams;
+import org.eclipse.lsp4j.services.LanguageClient;
 
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
@@ -66,9 +67,9 @@ public class SimulaCoreInitialize {
 	/// Called from:
 	///   - SimulaEditor:  Simula.main
 	///   - LangugeServer: SimulaLanguageServer.initialize
-	public static void connect(SimulaCoreClient client) {
+	public static void connect(LanguageClient client) {
 		CoreGlobal.initiate();
-		DocumentManager.simulaCoreClient = client;		
+		DocumentManager.simulaLanguageClient = client;		
 	}
 		
 	/// Debug Utility

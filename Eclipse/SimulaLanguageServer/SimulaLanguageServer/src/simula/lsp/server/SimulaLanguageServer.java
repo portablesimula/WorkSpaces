@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import simula.SimulaCoreClient;
 import simula.SimulaCoreInitialize;
 
 public class SimulaLanguageServer implements LanguageServer, LanguageClientAware {
@@ -27,8 +26,8 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
     public void connect(LanguageClient client) {
         // LSP4J injects the client proxy right after the launcher starts
         this.client = client;
-        SimulaCoreClient simulaCoreClient = new SimulaCoreClientProxy(client);
-        SimulaCoreInitialize.connect(simulaCoreClient);
+//        SimulaCoreClient simulaLanguageClient = new SimulaCoreClientProxy(client);
+//        SimulaCoreInitialize.connect(simulaLanguageClient);
     }
 
     /// --- LanguageServer Implementation ---

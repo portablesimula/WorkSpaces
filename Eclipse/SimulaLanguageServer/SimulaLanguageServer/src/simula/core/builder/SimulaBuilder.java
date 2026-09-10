@@ -5,15 +5,15 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.lsp4j.Diagnostic;
+
 import simula.Comn;
 import simula.Option;
 import simula.core.DocumentManager;
 import simula.core.builder.export.LexToken;
-import simula.core.builder.export.SimulaDiagnostic;
 import simula.core.builder.export.TokenListVerifyer;
 import simula.core.builder.export.TokenManager;
 import simula.core.builder.util.SimpleString;
-import simula.core.DocumentManager;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.syntaxClass.declaration.MaybeBlockDeclaration;
 import simula.core.syntaxClass.declaration.StandardClass;
@@ -49,7 +49,7 @@ public class SimulaBuilder {
 	// Builder generated data structure:
 	public ProgramModule syntaxTree; // Root of Syntax Tree
 	public int nErrors;
-	public List<SimulaDiagnostic> diagnostics;
+	public List<Diagnostic> diagnostics;
 	public List<LexToken> lexTokenList;
 	public List<Integer> semTokenList;
 	
@@ -210,12 +210,12 @@ public class SimulaBuilder {
 	}
 
 
-	public void addError(SimulaDiagnostic diagnostic) {
+	public void addError(Diagnostic diagnostic) {
 		diagnostics.add(diagnostic);
 		nErrors++;
 	}
 
-	public void addDiagnostic(SimulaDiagnostic diagnostic) {
+	public void addDiagnostic(Diagnostic diagnostic) {
 		diagnostics.add(diagnostic);
 	}
 	
@@ -364,7 +364,7 @@ public class SimulaBuilder {
 
 	public void printDiagnostics(String title) {
 		LOG.info("++++++++++++++++ BEGIN DIAGNOSTICS: " + title + " ++++++++++++++++++");
-		for(SimulaDiagnostic diagnostic:diagnostics) LOG.info(diagnostic.toString());			
+		for(Diagnostic diagnostic:diagnostics) LOG.info(diagnostic.toString());			
 		LOG.info("++++++++++++++++ ENDOF DIAGNOSTICS: " + title + " ++++++++++++++++++");
 	}
 	

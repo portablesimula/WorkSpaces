@@ -8,13 +8,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.undo.UndoManager;
 
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.SemanticTokens;
 import org.eclipse.lsp4j.SemanticTokensParams;
 import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.eclipse.lsp4j.TextDocumentItem;
 import simula.core.CoreGlobal;
-import simula.core.builder.export.SimulaDiagnostic;
 import simula.Comn;
 import simula.editor.SimulaEditor.Language;
 import simula.editor.text.TabTextPanel;
@@ -43,7 +43,7 @@ public class SourceModule {
 	
 	public DiagnosticHandler diagnosticHandler;
 //	List<SimulaDiagnostic> diagnostics;
-	public static void publishDiagnostics(String uri, List<SimulaDiagnostic> diagnostics) {
+	public static void publishDiagnostics(String uri, List<Diagnostic> diagnostics) {
 		IO.println("SourceModule.publishDiagnostics: " + uri + " " + diagnostics);
 		SourceModule sourceModule = SourceModule.getSourceModule(uri);
     	IO.println("SourceModule.publishDiagnostics: openModules: " + openModules);

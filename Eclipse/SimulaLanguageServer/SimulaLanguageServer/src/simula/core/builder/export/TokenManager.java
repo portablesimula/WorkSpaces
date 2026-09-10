@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.lsp4j.Diagnostic;
+
 import simula.Comn;
 import simula.Option;
 import simula.core.DocumentManager;
@@ -123,7 +125,7 @@ public class TokenManager {
 		return documentManager.getTokenList();
 	}
 
-	public static List<SimulaDiagnostic> getDiagnostics(String documentUri) {
+	public static List<Diagnostic> getDiagnostics(String documentUri) {
     	DocumentManager documentManager = DocumentManager.getDocumentManager(documentUri);
 		return documentManager.getDiagnostics();
 	}
