@@ -156,9 +156,9 @@ public class PaletteChooser extends JDialog {
     	demoModule.doCloseSimulaModule();
     	
 //    	SimulaExecutor.didClose(documentUri);
-		SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
-    	DidCloseTextDocumentParams params = new DidCloseTextDocumentParams(new TextDocumentIdentifier(documentUri));
-    	simulaTextDocumentService.didClose(params);
+//		SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
+//    	DidCloseTextDocumentParams params = new DidCloseTextDocumentParams(new TextDocumentIdentifier(documentUri));
+//    	simulaTextDocumentService.didClose(params);
     	
     	
 //    	Util.IERR("STOP HER INTILL VIDERE");

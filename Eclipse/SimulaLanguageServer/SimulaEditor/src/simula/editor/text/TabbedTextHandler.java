@@ -31,19 +31,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.eclipse.lsp4j.DidCloseTextDocumentParams;
-import org.eclipse.lsp4j.TextDocumentIdentifier;
-
 import simula.Comn;
-import simula.core.CoreGlobal;
 import simula.editor.ClosableTabPanel;
 import simula.editor.SimulaEditor;
 import simula.editor.SourceModule;
 import simula.editor.utilities.ConsolePanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Util;
-import simula.lsp.server.SimulaExecutor;
-import simula.lsp.server.SimulaTextDocumentService;
 
 /// @author Google AI
 /// @author Øystein Myhre Andersen
@@ -438,11 +432,12 @@ public class TabbedTextHandler {
 		IO.println("TabbedTextHandler.doCloseCurrentFileAction: currentModule: " + Global.currentModule);
 		maybeSaveCurrentFile();
 		SourceModule current = Global.currentModule;
-		String documentUri = current.getUri();
-		SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
-    	DidCloseTextDocumentParams params = new DidCloseTextDocumentParams(new TextDocumentIdentifier(documentUri));
-    	simulaTextDocumentService.didClose(params);
+//		String documentUri = current.getUri();
+//		SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
+//    	DidCloseTextDocumentParams params = new DidCloseTextDocumentParams(new TextDocumentIdentifier(documentUri));
+//    	simulaTextDocumentService.didClose(params);
     	
+		current.doCloseSimulaModule();
 //		Util.STOP();
 		removeSelectedTab();
 	}

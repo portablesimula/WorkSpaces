@@ -2,7 +2,6 @@ package client;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.LogTraceParams;
 import org.eclipse.lsp4j.MessageActionItem;
@@ -10,6 +9,7 @@ import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.services.LanguageClient;
+
 
 public class TestBatchClient implements LanguageClient {
 
@@ -23,8 +23,7 @@ public class TestBatchClient implements LanguageClient {
 	/// the client to log a telemetry event.
 	@Override
 	public void telemetryEvent(Object object) {
-		// TODO Auto-generated method stub
-		
+		throw new UnsupportedOperationException();
 	}
 
 	/// Diagnostics notifications are sent from the server to the client to
@@ -45,15 +44,6 @@ public class TestBatchClient implements LanguageClient {
 		IO.println("TestBatchClient.showMessage: " + params.getType() + "  " + params.getMessage());
 	}
 
-	/// The show message request is sent from a server to a client to ask the
-	/// client to display a particular message in the user interface. In addition
-	/// to the show message notification the request allows to pass actions and
-	/// to wait for an answer from the client.
-	@Override
-	public CompletableFuture<MessageActionItem> showMessageRequest(ShowMessageRequestParams requestParams) {
-		return null;
-	}
-
 	/// The log message notification is sent from the server to the client to ask
 	/// the client to log a particular message.
 	@Override
@@ -70,7 +60,16 @@ public class TestBatchClient implements LanguageClient {
 	/// the server should send window/logMessage notifications.
 	@Override
 	public void logTrace(LogTraceParams params) {
-//		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException();
+	}
+
+	/// The show message request is sent from a server to a client to ask the
+	/// client to display a particular message in the user interface. In addition
+	/// to the show message notification the request allows to pass actions and
+	/// to wait for an answer from the client.
+	@Override
+	public CompletableFuture<MessageActionItem> showMessageRequest(ShowMessageRequestParams requestParams) {
+		throw new UnsupportedOperationException();
 	}
 
 }

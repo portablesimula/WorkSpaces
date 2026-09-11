@@ -10,11 +10,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayDeque;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Properties;
-import java.util.Stack;
 import java.util.Vector;
 import java.util.jar.JarFile;
 

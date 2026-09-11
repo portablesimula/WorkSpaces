@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.undo.UndoManager;
 
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.SemanticTokens;
 import org.eclipse.lsp4j.SemanticTokensParams;
@@ -43,7 +44,7 @@ public class SourceModule {
 	
 	public DiagnosticHandler diagnosticHandler;
 //	List<SimulaDiagnostic> diagnostics;
-	public static void publishDiagnostics(String uri, List<Diagnostic> diagnostics) {
+	public static void unpackDiagnostics(String uri, List<Diagnostic> diagnostics) {
 		IO.println("SourceModule.publishDiagnostics: " + uri + " " + diagnostics);
 		SourceModule sourceModule = SourceModule.getSourceModule(uri);
     	IO.println("SourceModule.publishDiagnostics: openModules: " + openModules);
@@ -168,6 +169,9 @@ public class SourceModule {
         openModules.remove(documentUri);
 		IO.println("SourceModule.doCloseSimulaModule: " + openModules);
 //		Util.STOP();
+		SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
+    	DidCloseTextDocumentParams params = new DidCloseTextDocumentParams(new TextDocumentIdentifier(documentUri));
+    	simulaTextDocumentService.didClose(params);
 	}
 
 		

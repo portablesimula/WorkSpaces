@@ -57,13 +57,13 @@ public class ClosableTabPanel extends JPanel {
 
         // Close action
         button.addActionListener(e -> {
-        	IO.println("ClosableTabPanel'CloseAction: pasne: " + pane.getClass());
+        	IO.println("ClosableTabPanel'CloseAction: pane: " + pane.getClass());
         	IO.println("ClosableTabPanel'CloseAction: content: " + content.getClass());
         	IO.println("ClosableTabPanel'CloseAction: " + content);
         	if(content instanceof SimulaTextPanel simText) {
         		SourceModule sourceModule = simText.sourceModule;
             	IO.println("ClosableTabPanel'CloseAction: sourceModule: " + sourceModule);
-// ???         	sourceModule.doCloseSimulaModule();
+            	sourceModule.doCloseSimulaModule();
             }
         	
             int index = pane.indexOfComponent(content);

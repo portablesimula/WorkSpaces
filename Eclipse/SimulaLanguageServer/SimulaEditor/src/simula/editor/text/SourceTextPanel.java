@@ -6,22 +6,18 @@
 package simula.editor.text;
 
 import javax.swing.JPopupMenu;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import simula.editor.SourceModule;
-import simula.editor.utilities.Global;
 import simula.editor.utilities.StyleCode;
 import simula.editor.utilities.Util;
 
 import java.awt.Color;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.StringTokenizer;
 
 /// The Source text Panel.
 /// 
@@ -32,7 +28,7 @@ import java.util.StringTokenizer;
 @SuppressWarnings("serial")
 public class SourceTextPanel extends TabTextPanel {
 	/// DEBUG on/off
-	private static final boolean DEBUG=false;//true;
+//	private static final boolean DEBUG=false;//true;
 	
 //	public SourceModule currentModule;
 //
@@ -42,11 +38,11 @@ public class SourceTextPanel extends TabTextPanel {
 //	/// The ScrollPane
 //	private JScrollPane styleScrollPane;
  	
-	/** Style */ private Style styleRegular;
-	/** Style */ private Style styleKeyword;
-	/** Style */ private Style styleComment;
-	/** Style */ private Style styleConstant;
-	/** Style */ private Style styleLineNumber;
+//	/** Style */ private Style styleRegular;
+//	/** Style */ private Style styleKeyword;
+//	/** Style */ private Style styleComment;
+//	/** Style */ private Style styleConstant;
+//	/** Style */ private Style styleLineNumber;
 	
 //	/// The popup Menu.
 //	private JPopupMenu popupMenu;
@@ -147,7 +143,7 @@ public class SourceTextPanel extends TabTextPanel {
 	/// @param popupMenu the popupMenu
 //    SourceTextPanel(SimulaEditor.Language lang, JPopupMenu popupMenu) {
     SourceTextPanel(final SourceModule sourceModule, final JPopupMenu popupMenu) {
-    	super(sourceModule, popupMenu);
+    	super(sourceModule, null, popupMenu);
 //    	this.currentModule = currentModule;
 //    	this.sourceFile=sourceFile;
 //    	this.lang=lang;
@@ -266,13 +262,13 @@ public class SourceTextPanel extends TabTextPanel {
 	/// 
 	/// @param n the length of line number field
 	/// @return the resulting line number string
-    private String edLineNumber(int n) {
-	    String fill="";
-	    if(n<10) fill="   ";
-	    else if(n<100) fill="  ";
-	    else if(n<1000) fill=" ";
-    	return(fill+n+": \n");
-    }
+//    private String edLineNumber(int n) {
+//	    String fill="";
+//	    if(n<10) fill="   ";
+//	    else if(n<100) fill="  ";
+//	    else if(n<1000) fill=" ";
+//    	return(fill+n+": \n");
+//    }
 	
     /// Utility: Count extra control characters in the given string
     /// @param s the given string
@@ -289,17 +285,17 @@ public class SourceTextPanel extends TabTextPanel {
 	/// Utility: Get Style
 	/// @param code style code
 	/// @return the resuting Style
-    private Style getStyle(final StyleCode code) {
-    	switch(code) {
-    		case regular: return(styleRegular);
-    		case keyword: return(styleKeyword);
-    		case comment: return(styleComment);
-    		case constant: return(styleConstant);
-//    		case XlineNumber: return(styleLineNumber);
-    	}
-    	Util.IERR("");
-    	return(null);
-    }
+//    private Style getStyle(final StyleCode code) {
+//    	switch(code) {
+//    		case regular: return(styleRegular);
+//    		case keyword: return(styleKeyword);
+//    		case comment: return(styleComment);
+//    		case constant: return(styleConstant);
+////    		case XlineNumber: return(styleLineNumber);
+//    	}
+//    	Util.IERR("");
+//    	return(null);
+//    }
     
     /// Add Styles to the document.
     /// @param doc the document
@@ -328,11 +324,11 @@ public class SourceTextPanel extends TabTextPanel {
         StyleConstants.setBold(s, true);
         StyleConstants.setForeground(s,new Color(204,204,255));
         
-        styleRegular=doc.getStyle("regular");
-        styleKeyword=doc.getStyle("keyword");
-        styleComment=doc.getStyle("comment");
-        styleConstant=doc.getStyle("constant");
-        styleLineNumber=doc.getStyle("lineNumber");
+//        styleRegular=doc.getStyle("regular");
+//        styleKeyword=doc.getStyle("keyword");
+//        styleComment=doc.getStyle("comment");
+//        styleConstant=doc.getStyle("constant");
+//        styleLineNumber=doc.getStyle("lineNumber");
     }
     
     @Override

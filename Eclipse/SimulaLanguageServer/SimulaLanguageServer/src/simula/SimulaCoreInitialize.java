@@ -65,8 +65,9 @@ public class SimulaCoreInitialize {
 	
 	/// Debug Utility
 	/// Called from:
-	///   - SimulaEditor:  Simula.main
-	///   - LangugeServer: SimulaLanguageServer.initialize
+	///   - SimulaEditor:    Simula.main
+	///   - SimulaTestBatch: TestBatchLauncher
+	///   - LangugeServer:   SimulaLanguageServer.initialize
 	public static void connect(LanguageClient client) {
 		CoreGlobal.initiate();
 		DocumentManager.simulaLanguageClient = client;		
@@ -74,12 +75,11 @@ public class SimulaCoreInitialize {
 		
 	/// Debug Utility
 	/// Called from:
-	///   - SimulaEditor:  Simula.main
-	///   - LangugeServer: SimulaLanguageServer.initialize
+	///   - SimulaEditor:    Simula.main
+	///   - SimulaTestBatch: TestBatchLauncher
+	///   - LangugeServer:   SimulaLanguageServer.initialize
 	public static void initiate(Vector<String> argv) {
 		LOG.info("SimulaCoreInitialize.initiate: ");
-		
-//		Util.STOP();
 		String[] args = argv.toArray(new String[0]);
 		Option.decodeArguments(args);
 	}

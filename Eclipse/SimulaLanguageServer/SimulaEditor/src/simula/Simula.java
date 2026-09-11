@@ -4,14 +4,13 @@
 /// You find a copy of the License on the following
 /// page: https://creativecommons.org/licenses/by/4.0/
 
-package simula.editor.main;
+package simula;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Vector;
 
 import client.SimulaEditorClient;
-import simula.SimulaCoreInitialize;
 import simula.editor.RTOption;
 import simula.editor.SimulaEditor;
 import simula.editor.utilities.Global;

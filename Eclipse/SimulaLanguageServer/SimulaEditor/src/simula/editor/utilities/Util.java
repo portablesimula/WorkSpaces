@@ -15,6 +15,8 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import simula.Comn;
+
 /// A set of all static Utility Methods
 /// 
 /// Link to GitHub: <a href="https://github.com/portablesimula/WorkSpaces/blob/main/Eclipse/SimulaProjects/Simula/src/simula/compiler/utilities/Util.java"><b>Source File</b></a>.
@@ -89,67 +91,6 @@ public final class Util {
 	/// Number of error messages.
 	public static int nError;
 
-//	/// Print a error message.
-//	/// @param msg the message
-//	public static void error(final String msg) {
-//		String err = edLINE(": OLD_Error: " + msg);
-//		nError++;
-//		printError(err);
-//	}
-
-	/// Print a error message.
-	/// @param msg the message
-	public static void generalError(final String msg) {
-		String err = edLINE(": Error: " + msg);
-		nError++;
-		printError(err);
-	}
-
-//	/// Print a error message.
-//	/// @param msg the message
-//	public static void syntaxError(final PsiBuilder psiBuilder, final String msg) {
-//		syntaxError(psiBuilder.prevParserToken(), msg);
-//	}
-//	
-//	public static void syntaxError(final LexToken token, final String msg) {
-//		int lno = Global.sourceLineNumber;
-//		Global.sourceLineNumber = (token == null)? -99 : token.lineNumber;
-//		String mss = "Syntax Error: " + msg;
-//		String err = edLINE(": " + mss);
-//		nError++;
-//		printError(err);
-//		token.addError(mss);
-////		IO.println("Util.: ADD ERROR TEXT: " + token + " " + msg);
-//		Global.sourceLineNumber = lno;
-//	}
-//	
-//	public static void semanticError(final SyntaxElement elt, final String msg) {
-//		int lno = Global.sourceLineNumber;
-//		Global.sourceLineNumber = elt.firstLineNumber();
-//		String mss = "Semantic Error: " + msg;
-//		String err = edLINE(": " + mss);
-//		nError++;
-//		
-////		IO.println("\n\nUtil.semanticError: ADD ERROR TEXT: " + elt + " " + msg);
-//		printError(err);
-//		elt.addError(mss);
-//		Global.sourceLineNumber = lno;
-////		Thread.dumpStack();
-//	}
-	
-	/// Error during Code generation: SHOULD NOT OCCURE !
-	public static void codingError(final String msg) {
-//		int lno = Global.sourceLineNumber;
-//		Global.sourceLineNumber = elt.firstLineNumber();
-		String err = edLINE(": Coding Error: " + msg);
-		nError++;
-		
-		printError(err);
-//		elt.addError(err);
-//		IO.println("Util.error: ADD ERROR TEXT: " + elt + " " + msg);
-//		Global.sourceLineNumber = lno;
-		Util.IERR("Util.codingError: SHOULD NOT OCCURE !");
-	}
 
 	/// Exit with Thread.dumpStack
 	public static void STOP() {
@@ -165,7 +106,7 @@ public final class Util {
 	/// Print a internal error message.
 	/// @param msg the message
 	public static void IERR(final String msg) {
-		String err = edLINE(": Internal error - " + msg);
+		String err = ": Internal error - " + msg;
 		nError++;
 		printError(err);
 		Thread.dumpStack();
@@ -182,35 +123,11 @@ public final class Util {
 	/// @param msg the message
 	/// @param e any Throwable
 	public static void IERR(final String msg,final Throwable e) {
-		String err = edLINE(": Internal error - " + msg +"\nCaused by:");
+		String err = ": Internal error - " + msg +"\nCaused by:";
 		nError++;
 		printError(err);
 		e.printStackTrace();
 		FORCED_EXIT();
-	}
-
-	/// Print a warning message.
-	/// @param msg the message
-	public static void warning(final String msg) {
-		String line = edLINE(": WARNING: " + msg);
-		if (Option.WARNINGS) {
-			printWarning(line);
-		}
-	}
-	
-	/// Edit a line with source line number etc.
-	/// @param s the line string
-	/// @return the resulting string
-	private static String edLINE(String s) {		
-		String line = "LINE " + Global.sourceLineNumber + s;
-//		if(Global.insertName!=null) line = Global.insertName + ':' + line;
-//		if(Global.getCurrentScope() != null) {
-//			if(Global.getCurrentScope().sourceFileName!=null) {
-//				String sourceName = getBaseName(Global.getCurrentScope().sourceFileName);
-//				line = sourceName + ':' + line;
-//			}
-//		}
-		return(line);
 	}
 	
 	/// Return the base name part of a File Name
@@ -254,30 +171,27 @@ public final class Util {
 	/// Print a string.
 	/// @param s the string
 	public static void println(final String s) {
-		if (Global.console != null) {
-			String u = s.replace('\r', (char) 0);
-			u = u.replace('\n', (char) 0);
-			Global.console.write(u + '\n');
-		}
+		if (Global.console != null)
+			Global.console.write(Comn.printable(s) + '\n');
 		else IO.println(s);
-	}  
-
-	/// Print a error message.
-	/// @param s the message
-	public static void printError(final String s) {
-		String u = s.replace('\r', (char) 0);
-		if (Global.console != null)	Global.console.writeError(u + '\n');
-//		else
-			System.err.println(u);
 	}  
 
 	/// Print a warning message.
 	/// @param s the message
 	public static void printWarning(final String s) {
-		String u = s.replace('\r', (char) 0);
-		if (Global.console != null)	Global.console.writeWarning(u + '\n');
+		if (Global.console != null)
+			Global.console.writeError(Comn.printable(s) + '\n');
 //		else
-			System.err.println(u);
+			System.err.println(s);
+	}  
+
+	/// Print a error message.
+	/// @param s the message
+	public static void printError(final String s) {
+		if (Global.console != null)
+			Global.console.writeError(Comn.printable(s) + '\n');
+//		else
+			System.err.println(s);
 	}  
 
     //*******************************************************************************
@@ -383,22 +297,22 @@ public final class Util {
 //					+" which is outside integer value range["+Integer.MIN_VALUE+':'+Integer.MAX_VALUE+']');
 //		return((int)res);
 //	}
-  
-
-	// ***************************************************************
-	// *** LIST .class file
-	// ***************************************************************
-	/// Print a .class file listing.
-	/// @param classFileName the .class file name
-	public static void doListClassFile(final String classFileName) {
-		IO.println("\n\n******** BEGIN List ClassFile: "+classFileName + " *****************************************************");
-		try {
-			execute("javap", "-c", "-l", "-p", "-s", "-verbose", classFileName);
-		} catch (Exception e) {
-			Util.IERR("Impossible", e);
-		}
-		IO.println("******** ENDOF List ClassFile: "+classFileName + " *****************************************************\n\n");
-	}
+//  
+//
+//	// ***************************************************************
+//	// *** LIST .class file
+//	// ***************************************************************
+//	/// Print a .class file listing.
+//	/// @param classFileName the .class file name
+//	public static void doListClassFile(final String classFileName) {
+//		IO.println("\n\n******** BEGIN List ClassFile: "+classFileName + " *****************************************************");
+//		try {
+//			execute("javap", "-c", "-l", "-p", "-s", "-verbose", classFileName);
+//		} catch (Exception e) {
+//			Util.IERR("Impossible", e);
+//		}
+//		IO.println("******** ENDOF List ClassFile: "+classFileName + " *****************************************************\n\n");
+//	}
 
 	// ***************************************************************
 	// *** EXECUTE OS COMMAND
