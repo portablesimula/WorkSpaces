@@ -3,17 +3,19 @@ package simula.lsp.server;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.*;
 
+import simula.core.utilities.Util;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
-import simula.SimulaCoreInitialize;
+import java.util.concurrent.ExecutionException;
 
 public class SimulaLanguageServer implements LanguageServer, LanguageClientAware {
 
     private final TextDocumentService textDocumentService;
     private final WorkspaceService workspaceService;
-    private LanguageClient client; // The live hook to the IDE/Editor
+    public static LanguageClient languageClient; // The live hook to the IDE/Editor
     private ClientCapabilities clientCapabilities;
 
     public SimulaLanguageServer() {
@@ -21,13 +23,51 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         this.workspaceService = new SimulaWorkspaceService();
     }
 
-    // --- LanguageClientAware Implementation ---
+    /// --- LanguageClientAware Implementation ---
+    /// 
+    /// To obtain a reference to the client in your Eclipse language server
+    /// implementation using Eclipse LSP4J, you need to implement the
+    /// LanguageClientAware interface on your primary server class.
+    ///  [1] (https://medium.com/ballerina-techblog/practical-guide-for-the-language-server-protocol-3091a122b750),
+    ///  [2] (https://www.typefox.io/blog/eclipse-lsp4j-is-here/)
+    /// 
+    /// The framework will then pass the remote client proxy directly to your server during initialization.
+    ///  [1] (https://www.typefox.io/blog/eclipse-lsp4j-is-here/),
+    ///  [2] (https://medium.com/ballerina-techblog/practical-guide-for-the-language-server-protocol-3091a122b750)
+    /// This method is called automatically by LSPLauncher
     @Override
-    public void connect(LanguageClient client) {
+    public void connect(LanguageClient languageClient) {
         // LSP4J injects the client proxy right after the launcher starts
-        this.client = client;
+        SimulaLanguageServer.languageClient = languageClient;
 //        SimulaCoreClient simulaLanguageClient = new SimulaCoreClientProxy(client);
 //        SimulaCoreInitialize.connect(simulaLanguageClient);
+        String res = showMessageDialog("SimulaLanguageServer.connect: \nCONTINUE ?", "Ok", "Exit");
+        if(res.equals("Exit")) Util.STOP();
+    }
+
+	/// Debug utility: Blocking call on showMessageRequest.
+    public String showMessageDialog(String message, String... buttons) {
+    	List<MessageActionItem> actions = new ArrayList<>();
+    	for(String button:buttons) actions.add(new MessageActionItem(button));
+
+        // 2. Opprett parametere for dialogboksen
+        ShowMessageRequestParams params = new ShowMessageRequestParams();
+        params.setType(MessageType.Warning); // Kan være Error, Warning, Info, Log
+        params.setMessage(message);
+        params.setActions(actions);
+
+        try {
+            // 3. Send forespørselen, og bruk .get() for å blokkere synkront til brukeren svarer
+            MessageActionItem chosenAction = languageClient.showMessageRequest(params).get();
+            
+            // chosenAction vil være enten yesButton, noButton, eller null (hvis de lukket dialogen)
+            return chosenAction.getTitle();
+
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            // Håndter eventuelle feil i kommunikasjonen her
+            return null;
+        }
     }
 
     /// --- LanguageServer Implementation ---
@@ -70,6 +110,13 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
 	/// [4] (https://bugs.eclipse.org/bugs/show_bug.cgi?id=538245)
     @Override
     public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
+//        return CompletableFuture.supplyAsync(() -> {
+//        	return initialize_local(params);
+//        });
+        return CompletableFuture.completedFuture(initialize_local(params));
+    }
+    
+    public InitializeResult initialize_local(InitializeParams params) {
         // Retrieve the raw options object sent by the client
         Object options = params.getInitializationOptions(); 
         
@@ -115,7 +162,8 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
 
         // 4. Return the capabilities wrapped in an InitializeResult object
         InitializeResult result = new InitializeResult(serverCapabilities);
-        return CompletableFuture.completedFuture(result);
+//        return CompletableFuture.completedFuture(result);
+        return result;
     }
     
 
@@ -163,8 +211,8 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
     @Override
     public void initialized(InitializedParams params) {
         // Safely interact with the client now that the connection handshake is fully closed
-        if (client != null) {
-            client.logMessage(new MessageParams(MessageType.Info, "Language Server connected successfully!"));
+        if (languageClient != null) {
+        	languageClient.logMessage(new MessageParams(MessageType.Info, "Language Server connected successfully!"));
         }
     }
 
@@ -190,6 +238,6 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
 
     // Getter to allow sub-services to use the client connection
     public LanguageClient getClient() {
-        return this.client;
+        return this.languageClient;
     }
 }

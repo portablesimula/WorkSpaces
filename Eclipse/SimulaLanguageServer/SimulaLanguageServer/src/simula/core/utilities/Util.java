@@ -38,6 +38,7 @@ import org.eclipse.lsp4j.jsonrpc.validation.NonNull;
 import simula.core.builder.export.LexToken;
 import simula.core.builder.util.Identifier;
 import simula.core.syntaxClass.SyntaxElement;
+import simula.lsp.server.SimulaLanguageServer;
 
 /// A set of all static Utility Methods
 /// 
@@ -141,7 +142,7 @@ public final class Util {
 	/// Report an error message to the SimulaCoreClient.
 	/// @param msg the message
 	public static void generalError(final String msg) {
-//		DocumentManager.simulaLanguageClient.error("General Error: " + msg);
+//		SimulaLanguageServer.languageClient.error("General Error: " + msg);
 		
 		// Constructing the dialog options
 		ShowMessageRequestParams params = new ShowMessageRequestParams();
@@ -155,7 +156,7 @@ public final class Util {
 		params.setActions(Arrays.asList(ok, cancel, exit));
 
 		// Sent to the VS Code client over JSON-RPC, awaiting the user's choice
-		DocumentManager.simulaLanguageClient.showMessageRequest(params).thenAccept(selectedAction -> {
+		SimulaLanguageServer.languageClient.showMessageRequest(params).thenAccept(selectedAction -> {
 		    if (selectedAction != null && "Ok".equals(selectedAction.getTitle())) {
 		        // Trigger project compilation/sync logic...
 		    }

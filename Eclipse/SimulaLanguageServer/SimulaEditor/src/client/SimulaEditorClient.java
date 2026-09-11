@@ -135,29 +135,4 @@ public class SimulaEditorClient implements LanguageClient {
         }
     }
 
-	/// Debug utility: Blocking call on showMessageRequest.
-    public String showMessageDialog(String message, String... buttons) {
-    	List<MessageActionItem> actions = new ArrayList<>();
-    	for(String button:buttons) actions.add(new MessageActionItem(button));
-
-        // 2. Opprett parametere for dialogboksen
-        ShowMessageRequestParams params = new ShowMessageRequestParams();
-        params.setType(MessageType.Warning); // Kan være Error, Warning, Info, Log
-        params.setMessage(message);
-        params.setActions(actions);
-
-        try {
-            // 3. Send forespørselen, og bruk .get() for å blokkere synkront til brukeren svarer
-            MessageActionItem chosenAction = this.showMessageRequest(params).get();
-            
-            // chosenAction vil være enten yesButton, noButton, eller null (hvis de lukket dialogen)
-            return chosenAction.getTitle();
-
-        } catch (ExecutionException | InterruptedException e) {
-            Thread.currentThread().interrupt();
-            // Håndter eventuelle feil i kommunikasjonen her
-            return null;
-        }
-    }
-
 }

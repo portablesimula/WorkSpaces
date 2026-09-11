@@ -2,7 +2,11 @@ package simula;
 
 import java.util.Vector;
 
+import org.eclipse.lsp4j.ClientCapabilities;
+import org.eclipse.lsp4j.ClientInfo;
 import org.eclipse.lsp4j.InitializeParams;
+import org.eclipse.lsp4j.InitializeResult;
+import org.eclipse.lsp4j.TraceValue;
 import org.eclipse.lsp4j.services.LanguageClient;
 
 import simula.core.CoreGlobal;
@@ -70,7 +74,20 @@ public class SimulaCoreInitialize {
 	///   - LangugeServer:   SimulaLanguageServer.initialize
 	public static void connect(LanguageClient client) {
 		CoreGlobal.initiate();
-		DocumentManager.simulaLanguageClient = client;		
+//		SimulaLanguageServer.languageClient = client;	
+		CoreGlobal.simulaLanguageServer.connect(client);
+		
+		ClientCapabilities capabilities = null;
+		ClientInfo clientInfo = new ClientInfo("SimulaEditor");
+//		String trace = TraceValue.Off;      // No Tracing
+//		String trace = TraceValue.Messages; // Single message trace
+		String trace = TraceValue.Verbose;  // Full systematic trace
+
+		InitializeParams params = new InitializeParams();
+//		params.setCapabilities(capabilities);
+		params.setClientInfo(clientInfo);
+		params.setTrace(trace);
+	    InitializeResult result = CoreGlobal.simulaLanguageServer.initialize_local(params);
 	}
 		
 	/// Debug Utility

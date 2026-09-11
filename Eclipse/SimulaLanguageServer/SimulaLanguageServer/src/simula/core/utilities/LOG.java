@@ -6,6 +6,7 @@ import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
 
 import simula.core.DocumentManager;
+import simula.lsp.server.SimulaLanguageServer;
 
 public class LOG {
 //	private static final Logger logger = Logger.getLogger(SimulaServer.class.getName());
@@ -14,38 +15,38 @@ public class LOG {
 	public static void error(String message) {
 		logger.severe(message);
 		MessageParams params = new MessageParams(MessageType.Error, message);
-		DocumentManager.simulaLanguageClient.logMessage(params);
+		SimulaLanguageServer.languageClient.logMessage(params);
 	}
 
 	public static void severe(String message) {
 		logger.severe(message);
-//		DocumentManager.simulaLanguageClient.logError(message);
+//		SimulaLanguageServer.languageClient.logError(message);
 		MessageParams params = new MessageParams(MessageType.Error, message);
-		DocumentManager.simulaLanguageClient.logMessage(params);
+		SimulaLanguageServer.languageClient.logMessage(params);
 	}
 
 	public static void warning(String message) {
 		logger.warning(message);
-//		DocumentManager.simulaLanguageClient.logWarning(message);
+//		SimulaLanguageServer.languageClient.logWarning(message);
 		MessageParams params = new MessageParams(MessageType.Warning, message);
-		DocumentManager.simulaLanguageClient.logMessage(params);
+		SimulaLanguageServer.languageClient.logMessage(params);
 	}
 
 	public static void trace(String message) {
 		if(DocumentManager.verbose) {
 			logger.info(message);
-//			DocumentManager.simulaLanguageClient.logInfo(message);
+//			SimulaLanguageServer.languageClient.logInfo(message);
 			MessageParams params = new MessageParams(MessageType.Info, message);
-			DocumentManager.simulaLanguageClient.logMessage(params);
+			SimulaLanguageServer.languageClient.logMessage(params);
 		}
 	}
 
 	public static void info(String message) {
 //		if(DocumentManager.verbose) {
 //			logger.info(message);
-//			DocumentManager.simulaLanguageClient.logInfo(message);
+//			SimulaLanguageServer.languageClient.logInfo(message);
 		MessageParams params = new MessageParams(MessageType.Info, message);
-		DocumentManager.simulaLanguageClient.logMessage(params);
+		SimulaLanguageServer.languageClient.logMessage(params);
 //		}
 	}
 }

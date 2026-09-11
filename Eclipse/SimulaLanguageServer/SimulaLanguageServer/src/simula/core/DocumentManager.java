@@ -24,6 +24,7 @@ import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.statement.ProgramModule;
 import simula.core.utilities.LOG;
 import simula.core.utilities.Util;
+import simula.lsp.server.SimulaLanguageServer;
 
 /// Vi må lagre innholdet til dokumentene som er åpne i editoren.
 /// Siden editoren kan ha endringer som ikke er lagret til disken ennå,
@@ -35,8 +36,6 @@ public class DocumentManager {
 	
     // Nøkkelen er filens URI (f.eks. file:///path/to/file.txt)
     private static final ConcurrentHashMap<String, DocumentManager> openDocuments = new ConcurrentHashMap<>();
-	
-	public static LanguageClient simulaLanguageClient;
 
 	final public String documentUri;
 	final public File sourceFileDir;
@@ -328,7 +327,7 @@ public class DocumentManager {
 
 	public void publishDiagnostics(List<Diagnostic> diagnostics) {
 		PublishDiagnosticsParams params = new PublishDiagnosticsParams(documentUri, diagnostics);
-		DocumentManager.simulaLanguageClient.publishDiagnostics(params);
+		SimulaLanguageServer.languageClient.publishDiagnostics(params);
 	}
 
 	
