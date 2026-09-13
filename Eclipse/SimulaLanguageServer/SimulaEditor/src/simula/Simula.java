@@ -7,10 +7,12 @@
 package simula;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Vector;
-
+import org.eclipse.lsp4j.ClientInfo;
+import org.eclipse.lsp4j.InitializeParams;
+import org.eclipse.lsp4j.InitializeResult;
+import org.eclipse.lsp4j.TraceValue;
 import client.SimulaEditorClient;
+import simula.core.CoreGlobal;
 import simula.editor.RTOption;
 import simula.editor.SimulaEditor;
 import simula.editor.utilities.Global;
@@ -201,11 +203,31 @@ public final class Simula {
 	    
 //		Global.console = new ConsolePanel();
 		Global.initiate();
+		
+//		CoreGlobal.INLINE_CONNECTED = true;
 
-	    SimulaCoreInitialize.connect(new SimulaEditorClient());
+		// Start SimulaLanguageServer and Connect
+		CoreGlobal.initiate();
+		CoreGlobal.INLINE_CONNECTED = true;
+		CoreGlobal.simulaLanguageServer.connect(new SimulaEditorClient());
+			
+		// Initialize SimulaLanguageServer
+//		ClientCapabilities capabilities = null;
+		ClientInfo clientInfo = new ClientInfo("SimulaEditor");
+//		String trace = TraceValue.Off;      // No Tracing
+//		String trace = TraceValue.Messages; // Single message trace
+		String trace = TraceValue.Verbose;  // Full systematic trace
 
-	    Vector<String> args = new Vector<>(Arrays.asList(argv));
-	    SimulaCoreInitialize.initiate(args);
+		InitializeParams params = new InitializeParams();
+//		ClientCapabilities capabilities = new ClientCapabilities();
+//		params.setCapabilities(capabilities);
+		params.setClientInfo(clientInfo);
+		params.setTrace(trace);
+		InitializeResult result = CoreGlobal.simulaLanguageServer.initialize_local(params);
+		IO.println("Simula.main: Server reply: " + result.getServerInfo());
+
+//	    Vector<String> args = new Vector<>(Arrays.asList(argv));
+//	    SimulaCoreInitialize.initiate(args);
 		
 		
 //		if (fileNames.isEmpty()) {

@@ -1,4 +1,4 @@
-package simula.lsp.server;
+package simula.server;
 
 import java.io.IOException;
 import java.util.Vector;

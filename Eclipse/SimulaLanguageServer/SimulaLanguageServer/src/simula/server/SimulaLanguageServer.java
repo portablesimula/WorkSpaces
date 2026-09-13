@@ -1,8 +1,9 @@
-package simula.lsp.server;
+package simula.server;
 
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.*;
 
+import simula.core.CoreGlobal;
 import simula.core.utilities.Util;
 
 import java.util.ArrayList;
@@ -13,10 +14,12 @@ import java.util.concurrent.ExecutionException;
 
 public class SimulaLanguageServer implements LanguageServer, LanguageClientAware {
 
+    public static LanguageClient languageClient; // The live hook to the IDE/Editor
+    public static ClientInfo clientInfo;
+
     private final TextDocumentService textDocumentService;
     private final WorkspaceService workspaceService;
-    public static LanguageClient languageClient; // The live hook to the IDE/Editor
-    private ClientCapabilities clientCapabilities;
+    public ClientCapabilities clientCapabilities;
 
     public SimulaLanguageServer() {
         this.textDocumentService = new SimulaTextDocumentService(this);
@@ -39,35 +42,9 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
     public void connect(LanguageClient languageClient) {
         // LSP4J injects the client proxy right after the launcher starts
         SimulaLanguageServer.languageClient = languageClient;
-//        SimulaCoreClient simulaLanguageClient = new SimulaCoreClientProxy(client);
-//        SimulaCoreInitialize.connect(simulaLanguageClient);
-        String res = showMessageDialog("SimulaLanguageServer.connect: \nCONTINUE ?", "Ok", "Exit");
-        if(res.equals("Exit")) Util.STOP();
-    }
-
-	/// Debug utility: Blocking call on showMessageRequest.
-    public String showMessageDialog(String message, String... buttons) {
-    	List<MessageActionItem> actions = new ArrayList<>();
-    	for(String button:buttons) actions.add(new MessageActionItem(button));
-
-        // 2. Opprett parametere for dialogboksen
-        ShowMessageRequestParams params = new ShowMessageRequestParams();
-        params.setType(MessageType.Warning); // Kan være Error, Warning, Info, Log
-        params.setMessage(message);
-        params.setActions(actions);
-
-        try {
-            // 3. Send forespørselen, og bruk .get() for å blokkere synkront til brukeren svarer
-            MessageActionItem chosenAction = languageClient.showMessageRequest(params).get();
-            
-            // chosenAction vil være enten yesButton, noButton, eller null (hvis de lukket dialogen)
-            return chosenAction.getTitle();
-
-        } catch (ExecutionException | InterruptedException e) {
-            Thread.currentThread().interrupt();
-            // Håndter eventuelle feil i kommunikasjonen her
-            return null;
-        }
+        String res = Util.showMessageDialog("SimulaLanguageServer.connect: " + languageClient.getClass()
+        		+ " \n\nDo you want to CONTINUE ?", "Ok", "Exit");
+        if(res != null && res.equals("Exit")) Util.STOP();
     }
 
     /// --- LanguageServer Implementation ---
@@ -130,7 +107,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         this.clientCapabilities = params.getCapabilities();
         
         // Pick up: 
-        ClientInfo clientInfo = params.getClientInfo();
+        clientInfo = params.getClientInfo();
         
         
         /// The trace parameter accepts one of three specific string values:
@@ -141,7 +118,8 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         ///  'messages': The server logs basic communication events, such as when requests are received and
         ///              when responses are sent, without dumping full payloads.
         /// 
-        ///  'verbose':  The server logs granular execution details, full JSON-RPC payload messages, performance metrics, and deep debugging information.
+        ///  'verbose':  The server logs granular execution details,
+        ///              full JSON-RPC payload messages, performance metrics, and deep debugging information.
         /// 
         String trace = params.getTrace();
         
@@ -161,9 +139,8 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         serverCapabilities.setSemanticTokensProvider(getSemanticOptions());
 
         // 4. Return the capabilities wrapped in an InitializeResult object
-        InitializeResult result = new InitializeResult(serverCapabilities);
-//        return CompletableFuture.completedFuture(result);
-        return result;
+        InitializeResult reply = new InitializeResult(serverCapabilities, new ServerInfo(CoreGlobal.serverName, CoreGlobal.serverVersion));
+        return reply;
     }
     
 

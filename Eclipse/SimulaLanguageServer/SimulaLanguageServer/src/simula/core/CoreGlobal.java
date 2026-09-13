@@ -8,13 +8,11 @@ package simula.core;
 import java.io.File;
 import java.util.Stack;
 
-import org.eclipse.lsp4j.services.TextDocumentService;
-
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.utilities.ClassHierarchy;
-import simula.lsp.server.SimulaLanguageServer;
-import simula.lsp.server.SimulaTextDocumentService;
+import simula.server.SimulaLanguageServer;
+import simula.server.SimulaTextDocumentService;
 
 /// Global Variables.
 /// 
@@ -26,9 +24,12 @@ public final class CoreGlobal {
     
 //	public static boolean TRACE_LEXER = false;
 //	public static boolean TRACE_COMMENTS = false;
+	public static boolean INLINE_CONNECTED = false; // Set by: Simula main before Connect(client) is called
 
 	// ===============================================================================================
-	
+    public static String serverName = "SimulaLanguageServer";
+    public static String serverVersion = "1.0";
+
 	public static SimulaLanguageServer simulaLanguageServer;
 	public static SimulaTextDocumentService getSimulaTextDocumentService() {
 		return (SimulaTextDocumentService) simulaLanguageServer.getTextDocumentService();

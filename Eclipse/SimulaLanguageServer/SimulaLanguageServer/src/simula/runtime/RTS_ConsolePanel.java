@@ -186,10 +186,12 @@ public final class RTS_ConsolePanel extends JPanel {
 	/// Get a writer suitable for writing on this panel
 	/// @return a writer
 	public Writer getWriter() {
+		Thread.dumpStack();
 		return (new Writer() {
 			@Override
 			public void write(String s) {
 				RTS_ConsolePanel.this.write(s);
+				Thread.dumpStack();
 			}
 
 			public void write(char[] cbuf, int off, int len) throws IOException {

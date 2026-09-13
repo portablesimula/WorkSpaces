@@ -24,7 +24,7 @@ import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.statement.ProgramModule;
 import simula.core.utilities.LOG;
 import simula.core.utilities.Util;
-import simula.lsp.server.SimulaLanguageServer;
+import simula.server.SimulaLanguageServer;
 
 /// Vi må lagre innholdet til dokumentene som er åpne i editoren.
 /// Siden editoren kan ha endringer som ikke er lagret til disken ennå,

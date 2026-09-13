@@ -2,6 +2,9 @@ package client;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import javax.swing.JOptionPane;
+
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.LogTraceParams;
 import org.eclipse.lsp4j.MessageActionItem;
@@ -69,7 +72,12 @@ public class TestBatchClient implements LanguageClient {
 	/// to wait for an answer from the client.
 	@Override
 	public CompletableFuture<MessageActionItem> showMessageRequest(ShowMessageRequestParams requestParams) {
-		throw new UnsupportedOperationException();
+        // Opprett en fremtid (future) som skal returnere svaret
+        CompletableFuture<MessageActionItem> future = new CompletableFuture<>();
+
+            future.complete(null);
+        
+        return future;
 	}
 
 }

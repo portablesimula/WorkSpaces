@@ -1,4 +1,4 @@
-package simula.lsp.server;
+package simula.server;
 
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;

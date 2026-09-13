@@ -1,17 +1,22 @@
 package client;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Vector;
 
+import org.eclipse.lsp4j.ClientInfo;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
+import org.eclipse.lsp4j.InitializeParams;
+import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.TextDocumentItem;
+import org.eclipse.lsp4j.TraceValue;
 
-import simula.SimulaCoreInitialize;
+import simula.Option;
 import simula.core.CoreGlobal;
-import simula.lsp.server.SimulaExecutor;
-import simula.lsp.server.SimulaTextDocumentService;
+import simula.server.SimulaExecutor;
+import simula.server.SimulaTextDocumentService;
 
 public class TestBatchLauncher {
 
@@ -19,8 +24,30 @@ public class TestBatchLauncher {
 		// Remove time, date, and headers from Logger output.
 		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
 
-		SimulaCoreInitialize.connect(new TestBatchClient());
-		SimulaCoreInitialize.initiate(argv);
+		// Parse runtime arguments.
+		String[] args = argv.toArray(new String[0]);
+		Option.decodeArguments(args);
+
+		// Start SimulaLanguageServer and Connect
+		CoreGlobal.initiate();
+		CoreGlobal.INLINE_CONNECTED = true;
+		CoreGlobal.simulaLanguageServer.connect(new TestBatchClient());
+			
+		// Initialize SimulaLanguageServer
+//		ClientCapabilities capabilities = null;
+		ClientInfo clientInfo = new ClientInfo("SimulaEditor");
+		String trace = TraceValue.Off;      // No Tracing
+//		String trace = TraceValue.Messages; // Single message trace
+//		String trace = TraceValue.Verbose;  // Full systematic trace
+
+		InitializeParams initializeParams = new InitializeParams();
+//		initializeParams.setCapabilities(capabilities);
+		initializeParams.setClientInfo(clientInfo);
+		initializeParams.setTrace(trace);
+		InitializeResult result = CoreGlobal.simulaLanguageServer.initialize_local(initializeParams);
+			
+//		SimulaCoreInitialize.initiate(argv);
+		
 		String documentUri = fileName;
 		int version = 1;
 		try {

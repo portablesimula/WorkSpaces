@@ -17,10 +17,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
+import simula.Comn;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
@@ -28,17 +31,21 @@ import simula.core.builder.SimulaBuilder;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.MessageActionItem;
+import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
-import org.eclipse.lsp4j.jsonrpc.validation.NonNull;
+import org.eclipse.lsp4j.jsonrpc.ResponseErrorException;
+import org.eclipse.lsp4j.jsonrpc.messages.ResponseError;
+import org.eclipse.lsp4j.jsonrpc.messages.ResponseErrorCode;
 
 import simula.core.builder.export.LexToken;
 import simula.core.builder.util.Identifier;
 import simula.core.syntaxClass.SyntaxElement;
-import simula.lsp.server.SimulaLanguageServer;
+import simula.server.SimulaLanguageServer;
 
 /// A set of all static Utility Methods
 /// 
@@ -57,7 +64,7 @@ public final class Util {
         return(javaID);
 	}
 
-	
+	/// Debug utility
 	public static String calledFrom(int startIndex, int endIndex) {
 		StackTraceElement[] elt = Thread.currentThread().getStackTrace();
 		StringBuilder sb = new StringBuilder();
@@ -80,16 +87,54 @@ public final class Util {
 	/// Print a error message.
 	/// @param msg the message
 	public static void generalWarning(final String msg) {
-		if(DocumentManager.WARNINGS) LOG.warning("General Warning: " + msg);
-//		simBuilder.addDiagnostic(diagnostic); // TODO: DETTE MÅ RETTES - 
+		if(DocumentManager.WARNINGS) {
+			String mss = "General Error: " + msg;
+			LOG.error(mss);
+			showOkExitDialog(mss);
+		}
 	}
 
-	/// Print a error message.
+	/// Print a general Warning message.
 	/// @param msg the message
-	public static void generalWarning(final int lineNumber, final String msg) {
-		if(DocumentManager.WARNINGS) LOG.error("Line " + lineNumber + ": General Error: " + msg);
-//		simBuilder.addDiagnostic(diagnostic); // TODO: DETTE MÅ RETTES - 
+		public static void generalWarning(final int lineNumber, final String msg) {
+			if(DocumentManager.WARNINGS) {
+				String mss = "Line " + lineNumber + ": General Error: " + msg;
+				LOG.error(mss);
+				showOkExitDialog(mss);
+			}
+		}
+	
+	public static void showOkExitDialog(String message) {
+        String res = Util.showMessageDialog(message
+		+ " \n\nDo you want to CONTINUE ?", "Ok", "Exit");
+        if(res != null && res.equals("Exit")) Util.STOP();
+		
 	}
+
+	/// Debug utility: Blocking call on Client.showMessageRequest.
+    public static String showMessageDialog(String message, String... buttons) {
+    	List<MessageActionItem> actions = new ArrayList<>();
+    	for(String button:buttons) actions.add(new MessageActionItem(button));
+
+        // 2. Opprett parametere for dialogboksen
+        ShowMessageRequestParams params = new ShowMessageRequestParams();
+        params.setType(MessageType.Warning); // Kan være Error, Warning, Info, Log
+        params.setMessage(message);
+        params.setActions(actions);
+
+        try {
+            // 3. Send forespørselen, og bruk .get() for å blokkere synkront til brukeren svarer
+            MessageActionItem chosenAction = SimulaLanguageServer.languageClient .showMessageRequest(params).get();
+            
+            // chosenAction vil være enten yesButton, noButton, eller null (hvis de lukket dialogen)
+            return (chosenAction == null)? null : chosenAction.getTitle();
+
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            // Håndter eventuelle feil i kommunikasjonen her
+            return null;
+        }
+    }
 
 	/// Print a warning message.
 	/// @param msg the message
@@ -216,8 +261,7 @@ public final class Util {
 
 	/// Exit with Thread.dumpStack
 	public static void STOP() {
-		Thread.dumpStack();
-		System.exit(-1);;
+		FORCED_EXIT(new Exception("Util.STOP: Stack trace"));
 	}
 
 	/// Print the internal error message: IMPOSSIBLE.
@@ -229,14 +273,26 @@ public final class Util {
 	/// @param msg the message
 	public static void IERR(final String msg) {
 		LOG.error("ERROR: Internal error - " + msg);
-		Thread.dumpStack();
-		FORCED_EXIT();
+		FORCED_EXIT(new Exception("Util.IERR: Internal error - " + msg));
 	}
 
 	/// Perform FORCED EXIT.
-	private static void FORCED_EXIT() {
-		IO.println("FORCED EXIT");
-		System.exit(-1);
+	private static void FORCED_EXIT(Throwable e) {
+		if(CoreGlobal.INLINE_CONNECTED) {
+			e.printStackTrace();
+			IO.println("FORCED EXIT");
+			System.exit(-1);
+		} else {
+			// e.printStackTrace();
+			StackTraceElement[] stackTraceElements = e.getStackTrace();
+			for(StackTraceElement elt:stackTraceElements) {
+				Util.printError(elt.toString());
+			}
+			ResponseError error = new ResponseError();
+			error.setCode(ResponseErrorCode.InternalError);
+			error.setMessage("Failed: " + e.getMessage());
+			throw new ResponseErrorException(error); // TODO: SJEKK DETTE			
+		}
 	}
 
 	/// Print a internal error message.
@@ -244,8 +300,7 @@ public final class Util {
 	/// @param e any Throwable
 	public static void IERR(final String msg,final Throwable e) {
 		LOG.error("ERROR: Internal error - " + msg +"\nCaused by:");
-		e.printStackTrace();
-		FORCED_EXIT();
+		FORCED_EXIT(e);
 	}
 	
 	/// Return the base name part of an URI
@@ -291,30 +346,37 @@ public final class Util {
 	/// Print a string.
 	/// @param s the string
 	public static void println(final String s) {
-//		if (Global.console != null) {
-//			String u = s.replace('\r', (char) 0);
-//			u = u.replace('\n', (char) 0);
-//			Global.console.write(u + '\n');
-//		} else
-			IO.println(s);
+		String mss = Comn.printable(s);
+		if(CoreGlobal.INLINE_CONNECTED) {
+			IO.println(mss);
+		} else {
+			MessageParams params = new MessageParams(MessageType.Info, mss);
+			SimulaLanguageServer.languageClient.logMessage(params);
+		}
 	}  
 
 	/// Print a error message.
 	/// @param s the message
 	public static void printError(final String s) {
-		String u = s.replace('\r', (char) 0);
-//		if (Global.console != null)	Global.console.writeError(u + '\n');
-//		else
-			System.err.println(u);
+		String mss = Comn.printable(s);
+		if(CoreGlobal.INLINE_CONNECTED) {
+			System.err.println(mss);
+		} else {
+			MessageParams params = new MessageParams(MessageType.Error, mss);
+			SimulaLanguageServer.languageClient.logMessage(params);
+		}
 	}  
 
 	/// Print a warning message.
 	/// @param s the message
 	public static void printWarning(final String s) {
-		String u = s.replace('\r', (char) 0);
-//		if (Global.console != null)	Global.console.writeWarning(u + '\n');
-//		else
-			System.err.println(u);
+		String mss = Comn.printable(s);
+		if(CoreGlobal.INLINE_CONNECTED) {
+			IO.println(mss);
+		} else {
+			MessageParams params = new MessageParams(MessageType.Warning, mss);
+			SimulaLanguageServer.languageClient.logMessage(params);
+		}
 	}  
 
     //*******************************************************************************
