@@ -82,16 +82,16 @@ public class SimulaEditor extends JFrame {
 	/// See: https://docs.oracle.com/en/java/javase/25/troubleshoot/java-2d-properties.html
 	public static void setUIScale() {
      	Global.loadUserSettings();
-		IO.println("SimulaEditor.setUIScale: " + Option.editorUIScale);
+		Util.println("SimulaEditor.setUIScale: " + Option.editorUIScale);
 		if(! Option.editorUIScale.equals("1")) {
-			IO.println("SimulaEditor.setUIScale: setProperty(\"sun.java2d.uiScale\", " + Option.editorUIScale + ')');
+			Util.println("SimulaEditor.setUIScale: setProperty(\"sun.java2d.uiScale\", " + Option.editorUIScale + ')');
 			System.setProperty("sun.java2d.uiScale", Option.editorUIScale);
 		}
 	}
            
 	/// Create and add a new Tabbed Pane to 'mainCardPanel'
 	public static void addTabbedPaneToCard() {
-		IO.println("mainCardPanel.add(TabbedTextHandler.tabbedPane)");
+//		IO.println("mainCardPanel.add(TabbedTextHandler.tabbedPane)");
         mainCardPanel.add(TabbedTextHandler.tabbedPane,"TabbedPane");
 //        cardLayout.next(TabbedTextHandler.tabbedPane);
         cardLayout.next(mainCardPanel);

@@ -228,7 +228,7 @@ public final class ConsolePanel extends JPanel {
 	/// @param s a string to write
 	public void write(final String s) {
 //		Util.IERR("");
-		IO.println("ConsolePanel.write: " + debugName + ": " + s);
+//		IO.println("ConsolePanel.write: " + debugName + ": " + s);
 		write(s, styleRegular);
 	}
 

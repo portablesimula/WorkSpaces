@@ -3,6 +3,7 @@ package simula.server;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.*;
 
+import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.utilities.Util;
 
@@ -45,6 +46,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         String res = Util.showMessageDialog("SimulaLanguageServer.connect: " + languageClient.getClass()
         		+ " \n\nDo you want to CONTINUE ?", "Ok", "Exit");
         if(res != null && res.equals("Exit")) Util.STOP();
+        Util.redirectSystemIO();
     }
 
     /// --- LanguageServer Implementation ---
@@ -122,6 +124,11 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         ///              full JSON-RPC payload messages, performance metrics, and deep debugging information.
         /// 
         String trace = params.getTrace();
+        switch(trace) {
+	        case TraceValue.Off -> Option.lspTrace = 0;
+	        case TraceValue.Messages -> Option.lspTrace = 1;
+	        case TraceValue.Verbose -> Option.lspTrace = 2;
+        }
         
 //        CALL: SimulaCoreInitialize.initiate(...);
         

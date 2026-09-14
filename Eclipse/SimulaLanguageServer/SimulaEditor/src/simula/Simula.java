@@ -223,8 +223,8 @@ public final class Simula {
 //		params.setCapabilities(capabilities);
 		params.setClientInfo(clientInfo);
 		params.setTrace(trace);
-		InitializeResult result = CoreGlobal.simulaLanguageServer.initialize_local(params);
-		IO.println("Simula.main: Server reply: " + result.getServerInfo());
+		InitializeResult replay = CoreGlobal.simulaLanguageServer.initialize_local(params);
+		Util.println("Simula.main: Server reply: " + replay.getServerInfo());
 
 //	    Vector<String> args = new Vector<>(Arrays.asList(argv));
 //	    SimulaCoreInitialize.initiate(args);

@@ -54,8 +54,8 @@ public class Comn {
     	    }
     	    
     	}
-    	IO.println("Comn.modifySourceCode: Original: |" + Comn.printable(sourceCode) + '|');
-    	IO.println("Comn.modifySourceCode: Modified: |" + Comn.printable(sb.toString()) + '|');
+//    	IO.println("Comn.modifySourceCode: Original: |" + Comn.printable(sourceCode) + '|');
+//    	IO.println("Comn.modifySourceCode: Modified: |" + Comn.printable(sb.toString()) + '|');
 
 		return sb.toString();
 	}

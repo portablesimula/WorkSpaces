@@ -8,6 +8,7 @@ package simula.core.utilities;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
@@ -575,6 +576,30 @@ public final class Util {
 	/// @param lineNumber the line number
 	public static void buildLineNumber(CodeBuilder codeBuilder, int lineNumber) {
 		if(lineNumber > 0) codeBuilder.lineNumber(lineNumber);
+	}
+
+
+	private static InputStream prevIN;
+	private static PrintStream prevOUT;
+	public static void redirectSystemIO() {
+		prevIN = System.in;
+		prevOUT = System.out;	
+		System.setOut(new PrintStream(System.out) {
+			@Override public void write(int b) {
+				System.err.println("Illegal use of System.out.println(1): ");
+				super.write(b); 
+			}
+			@Override public void write(byte[] buf, int off, int len) {
+				System.err.println("Illegal use of System.out.println(2): ");
+				Thread.dumpStack();
+				super.write(buf, off, len);
+			}
+			@Override public void write(byte[] b) throws IOException {
+				System.err.println("Illegal use of System.out.println(3): ");
+				super.write(b);
+			}
+		});
+		System.setIn(null);
 	}
   
 }

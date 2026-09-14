@@ -28,6 +28,8 @@ public final class Option {
 	/// See: https://docs.oracle.com/en/java/javase/25/troubleshoot/java-2d-properties.html
 	public static String editorUIScale;
 	
+	public static int lspTrace;
+	
 	/// Testing and debugging options
 	public static class internal {
 		/** Default Constructor: NOT USED */ public internal() { Util.IERR(); }

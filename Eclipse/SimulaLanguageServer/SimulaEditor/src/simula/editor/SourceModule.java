@@ -218,7 +218,7 @@ public class SourceModule {
 	}
 	
 	public String getModifiedText() throws IOException {
-		IO.println("\nSourceModule.getModifiedText: ========================================");
+//		IO.println("\nSourceModule.getModifiedText: ========================================");
 		return Comn.modifySourceCode(this.sourceText);
 	}
     
