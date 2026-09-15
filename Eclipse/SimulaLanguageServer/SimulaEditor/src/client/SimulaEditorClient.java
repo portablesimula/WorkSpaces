@@ -1,10 +1,6 @@
 package client;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
 import javax.swing.JOptionPane;
 import org.eclipse.lsp4j.LogTraceParams;
 import org.eclipse.lsp4j.MessageActionItem;
