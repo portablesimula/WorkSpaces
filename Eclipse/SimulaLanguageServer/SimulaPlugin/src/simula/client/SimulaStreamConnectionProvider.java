@@ -48,14 +48,14 @@ public class SimulaStreamConnectionProvider implements StreamConnectionProvider 
 
     @Override
     public InputStream getInputStream() {
-//        return clientInputStream;
-        return new LoggingInputStream(clientInputStream);
+        return clientInputStream;
+//        return new LoggingInputStream(clientInputStream);
     }
 
     @Override
     public OutputStream getOutputStream() {
-//        return clientOutputStream;
-        return new LoggingOutputStream(clientOutputStream);
+        return clientOutputStream;
+//        return new LoggingOutputStream(clientOutputStream);
     }
 
     @Override

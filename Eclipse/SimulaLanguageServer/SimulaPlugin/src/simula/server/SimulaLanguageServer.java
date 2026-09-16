@@ -46,11 +46,9 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         // LSP4J injects the client proxy right after the launcher starts
         SimulaLanguageServer.languageClient = languageClient;
         
-//        Comn.popUp("SimulaLanguageServer.connect: " + languageClient.getClass());
+        if(true) throw new RuntimeException("");
+        Comn.popUp("SimulaLanguageServer.connect: " + languageClient.getClass());
         
-        String res = Util.showMessageDialog("SimulaLanguageServer.connect: " + languageClient.getClass()
-        		+ " \n\nDo you want to CONTINUE ?", "Ok", "Exit");
-        if(res != null && res.equals("Exit")) Util.STOP();
 //        Util.redirectSystemIO();
     }
 
@@ -95,7 +93,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
     @Override
     public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
     	
-        Comn.popUp("SimulaLanguageServer.initialize: " + params);
+        Comn.popUp("SimulaLanguageServer.initialize: " + params.getClientInfo());
         
 //        return CompletableFuture.supplyAsync(() -> {
 //        	return initialize_local(params);

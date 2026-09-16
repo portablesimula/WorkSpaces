@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.ZoneId;
@@ -22,42 +23,71 @@ import java.util.jar.Manifest;
 public class MakeSimulaLspServer {
 	private static boolean DEBUG = true;
 	
-	private final static String SETUP_ROOT="C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer\\MakeJars";
-	private final static String SERVER_ROOT="C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLanguageServer";
-	private final static String SERVER_BIN=SERVER_ROOT+"\\bin";
+	private final static String SETUP_ROOT="C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/MakeJars";
+	private final static String SERVER_ROOT="C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaPlugin";
+	private final static String SERVER_BIN=SERVER_ROOT+"/bin";
 
 
 	private static String installParentDirectory = System.getProperty("user.home");
 	private static File INSTALL_DIR = new File(installParentDirectory, "Simula");
+	
+	private static String VSCODE_SERVER_DIR = "C:/GitHub/WorkSpaces/VScode/simulaplugin/server";
+	private static String INTELLIJ_SERVER_DIR = "C:/GitHub/WorkSpaces/Intellij/SimulaPlugin/build/resources/main/server";
 
 	public static void main(String[] args) {
 		try {
 //			list(SERVER_BIN);
 			
-			File file = new File(INSTALL_DIR, "OLD_TestSimulaLspServer.jar");
-			listJarFile("", file);
-//			listManifest(new JarFile(file));
+//			File file = new File(INSTALL_DIR, "OLD_TestSimulaLspServer.jar");
+//			listJarFile("", file);
+////			listManifest(new JarFile(file));
 			
-			file = new File(INSTALL_DIR, "TestSimulaLspServer.jar");
-			listJarFile("", file);
-//			listManifest(new JarFile(file));
+			new File(INSTALL_DIR, "SimulaLspServer.jar");
+//			listJarFile("", INSTALLED);
+//			listManifest(new JarFile(INSTALLED));
 
-			makeSimulaLanguageServer();
+			String INSTALLED = makeSimulaLanguageServer();
+			
+			copyInstalledServerToVSCode(INSTALLED, VSCODE_SERVER_DIR);
+			copyInstalledServerToVSCode(INSTALLED, INTELLIJ_SERVER_DIR);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	private static void copyInstalledServerToVSCode(String INSTALLED, String TARGET_DIR) throws IOException	{
+		Path source = Paths.get(INSTALLED);
+		Path target = Paths.get(TARGET_DIR);
+		IO.println("copyInstalledServerToVSCode: source="+source);
+		IO.println("copyInstalledServerToVSCode: target="+target);
+	        
+	        // Kombinerer mappen og filnavnet til den endelige destinasjonsstien
+	        Path destinasjon = target.resolve(source.getFileName());
+
+	        try {
+	            // REPLACE_EXISTING tvinger Java til å overskrive filen hvis den finnes
+	            Files.copy(source, destinasjon, StandardCopyOption.REPLACE_EXISTING);
+	            System.out.println("Filen ble kopiert og overskrevet suksessfullt.");
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	}
+
+	
 	// ***************************************************************
 	// *** MAKE SIMULA COMPILER JAR
 	// ***************************************************************
-	private static void makeSimulaLanguageServer() throws IOException	{
+	private static String makeSimulaLanguageServer() throws IOException	{
 		IO.println("Make Simula Language Server.jar in "+INSTALL_DIR);
 		INSTALL_DIR.mkdirs();
+		String INSTALL_FILE = INSTALL_DIR+"/SimulaLspServer.jar";
+		IO.println("Make Simula Language Server.jar as "+INSTALL_FILE);
 		String compilerManifest=SETUP_ROOT+"/src/make/jars/ServerManifest.MF";
-		execute("jar","cmf",compilerManifest,INSTALL_DIR+"/TestSimulaLspServer.jar",
+		execute("jar","cmf",compilerManifest,INSTALL_FILE,
 				"-C", SERVER_BIN, "./simula");
-//		execute("jar", "-tvf", INSTALL_DIR+"\\TestSimulaLspServer.jar");
+//		execute("jar", "-tvf", INSTALL_DIR+"/TestSimulaLspServer.jar");
+		return INSTALL_FILE;
 	}
 	
 	// ***************************************************************
