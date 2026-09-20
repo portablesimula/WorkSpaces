@@ -1,0 +1,18 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <id>intellij-lsp-plugin-example</id>
+    <!--suppress PluginXmlValidity -->
+    <name>LSP Plugin Example</name>
+    <vendor>Alexander Doroshko</vendor>
+    <description><![CDATA[
+    This is a plugin for IntelliJ-based IDEs that demonstrates the usage of the
+    <a href="https://plugins.jetbrains.com/docs/intellij/language-server-protocol.html">LSP API</a>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.ultimate</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <platform.lsp.serverSupportProvider implementation="com.lsp_plugin_example.DartLspServerSupportProvider"/>
+    </extensions>
+</idea-plugin>

@@ -32,22 +32,42 @@ public class MakeSimulaLspServer {
 	private static File INSTALL_DIR = new File(installParentDirectory, "Simula");
 	
 	private static String VSCODE_SERVER_DIR = "C:/GitHub/WorkSpaces/VScode/simulaplugin/server";
-	private static String INTELLIJ_SERVER_DIR = "C:/GitHub/WorkSpaces/Intellij/SimulaPlugin/build/resources/main/server";
+	private static String INTELLIJ_SERVER_DIR = "C:/GitHub/WorkSpaces/Intellij/SimulaPlugin/src/main/resources/server";
 
 	public static void main(String[] args) {
 		try {
 //			list(SERVER_BIN);
 			
-//			File file = new File(INSTALL_DIR, "OLD_TestSimulaLspServer.jar");
+//			File file = new File("C:/Program Files/Eclipse_LSP", "org.eclipse.lsp4j-1.0.0.jar");
+//			listJarFile("", file);
+////			listManifest(new JarFile(file));
+
+//			Path tempFilePath = Files.createTempFile("lib", ".lib");
+//			File tempFile = tempFilePath.toFile();
+//			unpackJarFile("", tempFile, new File("C:/Program Files/Eclipse_LSP", "org.eclipse.lsp4j-1.0.0.jar"));
+//			unpackJarFile("", tempFile, new File("C:/Program Files/Eclipse_LSP", "org.eclipse.lsp4j.jsonrpc-0.24.0.jar"));
+//			unpackJarFile("", tempFile, new File("C:/Program Files/Eclipse_LSP", "gson-2.9.0.jar"));
+			
+	        Path tempDir = Files.createTempDirectory("JarFiles");
+			unpackJarFile("", tempDir, "C:/Program Files/Eclipse_LSP/org.eclipse.lsp4j-1.0.0.jar");
+//			unpackJarFile("", tempDir, "C:/Program Files/Eclipse_LSP/org.eclipse.lsp4j.jsonrpc-0.24.0.jar");
+//			unpackJarFile("", tempDir, "C:/Program Files/Eclipse_LSP/gson-2.9.0.jar");
+			
+			list(tempDir.toFile());
+
+
+			
+//			File file = new File(INSTALL_DIR, "TestSimulaLspServer.jar");
 //			listJarFile("", file);
 ////			listManifest(new JarFile(file));
 			
-			new File(INSTALL_DIR, "SimulaLspServer.jar");
-//			listJarFile("", INSTALLED);
-//			listManifest(new JarFile(INSTALLED));
+//			new File(INSTALL_DIR, "SimulaLspServer.jar");
 
 			String INSTALLED = makeSimulaLanguageServer();
 			
+			listJarFile("", new File(INSTALL_DIR, "SimulaLspServer.jar"));
+			listManifest(new JarFile(INSTALLED));
+
 			copyInstalledServerToVSCode(INSTALLED, VSCODE_SERVER_DIR);
 			copyInstalledServerToVSCode(INSTALLED, INTELLIJ_SERVER_DIR);
 			
@@ -83,9 +103,11 @@ public class MakeSimulaLspServer {
 		INSTALL_DIR.mkdirs();
 		String INSTALL_FILE = INSTALL_DIR+"/SimulaLspServer.jar";
 		IO.println("Make Simula Language Server.jar as "+INSTALL_FILE);
-		String compilerManifest=SETUP_ROOT+"/src/make/jars/ServerManifest.MF";
-		execute("jar","cmf",compilerManifest,INSTALL_FILE,
+		
+		String compilerManifest=SETUP_ROOT+"/src/make/jars/MANIFEST.MF";
+		execute("jar","cmf", compilerManifest, INSTALL_FILE,
 				"-C", SERVER_BIN, "./simula");
+		
 //		execute("jar", "-tvf", INSTALL_DIR+"/TestSimulaLspServer.jar");
 		return INSTALL_FILE;
 	}
@@ -192,6 +214,93 @@ public class MakeSimulaLspServer {
     }
 	
 	// ***************************************************************
+	// *** UNPACK .jar file
+	// ***************************************************************
+	/// Debug utility: List .jar file
+	/// @param file the .jar file
+	public static void OLD_unpackJarFile(final String title, final File tempFile, final File file) {
+		IO.println("\n--------- " + title + " UNPACK .jar File: " + file + "  ---------");
+//		if (!(file.exists() && file.canRead())) {
+//			Util.generalError("Can't read .jar file: " + file);
+//			return;
+//		}
+		JarFile jarFile = null;
+		try {
+			jarFile = new JarFile(file);
+			Manifest manifest = jarFile.getManifest();
+			Attributes mainAttributes = manifest.getMainAttributes();
+			Set<Object> keys = mainAttributes.keySet();
+			for (Object key : keys) {
+				String val = mainAttributes.getValue(key.toString());
+				IO.println(key.toString() + "=\"" + val + "\"");
+			}
+
+			Enumeration<JarEntry> entries = jarFile.entries();
+			while (entries.hasMoreElements()) {
+				JarEntry entry = entries.nextElement();
+				String size = "" + entry.getSize();
+				while (size.length() < 6)
+					size = " " + size;
+				FileTime fileTime = entry.getLastModifiedTime();
+				String date = DateTimeFormatter.ofPattern("uuuu-MMM-dd HH:mm:ss", Locale.getDefault())
+						.withZone(ZoneId.systemDefault()).format(fileTime.toInstant());
+				IO.println("Jar-Entry: " + size + "  " + date + "  \"" + entry + "\"");
+			}
+			listManifest(jarFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (jarFile != null)
+				try {
+					jarFile.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
+		IO.println();
+	}
+
+    public static void unpackJarFile(final String title, final Path tempDir, final String jarPathName) throws IOException {
+        // 1. Create a secure system temporary directory
+//        Path tempDir = Files.createTempDirectory(tempDirPrefix);
+    	Path jarPath = Path.of(jarPathName);
+
+    	
+        // 2. Open the JAR file
+        try (JarFile jar = new JarFile(jarPath.toFile())) {
+            Enumeration<JarEntry> entries = jar.entries();
+            
+            // 3. Iterate through every file and directory in the JAR
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+                
+                // Resolve the entry path relative to our target temporary directory
+                Path targetPath = tempDir.resolve(entry.getName()).normalize();
+                
+                // Security Check: Guard against Zip Slip vulnerability (directory traversal)
+                if (!targetPath.startsWith(tempDir)) {
+                    throw new IOException("Malicious JAR entry detected outside target directory: " + entry.getName());
+                }
+                
+                if (entry.isDirectory()) {
+                    // Create the nested subdirectory structural layout
+                    Files.createDirectories(targetPath);
+                } else {
+                    // Ensure the parent directories exist (in case the JAR structure is implicit)
+                    if (targetPath.getParent() != null) {
+                        Files.createDirectories(targetPath.getParent());
+                    }
+                    
+                    // Extract and write the file
+                    try (InputStream is = jar.getInputStream(entry)) {
+                        Files.copy(is, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                }
+            }
+        }
+    }
+
+	// ***************************************************************
 	// *** EXECUTE OS COMMAND
 	// ***************************************************************
 	private static int execute(String... cmd) throws IOException {
@@ -214,4 +323,5 @@ public class MakeSimulaLspServer {
 		return(process.exitValue());
 	}
 
+	
 }

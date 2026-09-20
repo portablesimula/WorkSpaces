@@ -8,22 +8,23 @@ plugins {
 
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
 dependencies {
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit)
 
-    // IntelliJ Platform Gradle Plugin Dependencies Extension
-    // - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html
+    // IntelliJ Platform Gradle Plugin Dependencies Extension - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html
     intellijPlatform {
-        intellijIdea("2026.2.0.1")
-        bundledPlugin("com.intellij.java")
+//        intellijIdea("2025.3.5")
+        intellijIdea("2026.2")
         testFramework(TestFrameworkType.Platform)
 
-        // Add plugin dependencies for compilation here, for example:
-        // bundledPlugin("com.intellij.java")
-
-        // Add the Red Hat LSP4IJ plugin dependency
-        plugin("com.redhat.devtools.lsp4ij","0.21.0") // Replace with the latest version
-
+        // Add plugin dependencies for compilation here:
+        bundledPlugin("com.intellij.java")
+        bundledPlugin("com.intellij.modules.json")
     }
 
+//    intellijPlatform {
+//        // Du må oppdatere til en 2026.2+ versjon (f.eks. "262.XXXX" eller tilsvarende stabil versjon)
+//        type.set(IntelliJPlatformType.IntelliJIdeaUltimate)
+//        version.set("2026.2")
+//    }
 
 }

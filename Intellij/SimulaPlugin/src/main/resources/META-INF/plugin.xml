@@ -1,33 +1,59 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
-    <id>com.simula.SimulaPlugin</id>
+    <id>com.simula.SimulaLspServer</id>
 
     <!-- Public plugin name should be written in Title Case.
      Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
     <name>SimulaPlugin</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor url="https://www.yourcompany.com">YourCompany</vendor>
+    <vendor url="https://portablesimula.github.io/github.io/">Simula</vendor>
 
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
     <description><![CDATA[
-        Enter short description for your plugin here.<br>
-        <em>most HTML tags may be used</em>
+        <p>Lsp plugin for the Simula language</p>
         ]]></description>
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.json</depends>
+    <depends>com.intellij.java</depends>
+    <depends>com.intellij.modules.lsp</depends>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends> <!-- Hvis du jobber med Java-spesifikk kode -->
 
     <resource-bundle>messages.MyMessageBundle</resource-bundle>
 
     <!-- Extensions defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="MyToolWindow" factoryClass="com.simula.MyToolWindowFactory"
-                    icon="AllIcons.Toolwindows.ToolWindowPalette"/>
+<!--        <toolWindow id="MyToolWindow" factoryClass="com.simula.MyToolWindowFactory"-->
+<!--                    icon="AllIcons.Toolwindows.ToolWindowPalette"/>-->
+
+        <toolWindow id="Simula Console" anchor="bottom"
+                    factoryClass="com.simula.extensions.toolWindow.ConsoleToolWindowFactory"
+                    icon="/icons/favico.png" />
+
+        <!-- The Extension Point for your LSP implementation -->
+        <platform.lsp.integrationProvider
+                implementation="com.simula.lsp.SimulaLspIntegrationProvider"/>
+
+        <!-- New Project -->
+        <newProjectWizard.languageGenerator implementation="com.simula.extensions.newProject.SimulaNewProjectWizard"/>
+
+        <!-- Registering the custom file drop handler -->
+        <fileDropHandler implementation="com.simula.extensions.fileDrop.SimulaFileDropHandler" order="first"/>
+
+        <!-- Run Configuration -->
+        <!-- Register your main configuration type first -->
+        <!--configurationType implementation="simula.plugin.extensions.config.SimulaRunConfigurationType"/-->
+        <configurationType implementation="com.simula.extensions.config.SimulaRunConfigurationType"/>
+
+        <!-- Register the producer to link it to the context menu -->
+        <runConfigurationProducer implementation="com.simula.extensions.config.SimulaFileRunConfigurationProducer"/>
+
     </extensions>
 
 </idea-plugin>

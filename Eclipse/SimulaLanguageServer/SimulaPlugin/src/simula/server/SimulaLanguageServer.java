@@ -1,19 +1,15 @@
 package simula.server;
 
 import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.*;
 
 import simula.Comn;
 import simula.Option;
-import simula.client.SimulaStreamConnectionProvider;
 import simula.core.CoreGlobal;
-import simula.core.utilities.Util;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class SimulaLanguageServer implements LanguageServer, LanguageClientAware {
 
@@ -24,6 +20,8 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
     private final WorkspaceService workspaceService;
     public ClientCapabilities clientCapabilities;
 
+    
+    
     public SimulaLanguageServer() {
         this.textDocumentService = new SimulaTextDocumentService(this);
         this.workspaceService = new SimulaWorkspaceService();
@@ -46,7 +44,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         // LSP4J injects the client proxy right after the launcher starts
         SimulaLanguageServer.languageClient = languageClient;
         
-        if(true) throw new RuntimeException("");
+//        if(true) throw new RuntimeException("");
         Comn.popUp("SimulaLanguageServer.connect: " + languageClient.getClass());
         
 //        Util.redirectSystemIO();
@@ -93,7 +91,8 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
     @Override
     public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
     	
-        Comn.popUp("SimulaLanguageServer.initialize: " + params.getClientInfo());
+    	if(true) throw new RuntimeException("Server initialize was called: " + params);
+//        Comn.popUp("SimulaLanguageServer.initialize: " + params.getClientInfo());
         
 //        return CompletableFuture.supplyAsync(() -> {
 //        	return initialize_local(params);
