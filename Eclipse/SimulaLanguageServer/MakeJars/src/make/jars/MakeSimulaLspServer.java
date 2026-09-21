@@ -20,13 +20,28 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+/// Dependency Tree:
+/// org.eclipse.lsp4j:org.eclipse.lsp4j (compile)
+///  └── org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc (compile)
+///       └── com.google.code.gson:gson (compile)
+///
+/// Eclipse LSP Libraries resides in C:/Eclipse_LSP:
+/// - C:/Eclipse_LSP/org.eclipse.lsp4j-1.0.0.jar
+/// - "C:/Eclipse_LSP/org.eclipse.lsp4j.jsonrpc-0.24.0.jar
+/// - "C:/Eclipse_LSP/gson-2.9.0.jar
+/// 
+/// They will be unpacked to directories:
+/// - C:/Eclipse_LSP/org.eclipse.lsp4j-1.0.0
+/// - "C:/Eclipse_LSP/org.eclipse.lsp4j.jsonrpc-0.24.0
+/// - "C:/Eclipse_LSP/gson-2.9.0
+///
 public class MakeSimulaLspServer {
 	private static boolean DEBUG = true;
 	
-	private final static String SETUP_ROOT="C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/MakeJars";
-	private final static String SERVER_ROOT="C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaPlugin";
-	private final static String SERVER_BIN=SERVER_ROOT+"/bin";
-
+	private final static String SETUP_ROOT = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/MakeJars";
+	private final static String SERVER_ROOT = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaPlugin";
+	private final static String SERVER_BIN = SERVER_ROOT+"/bin";
+	private final static String LIBRARY_DIR = "C:/Eclipse_LSP/UnpackedLibraries";
 
 	private static String installParentDirectory = System.getProperty("user.home");
 	private static File INSTALL_DIR = new File(installParentDirectory, "Simula");
@@ -42,16 +57,10 @@ public class MakeSimulaLspServer {
 //			listJarFile("", file);
 ////			listManifest(new JarFile(file));
 
-//			Path tempFilePath = Files.createTempFile("lib", ".lib");
-//			File tempFile = tempFilePath.toFile();
-//			unpackJarFile("", tempFile, new File("C:/Program Files/Eclipse_LSP", "org.eclipse.lsp4j-1.0.0.jar"));
-//			unpackJarFile("", tempFile, new File("C:/Program Files/Eclipse_LSP", "org.eclipse.lsp4j.jsonrpc-0.24.0.jar"));
-//			unpackJarFile("", tempFile, new File("C:/Program Files/Eclipse_LSP", "gson-2.9.0.jar"));
-			
-	        Path tempDir = Files.createTempDirectory("JarFiles");
-			unpackJarFile("", tempDir, "C:/Program Files/Eclipse_LSP/org.eclipse.lsp4j-1.0.0.jar");
-//			unpackJarFile("", tempDir, "C:/Program Files/Eclipse_LSP/org.eclipse.lsp4j.jsonrpc-0.24.0.jar");
-//			unpackJarFile("", tempDir, "C:/Program Files/Eclipse_LSP/gson-2.9.0.jar");
+			Path tempDir = Path.of(LIBRARY_DIR);
+			unpackJarFile("", tempDir, "C:/Eclipse_LSP/org.eclipse.lsp4j-1.0.0.jar");
+			unpackJarFile("", tempDir, "C:/Eclipse_LSP/org.eclipse.lsp4j.jsonrpc-0.24.0.jar");
+			unpackJarFile("", tempDir, "C:/Eclipse_LSP/gson-2.9.0.jar");
 			
 			list(tempDir.toFile());
 
@@ -70,6 +79,8 @@ public class MakeSimulaLspServer {
 
 			copyInstalledServerToVSCode(INSTALLED, VSCODE_SERVER_DIR);
 			copyInstalledServerToVSCode(INSTALLED, INTELLIJ_SERVER_DIR);
+			
+			IO.println("SimulaLspServer was created in " + INSTALL_DIR);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -106,7 +117,9 @@ public class MakeSimulaLspServer {
 		
 		String compilerManifest=SETUP_ROOT+"/src/make/jars/MANIFEST.MF";
 		execute("jar","cmf", compilerManifest, INSTALL_FILE,
-				"-C", SERVER_BIN, "./simula");
+				"-C", SERVER_BIN, "./simula",
+				"-C", LIBRARY_DIR, "./com",
+				"-C", LIBRARY_DIR, "./org");
 		
 //		execute("jar", "-tvf", INSTALL_DIR+"/TestSimulaLspServer.jar");
 		return INSTALL_FILE;
@@ -115,6 +128,7 @@ public class MakeSimulaLspServer {
 	// ***************************************************************
 	// *** LIST FILES
 	// ***************************************************************
+	@SuppressWarnings("unused")
 	private static void list(final String dirName) { list(new File(dirName)); }
 	private static void list(final File dir) {
 		try { IO.println("------------  LIST "+dir+"  ------------");

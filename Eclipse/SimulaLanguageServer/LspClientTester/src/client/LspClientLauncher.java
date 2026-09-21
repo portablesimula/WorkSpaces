@@ -1,3 +1,4 @@
+package client;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.ClientCapabilities;
@@ -17,7 +18,7 @@ public class LspClientLauncher {
     private Future<Void> listenFuture;
 
     public void start(Process serverProcess) throws Exception {
-    	IO.println("LspClientLauncher.start: serverProcess: " + serverProcess);
+    	IO.println("CLIENT: LspClientLauncher.start: serverProcess: " + serverProcess);
         // 1. Hent I/O strømmer fra server-prosessen
         InputStream in = serverProcess.getInputStream();
         OutputStream out = serverProcess.getOutputStream();
@@ -31,25 +32,25 @@ public class LspClientLauncher {
                 in, 
                 out
         );
-    	IO.println("LspClientLauncher.start: launcher: " + launcher.getClass());
+    	IO.println("CLIENT: LspClientLauncher.start: launcher: " + launcher.getClass());
 
         // 3. Start lytting på en egen tråd
         this.listenFuture = launcher.startListening();
         this.server = launcher.getRemoteProxy();
-    	IO.println("LspClientLauncher.start: RemoteProxy: " + server.getClass());
+    	IO.println("CLIENT: LspClientLauncher.start: RemoteProxy: " + server.getClass());
 
         // 4. Initialiser serveren (Handshake)
         InitializeParams initParams = new InitializeParams();
         initParams.setProcessId((int) ProcessHandle.current().pid());
         initParams.setRootUri(System.getProperty("user.dir")); // Sett rotmappe for prosjektet
         initParams.setCapabilities(new ClientCapabilities());
-    	IO.println("LspClientLauncher.start: InitializeParams: " + initParams);
+    	IO.println("CLIENT: LspClientLauncher.start: InitializeParams: " + initParams);
 
         CompletableFuture<InitializeResult> initialize = server.initialize(initParams);
         InitializeResult result = initialize.get(); // Vent på at serveren blir klar
-    	IO.println("LspClientLauncher.start: InitializeResult: " + result);
+    	IO.println("CLIENT: LspClientLauncher.start: InitializeResult: " + result);
         
-        System.out.println("LSP Server initialisert! Serverinfo: " + result.getServerInfo().getName());
+        IO.println("CLIENT: LSP Server initialisert! Serverinfo: " + result.getServerInfo().getName());
         
         // 5. Fortell serveren at klienten er ferdig initialisert
         server.initialized();

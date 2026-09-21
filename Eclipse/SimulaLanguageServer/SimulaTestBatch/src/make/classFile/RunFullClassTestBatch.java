@@ -23,8 +23,7 @@ import simula.Option;
  */
 public final class RunFullClassTestBatch {
 	
-//	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
-	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLanguageServer");
+	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaPlugin");
 	private static final String userDir = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaTestBatch";
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 

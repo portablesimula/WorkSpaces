@@ -27,6 +27,25 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         this.workspaceService = new SimulaWorkspaceService();
     }
 
+    public static void main(String[] args) {
+        Comn.popUp("SERVER: SimulaLanguageServer.main: ");
+        
+    	SimulaLanguageServer server = new SimulaLanguageServer();
+//        Comn.popUp("SimulaLanguageServer.main: server: " + server);
+        
+        // Wire up the launcher to read from standard input/output streams 
+        // provided by the IntelliJ Client process
+        var launcher = LSPLauncher.createServerLauncher(server, System.in, System.out);
+
+        // Fetch the proxy client representing IntelliJ and pass it to your server
+        LanguageClient clientProxy = launcher.getRemoteProxy();
+        server.connect(clientProxy);
+
+        // Start listening to the input streams
+        launcher.startListening();
+    }
+
+    
     /// --- LanguageClientAware Implementation ---
     /// 
     /// To obtain a reference to the client in your Eclipse language server
@@ -45,7 +64,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         SimulaLanguageServer.languageClient = languageClient;
         
 //        if(true) throw new RuntimeException("");
-        Comn.popUp("SimulaLanguageServer.connect: " + languageClient.getClass());
+//        Comn.popUp("SimulaLanguageServer.connect: " + languageClient.getClass());
         
 //        Util.redirectSystemIO();
     }
@@ -90,8 +109,8 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
 	/// [4] (https://bugs.eclipse.org/bugs/show_bug.cgi?id=538245)
     @Override
     public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
-    	
-    	if(true) throw new RuntimeException("Server initialize was called: " + params);
+//    	IO.println("SERVER: SimulaLanguageServer.initialize: " + params.getClientInfo());
+//    	if(true) throw new RuntimeException("Server initialize was called: " + params);
 //        Comn.popUp("SimulaLanguageServer.initialize: " + params.getClientInfo());
         
 //        return CompletableFuture.supplyAsync(() -> {
@@ -129,7 +148,9 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         ///              full JSON-RPC payload messages, performance metrics, and deep debugging information.
         /// 
         String trace = params.getTrace();
-        switch(trace) {
+        if(trace == null) {
+        	Option.lspTrace = 0;
+        } else switch(trace) {
 	        case TraceValue.Off -> Option.lspTrace = 0;
 	        case TraceValue.Messages -> Option.lspTrace = 1;
 	        case TraceValue.Verbose -> Option.lspTrace = 2;
