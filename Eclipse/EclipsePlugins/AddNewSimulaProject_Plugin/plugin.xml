@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="org.eclipse.ui.newWizards"
+    name="NewSimulaProject"
+     schema="schema/org.eclipse.ui.newWizards.exsd"/>
+   <extension-point id="org.eclipse.core.resources.builders" name="SimulaBuilders" schema="schema/org.eclipse.core.resources.builders.exsd"/>
+   <extension-point id="org.eclipse.core.resources.natures" name="SimulaNatures" schema="schema/org.eclipse.core.resources.natures.exsd"/>
+
+<extension point="org.eclipse.ui.newWizards">
+   <!-- Valgfritt: Opprett en egen kategori i "New"-menyen -->
+   <category
+         id="com.example.myplugin.category"
+         name="Min Kategori">
+   </category>
+   
+   <!-- Definer selve veiviseren -->
+   <wizard
+         id="com.example.myplugin.mywizard"
+         name="Min Nye Veiviser"
+         category="com.example.myplugin.category"
+         class="com.example.myplugin.wizards.MyNewWizard"
+         icon="icons/sample.png">
+         <description>Dette er en beskrivelse av hva veiviseren gjør.</description>
+   </wizard>
+</extension>
+
+
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="org.eclipse.ui.navigator.CommonNavigator"
+            icon="icons/sample.png"
+            id="com.example.test"
+            name="My Common Navigator">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerActionBinding
+            viewerId="com.example.test">
+         <includes>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.*">
+            </actionExtension>
+         </includes>
+      </viewerActionBinding>
+      <viewerContentBinding
+            viewerId="com.example.test">
+         <includes>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resourceContent">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.filters.*">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.linkHelper">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.workingSets">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.ui.resourcePerspective">
+         <view
+               id="com.example.test"
+               ratio="0.5"
+               relationship="stack"
+               relative="org.eclipse.ui.navigator.ProjectExplorer">
+         </view>
+      </perspectiveExtension>
+   </extension>
+
+</plugin>

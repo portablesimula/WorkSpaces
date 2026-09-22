@@ -7,6 +7,8 @@ import org.eclipse.lsp4j.services.*;
 import simula.Comn;
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.utilities.LOG;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -67,6 +69,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
 //        Comn.popUp("SimulaLanguageServer.connect: " + languageClient.getClass());
         
 //        Util.redirectSystemIO();
+        LOG.info("MESSAGE TEXT 2");
     }
 
     /// --- LanguageServer Implementation ---

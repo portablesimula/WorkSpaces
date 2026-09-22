@@ -12,8 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
-import org.eclipse.lsp4j.services.LanguageClient;
-
 import simula.Comn;
 import simula.Option;
 import simula.core.builder.DocumentTextUpdater;

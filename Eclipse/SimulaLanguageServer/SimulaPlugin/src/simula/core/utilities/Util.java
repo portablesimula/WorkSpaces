@@ -186,6 +186,8 @@ public final class Util {
 	/// @param msg the message
 	public static void generalError(final String msg) {
 //		SimulaLanguageServer.languageClient.error("General Error: " + msg);
+		LOG.error(msg);
+		Util.println(msg);
 		
 		// Constructing the dialog options
 		ShowMessageRequestParams params = new ShowMessageRequestParams();

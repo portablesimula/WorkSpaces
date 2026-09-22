@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: FirstPlugin
+Bundle-SymbolicName: AddNewMenuButton_Plugin;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: org.eclipse.swt,
+ org.eclipse.jface,
+ org.eclipse.ui
+Automatic-Module-Name: firstPlugin
+Bundle-RequiredExecutionEnvironment: JavaSE-25

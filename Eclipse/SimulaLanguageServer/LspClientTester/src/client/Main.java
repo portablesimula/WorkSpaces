@@ -29,6 +29,7 @@ public class Main {
             Path path = Paths.get("C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/Test.sim");
             String uri = path.toUri().toString();
             String content = Files.readString(path);
+            content = content.replace("\r\n", "\n");
        
             TextDocumentItem document = new TextDocumentItem();
             document.setUri(uri);

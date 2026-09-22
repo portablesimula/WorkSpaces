@@ -80,7 +80,9 @@ public class MakeSimulaLspServer {
 			copyInstalledServerToVSCode(INSTALLED, VSCODE_SERVER_DIR);
 			copyInstalledServerToVSCode(INSTALLED, INTELLIJ_SERVER_DIR);
 			
-			IO.println("SimulaLspServer was created in " + INSTALL_DIR);
+			IO.println("\nSimulaLspServer was created in " + INSTALL_DIR);
+			IO.println("                        and in " + VSCODE_SERVER_DIR);
+			IO.println("                        and in " + INTELLIJ_SERVER_DIR);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
