@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ProjectView
+Bundle-SymbolicName: ProjectView;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: org.eclipse.swt,
+ org.eclipse.jface,
+ org.eclipse.core.resources;bundle-version="3.24.100",
+ org.eclipse.ui;bundle-version="3.209.100"
+Automatic-Module-Name: ProjectView
+Bundle-RequiredExecutionEnvironment: JavaSE-25

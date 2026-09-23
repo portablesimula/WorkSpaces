@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<extension point="org.eclipse.ui.views">
+   <category
+         id="com.example.myplugin.category"
+         name="My Custom Tools">
+   </category>
+   <view
+         id="com.example.myplugin.projectview"
+         name="Custom Project Explorer"
+         icon="icons/view.png"
+         category="com.example.myplugin.category"
+         class="com.example.myplugin.views.CustomProjectView">
+   </view>
+</extension>
+
+</plugin>

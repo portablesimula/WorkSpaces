@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="org.eclipse.ui.views" name="org.eclipse.ui.views" schema="schema/org.eclipse.ui.views.exsd"/>
+
+<!-- EXTENSION: New Ctrl+N on th Welcome Panel -->
+<extension point="org.eclipse.ui.newWizards">
+   <!-- Optional: Create a custom folder category for your wizards -->
+   <category
+         id="com.example.myplugin.category"
+         name="My Custom Wizards">
+   </category>
+   
+   <!-- Define the Wizard itself -->
+   <wizard
+         id="com.example.myplugin.wizard.myartifact"
+         name="My Custom File"
+         category="com.example.myplugin.category"
+         icon="icons/sample.png"
+         class="com.example.myplugin.wizards.MyNewWizard">
+      <description>
+         Creates a custom configuration artifact for the project.
+      </description>
+      <!-- Optional: Restrict visibility to specific selections -->
+      <selection class="org.eclipse.core.resources.IResource"/>
+   </wizard>
+</extension>
+
+<!-- EXTENSION: File -> New -> menue -->
+<extension point="org.eclipse.ui.perspectiveExtensions">
+   <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
+      <newWizardShortcut id="no.simula.ide.wizards.SimulaProjectWizard"/>
+   </perspectiveExtension>
+</extension>
+
+</plugin>

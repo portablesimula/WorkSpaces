@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>   
+   
+   <!-- 1. Define a Content Type for your file format -->
+   <extension
+         id="com.simula.contenttype"
+         name="Simula Source File"
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            id="com.simula.contenttype"
+            name="Simula Source File"
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="sim"
+            priority="high">
+      </content-type>
+   </extension>
+
+   <!-- 2. Register your Language Server and bind it to the content type -->
+   <!--            class="simula.client.SimulaStreamConnectionProvider">   -->
+   <extension
+         id="com.simula.server"
+         name="Simula Language Server"
+         point="org.eclipse.lsp4e.languageServer">
+      <server
+            id="com.simula.server"
+            label="Simula Language Server"
+            class="simula.client.NativeLanguageServerProvider">
+      </server>
+      
+      <contentTypeMapping
+            contentType="com.simula.contenttype"
+            id="com.simula.server"
+            languageId="Simula">
+      </contentTypeMapping>
+   </extension>
+
+   
+
+   <!-- 2. Bind your custom content type explicitly to the Generic Editor -->
+   <!--    class="org.eclipse.ui.genericeditor.GenericEditor" -->
+
+<extension point="org.eclipse.ui.editors">
+   <editor
+         id="org.eclipse.ui.genericeditor.GenericEditor"
+         name="Generic Editor"
+         extensions="sim"
+         class="org.eclipse.ui.internal.genericeditor.ExtensionBasedTextEditor"
+         contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor">
+         <contentTypeBinding contentTypeId="com.simula.contenttype" />
+   </editor>
+</extension>
+
+   <!-- 3. Provide Syntax Highlighting (Presentation Reconciler) -->
+   <extension point="org.eclipse.ui.genericeditor.presentationReconcilers">
+      <presentationReconciler
+            class="com.example.plugin.editor.MyLanguagePresentationReconciler"
+            contentType="com.simula.contenttype">
+      </presentationReconciler>
+   </extension>
+
+   <!-- 4. Provide Code Completion (Content Assist Processors) -->
+   <extension point="org.eclipse.ui.genericeditor.contentAssistProcessors">
+      <contentAssistProcessor
+            class="com.example.plugin.editor.MyLanguageCompletionProcessor"
+            contentType="com.simula.contenttype">
+      </contentAssistProcessor>
+   </extension>
+
+   <!-- 5. Provide Documentation / Tooltips (Hover Providers) -->
+   <extension point="org.eclipse.ui.genericeditor.hoverProviders">
+      <hoverProvider
+            class="com.example.plugin.editor.MyLanguageHoverProvider"
+            contentType="com.simula.contenttype">
+      </hoverProvider>
+   </extension>
+
+</plugin>

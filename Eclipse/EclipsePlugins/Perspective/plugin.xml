@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<extension point="org.eclipse.ui.perspectives">
+    <perspective
+          class="com.simula.ide.ui.SimulaPerspectiveFactory"
+          id="com.simula.ide.ui.perspective"
+          name="Simula">
+    </perspective>
+</extension>
+
+<extension point="org.eclipse.ui.commands">
+    <command
+          id="com.simula.ide.ui.commands.runCompiler"
+          name="Compile Simula File">
+    </command>
+</extension>
+
+<extension point="org.eclipse.ui.handlers">
+    <handler
+          class="com.simula.ide.ui.handlers.CompileSimulaHandler"
+          commandId="com.simula.ide.ui.commands.runCompiler">
+    </handler>
+</extension>
+
+<extension point="org.eclipse.ui.menus">
+    <!-- Top-level Simula Menu -->
+    <menuContribution
+          locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+        <menu
+              id="com.simula.ide.ui.menus.simulaMenu"
+              label="Simula">
+            <!-- Command Item inside the menu -->
+            <command
+                  commandId="com.simula.ide.ui.commands.runCompiler"
+                  label="Compile Program"
+                  style="push">
+            </command>
+            <!-- Perspective visibility constraint -->
+            <visibleWhen checkEnabled="false">
+                <with variable="activePerspectiveId">
+                    <equals value="com.simula.ide.ui.perspective" />
+                </with>
+            </visibleWhen>
+        </menu>
+    </menuContribution>
+</extension>
+
+</plugin>

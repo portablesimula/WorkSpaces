@@ -34,4 +34,17 @@
       </contentTypeMapping>
    </extension>
 
+ 
+<extension point="org.eclipse.ui.editors">
+   <editor
+         id="org.eclipse.ui.genericeditor.GenericEditor"
+         name="Simula Editor"
+         class="org.eclipse.ui.internal.genericeditor.GenericEditor"
+         contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor">
+      <contentTypeBinding
+            contentTypeId="com.example.simula.contenttype">
+      </contentTypeBinding>
+   </editor>
+</extension>
+
 </plugin>

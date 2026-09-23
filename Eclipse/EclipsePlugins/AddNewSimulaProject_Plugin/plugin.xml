@@ -7,11 +7,12 @@
    <extension-point id="org.eclipse.core.resources.builders" name="SimulaBuilders" schema="schema/org.eclipse.core.resources.builders.exsd"/>
    <extension-point id="org.eclipse.core.resources.natures" name="SimulaNatures" schema="schema/org.eclipse.core.resources.natures.exsd"/>
 
+<!-- EXTENSION: New Ctrl-N on th Welcome Panel -->
 <extension point="org.eclipse.ui.newWizards">
    <!-- Valgfritt: Opprett en egen kategori i "New"-menyen -->
    <category
          id="com.example.myplugin.category"
-         name="Min Kategori">
+         name="Simula">
    </category>
    
    <!-- Definer selve veiviseren -->
