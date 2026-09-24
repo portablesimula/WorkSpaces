@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   
+<extension point="org.eclipse.core.contenttype.contentTypes">
+   <content-type 
+         id="com.example.simula.contenttype"
+         name="Simula Source File"
+         base-type="org.eclipse.core.runtime.text"
+         file-extensions="sim"
+         priority="high">
+   </content-type>
+</extension>
+
+<extension point="org.eclipse.lsp4e.languageServer">
+   <server
+         class="com.example.simula.SimulaStreamConnectionProvider"
+         id="com.example.simula.server"
+         label="Simula Language Server">
+   </server>
+   <contentTypeMapping
+         contentTypeId="com.example.simula.contenttype"
+         id="com.example.simula.server">
+   </contentTypeMapping>
+</extension>
+ 
+<extension point="org.eclipse.ui.editors">
+   <editor
+         id="org.eclipse.ui.genericeditor.GenericEditor"
+         name="Simula Editor"
+         class="org.eclipse.ui.genericeditor.GenericEditor"
+         contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor">
+      <contentTypeBinding
+            contentTypeId="com.example.simula.contenttype">
+      </contentTypeBinding>
+   </editor>
+   
+</extension>
+   
+</plugin>

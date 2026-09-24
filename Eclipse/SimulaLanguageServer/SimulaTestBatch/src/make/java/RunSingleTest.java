@@ -23,8 +23,8 @@ import simula.Option;
  */
 public final class RunSingleTest {
 	
-//	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
-	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaPlugin");
+//	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspServer");
+	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspServer");
 	private static final String userDir = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaTestBatch";
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 
@@ -58,7 +58,7 @@ public final class RunSingleTest {
 //		names.add("adHoc03.sim"); // For ad'hoc testing
 //		names.add("adHoc04.sim"); // For ad'hoc testing
 //	names.add("adHoc05.sim"); // For ad'hoc testing
-	names.add("adHoc06.sim"); // For ad'hoc testing
+//	names.add("adHoc06.sim"); // For ad'hoc testing
 //	names.add("adHoc10.sim"); // For ad'hoc testing
 //		names.add("adHoc11.sim"); // For ad'hoc testing
 //		names.add("CLASS_COMMON.sim"); // For ad'hoc testing
@@ -73,8 +73,8 @@ public final class RunSingleTest {
 		
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
-//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
-//		names.add("simtst00.sim"); // OK:  Empty test
+		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
 //		names.add("simtst03.sim"); // OK:  Test Text Value Relations
