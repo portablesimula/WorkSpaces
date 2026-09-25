@@ -44,7 +44,7 @@ public final class SimulaLexer {
     private int currentColumn;
     private int tokenStartPos; // Used to calculate length
     
-    private LexToken prevParserToken;
+//    private LexToken prevParserToken;
     private LexToken prevLexerToken;
     private LexToken currentLexerToken;
     
@@ -172,7 +172,7 @@ public final class SimulaLexer {
     			currentColumn = prevLexerToken.column + prevLexerToken.length;
     			if(TRACE_CURRENT_COLUMN) Util.println("SimulaLexer.nextToken(1): currentColumn="+currentColumn+", prevLexerToken: "+prevLexerToken);
     		}
-    		if(prevLexerToken.isParserToken()) prevParserToken = prevLexerToken;
+//    		if(prevLexerToken.isParserToken()) prevParserToken = prevLexerToken;
     	}
     	tokenStartPos = nextPos;
     	
@@ -355,10 +355,7 @@ public final class SimulaLexer {
     		break LOOP;
     	}
     	pushBackPos(1);
-//		snapShot("SimulaLexer.scanWhiteSpace: END");
-//		Util.println("SimulaLexer.scanWhiteSpace: END Current: " + edCurrent());
-//    	return(newWhiteSpaceToken());
-   		return new WhiteSpaceToken(currentLineNumber, sourceText, currentColumn, nextPos - tokenStartPos, this);
+    	return new WhiteSpaceToken(currentLineNumber, sourceText, currentColumn, nextPos - tokenStartPos, this);
      }
 
     
@@ -1301,7 +1298,7 @@ public final class SimulaLexer {
     		} else if (current == ';') {
 //    			Util.println("\n\n\n\nLexToken.scanComment: BEGIN TREAT SEMICOLON: nextPos="+nextPos+", tokenStartPos="+tokenStartPos);
 //    			Util.println("LexToken.scanComment: AT SEMICOLON: nextPos="+nextPos+", tokenStartPos="+tokenStartPos);
-    			int lng = nextPos - tokenStartPos;
+//    			int lng = nextPos - tokenStartPos;
 //    			Util.println("LexToken.scanComment: AT SEMICOLON: lng="+lng);
 				LexToken lexToken = newKeyWordToken(KeyWord.COMMENT_TEXT);
 				if(nPhrase > 1) Util.warning(simBuilder, lexToken, "Comment spans multiple lines");

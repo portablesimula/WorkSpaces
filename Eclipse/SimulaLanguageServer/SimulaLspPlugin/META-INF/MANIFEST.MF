@@ -16,4 +16,7 @@ Require-Bundle: org.eclipse.swt,
  org.eclipse.ui.editors;bundle-version="3.22.100"
 Automatic-Module-Name: com.vogella.lsp.asciidoc.client
 Bundle-RequiredExecutionEnvironment: JavaSE-25
-Import-Package: org.eclipse.jface.text.presentation
+Import-Package: org.eclipse.jface.text,
+ org.eclipse.jface.text.contentassist,
+ org.eclipse.jface.text.presentation,
+ org.eclipse.jface.text.rules

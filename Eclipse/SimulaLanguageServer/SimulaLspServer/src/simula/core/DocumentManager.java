@@ -12,8 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
-import simula.Comn;
-import simula.Option;
 import simula.core.builder.DocumentTextUpdater;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.export.LexToken;
@@ -105,22 +103,7 @@ public class DocumentManager {
     	this.documentUri = documentUri;
     	this.sourceFileDir = new File(documentUri).getParentFile();
     	this.documentVersion = documentVersion;
-    	if(Option.LEX_VERIFY) {
-    		Util.println("\nNEW DocumentManager: ========================================");
-	    	this.sourceCode = Comn.modifySourceCode(sourceCode);
-	    	if(Option.internal.TRACE_NEW_LEXTOKEN > 0) {
-		    	Util.println("DocumentManager.modifySourceCode: Original: |" + Comn.printable(sourceCode) + '|');
-		    	Util.println("DocumentManager.modifySourceCode: Modified: |" + Comn.printable(this.sourceCode) + '|');
-		   	}
-	    	if(! this.sourceCode.equals(sourceCode)) {
-	    		Util.generalWarning("NEW Document: " + documentUri
-	    				+ "\n Document text does not satisfy the rules required by Simula Lexer."
-	    				+ "\n Remove trailing blankes etc."
-	    				);
-	    	}
-    	} else {
-        	this.sourceCode = sourceCode;    		
-    	}
+    	this.sourceCode = sourceCode;    		    		
     	sourceFileName = this.documentUri;
 		sourceName = getSourceName(this.documentUri);
 		externalJarFileNames = new Vector<String>();
@@ -340,7 +323,7 @@ public class DocumentManager {
     	List<Integer> encodedData = documentManager.simBuilder.semTokenList;
 //		Util.IERR("DO VERIFY");
 //		if(Option.LEX_VERIFY) {
-//			TokenListVerifyer.verifyTokenList(documentManager.sourceCode, encodedData, lexTokenList);
+//		TokenListVerifyer.doVerify(documentManager.sourceCode, encodedData);
 //		}
 		return encodedData;
 	}

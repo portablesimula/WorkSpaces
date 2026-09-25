@@ -1,5 +1,8 @@
- 
-begin
+begin integer kk;    
+
+	
 	  	integer i;   
 	text t;   
 end
+
+

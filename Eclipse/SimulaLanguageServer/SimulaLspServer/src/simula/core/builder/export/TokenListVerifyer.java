@@ -1,6 +1,7 @@
 package simula.core.builder.export;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import simula.Comn;
 import simula.Option;
@@ -24,70 +25,28 @@ import simula.core.utilities.Util;
 /// 
 public class TokenListVerifyer {
 
-	public static void verifyTokenList(String originalText, List<Integer> semanticTokens, List<LexToken> lexTokenList) {
-		if(Option.internal.TRACE_VERIFY_TOKEN > 0) {
-			printLexTokenList("TokenListVerifyer.verifyTokenList: ", lexTokenList);
-			Util.println("\nTokenListVerifyer.verifyTokenList:" + lexTokenList.size());
-		}
-		
-        String reconstructedText = reconstruct(originalText, semanticTokens, lexTokenList);
-		if(! reconstructedText.equals(originalText)) {
-			String reconstr = Comn.printable(reconstructedText);
-			String original = Comn.printable(originalText);
-			int lng1 = original.length();
-			int lng2 = reconstr.length();
-			System.err.println("SimulaBuilder: VERIFIER FAILED: Reconstructed text differ from original text");
-			System.err.println("Original Text(lng:"+lng1+"): " + original);
-			System.err.println("Reconstr Text(lng:"+lng2+"): " + reconstr);
-			int n = Math.min(lng1, lng2);
-			LOOP:for(int i=0;i<n;i++) {
-				if(reconstr.charAt(i) != original.charAt(i)) {
-					int orgnal = original.charAt(i);
-					int recstr = reconstr.charAt(i);
-	    			System.err.println("First deviation at pos " + i + ", original: " + orgnal + ':' + Comn.printable((char)orgnal)
-	    			                                                 + ", reconstr: " + recstr + ':' + Comn.printable((char)recstr));
-					break LOOP;
-				}
-			}
-			if(lng1 != lng2) {
-				int pos = Math.max(0, n - 100);
-    			System.err.println("Original Tail: " + original.substring(pos));
-    			System.err.println("Reconstr Tail: " + reconstr.substring(pos));
-			}
-			Util.IERR("");
-
-		}
-		if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("TokenListVerifyer.verifyTokenList: OK - lexTokenList.size=" + lexTokenList.size());		
-	}
-
-//	public static void printSemTokenList(String originalText, List<Integer> tokens) {
-//		
-//	}
-
-	public static void printLexTokenList(String title, List<LexToken> lexTokenList) {
-		Util.println("================ " + title +": LexTokenList ================");
-		for(LexToken lexToken:lexTokenList) {
-			Util.println(""+lexToken);
-		}
-	}
-
-
-	private static boolean TESTING = false;//true;
-
 	// ****************************************************************
 	// *** reconstruct  -- SEE: LspTextPanel.fillTextPane
 	// ****************************************************************
-    private static String reconstruct(String originalText, List<Integer> semanticTokens, List<LexToken> lexTokenList) {
-        StringBuilder result = new StringBuilder();
+    public static void doVerify(String originalText, List<Integer> semanticTokens) {
+    	
+//    	Option.internal.TRACE_VERIFY_TOKEN = 1;
+    	
+    	List<String> sourceLines = originalText.lines().collect(Collectors.toList());
+    	if(Option.internal.TRACE_VERIFY_TOKEN > 0) {
+	    	int i = 1;
+	    	for(String line:sourceLines) {
+	    		Util.println("Line " + i++ + ": |" + Comn.printable(line) + '|');
+	    	}
+    	}
+        StringBuilder reconstr = new StringBuilder();
         int sourcePos = 0;
         int lineNumber = 0;
         int prevTextLength = 0;
 
         if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("\nSemanticTextReconstructor.reconstruct: SOURCE:"+Comn.printable(originalText));
         int x = 0;
-        int lexTokenIndex = 0;
 		while(x < semanticTokens.size()) {
-            LexToken lexToken = lexTokenList.get(lexTokenIndex++);
             int deltaLine = semanticTokens.get(x++);
             int deltaStartChar = semanticTokens.get(x++);
             int length = semanticTokens.get(x++);
@@ -96,86 +55,65 @@ public class TokenListVerifyer {
             @SuppressWarnings("unused")
 			int tokenModifiersBitmask = semanticTokens.get(x++);
           
-            if(TESTING) {
-	            Util.println("\nSemanticTextReconstructor.reconstruct: LOOP START: lexToken:"+lexToken);
+            if(Option.internal.TRACE_VERIFY_TOKEN > 0) {
 	            Util.println("SemanticTextReconstructor.reconstruct: LOOP START: semToken: deltaLine="+deltaLine + ", deltaStartChar="+deltaStartChar+", length="+length);
             }
             
             // 1. Calculate absolute positions based on LSP delta rules
             if (deltaLine > 0) {
+    			checkEqual("case 1", lineNumber, sourceLines.get(lineNumber++), reconstr.toString());
         		// Start NEWLINE
             	// meaning the current token is on a new line relative to the previous token),
             	// deltaStart is relative to 0 (the absolute beginning/left margin of that new line).
-        		//
-        		// |    token    | lexToken.column = 17, lastChar = 9
-        		// |--->         | deltaStart = lexToken.column - lastChar = 17 - 9 = 8
-            	while((deltaLine--) > 0) {
-                    result.append('\n');
-            		if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("APPEND tokenText|" + Comn.printable('\n') + "| ==> |" + Comn.printable(""+result) + '|');
-//            		if(TESTING && (!Option.TESTING_VERIFY)) {
-//	                    lineNumber++;            		
-//	                    Util.ASSERT(lexToken.keyWord == KeyWord.NEWLINE, "Not a NEWLINE Token: " + lexToken);
-//	                    String checkText = originalText.substring(sourcePos, sourcePos + 1);
-//	    				if(! checkText.equals('\n')) Util.IERR("Bad NEWLINE: " + Comn.printable(checkText) + ", lexToken=" + lexToken);
-//	                    lexToken = lexTokenList.get(lexTokenIndex++);
-//	                    Util.println("UPDATE NEWLINE lexToken: " + lexToken);
-//    				}
-               	    sourcePos ++;
+            	sourcePos = 0;
+           	    reconstr = new StringBuilder();
+            	while((deltaLine--) > 1) {
+            		// Empty line
+        			checkEqual("case 2", lineNumber, sourceLines.get(lineNumber++), "");
             	}
                 prevTextLength = 0;
-                if(TESTING) Util.println("\nStart NEWLINE: sourcePos="+sourcePos+", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
-            } else {
-                // token.deltaLine == 0
-        		// Fortsett på samme linje
-        		// meaning the current token is on the same line as the previous token),
-        		// deltaStart is relative to the start character (column offset) of the previous token.
-        		//
-        		// |  prev   token    | lexToken.column = 17, lastChar = 9
-        		// |  ------>         | deltaStart = lexToken.column - lastChar = 17 - 9 = 8
-            	if(TESTING) Util.println("\nCONTINUE LINE: sourcePos="+sourcePos+", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
             }
 
             // 3. Pad missing characters on the current line
             int gap = deltaStartChar - prevTextLength;
             if(gap != 0) {
-            	if(TESTING) Util.println("\nPAD SPACE Characters: gap = " + gap);  
-        		while((gap--) > 0) {
-                    result.append(" ");
-                    if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("APPEND tokenText| | ==> |" + Comn.printable(""+result) + '|');
-            	    sourcePos++;
-            	    if(TESTING) Util.println("UPDATE LINE: sourcePos="+sourcePos+", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
-        		}
-//        		if(TESTING && (!Option.TESTING_VERIFY)) {
-//                    Util.ASSERT(lexToken.keyWord == KeyWord.WHITESPACES, "Not a WHITESPACES Token");
-//                    while(lexToken.keyWord == KeyWord.WHITESPACES) {
-//                    	lexToken = lexTokenList.get(lexTokenIndex++);
-//                    	if(TESTING) Util.println("UPDATE SPACES lexToken: " + lexToken);
-//                    }
-//        		}
+        		reconstr.append(" ".repeat(gap));
+        		sourcePos += gap;
+                if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("LINE " + lineNumber + ": PAD SPACE: gap = " + gap + " ==> LINE|" + reconstr + '|');
             }
 
             // 4. Insert the token text
-            if(TESTING) Util.println("\nINSERT TEXT: length = " + length + ", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
-            String tokenText = originalText.substring(sourcePos, sourcePos + length);
-            result.append(tokenText);
-            if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("APPEND tokenText|" + Comn.printable(tokenText) + "| ==> |" + Comn.printable(""+result) + '|');
-            sourcePos += length;
-			if(Option.LEX_VERIFY) {
-				if(TESTING) Util.println("AFTER INSERT: sourcePos="+sourcePos+", TAIL|"+Comn.printable(originalText.substring(sourcePos)));
-				String lexTokenText = lexToken.getText();
-				if(! tokenText.equals(lexTokenText)) {
-			    	Util.println("SemanticTextReconstructor.reconstruct: Original: |" + Comn.printable(originalText) + '|');
-					Util.IERR("Bad TEXT: " + Comn.printable(tokenText) + ", lexToken=" + lexToken);
-				}
-			}
-
-            // 5. Update buffer character tracking
-            // Note: If tokenText contains internal newlines, handle lineNumber updates here.
+            if(length > 0) {
+	            String originalLine = sourceLines.get(lineNumber);
+	            String tokenText = originalLine.substring(sourcePos, sourcePos + length);
+	            reconstr.append(tokenText);
+	            if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("LINE " + lineNumber + ": APPEND TEXT: length = " + length + ", TEXT|" + tokenText + "| ==> LINE|" + reconstr + '|');
+	            sourcePos += length;
+            }
         	prevTextLength = length;
-        }
-
-        return result.toString();
+		}
+//		Util.println("sourceLines.size="+sourceLines.size()+", lineNumber="+lineNumber);
+		while(lineNumber < sourceLines.size()) {
+			checkEqual("case 3", lineNumber, sourceLines.get(lineNumber++), reconstr.toString());
+		}
+//    	Util.STOP();
     }
-
+    
+    private static void checkEqual(String debugName, int lineNumber, String original, String reconstr) {
+        String originalLine = original.stripTrailing();
+        String reconstrLine = reconstr.stripTrailing();
+        if(Option.internal.TRACE_VERIFY_TOKEN > 0) {
+        	Util.println("LINE " + lineNumber + ": RECONSTR: |" + Comn.printable(reconstrLine) + '|');
+        	Util.println("LINE " + lineNumber + ": ORIGINAL: |" + Comn.printable(originalLine) + '|');
+        }
+        if(! reconstrLine.equals(originalLine)) {
+        	System.err.println("SimulaBuilder: VERIFIER FAILED(" + debugName + "): Reconstructed text differ from original text on line " + lineNumber);
+        	int lng1 = original.length();
+        	int lng2 = reconstr.length();
+        	System.err.println("Original Text(lng:"+lng1+"): |" + Comn.printable(original) + '|');
+        	System.err.println("Reconstr Text(lng:"+lng2+"): |" + Comn.printable(reconstr) + '|');
+        	System.exit(-1);
+        }
+    }
 
 }

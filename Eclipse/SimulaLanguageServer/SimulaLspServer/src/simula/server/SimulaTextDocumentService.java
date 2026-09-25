@@ -82,7 +82,7 @@ public class SimulaTextDocumentService implements TextDocumentService {
     public SemanticTokens semanticTokensFull_Local(SemanticTokensParams params) {
     	String documentUri = params.getTextDocument().getUri();
     	LOG.info("got Request: semanticTokensFull: " + documentUri);
-    	LOG.severe("SimulaCoreExports.semanticTokensFull NOT IMPL");
+//    	LOG.severe("SimulaCoreExports.semanticTokensFull NOT IMPL");
     	List<Integer> tokens = DocumentManager.semanticTokensFull(documentUri);
     	return new SemanticTokens(tokens);
     }

@@ -136,8 +136,7 @@ public class SimulaBuilder {
 		}
     	this.semTokenList = TokenManager.generateSemanticTokens(lexTokenList);
 		if(Option.LEX_VERIFY) {
-			TokenListVerifyer.verifyTokenList(documentManager.sourceCode, semTokenList, lexTokenList);
-//			TokenListVerifyer.verifyTokenList(documentManager.modifiedSourceCode, semTokenList, lexTokenList);
+			TokenListVerifyer.doVerify(documentManager.sourceCode, semTokenList);
 		}
 //		Util.IERR("STOP HER INTILL VIDERE: BYGG og CHECK SemTokenList ??");	
 		documentManager.publishDiagnostics(diagnostics);

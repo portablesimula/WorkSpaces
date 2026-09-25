@@ -38,7 +38,7 @@ import java.util.jar.Manifest;
 public class MakeSimulaLspServer {
 	private static boolean DEBUG = true;
 	
-	private final static String SETUP_ROOT = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/MakeJars";
+	private final static String SETUP_ROOT = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspServer";
 	private final static String SERVER_ROOT = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspServer";
 	private final static String SERVER_BIN = SERVER_ROOT+"/bin";
 	private final static String LIBRARY_DIR = "C:/Eclipse_LSP/UnpackedLibraries";
@@ -46,7 +46,7 @@ public class MakeSimulaLspServer {
 	private static String installParentDirectory = System.getProperty("user.home");
 	private static File INSTALL_DIR = new File(installParentDirectory, "Simula");
 	
-	private static String ECLIPSE_SERVER_DIR = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaPlugin/server";
+	private static String ECLIPSE_SERVER_DIR = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspPlugin/server";
 	private static String VSCODE_SERVER_DIR = "C:/GitHub/WorkSpaces/VScode/simulaplugin/server";
 	private static String INTELLIJ_SERVER_DIR = "C:/GitHub/WorkSpaces/Intellij/SimulaPlugin/src/main/resources/server";
 
@@ -78,9 +78,9 @@ public class MakeSimulaLspServer {
 			listJarFile("", new File(INSTALL_DIR, "SimulaLspServer.jar"));
 			listManifest(new JarFile(INSTALLED));
 
-			copyInstalledServerToVSCode(INSTALLED, ECLIPSE_SERVER_DIR);
-			copyInstalledServerToVSCode(INSTALLED, VSCODE_SERVER_DIR);
-			copyInstalledServerToVSCode(INSTALLED, INTELLIJ_SERVER_DIR);
+			copyInstalledServer(INSTALLED, ECLIPSE_SERVER_DIR);
+			copyInstalledServer(INSTALLED, VSCODE_SERVER_DIR);
+			copyInstalledServer(INSTALLED, INTELLIJ_SERVER_DIR);
 			
 			IO.println("\nSimulaLspServer was created in " + INSTALL_DIR);
 			IO.println("                        and in " + ECLIPSE_SERVER_DIR);
@@ -92,11 +92,11 @@ public class MakeSimulaLspServer {
 		}
 	}
 	
-	private static void copyInstalledServerToVSCode(String INSTALLED, String TARGET_DIR) throws IOException	{
+	private static void copyInstalledServer(String INSTALLED, String TARGET_DIR) throws IOException	{
 		Path source = Paths.get(INSTALLED);
 		Path target = Paths.get(TARGET_DIR);
-		IO.println("copyInstalledServerToVSCode: source="+source);
-		IO.println("copyInstalledServerToVSCode: target="+target);
+		IO.println("copyInstalledServerToVSCode: source="+source+"   Exists:"+(new File(INSTALLED)).exists());
+		IO.println("copyInstalledServerToVSCode: target="+target+"   Exists:"+(new File(TARGET_DIR)).exists());
 	        
 	        // Kombinerer mappen og filnavnet til den endelige destinasjonsstien
 	        Path destinasjon = target.resolve(source.getFileName());
@@ -112,7 +112,7 @@ public class MakeSimulaLspServer {
 
 	
 	// ***************************************************************
-	// *** MAKE SIMULA COMPILER JAR
+	// *** MAKE SIMULA LANGUAGE SERVER JAR
 	// ***************************************************************
 	private static String makeSimulaLanguageServer() throws IOException	{
 		IO.println("Make Simula Language Server.jar in "+INSTALL_DIR);
@@ -121,6 +121,7 @@ public class MakeSimulaLspServer {
 		IO.println("Make Simula Language Server.jar as "+INSTALL_FILE);
 		
 		String compilerManifest=SETUP_ROOT+"/src/make/jars/MANIFEST.MF";
+		IO.println("makeSimulaLanguageServer: compilerManifest: " + compilerManifest+"  Exists:" + (new File(compilerManifest)).exists());
 		execute("jar","cmf", compilerManifest, INSTALL_FILE,
 				"-C", SERVER_BIN, "./simula",
 				"-C", LIBRARY_DIR, "./com",

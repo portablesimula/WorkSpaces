@@ -17,7 +17,7 @@ import simula.core.utilities.Util;
 /// 
 /// @author Øystein Myhre Andersen
 public final class Option {
-//	public static boolean TESTING_VERIFY = true;
+	public static boolean TESTING_TRAILING_BLANKS = true;
 	
 	public static boolean LEX_VERIFY = true;
 
