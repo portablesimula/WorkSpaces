@@ -26,6 +26,8 @@ public class LexToken {
 	
     public void setTokenTypeIndex(String tokenType) {
     	tokenTypeIndex = TokenManager.getTokenTypeIndex(tokenType);
+    	Util.println("LexToken.setTokenTypeIndex: " + tokenType);
+    	Util.println("LexToken.setTokenTypeIndex: " + tokenType + " ==> " + this.edit());
      }
 
 
@@ -117,7 +119,6 @@ public class LexToken {
 //		CharSequence txt = sourceText.subSequence(startOffset, endOffset);
 //		return txt.toString();
 //	}
-	
 	public int firstLineNumber() {
 		return lineNumber;
 	}
@@ -140,15 +141,22 @@ public class LexToken {
 	
 	public String edToken(SimulaLexer lexer) {
 		String str = Comn.printable(edTokenText(lexer));
-		return "Line " + lineNumber + ": " + KeyWord.edit(keyWord) + "[col:" + column + ", lng:" + length + "]=\"" + str + '"';
+		String tokenType = (tokenTypeIndex < 0)? "UNKNOWN" : TokenManager.STANDARD_TOKEN_TYPES.get(tokenTypeIndex);
+		String type = "" + tokenTypeIndex + ':' + tokenType;
+		return "Line " + lineNumber + ": " + KeyWord.edit(keyWord) + "[col:" + column + ", lng:" + length + ", type:" + type + "] Text: \"" + str + '"';
+	}
+
+	public String edit() {
+		String str = (tokenText == null)? "UNKNOWN" :  Comn.printable(tokenText);
+		String tokenType = (tokenTypeIndex < 0)? "UNKNOWN" : TokenManager.STANDARD_TOKEN_TYPES.get(tokenTypeIndex);
+		String type = "" + tokenTypeIndex + ':' + tokenType;
+		return "Line " + lineNumber + ": " + KeyWord.edit(keyWord) + "[col:" + column + ", lng:" + length + ", type:" + type + "] Text: \"" + str + '"';
 	}
 
 	@Override
 	public String toString() {
 		if(tokenText == null) Util.IERR("");
-		String str = (tokenText == null)? "UNKNOWN" :  Comn.printable(tokenText);
-		return "Line " + lineNumber + ": " + KeyWord.edit(keyWord) + "[col:" + column + ", lng:" + length + "] Text: \"" + str + '"';
+		return edit();
 	}
-
 
 }

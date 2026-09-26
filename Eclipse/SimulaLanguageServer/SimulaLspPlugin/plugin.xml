@@ -68,11 +68,13 @@
    </extension>
 
    <!-- 5. Provide Documentation / Tooltips (Hover Providers) -->
+   <!--
    <extension point="org.eclipse.ui.genericeditor.hoverProviders">
       <hoverProvider
             class="com.simula.client.editor.SimulaTextHoverProvider"
             contentType="com.simula.contenttype">
       </hoverProvider>
    </extension>
+   -->
 
 </plugin>

@@ -7,6 +7,7 @@ import org.eclipse.lsp4j.services.*;
 import simula.Comn;
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.builder.export.TokenManager;
 import simula.core.utilities.LOG;
 
 import java.util.Arrays;
@@ -69,7 +70,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
 //        Comn.popUp("SimulaLanguageServer.connect: " + languageClient.getClass());
         
 //        Util.redirectSystemIO();
-        LOG.info("MESSAGE TEXT 2");
+        LOG.info("SimulaLanguageServer.connect: " + languageClient);
     }
 
     /// --- LanguageServer Implementation ---
@@ -123,6 +124,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
     }
     
     public InitializeResult initialize_local(InitializeParams params) {
+//        LOG.info("SimulaLanguageServer.initialize_local: " + params);
         // Retrieve the raw options object sent by the client
         Object options = params.getInitializationOptions(); 
         
@@ -131,7 +133,21 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
 //            MyConfig config = new Gson().fromJson(options.toString(), MyConfig.class);
 //            // Apply options to the server instance...
         }
-        
+
+//        // 1. Naviger ned til klientens Semantic Tokens kapabiliteter
+//        try {
+//            List<String> clientSupportedTokenTypes = params.getCapabilities()
+//                .getTextDocument()
+//                .getSemanticTokens()
+//                .getTokenTypes()
+//                ;
+//                
+//            LOG.info("Klienten støtter følgende token types: " + clientSupportedTokenTypes);
+//        } catch (NullPointerException e) {
+//            // Håndter tilfeller hvor klienten ikke støtter semantisk syntaksutheving i det hele tatt
+//            LOG.info("Klienten har ikke lagt ved støtte for Semantic Tokens.");
+//        }
+
         // 1. Capture what the client is capable of doing
         this.clientCapabilities = params.getCapabilities();
         
@@ -172,53 +188,12 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         serverCapabilities.setCompletionProvider(new CompletionOptions(true, null));
         serverCapabilities.setDefinitionProvider(true);
         serverCapabilities.setHoverProvider(true);
-        serverCapabilities.setSemanticTokensProvider(getSemanticOptions());
+        serverCapabilities.setSemanticTokensProvider(TokenManager.getSemanticOptions());
 
         // 4. Return the capabilities wrapped in an InitializeResult object
         InitializeResult reply = new InitializeResult(serverCapabilities, new ServerInfo(CoreGlobal.serverName, CoreGlobal.serverVersion));
         return reply;
     }
-    
-
-    // 1. Define the ordered array of Token Types. 
-    // The index positions (0, 1, 2...) are what the server will transmit later.
-    private static final List<String> SUPPORTED_TOKEN_TYPES = Arrays.asList(
-    		SemanticTokenTypes.Namespace,
-    		"namespace", // Index 0
-        "type",      // Index 1
-        "class",     // Index 2
-        "enum",      // Index 3
-        "interface", // Index 4
-        "struct",    // Index 5
-        "typeParameter", // Index 6
-        "parameter", // Index 7
-        "variable",  // Index 8
-        "property",  // Index 9
-        "macro",     // Index 10
-        "function",  // Index 11
-        "method"     // Index 12
-    );
-
-    // Leave modifiers empty for this baseline configuration
-    private static final List<String> SUPPORTED_TOKEN_MODIFIERS = Arrays.asList();
-
-    private SemanticTokensWithRegistrationOptions getSemanticOptions() {
-    	// Set up semantic tokens options with your token types and modifiers legend
-        SemanticTokensWithRegistrationOptions semanticOptions = new SemanticTokensWithRegistrationOptions();
-//        SemanticTokensLegend legend = new SemanticTokensLegend(
-//            Arrays.asList("class", "interface", "variable", "function"), 
-//            Arrays.asList("declaration", "readonly")
-//        );
-        SemanticTokensLegend legend = new SemanticTokensLegend(
-                SUPPORTED_TOKEN_TYPES, 
-                SUPPORTED_TOKEN_MODIFIERS
-            );
-        semanticOptions.setLegend(legend);
-        semanticOptions.setFull(true); // Enable full document semantic tokens
-        return semanticOptions;
-    }
-    
-    
     
 
     @Override
@@ -251,6 +226,6 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
 
     // Getter to allow sub-services to use the client connection
     public LanguageClient getClient() {
-        return this.languageClient;
+        return SimulaLanguageServer.languageClient;
     }
 }

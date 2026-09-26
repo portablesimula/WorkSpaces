@@ -6863,3 +6863,1717 @@ This warning can be switched off on the Team > Git > Confirmations and Warnings 
 
 !ENTRY org.eclipse.lsp4e 1 0 2026-09-25 12:10:37.245
 !MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+!SESSION 2026-09-25 14:14:19.659 -----------------------------------------------
+eclipse.buildId=4.41.0.20260903-0719
+java.version=25
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=no_NO
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -product org.eclipse.epp.package.java.product -data C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer/../runtime-EclipseApplication -dev file:///C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/.metadata/.plugins/org.eclipse.pde.core/Eclipse%20Application/dev.properties -os win32 -ws win32 -arch x86_64 -consoleLog
+
+!ENTRY org.eclipse.egit.ui 2 0 2026-09-25 14:14:28.485
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\omyhr'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.174
+!MESSAGE [LS:Simula Language Server][Info]	MESSAGE TEXT 2
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.236
+!MESSAGE [LS:Simula Language Server][Info]	Language Server connected successfully!
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.241
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didOpen: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.241
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didOpen: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.258
+!MESSAGE [LS:Simula Language Server][Info]	StandardClass: INITIATE DONE
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.259
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.createJarFilesDirectory: jarFileDir=C:\Users\omyhr\OneDrive\Desktop\bin
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.259
+!MESSAGE [LS:Simula Language Server][Info]	\"DocumentManager.didOpen: openDocuments: {file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim=simula.core.DocumentManager@31f47f4}
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.260
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.tryCreateBuilder: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.261
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder.doParsing: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.271
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder.doChecking: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.272
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder: syntaxTree, tokenList and diagnostics DONE
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.285
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didOpen: RETURNS
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.286
+!MESSAGE [LS:Simula Language Server][Info]	got Request: semanticTokensFull: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.286
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.semanticTokensFull: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:14:35.287
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.getDocumentManager: documentUri ==> simula.core.DocumentManager@31f47f4
+!SESSION 2026-09-25 14:21:59.312 -----------------------------------------------
+eclipse.buildId=4.41.0.20260903-0719
+java.version=25
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=no_NO
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -product org.eclipse.epp.package.java.product -data C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer/../runtime-EclipseApplication -dev file:///C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/.metadata/.plugins/org.eclipse.pde.core/Eclipse%20Application/dev.properties -os win32 -ws win32 -arch x86_64 -consoleLog
+
+!ENTRY org.eclipse.egit.ui 2 0 2026-09-25 14:22:07.519
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\omyhr'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:09.988
+!MESSAGE [LS:Simula Language Server][Info]	SimulaLanguageServer.connect: EndpointProxy for org.eclipse.lsp4j.jsonrpc.RemoteEndpoint@18ce0030
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.026
+!MESSAGE [LS:Simula Language Server][Info]	SimulaLanguageServer.initialize_local: InitializeParams [
+  workDoneToken = null
+  processId = 29008
+  rootPath = "/C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/"
+  rootUri = "file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/"
+  initializationOptions = null
+  capabilities = ClientCapabilities [
+    workspace = WorkspaceClientCapabilities [
+      applyEdit = true
+      workspaceEdit = WorkspaceEditCapabilities [
+        documentChanges = true
+        resourceOperations = ArrayList (
+          "create",
+          "delete",
+          "rename"
+        )
+        failureHandling = "undo"
+        normalizesLineEndings = null
+        changeAnnotationSupport = WorkspaceEditChangeAnnotationSupportCapabilities [
+          groupsOnLabel = true
+        ]
+        snippetEditSupport = null
+        metadataSupport = null
+      ]
+      didChangeConfiguration = null
+      didChangeWatchedFiles = DidChangeWatchedFilesCapabilities [
+        relativePatternSupport = true
+        dynamicRegistration = true
+      ]
+      symbol = SymbolCapabilities [
+        symbolKind = null
+        tagSupport = SymbolTagSupportCapabilities [
+          valueSet = ArrayList (
+            Deprecated,
+            Private,
+            Package,
+            Protected,
+            Public,
+            Internal,
+            File,
+            Static,
+            Abstract,
+            Final,
+            Sealed,
+            Transient,
+            Volatile,
+            Synchronized,
+            Virtual,
+            Nullable,
+            NonNull,
+            Declaration,
+            Definition,
+            ReadOnly,
+            Overrides,
+            Implements
+          )
+        ]
+        resolveSupport = null
+        dynamicRegistration = true
+      ]
+      executeCommand = ExecuteCommandCapabilities [
+        dynamicRegistration = true
+      ]
+      workspaceFolders = true
+      configuration = true
+      semanticTokens = null
+      codeLens = CodeLensWorkspaceCapabilities [
+        refreshSupport = true
+      ]
+      fileOperations = FileOperationsWorkspaceCapabilities [
+        didCreate = null
+        willCreate = true
+        didRename = null
+        willRename = true
+        didDelete = null
+        willDelete = true
+        dynamicRegistration = null
+      ]
+      inlayHint = null
+      inlineValue = null
+      diagnostics = null
+      foldingRange = null
+      textDocumentContent = null
+    ]
+    textDocument = TextDocumentClientCapabilities [
+      synchronization = SynchronizationCapabilities [
+        willSave = true
+        willSaveWaitUntil = true
+        didSave = true
+        dynamicRegistration = null
+      ]
+      filters = null
+      completion = CompletionCapabilities [
+        completionItem = CompletionItemCapabilities [
+          snippetSupport = true
+          commitCharactersSupport = null
+          documentationFormat = ArrayList (
+            "markdown",
+            "plaintext"
+          )
+          deprecatedSupport = null
+          preselectSupport = null
+          tagSupport = null
+          insertReplaceSupport = null
+          resolveSupport = CompletionItemResolveSupportCapabilities [
+            properties = ArrayList (
+              "documentation",
+              "detail",
+              "additionalTextEdits"
+            )
+          ]
+          insertTextModeSupport = CompletionItemInsertTextModeSupportCapabilities [
+            valueSet = ArrayList (
+              AsIs,
+              AdjustIndentation
+            )
+          ]
+          labelDetailsSupport = null
+        ]
+        completionItemKind = null
+        contextSupport = true
+        insertTextMode = AdjustIndentation
+        completionList = CompletionListCapabilities [
+          itemDefaults = ArrayList (
+            "commitCharacters",
+            "editRange",
+            "insertTextFormat",
+            "insertTextMode"
+          )
+          applyKindSupport = null
+        ]
+        dynamicRegistration = true
+      ]
+      hover = HoverCapabilities [
+        contentFormat = ArrayList (
+          "markdown",
+          "plaintext"
+        )
+        dynamicRegistration = null
+      ]
+      signatureHelp = SignatureHelpCapabilities [
+        signatureInformation = SignatureInformationCapabilities [
+          documentationFormat = ArrayList (
+            "plaintext",
+            "markdown"
+          )
+          parameterInformation = ParameterInformationCapabilities [
+            labelOffsetSupport = true
+          ]
+          activeParameterSupport = true
+        ]
+        contextSupport = null
+        dynamicRegistration = null
+      ]
+      references = ReferencesCapabilities [
+        dynamicRegistration = null
+      ]
+      documentHighlight = DocumentHighlightCapabilities [
+        dynamicRegistration = null
+      ]
+      documentSymbol = DocumentSymbolCapabilities [
+        symbolKind = SymbolKindCapabilities [
+          valueSet = ArrayList (
+            File,
+            Module,
+            Namespace,
+            Package,
+            Class,
+            Method,
+            Property,
+            Field,
+            Constructor,
+            Enum,
+            Interface,
+            Function,
+            Variable,
+            Constant,
+            String,
+            Number,
+            Boolean,
+            Array,
+            Object,
+            Key,
+            Null,
+            EnumMember,
+            Struct,
+            Event,
+            Operator,
+            TypeParameter
+          )
+        ]
+        hierarchicalDocumentSymbolSupport = true
+        tagSupport = SymbolTagSupportCapabilities [
+          valueSet = ArrayList (
+            Deprecated,
+            Private,
+            Package,
+            Protected,
+            Public,
+            Internal,
+            File,
+            Static,
+            Abstract,
+            Final,
+            Sealed,
+            Transient,
+            Volatile,
+            Synchronized,
+            Virtual,
+            Nullable,
+            NonNull,
+            Declaration,
+            Definition,
+            ReadOnly,
+            Overrides,
+            Implements
+          )
+        ]
+        labelSupport = null
+        dynamicRegistration = null
+      ]
+      formatting = FormattingCapabilities [
+        dynamicRegistration = true
+      ]
+      rangeFormatting = RangeFormattingCapabilities [
+        rangesSupport = null
+        dynamicRegistration = null
+      ]
+      onTypeFormatting = OnTypeFormattingCapabilities [
+        dynamicRegistration = true
+      ]
+      declaration = null
+      definition = DefinitionCapabilities [
+        linkSupport = true
+        dynamicRegistration = null
+      ]
+      typeDefinition = TypeDefinitionCapabilities [
+        linkSupport = true
+        dynamicRegistration = null
+      ]
+      implementation = null
+      codeAction = CodeActionCapabilities [
+        codeActionLiteralSupport = CodeActionLiteralSupportCapabilities [
+          codeActionKind = CodeActionKindCapabilities [
+            valueSet = ArrayList (
+              "quickfix",
+              "refactor",
+              "refactor.extract",
+              "refactor.inline",
+              "refactor.rewrite",
+              "source",
+              "source.organizeImports"
+            )
+          ]
+        ]
+        isPreferredSupport = null
+        disabledSupport = null
+        dataSupport = true
+        resolveSupport = CodeActionResolveSupportCapabilities [
+          properties = ArrayList (
+            "edit"
+          )
+        ]
+        honorsChangeAnnotations = null
+        documentationSupport = null
+        tagSupport = null
+        dynamicRegistration = true
+      ]
+      codeLens = CodeLensCapabilities [
+        resolveSupport = null
+        dynamicRegistration = null
+      ]
+      documentLink = DocumentLinkCapabilities [
+        tooltipSupport = null
+        dynamicRegistration = null
+      ]
+      colorProvider = ColorProviderCapabilities [
+        dynamicRegistration = null
+      ]
+      rename = RenameCapabilities [
+        prepareSupport = true
+        prepareSupportDefaultBehavior = null
+        honorsChangeAnnotations = null
+        dynamicRegistration = null
+      ]
+      publishDiagnostics = PublishDiagnosticsCapabilities [
+        relatedInformation = null
+        tagSupport = null
+        versionSupport = null
+        codeDescriptionSupport = null
+        dataSupport = null
+      ]
+      foldingRange = FoldingRangeCapabilities [
+        rangeLimit = null
+        lineFoldingOnly = true
+        foldingRangeKind = FoldingRangeKindSupportCapabilities [
+          valueSet = ArrayList (
+            "comment",
+            "imports",
+            "region"
+          )
+        ]
+        foldingRange = FoldingRangeSupportCapabilities [
+          collapsedText = false
+        ]
+        dynamicRegistration = null
+      ]
+      typeHierarchy = null
+      callHierarchy = CallHierarchyCapabilities [
+        dynamicRegistration = null
+      ]
+      selectionRange = SelectionRangeCapabilities [
+        dynamicRegistration = null
+      ]
+      semanticTokens = null
+      moniker = null
+      linkedEditingRange = null
+      inlayHint = InlayHintCapabilities [
+        resolveSupport = null
+        dynamicRegistration = null
+      ]
+      inlineValue = null
+      diagnostic = null
+      inlineCompletion = null
+    ]
+    notebookDocument = null
+    window = WindowClientCapabilities [
+      workDoneProgress = true
+      showMessage = WindowShowMessageRequestCapabilities [
+        messageActionItem = null
+      ]
+      showDocument = ShowDocumentCapabilities [
+        support = true
+      ]
+    ]
+    general = null
+    experimental = null
+  ]
+  clientInfo = ClientInfo [
+    name = "Eclipse IDE"
+    version = "0.19.15.202608181341"
+  ]
+  locale = null
+  trace = "off"
+  workspaceFolders = ArrayList ()
+]
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.058
+!MESSAGE [LS:Simula Language Server][Info]	Language Server connected successfully!
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.062
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didOpen: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.062
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didOpen: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.081
+!MESSAGE [LS:Simula Language Server][Info]	StandardClass: INITIATE DONE
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.081
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.createJarFilesDirectory: jarFileDir=C:\Users\omyhr\OneDrive\Desktop\bin
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.082
+!MESSAGE [LS:Simula Language Server][Info]	\"DocumentManager.didOpen: openDocuments: {file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim=simula.core.DocumentManager@6ef267f2}
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.083
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.tryCreateBuilder: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.084
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder.doParsing: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.094
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder: syntaxTree, tokenList and diagnostics DONE
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.094
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder.doChecking: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.108
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didOpen: RETURNS
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.108
+!MESSAGE [LS:Simula Language Server][Info]	got Request: semanticTokensFull: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.109
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.semanticTokensFull: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-25 14:22:10.109
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.getDocumentManager: documentUri ==> simula.core.DocumentManager@6ef267f2
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-09-26 07:53:41.562
+!MESSAGE Cannot get hover region for offset 534
+!STACK 0
+java.lang.Exception: Internal error.(-32603)
+java.lang.UnsupportedOperationException
+	at org.eclipse.lsp4j.services.TextDocumentService.hover(TextDocumentService.java:147)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.lambda$recursiveFindRpcMethods$0(GenericEndpoint.java:65)
+	at org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.request(GenericEndpoint.java:128)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleRequest(RemoteEndpoint.java:271)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:201)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:185)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)
+	at org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:114)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+	at org.eclipse.lsp4e.LanguageServerPlugin.logThrowable(LanguageServerPlugin.java:140)
+	at org.eclipse.lsp4e.LanguageServerPlugin.logError(LanguageServerPlugin.java:132)
+	at org.eclipse.lsp4e.operations.hover.LSPTextHover.getHoverRegion(LSPTextHover.java:182)
+	at org.eclipse.ui.internal.genericeditor.hover.CompositeTextHover.getHoverRegion(CompositeTextHover.java:101)
+	at org.eclipse.jface.text.TextViewerHoverManager.computeInformation(TextViewerHoverManager.java:128)
+	at org.eclipse.jface.text.AbstractInformationControlManager.doShowInformation(AbstractInformationControlManager.java:1127)
+	at org.eclipse.jface.text.AbstractHoverInformationControlManager$MouseTracker.mouseHover(AbstractHoverInformationControlManager.java:519)
+	at org.eclipse.swt.widgets.TypedListener.handleEvent(TypedListener.java:250)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4363)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1217)
+	at org.eclipse.swt.widgets.Display.runDeferredEvents(Display.java:4161)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3749)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1160)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1051)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:680)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:583)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:193)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:219)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:149)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:115)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:467)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:298)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:615)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:563)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1415)
+	at org.eclipse.equinox.launcher.Main.main(Main.java:1387)
+Caused by: java.util.concurrent.ExecutionException: org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Internal error.
+	at java.base/java.util.concurrent.CompletableFuture.wrapInExecutionException(CompletableFuture.java:345)
+	at java.base/java.util.concurrent.CompletableFuture.reportGet(CompletableFuture.java:440)
+	at java.base/java.util.concurrent.CompletableFuture.get(CompletableFuture.java:2117)
+	at org.eclipse.lsp4e.operations.hover.LSPTextHover.getHoverRegion(LSPTextHover.java:169)
+	... 30 more
+Caused by: org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Internal error.
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleResponse(RemoteEndpoint.java:214)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:198)
+	at org.eclipse.lsp4e.LanguageServerWrapper.lambda$3(LanguageServerWrapper.java:458)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:189)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)
+	at org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:97)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-09-26 07:53:41.569
+!MESSAGE org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Internal error.
+!STACK 0
+java.lang.Exception: Internal error.(-32603)
+java.lang.UnsupportedOperationException
+	at org.eclipse.lsp4j.services.TextDocumentService.hover(TextDocumentService.java:147)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.lambda$recursiveFindRpcMethods$0(GenericEndpoint.java:65)
+	at org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.request(GenericEndpoint.java:128)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleRequest(RemoteEndpoint.java:271)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:201)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:185)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)
+	at org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:114)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+	at org.eclipse.lsp4e.LanguageServerPlugin.logThrowable(LanguageServerPlugin.java:140)
+	at org.eclipse.lsp4e.LanguageServerPlugin.logError(LanguageServerPlugin.java:132)
+	at org.eclipse.lsp4e.LanguageServerPlugin.logError(LanguageServerPlugin.java:111)
+	at org.eclipse.lsp4e.operations.hover.LSPTextHover.getResult(LSPTextHover.java:97)
+	at org.eclipse.lsp4e.operations.hover.LSPTextHover.getHoverInfo2(LSPTextHover.java:85)
+	at org.eclipse.ui.internal.genericeditor.hover.CompositeTextHover.getHoverInfo2(CompositeTextHover.java:59)
+	at org.eclipse.jface.text.TextViewerHoverManager$1.run(TextViewerHoverManager.java:155)
+Caused by: java.util.concurrent.CompletionException: org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Internal error.
+	at java.base/java.util.concurrent.CompletableFuture.wrapInCompletionException(CompletableFuture.java:323)
+	at java.base/java.util.concurrent.CompletableFuture.encodeRelay(CompletableFuture.java:412)
+	at java.base/java.util.concurrent.CompletableFuture.completeRelay(CompletableFuture.java:421)
+	at java.base/java.util.concurrent.CompletableFuture$UniRelay.tryFire(CompletableFuture.java:1118)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:531)
+	at java.base/java.util.concurrent.CompletableFuture.completeExceptionally(CompletableFuture.java:2221)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleResponse(RemoteEndpoint.java:214)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:198)
+	at org.eclipse.lsp4e.LanguageServerWrapper.lambda$3(LanguageServerWrapper.java:458)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:189)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)
+	at org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:97)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+Caused by: org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Internal error.
+	... 11 more
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 07:53:47.127
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didClose: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 07:53:47.127
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: openDocuments: {file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim=simula.core.DocumentManager@6ef267f2}
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 07:53:47.128
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 07:53:47.128
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: openDocuments: {}
+!SESSION 2026-09-26 08:33:49.502 -----------------------------------------------
+eclipse.buildId=4.41.0.20260903-0719
+java.version=25
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=no_NO
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -product org.eclipse.epp.package.java.product -data C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer/../runtime-EclipseApplication -dev file:///C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/.metadata/.plugins/org.eclipse.pde.core/Eclipse%20Application/dev.properties -os win32 -ws win32 -arch x86_64 -consoleLog
+
+!ENTRY org.eclipse.egit.ui 2 0 2026-09-26 08:34:01.201
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\omyhr'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:01.995
+!MESSAGE [LS:Simula Language Server][Info]	SimulaLanguageServer.connect: EndpointProxy for org.eclipse.lsp4j.jsonrpc.RemoteEndpoint@18ce0030
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.038
+!MESSAGE [LS:Simula Language Server][Info]	SimulaLanguageServer.initialize_local: InitializeParams [
+  workDoneToken = null
+  processId = 7232
+  rootPath = "/C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/"
+  rootUri = "file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/"
+  initializationOptions = null
+  capabilities = ClientCapabilities [
+    workspace = WorkspaceClientCapabilities [
+      applyEdit = true
+      workspaceEdit = WorkspaceEditCapabilities [
+        documentChanges = true
+        resourceOperations = ArrayList (
+          "create",
+          "delete",
+          "rename"
+        )
+        failureHandling = "undo"
+        normalizesLineEndings = null
+        changeAnnotationSupport = WorkspaceEditChangeAnnotationSupportCapabilities [
+          groupsOnLabel = true
+        ]
+        snippetEditSupport = null
+        metadataSupport = null
+      ]
+      didChangeConfiguration = null
+      didChangeWatchedFiles = DidChangeWatchedFilesCapabilities [
+        relativePatternSupport = true
+        dynamicRegistration = true
+      ]
+      symbol = SymbolCapabilities [
+        symbolKind = null
+        tagSupport = SymbolTagSupportCapabilities [
+          valueSet = ArrayList (
+            Deprecated,
+            Private,
+            Package,
+            Protected,
+            Public,
+            Internal,
+            File,
+            Static,
+            Abstract,
+            Final,
+            Sealed,
+            Transient,
+            Volatile,
+            Synchronized,
+            Virtual,
+            Nullable,
+            NonNull,
+            Declaration,
+            Definition,
+            ReadOnly,
+            Overrides,
+            Implements
+          )
+        ]
+        resolveSupport = null
+        dynamicRegistration = true
+      ]
+      executeCommand = ExecuteCommandCapabilities [
+        dynamicRegistration = true
+      ]
+      workspaceFolders = true
+      configuration = true
+      semanticTokens = null
+      codeLens = CodeLensWorkspaceCapabilities [
+        refreshSupport = true
+      ]
+      fileOperations = FileOperationsWorkspaceCapabilities [
+        didCreate = null
+        willCreate = true
+        didRename = null
+        willRename = true
+        didDelete = null
+        willDelete = true
+        dynamicRegistration = null
+      ]
+      inlayHint = null
+      inlineValue = null
+      diagnostics = null
+      foldingRange = null
+      textDocumentContent = null
+    ]
+    textDocument = TextDocumentClientCapabilities [
+      synchronization = SynchronizationCapabilities [
+        willSave = true
+        willSaveWaitUntil = true
+        didSave = true
+        dynamicRegistration = null
+      ]
+      filters = null
+      completion = CompletionCapabilities [
+        completionItem = CompletionItemCapabilities [
+          snippetSupport = true
+          commitCharactersSupport = null
+          documentationFormat = ArrayList (
+            "markdown",
+            "plaintext"
+          )
+          deprecatedSupport = null
+          preselectSupport = null
+          tagSupport = null
+          insertReplaceSupport = null
+          resolveSupport = CompletionItemResolveSupportCapabilities [
+            properties = ArrayList (
+              "documentation",
+              "detail",
+              "additionalTextEdits"
+            )
+          ]
+          insertTextModeSupport = CompletionItemInsertTextModeSupportCapabilities [
+            valueSet = ArrayList (
+              AsIs,
+              AdjustIndentation
+            )
+          ]
+          labelDetailsSupport = null
+        ]
+        completionItemKind = null
+        contextSupport = true
+        insertTextMode = AdjustIndentation
+        completionList = CompletionListCapabilities [
+          itemDefaults = ArrayList (
+            "commitCharacters",
+            "editRange",
+            "insertTextFormat",
+            "insertTextMode"
+          )
+          applyKindSupport = null
+        ]
+        dynamicRegistration = true
+      ]
+      hover = HoverCapabilities [
+        contentFormat = ArrayList (
+          "markdown",
+          "plaintext"
+        )
+        dynamicRegistration = null
+      ]
+      signatureHelp = SignatureHelpCapabilities [
+        signatureInformation = SignatureInformationCapabilities [
+          documentationFormat = ArrayList (
+            "plaintext",
+            "markdown"
+          )
+          parameterInformation = ParameterInformationCapabilities [
+            labelOffsetSupport = true
+          ]
+          activeParameterSupport = true
+        ]
+        contextSupport = null
+        dynamicRegistration = null
+      ]
+      references = ReferencesCapabilities [
+        dynamicRegistration = null
+      ]
+      documentHighlight = DocumentHighlightCapabilities [
+        dynamicRegistration = null
+      ]
+      documentSymbol = DocumentSymbolCapabilities [
+        symbolKind = SymbolKindCapabilities [
+          valueSet = ArrayList (
+            File,
+            Module,
+            Namespace,
+            Package,
+            Class,
+            Method,
+            Property,
+            Field,
+            Constructor,
+            Enum,
+            Interface,
+            Function,
+            Variable,
+            Constant,
+            String,
+            Number,
+            Boolean,
+            Array,
+            Object,
+            Key,
+            Null,
+            EnumMember,
+            Struct,
+            Event,
+            Operator,
+            TypeParameter
+          )
+        ]
+        hierarchicalDocumentSymbolSupport = true
+        tagSupport = SymbolTagSupportCapabilities [
+          valueSet = ArrayList (
+            Deprecated,
+            Private,
+            Package,
+            Protected,
+            Public,
+            Internal,
+            File,
+            Static,
+            Abstract,
+            Final,
+            Sealed,
+            Transient,
+            Volatile,
+            Synchronized,
+            Virtual,
+            Nullable,
+            NonNull,
+            Declaration,
+            Definition,
+            ReadOnly,
+            Overrides,
+            Implements
+          )
+        ]
+        labelSupport = null
+        dynamicRegistration = null
+      ]
+      formatting = FormattingCapabilities [
+        dynamicRegistration = true
+      ]
+      rangeFormatting = RangeFormattingCapabilities [
+        rangesSupport = null
+        dynamicRegistration = null
+      ]
+      onTypeFormatting = OnTypeFormattingCapabilities [
+        dynamicRegistration = true
+      ]
+      declaration = null
+      definition = DefinitionCapabilities [
+        linkSupport = true
+        dynamicRegistration = null
+      ]
+      typeDefinition = TypeDefinitionCapabilities [
+        linkSupport = true
+        dynamicRegistration = null
+      ]
+      implementation = null
+      codeAction = CodeActionCapabilities [
+        codeActionLiteralSupport = CodeActionLiteralSupportCapabilities [
+          codeActionKind = CodeActionKindCapabilities [
+            valueSet = ArrayList (
+              "quickfix",
+              "refactor",
+              "refactor.extract",
+              "refactor.inline",
+              "refactor.rewrite",
+              "source",
+              "source.organizeImports"
+            )
+          ]
+        ]
+        isPreferredSupport = null
+        disabledSupport = null
+        dataSupport = true
+        resolveSupport = CodeActionResolveSupportCapabilities [
+          properties = ArrayList (
+            "edit"
+          )
+        ]
+        honorsChangeAnnotations = null
+        documentationSupport = null
+        tagSupport = null
+        dynamicRegistration = true
+      ]
+      codeLens = CodeLensCapabilities [
+        resolveSupport = null
+        dynamicRegistration = null
+      ]
+      documentLink = DocumentLinkCapabilities [
+        tooltipSupport = null
+        dynamicRegistration = null
+      ]
+      colorProvider = ColorProviderCapabilities [
+        dynamicRegistration = null
+      ]
+      rename = RenameCapabilities [
+        prepareSupport = true
+        prepareSupportDefaultBehavior = null
+        honorsChangeAnnotations = null
+        dynamicRegistration = null
+      ]
+      publishDiagnostics = PublishDiagnosticsCapabilities [
+        relatedInformation = null
+        tagSupport = null
+        versionSupport = null
+        codeDescriptionSupport = null
+        dataSupport = null
+      ]
+      foldingRange = FoldingRangeCapabilities [
+        rangeLimit = null
+        lineFoldingOnly = true
+        foldingRangeKind = FoldingRangeKindSupportCapabilities [
+          valueSet = ArrayList (
+            "comment",
+            "imports",
+            "region"
+          )
+        ]
+        foldingRange = FoldingRangeSupportCapabilities [
+          collapsedText = false
+        ]
+        dynamicRegistration = null
+      ]
+      typeHierarchy = null
+      callHierarchy = CallHierarchyCapabilities [
+        dynamicRegistration = null
+      ]
+      selectionRange = SelectionRangeCapabilities [
+        dynamicRegistration = null
+      ]
+      semanticTokens = null
+      moniker = null
+      linkedEditingRange = null
+      inlayHint = InlayHintCapabilities [
+        resolveSupport = null
+        dynamicRegistration = null
+      ]
+      inlineValue = null
+      diagnostic = null
+      inlineCompletion = null
+    ]
+    notebookDocument = null
+    window = WindowClientCapabilities [
+      workDoneProgress = true
+      showMessage = WindowShowMessageRequestCapabilities [
+        messageActionItem = null
+      ]
+      showDocument = ShowDocumentCapabilities [
+        support = true
+      ]
+    ]
+    general = null
+    experimental = null
+  ]
+  clientInfo = ClientInfo [
+    name = "Eclipse IDE"
+    version = "0.19.15.202608181341"
+  ]
+  locale = null
+  trace = "off"
+  workspaceFolders = ArrayList ()
+]
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.039
+!MESSAGE [LS:Simula Language Server][Info]	Klienten har ikke lagt ved støtte for Semantic Tokens.
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.072
+!MESSAGE [LS:Simula Language Server][Info]	Language Server connected successfully!
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.076
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didOpen: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.077
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didOpen: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.097
+!MESSAGE [LS:Simula Language Server][Info]	StandardClass: INITIATE DONE
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.097
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.createJarFilesDirectory: jarFileDir=C:\Users\omyhr\OneDrive\Desktop\bin
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.098
+!MESSAGE [LS:Simula Language Server][Info]	\"DocumentManager.didOpen: openDocuments: {file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim=simula.core.DocumentManager@198c531d}
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.099
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.tryCreateBuilder: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.101
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder.doParsing: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.112
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder: syntaxTree, tokenList and diagnostics DONE
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.113
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder.doChecking: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.129
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didOpen: RETURNS
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.130
+!MESSAGE [LS:Simula Language Server][Info]	got Request: semanticTokensFull: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.130
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.semanticTokensFull: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:02.131
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.getDocumentManager: documentUri ==> simula.core.DocumentManager@198c531d
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-09-26 08:34:02.798
+!MESSAGE Cannot get hover region for offset 1056
+!STACK 0
+java.lang.Exception: Internal error.(-32603)
+java.lang.UnsupportedOperationException
+	at org.eclipse.lsp4j.services.TextDocumentService.hover(TextDocumentService.java:147)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.lambda$recursiveFindRpcMethods$0(GenericEndpoint.java:65)
+	at org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.request(GenericEndpoint.java:128)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleRequest(RemoteEndpoint.java:271)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:201)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:185)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)
+	at org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:114)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+	at org.eclipse.lsp4e.LanguageServerPlugin.logThrowable(LanguageServerPlugin.java:140)
+	at org.eclipse.lsp4e.LanguageServerPlugin.logError(LanguageServerPlugin.java:132)
+	at org.eclipse.lsp4e.operations.hover.LSPTextHover.getHoverRegion(LSPTextHover.java:182)
+	at org.eclipse.ui.internal.genericeditor.hover.CompositeTextHover.getHoverRegion(CompositeTextHover.java:101)
+	at org.eclipse.jface.text.TextViewerHoverManager.computeInformation(TextViewerHoverManager.java:128)
+	at org.eclipse.jface.text.AbstractInformationControlManager.doShowInformation(AbstractInformationControlManager.java:1127)
+	at org.eclipse.jface.text.AbstractHoverInformationControlManager$MouseTracker.mouseHover(AbstractHoverInformationControlManager.java:519)
+	at org.eclipse.swt.widgets.TypedListener.handleEvent(TypedListener.java:250)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4363)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1217)
+	at org.eclipse.swt.widgets.Display.runDeferredEvents(Display.java:4161)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3749)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1160)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1051)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:680)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:583)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:193)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:219)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:149)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:115)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:467)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:298)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:615)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:563)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1415)
+	at org.eclipse.equinox.launcher.Main.main(Main.java:1387)
+Caused by: java.util.concurrent.ExecutionException: org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Internal error.
+	at java.base/java.util.concurrent.CompletableFuture.wrapInExecutionException(CompletableFuture.java:345)
+	at java.base/java.util.concurrent.CompletableFuture.reportGet(CompletableFuture.java:440)
+	at java.base/java.util.concurrent.CompletableFuture.get(CompletableFuture.java:2117)
+	at org.eclipse.lsp4e.operations.hover.LSPTextHover.getHoverRegion(LSPTextHover.java:169)
+	... 30 more
+Caused by: org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Internal error.
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleResponse(RemoteEndpoint.java:214)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:198)
+	at org.eclipse.lsp4e.LanguageServerWrapper.lambda$3(LanguageServerWrapper.java:458)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:189)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)
+	at org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:97)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-09-26 08:34:02.800
+!MESSAGE org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Internal error.
+!STACK 0
+java.lang.Exception: Internal error.(-32603)
+java.lang.UnsupportedOperationException
+	at org.eclipse.lsp4j.services.TextDocumentService.hover(TextDocumentService.java:147)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.lambda$recursiveFindRpcMethods$0(GenericEndpoint.java:65)
+	at org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.request(GenericEndpoint.java:128)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleRequest(RemoteEndpoint.java:271)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:201)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:185)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)
+	at org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:114)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+	at org.eclipse.lsp4e.LanguageServerPlugin.logThrowable(LanguageServerPlugin.java:140)
+	at org.eclipse.lsp4e.LanguageServerPlugin.logError(LanguageServerPlugin.java:132)
+	at org.eclipse.lsp4e.LanguageServerPlugin.logError(LanguageServerPlugin.java:111)
+	at org.eclipse.lsp4e.operations.hover.LSPTextHover.getResult(LSPTextHover.java:97)
+	at org.eclipse.lsp4e.operations.hover.LSPTextHover.getHoverInfo2(LSPTextHover.java:85)
+	at org.eclipse.ui.internal.genericeditor.hover.CompositeTextHover.getHoverInfo2(CompositeTextHover.java:59)
+	at org.eclipse.jface.text.TextViewerHoverManager$1.run(TextViewerHoverManager.java:155)
+Caused by: java.util.concurrent.CompletionException: org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Internal error.
+	at java.base/java.util.concurrent.CompletableFuture.wrapInCompletionException(CompletableFuture.java:323)
+	at java.base/java.util.concurrent.CompletableFuture.encodeRelay(CompletableFuture.java:412)
+	at java.base/java.util.concurrent.CompletableFuture.completeRelay(CompletableFuture.java:421)
+	at java.base/java.util.concurrent.CompletableFuture$UniRelay.tryFire(CompletableFuture.java:1118)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:531)
+	at java.base/java.util.concurrent.CompletableFuture.completeExceptionally(CompletableFuture.java:2221)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleResponse(RemoteEndpoint.java:214)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:198)
+	at org.eclipse.lsp4e.LanguageServerWrapper.lambda$3(LanguageServerWrapper.java:458)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:189)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)
+	at org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:97)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+Caused by: org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Internal error.
+	... 11 more
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:43.079
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: openDocuments: {file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim=simula.core.DocumentManager@198c531d}
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:43.080
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didClose: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:43.080
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:34:43.080
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: openDocuments: {}
+!SESSION 2026-09-26 08:35:40.270 -----------------------------------------------
+eclipse.buildId=4.41.0.20260903-0719
+java.version=25
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=no_NO
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -product org.eclipse.epp.package.java.product -data C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer/../runtime-EclipseApplication -dev file:///C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/.metadata/.plugins/org.eclipse.pde.core/Eclipse%20Application/dev.properties -os win32 -ws win32 -arch x86_64 -consoleLog
+
+!ENTRY org.eclipse.egit.ui 2 0 2026-09-26 08:35:48.803
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\omyhr'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.700
+!MESSAGE [LS:Simula Language Server][Info]	SimulaLanguageServer.connect: EndpointProxy for org.eclipse.lsp4j.jsonrpc.RemoteEndpoint@18ce0030
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.737
+!MESSAGE [LS:Simula Language Server][Info]	SimulaLanguageServer.initialize_local: InitializeParams [
+  workDoneToken = null
+  processId = 6164
+  rootPath = "/C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/"
+  rootUri = "file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/"
+  initializationOptions = null
+  capabilities = ClientCapabilities [
+    workspace = WorkspaceClientCapabilities [
+      applyEdit = true
+      workspaceEdit = WorkspaceEditCapabilities [
+        documentChanges = true
+        resourceOperations = ArrayList (
+          "create",
+          "delete",
+          "rename"
+        )
+        failureHandling = "undo"
+        normalizesLineEndings = null
+        changeAnnotationSupport = WorkspaceEditChangeAnnotationSupportCapabilities [
+          groupsOnLabel = true
+        ]
+        snippetEditSupport = null
+        metadataSupport = null
+      ]
+      didChangeConfiguration = null
+      didChangeWatchedFiles = DidChangeWatchedFilesCapabilities [
+        relativePatternSupport = true
+        dynamicRegistration = true
+      ]
+      symbol = SymbolCapabilities [
+        symbolKind = null
+        tagSupport = SymbolTagSupportCapabilities [
+          valueSet = ArrayList (
+            Deprecated,
+            Private,
+            Package,
+            Protected,
+            Public,
+            Internal,
+            File,
+            Static,
+            Abstract,
+            Final,
+            Sealed,
+            Transient,
+            Volatile,
+            Synchronized,
+            Virtual,
+            Nullable,
+            NonNull,
+            Declaration,
+            Definition,
+            ReadOnly,
+            Overrides,
+            Implements
+          )
+        ]
+        resolveSupport = null
+        dynamicRegistration = true
+      ]
+      executeCommand = ExecuteCommandCapabilities [
+        dynamicRegistration = true
+      ]
+      workspaceFolders = true
+      configuration = true
+      semanticTokens = null
+      codeLens = CodeLensWorkspaceCapabilities [
+        refreshSupport = true
+      ]
+      fileOperations = FileOperationsWorkspaceCapabilities [
+        didCreate = null
+        willCreate = true
+        didRename = null
+        willRename = true
+        didDelete = null
+        willDelete = true
+        dynamicRegistration = null
+      ]
+      inlayHint = null
+      inlineValue = null
+      diagnostics = null
+      foldingRange = null
+      textDocumentContent = null
+    ]
+    textDocument = TextDocumentClientCapabilities [
+      synchronization = SynchronizationCapabilities [
+        willSave = true
+        willSaveWaitUntil = true
+        didSave = true
+        dynamicRegistration = null
+      ]
+      filters = null
+      completion = CompletionCapabilities [
+        completionItem = CompletionItemCapabilities [
+          snippetSupport = true
+          commitCharactersSupport = null
+          documentationFormat = ArrayList (
+            "markdown",
+            "plaintext"
+          )
+          deprecatedSupport = null
+          preselectSupport = null
+          tagSupport = null
+          insertReplaceSupport = null
+          resolveSupport = CompletionItemResolveSupportCapabilities [
+            properties = ArrayList (
+              "documentation",
+              "detail",
+              "additionalTextEdits"
+            )
+          ]
+          insertTextModeSupport = CompletionItemInsertTextModeSupportCapabilities [
+            valueSet = ArrayList (
+              AsIs,
+              AdjustIndentation
+            )
+          ]
+          labelDetailsSupport = null
+        ]
+        completionItemKind = null
+        contextSupport = true
+        insertTextMode = AdjustIndentation
+        completionList = CompletionListCapabilities [
+          itemDefaults = ArrayList (
+            "commitCharacters",
+            "editRange",
+            "insertTextFormat",
+            "insertTextMode"
+          )
+          applyKindSupport = null
+        ]
+        dynamicRegistration = true
+      ]
+      hover = HoverCapabilities [
+        contentFormat = ArrayList (
+          "markdown",
+          "plaintext"
+        )
+        dynamicRegistration = null
+      ]
+      signatureHelp = SignatureHelpCapabilities [
+        signatureInformation = SignatureInformationCapabilities [
+          documentationFormat = ArrayList (
+            "plaintext",
+            "markdown"
+          )
+          parameterInformation = ParameterInformationCapabilities [
+            labelOffsetSupport = true
+          ]
+          activeParameterSupport = true
+        ]
+        contextSupport = null
+        dynamicRegistration = null
+      ]
+      references = ReferencesCapabilities [
+        dynamicRegistration = null
+      ]
+      documentHighlight = DocumentHighlightCapabilities [
+        dynamicRegistration = null
+      ]
+      documentSymbol = DocumentSymbolCapabilities [
+        symbolKind = SymbolKindCapabilities [
+          valueSet = ArrayList (
+            File,
+            Module,
+            Namespace,
+            Package,
+            Class,
+            Method,
+            Property,
+            Field,
+            Constructor,
+            Enum,
+            Interface,
+            Function,
+            Variable,
+            Constant,
+            String,
+            Number,
+            Boolean,
+            Array,
+            Object,
+            Key,
+            Null,
+            EnumMember,
+            Struct,
+            Event,
+            Operator,
+            TypeParameter
+          )
+        ]
+        hierarchicalDocumentSymbolSupport = true
+        tagSupport = SymbolTagSupportCapabilities [
+          valueSet = ArrayList (
+            Deprecated,
+            Private,
+            Package,
+            Protected,
+            Public,
+            Internal,
+            File,
+            Static,
+            Abstract,
+            Final,
+            Sealed,
+            Transient,
+            Volatile,
+            Synchronized,
+            Virtual,
+            Nullable,
+            NonNull,
+            Declaration,
+            Definition,
+            ReadOnly,
+            Overrides,
+            Implements
+          )
+        ]
+        labelSupport = null
+        dynamicRegistration = null
+      ]
+      formatting = FormattingCapabilities [
+        dynamicRegistration = true
+      ]
+      rangeFormatting = RangeFormattingCapabilities [
+        rangesSupport = null
+        dynamicRegistration = null
+      ]
+      onTypeFormatting = OnTypeFormattingCapabilities [
+        dynamicRegistration = true
+      ]
+      declaration = null
+      definition = DefinitionCapabilities [
+        linkSupport = true
+        dynamicRegistration = null
+      ]
+      typeDefinition = TypeDefinitionCapabilities [
+        linkSupport = true
+        dynamicRegistration = null
+      ]
+      implementation = null
+      codeAction = CodeActionCapabilities [
+        codeActionLiteralSupport = CodeActionLiteralSupportCapabilities [
+          codeActionKind = CodeActionKindCapabilities [
+            valueSet = ArrayList (
+              "quickfix",
+              "refactor",
+              "refactor.extract",
+              "refactor.inline",
+              "refactor.rewrite",
+              "source",
+              "source.organizeImports"
+            )
+          ]
+        ]
+        isPreferredSupport = null
+        disabledSupport = null
+        dataSupport = true
+        resolveSupport = CodeActionResolveSupportCapabilities [
+          properties = ArrayList (
+            "edit"
+          )
+        ]
+        honorsChangeAnnotations = null
+        documentationSupport = null
+        tagSupport = null
+        dynamicRegistration = true
+      ]
+      codeLens = CodeLensCapabilities [
+        resolveSupport = null
+        dynamicRegistration = null
+      ]
+      documentLink = DocumentLinkCapabilities [
+        tooltipSupport = null
+        dynamicRegistration = null
+      ]
+      colorProvider = ColorProviderCapabilities [
+        dynamicRegistration = null
+      ]
+      rename = RenameCapabilities [
+        prepareSupport = true
+        prepareSupportDefaultBehavior = null
+        honorsChangeAnnotations = null
+        dynamicRegistration = null
+      ]
+      publishDiagnostics = PublishDiagnosticsCapabilities [
+        relatedInformation = null
+        tagSupport = null
+        versionSupport = null
+        codeDescriptionSupport = null
+        dataSupport = null
+      ]
+      foldingRange = FoldingRangeCapabilities [
+        rangeLimit = null
+        lineFoldingOnly = true
+        foldingRangeKind = FoldingRangeKindSupportCapabilities [
+          valueSet = ArrayList (
+            "comment",
+            "imports",
+            "region"
+          )
+        ]
+        foldingRange = FoldingRangeSupportCapabilities [
+          collapsedText = false
+        ]
+        dynamicRegistration = null
+      ]
+      typeHierarchy = null
+      callHierarchy = CallHierarchyCapabilities [
+        dynamicRegistration = null
+      ]
+      selectionRange = SelectionRangeCapabilities [
+        dynamicRegistration = null
+      ]
+      semanticTokens = null
+      moniker = null
+      linkedEditingRange = null
+      inlayHint = InlayHintCapabilities [
+        resolveSupport = null
+        dynamicRegistration = null
+      ]
+      inlineValue = null
+      diagnostic = null
+      inlineCompletion = null
+    ]
+    notebookDocument = null
+    window = WindowClientCapabilities [
+      workDoneProgress = true
+      showMessage = WindowShowMessageRequestCapabilities [
+        messageActionItem = null
+      ]
+      showDocument = ShowDocumentCapabilities [
+        support = true
+      ]
+    ]
+    general = null
+    experimental = null
+  ]
+  clientInfo = ClientInfo [
+    name = "Eclipse IDE"
+    version = "0.19.15.202608181341"
+  ]
+  locale = null
+  trace = "off"
+  workspaceFolders = ArrayList ()
+]
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.738
+!MESSAGE [LS:Simula Language Server][Info]	Klienten har ikke lagt ved støtte for Semantic Tokens.
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.768
+!MESSAGE [LS:Simula Language Server][Info]	Language Server connected successfully!
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.771
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didOpen: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.772
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didOpen: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.790
+!MESSAGE [LS:Simula Language Server][Info]	StandardClass: INITIATE DONE
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.790
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.createJarFilesDirectory: jarFileDir=C:\Users\omyhr\OneDrive\Desktop\bin
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.791
+!MESSAGE [LS:Simula Language Server][Info]	\"DocumentManager.didOpen: openDocuments: {file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim=simula.core.DocumentManager@4903beba}
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.792
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.tryCreateBuilder: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.793
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder.doParsing: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.803
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder: syntaxTree, tokenList and diagnostics DONE
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.803
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder.doChecking: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.817
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didOpen: RETURNS
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.817
+!MESSAGE [LS:Simula Language Server][Info]	got Request: semanticTokensFull: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.818
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.semanticTokensFull: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:35:49.818
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.getDocumentManager: documentUri ==> simula.core.DocumentManager@4903beba
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:36:15.985
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didClose: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:36:15.986
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: openDocuments: {file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim=simula.core.DocumentManager@4903beba}
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:36:15.986
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:36:15.987
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: openDocuments: {}
+!SESSION 2026-09-26 08:37:47.599 -----------------------------------------------
+eclipse.buildId=4.41.0.20260903-0719
+java.version=25
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=no_NO
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -product org.eclipse.epp.package.java.product -data C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer/../runtime-EclipseApplication -dev file:///C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/.metadata/.plugins/org.eclipse.pde.core/Eclipse%20Application/dev.properties -os win32 -ws win32 -arch x86_64 -consoleLog
+
+!ENTRY org.eclipse.egit.ui 2 0 2026-09-26 08:37:55.842
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\omyhr'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.286
+!MESSAGE [LS:Simula Language Server][Info]	SimulaLanguageServer.connect: EndpointProxy for org.eclipse.lsp4j.jsonrpc.RemoteEndpoint@18ce0030
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.319
+!MESSAGE [LS:Simula Language Server][Info]	Klienten har ikke lagt ved støtte for Semantic Tokens.
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.349
+!MESSAGE [LS:Simula Language Server][Info]	Language Server connected successfully!
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.352
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didOpen: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.353
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didOpen: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.370
+!MESSAGE [LS:Simula Language Server][Info]	StandardClass: INITIATE DONE
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.371
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.createJarFilesDirectory: jarFileDir=C:\Users\omyhr\OneDrive\Desktop\bin
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.371
+!MESSAGE [LS:Simula Language Server][Info]	\"DocumentManager.didOpen: openDocuments: {file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim=simula.core.DocumentManager@58ba9c02}
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.372
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.tryCreateBuilder: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.373
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder.doParsing: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.384
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder.doChecking: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.384
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder: syntaxTree, tokenList and diagnostics DONE
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.403
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didOpen: RETURNS
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.403
+!MESSAGE [LS:Simula Language Server][Info]	got Request: semanticTokensFull: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.404
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.semanticTokensFull: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 08:37:57.404
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.getDocumentManager: documentUri ==> simula.core.DocumentManager@58ba9c02
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:48:07.514
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: openDocuments: {file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim=simula.core.DocumentManager@58ba9c02}
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:48:07.515
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didClose: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:48:07.516
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:48:07.516
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: openDocuments: {}
+!SESSION 2026-09-26 10:48:53.954 -----------------------------------------------
+eclipse.buildId=4.41.0.20260903-0719
+java.version=25
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=no_NO
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -product org.eclipse.epp.package.java.product -data C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer/../runtime-EclipseApplication -dev file:///C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/.metadata/.plugins/org.eclipse.pde.core/Eclipse%20Application/dev.properties -os win32 -ws win32 -arch x86_64 -consoleLog
+
+!ENTRY org.eclipse.egit.ui 2 0 2026-09-26 10:49:02.242
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\omyhr'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.307
+!MESSAGE [LS:Simula Language Server][Info]	SimulaLanguageServer.connect: EndpointProxy for org.eclipse.lsp4j.jsonrpc.RemoteEndpoint@6973bf95
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.339
+!MESSAGE [LS:Simula Language Server][Info]	Klienten har ikke lagt ved støtte for Semantic Tokens.
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.369
+!MESSAGE [LS:Simula Language Server][Info]	Language Server connected successfully!
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.373
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didOpen: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.373
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didOpen: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.391
+!MESSAGE [LS:Simula Language Server][Info]	StandardClass: INITIATE DONE
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.391
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.createJarFilesDirectory: jarFileDir=C:\Users\omyhr\OneDrive\Desktop\bin
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.392
+!MESSAGE [LS:Simula Language Server][Info]	\"DocumentManager.didOpen: openDocuments: {file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim=simula.core.DocumentManager@1e7296b9}
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.393
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.tryCreateBuilder: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.394
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder.doParsing: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.405
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder.doChecking: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.405
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder: syntaxTree, tokenList and diagnostics DONE
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.419
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didOpen: RETURNS
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.419
+!MESSAGE [LS:Simula Language Server][Info]	got Request: semanticTokensFull: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.420
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.semanticTokensFull: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:49:03.420
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.getDocumentManager: documentUri ==> simula.core.DocumentManager@1e7296b9
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:50:24.539
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didClose: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:50:24.539
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: openDocuments: {file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim=simula.core.DocumentManager@1e7296b9}
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:50:24.540
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: file:///C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-09-26 10:50:24.540
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: openDocuments: {}

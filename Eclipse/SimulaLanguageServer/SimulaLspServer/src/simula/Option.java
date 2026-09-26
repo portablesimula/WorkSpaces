@@ -54,7 +54,7 @@ public final class Option {
 
 		// Lexer Trace Options
 		/** Debug option */	public static int TRACE_LEXER = 0;
-		/** Debug option */	public static int TRACE_NEW_LEXTOKEN = 0;
+		/** Debug option */	public static int TRACE_NEW_LEXTOKEN = 1;// 0;
 //		/** Debug option */	public static boolean TRACE_ADVANCE_LEXER = false;//true;
 //		/** Debug option */	public static boolean TRACE_COMMENTS = false;
 

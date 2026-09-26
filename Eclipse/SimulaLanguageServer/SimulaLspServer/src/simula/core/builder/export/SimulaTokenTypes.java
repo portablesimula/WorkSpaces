@@ -3,7 +3,7 @@ package simula.core.builder.export;
 public final class SimulaTokenTypes {
 	  public static final String Keyword = SemanticTokenTypes.Keyword;
 	  public static final String Symbol = SemanticTokenTypes.Keyword;
-	  public static final String WhiteSpace = SemanticTokenTypes.Keyword;
+	  public static final String WhiteSpace = "UNKNOWN"; // SemanticTokenTypes.Keyword;
 
 	  public static final String Class = SemanticTokenTypes.Class;
 	  public static final String Attribute =  SemanticTokenTypes.Property;
