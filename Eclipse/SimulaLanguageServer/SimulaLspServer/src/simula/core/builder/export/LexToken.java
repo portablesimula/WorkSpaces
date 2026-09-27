@@ -26,8 +26,8 @@ public class LexToken {
 	
     public void setTokenTypeIndex(String tokenType) {
     	tokenTypeIndex = TokenManager.getTokenTypeIndex(tokenType);
-    	Util.println("LexToken.setTokenTypeIndex: " + tokenType);
-    	Util.println("LexToken.setTokenTypeIndex: " + tokenType + " ==> " + this.edit());
+//    	Util.println("LexToken.setTokenTypeIndex: " + tokenType);
+//    	Util.println("LexToken.setTokenTypeIndex: " + tokenType + " ==> " + this.edit());
      }
 
 
@@ -61,10 +61,10 @@ public class LexToken {
 //		Util.println("NEW LexToken: " + this);
 				
 		if(Option.LEX_VERIFY) {
-			if(keyWord != KeyWord.NEWLINE && this.getText().contains("\r"))
-				Util.IERR("NEW LexToken: LEX_VERIFY FAILD: Token text contais CR: " + this);
-			if(keyWord != KeyWord.NEWLINE && this.getText().contains("\n"))
-				Util.IERR("NEW LexToken: LEX_VERIFY FAILD: Token text contais NEWLINE: " + this);
+			if(keyWord != KeyWord.NEWLINE) {
+				if(tokenText.contains("\r")) Util.IERR("NEW LexToken: LEX_VERIFY FAILD: Token text contais CR: " + this);
+				if(tokenText.contains("\n")) Util.IERR("NEW LexToken: LEX_VERIFY FAILD: Token text contais NEWLINE: " + this);
+			}
 			if(prevToken != null) {
 				if(keyWord != KeyWord.EOF && column != ( prevToken.column + prevToken.length )) {
 					System.err.println("\nNEW LexToken: Illegal gap between tokens: ");
@@ -100,6 +100,31 @@ public class LexToken {
 		}
 	}
 	
+	public int semTokenLength() {
+		int nBlanks = nTrailingBlanks();
+		if(nBlanks > 0) {
+			Util.println("LexToken.semTokenLength: nTrailingBlanks=" + nBlanks);
+			String semTokenText = tokenText.substring(0,length - nBlanks);
+			Util.println("      |" + tokenText +'|');
+			Util.println(" ==>  |" + semTokenText +'|');
+//			Util.IERR("SJEKK DETTE");
+		}
+		return length - nBlanks;
+	}
+	
+	
+	public int nTrailingBlanks() {
+	    if (tokenText == null) return 0;
+	    int count = 0;
+	    int len = tokenText.length();
+	    LOOP:for (int i = len - 1; i >= 0; i--) {
+	        if (Character.isWhitespace(tokenText.charAt(i))) count++;
+//	        if (tokenText.charAt(i) == ' ') count++;
+	        else break LOOP;
+	    }
+	    return count;
+	}
+
 	public String edText() {
 		return KeyWord.edit(keyWord);
 	}
@@ -143,14 +168,14 @@ public class LexToken {
 		String str = Comn.printable(edTokenText(lexer));
 		String tokenType = (tokenTypeIndex < 0)? "UNKNOWN" : TokenManager.STANDARD_TOKEN_TYPES.get(tokenTypeIndex);
 		String type = "" + tokenTypeIndex + ':' + tokenType;
-		return "Line " + lineNumber + ": " + KeyWord.edit(keyWord) + "[col:" + column + ", lng:" + length + ", type:" + type + "] Text: \"" + str + '"';
+		return "Line " + lineNumber + ": " + KeyWord.edit(keyWord) + "[col:" + column + ", lng:" + length + ", type:" + type + "] Text|" + str + '|';
 	}
 
 	public String edit() {
 		String str = (tokenText == null)? "UNKNOWN" :  Comn.printable(tokenText);
 		String tokenType = (tokenTypeIndex < 0)? "UNKNOWN" : TokenManager.STANDARD_TOKEN_TYPES.get(tokenTypeIndex);
 		String type = "" + tokenTypeIndex + ':' + tokenType;
-		return "Line " + lineNumber + ": " + KeyWord.edit(keyWord) + "[col:" + column + ", lng:" + length + ", type:" + type + "] Text: \"" + str + '"';
+		return "Line " + lineNumber + ": " + KeyWord.edit(keyWord) + "[col:" + column + ", lng:" + length + ", type:" + type + "] Text|" + str + '|';
 	}
 
 	@Override

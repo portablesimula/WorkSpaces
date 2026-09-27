@@ -14,15 +14,15 @@ import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.export.LexToken;
-import simula.core.builder.util.CharacterConst;
-import simula.core.builder.util.Identifier;
-import simula.core.builder.util.IntegerConst;
-import simula.core.builder.util.KeyWordToken;
-import simula.core.builder.util.LongRealConst;
-import simula.core.builder.util.RealConst;
-import simula.core.builder.util.SimpleString;
-import simula.core.builder.util.TabToken;
-import simula.core.builder.util.WhiteSpaceToken;
+import simula.core.builder.token.CharacterConst;
+import simula.core.builder.token.Identifier;
+import simula.core.builder.token.IntegerConst;
+import simula.core.builder.token.KeyWordToken;
+import simula.core.builder.token.LongRealConst;
+import simula.core.builder.token.RealConst;
+import simula.core.builder.token.SimpleString;
+import simula.core.builder.token.TabToken;
+import simula.core.builder.token.WhiteSpaceToken;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.Util;
 import simula.exception.EOTException;
@@ -306,13 +306,17 @@ public final class SimulaLexer {
 	            case '\"': return(scanTextConstant());
 	            case '0':case '1':case '2':case '3':case '4':
 	            case '5':case '6':case '7':case '8':case '9':return(scanNumber());
-	            
-	            case '\t': return(newTabToken());
 		    	  
 	            case '\n': return(newNewlineToken());
 
 	            case '\r': if(getNext()=='\n') return (newNewlineToken());
 				    pushBackPos(1); // NOTE: No break or return ==> default
+				    
+	            case '\t':
+	            	if(! Option.TESTING_TABS) {
+	            		return(newTabToken());
+	            	}
+				    
 	            default: if(Character.isWhitespace(current)) return(scanWhiteSpace());
 	        		return newKeyWordToken(KeyWord.BAD_CHARACTERS);
     		}
@@ -344,13 +348,15 @@ public final class SimulaLexer {
     /// @return next Token
 	private LexToken scanWhiteSpace() {
 //		snapShot("SimulaLexer.scanWhiteSpace: BEGIN");
-//		Util.println("\n\nSimulaLexer.scanWhiteSpace: BEGIN nextPos: " + nextPos + " with value: " + edCurrent());
+//		Util.println("SimulaLexer.scanWhiteSpace: BEGIN nextPos: " + nextPos + " with value: " + edCurrent());
     	LOOP:while(true) {
     		getNext();
 //    		Util.println("SimulaLexer.scanWhiteSpace: currentColumn: " + currentColumn);
 			if(current == '\r' && nextCharIs('\n')) break LOOP;
     		if(current == '\n') break LOOP;
-    		if(current == '\t') break LOOP;
+    		if(! Option.TESTING_TABS) {
+    			if(current == '\t') break LOOP;
+    		}
     		if(Character.isWhitespace(current)) continue LOOP;
     		break LOOP;
     	}
@@ -845,7 +851,8 @@ public final class SimulaLexer {
 		// First: Skip Token separators
 		while(currentIsTokenSeparator()) {
 			if(Option.LEX_VERIFY) {
-				if(current == '\n' || current == ';' || isWhiteSpace(current)) ; // OK
+//				if(current == '\n' || current == ';' || isWhiteSpace(current)) ; // OK
+				if(current == '\n' || current == ';' || Character.isWhitespace((char)current)) ; // OK
 				else Util.IERR("SimulaLexer.moreSimpleString: TokenSeparator End-Condition Failed: current = "+edCurrent());
 			}
 			getNext();
@@ -1100,7 +1107,8 @@ public final class SimulaLexer {
     		return false;
 		}
     	
-    	boolean res = isWhiteSpace(current);
+//    	boolean res = isWhiteSpace(current);
+    	boolean res = Character.isWhitespace((char)current);
 //    	Util.println("SimulaLexer.currentIsTokenSeparator: isWhiteSpace("+current+")=" + isWhiteSpace(current));
     	return res;
     }
@@ -1601,6 +1609,15 @@ public final class SimulaLexer {
 	private LexToken newKeyWordToken(final int keyWord) {
 		return new KeyWordToken(currentLineNumber, sourceText, currentColumn, nextPos - tokenStartPos, keyWord, this);
 	}
+	
+	private String edTokenText(CharSequence sourceText, int lineNumber, int column, int length) {
+		int startOfLine = getLineStartPos(lineNumber);
+		int tokenStartPos = startOfLine + column;
+		CharSequence txt = sourceText.subSequence(tokenStartPos, tokenStartPos + length);
+		String debugText=txt.toString();
+		return debugText;
+	}
+
 //	private LexToken newKeyWordToken(final int tokenStartPos, final int length, final int keyWord) {
 //		return new KeyWordToken(currentLineNumber, sourceText, currentColumn, length, keyWord, this);
 //	}
@@ -1743,19 +1760,19 @@ public final class SimulaLexer {
 	/// Utility: Check if a character is a whiteSpace.
 	/// @param c the character
 	/// @return true if character c is a whiteSpace
-	private boolean isWhiteSpace(final int c) {
-		switch(c) {
-		    case '\n':	/* NL (LF) */
-		    case 32:    /* SPACE */
-		    case '\b':	/* BS */
-		    case '\t':	/* HT */
-		    case 11:	/* VT */
-		    case '\f':	/* FF */
-		    case '\r':	/* CR */
-			         return(true);
-		    default: return(false);
-		}  
-	}
+//	private boolean isWhiteSpace(final int c) {
+//		switch(c) {
+//		    case '\n':	/* NL (LF) */
+//		    case 32:    /* SPACE */
+//		    case '\b':	/* BS */
+//		    case '\t':	/* HT */
+//		    case 11:	/* VT */
+//		    case '\f':	/* FF */
+//		    case '\r':	/* CR */
+//			         return(true);
+//		    default: return(false);
+//		}  
+//	}
 
 
 	public LexToken getEOFToken() {

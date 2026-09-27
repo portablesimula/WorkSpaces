@@ -14,7 +14,7 @@ import java.lang.constant.ClassDesc;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.builder.util.Identifier;
+import simula.core.builder.token.Identifier;
 import simula.core.DocumentManager;
 import simula.core.coder.SimulaCoder;
 import simula.core.utilities.DeclarationList;

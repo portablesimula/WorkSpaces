@@ -7,13 +7,11 @@ import java.util.List;
 
 import org.eclipse.lsp4j.Diagnostic;
 
-import simula.Comn;
 import simula.Option;
 import simula.core.DocumentManager;
 import simula.core.builder.export.LexToken;
-import simula.core.builder.export.TokenListVerifyer;
 import simula.core.builder.export.TokenManager;
-import simula.core.builder.util.SimpleString;
+import simula.core.builder.token.SimpleString;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.syntaxClass.declaration.MaybeBlockDeclaration;
 import simula.core.syntaxClass.declaration.StandardClass;
@@ -136,7 +134,7 @@ public class SimulaBuilder {
 		}
     	this.semTokenList = TokenManager.generateSemanticTokens(lexTokenList);
 		if(Option.LEX_VERIFY) {
-			TokenListVerifyer.doVerify(documentManager.sourceCode, semTokenList);
+			TokenManager.tokenListVerifyer(documentManager.sourceCode, semTokenList);
 		}
 //		Util.IERR("STOP HER INTILL VIDERE: BYGG og CHECK SemTokenList ??");	
 		documentManager.publishDiagnostics(diagnostics);

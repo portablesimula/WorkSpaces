@@ -323,7 +323,7 @@ public class DocumentManager {
     	List<Integer> encodedData = documentManager.simBuilder.semTokenList;
 //		Util.IERR("DO VERIFY");
 //		if(Option.LEX_VERIFY) {
-//		TokenListVerifyer.doVerify(documentManager.sourceCode, encodedData);
+//		TokenManager.tokenListVerifyer(documentManager.sourceCode, encodedData);
 //		}
 		return encodedData;
 	}

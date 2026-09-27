@@ -17,7 +17,7 @@ import simula.core.utilities.Util;
 /// 
 /// @author Øystein Myhre Andersen
 public final class Option {
-	public static boolean TESTING_TRAILING_BLANKS = true;
+	public static boolean TESTING_TABS = true;
 	
 	public static boolean LEX_VERIFY = true;
 
@@ -54,7 +54,7 @@ public final class Option {
 
 		// Lexer Trace Options
 		/** Debug option */	public static int TRACE_LEXER = 0;
-		/** Debug option */	public static int TRACE_NEW_LEXTOKEN = 1;// 0;
+		/** Debug option */	public static int TRACE_NEW_LEXTOKEN = 1;//0;
 //		/** Debug option */	public static boolean TRACE_ADVANCE_LEXER = false;//true;
 //		/** Debug option */	public static boolean TRACE_COMMENTS = false;
 

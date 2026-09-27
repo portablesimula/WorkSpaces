@@ -1,4 +1,4 @@
-package simula.core.builder.util;
+package simula.core.builder.token;
 
 import simula.Option;
 import simula.core.builder.SimulaLexer;

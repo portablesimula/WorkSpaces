@@ -1,4 +1,4 @@
-package simula.core.builder.util;
+package simula.core.builder.token;
 
 import javax.lang.model.SourceVersion;
 
@@ -55,6 +55,6 @@ public class Identifier extends LexToken {
 
 	@Override
 	public String toString() {
-		return super.toString() + ", Value: \"" + value + '"';
+		return super.toString() + ", Value|" + value + '|';
 	}
 }

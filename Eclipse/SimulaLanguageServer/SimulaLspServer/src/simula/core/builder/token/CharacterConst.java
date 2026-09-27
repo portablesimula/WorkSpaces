@@ -1,4 +1,4 @@
-package simula.core.builder.util;
+package simula.core.builder.token;
 
 import simula.Option;
 import simula.core.builder.SimulaLexer;
@@ -6,14 +6,13 @@ import simula.core.builder.export.LexToken;
 import simula.core.builder.export.SimulaTokenTypes;
 import simula.core.utilities.KeyWord;
 
-public class TabToken extends LexToken {
+public class CharacterConst extends LexToken {
 	public final Character value;
 
-	public TabToken(int tokenStartLine, CharSequence sourceText, int column, int length, SimulaLexer lexer) {
+	public CharacterConst(int tokenStartLine, CharSequence sourceText, int column, int length, int value, SimulaLexer lexer) {
 //		super(tokenStartLine, sourceText, startOffset, endOffset, KeyWord.CHARACTERKONST);
-//		super(tokenStartLine, sourceText, column, length, KeyWord.CHARACTERKONST, SimulaTokenTypes.Character, lexer);
-		super(tokenStartLine, sourceText, column, length, KeyWord.TAB_CHAR, SimulaTokenTypes.WhiteSpace, lexer);
-		this.value = '\t';
+		super(tokenStartLine, sourceText, column, length, KeyWord.CHARACTERKONST, SimulaTokenTypes.Character, lexer);
+		this.value = Character.valueOf((char) value);
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();
 	}
 

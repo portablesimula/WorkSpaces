@@ -10,7 +10,7 @@ import java.io.IOException;
 import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
-import simula.core.builder.util.Identifier;
+import simula.core.builder.token.Identifier;
 import simula.core.syntaxClass.declaration.ClassDeclaration;
 import simula.core.syntaxClass.declaration.Declaration;
 import simula.core.syntaxClass.declaration.VirtualSpecification;

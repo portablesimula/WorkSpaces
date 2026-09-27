@@ -1,3 +1,4 @@
+%  PURPOSE:  To test the relational operators  =  <>  <  <=  >  >=   
 begin integer kk;    
 
 	
