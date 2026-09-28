@@ -102,13 +102,12 @@ public class LexToken {
 	
 	public int semTokenLength() {
 		int nBlanks = nTrailingBlanks();
-		if(nBlanks > 0) {
-			Util.println("LexToken.semTokenLength: nTrailingBlanks=" + nBlanks);
-			String semTokenText = tokenText.substring(0,length - nBlanks);
-			Util.println("      |" + tokenText +'|');
-			Util.println(" ==>  |" + semTokenText +'|');
-//			Util.IERR("SJEKK DETTE");
-		}
+//		if(nBlanks > 0) {
+//			Util.println("LexToken.semTokenLength: nTrailingBlanks=" + nBlanks);
+//			String semTokenText = tokenText.substring(0,length - nBlanks);
+//			Util.println("      |" + tokenText +'|');
+//			Util.println(" ==>  |" + semTokenText +'|');
+//		}
 		return length - nBlanks;
 	}
 	

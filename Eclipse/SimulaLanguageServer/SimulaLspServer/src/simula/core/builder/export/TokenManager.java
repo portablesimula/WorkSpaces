@@ -323,7 +323,7 @@ public class TokenManager {
 			int tokenModifiersBitmask = semanticTokens.get(x++);
 
 			if(Option.internal.TRACE_VERIFY_TOKEN > 0) {
-				Util.println("TokenManager.tokenListVerifyer: LOOP START: semToken: deltaLine=" + deltaLine + ", deltaStartChar="+deltaStartChar
+				Util.println("TokenManager.tokenListVerifyer: SEM_TOKEN: semToken: deltaLine=" + deltaLine + ", deltaStartChar="+deltaStartChar
 						+ ", length="+length+", tokenTypeIndex=" + tokenTypeIndex+", tokenModifiersBitmask=" + tokenModifiersBitmask);
 			}
 			
@@ -343,6 +343,7 @@ public class TokenManager {
 				// deltaStart is relative to 0 (the absolute beginning/left margin of that new line).
 				sourcePos = 0;
 				reconstr = new StringBuilder();
+//				IO.println("CASE 1: NEW RECONSTR");
 				while((deltaLine--) > 1) {
 					// Empty line
 					checkEqual("case 2", lineNumber, sourceLines.get(lineNumber++), "");
@@ -359,6 +360,7 @@ public class TokenManager {
 			}
 			if(gap != 0) {
 				reconstr.append(" ".repeat(gap));
+//				IO.println("CASE 2: ADD GAP RECONSTR|" + reconstr + '|');
 				sourcePos += gap;
 				if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("LINE " + lineNumber + ": PAD SPACE: gap = " + gap + " ==> LINE|" + reconstr + '|');
 			}
@@ -373,6 +375,7 @@ public class TokenManager {
 					System.err.println("TokenManager.tokenListVerifyer: VERIFIER FAILED: Token text has trailing blanks on line " + lineNumber);					
 				}
 				reconstr.append(tokenText);
+//				IO.println("CASE 3: INSERT  RECONSTR|" + reconstr + '|');
 				if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("LINE " + lineNumber + ": APPEND TEXT: length = " + length + ", TEXT|" + tokenText + "| ==> LINE|" + reconstr + '|');
 				sourcePos += length;
 			}
@@ -392,14 +395,21 @@ public class TokenManager {
 	private static void checkEqual(String debugName, int lineNumber, String original, String reconstr) {
 //		String originalLine = original.stripTrailing();
 //		String reconstrLine = reconstr.stripTrailing();
+		
+//		String originalLine = original.replace("\t", " ").stripTrailing();
+//		String reconstrLine = reconstr.replace("\t", " ").stripTrailing();
+
 		String originalLine = original.replace("\t", " ").stripTrailing();
 		String reconstrLine = reconstr;
+
 		if(Option.internal.TRACE_VERIFY_TOKEN > 0) {
 			Util.println("LINE " + lineNumber + ": RECONSTR: |" + Comn.printable(reconstrLine) + '|');
 			Util.println("LINE " + lineNumber + ": ORIGINAL: |" + Comn.printable(originalLine) + '|');
 		}
 		if(! reconstrLine.equals(originalLine)) {
 			System.err.println("TokenManager.tokenListVerifyer: VERIFIER FAILED(" + debugName + "): Reconstructed text differ from original text on line " + lineNumber);
+			Util.println("LINE " + lineNumber + ": RECONSTR_LINE: |" + Comn.printable(reconstrLine) + '|');
+			Util.println("LINE " + lineNumber + ": ORIGINAL_LINE: |" + Comn.printable(originalLine) + '|');
 			int lng1 = original.length();
 			int lng2 = reconstr.length();
 			System.err.println("Original Text(lng:"+lng1+"): |" + Comn.printable(original) + '|');
