@@ -31,8 +31,8 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
 import simula.Comn;
-import simula.core.builder.export.LexToken;
-import simula.core.builder.export.TokenManager;
+import simula.core.builder.token.LexToken;
+import simula.core.builder.token.TokenManager;
 import simula.editor.DiagnosticHandler;
 import simula.editor.Palette;
 import simula.editor.SourceModule;

@@ -1,4 +1,4 @@
-package simula.core.builder.export;
+package simula.core.builder.token;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -297,11 +297,12 @@ public class TokenManager {
 	// ****************************************************************
 	// *** TokenListVerifyer  -- SEE: LspTextPanel.fillTextPane
 	// ****************************************************************
-	public static void tokenListVerifyer(String originalText, List<Integer> semanticTokens) {
+//	public static void tokenListVerifyer(String originalText, List<Integer> semanticTokens) {
+	public static void tokenListVerifyer(List<String> sourceLines, List<Integer> semanticTokens) {
 
 //		Option.internal.TRACE_VERIFY_TOKEN = 1;
 
-		List<String> sourceLines = originalText.lines().collect(Collectors.toList());
+//		List<String> sourceLines = originalText.lines().collect(Collectors.toList());
 		if(Option.internal.TRACE_VERIFY_TOKEN > 0) {
 			int i = 1;
 			for(String line:sourceLines) {
@@ -313,7 +314,7 @@ public class TokenManager {
 		int lineNumber = 0;
 		int prevTextLength = 0;
 
-		if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("SemanticTextReconstructor.reconstruct: SOURCE:"+Comn.printable(originalText));
+//		if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("SemanticTextReconstructor.reconstruct: SOURCE:"+Comn.printable(sourceLines));
 		int x = 0;
 		while(x < semanticTokens.size()) {
 			int deltaLine = semanticTokens.get(x++);

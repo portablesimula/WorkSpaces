@@ -1,4 +1,6 @@
-package simula.core.builder.export;
+package simula.core.builder.token;
+
+import java.util.List;
 
 import org.eclipse.lsp4j.Position;
 
@@ -9,7 +11,8 @@ import simula.core.utilities.KeyWord;
 import simula.core.utilities.Util;
 
 public class LexToken {
-    CharSequence sourceText; // Pointer to the Whole FILE
+//    CharSequence sourceText; // Pointer to the Whole FILE
+	List<String> sourceLines;
     public int lineNumber;
 //    public int startOffset;
 //    public int endOffset;
@@ -39,16 +42,16 @@ public class LexToken {
 		return new Position(lineNumber, column);
 	}
 	
-	public LexToken(int tokenStartLine, CharSequence sourceText, int column, int length, int keyWord, String tokenType, SimulaLexer lexer) {
+	public LexToken(int tokenStartLine, List<String> sourceLines, int column, int length, int keyWord, String tokenType, SimulaLexer lexer) {
 		this.lineNumber = tokenStartLine;
-		this.sourceText = sourceText;
+		this.sourceLines = sourceLines;
 		this.column = column;
 		this.length = length;
 		this.keyWord = keyWord;
 //		this.styleName = styleName;
 		this.setTokenTypeIndex(tokenType);
 		
-//		Util.println("NEW LexToken: lineNumber: "+lineNumber+", column:"+column+", length:"+length);
+		Util.println("NEW LexToken: lineNumber: "+lineNumber+", column:"+column+", length:"+length);
 		
 		if(Option.LEX_VERIFY) {
 	    	if(length == 0 && keyWord == KeyWord.EOF) {
@@ -156,11 +159,17 @@ public class LexToken {
 	}
 	
 	public String edTokenText(SimulaLexer lexer) {
-		int startOfLine = lexer.getLineStartPos(lineNumber);
-		int tokenStartPos = startOfLine + column;
-		CharSequence txt = sourceText.subSequence(tokenStartPos, tokenStartPos + length);
-		String debugText=txt.toString();
-		return debugText;
+//		int startOfLine = lexer.getLineStartPos(lineNumber);
+//		int tokenStartPos = startOfLine + column;
+//		CharSequence txt = sourceText.subSequence(tokenStartPos, tokenStartPos + length);
+//		String debugText=txt.toString();
+//		return debugText;
+		String sourceLine = sourceLines.get(lineNumber);
+		Util.println("LexToken.edTokenText: Line "+lineNumber+": |"+sourceLine+"| column="+column+", length="+length);
+		String txt = sourceLine.substring(column, column + length);
+		Util.println("LexToken.edTokenText: Line "+lineNumber+": |"+sourceLine+"| column="+column+", length="+length+" ==> |" + txt +'|');
+//		Util.IERR("DETT MÅ SJEKKES");
+		return txt;
 	}
 	
 	public String edToken(SimulaLexer lexer) {

@@ -58,7 +58,7 @@ public final class RunSingleTest {
 //		names.add("adHoc03.sim"); // For ad'hoc testing
 //		names.add("adHoc04.sim"); // For ad'hoc testing
 //	names.add("adHoc05.sim"); // For ad'hoc testing
-//	names.add("adHoc06.sim"); // For ad'hoc testing
+	names.add("adHoc06.sim"); // For ad'hoc testing
 //	names.add("adHoc10.sim"); // For ad'hoc testing
 //		names.add("adHoc11.sim"); // For ad'hoc testing
 //		names.add("CLASS_COMMON.sim"); // For ad'hoc testing
@@ -171,7 +171,7 @@ public final class RunSingleTest {
 //		names.add("simtst81.sim"); // OK:  Test the value of close.
 //		names.add("simtst82.sim"); // OK:  Simple test of the operations +, -, *, / and //.
 //		names.add("simtst83.sim"); // OK:  Name Parameter with EXTREME BI-EFFECTS
-		names.add("simtst84.sim"); // OK:  Test DirectBytefile.
+//		names.add("simtst84.sim"); // OK:  Test DirectBytefile.
 //		names.add("simtst85.sim"); // OK:  Test Directfile.
 //		names.add("Separat.sim");  // OK:  Precompile this for Simtst 86.
 //		names.add("simtst86.sim"); // OK: Simple Test of Separately Compiled Class.

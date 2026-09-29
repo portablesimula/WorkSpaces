@@ -16,7 +16,7 @@ import simula.core.DocumentManager;
 import simula.core.builder.AttributeInputStream;
 import simula.core.builder.AttributeOutputStream;
 import simula.core.builder.JavaSourceFileCoder;
-import simula.core.builder.export.LexToken;
+import simula.core.builder.token.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.Declaration;
 import simula.core.utilities.Util;

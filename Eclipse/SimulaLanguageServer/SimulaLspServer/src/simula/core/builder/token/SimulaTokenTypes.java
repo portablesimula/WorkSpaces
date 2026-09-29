@@ -1,4 +1,4 @@
-package simula.core.builder.export;
+package simula.core.builder.token;
 
 public final class SimulaTokenTypes {
 	  public static final String Keyword = SemanticTokenTypes.Keyword;

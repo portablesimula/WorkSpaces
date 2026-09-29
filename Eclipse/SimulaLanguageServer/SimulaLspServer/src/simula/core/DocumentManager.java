@@ -8,13 +8,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
+
+import simula.Comn;
 import simula.core.builder.DocumentTextUpdater;
 import simula.core.builder.SimulaBuilder;
-import simula.core.builder.export.LexToken;
+import simula.core.builder.token.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.statement.ProgramModule;
@@ -36,7 +39,9 @@ public class DocumentManager {
 	final public String documentUri;
 	final public File sourceFileDir;
 	public int documentVersion;
-	public String sourceCode;
+	
+//	public String sourceCode;
+	public List<String> sourceLines;
 	
 	public SimulaBuilder simBuilder;
 	public SimulaCoder simCoder;
@@ -103,13 +108,26 @@ public class DocumentManager {
     	this.documentUri = documentUri;
     	this.sourceFileDir = new File(documentUri).getParentFile();
     	this.documentVersion = documentVersion;
-    	this.sourceCode = sourceCode;    		    		
+//    	this.sourceCode = sourceCode;    		    		
     	sourceFileName = this.documentUri;
 		sourceName = getSourceName(this.documentUri);
 		externalJarFileNames = new Vector<String>();
 		compileViaJavaSource = false;
 		StandardClass.INITIATE(this);
 		createJarFilesDirectory();
+		
+//		sourceLines = sourceCode.lines()
+//                .map(String::strip)
+//                .toList();
+		
+		sourceLines = sourceCode.lines()
+                .map(line -> line.stripTrailing() + "\n")
+                .collect(Collectors.toList());
+		
+//		for(String line:sourceLines) {
+//			IO.println("Line|" + Comn.printable(line) + '|');
+//		}
+//		Util.STOP();
     }
 
 	private void createJarFilesDirectory() {
@@ -200,12 +218,17 @@ public class DocumentManager {
 
 	/// Get the content of the opened text document.
 	public String getText() {
+		Util.IERR("NOT IMPL");
+		String sourceCode = String.join(System.lineSeparator(), sourceLines);
 		return sourceCode;
 	}
 
 	/// Set the content of the opened text document.
 	public void setText(final String text) {
-		sourceCode = text;
+		Util.IERR("NOT IMPL");
+		sourceLines = text.lines()
+                .map(String::strip)
+                .toList();
 	}
     
 	/// The document open notification is sent from the client to the server to

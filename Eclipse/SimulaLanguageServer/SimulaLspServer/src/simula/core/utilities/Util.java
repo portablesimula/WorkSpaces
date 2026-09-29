@@ -40,8 +40,8 @@ import org.eclipse.lsp4j.jsonrpc.ResponseErrorException;
 import org.eclipse.lsp4j.jsonrpc.messages.ResponseError;
 import org.eclipse.lsp4j.jsonrpc.messages.ResponseErrorCode;
 
-import simula.core.builder.export.LexToken;
 import simula.core.builder.token.Identifier;
+import simula.core.builder.token.LexToken;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.server.SimulaLanguageServer;
 

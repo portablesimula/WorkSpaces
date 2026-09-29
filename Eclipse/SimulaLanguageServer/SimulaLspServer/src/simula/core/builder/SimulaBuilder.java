@@ -9,9 +9,9 @@ import org.eclipse.lsp4j.Diagnostic;
 
 import simula.Option;
 import simula.core.DocumentManager;
-import simula.core.builder.export.LexToken;
-import simula.core.builder.export.TokenManager;
+import simula.core.builder.token.LexToken;
 import simula.core.builder.token.SimpleString;
+import simula.core.builder.token.TokenManager;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.syntaxClass.declaration.MaybeBlockDeclaration;
 import simula.core.syntaxClass.declaration.StandardClass;
@@ -58,7 +58,8 @@ public class SimulaBuilder {
 		this.nErrors = 0;
     	this.diagnostics  = new ArrayList<>();
     	this.lexTokenList = new ArrayList<>();
-        lexer = new SimulaLexer(this, documentManager.sourceCode);
+//        lexer = new SimulaLexer(this, documentManager.sourceCode);
+        lexer = new SimulaLexer(this, documentManager.sourceLines);
 
 		File desktop = new File(System.getProperty("user.home"), "Desktop");
 		if (DocumentManager.verbose) {
@@ -134,7 +135,7 @@ public class SimulaBuilder {
 		}
     	this.semTokenList = TokenManager.generateSemanticTokens(lexTokenList);
 		if(Option.LEX_VERIFY) {
-			TokenManager.tokenListVerifyer(documentManager.sourceCode, semTokenList);
+			TokenManager.tokenListVerifyer(documentManager.sourceLines, semTokenList);
 		}
 //		Util.IERR("STOP HER INTILL VIDERE: BYGG og CHECK SemTokenList ??");	
 		documentManager.publishDiagnostics(diagnostics);

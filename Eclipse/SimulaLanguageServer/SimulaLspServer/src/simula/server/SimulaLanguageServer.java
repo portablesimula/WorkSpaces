@@ -7,7 +7,7 @@ import org.eclipse.lsp4j.services.*;
 import simula.Comn;
 import simula.Option;
 import simula.core.CoreGlobal;
-import simula.core.builder.export.TokenManager;
+import simula.core.builder.token.TokenManager;
 import simula.core.utilities.LOG;
 
 import java.util.Arrays;

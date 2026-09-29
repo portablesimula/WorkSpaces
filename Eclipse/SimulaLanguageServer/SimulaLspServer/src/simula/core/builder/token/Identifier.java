@@ -1,12 +1,12 @@
 package simula.core.builder.token;
 
+import java.util.List;
+
 import javax.lang.model.SourceVersion;
 
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.builder.SimulaLexer;
-import simula.core.builder.export.LexToken;
-import simula.core.builder.export.SimulaTokenTypes;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.Util;
@@ -15,9 +15,8 @@ public class Identifier extends LexToken {
 	public DeclarationScope scope;
 	public String value;
 
-	public Identifier(int tokenStartLine, CharSequence sourceText, int column, int length, SimulaLexer lexer) {
-//		super(tokenStartLine, sourceText, startOffset, endOffset, KeyWord.CHARACTERKONST);
-		super(tokenStartLine, sourceText, column, length, KeyWord.IDENTIFIER, SimulaTokenTypes.Identifier, lexer);
+	public Identifier(int tokenStartLine, List<String> sourceLines, int column, int length, SimulaLexer lexer) {
+		super(tokenStartLine, sourceLines, column, length, KeyWord.IDENTIFIER, SimulaTokenTypes.Identifier, lexer);
 		this.value = this.edTokenText(lexer);
 		if(SourceVersion.isKeyword(value)) value = "_" + value;
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();

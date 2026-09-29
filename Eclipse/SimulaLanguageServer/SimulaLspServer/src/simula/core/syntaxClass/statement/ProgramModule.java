@@ -15,8 +15,9 @@ import simula.core.DocumentManager;
 import simula.core.builder.Parse;
 import simula.core.builder.SimulaBuilder;
 import org.eclipse.lsp4j.Position;
-import simula.core.builder.export.LexToken;
+
 import simula.core.builder.token.Identifier;
+import simula.core.builder.token.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.SyntaxElement;
 import simula.core.syntaxClass.Type;

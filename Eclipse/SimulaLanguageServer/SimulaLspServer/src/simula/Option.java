@@ -18,6 +18,7 @@ import simula.core.utilities.Util;
 /// @author Øystein Myhre Andersen
 public final class Option {
 	public static boolean TESTING_TABS = true;
+	public static boolean TESTING_NEWLINE = true;
 	
 	public static boolean LEX_VERIFY = true;
 
