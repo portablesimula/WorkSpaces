@@ -11,7 +11,7 @@ public class StringToken extends LexToken {
 
 	public StringToken(int tokenStartLine, List<String> sourceLines, int column, int length, String value, SimulaLexer lexer) {
 //		super(tokenStartLine, sourceText, startOffset, endOffset, KeyWord.TEXTKONST);
-		super(tokenStartLine, sourceLines, column, length, KeyWord.TEXTKONST, SimulaTokenTypes.String, lexer);
+		super(tokenStartLine, sourceLines, column, length, KeyWord.TEXTKONST, SemanticTokenTypes.String, lexer);
 		this.value = value;
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();
 	}

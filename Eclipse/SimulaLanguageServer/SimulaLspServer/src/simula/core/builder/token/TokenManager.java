@@ -113,20 +113,20 @@ public class TokenManager {
 
 //	/// NOTE: SEE: simula.editor.LspTextPanel
 //	public static List<String> tokenTypes = Arrays.asList(
-//        SimulaTokenTypes.Keyword,    // Index: 0
-//        SimulaTokenTypes.Class,      // Index: 1  Class identifier
-//        SimulaTokenTypes.Attribute,  // Index: 2  Class attribute
-//        SimulaTokenTypes.Procedure,  // Index: 3  Procedure identifier
-//        SimulaTokenTypes.Variable,   // Index: 4  Variable identifier
-//        SimulaTokenTypes.Parameter,  // Index: 5  Class/Procedure Parameter identifier
-//        SimulaTokenTypes.String,     // Index: 6  String constant
-//        SimulaTokenTypes.Character,  // Index: 7  Character constant
-//        SimulaTokenTypes.Number,     // Index: 8
-//        SimulaTokenTypes.Operator,   // Index: 9  LT, EQ, ...
-//        SimulaTokenTypes.Label,      // Index: 10
-//        SimulaTokenTypes.Comment,    // Index: 11
-//        SimulaTokenTypes.WhiteSpace, // Index: 12
-//        SimulaTokenTypes.Symbol      // Index: 13
+//        SemanticTokenTypes.Keyword,    // Index: 0
+//        SemanticTokenTypes.Class,      // Index: 1  Class identifier
+//        SemanticTokenTypes.Attribute,  // Index: 2  Class attribute
+//        SemanticTokenTypes.Procedure,  // Index: 3  Procedure identifier
+//        SemanticTokenTypes.Variable,   // Index: 4  Variable identifier
+//        SemanticTokenTypes.Parameter,  // Index: 5  Class/Procedure Parameter identifier
+//        SemanticTokenTypes.String,     // Index: 6  String constant
+//        SemanticTokenTypes.Character,  // Index: 7  Character constant
+//        SemanticTokenTypes.Number,     // Index: 8
+//        SemanticTokenTypes.Operator,   // Index: 9  LT, EQ, ...
+//        SemanticTokenTypes.Label,      // Index: 10
+//        SemanticTokenTypes.Comment,    // Index: 11
+//        SemanticTokenTypes.WhiteSpace, // Index: 12
+//        SemanticTokenTypes.Symbol      // Index: 13
 //    );
 //
 //    public static final int SimulaTokenKeyword    = 0;
@@ -229,10 +229,9 @@ public class TokenManager {
         
         for (LexToken lexToken : lexTokenList) {
 //        	Util.println("TREATING: " + lexToken);
-        	if(Option.TESTING_TABS) {
-        		currentLine = lexToken.lineNumber;
-        	}
-            // Beregn relative verdier (deltas)
+        	currentLine = lexToken.lineNumber;
+
+        	// Beregn relative verdier (deltas)
             int deltaLine = 0;  // Number of lines down from the start of the previous token.
             int deltaStart = 0; // Number of characters to the right from the start of the previous token
                                 // or from the start of the line if deltaLine > 0.
@@ -338,7 +337,8 @@ public class TokenManager {
 
 			// 1. Calculate absolute positions based on LSP delta rules
 			if (deltaLine > 0) {
-				checkEqual("case 1", lineNumber, sourceLines.get(lineNumber++), reconstr.toString());
+				Util.println("TokenManager.tokenListVerifyer: tokenType: " + tokenTypeIndex + ':' + getTokenType(tokenTypeIndex));
+				checkEqual("case 1", tokenTypeIndex, lineNumber, sourceLines.get(lineNumber++), reconstr.toString());
 				// Start NEWLINE
 				// meaning the current token is on a new line relative to the previous token),
 				// deltaStart is relative to 0 (the absolute beginning/left margin of that new line).
@@ -347,7 +347,7 @@ public class TokenManager {
 //				IO.println("CASE 1: NEW RECONSTR");
 				while((deltaLine--) > 1) {
 					// Empty line
-					checkEqual("case 2", lineNumber, sourceLines.get(lineNumber++), "");
+					checkEqual("case 2", tokenTypeIndex, lineNumber, sourceLines.get(lineNumber++), "");
 				}
 				prevTextLength = 0;
 			}
@@ -383,7 +383,7 @@ public class TokenManager {
 			prevTextLength = length;
 		}
 		while(lineNumber < sourceLines.size()) {
-			checkEqual("case 3", lineNumber, sourceLines.get(lineNumber++), reconstr.toString());
+			checkEqual("case 3", 0, lineNumber, sourceLines.get(lineNumber++), reconstr.toString());
 		}
 	}
 
@@ -393,7 +393,7 @@ public class TokenManager {
 	    return Character.isWhitespace(lastChar);
 	}
 
-	private static void checkEqual(String debugName, int lineNumber, String original, String reconstr) {
+	private static void checkEqual(String debugName, int tokenTypeIndex, int lineNumber, String original, String reconstr) {
 //		String originalLine = original.stripTrailing();
 //		String reconstrLine = reconstr.stripTrailing();
 		
@@ -402,6 +402,11 @@ public class TokenManager {
 
 		String originalLine = original.replace("\t", " ").stripTrailing();
 		String reconstrLine = reconstr;
+		Util.println("TokenManager.checkEqual: tokenType: " + tokenTypeIndex + ':' + getTokenType(tokenTypeIndex));
+		if(tokenTypeIndex == getTokenTypeIndex(SemanticTokenTypes.Comment)
+		|| tokenTypeIndex == getTokenTypeIndex(SemanticTokenTypes.String)) {
+			reconstrLine = reconstrLine.replace("\t", " ").stripTrailing();
+		}
 
 		if(Option.internal.TRACE_VERIFY_TOKEN > 0) {
 			Util.println("LINE " + lineNumber + ": RECONSTR: |" + Comn.printable(reconstrLine) + '|');

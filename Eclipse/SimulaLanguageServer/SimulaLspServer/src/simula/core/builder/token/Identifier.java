@@ -16,7 +16,7 @@ public class Identifier extends LexToken {
 	public String value;
 
 	public Identifier(int tokenStartLine, List<String> sourceLines, int column, int length, SimulaLexer lexer) {
-		super(tokenStartLine, sourceLines, column, length, KeyWord.IDENTIFIER, SimulaTokenTypes.Identifier, lexer);
+		super(tokenStartLine, sourceLines, column, length, KeyWord.IDENTIFIER, SemanticTokenTypes.Type, lexer);
 		this.value = this.edTokenText(lexer);
 		if(SourceVersion.isKeyword(value)) value = "_" + value;
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();

@@ -10,7 +10,7 @@ public class CharacterConst extends LexToken {
 	public final Character value;
 
 	public CharacterConst(int tokenStartLine, List<String> sourceLines, int column, int length, int value, SimulaLexer lexer) {
-		super(tokenStartLine, sourceLines, column, length, KeyWord.CHARACTERKONST, SimulaTokenTypes.Character, lexer);
+		super(tokenStartLine, sourceLines, column, length, KeyWord.CHARACTERKONST, SemanticTokenTypes.String, lexer);
 		this.value = Character.valueOf((char) value);
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();
 	}

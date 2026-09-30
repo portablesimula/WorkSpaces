@@ -21,7 +21,7 @@ import simula.Option;
  * @author Øystein Myhre Andersen
  *
  */
-public final class RunSingleTest {
+public final class RunAdHocTest {
 	
 //	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspServer");
 	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspServer");
@@ -52,7 +52,7 @@ public final class RunSingleTest {
 		
 		Vector<String> names=new Vector<String>();
 //		names.add("AdHoc_SimulaTest.sim"); // Simula TestBatch Framework
-//		names.add("adHoc00.sim"); // For ad'hoc testing
+		names.add("adHoc00.sim"); // For ad'hoc testing
 //		names.add("adHoc01.sim"); // For ad'hoc testing
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
@@ -171,7 +171,7 @@ public final class RunSingleTest {
 //		names.add("simtst81.sim"); // OK:  Test the value of close.
 //		names.add("simtst82.sim"); // OK:  Simple test of the operations +, -, *, / and //.
 //		names.add("simtst83.sim"); // OK:  Name Parameter with EXTREME BI-EFFECTS
-		names.add("simtst84.sim"); // OK:  Test DirectBytefile.
+//		names.add("simtst84.sim"); // OK:  Test DirectBytefile.
 //		names.add("simtst85.sim"); // OK:  Test Directfile.
 //		names.add("Separat.sim");  // OK:  Precompile this for Simtst 86.
 //		names.add("simtst86.sim"); // OK: Simple Test of Separately Compiled Class.

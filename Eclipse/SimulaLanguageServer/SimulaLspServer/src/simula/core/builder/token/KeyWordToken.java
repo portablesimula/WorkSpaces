@@ -8,8 +8,7 @@ import simula.core.builder.SimulaLexer;
 public class KeyWordToken extends LexToken {
 	
 	public KeyWordToken(int tokenStartLine, List<String> sourceLines, int column, int length, int keyWord, SimulaLexer lexer) {
-		super(tokenStartLine, sourceLines, column, length, keyWord, SimulaTokenTypes.Symbol, lexer);
-		if(tokenText.length() > 0 && Character.isLetter(tokenText.charAt(0))) tokenTypeIndex = TokenManager.getTokenTypeIndex(SimulaTokenTypes.Keyword);
+		super(tokenStartLine, sourceLines, column, length, keyWord, SemanticTokenTypes.Keyword, lexer);
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();
 	}
 

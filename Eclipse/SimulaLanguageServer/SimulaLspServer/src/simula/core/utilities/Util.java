@@ -346,7 +346,7 @@ public final class Util {
 	/// Print a string.
 	/// @param s the string
 	public static void println(final String s) {
-		String mss = Comn.printable(s);
+		String mss = s;//Comn.printable(s);
 		if(CoreGlobal.INLINE_CONNECTED) {
 			IO.println(mss);
 		} else {

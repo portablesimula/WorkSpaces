@@ -33,6 +33,14 @@ public class SourceTextReader {
    	public int currentLineNumber() {
    		return lineIndex;
    	}
+   	
+   	public String currentLine() {
+   		return sourceLines.get(lineIndex);
+   	}
+   	
+   	public int prevLineLength() {
+   		return sourceLines.get(lineIndex - 1).length();
+   	}
 
    	public int nextPos() {
    		return charIndex;
@@ -156,6 +164,7 @@ public class SourceTextReader {
                 charIndex = sourceLines.get(lineIndex).length();
             }
         }
+        EOF_SEEN=false;
     }
 
 }

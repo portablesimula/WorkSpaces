@@ -10,7 +10,7 @@ public class SimpleString extends LexToken {
 	public final String value;
 
 	public SimpleString(int tokenStartLine, List<String> sourceLines, int column, int length, String value, SimulaLexer lexer) {
-		super(tokenStartLine, sourceLines, column, length, KeyWord.TEXTKONST, SimulaTokenTypes.String, lexer);
+		super(tokenStartLine, sourceLines, column, length, KeyWord.TEXTKONST, SemanticTokenTypes.String, lexer);
 		this.value = value;
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();
 	}

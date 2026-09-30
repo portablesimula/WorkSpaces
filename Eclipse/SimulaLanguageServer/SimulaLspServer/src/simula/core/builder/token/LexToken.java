@@ -51,8 +51,6 @@ public class LexToken {
 //		this.styleName = styleName;
 		this.setTokenTypeIndex(tokenType);
 		
-		Util.println("NEW LexToken: lineNumber: "+lineNumber+", column:"+column+", length:"+length);
-		
 		if(Option.LEX_VERIFY) {
 	    	if(length == 0 && keyWord == KeyWord.EOF) {
 	    		prevToken = null;
@@ -164,12 +162,15 @@ public class LexToken {
 //		CharSequence txt = sourceText.subSequence(tokenStartPos, tokenStartPos + length);
 //		String debugText=txt.toString();
 //		return debugText;
-		String sourceLine = sourceLines.get(lineNumber);
-		Util.println("LexToken.edTokenText: Line "+lineNumber+": |"+sourceLine+"| column="+column+", length="+length);
-		String txt = sourceLine.substring(column, column + length);
-		Util.println("LexToken.edTokenText: Line "+lineNumber+": |"+sourceLine+"| column="+column+", length="+length+" ==> |" + txt +'|');
-//		Util.IERR("DETT MÅ SJEKKES");
+		try {
+			String sourceLine = sourceLines.get(lineNumber);
+//			Util.println("LexToken.edTokenText: Line "+lineNumber+": |"+sourceLine+"| column="+column+", length="+length);
+			String txt = sourceLine.substring(column, column + length);
+//			Util.println("LexToken.edTokenText: Line "+lineNumber+": |"+sourceLine+"| column="+column+", length="+length+" ==> |" + txt +'|');
 		return txt;
+		} catch(Exception e) {
+			return "";
+		}
 	}
 	
 	public String edToken(SimulaLexer lexer) {
