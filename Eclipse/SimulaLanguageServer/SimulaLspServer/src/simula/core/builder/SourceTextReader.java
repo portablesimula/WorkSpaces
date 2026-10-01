@@ -2,9 +2,6 @@ package simula.core.builder;
 
 import java.util.List;
 
-import simula.Comn;
-import simula.core.utilities.Util;
-
 public class SourceTextReader {
     private List<String> sourceLines;
     private int charIndex;
@@ -13,11 +10,10 @@ public class SourceTextReader {
 	/// The current character read.
     private int current;
     
-
 	/// ISO EM(EndMedia) character used to denote end-of-input
+	/// Unicode: 25 = \u0019 End of Medium
     public static final int EOF_MARK=25;
     
-    /// Set 'true' when EOF-character ( -1 ) was read.
     /// Set 'true' when EOF-character EOF_MARK was read.
     private boolean EOF_SEEN=false;
 
@@ -53,29 +49,18 @@ public class SourceTextReader {
     /// Returns next input character.
     /// currentColumn is incremented to point to the next character
     /// @return next input character
-//    private int getNext() {
-//    	if(currentColumn >= lineEndOffset) {
-//    		if(EOF_SEEN) {
-//    			Util.syntaxError(simBuilder, prevLexerToken, "Attempt to scan beyond EOF");
-//    			current = EOF_MARK;
-//    			throw new EOTException("Attempt to scan beyond EOF");
-//    		} else {
-//    			EOF_SEEN = true; current = EOF_MARK;
-//    		}
-//    	} else {
-//    		current = sourceText.charAt(currentColumn++);
-//    	}
-//    	return(current);
-//    }
     /// Retrieves the next character in the source code, 
     /// including the trailing newline (LF) at the end of each line.
     /// 
+    /// Note: A single character line containing EOF_MARK was added
+    ///       to List<String> sourceLines in DocumentManager.
+    /// 
     /// @return The next character, or EOF_MARK if the end of the input is reached.
     public int getNext() {
-        if (lineIndex >= sourceLines.size()) {
-			EOF_SEEN = true; current = EOF_MARK;
-            return current; // End of input
-        }
+    	if(current == SourceTextReader.EOF_MARK) {
+    		EOF_SEEN = true;
+    		return current;
+    	}
         String currentLine = sourceLines.get(lineIndex);
         current = currentLine.charAt(charIndex++);
 
@@ -88,38 +73,28 @@ public class SourceTextReader {
     }
     
 	
-	private void testGetNext() {
-		StringBuilder sb = new StringBuilder();
-		int c;
-		c = getNext(); sb.append((char)c);
-		IO.println("First character: " + c + ':' + (char)c);
-		c = getNext(); sb.append((char)c); IO.println("2. character: " + c + ':' + (char)c);
-		c = getNext(); sb.append((char)c); IO.println("3. character: " + c + ':' + (char)c);
-		c = getNext(); sb.append((char)c); IO.println("4. character: " + c + ':' + (char)c);
-		c = getNext(); sb.append((char)c); IO.println("6. character: " + c + ':' + (char)c);
-		pushBackPos(2);
-		c = getNext(); sb.append((char)c); IO.println("4. character: " + c + ':' + (char)c);
-		IO.println("nextCharIs('U'): " + nextCharIs('U'));
-		while(! EOF_SEEN) {
-			c = getNext(); sb.append((char)c); // IO.println("Line "+lineIndex+": Next character: " + c + ':' + (char)c);
-			if(c == '\n') {
-				IO.println("Line "+lineIndex+": |" + Comn.printable(sb.toString()) + '|');
-				sb = new StringBuilder();
-//				Util.STOP();
-			}
-		}
-		Util.STOP();
-	}
+//	private void testGetNext() {
+//		StringBuilder sb = new StringBuilder();
+//		int c;
+//		c = getNext(); sb.append((char)c);
+//		IO.println("First character: " + c + ':' + (char)c);
+//		c = getNext(); sb.append((char)c); IO.println("2. character: " + c + ':' + (char)c);
+//		c = getNext(); sb.append((char)c); IO.println("3. character: " + c + ':' + (char)c);
+//		c = getNext(); sb.append((char)c); IO.println("4. character: " + c + ':' + (char)c);
+//		c = getNext(); sb.append((char)c); IO.println("6. character: " + c + ':' + (char)c);
+//		pushBackPos(2);
+//		c = getNext(); sb.append((char)c); IO.println("4. character: " + c + ':' + (char)c);
+//		IO.println("nextCharIs('U'): " + nextCharIs('U'));
+//		while(c != EOF_MARK) {
+//			c = getNext(); sb.append((char)c); // IO.println("Line "+lineIndex+": Next character: " + c + ':' + (char)c);
+//			if(c == '\n') {
+//				IO.println("Line "+lineIndex+": |" + Comn.printable(sb.toString()) + '|');
+//				sb = new StringBuilder();
+//			}
+//		}
+//		Util.STOP();
+//	}
     
-//    private boolean nextCharIs(int c) {
-//    	int next = 0;
-//    	if(charIndex >= lineEndOffset) {
-//    		next = EOF_MARK;
-//     	} else {
-//    		next = sourceText.charAt(charIndex);
-//    	}
-//    	return(next == c);
-//    }
     /// Checks if the next unread character matches the given expected value 
     /// without consuming or moving the reader pointer.
     /// 
@@ -134,11 +109,6 @@ public class SourceTextReader {
     }
 
 
-//	private void pushBackPos(int count) {
-//		charIndex = charIndex - count;
-//		current = currentLine.charAt(charIndex - 1);
-////		Util.println("SimulaLexer.pushBackPos("+ count + "): ==> charIndex=" + charIndex + ", current=" + edCurrent());
-//	}  
 	/// Moves the internal stream pointers back by 'count' positions.
 	/// Also handles movement across line breaks.
 	/// @param count number of positions to backtrack

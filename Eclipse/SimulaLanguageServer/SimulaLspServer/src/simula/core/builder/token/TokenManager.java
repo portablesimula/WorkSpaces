@@ -3,7 +3,6 @@ package simula.core.builder.token;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.SemanticTokenModifiers;
@@ -14,8 +13,6 @@ import org.eclipse.lsp4j.SemanticTokensWithRegistrationOptions;
 import simula.Comn;
 import simula.Option;
 import simula.core.DocumentManager;
-import simula.core.builder.SimulaTokenType;
-import simula.core.utilities.KeyWord;
 import simula.core.utilities.Util;
 
 /// @author Øystein Myhre Andersen
@@ -64,40 +61,10 @@ public class TokenManager {
 		SemanticTokenModifiers.DefaultLibrary  // Index 9: e.g., global built-ins like console or window)
 	);
 
-    
-
-    // 1. Define the ordered array of Token Types. 
-    // The index positions (0, 1, 2...) are what the server will transmit later.
-    private static final List<String> SUPPORTED_TOKEN_TYPES = Arrays.asList(
-    		SemanticTokenTypes.Namespace,
-    		"namespace", // Index 0
-        "type",      // Index 1
-        "class",     // Index 2
-        "enum",      // Index 3
-        "interface", // Index 4
-        "struct",    // Index 5
-        "typeParameter", // Index 6
-        "parameter", // Index 7
-        "variable",  // Index 8
-        "property",  // Index 9
-        "macro",     // Index 10
-        "function",  // Index 11
-        "method"     // Index 12
-    );
-
-    // Leave modifiers empty for this baseline configuration
-    private static final List<String> SUPPORTED_TOKEN_MODIFIERS = Arrays.asList();
-
     public static SemanticTokensWithRegistrationOptions getSemanticOptions() {
     	// Set up semantic tokens options with your token types and modifiers legend
         SemanticTokensWithRegistrationOptions semanticOptions = new SemanticTokensWithRegistrationOptions();
-//        SemanticTokensLegend legend = new SemanticTokensLegend(
-//            Arrays.asList("class", "interface", "variable", "function"), 
-//            Arrays.asList("declaration", "readonly")
-//        );
         SemanticTokensLegend legend = new SemanticTokensLegend(
-//                SUPPORTED_TOKEN_TYPES, 
-//                SUPPORTED_TOKEN_MODIFIERS
                 STANDARD_TOKEN_TYPES, 
                 STANDARD_TOKEN_MODIFIERS
             );
@@ -105,90 +72,17 @@ public class TokenManager {
         semanticOptions.setFull(true); // Enable full document semantic tokens
         return semanticOptions;
     }
-    
-    
-
-//    public static List<String> tokenTypes = Arrays.asList("class", "procedure", "parameter", "identifier", "variable",
-//			  "keyword", "comment", "string", "constant", "symbol", "whiyeSpaces");
-
-//	/// NOTE: SEE: simula.editor.LspTextPanel
-//	public static List<String> tokenTypes = Arrays.asList(
-//        SemanticTokenTypes.Keyword,    // Index: 0
-//        SemanticTokenTypes.Class,      // Index: 1  Class identifier
-//        SemanticTokenTypes.Attribute,  // Index: 2  Class attribute
-//        SemanticTokenTypes.Procedure,  // Index: 3  Procedure identifier
-//        SemanticTokenTypes.Variable,   // Index: 4  Variable identifier
-//        SemanticTokenTypes.Parameter,  // Index: 5  Class/Procedure Parameter identifier
-//        SemanticTokenTypes.String,     // Index: 6  String constant
-//        SemanticTokenTypes.Character,  // Index: 7  Character constant
-//        SemanticTokenTypes.Number,     // Index: 8
-//        SemanticTokenTypes.Operator,   // Index: 9  LT, EQ, ...
-//        SemanticTokenTypes.Label,      // Index: 10
-//        SemanticTokenTypes.Comment,    // Index: 11
-//        SemanticTokenTypes.WhiteSpace, // Index: 12
-//        SemanticTokenTypes.Symbol      // Index: 13
-//    );
-//
-//    public static final int SimulaTokenKeyword    = 0;
-//    public static final int SimulaTokenClass      = 1; //  Class identifier
-//    public static final int SimulaTokenAttribute  = 2; //  Class attribute
-//    public static final int SimulaTokenProcedure  = 3; //  Procedure identifier
-//    public static final int SimulaTokenVariable   = 4; //  Variable identifier
-//    public static final int SimulaTokenParameter  = 5; //  Class/Procedure Parameter identifier
-//    public static final int SimulaTokenString     = 6; //  String constant
-//    public static final int SimulaTokenCharacter  = 7; //  Character constant
-//    public static final int SimulaTokenNumber     = 8; //
-//    public static final int SimulaTokenOperator   = 9; //  LT, EQ, ...
-//    public static final int SimulaTokenLabel      = 10; //
-//    public static final int SimulaTokenComment    = 11; //
-//    public static final int SimulaTokenWhiteSpace = 12; //
-//    public static final int SimulaTokenSymbol     = 13; //
 
     public static String getTokenType(int tokenTypeIndex) {
-//    	String tokenType = TokenManager.tokenTypes.get(tokenTypeIndex);
     	String tokenType = TokenManager.STANDARD_TOKEN_TYPES.get(tokenTypeIndex);
     	return tokenType;
      }
 	
     public static int getTokenTypeIndex(String tokenType) {
-//    	Util.println("TokenManager.getTokenTypeIndex: " + tokenType);
-//    	int tokenTypeIndex = TokenManager.tokenTypes.indexOf(tokenType);
     	int tokenTypeIndex = TokenManager.STANDARD_TOKEN_TYPES.indexOf(tokenType);
-//    	Util.println("TokenManager.getTokenTypeIndex: " + tokenType + " ==> " + tokenTypeIndex);
-//    	if(tokenTypeIndex < 0) Util.IERR("Undefined token type: "+tokenType);
     	return tokenTypeIndex;
      }
     
-    
-//	class SimulaTokenType {
-//		String VSCode_TokenType;
-//		int index;
-//		
-//		public SimulaTokenType(String VSCode_TokenType, int index) {
-//			this.VSCode_TokenType = VSCode_TokenType;
-//			this.index = index;
-//		}
-//	}
-	
-	// Simula Token Types mapped to Standard Token Types
-	// KEYWORD, IDENTIFIER, NUMBER_LITERAL, TEXT_LITERAL, OPERATOR, COMMENT, WHITESPACE, UNKNOWN
-	public static final SimulaTokenType KEYWORD =	new SimulaTokenType( "keyword",  1 );
-	public static final SimulaTokenType STRING =	new SimulaTokenType( "string",   2 );
-	public static final SimulaTokenType NUMBER =	new SimulaTokenType( "number",   3 );
-	public static final SimulaTokenType COMMENT =	new SimulaTokenType( "macro",    4 );
-	public static final SimulaTokenType OTHER =		new SimulaTokenType( "variable", 5 );
-	
-	public static String edSimulaTokenType(int index) {
-		switch(index) {
-			case 1: return "keyword";
-			case 2: return "string";
-			case 3: return "number";
-			case 4: return "comment";
-			case 5: return "other";
-		}
-		return "UNKNOWN";
-	}
-
 	public static List<LexToken> getTokenList(String documentUri) {
     	DocumentManager documentManager = DocumentManager.getDocumentManager(documentUri);
 		return documentManager.getTokenList();
@@ -228,7 +122,6 @@ public class TokenManager {
         int prevTokenColumn = 0;
         
         for (LexToken lexToken : lexTokenList) {
-//        	Util.println("TREATING: " + lexToken);
         	currentLine = lexToken.lineNumber;
 
         	// Beregn relative verdier (deltas)
@@ -237,21 +130,15 @@ public class TokenManager {
                                 // or from the start of the line if deltaLine > 0.
             deltaLine = currentLine - prevTokenLine;
             if(deltaLine > 0) {
-        		// Start NEWLINE
+        		// Start NEWLINE,
             	// meaning the current token is on a new line relative to the previous token),
             	// deltaStart is relative to 0 (the absolute beginning/left margin of that new line).
-        		//
-        		// |  token  token   token    | lexToken.column = 17, prevTokenColumn = 9
-        		// |         ------->         | deltaStart = lexToken.column - prevTokenColumn = 17 - 9 = 8
         		deltaStart = lexToken.column;
         		if(Option.internal.TRACE_NEW_SEMTOKEN > 1) Util.println("\nStart NEWLINE: deltaStart = lexToken.column: " + deltaStart);            	
             } else {
-        		// Fortsett på samme linje
+        		// Continue on current line,
         		// meaning the current token is on the same line as the previous token),
         		// deltaStart is relative to the start character (column offset) of the previous token.
-        		//
-        		// |  token  token   token    | lexToken.column = 17, prevTokenColumn = 9
-        		// |         ------->         | deltaStart = lexToken.column - prevTokenColumn = 17 - 9 = 8
         		deltaStart = lexToken.column - prevTokenColumn;
         		if(Option.internal.TRACE_NEW_SEMTOKEN > 1) Util.println("\nCONTINUE LINE: deltaStart = lexToken.column - lastDeltaStart: " + deltaStart);
         	}
@@ -261,10 +148,9 @@ public class TokenManager {
             	if(lexToken.tokenTypeIndex < 0) Util.IERR(""+lexToken);
             }
 
-            // Legg til det semantiske tokenet
+            // Add the semantic token
             encodedData.add(deltaLine);
             encodedData.add(deltaStart);
-//            encodedData.add(lexToken.length);
             encodedData.add(lexToken.semTokenLength());
             encodedData.add(lexToken.tokenTypeIndex);
             
@@ -296,12 +182,11 @@ public class TokenManager {
 	// ****************************************************************
 	// *** TokenListVerifyer  -- SEE: LspTextPanel.fillTextPane
 	// ****************************************************************
-//	public static void tokenListVerifyer(String originalText, List<Integer> semanticTokens) {
 	public static void tokenListVerifyer(List<String> sourceLines, List<Integer> semanticTokens) {
 
 //		Option.internal.TRACE_VERIFY_TOKEN = 1;
+		boolean TRACE_RECONSTR = false;// true;
 
-//		List<String> sourceLines = originalText.lines().collect(Collectors.toList());
 		if(Option.internal.TRACE_VERIFY_TOKEN > 0) {
 			int i = 1;
 			for(String line:sourceLines) {
@@ -312,8 +197,8 @@ public class TokenManager {
 		int sourcePos = 0;
 		int lineNumber = 0;
 		int prevTextLength = 0;
+		String originalLine = sourceLines.get(lineNumber);
 
-//		if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("SemanticTextReconstructor.reconstruct: SOURCE:"+Comn.printable(sourceLines));
 		int x = 0;
 		while(x < semanticTokens.size()) {
 			int deltaLine = semanticTokens.get(x++);
@@ -337,19 +222,19 @@ public class TokenManager {
 
 			// 1. Calculate absolute positions based on LSP delta rules
 			if (deltaLine > 0) {
-				Util.println("TokenManager.tokenListVerifyer: tokenType: " + tokenTypeIndex + ':' + getTokenType(tokenTypeIndex));
 				checkEqual("case 1", tokenTypeIndex, lineNumber, sourceLines.get(lineNumber++), reconstr.toString());
 				// Start NEWLINE
 				// meaning the current token is on a new line relative to the previous token),
 				// deltaStart is relative to 0 (the absolute beginning/left margin of that new line).
-				sourcePos = 0;
-				reconstr = new StringBuilder();
-//				IO.println("CASE 1: NEW RECONSTR");
 				while((deltaLine--) > 1) {
 					// Empty line
 					checkEqual("case 2", tokenTypeIndex, lineNumber, sourceLines.get(lineNumber++), "");
 				}
 				prevTextLength = 0;
+				sourcePos = 0;
+				originalLine = sourceLines.get(lineNumber);
+				reconstr = new StringBuilder();
+				if(TRACE_RECONSTR) Util.println("CASE 1: NEW RECONSTR: Line "+lineNumber+" |" + Comn.printable(originalLine) + '|');
 			}
 
 			// 3. Pad missing characters on the current line
@@ -361,14 +246,13 @@ public class TokenManager {
 			}
 			if(gap != 0) {
 				reconstr.append(" ".repeat(gap));
-//				IO.println("CASE 2: ADD GAP RECONSTR|" + reconstr + '|');
+				if(TRACE_RECONSTR) Util.println("CASE 2: ADD GAP RECONSTR|" + reconstr + '|');
 				sourcePos += gap;
 				if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("LINE " + lineNumber + ": PAD SPACE: gap = " + gap + " ==> LINE|" + reconstr + '|');
 			}
 
 			// 4. Insert the token text
 			if(length > 0) {
-				String originalLine = sourceLines.get(lineNumber);
 				String tokenText = originalLine.substring(sourcePos, sourcePos + length);
 				if(hasTrailingBlanks(tokenText)) {
 					System.err.println("TokenManager.tokenListVerifyer: LOOP START: semToken: deltaLine=" + deltaLine + ", deltaStartChar="+deltaStartChar
@@ -376,15 +260,18 @@ public class TokenManager {
 					System.err.println("TokenManager.tokenListVerifyer: VERIFIER FAILED: Token text has trailing blanks on line " + lineNumber);					
 				}
 				reconstr.append(tokenText);
-//				IO.println("CASE 3: INSERT  RECONSTR|" + reconstr + '|');
+				if(TRACE_RECONSTR) Util.println("CASE 3: INSERT  RECONSTR|" + Comn.printable(reconstr.toString()) + '|');
 				if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("LINE " + lineNumber + ": APPEND TEXT: length = " + length + ", TEXT|" + tokenText + "| ==> LINE|" + reconstr + '|');
 				sourcePos += length;
 			}
 			prevTextLength = length;
 		}
-		while(lineNumber < sourceLines.size()) {
-			checkEqual("case 3", 0, lineNumber, sourceLines.get(lineNumber++), reconstr.toString());
+		String reconstrLine = reconstr.toString();
+		while(lineNumber < (sourceLines.size()-1)) {
+			checkEqual("case 3", 0, lineNumber, sourceLines.get(lineNumber++), reconstrLine);
+			reconstrLine = "";
 		}
+		if(TRACE_RECONSTR) Util.println("TokenManager.tokenListVerifyer: DONE");
 	}
 
 	private static boolean hasTrailingBlanks(String str) {
@@ -394,20 +281,8 @@ public class TokenManager {
 	}
 
 	private static void checkEqual(String debugName, int tokenTypeIndex, int lineNumber, String original, String reconstr) {
-//		String originalLine = original.stripTrailing();
-//		String reconstrLine = reconstr.stripTrailing();
-		
-//		String originalLine = original.replace("\t", " ").stripTrailing();
-//		String reconstrLine = reconstr.replace("\t", " ").stripTrailing();
-
-		String originalLine = original.replace("\t", " ").stripTrailing();
-		String reconstrLine = reconstr;
-		Util.println("TokenManager.checkEqual: tokenType: " + tokenTypeIndex + ':' + getTokenType(tokenTypeIndex));
-		if(tokenTypeIndex == getTokenTypeIndex(SemanticTokenTypes.Comment)
-		|| tokenTypeIndex == getTokenTypeIndex(SemanticTokenTypes.String)) {
-			reconstrLine = reconstrLine.replace("\t", " ").stripTrailing();
-		}
-
+		String originalLine = original.replace("\t", " ");
+		String reconstrLine = reconstr.replace("\t", " ") + '\n';
 		if(Option.internal.TRACE_VERIFY_TOKEN > 0) {
 			Util.println("LINE " + lineNumber + ": RECONSTR: |" + Comn.printable(reconstrLine) + '|');
 			Util.println("LINE " + lineNumber + ": ORIGINAL: |" + Comn.printable(originalLine) + '|');

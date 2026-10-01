@@ -52,13 +52,13 @@ public final class RunAdHocTest {
 		
 		Vector<String> names=new Vector<String>();
 //		names.add("AdHoc_SimulaTest.sim"); // Simula TestBatch Framework
-		names.add("adHoc00.sim"); // For ad'hoc testing
+//		names.add("adHoc00.sim"); // For ad'hoc testing
 //		names.add("adHoc01.sim"); // For ad'hoc testing
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
 //		names.add("adHoc04.sim"); // For ad'hoc testing
 //	names.add("adHoc05.sim"); // For ad'hoc testing
-//	names.add("adHoc06.sim"); // For ad'hoc testing
+	names.add("adHoc06.sim"); // For ad'hoc testing
 //	names.add("adHoc10.sim"); // For ad'hoc testing
 //		names.add("adHoc11.sim"); // For ad'hoc testing
 //		names.add("CLASS_COMMON.sim"); // For ad'hoc testing

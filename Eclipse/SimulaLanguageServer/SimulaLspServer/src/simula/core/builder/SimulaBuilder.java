@@ -12,13 +12,10 @@ import simula.core.DocumentManager;
 import simula.core.builder.token.LexToken;
 import simula.core.builder.token.SimpleString;
 import simula.core.builder.token.TokenManager;
-import simula.core.syntaxClass.declaration.DeclarationScope;
-import simula.core.syntaxClass.declaration.MaybeBlockDeclaration;
 import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.statement.ProgramModule;
 import simula.core.utilities.KeyWord;
 import simula.core.utilities.LOG;
-import simula.core.utilities.ObjectKind;
 import simula.core.utilities.Util;
 import simula.exception.EOTException;
 
@@ -318,7 +315,7 @@ public class SimulaBuilder {
     /// 
     public String getTextString(LexToken prevToken) {
 //		Util.IERR("SJEKK DETTE");
-		LexToken nextToken = prevToken;
+//		LexToken nextToken = prevToken;
 //		Util.println("\n\nSimulaBuilder.getTextString: nextToken: "+nextToken);
 		String result = ((SimpleString)prevToken).value;
     	while(getCurrentParserToken() instanceof SimpleString str) {
@@ -341,17 +338,17 @@ public class SimulaBuilder {
 //		Util.STOP();
 	}
 	
-	private void dumpSyntaxTree() {
-		Util.println("SimulaBuilder.dumpSyntaxTree: ProgramModule: " + syntaxTree);
-		DeclarationScope mainModule = syntaxTree.mainModule;
-		Util.println("SimulaBuilder.dumpSyntaxTree: ProgramModule.mainModule: " + mainModule.getClass().getSimpleName() + " " + mainModule);
-		if(mainModule instanceof MaybeBlockDeclaration blk) {
-			Util.println("SimulaBuilder.dumpSyntaxTree: Block: " + ObjectKind.edit(blk.declarationKind));
-//			blk.print(4);
-			blk.printTree(4);
-		}
-		Util.STOP();
-	}
+//	private void dumpSyntaxTree() {
+//		Util.println("SimulaBuilder.dumpSyntaxTree: ProgramModule: " + syntaxTree);
+//		DeclarationScope mainModule = syntaxTree.mainModule;
+//		Util.println("SimulaBuilder.dumpSyntaxTree: ProgramModule.mainModule: " + mainModule.getClass().getSimpleName() + " " + mainModule);
+//		if(mainModule instanceof MaybeBlockDeclaration blk) {
+//			Util.println("SimulaBuilder.dumpSyntaxTree: Block: " + ObjectKind.edit(blk.declarationKind));
+////			blk.print(4);
+//			blk.printTree(4);
+//		}
+//		Util.STOP();
+//	}
 	
 	public void printSyntaxTree(String title) {
 		Util.println("======================================== BEGIN SYNTAX TREE: " + title + " ============================ ");

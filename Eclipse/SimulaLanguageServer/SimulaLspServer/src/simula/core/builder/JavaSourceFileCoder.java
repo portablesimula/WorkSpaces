@@ -16,7 +16,6 @@ import java.util.Vector;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.core.DocumentManager;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.BlockDeclaration;
 import simula.core.utilities.LOG;

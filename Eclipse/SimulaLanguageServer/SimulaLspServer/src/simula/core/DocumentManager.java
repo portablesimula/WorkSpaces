@@ -17,6 +17,7 @@ import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import simula.Comn;
 import simula.core.builder.DocumentTextUpdater;
 import simula.core.builder.SimulaBuilder;
+import simula.core.builder.SourceTextReader;
 import simula.core.builder.token.LexToken;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.StandardClass;
@@ -123,6 +124,7 @@ public class DocumentManager {
 		sourceLines = sourceCode.lines()
                 .map(line -> line.stripTrailing() + "\n")
                 .collect(Collectors.toList());
+		sourceLines.add(""+(char)SourceTextReader.EOF_MARK);
 		
 //		for(String line:sourceLines) {
 //			IO.println("Line|" + Comn.printable(line) + '|');
