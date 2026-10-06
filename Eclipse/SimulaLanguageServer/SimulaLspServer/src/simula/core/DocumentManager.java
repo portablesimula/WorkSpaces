@@ -19,6 +19,7 @@ import simula.core.builder.DocumentTextUpdater;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.SourceTextReader;
 import simula.core.builder.token.LexToken;
+import simula.core.builder.token.TokenManager;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.statement.ProgramModule;
@@ -343,14 +344,10 @@ public class DocumentManager {
 	public static List<Integer> semanticTokensFull(String documentUri) {
 		if(TESTING) Util.println("DocumentManager.semanticTokensFull: " + documentUri);
     	DocumentManager documentManager = getDocumentManager(documentUri);
-//    	List<LexToken> lexTokenList = documentManager.simBuilder.lexTokenList;
-//    	List<Integer> encodedData = generateSemanticTokens(lexTokenList);
-    	List<Integer> encodedData = documentManager.simBuilder.semTokenList;
-//		Util.IERR("DO VERIFY");
-//		if(Option.LEX_VERIFY) {
-//		TokenManager.tokenListVerifyer(documentManager.sourceCode, encodedData);
-//		}
-		return encodedData;
+    	List<Integer> semanticTokens = documentManager.simBuilder.semTokenList;
+    	LOG.info("DocumentManager.semanticTokensFull: semanticTokens.size=" + semanticTokens.size());
+//		TokenManager.validateSemanticTokens(semanticTokens, TokenManager.STANDARD_TOKEN_TYPES.size() - 1);
+		return semanticTokens;
 	}
 	
 	public void tryCreateBuilder() {

@@ -1,23 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
-<plugin>   
+<plugin>
+
+	<extension point="org.eclipse.ui.startup">
+	    <startup class="com.simula.client.SimulaStartupHandler"/>
+	</extension>
+   
    
    <!-- 1. Define a Content Type for your file format -->
+   <!-- EXAMPLE:
    <extension
-         id="com.simula.contenttype"
-         name="Simula Source File"
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="cs"
+            id="org.eclipse.acute.csharp"
+            name="%content-type.name"
+            priority="normal">
+      </content-type>
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            file-extensions="csproj"
+            id="org.eclipse.acute.csproj"
+            name="%content-type.name.csproj"
+            priority="normal">
+      </content-type>
+   </extension>
+   -->
+   <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             id="com.simula.contenttype"
             name="Simula Source File"
             base-type="org.eclipse.core.runtime.text"
             file-extensions="sim"
-            priority="high">
+            priority="normal">
       </content-type>
    </extension>
 
    <!-- 2. Register your Language Server and bind it to the content type -->
    <!--            class="simula.client.SimulaStreamConnectionProvider  simula.client.NativeLanguageServerProvider">   -->
+   <!-- EXAMPLE:
+   <extension
+         point="org.eclipse.lsp4e.languageServer">
+      <server
+            class="org.eclipse.acute.RoslynLSConnectionProvider"
+            clientImpl="org.eclipse.acute.RoslynLanguageClient"      // ET AVVIK HER:
+            id="org.eclipse.acute.roslynLS"
+            label="org.eclipse.acute.roslynLS">
+      </server>
+      <contentTypeMapping
+            contentType="org.eclipse.acute.csharp"
+            id="org.eclipse.acute.roslynLS">
+      </contentTypeMapping>
+      <server
+            class="org.eclipse.acute.MSBuildStreamConnectionProvider"
+            id="org.eclipse.acute.msbuild"
+            label="org.eclipse.acute.MSBuild">
+      </server>
+      <contentTypeMapping
+            contentType="org.eclipse.acute.csproj"
+            id="org.eclipse.acute.msbuild">
+      </contentTypeMapping>
+   </extension>
+   -->
    <extension
          id="com.simula.server"
          name="Simula Language Server"
@@ -39,35 +85,174 @@
 
    <!-- 2. Bind your custom content type explicitly to the Generic Editor -->
    <!--    class="org.eclipse.ui.genericeditor.GenericEditor" -->
-
+<!-- EXAMPLE:
+   <extension
+         point="org.eclipse.ui.editors">
+      <editorContentTypeBinding
+            contentTypeId="org.eclipse.acute.csharp"
+            editorId="org.eclipse.ui.genericeditor.GenericEditor">
+      </editorContentTypeBinding>
+      <editorContentTypeBinding
+            contentTypeId="org.eclipse.acute.csproj"
+            editorId="org.eclipse.ui.genericeditor.GenericEditor">
+      </editorContentTypeBinding>
+   </extension>
+-->
 <extension point="org.eclipse.ui.editors">
-   <editor
-         id="org.eclipse.ui.genericeditor.GenericEditor"
-         name="Generic Editor"
-         extensions="sim"
-         class="org.eclipse.ui.internal.genericeditor.ExtensionBasedTextEditor"
-         contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor">
-         <contentTypeBinding contentTypeId="com.simula.contenttype" />
-   </editor>
+   <editorContentTypeBinding
+         contentTypeId="com.simula.contenttype"
+         editorId="org.eclipse.ui.genericeditor.GenericEditor">
+   </editorContentTypeBinding>
 </extension>
 
+
    <!-- 3. Provide Syntax Highlighting (Presentation Reconciler) -->
+   <!-- EXAMPLE
+   <extension
+         point="org.eclipse.ui.genericeditor.presentationReconcilers">
+      <presentationReconciler
+            class="org.eclipse.tm4e.ui.text.TMPresentationReconciler"   // DETTE ER EN DEFAULT
+            contentType="org.eclipse.acute.csharp">
+      </presentationReconciler>
+   </extension>
+   -->
    <extension point="org.eclipse.ui.genericeditor.presentationReconcilers">
       <presentationReconciler
             class="com.simula.client.editor.MyLanguagePresentationReconciler"
             contentType="com.simula.contenttype">
       </presentationReconciler>
    </extension>
+   
+   <!-- =====================================================================
+   Dette punktet lar utviklere koble en VS Code-kompatibel language-configuration.json-fil
+   til en spesifikk filtype (Content Type) i Eclipse. Mens TextMate-grammatikken håndterer
+   selve fargeleggingen (syntax highlighting), brukes denne konfigurasjonen til å styre
+   redigeringsfunksjonalitet som:
+   • Auto-lukking av klammer og sitattegn (auto close)
+   • Kommentering (ut- og innkommentering av linjer/blokker)
+   • Parre klammer (matching brackets)
+   • Smarte innrykk når du trykker Enter (on enter support)   -->
+   
+   NOTE: SER IKKE UT TIL Å VIRKE
+   
+   <!-- EXAMPLE:
+   <extension
+         point="org.eclipse.tm4e.languageconfiguration.languageConfigurations">
+      <languageConfiguration
+            contentTypeId="org.eclipse.acute.csharp"
+            path="language-configurations/language-configuration.json">
+      </languageConfiguration>
+   </extension>
+   -->
+   <extension
+         point="org.eclipse.tm4e.languageconfiguration.languageConfigurations">
+      <languageConfiguration
+            contentTypeId="com.simula.contenttype"
+            path="language-configurations/language-configuration.json">
+      </languageConfiguration>
+   </extension>
+
+   <!--                                                                           Defines: Simula Perspective -->
+   <!-- 1. Definer selve perspektivet -->
+   <extension point="org.eclipse.ui.perspectives">
+      <perspective
+            id="com.simula.client.ui.SimulaPerspective"
+            name="Simula"
+	        class="com.simula.client.ui.SimulaPerspectiveFactory"
+	        icon="icons/favico.png">
+      </perspective>
+   </extension>
+
+   <!-- 2. Gjør perspektivet tilgjengelig i "New Wizard" snarveier (Valgfritt, men anbefalt) -->
+   <extension point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="com.simula.client.ui.SimulaPerspective">
+        <view
+            id="org.eclipse.ui.internal.introview"
+            relationship="right"
+            relative="org.eclipse.ui.editorss"
+            visible="false"/>
+         <!-- Erstatter "YOUR_SIMULA_WIZARD_ID" med ID-en til din File->New Wizard -->
+         <newWizardShortcut id="com.simula.client.newWizard.NewSimulaProjectWizard"/>
+         <newWizardShortcut id="com.simula.client.newWizard.NewSimulaFileWizard"/>
+      </perspectiveExtension>
+   </extension>
+
+	<!--
+    For at veiviseren skal dukke opp som en direkte snarvei i File > New-menyen
+	når en bruker befinner seg i et spesifikt perspektiv (f.eks. Java-perspektivet
+	eller Ressurs-perspektivet), legger du til følgende kode:	-->
+	<extension point="org.eclipse.ui.perspectiveExtensions">
+	   <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
+	      <newWizardShortcut id="no.mittfirma.minveiviser.id"/>
+	   </perspectiveExtension>
+	   <!-- Du kan også legge den til i Java-perspektivet -->
+	   <perspectiveExtension targetID="org.eclipse.jdt.ui.JavaPerspective">
+	      <newWizardShortcut id="no.mittfirma.minveiviser.id"/>
+	   </perspectiveExtension>
+	</extension>
+   
+	<!--                                                                          File -> New   Wizards	-->   
+	<extension point="org.eclipse.ui.newWizards">
+	   <!-- Optional: Create a custom category/folder for your wizard -->
+	   <category 
+	         id="com.simula.client.category" 
+	         name="Simula">
+	   </category>
+	   
+	   <!-- New Simula File Wizard -->
+	   <wizard
+	         id="com.simula.client.wizard.mywizard"
+	         name="New Simula File"
+	         category="com.simula.client.category"
+	         class="com.simula.client.newWizard.NewSimulaFileWizard"
+	         icon="icons/favico.png">
+	      <description>Creates a custom artifact file inside your project.</description>
+	      <selection class="org.eclipse.core.resources.IResource"/>
+	   </wizard>
+	   <!-- New Simula Project Wizard -->
+	   <wizard
+	         id="com.simula.client.wizards.NewSimulaProjectWizard"
+	         name="New Simula Project"
+	         category="com.simula.client.category"
+	         class="com.simula.client.newWizard.NewSimulaProjectWizard"
+	         icon="icons/favico.png"
+	         project="true">
+	      <description>
+	         Create a pre-configured Custom Project.
+	      </description>
+	   </wizard>
+	</extension>
+   
+   
+   <extension point="org.eclipse.ui.commands">
+    <command
+        id="com.simula.ide.commands.createProject"
+        name="Create Simula Project">
+    </command>
+	</extension>
+
+	<extension point="org.eclipse.ui.handlers">
+    <handler
+        class="com.simula.client.newWizard.CreateSimulaProjectHandler"
+        commandId="com.simula.ide.commands.createProject">
+    </handler>
+	</extension>
+   
+
 
    <!-- 4. Provide Code Completion (Content Assist Processors) -->
+   <!-- SEE: serverCapabilities.setCompletionProvider -->
+   <!--
    <extension point="org.eclipse.ui.genericeditor.contentAssistProcessors">
       <contentAssistProcessor
             class="com.simula.client.editor.SimulaContentAssistProcessor"
             contentType="com.simula.contenttype">
       </contentAssistProcessor>
    </extension>
+   -->
 
    <!-- 5. Provide Documentation / Tooltips (Hover Providers) -->
+   <!-- SEE: serverCapabilities.setHoverProvider(true) -->
    <!--
    <extension point="org.eclipse.ui.genericeditor.hoverProviders">
       <hoverProvider

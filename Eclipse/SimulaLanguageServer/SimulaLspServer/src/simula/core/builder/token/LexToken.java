@@ -65,6 +65,12 @@ public class LexToken {
 			if(keyWord != KeyWord.NEWLINE) {
 				if(tokenText.contains("\r")) Util.IERR("NEW LexToken: LEX_VERIFY FAILD: Token text contais CR: " + this);
 				if(tokenText.contains("\n")) Util.IERR("NEW LexToken: LEX_VERIFY FAILD: Token text contais NEWLINE: " + this);
+				if(keyWord != KeyWord.WHITESPACES) {
+					if(! tokenText.stripTrailing().equals(tokenText)) {
+						System.err.println("NEW LexToken: Line "+lineNumber+": "+KeyWord.edit(keyWord)+": Illegal tokenText|" + tokenText + '|');
+//						Util.STOP();
+					}	
+				}
 			}
 			if(prevToken != null) {
 				if(keyWord != KeyWord.EOF && column != ( prevToken.column + prevToken.length )) {
@@ -99,30 +105,6 @@ public class LexToken {
 //				Util.println("NEW LexToken: " + this+"  CALLED FROM: " + Util.calledFrom(3, 25));
 			}
 		}
-	}
-	
-	public int semTokenLength() {
-		int nBlanks = nTrailingBlanks();
-//		if(nBlanks > 0) {
-//			Util.println("LexToken.semTokenLength: nTrailingBlanks=" + nBlanks);
-//			String semTokenText = tokenText.substring(0,length - nBlanks);
-//			Util.println("      |" + tokenText +'|');
-//			Util.println(" ==>  |" + semTokenText +'|');
-//		}
-		return length - nBlanks;
-	}
-	
-	
-	public int nTrailingBlanks() {
-	    if (tokenText == null) return 0;
-	    int count = 0;
-	    int len = tokenText.length();
-	    LOOP:for (int i = len - 1; i >= 0; i--) {
-	        if (Character.isWhitespace(tokenText.charAt(i))) count++;
-//	        if (tokenText.charAt(i) == ' ') count++;
-	        else break LOOP;
-	    }
-	    return count;
 	}
 
 	public String edText() {

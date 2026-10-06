@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <!-- CHECKED ! -->
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="cs"
+            id="org.eclipse.acute.csharp"
+            name="%content-type.name"
+            priority="normal">
+      </content-type>
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            file-extensions="csproj"
+            id="org.eclipse.acute.csproj"
+            name="%content-type.name.csproj"
+            priority="normal">
+      </content-type>
+   </extension>
+   
+   <!-- CHECKED ! -->
+   <extension
+         point="org.eclipse.ui.editors">
+      <editorContentTypeBinding
+            contentTypeId="org.eclipse.acute.csharp"
+            editorId="org.eclipse.ui.genericeditor.GenericEditor">
+      </editorContentTypeBinding>
+      <editorContentTypeBinding
+            contentTypeId="org.eclipse.acute.csproj"
+            editorId="org.eclipse.ui.genericeditor.GenericEditor">
+      </editorContentTypeBinding>
+   </extension>
+   
+   <!-- CHECKED ! -->
+   <extension
+         point="org.eclipse.lsp4e.languageServer">
+      <server
+            class="org.eclipse.acute.RoslynLSConnectionProvider"
+            clientImpl="org.eclipse.acute.RoslynLanguageClient"
+            id="org.eclipse.acute.roslynLS"
+            label="org.eclipse.acute.roslynLS">
+      </server>
+      <contentTypeMapping
+            contentType="org.eclipse.acute.csharp"
+            id="org.eclipse.acute.roslynLS">
+      </contentTypeMapping>
+      <server
+            class="org.eclipse.acute.MSBuildStreamConnectionProvider"
+            id="org.eclipse.acute.msbuild"
+            label="org.eclipse.acute.MSBuild">
+      </server>
+      <contentTypeMapping
+            contentType="org.eclipse.acute.csproj"
+            id="org.eclipse.acute.msbuild">
+      </contentTypeMapping>
+   </extension>
+   
+   <extension
+         id="problem"
+         name="%marker.name.problem"
+         point="org.eclipse.core.resources.markers">
+      <!-- Roslyn only answers diagnostic pulls, so aCute creates the markers itself. -->
+      <super type="org.eclipse.core.resources.problemmarker"/>
+      <super type="org.eclipse.core.resources.textmarker"/>
+      <persistent value="false"/>
+   </extension>
+   
+   <extension
+         point="org.eclipse.tm4e.registry.grammars">
+      <grammar
+            path="grammar/csharp.tmLanguage"
+            scopeName="source.cs">
+      </grammar>
+      <scopeNameContentTypeBinding
+            contentTypeId="org.eclipse.acute.csharp"
+            scopeName="source.cs">
+      </scopeNameContentTypeBinding>
+      <grammar
+            path="grammar/MSBuild.tmLanguage"
+            scopeName="source.msbuild">
+      </grammar>
+      <scopeNameContentTypeBinding
+            contentTypeId="org.eclipse.acute.csproj"
+            scopeName="source.msbuild">
+      </scopeNameContentTypeBinding>
+   </extension>
+   
+   <!-- CHECKED ! -->
+   <extension
+         point="org.eclipse.ui.genericeditor.presentationReconcilers">
+      <presentationReconciler
+            class="org.eclipse.tm4e.ui.text.TMPresentationReconciler"
+            contentType="org.eclipse.acute.csharp">
+      </presentationReconciler>
+   </extension>
+   
+   <!-- CHECKED ! -->
+   <extension
+         point="org.eclipse.tm4e.languageconfiguration.languageConfigurations">
+      <languageConfiguration
+            contentTypeId="org.eclipse.acute.csharp"
+            path="language-configurations/language-configuration.json">
+      </languageConfiguration>
+   </extension>
+   
+   <!-- CHECKED ! Menu: File->New->Project|File ... -->
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.eclipse.acute.dotnet"
+            name="%category.name">
+      </category>
+      <wizard
+            category="org.eclipse.acute.dotnet"
+            class="org.eclipse.acute.dotnetnew.DotnetNewWizard"
+            icon="icons/dotnet.png"
+            id="org.eclipse.acute.newWizard"
+            name="%new.wizard.name"
+            project="true">
+      </wizard>
+   </extension>
+   
+   <!-- UN-CHECKED ! Menu: Run ... -->
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+           name="%launchConfigurationType.name"
+           delegate="org.eclipse.acute.dotnetrun.DotnetRunDelegate"
+           modes="run"
+           id="org.eclipse.acute.dotnetrun.DotnetRunDelegate">
+      </launchConfigurationType>
+   </extension>
+   
+   <!-- UN-CHECKED ! Fanegrupper (tab groups) i Run/Debug Configurations-dialoge -->
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.eclipse.acute.dotnetrun.DotnetRunTabGroup"
+            id="org.eclipse.acute.dotnetrun.DotnetRunTabGroup"
+            type="org.eclipse.acute.dotnetrun.DotnetRunDelegate">
+      </launchConfigurationTabGroup>
+   </extension>
+   
+   <!-- UN-CHECKED ! knytte et ikon (bilde) til en spesifikk type kjøre- eller feilsøkingskonfigurasjon (launch configuration type). -->
+   <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            id="org.eclipse.acute.dotnetrun.DotnetRunTypeImage"
+            configTypeID="org.eclipse.acute.dotnetrun.DotnetRunDelegate"
+            icon="icons/dotnet.png">
+      </launchConfigurationTypeImage>
+   </extension>
+   
+   <!-- UN-CHECKED ! legge til egendefinerte egenskaper (properties) på eksisterende Java-klasser. -->
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            id="org.eclipse.acute.dotnetProjectTester"
+            type="org.eclipse.core.resources.IResource"
+            namespace="org.eclipse.acute"
+            properties="isDotnetProject"
+            class="org.eclipse.acute.Tester">
+      </propertyTester>
+   </extension>
+   
+   <!-- UN-CHECKED !  er et utvidelsespunkt som lar deg registrere snarveier i "Run As"- og "Debug As"-menyene -->
+   <extension point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            id="org.eclipse.acute.dotnetrun.Shortcut"
+            class="org.eclipse.acute.dotnetrun.DotnetRunDelegate"
+            label="%shortcut.label"
+            icon="icons/dotnet.png"
+            modes="run">
+         <contextualLaunch>
+            <enablement>
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate>
+                     <adapt type="org.eclipse.core.resources.IResource">
+                        <test property="org.eclipse.acute.isDotnetProject"
+                              forcePluginActivation="true"/>
+                     </adapt>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+   </extension>
+   
+   <!-- UN-CHECKED ! Menu: File > Export -->
+   <extension
+         point="org.eclipse.ui.exportWizards">
+      <wizard
+            id="org.eclipse.acute.ExportWizard"
+            name="%export.wizard.name"
+            class="org.eclipse.acute.dotnetexport.DotnetExportWizard"
+            icon="icons/dotnet.png">
+         <description>
+            %export.wizard.description
+         </description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+   
+   <!-- UN-CHECKED ! Menu: Debug  brukes til å definere egendefinerte måter å kjøre eller feilsøke (debugge) programmer på -->
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            name="%launchConfigurationType.name.test"
+            delegate="org.eclipse.acute.dotnettest.DotnetTestDelegate"
+            modes="run"
+            id="org.eclipse.acute.dotnettest.DotnetTestDelegate">
+      </launchConfigurationType>
+   </extension>
+   
+   <!-- UN-CHECKED ! brukes til å definere en gruppe med faner (tabs) i Eclipse sitt "Run/Debug Configurations"-vindu -->
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.eclipse.acute.dotnettest.DotnetTestTabGroup"
+            id="org.eclipse.acute.dotnettest.DotnetTestTabGroup"
+            type="org.eclipse.acute.dotnettest.DotnetTestDelegate">
+      </launchConfigurationTabGroup>
+   </extension>
+   
+   <!-- UN-CHECKED ! for å knytte et ikon (bilde) til en spesifikk kjørekonfigurasjonstype  -->
+   <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            id="org.eclipse.acute.dotnettest.DotnetTestTypeImage"
+            configTypeID="org.eclipse.acute.dotnettest.DotnetTestDelegate"
+            icon="icons/dotnet.png">
+      </launchConfigurationTypeImage>
+   </extension>
+   
+   <!-- UN-CHECKED !  i Eclipse-rammeverket. Det brukes til å registrere snarveier i menyer som gjør det mulig
+    for brukere å hurtigstarte (kjøre, feilsøke eller profilere) en fil eller et prosjekt direkte fra
+    Eclipse-editoren eller prosjektutforskeren (f.eks. via Run As -> My Application). -->
+   <extension point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            id="org.eclipse.acute.dotnettest.Shortcut"
+            class="org.eclipse.acute.dotnettest.DotnetTestDelegate"
+            label="%shortcut.label.test"
+            icon="icons/dotnet.png"
+            modes="run">
+         <contextualLaunch>
+            <enablement>
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate>
+                     <adapt type="org.eclipse.core.resources.IResource">
+                        <test property="org.eclipse.acute.isDotnetProject"
+                              forcePluginActivation="true"/>
+                     </adapt>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+   </extension>
+   
+   <!-- UN-CHECKED ! brukes til å definere Incremental Project Builders 
+   Du kan konfigurere en bygger til å kjøre automatisk ved lagring (Auto-build),
+   ved manuelle bygg, eller når prosjektet renses (Clean). -->
+   <extension
+         id="org.eclipse.acute.builder.IncrementalDotnetBuilder"
+         name="%builder.name"
+         point="org.eclipse.core.resources.builders">
+      <builder>
+         <run class="org.eclipse.acute.builder.IncrementalDotnetBuilder"/>
+      </builder>
+   </extension>
+   
+   <!-- UN-CHECKED !  er et utvidelsesspunkt (extension point) i Eclipse-plattformen 
+   som brukes til å legge til menypunkter, verktøylinjer (toolbars), kontekstmenyer
+   (høyreklikkmenyer) og statuslinje-elementer (trim) i Eclipse-grensesnittet. -->
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
+         <command
+               commandId="org.eclipse.acute.builder.AddDotnetBuilder"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <and>
+                  <count value="1"/>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <adapt type="org.eclipse.core.resources.IProject">
+                        <test
+                              property="org.eclipse.acute.isDotnetProject"  
+                              forcePluginActivation="true">
+                        </test>
+                     </adapt>
+                  </iterate>
+                  <iterate>
+                     <not>
+                        <test
+                              forcePluginActivation="true"
+                              property="org.eclipse.acute.builder.isDotnetBuilderEnabled">
+                        </test>
+                     </not>
+                  </iterate>
+               </and>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.acute.builder.RemoveDotnetBuilder"
+               style="push">
+            <visibleWhen checkEnabled="true">
+               <and>
+                  <count value="1"/>
+                  <iterate ifEmpty="false" operator="and">
+                     <adapt type="org.eclipse.core.resources.IProject">
+                        <test
+                              property="org.eclipse.acute.isDotnetProject"  
+                              forcePluginActivation="true">
+                        </test>
+                     </adapt>
+                  </iterate>
+                  <iterate>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.acute.builder.isDotnetBuilderEnabled">
+                     </test>
+                  </iterate>
+               </and>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   
+   <!-- UN-CHECKED ! brukes til å deklarere abstrakte, semantiske kommandoer og kategorier.
+   En kommando i Eclipse er kun en intensjon eller en "funksjonspeker" (f.eks. "Lagre", "Kopier" eller "Gjør noe spesielt"),
+   helt separert fra den faktiske kildekoden som utfører handlingen.
+   Dette gjør det mulig å gjenbruke samme kommando på tvers av menyer, verktøy(toolbars) og hurtigtaster,
+   eller gi den ulik oppførsel avhengig av hvilket vindu som er aktivt.    -->
+   <extension
+          point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.eclipse.acute.builder.AddDotnetBuilder"
+            name="%command.name.add"
+            id="org.eclipse.acute.builder.AddDotnetBuilder">
+      </command>
+      <command
+            defaultHandler="org.eclipse.acute.builder.RemoveDotnetBuilder"
+            id="org.eclipse.acute.builder.RemoveDotnetBuilder"
+            name="%command.name.remove">
+      </command>
+   </extension>
+   
+   <!-- UN-CHECKED !  -->
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.acute.builder.TestDotnetBuilderEnabled"
+            id="org.eclipse.acute.builder.IncrementalDotnetBuilderTester"
+            namespace="org.eclipse.acute.builder"
+            properties="isDotnetBuilderEnabled"
+            type="java.lang.Object">
+      </propertyTester>
+   </extension>
+   
+   <!-- UN-CHECKED ! et rammeverk for å lagre, hente og administrere innstillinger (preferences) som nøkkel-verdi-par -->
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.acute.AcutePreferenceInitializer">
+      </initializer>
+   </extension>
+   
+   <!-- UN-CHECKED ! legge til egne innstillingssider (Preference Pages) i Eclipses globale innstillingsvindu (Window > Preferences). -->
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.eclipse.acute.AcutePreferencePage"
+            id="org.eclipse.acute.preferencePage"
+            name="%preferencePage">
+      </page>
+   </extension>
+   
+   <!-- UN-CHECKED ! Menu: Debug -->
+ <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="org.eclipse.acute.debug.DotnetDebugLaunchDelegate"
+            id="org.eclipse.acute.debug.launchType"
+            modes="debug"
+            name=".NET Core Debug Adapter Launcher"
+            public="true"
+            sourceLocatorId="org.eclipse.lsp4e.debug.sourceLocator"
+            sourcePathComputerId="org.eclipse.lsp4e.debug.sourcePathComputer">
+      </launchConfigurationType>
+      <launchConfigurationType
+            delegate="org.eclipse.acute.debug.DotnetDebugAttachDelegate"
+            id="org.eclipse.acute.debug.attachType"
+            modes="debug"
+            name=".NET Core Debug Adapter Attach"
+            public="true"
+            sourceLocatorId="org.eclipse.lsp4e.debug.sourceLocator"
+            sourcePathComputerId="org.eclipse.lsp4e.debug.sourcePathComputer">
+      </launchConfigurationType>
+   </extension>
+   
+   <!-- UN-CHECKED ! Menu: Run, Debug -->
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.eclipse.acute.debug.DebugLaunchTabGroup"
+            description="Run and Debug .NET application"
+            id="org.eclipse.acute.debug.tabGroup"
+            type="org.eclipse.acute.debug.launchType">
+      </launchConfigurationTabGroup>
+      <launchConfigurationTabGroup
+            class="org.eclipse.acute.debug.DebugAttachTabGroup"
+            description="Debug running .NET application"
+            id="org.eclipse.acute.debug.attch.tabGroup"
+            type="org.eclipse.acute.debug.attachType">
+      </launchConfigurationTabGroup>
+   </extension>
+   
+   <!-- UN-CHECKED ! Icon til Run, Debug -->
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.eclipse.acute.debug.launchType"
+            icon="icons/dotnet.png"
+            id="org.eclipse.acute.debug.typeImage">
+      </launchConfigurationTypeImage>
+      <launchConfigurationTypeImage
+            configTypeID="org.eclipse.acute.debug.attachType"
+            icon="icons/dotnet.png"
+            id="org.eclipse.acute.debug.typeImage">
+      </launchConfigurationTypeImage>
+   </extension>
+   
+   <!-- UN-CHECKED !  er et utvidelsespunkt som lar deg registrere snarveier i "Run As"- og "Debug As"-menyene -->
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="org.eclipse.acute.debug.DotnetDebugLaunchShortcut"
+            icon="icons/dotnet.png"
+            id="org.eclipse.acute.debug.Shortcut"
+            label="%shortcut.label"
+            modes="debug">
+         <contextualLaunch>
+            <enablement>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <test
+                              forcePluginActivation="true"
+                              property="org.eclipse.acute.isDotnetProject">
+                        </test>
+                     </adapt>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+   </extension>
+   
+   <!-- UN-CHECKED ! Det brukes til å registrere adapter-fabrikker (adapter factories) deklarativt i en plugin.
+   Dette lar deg transformere ett objekt (f.eks. en datamodell) til en annen type (f.eks. et UI-element)
+   uten at objektene må kjenne til hverandre. Fordelen med utvidelsespunktet er at Eclipse kan finne ut at
+   en adapter eksisterer uten å laste inn selve kildekoden til pluginen din før det faktisk trengs (lazy loading). -->
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.core.resources.IResource"
+            class="org.eclipse.acute.LaunchableAdapterFactory">
+         <adapter
+               type="org.eclipse.debug.ui.actions.ILaunchable">
+         </adapter>
+      </factory>
+   </extension>
+
+   <!-- UN-CHECKED ! lar utviklere registrere egendefinerte visningskomponenter (viewers) for spesifikke filtyper eller innholdstyper.
+   Når Eclipse skal vise innholdet av en fil i en sammenligningsdialog eller i en "EditionSelectionDialog"
+   (for eksempel når du sjekker historikken til en fil), bruker Eclipse dette utvidelsespunktet til å finne riktig visningskomponent. -->
+   <extension
+         point="org.eclipse.compare.contentViewers">
+      <contentTypeBinding
+            contentTypeId="org.eclipse.acute.csharp"
+            contentViewerId="org.eclipse.ui.genericeditor.compareViewer">
+      </contentTypeBinding>
+   </extension>
+   
+   <!-- UN-CHECKED ! ar utviklere registrere egne visnings- og redigeringskomponenter (compare/merge viewers)
+   for å sammenligne og flette spesifikke filtyper eller innholdstyper side-om-side.
+   Når du for eksempel dobbeltklikker på en fil i en Git-sammenligning i Eclipse, bruker plattformen dette
+   utvidelsespunktet til å finne ut om den skal åpne en vanlig tekstsammenligning (TextMergeViewer),
+   en bildesammenligning (ImageMergeViewer), eller en spesialtilpasset visning for dine egne filformater. -->
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="org.eclipse.ui.genericeditor.compareViewer"
+            contentTypeId="org.eclipse.acute.csharp">
+      </contentTypeBinding>
+   </extension>
+   
+   <!-- UN-CHECKED !  -->
+      <extension
+         point="org.eclipse.compare.contentViewers">
+      <contentTypeBinding
+            contentTypeId="org.eclipse.acute.csproj"
+            contentViewerId="org.eclipse.ui.genericeditor.compareViewer">
+      </contentTypeBinding>
+   </extension>
+   
+   <!-- UN-CHECKED !  -->
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="org.eclipse.ui.genericeditor.compareViewer"
+            contentTypeId="org.eclipse.acute.csproj">
+      </contentTypeBinding>
+   </extension>
+   
+</plugin>

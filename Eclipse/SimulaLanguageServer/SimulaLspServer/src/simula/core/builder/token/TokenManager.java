@@ -13,6 +13,8 @@ import org.eclipse.lsp4j.SemanticTokensWithRegistrationOptions;
 import simula.Comn;
 import simula.Option;
 import simula.core.DocumentManager;
+import simula.core.utilities.KeyWord;
+import simula.core.utilities.LOG;
 import simula.core.utilities.Util;
 
 /// @author Øystein Myhre Andersen
@@ -70,6 +72,8 @@ public class TokenManager {
             );
         semanticOptions.setLegend(legend);
         semanticOptions.setFull(true); // Enable full document semantic tokens
+        // Optionally enable delta tracking if supported by your server logic
+        // semanticOptions.setFull(new SemanticTokensServerFull(true)); 
         return semanticOptions;
     }
 
@@ -121,7 +125,13 @@ public class TokenManager {
         int prevTokenLine = 0;
         int prevTokenColumn = 0;
         
-        for (LexToken lexToken : lexTokenList) {
+        LOOP:for (LexToken lexToken : lexTokenList) {
+        	
+        	if(lexToken.keyWord == KeyWord.COMMENT_TEXT || lexToken.keyWord == KeyWord.COMMENT_KEY) {
+        		if(lexToken.tokenText.stripTrailing() == "") {
+        			continue LOOP;
+        		}
+        	}
         	currentLine = lexToken.lineNumber;
 
         	// Beregn relative verdier (deltas)
@@ -146,21 +156,46 @@ public class TokenManager {
             if(Option.LEX_VERIFY) {
             	if(deltaStart < 0) Util.IERR(""+lexToken);
             	if(lexToken.tokenTypeIndex < 0) Util.IERR(""+lexToken);
+            	if(lexToken.tokenText == null || lexToken.tokenText.isEmpty()) Util.IERR(""+lexToken);
+                if(lexToken.length < 1 ) {
+                	Util.IERR("TokenManager.generateSemanticTokens: FAILED: lexToken.length < 1  " + lexToken);
+                	System.exit(0);
+                }
             }
+            
+            String tokenText = lexToken.tokenText;
+            prevTokenColumn = lexToken.column;
+            int length = lexToken.length;
+            LOOP1:while(length > 0) {
+            	char c = tokenText.charAt(0);
+            	if(! Character.isWhitespace(c)) break LOOP1;
+        		tokenText = tokenText.substring(1);
+        		prevTokenColumn++;
+        		deltaStart++;
+        		length--;
+            }
+            tokenText = tokenText.stripTrailing();
+            length = tokenText.length();
+            if(length != lexToken.length)
+            Util.println("TokenManager.generateSemanticTokens: T"+lexToken.length+'|'+Comn.printable(lexToken.tokenText)+ "| ==> T"
+            		+length+'|'+Comn.printable(tokenText)+ "| ==>"
+            		);
 
             // Add the semantic token
             encodedData.add(deltaLine);
             encodedData.add(deltaStart);
-            encodedData.add(lexToken.semTokenLength());
+//            encodedData.add(lexToken.semTokenLength());
+            encodedData.add(length);
             encodedData.add(lexToken.tokenTypeIndex);
             
 //          encodedData.add(lexToken.tokenModifiersBitmask);
             encodedData.add(0);
             
+//            Option.internal.TRACE_NEW_SEMTOKEN = 1;
             if(Option.internal.TRACE_NEW_SEMTOKEN > 0) {
-        		String str = Comn.printable(lexToken.tokenText);
+        		String str = Comn.printable(tokenText);
         		String sem = ("DeltaLine " + deltaLine + ": " + TokenManager.STANDARD_TOKEN_TYPES.get(lexToken.tokenTypeIndex)
-        					+ "[deltaStart:" + deltaStart + ", lng:" + lexToken.length + "] Text: \"" + str + '"');
+        					+ "[deltaStart:" + deltaStart + ", lng:" + length + "] Text: \"" + str + '"');
             	if(Option.internal.TRACE_NEW_SEMTOKEN > 1) {
             		Util.println(""+lexToken);
             		Util.println("==> " + sem);
@@ -171,7 +206,6 @@ public class TokenManager {
             
             // Oppdater historikk for neste iterasjon
             prevTokenLine = currentLine;
-            prevTokenColumn = lexToken.column;
             if(Option.internal.TRACE_NEW_SEMTOKEN > 1) Util.println("Fortsett: prevTokenColumn: " + prevTokenColumn);
         }
         return encodedData;
@@ -182,10 +216,24 @@ public class TokenManager {
 	// ****************************************************************
 	// *** TokenListVerifyer  -- SEE: LspTextPanel.fillTextPane
 	// ****************************************************************
+	/// Validates whether a list of encoded data complies with the LSP specification for Semantic Tokens.
+	///
+	/// @param semanticTokens The list of integers to be validated.
 	public static void tokenListVerifyer(List<String> sourceLines, List<Integer> semanticTokens) {
-
+		
 //		Option.internal.TRACE_VERIFY_TOKEN = 1;
 		boolean TRACE_RECONSTR = false;// true;
+		
+		int maxTokenType = STANDARD_TOKEN_TYPES.size() - 1;
+
+		if (semanticTokens == null) {
+			LOG.error("TokenManager.tokenListVerifyer: VERIFIER FAILED: encodedData == null.");
+		}
+
+		int semSize = semanticTokens.size();
+		if (semSize % 5 != 0) {
+			LOG.error("TokenManager.tokenListVerifyer: VERIFIER FAILED: encodedData of wrong size (" + semSize + "). Must be a multiple of 5.");
+		}
 
 		if(Option.internal.TRACE_VERIFY_TOKEN > 0) {
 			int i = 1;
@@ -211,14 +259,6 @@ public class TokenManager {
 				Util.println("TokenManager.tokenListVerifyer: SEM_TOKEN: semToken: deltaLine=" + deltaLine + ", deltaStartChar="+deltaStartChar
 						+ ", length="+length+", tokenTypeIndex=" + tokenTypeIndex+", tokenModifiersBitmask=" + tokenModifiersBitmask);
 			}
-			
-			int size = STANDARD_TOKEN_TYPES.size();
-			if(tokenTypeIndex < 0 || tokenTypeIndex >= size) {
-				System.err.println("TokenManager.tokenListVerifyer: LOOP START: semToken: deltaLine=" + deltaLine + ", deltaStartChar="+deltaStartChar
-						+ ", length="+length+", tokenTypeIndex=" + tokenTypeIndex+", tokenModifiersBitmask=" + tokenModifiersBitmask);
-				System.err.println("TokenManager.tokenListVerifyer: VERIFIER FAILED: tokenTypeIndex(" + tokenTypeIndex + ") "
-						+ " is outside legal range[0:" + size + "] on line " + lineNumber);
-			}
 
 			// 1. Calculate absolute positions based on LSP delta rules
 			if (deltaLine > 0) {
@@ -235,14 +275,31 @@ public class TokenManager {
 				originalLine = sourceLines.get(lineNumber);
 				reconstr = new StringBuilder();
 				if(TRACE_RECONSTR) Util.println("CASE 1: NEW RECONSTR: Line "+lineNumber+" |" + Comn.printable(originalLine) + '|');
+			} else if (deltaLine < 0) {
+				VERIFIER_FAILED(lineNumber, sourcePos, x - 5, "deltaLine is negative (" + deltaLine + ").");
+			}
+			
+			// DeltaStartChar can't be negative
+			if (deltaStartChar < 0) {
+				VERIFIER_FAILED(lineNumber, sourcePos, x - 4, "deltaStartChar is negative (" + deltaStartChar + ").");
+			}
+
+			// Validate tokenType against the range of allowed types (if provided)
+			if (maxTokenType >= 0 && tokenTypeIndex >= maxTokenType) {
+				VERIFIER_FAILED(lineNumber, sourcePos, x - 2, "tokenTypeIndex (" + tokenTypeIndex + ") is outside legal range[0:" + maxTokenType + "]");
+			}
+
+			if (tokenTypeIndex < 0)	VERIFIER_FAILED(lineNumber, sourcePos, x - 2, "tokenTypeIndex can't be negative.");
+
+			// tokenModifiers can't be negative (bitmask)
+			if (tokenModifiersBitmask < 0) {
+				VERIFIER_FAILED(lineNumber, sourcePos, x - 1, "tokenModifiers is negative (" + tokenModifiersBitmask + ").");
 			}
 
 			// 3. Pad missing characters on the current line
 			int gap = deltaStartChar - prevTextLength;
 			if(gap < 0) {
-				System.err.println("TokenManager.tokenListVerifyer: LOOP START: semToken: deltaLine=" + deltaLine + ", deltaStartChar="+deltaStartChar
-						+ ", length="+length+", tokenTypeIndex=" + tokenTypeIndex+", tokenModifiersBitmask=" + tokenModifiersBitmask);
-				System.err.println("TokenManager.tokenListVerifyer: VERIFIER FAILED: Illegal gap between tokens: " + gap + " on line " + lineNumber);
+				VERIFIER_FAILED(lineNumber, sourcePos, x - 1, "Illegal gap between tokens: " + gap);
 			}
 			if(gap != 0) {
 				reconstr.append(" ".repeat(gap));
@@ -255,15 +312,13 @@ public class TokenManager {
 			if(length > 0) {
 				String tokenText = originalLine.substring(sourcePos, sourcePos + length);
 				if(hasTrailingBlanks(tokenText)) {
-					System.err.println("TokenManager.tokenListVerifyer: LOOP START: semToken: deltaLine=" + deltaLine + ", deltaStartChar="+deltaStartChar
-							+ ", length="+length+", tokenTypeIndex=" + tokenTypeIndex+", tokenModifiersBitmask=" + tokenModifiersBitmask);
-					System.err.println("TokenManager.tokenListVerifyer: VERIFIER FAILED: Token text has trailing blanks on line " + lineNumber);					
+					VERIFIER_FAILED(lineNumber, sourcePos, x - 1, "Token text has trailing blanks|" + tokenText + '|');					
 				}
 				reconstr.append(tokenText);
 				if(TRACE_RECONSTR) Util.println("CASE 3: INSERT  RECONSTR|" + Comn.printable(reconstr.toString()) + '|');
 				if(Option.internal.TRACE_VERIFY_TOKEN > 0) Util.println("LINE " + lineNumber + ": APPEND TEXT: length = " + length + ", TEXT|" + tokenText + "| ==> LINE|" + reconstr + '|');
 				sourcePos += length;
-			}
+			} else if (length <= 0)	VERIFIER_FAILED(lineNumber, sourcePos, x - 3, "length must be greater then 0 (" + length + ").");
 			prevTextLength = length;
 		}
 		String reconstrLine = reconstr.toString();
@@ -272,6 +327,10 @@ public class TokenManager {
 			reconstrLine = "";
 		}
 		if(TRACE_RECONSTR) Util.println("TokenManager.tokenListVerifyer: DONE");
+	}
+	
+	private static void VERIFIER_FAILED(int lineNumber, int sourcePos, int index, String mss) {
+		LOG.error("TokenManager.tokenListVerifyer: VERIFIER FAILED: at index " + index + ", line " + lineNumber + ", pos=" + sourcePos  + ": " + mss);
 	}
 
 	private static boolean hasTrailingBlanks(String str) {
@@ -288,16 +347,15 @@ public class TokenManager {
 			Util.println("LINE " + lineNumber + ": ORIGINAL: |" + Comn.printable(originalLine) + '|');
 		}
 		if(! reconstrLine.equals(originalLine)) {
-			System.err.println("TokenManager.tokenListVerifyer: VERIFIER FAILED(" + debugName + "): Reconstructed text differ from original text on line " + lineNumber);
+			LOG.error("TokenManager.tokenListVerifyer: VERIFIER FAILED(" + debugName + "): Reconstructed text differ from original text on line " + lineNumber);
 			Util.println("LINE " + lineNumber + ": RECONSTR_LINE: |" + Comn.printable(reconstrLine) + '|');
 			Util.println("LINE " + lineNumber + ": ORIGINAL_LINE: |" + Comn.printable(originalLine) + '|');
 			int lng1 = original.length();
 			int lng2 = reconstr.length();
-			System.err.println("Original Text(lng:"+lng1+"): |" + Comn.printable(original) + '|');
-			System.err.println("Reconstr Text(lng:"+lng2+"): |" + Comn.printable(reconstr) + '|');
+			LOG.error("Original Text(lng:"+lng1+"): |" + Comn.printable(original) + '|');
+			LOG.error("Reconstr Text(lng:"+lng2+"): |" + Comn.printable(reconstr) + '|');
 			System.exit(-1);
 		}
 	}
-
 
 }

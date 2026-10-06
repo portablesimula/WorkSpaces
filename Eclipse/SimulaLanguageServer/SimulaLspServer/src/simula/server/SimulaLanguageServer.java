@@ -185,13 +185,15 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         serverCapabilities.setTextDocumentSync(TextDocumentSyncKind.Incremental);
         
         // 3. Declare features your server supports
-        serverCapabilities.setCompletionProvider(new CompletionOptions(true, null));
-        serverCapabilities.setDefinitionProvider(true);
-        serverCapabilities.setHoverProvider(true);
+//        serverCapabilities.setCompletionProvider(new CompletionOptions(true, null));
+//        serverCapabilities.setDefinitionProvider(true);
+//		serverCapabilities.setHoverProvider(true);
+        
         serverCapabilities.setSemanticTokensProvider(TokenManager.getSemanticOptions());
 
         // 4. Return the capabilities wrapped in an InitializeResult object
         InitializeResult reply = new InitializeResult(serverCapabilities, new ServerInfo(CoreGlobal.serverName, CoreGlobal.serverVersion));
+        LOG.info("initialize.Reply: InitializeResult: "+reply);
         return reply;
     }
     
