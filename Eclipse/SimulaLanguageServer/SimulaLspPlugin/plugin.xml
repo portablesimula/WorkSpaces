@@ -27,6 +27,7 @@
       </content-type>
    </extension>
    -->
+   <!--                                                                           Content types -->
    <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
@@ -64,6 +65,7 @@
       </contentTypeMapping>
    </extension>
    -->
+   <!--                                                                           Register Language Server -->
    <extension
          id="com.simula.server"
          name="Simula Language Server"
@@ -98,12 +100,23 @@
       </editorContentTypeBinding>
    </extension>
 -->
-<extension point="org.eclipse.ui.editors">
-   <editorContentTypeBinding
-         contentTypeId="com.simula.contenttype"
-         editorId="org.eclipse.ui.genericeditor.GenericEditor">
-   </editorContentTypeBinding>
-</extension>
+   <!--                                                                           Bind Content type to the Generic Editor -->
+	<extension point="org.eclipse.ui.editors">
+	   <editorContentTypeBinding
+	         contentTypeId="com.simula.contenttype"
+	         editorId="org.eclipse.ui.genericeditor.GenericEditor">
+	   </editorContentTypeBinding>
+<!--
+	   <editor
+	         id="com.simula.client.simulaEditor"
+	         name="Simula Editor"
+	         icon="icons/favico.png"
+	         extensions="sim"
+	         class="com.example.myplugin.editors.SimulaEditor">
+	   </editor>
+-->
+	</extension>
+
 
 
    <!-- 3. Provide Syntax Highlighting (Presentation Reconciler) -->
@@ -116,6 +129,7 @@
       </presentationReconciler>
    </extension>
    -->
+   <!--                                                                           Provide Syntax Highlighting -->
    <extension point="org.eclipse.ui.genericeditor.presentationReconcilers">
       <presentationReconciler
             class="com.simula.client.editor.MyLanguagePresentationReconciler"
@@ -144,6 +158,7 @@
       </languageConfiguration>
    </extension>
    -->
+   <!--                                                                           Defines: Auto close etc. -->
    <extension
          point="org.eclipse.tm4e.languageconfiguration.languageConfigurations">
       <languageConfiguration
@@ -163,7 +178,8 @@
       </perspective>
    </extension>
 
-   <!-- 2. Gjør perspektivet tilgjengelig i "New Wizard" snarveier (Valgfritt, men anbefalt) -->
+   <!-- 2. Gjør perspektivet tilgjengelig i "New Wizard" snarveier -->
+   <!--                                                                           Perspective Extensions -->
    <extension point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension targetID="com.simula.client.ui.SimulaPerspective">
         <view
@@ -224,6 +240,7 @@
 	</extension>
    
    
+   <!--                                                                           Defines: Commands -->
    <extension point="org.eclipse.ui.commands">
     <command
         id="com.simula.ide.commands.createProject"
@@ -231,6 +248,7 @@
     </command>
 	</extension>
 
+   <!--                                                                           Defines: Handlers -->
 	<extension point="org.eclipse.ui.handlers">
     <handler
         class="com.simula.client.newWizard.CreateSimulaProjectHandler"
@@ -239,9 +257,47 @@
 	</extension>
    
 
+   <!--                                                                           Navigator Viewer -->
+	<extension point="org.eclipse.ui.navigator.viewer">
+	   <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+	      <includes>
+	         <contentExtension pattern="com.example.myplugin.navigatorContent"/>
+	      </includes>
+	   </viewerContentBinding>
+	</extension>
+
+	<extension point="org.eclipse.ui.navigator.navigatorContent">
+	   <navigatorContent
+	         id="com.example.myplugin.navigatorContent"
+	         name="Custom Mapper Content"
+	         contentProvider="com.example.myplugin.navigator.MapperContentProvider"
+	         labelProvider="com.example.myplugin.navigator.MapperLabelProvider"
+	         activeByDefault="true">
+	         
+	      <!-- This ensures your provider triggers when a file ends with .mapper -->
+	      <triggerPoints>
+	         <or>
+	            <and>
+	               <instanceof value="org.eclipse.core.resources.IFile"/>
+	               <test property="org.eclipse.core.resources.extension" value="mapper"/>
+	            </and>
+	         </or>
+	      </triggerPoints>
+	      
+	      <!-- Declares what kind of objects this provider outputs -->
+	      <possibleChildren>
+	         <or>
+	            <instanceof value="com.example.myplugin.model.MapperElement"/>
+	         </or>
+	      </possibleChildren>
+	   </navigatorContent>
+	</extension>
+
+
 
    <!-- 4. Provide Code Completion (Content Assist Processors) -->
    <!-- SEE: serverCapabilities.setCompletionProvider -->
+   <!--                                                                           Defines: Content Assists Processors -->
    <!--
    <extension point="org.eclipse.ui.genericeditor.contentAssistProcessors">
       <contentAssistProcessor
@@ -253,6 +309,7 @@
 
    <!-- 5. Provide Documentation / Tooltips (Hover Providers) -->
    <!-- SEE: serverCapabilities.setHoverProvider(true) -->
+   <!--                                                                           Defines: Hover Providers -->
    <!--
    <extension point="org.eclipse.ui.genericeditor.hoverProviders">
       <hoverProvider

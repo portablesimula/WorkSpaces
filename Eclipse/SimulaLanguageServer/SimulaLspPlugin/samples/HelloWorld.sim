@@ -1,0 +1,6 @@
+begin
+% --   dfdfgjcghkhjk  ,,, 
+   comment en kommentar ;
+   outtext("Hello World! og mere til");
+--   outimage;
+end;   

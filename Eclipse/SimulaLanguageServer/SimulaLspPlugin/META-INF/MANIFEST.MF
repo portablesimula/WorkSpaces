@@ -1,12 +1,14 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Client
+Bundle-Name: SimulaClient
 Bundle-SymbolicName: com.simula.lsp.client;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.simula.client.SimulaPluginActivator
 Automatic-Module-Name: com.simula.lsp.client
 Bundle-RequiredExecutionEnvironment: JavaSE-25
-Import-Package: org.bouncycastle.pqc.jcajce.provider.uov;version="[1.85.0,2.0.0)",
+Import-Package: com.github.weisj.jsvg.nodes;version="[2.1.0,3.0.0)",
+ org.bouncycastle.pqc.jcajce.provider.uov;version="[1.85.0,2.0.0)",
+ org.eclipse.core.commands,
  org.eclipse.core.resources,
  org.eclipse.jdt.annotation,
  org.eclipse.jface.text,
@@ -14,13 +16,24 @@ Import-Package: org.bouncycastle.pqc.jcajce.provider.uov;version="[1.85.0,2.0.0)
  org.eclipse.jface.text.presentation,
  org.eclipse.jface.text.rules,
  org.eclipse.jface.text.templates,
+ org.eclipse.jface.viewers,
+ org.eclipse.jface.wizard,
+ org.eclipse.jface.operation,
+ org.eclipse.swt,
+ org.eclipse.swt.events,
+ org.eclipse.swt.graphics,
+ org.eclipse.swt.layout,
  org.eclipse.swt.widgets,
  org.eclipse.ui,
  org.eclipse.ui.actions,
  org.eclipse.ui.dialogs,
+ org.eclipse.ui.handlers,
  org.eclipse.ui.ide,
  org.eclipse.ui.navigator,
+ org.eclipse.ui.part,
  org.eclipse.ui.plugin,
  org.osgi.framework;version="[1.10.0,2.0.0)"
 Require-Bundle: org.eclipse.lsp4e;bundle-version="0.19.15",
- org.eclipse.core.runtime;bundle-version="3.35.0"
+ org.eclipse.core.runtime;bundle-version="3.35.0",
+ org.eclipse.equinox.common;bundle-version="[3.21.0,4.0.0)",
+ org.eclipse.equinox.registry;bundle-version="[3.12.0,4.0.0)"

@@ -9,7 +9,7 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 public class SimulaProjectCreationPage extends WizardNewProjectCreationPage {
 
     private Button includeExamplesCheckbox;
-    private boolean isIncludeExamplesSelected = false;
+    private boolean isIncludeExamplesSelected = true;
 
     public SimulaProjectCreationPage(String pageName) {
         super(pageName);
@@ -28,6 +28,7 @@ public class SimulaProjectCreationPage extends WizardNewProjectCreationPage {
         // 3. Create your custom checkbox button
         includeExamplesCheckbox = new Button(composite, SWT.CHECK);
         includeExamplesCheckbox.setText("Add Simula Samples");
+        includeExamplesCheckbox.setSelection(true);
         
         // 4. Configure layout data so it aligns nicely with standard components
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -46,7 +47,7 @@ public class SimulaProjectCreationPage extends WizardNewProjectCreationPage {
     /**
      * Helper method to expose the checkbox state to your Wizard class.
      */
-    public boolean isIncludeExamplesSelected() {
+    public boolean isIncludeSamplesSelected() {
         return isIncludeExamplesSelected;
     }
 }
