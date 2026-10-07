@@ -94,7 +94,8 @@ public class SimulaStartupHandler implements IStartup {
 			        System.out.println("SimulaStartupHandler'IPartListener2.partOpened: Part opened with ID: " + partRef.getId());
 			        System.out.println("SimulaStartupHandler'IPartListener2.partOpened: URI: " + uri);
 			        switchToSimulaPerspective();
-			        IProject project = getSimulaProject();
+			        
+			        IProject project = ProjectManager.getSimulaProject();
 			        addFileToProjectExplorer(project, uri);
 		        }
 		    }
@@ -115,19 +116,12 @@ public class SimulaStartupHandler implements IStartup {
 //		    @Override public void partInputChanged(IWorkbenchPartReference partRef) { }
 		};
 		
-		private IProject getSimulaProject() {
-			IProject project = ProjectManager.getActiveProject();
-			// ...
-			return project;
-		}
-		
 		private void addFileToProjectExplorer(IProject project, URI fileUri) {
 			ProjectManager.addFileToProject(project, fileUri, ""+fileUri);
 		}
 		
 		private void switchToSimulaPerspective() {
 		    // ID-en du har definert for perspektivet ditt i plugin.xml
-		    final String SIMULA_PERSPECTIVE_ID = "com.simula.client.ui.SimulaPerspective"; 
 
 		    // Kjør på UI-tråden for å unngå ugyldige tråd-tilganger
 		    PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
@@ -136,7 +130,7 @@ public class SimulaStartupHandler implements IStartup {
 		            try {
 		                IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		                if (window != null) {
-		                    PlatformUI.getWorkbench().showPerspective(SIMULA_PERSPECTIVE_ID, window);
+		                    PlatformUI.getWorkbench().showPerspective(DEF.SIMULA_PERSPECTIVE_ID, window);
 		                }
 		            } catch (WorkbenchException e) {
 		                // Håndter eventuell feil hvis perspektiv-ID-en ikke finnes

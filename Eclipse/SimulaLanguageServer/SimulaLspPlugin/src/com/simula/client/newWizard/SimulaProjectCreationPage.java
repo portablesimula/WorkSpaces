@@ -8,8 +8,8 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
 public class SimulaProjectCreationPage extends WizardNewProjectCreationPage {
 
-    private Button includeExamplesCheckbox;
-    private boolean isIncludeExamplesSelected = true;
+    private Button includeSamplesCheckbox;
+    private boolean isIncludeSamplesSelected = true;
 
     public SimulaProjectCreationPage(String pageName) {
         super(pageName);
@@ -26,20 +26,20 @@ public class SimulaProjectCreationPage extends WizardNewProjectCreationPage {
         Composite composite = (Composite) getControl();
 
         // 3. Create your custom checkbox button
-        includeExamplesCheckbox = new Button(composite, SWT.CHECK);
-        includeExamplesCheckbox.setText("Add Simula Samples");
-        includeExamplesCheckbox.setSelection(true);
+        includeSamplesCheckbox = new Button(composite, SWT.CHECK);
+        includeSamplesCheckbox.setText("Add Simula Samples");
+        includeSamplesCheckbox.setSelection(true);
         
         // 4. Configure layout data so it aligns nicely with standard components
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 3; // Standard page uses a 3-column layout
-        includeExamplesCheckbox.setLayoutData(gd);
+        includeSamplesCheckbox.setLayoutData(gd);
 
         // 5. Track the state selection when clicked
-        includeExamplesCheckbox.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+        includeSamplesCheckbox.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
             @Override
             public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-                isIncludeExamplesSelected = includeExamplesCheckbox.getSelection();
+                isIncludeSamplesSelected = includeSamplesCheckbox.getSelection();
             }
         });
     }
@@ -48,6 +48,6 @@ public class SimulaProjectCreationPage extends WizardNewProjectCreationPage {
      * Helper method to expose the checkbox state to your Wizard class.
      */
     public boolean isIncludeSamplesSelected() {
-        return isIncludeExamplesSelected;
+        return isIncludeSamplesSelected;
     }
 }

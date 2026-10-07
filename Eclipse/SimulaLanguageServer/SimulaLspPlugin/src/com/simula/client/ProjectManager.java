@@ -4,8 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -37,11 +39,27 @@ public class ProjectManager {
 
 		for (IProject project : projects) {
 			if (project.isOpen()) {
-				System.out.println("Project Name: " + project.getName());
-				System.out.println("Project Location: " + project.getLocation().toOSString());
+				System.out.println("ProjectManager.printAllProjects: Project: " + project);
+				System.out.println("ProjectManager.printAllProjects: Project Name: " + project.getName());
+				System.out.println("ProjectManager.printAllProjects: Project Location: " + project.getLocation().toOSString());
+				System.out.println("ProjectManager.printAllProjects: Project.type: " + project.getType());
+				if (project.isOpen()) {
+					try {
+						IProjectDescription description = project.getDescription();
+						String[] natureIds = description.getNatureIds();
+
+						for (String natureId : natureIds) {
+							System.out.println("ProjectManager.printAllProjects: Project Nature ID: " + natureId);
+						}
+
+//						System.out.println("ProjectManager.printAllProjects: Project.content type: " + project.getContentTypeMatcher());
+					} catch (CoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
 		}
-
 	}
 	
 	public static IProject getProjectByName(String projectName) {
@@ -61,9 +79,46 @@ public class ProjectManager {
 		}	
 		return project;
 	}
+
 	
+	public static IProject getSimulaProject() {
+		printAllProjects();
+		IProject project = getActiveProject();
+		IO.println("SimulaStartupHandler.getSimulaProject: project="+project);
+		// ...
+		return project;
+	}
+
+	public static boolean isSimulaProject(IProject project) {
+		try {
+			// Ensure the project is open before checking its nature
+			return project != null && project.isOpen() && project.hasNature(DEF.SIMULA_NATURE_ID);
+		} catch (CoreException e) {
+			// Handle exceptions (e.g., project does not exist or is closed)
+			return false;
+		}
+	}
+
+    public static void addSimulaNature(IProject project) throws CoreException {
+        // 1. Hent den eksisterende prosjektbeskrivelsen
+        IProjectDescription description = project.getDescription();
+        String[] prevNatures = description.getNatureIds();
+        
+        // 2. Opprett en ny matrise med plass til den nye nature-ID-en
+        String[] newNatures = new String[prevNatures.length + 1];
+        System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
+        
+        // 3. Legg til din spesifikke Simula Nature ID (må matche plugin.xml)
+//        newNatures[prevNatures.length] = "din.plugin.id.simulaNature"; 
+        newNatures[prevNatures.length] = DEF.SIMULA_NATURE_ID; 
+        
+        // 4. Sett de oppdaterte natures på beskrivelsen og lagre
+        description.setNatureIds(newNatures);
+        project.setDescription(description, null);
+    }
+
 	public static IProject getActiveProject() {
-	    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 	    if (window == null) {
 	        return null;
 	    }
@@ -171,5 +226,68 @@ public class ProjectManager {
 	        e.printStackTrace();
 	    }
 	}
+
+	
+    
+    public static void printProjectDescription(IProject project) {
+        // 1. Ensure the project is not null and is open before inspecting it
+        if (project == null) {
+            System.out.println("ProjectManager.printProjectDescription: Project reference is null.");
+            return;
+        }
+        
+        if (!project.isOpen()) {
+            System.out.println("ProjectManager.printProjectDescription: Project '" + project.getName() + "' is closed.");
+            return;
+        }
+
+        try {
+            // 2. Retrieve the underlying IProjectDescription
+            IProjectDescription description = project.getDescription();
+
+            System.out.println("ProjectManager.printProjectDescription:  ========================================");
+            System.out.println("Project Name: " + description.getName());
+            System.out.println("Location URI: " + description.getLocationURI());
+            System.out.println("Comment:      " + description.getComment());
+
+            // 3. Print associated Project Natures (e.g., Java, Plugin, etc.)
+            String[] natures = description.getNatureIds();
+            System.out.println("\n--- Project Natures ---");
+            if (natures.length == 0) {
+                System.out.println("None");
+            } else {
+                for (String nature : natures) {
+                    System.out.println(" Nature ID: " + nature);
+                }
+            }
+
+            // 4. Print Build Commands / Builders configured for this project
+            ICommand[] buildSpec = description.getBuildSpec();
+            System.out.println("\n--- Build Spec (Builders) ---");
+            if (buildSpec.length == 0) {
+                System.out.println("None");
+            } else {
+                for (ICommand command : buildSpec) {
+                    System.out.println(" Builder Name: " + command.getBuilderName());
+                }
+            }
+
+            // 5. Print Referenced Projects
+            IProject[] referencedProjects = description.getReferencedProjects();
+            System.out.println("\n--- Referenced Projects ---");
+            if (referencedProjects.length == 0) {
+                System.out.println("None");
+            } else {
+                for (IProject refProject : referencedProjects) {
+                    System.out.println(" References: " + refProject.getName());
+                }
+            }
+            System.out.println("========================================");
+
+        } catch (CoreException e) {
+            System.err.println("Failed to read project description for: " + project.getName());
+            e.printStackTrace();
+        }
+    }
 
 }

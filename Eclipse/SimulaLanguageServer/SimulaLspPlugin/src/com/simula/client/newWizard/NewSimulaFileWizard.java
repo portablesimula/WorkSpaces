@@ -7,8 +7,11 @@ import org.eclipse.ui.IWorkbench;
 
 public class NewSimulaFileWizard extends Wizard implements INewWizard {
     private NewSimulaFileWizardPage page;
-    private IStructuredSelection selection;
-    private IWorkbench workbench;
+    
+    @SuppressWarnings("unused")
+	private IStructuredSelection selection;
+    @SuppressWarnings("unused")
+	private IWorkbench workbench;
 
     public NewSimulaFileWizard() {
         super();

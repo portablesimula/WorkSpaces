@@ -38,6 +38,19 @@
             priority="normal">
       </content-type>
    </extension>
+   
+   
+   <!--                                                                           Project Nature -->
+	<extension
+      id="simulaNature"
+      name="Simula Project Nature"
+      point="org.eclipse.core.resources.natures">
+	   <runtime>
+	      <run class="com.simula.client.SimulaNature">
+	      </run>
+	   </runtime>
+	</extension>
+   
 
    <!-- 2. Register your Language Server and bind it to the content type -->
    <!--            class="simula.client.SimulaStreamConnectionProvider  simula.client.NativeLanguageServerProvider">   -->

@@ -9,7 +9,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -22,14 +21,16 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.osgi.framework.Bundle;
 
+import com.simula.client.DEF;
+import com.simula.client.ProjectManager;
+
 
 public class NewSimulaProjectWizard extends Wizard implements INewWizard {
-    
-    final static String PLUGIN_ID = "com.simula.lsp.client"; 
 
-//    private MyProjectWizardPage page;
     private SimulaProjectCreationPage page;
-    private IWorkbench workbench;
+    
+    @SuppressWarnings("unused")
+	private IWorkbench workbench;
 
     public NewSimulaProjectWizard() {
         super();
@@ -90,6 +91,8 @@ public class NewSimulaProjectWizard extends Wizard implements INewWizard {
     		project.open(subMonitor.split(1));
     	}
 
+    	ProjectManager.addSimulaNature(project);
+    	
     	// 2. Create the 'src' directory
     	IFolder srcFolder = project.getFolder("src");
     	if (!srcFolder.exists()) {
@@ -108,13 +111,12 @@ public class NewSimulaProjectWizard extends Wizard implements INewWizard {
 	            copySamplesToSource(samplesFolder, monitor);
 	        } catch (Exception e) {
 	            throw new CoreException(new org.eclipse.core.runtime.Status(
-	                org.eclipse.core.runtime.IStatus.ERROR, PLUGIN_ID, "Failed to copy sample files", e));
+	                org.eclipse.core.runtime.IStatus.ERROR, DEF.SIMULA_PLUGIN_ID, "Failed to copy sample files", e));
 	        }
         }
         monitor.worked(1);
         monitor.done();
     }
-
 
     private void copySamplesToSource(IFolder targetFolder, IProgressMonitor monitor) throws Exception {
         String pluginId = "com.simula.lsp.client"; 
@@ -164,6 +166,4 @@ public class NewSimulaProjectWizard extends Wizard implements INewWizard {
         }
     }
     
-    // Tiny helper to bypass anonymous thread scope constraint flags
-    private boolean booleanValue() { return true; }
 }
