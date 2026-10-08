@@ -29,38 +29,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 public class ProjectManager {
-
-	public static void printAllProjects() {
-		// Get the root of the workspace
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-
-		// Retrieve all projects
-		IProject[] projects = root.getProjects();
-
-		for (IProject project : projects) {
-			if (project.isOpen()) {
-				System.out.println("ProjectManager.printAllProjects: Project: " + project);
-				System.out.println("ProjectManager.printAllProjects: Project Name: " + project.getName());
-				System.out.println("ProjectManager.printAllProjects: Project Location: " + project.getLocation().toOSString());
-				System.out.println("ProjectManager.printAllProjects: Project.type: " + project.getType());
-				if (project.isOpen()) {
-					try {
-						IProjectDescription description = project.getDescription();
-						String[] natureIds = description.getNatureIds();
-
-						for (String natureId : natureIds) {
-							System.out.println("ProjectManager.printAllProjects: Project Nature ID: " + natureId);
-						}
-
-//						System.out.println("ProjectManager.printAllProjects: Project.content type: " + project.getContentTypeMatcher());
-					} catch (CoreException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-	}
 	
 	public static IProject getProjectByName(String projectName) {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -228,6 +196,39 @@ public class ProjectManager {
 	}
 
 	
+
+	public static void printAllProjects() {
+		// Get the root of the workspace
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+
+		// Retrieve all projects
+		IProject[] projects = root.getProjects();
+
+		for (IProject project : projects) {
+			if (project.isOpen()) {
+//				System.out.println("ProjectManager.printAllProjects: Project: " + project);
+//				System.out.println("ProjectManager.printAllProjects: Project Name: " + project.getName());
+//				System.out.println("ProjectManager.printAllProjects: Project Location: " + project.getLocation().toOSString());
+//				System.out.println("ProjectManager.printAllProjects: Project.type: " + project.getType());
+//				if (project.isOpen()) {
+//					try {
+//						IProjectDescription description = project.getDescription();
+//						String[] natureIds = description.getNatureIds();
+//
+//						for (String natureId : natureIds) {
+//							System.out.println("ProjectManager.printAllProjects: Project Nature ID: " + natureId);
+//						}
+//
+////						System.out.println("ProjectManager.printAllProjects: Project.content type: " + project.getContentTypeMatcher());
+//					} catch (CoreException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+				printProjectDescription(project);
+			}
+		}
+	}
     
     public static void printProjectDescription(IProject project) {
         // 1. Ensure the project is not null and is open before inspecting it
@@ -246,9 +247,11 @@ public class ProjectManager {
             IProjectDescription description = project.getDescription();
 
             System.out.println("ProjectManager.printProjectDescription:  ========================================");
-            System.out.println("Project Name: " + description.getName());
-            System.out.println("Location URI: " + description.getLocationURI());
-            System.out.println("Comment:      " + description.getComment());
+            System.out.println("Project Name: " + project.getName());
+            System.out.println("Project Location: " + project.getLocation().toOSString());
+            System.out.println("Description Name: " + description.getName());
+            System.out.println("Description Location URI: " + description.getLocationURI());
+            System.out.println("Description Comment:      " + description.getComment());
 
             // 3. Print associated Project Natures (e.g., Java, Plugin, etc.)
             String[] natures = description.getNatureIds();

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Test2</name>
+	<name>ffffffff</name>
 	<comment></comment>
 	<projects>
 	</projects>
 	<buildSpec>
 	</buildSpec>
 	<natures>
+		<nature>com.simula.client.simulanature</nature>
 	</natures>
 </projectDescription>

@@ -93,7 +93,7 @@ public class SimulaStartupHandler implements IStartup {
 		        	URI uri = getFileUriFromReference(partRef);
 			        System.out.println("SimulaStartupHandler'IPartListener2.partOpened: Part opened with ID: " + partRef.getId());
 			        System.out.println("SimulaStartupHandler'IPartListener2.partOpened: URI: " + uri);
-			        switchToSimulaPerspective();
+			        SimulaPerspectiveListener.switchToSimulaPerspective();
 			        
 			        IProject project = ProjectManager.getSimulaProject();
 			        addFileToProjectExplorer(project, uri);
@@ -120,30 +120,9 @@ public class SimulaStartupHandler implements IStartup {
 			ProjectManager.addFileToProject(project, fileUri, ""+fileUri);
 		}
 		
-		private void switchToSimulaPerspective() {
-		    // ID-en du har definert for perspektivet ditt i plugin.xml
 
-		    // Kjør på UI-tråden for å unngå ugyldige tråd-tilganger
-		    PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-		        @Override
-		        public void run() {
-		            try {
-		                IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		                if (window != null) {
-		                    PlatformUI.getWorkbench().showPerspective(DEF.SIMULA_PERSPECTIVE_ID, window);
-		                }
-		            } catch (WorkbenchException e) {
-		                // Håndter eventuell feil hvis perspektiv-ID-en ikke finnes
-		                e.printStackTrace();
-		            }
-		        }
-		    });
-		}
-		
-
-	    private static final String GENERIC_EDITOR_ID = "org.eclipse.ui.genericeditor.GenericEditor";
 	    private boolean isGenericEditor(IWorkbenchPartReference partRef) {
-	        return GENERIC_EDITOR_ID.equals(partRef.getId());
+	        return DEF.GENERIC_EDITOR_ID.equals(partRef.getId());
 	    }
 
 		public static URI getFileUriFromReference(IWorkbenchPartReference partRef) {

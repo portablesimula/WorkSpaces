@@ -41,14 +41,20 @@
    
    
    <!--                                                                           Project Nature -->
-	<extension
+	<extension point="org.eclipse.core.resources.natures">
       id="simulaNature"
       name="Simula Project Nature"
-      point="org.eclipse.core.resources.natures">
 	   <runtime>
-	      <run class="com.simula.client.SimulaNature">
-	      </run>
+	      <run class="com.simula.client.SimulaNature"/>
 	   </runtime>
+	</extension>
+
+	<extension point="org.eclipse.ui.ide.projectNatureImages">
+	   <image
+	         id="com.simula.ide.ui.simulaProjectImage"
+	         natureId="com.simula.ide.core.simulaNature"
+	         icon="icons/favico.png">
+	   </image>
 	</extension>
    
 
@@ -119,7 +125,6 @@
 	         contentTypeId="com.simula.contenttype"
 	         editorId="org.eclipse.ui.genericeditor.GenericEditor">
 	   </editorContentTypeBinding>
-<!--
 	   <editor
 	         id="com.simula.client.simulaEditor"
 	         name="Simula Editor"
@@ -127,7 +132,21 @@
 	         extensions="sim"
 	         class="com.example.myplugin.editors.SimulaEditor">
 	   </editor>
--->
+	</extension>
+
+   <!--                                                                           Label Decorators -->
+	<extension point="org.eclipse.ui.decorators">
+	   <decorator
+	         id="com.example.simula.fileDecorator"
+	         label="Simula File Decorator"
+	         state="true"
+	         class="com.simula.client.ui.SimulaLabelDecorator"
+	         objectClass="org.eclipse.core.resources.IFile"
+	         adaptable="true">
+	      <description>
+	         Adds custom icons to Simula language source files.
+	      </description>
+	   </decorator>
 	</extension>
 
 
