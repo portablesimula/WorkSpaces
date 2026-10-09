@@ -1,32 +1,34 @@
 package com.simula.client;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.ElementListSelectionDialog;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
+import com.simula.client.newWizard.NewSimulaProjectWizard;
 
 public class ProjectManager {
 	
@@ -51,10 +53,17 @@ public class ProjectManager {
 	
 	public static IProject getSimulaProject() {
 		printAllProjects();
-		IProject project = getActiveProject();
-		IO.println("SimulaStartupHandler.getSimulaProject: project="+project);
+//		IProject project = getActiveProject();
 		// ...
-		return project;
+		List<IProject> simulaProjects = getSimulaProjects();
+		IO.println("SimulaStartupHandler.getSimulaProject: simulaProjects="+simulaProjects);
+		if(simulaProjects.isEmpty()) {
+			return createNewProject();		
+		}
+		if(simulaProjects.size() > 1) {
+			return askUserToSelectProject(simulaProjects);
+		}
+		return simulaProjects.get(0);
 	}
 
 	public static boolean isSimulaProject(IProject project) {
@@ -65,6 +74,52 @@ public class ProjectManager {
 			// Handle exceptions (e.g., project does not exist or is closed)
 			return false;
 		}
+	}
+
+	private static IProject askUserToSelectProject(List<IProject> simulaProjects) {
+	    // Get the current active window shell
+	    Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+	    
+	    // WorkbenchLabelProvider naturally extracts the proper icons and text for IProject elements
+	    ElementListSelectionDialog dialog = new ElementListSelectionDialog(shell, new WorkbenchLabelProvider());
+	    
+	    dialog.setTitle("Select Simula Project");
+	    dialog.setMessage(
+	    		  "Your workspace contains several Simula projects.\n"
+	    		+ "In which project do you want to place the file?\n\n"
+	    		+ "Choose a project from the list or leave unselected\n"
+	    		+ "in which case the file is not added to any project:");
+	    dialog.setElements(simulaProjects.toArray());
+	    
+	    // CRITICAL: Allows the user to click OK with zero elements highlighted
+//	    dialog.setAllowEmptySelection(true); 
+	    
+	    // Optional: set to false if you only want them to pick at most ONE project
+	    dialog.setMultipleSelection(false); 
+	    
+	    if (dialog.open() == Window.OK) {
+	        Object[] result = dialog.getResult();
+	        if (result != null && result.length > 0) {
+	            return (IProject) result[0];
+	        }
+	    }
+	    
+	    // Returns null if the user canceled OR explicitly chose "none"
+	    return null; 
+	}
+
+	public static List<IProject> getSimulaProjects() {
+	    List<IProject> simulaProjects = new ArrayList<>();
+	    
+	    // 1. Hent roten til det gjeldende Eclipse-workspacet
+	    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+	    
+	    // 2. Gå gjennom alle prosjekter i workspacet
+	    for (IProject project : root.getProjects()) {
+	    	if(isSimulaProject(project)) simulaProjects.add(project);
+	    }
+	    IO.println("ProjectManager.getSimulaProjects: returns: " + simulaProjects);
+	    return simulaProjects;
 	}
 
     public static void addSimulaNature(IProject project) throws CoreException {
@@ -85,46 +140,31 @@ public class ProjectManager {
         project.setDescription(description, null);
     }
 
-	public static IProject getActiveProject() {
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-	    if (window == null) {
-	        return null;
-	    }
+    public static IProject createNewProject() {
+    	// 1. Instansier din egen wizard-klasse
+    	NewSimulaProjectWizard wizard = new NewSimulaProjectWizard();
 
-	    // 1. Try getting the project from the current view selection (e.g., Package Explorer)
-	    ISelection selection = window.getSelectionService().getSelection();
-	    if (selection instanceof IStructuredSelection) {
-	        Object firstElement = ((IStructuredSelection) selection).getFirstElement();
-	        if (firstElement instanceof IAdaptable) {
-	            IProject project = ((IAdaptable) firstElement).getAdapter(IProject.class);
-	            if (project != null) {
-	                return project;
-	            }
-	        }
-	    }
+    	// 2. Initialiser den (viktig for prosjekt-wizards for å sette opp workbench og utvalg)
+    	wizard.init(PlatformUI.getWorkbench(), StructuredSelection.EMPTY);
 
-	    // 2. Fallback: Try getting the project from the active editor
-	    IWorkbenchPage activePage = window.getActivePage();
-	    if (activePage != null) {
-	        IEditorPart activeEditor = activePage.getActiveEditor();
-	        if (activeEditor != null) {
-	            IEditorInput input = activeEditor.getEditorInput();
-	            IProject project = input.getAdapter(IProject.class);
-	            if (project != null) {
-	                return project;
-	            }
-	            
-	            // Second fallback fallback: Adapt to resource first, then get project
-	            IResource resource = input.getAdapter(IResource.class);
-	            if (resource != null) {
-	                return resource.getProject();
-	            }
-	        }
-	    }
+    	// 3. Opprett en WizardDialog som ramme rundt wizarden
+    	WizardDialog dialog = new WizardDialog(
+    	    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+    	    wizard
+    	);
 
-	    return null;
-	}
+    	// 4. Åpne dialogen og fang opp returkoden (blokkerer tråden til vinduet lukkes)
+    	int result = dialog.open();
 
+    	if (result == Window.OK) {
+    	    IO.println("ProjectManager.createNewProject: OK");
+    	    IProject newProject = wizard.getCreatedProject(); 
+    	    return newProject;
+    	} else {
+    	    IO.println("ProjectManager.createNewProject: CANCEL");
+    	    return null;
+    	}
+    }
 	
 	public void refresh(IProject project) throws CoreException {
 		// Call this after performing native Java file writes to update the UI
@@ -133,35 +173,61 @@ public class ProjectManager {
 	
 	/// create a completely new file inside an existing project,
 	/// get a handle on the project, define the path, and invoke IFile.create()
+//	public void addFileToProject(String projectName, String filePath, String content) {
+//	    // 1. Get the workspace root
+//	    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+//	    
+//	    // 2. Get the target project
+//	    IProject project = root.getProject(projectName);
+//	    
+//	    if (project.isOpen()) {
+//	        // 3. Get the file handle (relative to the project)
+//	        IFile file = project.getFile(new Path(filePath));
+//	        
+//	        // 4. Set up file content stream
+//	        InputStream source = new ByteArrayInputStream(content.getBytes());
+//	        
+//	        try {
+//	            // 5. Create the file in the workspace
+//	            if (!file.exists()) {
+//	                file.create(source, IResource.NONE, new NullProgressMonitor());
+//	            } else {
+//	                // Update file content if it already exists
+//	                file.setContents(source, IResource.FORCE, new NullProgressMonitor());
+//	            }
+//	        } catch (CoreException e) {
+//	            e.printStackTrace();
+//	        }
+//	    }
+//	}
+
 	public void addFileToProject(String projectName, String filePath, String content) {
-	    // 1. Get the workspace root
-	    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+	    // 1. Get a reference to the project
+	    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 	    
-	    // 2. Get the target project
-	    IProject project = root.getProject(projectName);
-	    
-	    if (project.isOpen()) {
-	        // 3. Get the file handle (relative to the project)
+	    if (project.exists()) {
+	        // 2. Define the file path relative to the project
 	        IFile file = project.getFile(new Path(filePath));
 	        
-	        // 4. Set up file content stream
+	        // 3. Prepare your text/binary content
 	        InputStream source = new ByteArrayInputStream(content.getBytes());
 	        
 	        try {
-	            // 5. Create the file in the workspace
+	            // Create the file. If parent folders don't exist, you'll need to create them first.
 	            if (!file.exists()) {
-	                file.create(source, IResource.NONE, new NullProgressMonitor());
+	                file.create(source, IFile.FORCE, null);
 	            } else {
-	                // Update file content if it already exists
-	                file.setContents(source, IResource.FORCE, new NullProgressMonitor());
+	                // If it already exists, update the contents instead
+	                file.setContents(source, IFile.FORCE, null);
 	            }
 	        } catch (CoreException e) {
 	            e.printStackTrace();
 	        }
 	    }
 	}
+
 	
-	public static void addFileToProject(IProject project, URI fileUri, String desiredFileName) {
+	private static void addFileToProject(IProject project, URI fileUri, String desiredFileName) {
 	    IProgressMonitor monitor = new NullProgressMonitor();
 	    
 	    // 1. Get the file handle relative to your target project folder
@@ -180,10 +246,106 @@ public class ProjectManager {
 	    }
 	}
 	
+    public void addFileToSrcFolder(IProject project, String fileName, String fileContent, IProgressMonitor monitor) {
+        try {
+            // 1. Get a reference to the 'src' folder
+            IFolder srcFolder = project.getFolder("src");
+            
+            // Optional: Create the src folder if it doesn't exist yet
+            if (!srcFolder.exists()) {
+                srcFolder.create(true, true, monitor);
+            }
+
+            // 2. Get a reference to the file handle inside the src folder
+            IFile newFile = srcFolder.getFile(fileName);
+
+            // 3. Convert your file string content into an InputStream
+            InputStream source = new ByteArrayInputStream(fileContent.getBytes());
+
+            // 4. Create the file in the workspace
+            if (!newFile.exists()) {
+                newFile.create(source, IFile.FORCE, monitor);
+            } else {
+                // If it already exists, overwrite its content
+                newFile.setContents(source, IFile.FORCE, monitor);
+            }
+
+        } catch (CoreException e) {
+            e.printStackTrace();
+            // Handle Eclipse core exceptions here
+        }
+    }
+
+//    public void linkFileToSrcFolder(String projectName, String externalFilePath) {
+//    public static void OLD_linkFileToSrcFolder(IProject project, URI fileUri) {
+//        try {
+//            // 1. Get the workspace root
+////            IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+////            IProject project = workspaceRoot.getProject(projectName);
+//            
+//        	IO.println("ProjectManager.linkFileToSrcFolder: " + fileUri);
+//            if (!project.exists()) {
+//                // Handle project missing error
+//            	IO.println("ProjectManager.linkFileToSrcFolder: Project does NOT Exits " + project);
+//                return;
+//            }
+//
+//            // 2. Get the handle to the 'src' folder
+//            IFolder srcFolder = project.getFolder("src");
+//            if (!srcFolder.exists()) {
+//                // Note: If 'src' doesn't exist yet, you can create it or handle it here
+//                srcFolder.create(true, true, null);
+//            }
+//
+//            // 3. Define the virtual name of the file as it will appear under src/
+//            File externalFile = new File(fileUri);
+//            IFile linkedFile = srcFolder.getFile(new Path(externalFile.getName()));
+//
+//            // 4. Validate and create the link
+//            URI locationURI = externalFile.toURI();
+//            
+//            // Optional: Check if the link location is valid
+//            if (project.getWorkspace().validateLinkLocationURI(linkedFile, fileUri).isOK()) {
+//                // This creates the link without copying the physical underlying file
+//                linkedFile.createLink(locationURI, IResource.NONE, null);
+//            }
+//        	IO.println("ProjectManager.linkFileToSrcFolder: DONE: " + fileUri);
+//           
+//        } catch (CoreException e) {
+//            e.printStackTrace();
+//        }
+//    }
+    public static void linkFileToSrcFolder(IProject project, URI fileUri) {
+    	IO.println("ProjectManager.linkFileToSrcFolder: " + fileUri);
+    	// Get the handle to the 'src' folder
+    	IFolder srcFolder = project.getFolder("src");
+
+    	// The external file you want to link
+    	File externalFile = new File(fileUri);
+    	IPath externalPath = new Path(externalFile.getAbsolutePath());
+
+    	// Define the name the file will have inside the 'src' folder
+    	IFile linkedFile = srcFolder.getFile(externalPath.lastSegment());
+
+    	try {
+    	    // Create the link. 
+    	    // Using IResource.NONE or IResource.REPLACE depends on your fallback strategy
+    	    linkedFile.createLink(externalPath, IResource.NONE, new NullProgressMonitor());
+
+        	// Forces the resource tree to sync with the local file system structure
+        	linkedFile.refreshLocal(IResource.DEPTH_ZERO, new NullProgressMonitor());
+    	} catch (CoreException e) {
+    	    e.printStackTrace();
+    	    // Handle exception (e.g., file already exists, invalid path)
+    	}
+    	IO.println("ProjectManager.linkFileToSrcFolder: DONE: " + fileUri);    	
+    }
+
+	
 	/// Linking an Existing External File.
 	/// If the file already exists somewhere else on the local file system and you want it
 	/// to appear in the Project Explorer without physically moving it, create it as a linked resource:
-	public void linkExternalFile(IProject project, String targetFileName, IPath externalFilePath) {
+	public void linkExternalFile(IProject project, String targetFileName, IPath fileUri) {
 	    IFile file = project.getFile(new Path(targetFileName));
 	    try {
 	        if (!file.exists()) {

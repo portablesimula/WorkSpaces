@@ -125,13 +125,14 @@
 	         contentTypeId="com.simula.contenttype"
 	         editorId="org.eclipse.ui.genericeditor.GenericEditor">
 	   </editorContentTypeBinding>
-	   <editor
-	         id="com.simula.client.simulaEditor"
-	         name="Simula Editor"
-	         icon="icons/favico.png"
-	         extensions="sim"
-	         class="com.example.myplugin.editors.SimulaEditor">
-	   </editor>
+	</extension>
+
+   <!--                                                                           Bind Simula Icon to the Generic Editor -->
+	<extension point="org.eclipse.ui.genericeditor.icons">
+	    <icon 
+	        contentType="com.simula.contenttype" 
+	        icon="icons/favico.png">
+	    </icon>
 	</extension>
 
    <!--                                                                           Label Decorators -->

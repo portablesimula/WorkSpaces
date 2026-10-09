@@ -5,7 +5,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
-public class IconManager {
+public class ResourceManager {
     
     public static Image resizeImage(Image originalImage, int targetWidth, int targetHeight) {
         // 1. Create a blank destination image with the desired size

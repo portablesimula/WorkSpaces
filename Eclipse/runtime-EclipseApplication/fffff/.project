@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>ffffffff</name>
+	<name>fffff</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -9,4 +9,11 @@
 	<natures>
 		<nature>com.simula.client.simulanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/FittingRoom.sim</name>
+			<type>1</type>
+			<location>C:/Users/omyhr/Simula_OLD2/Simula-2.0/samples/FittingRoom.sim</location>
+		</link>
+	</linkedResources>
 </projectDescription>

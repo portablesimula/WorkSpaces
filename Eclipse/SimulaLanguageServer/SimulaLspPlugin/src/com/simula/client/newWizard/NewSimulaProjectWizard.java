@@ -31,6 +31,7 @@ import com.simula.client.ui.SimulaPerspectiveListener;
 public class NewSimulaProjectWizard extends Wizard implements INewWizard {
 
     private SimulaProjectCreationPage page;
+    private IProject project;
     
     @SuppressWarnings("unused")
 	private IWorkbench workbench;
@@ -40,6 +41,11 @@ public class NewSimulaProjectWizard extends Wizard implements INewWizard {
         setNeedsProgressMonitor(true);
         setWindowTitle("New Simula Project");
     }
+
+	public IProject getCreatedProject() {
+		// TODO Auto-generated method stub
+		return project;
+	}
 
     @Override
     public void init(IWorkbench workbench, IStructuredSelection selection) {
@@ -57,7 +63,8 @@ public class NewSimulaProjectWizard extends Wizard implements INewWizard {
     @Override
     public boolean performFinish() {
         // Get the project handle from the wizard page
-        final IProject project = page.getProjectHandle();
+//      final IProject project = page.getProjectHandle();
+        project = page.getProjectHandle();
 //        final URI location = page.useDefaults() ? null : page.getLocationURI();
         final URI location = page.getLocationURI();
         final boolean includeSamples = page.isIncludeSamplesSelected();

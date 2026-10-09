@@ -1,9 +1,11 @@
 package com.simula.client;
 
 import java.net.URI;
+import java.nio.file.Path;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorReference;
@@ -17,8 +19,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.WorkbenchException;
-
+import org.eclipse.ui.editors.text.ILocationProvider;
 import com.simula.client.ui.SimulaPerspectiveListener;
 
 public class SimulaStartupHandler implements IStartup {
@@ -49,121 +50,120 @@ public class SimulaStartupHandler implements IStartup {
         	PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(new SimulaPerspectiveListener());
         });
     }
-		
-		public void registerMyPartListener() {
-	        // Switch to the UI Thread safely
-	        Display.getDefault().asyncExec(() -> {
-	            final IWorkbench workbench = PlatformUI.getWorkbench();
-	            
-	            // 1. Hook listeners to all currently open windows
-	            for (IWorkbenchWindow window : workbench.getWorkbenchWindows()) {
-	                hookPartListenerToWindow(window);
-	            }
-	            
-	            // 2. Listen for any future windows that get opened
-	            workbench.addWindowListener(new IWindowListener() {
-	                @Override
-	                public void windowOpened(IWorkbenchWindow window) {
-	                    hookPartListenerToWindow(window);
-	                }
 
-	                @Override public void windowClosed(IWorkbenchWindow window) {}
-	                @Override public void windowActivated(IWorkbenchWindow window) {}
-	                @Override public void windowDeactivated(IWorkbenchWindow window) {}
-	            });
-	        });
-		}
-		
-	    private void hookPartListenerToWindow(IWorkbenchWindow window) {
-	        if (window == null) return;
-	        
-	        // Listen to pages already present or opened in this window
-	        IWorkbenchPage activePage = window.getActivePage();
-	        if (activePage != null) {
-//	            activePage.addPartListener(new CustomPartListener());
-	            activePage.addPartListener(partListener);
-	        }
-	    }
+    public void registerMyPartListener() {
+    	// Switch to the UI Thread safely
+    	Display.getDefault().asyncExec(() -> {
+    		final IWorkbench workbench = PlatformUI.getWorkbench();
 
-		// Implement your listener
-		private final IPartListener2 partListener = new IPartListener2() {
-		    @Override public void partOpened(IWorkbenchPartReference partRef) {
-		        if (isGenericEditor(partRef)) {
-		            // Your logic when a Generic Editor is opened
-		        	URI uri = getFileUriFromReference(partRef);
-			        System.out.println("SimulaStartupHandler'IPartListener2.partOpened: Part opened with ID: " + partRef.getId());
-			        System.out.println("SimulaStartupHandler'IPartListener2.partOpened: URI: " + uri);
-			        SimulaPerspectiveListener.switchToSimulaPerspective();
-			        
-			        IProject project = ProjectManager.getSimulaProject();
-			        addFileToProjectExplorer(project, uri);
-		        }
-		    }
+    		// 1. Hook listeners to all currently open windows
+    		for (IWorkbenchWindow window : workbench.getWorkbenchWindows()) {
+    			hookPartListenerToWindow(window);
+    		}
 
-		    @Override public void partActivated(IWorkbenchPartReference partRef) {
-		        if (isGenericEditor(partRef)) {
-		            // Your logic when Generic Editor takes focus
-			        System.out.println("SimulaStartupHandler'IPartListener2.partOpened: Part activated with ID: " + partRef.getId());
-		        }
-		    }
+    		// 2. Listen for any future windows that get opened
+    		workbench.addWindowListener(new IWindowListener() {
+    			@Override
+    			public void windowOpened(IWorkbenchWindow window) {
+    				hookPartListenerToWindow(window);
+    			}
 
-//		    @Override public void partClosed(IWorkbenchPartReference partRef) { }
-//		    @Override public void partActivated(IWorkbenchPartReference partRef) { }
-//		    @Override public void partDeactivated(IWorkbenchPartReference partRef) { }
-//		    @Override public void partVisible(IWorkbenchPartReference partRef) { }
-//		    @Override public void partHidden(IWorkbenchPartReference partRef) { }
-//		    @Override public void partBroughtToTop(IWorkbenchPartReference partRef) { }
-//		    @Override public void partInputChanged(IWorkbenchPartReference partRef) { }
-		};
-		
-		private void addFileToProjectExplorer(IProject project, URI fileUri) {
-			ProjectManager.addFileToProject(project, fileUri, ""+fileUri);
-		}
-		
-
-	    private boolean isGenericEditor(IWorkbenchPartReference partRef) {
-	        return DEF.GENERIC_EDITOR_ID.equals(partRef.getId());
-	    }
-
-		public static URI getFileUriFromReference(IWorkbenchPartReference partRef) {
-		    // 1. Check if the part reference points to an editor
-		    if (partRef instanceof IEditorReference) {
-		        IEditorReference editorRef = (IEditorReference) partRef;
-		        try {
-		            // 2. Extract the editor input (safely resolves without forcing part activation)
-		            IEditorInput input = editorRef.getEditorInput();
-		            if (input == null) return null;
-
-		            // 3. Try to adapt or cast to IURIEditorInput (covers generic/remote/local file inputs)
-		            IURIEditorInput uriInput = input.getAdapter(IURIEditorInput.class);
-		            if (uriInput != null) {
-		                return uriInput.getURI();
-		            }
-		            
-		            // Fallback for direct instanceof check if the adapter mechanism isn't fully implemented
-		            if (input instanceof IURIEditorInput) {
-		                return ((IURIEditorInput) input).getURI();
-		            }
-
-		            // 4. Try to adapt or cast to IFileEditorInput (covers typical workspace files)
-		            IFileEditorInput fileInput = input.getAdapter(IFileEditorInput.class);
-		            if (fileInput == null && input instanceof IFileEditorInput) {
-		                fileInput = (IFileEditorInput) input;
-		            }
-		            
-		            if (fileInput != null) {
-		                IFile file = fileInput.getFile();
-		                if (file != null) {
-		                    return file.getLocationURI(); // Returns the absolute file system URI
-		                }
-		            }
-		        } catch (Exception e) {
-		            // Handle or log potential PartInitException from getEditorInput()
-		            e.printStackTrace();
-		        }
-		    }
-		    return null;
-		}
-		
+    			@Override public void windowClosed(IWorkbenchWindow window) {}
+    			@Override public void windowActivated(IWorkbenchWindow window) {}
+    			@Override public void windowDeactivated(IWorkbenchWindow window) {}
+    		});
+    	});
     }
+
+    private void hookPartListenerToWindow(IWorkbenchWindow window) {
+    	if (window == null) return;
+
+    	// Listen to pages already present or opened in this window
+    	IWorkbenchPage activePage = window.getActivePage();
+    	if (activePage != null) {
+    		activePage.addPartListener(partListener);
+    	}
+    }
+
+    // Implement your listener
+    private final IPartListener2 partListener = new IPartListener2() {
+    	@Override public void partOpened(IWorkbenchPartReference partRef) {
+    		if (isGenericEditor(partRef)) {
+    			// Your logic when a Generic Editor is opened
+    			URI uri = getFileUriFromReference(partRef);
+    			System.out.println("SimulaStartupHandler'IPartListener2.partOpened: Part opened with ID: " + partRef.getId());
+    			System.out.println("SimulaStartupHandler'IPartListener2.partOpened: URI: " + uri);
+    			SimulaPerspectiveListener.switchToSimulaPerspective();
+
+    			IProject project = ProjectManager.getSimulaProject();
+    			if(project != null)
+    				addFileToProjectExplorer(project, uri);
+    		}
+    	}
+
+    	@Override public void partActivated(IWorkbenchPartReference partRef) {
+    		if (isGenericEditor(partRef)) {
+    			// Your logic when Generic Editor takes focus
+    			System.out.println("SimulaStartupHandler'IPartListener2.partOpened: Part activated with ID: " + partRef.getId());
+    		}
+    	}
+
+//	    @Override public void partClosed(IWorkbenchPartReference partRef) { }
+//	    @Override public void partActivated(IWorkbenchPartReference partRef) { }
+//	    @Override public void partDeactivated(IWorkbenchPartReference partRef) { }
+//	    @Override public void partVisible(IWorkbenchPartReference partRef) { }
+//	    @Override public void partHidden(IWorkbenchPartReference partRef) { }
+//	    @Override public void partBroughtToTop(IWorkbenchPartReference partRef) { }
+//	    @Override public void partInputChanged(IWorkbenchPartReference partRef) { }
+    };
+
+    private void addFileToProjectExplorer(IProject project, URI fileUri) {
+    	ProjectManager.linkFileToSrcFolder(project, fileUri);
+    }
+
+
+    private boolean isGenericEditor(IWorkbenchPartReference partRef) {
+    	return DEF.GENERIC_EDITOR_ID.equals(partRef.getId());
+    }
+
+    public static URI getFileUriFromReference(IWorkbenchPartReference partRef) {
+    	// 1. Check if the part reference points to an editor
+    	if (partRef instanceof IEditorReference editorRef) {
+    		try {
+    			// 2. Extract the editor input (safely resolves without forcing part activation)
+    			IEditorInput input = editorRef.getEditorInput();
+    			if (input == null) return null;
+
+    			// 3. Try to adapt or cast to IURIEditorInput (covers generic/remote/local file inputs)
+    			IURIEditorInput uriInput = input.getAdapter(IURIEditorInput.class);
+    			if (uriInput != null) {
+    				return uriInput.getURI();
+    			}
+
+    			// Fallback for direct instanceof check if the adapter mechanism isn't fully implemented
+    			if (input instanceof IURIEditorInput) {
+    				return ((IURIEditorInput) input).getURI();
+    			}
+
+    			// 4. Try to adapt or cast to IFileEditorInput (covers typical workspace files)
+    			IFileEditorInput fileInput = input.getAdapter(IFileEditorInput.class);
+    			if (fileInput == null && input instanceof IFileEditorInput) {
+    				fileInput = (IFileEditorInput) input;
+    			}
+
+    			if (fileInput != null) {
+    				IFile file = fileInput.getFile();
+    				if (file != null) {
+    					return file.getLocationURI(); // Returns the absolute file system URI
+    				}
+    			}
+    		} catch (Exception e) {
+    			// Handle or log potential PartInitException from getEditorInput()
+    			e.printStackTrace();
+    		}
+    	}
+    	return null;
+    }
+
+}
 

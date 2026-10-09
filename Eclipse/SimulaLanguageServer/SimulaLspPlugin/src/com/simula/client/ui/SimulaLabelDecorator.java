@@ -47,7 +47,7 @@ public class SimulaLabelDecorator implements ILabelDecorator {
 //    	simulaIcon = imageDesc.createImage();
     	Image original = imageDesc.createImage();
 //        simulaIcon = IconManager.resizeImage(original, 16, 16);
-        simulaIcon = IconManager.resizeImage(original, 12, 12);
+        simulaIcon = ResourceManager.resizeImage(original, 12, 12);
     }
 
     @Override
