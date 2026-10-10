@@ -1,5 +1,11 @@
 package com.simula.client.newWizard;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -12,8 +18,10 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 
 import com.simula.client.DEF;
+import com.simula.client.ProjectManager;
 
 public class NewSimulaFileWizard extends Wizard implements INewWizard {
     private SimulaFileWizardPage page;
@@ -75,10 +83,13 @@ public class NewSimulaFileWizard extends Wizard implements INewWizard {
         	}
         }
 
+        String content = "begin\n\touttext(\"Hello Word\");\nend";
+        ProjectManager.createAndOpenInGenericEditor(outputFileName, content);
         
         IO.println("NewSimulaFileWizard.performFinish: Creating item: " + outputFileName);
         // Implement resource manipulation, file system generation, or file generation logic here
         
         return true;
     }
+   
 }

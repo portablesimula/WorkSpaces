@@ -18,6 +18,37 @@
       </content-type>
    </extension>
    
+   <!--                                                                           Menu: About -->
+
+   <!-- 1. Define the Command -->
+   <extension point="org.eclipse.ui.commands">
+      <command
+            id="com.simula.plugin.commands.aboutSimula"
+            name="About Simula">
+      </command>
+   </extension>
+
+   <!-- 2. Bind the Command to your Help Menu Implementation -->
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            class="com.simula.client.handlers.AboutSimulaHandler"
+            commandId="com.simula.plugin.commands.aboutSimula">
+      </handler>
+   </extension>
+
+   <!-- 3. Contribute the item to the Help Menu -->
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:help?after=additions">
+         <command
+               commandId="com.simula.plugin.commands.aboutSimula"
+               label="About Simula"
+               id="com.simula.plugin.menu.aboutSimula"
+               icon="icons/favico.png"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
    
    <!--                                                                           Project Nature -->
 	<extension 

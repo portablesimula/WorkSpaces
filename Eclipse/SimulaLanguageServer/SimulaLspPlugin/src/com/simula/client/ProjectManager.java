@@ -27,10 +27,13 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CopyFilesAndFoldersOperation;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
+import org.eclipse.ui.part.FileEditorInput;
+
 import com.simula.client.newWizard.NewSimulaProjectWizard;
 
 public class ProjectManager {
@@ -174,36 +177,52 @@ public class ProjectManager {
 		project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 	}
 	
+    
+    /**
+     * Creates a file in the specified project and opens it in the Eclipse Generic Editor.
+     * 
+     * @param project The target IProject workspace resource
+     * @param fileName The name of the file (e.g., "config.txt" or "script.js")
+     * @param initialContent The starting string content of the file
+     */
+    public static void createAndOpenInGenericEditor(String fileName, String initialContent) {
+        // 1. Get a handle on the file within the project
+    	IProject project = getSimulaProject();
+    	IFile file = project.getFile(fileName);
+
+        // 2. Create the file resource with initial content if it doesn't exist
+        if (!file.exists()) {
+            try {
+                InputStream source = new ByteArrayInputStream(initialContent.getBytes());
+                // This automatically triggers resource change listeners to refresh Project Explorer
+                file.create(source, true, null); 
+            } catch (CoreException e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+
+        // 3. Open the file in the Generic Editor on the UI thread
+        PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+            try {
+                IWorkbenchPage page = PlatformUI.getWorkbench()
+                                                .getActiveWorkbenchWindow()
+                                                .getActivePage();
+                
+                // The explicit ID for the Eclipse Generic Editor
+                String genericEditorId = "org.eclipse.ui.genericeditor.GenericEditor";
+                
+                // Open the editor
+                page.openEditor(new FileEditorInput(file), genericEditorId, true);
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
 	/// create a completely new file inside an existing project,
 	/// get a handle on the project, define the path, and invoke IFile.create()
-//	public void addFileToProject(String projectName, String filePath, String content) {
-//	    // 1. Get the workspace root
-//	    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-//	    
-//	    // 2. Get the target project
-//	    IProject project = root.getProject(projectName);
-//	    
-//	    if (project.isOpen()) {
-//	        // 3. Get the file handle (relative to the project)
-//	        IFile file = project.getFile(new Path(filePath));
-//	        
-//	        // 4. Set up file content stream
-//	        InputStream source = new ByteArrayInputStream(content.getBytes());
-//	        
-//	        try {
-//	            // 5. Create the file in the workspace
-//	            if (!file.exists()) {
-//	                file.create(source, IResource.NONE, new NullProgressMonitor());
-//	            } else {
-//	                // Update file content if it already exists
-//	                file.setContents(source, IResource.FORCE, new NullProgressMonitor());
-//	            }
-//	        } catch (CoreException e) {
-//	            e.printStackTrace();
-//	        }
-//	    }
-//	}
-
 	public void addFileToProject(String projectName, String filePath, String content) {
 	    // 1. Get a reference to the project
 	    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
