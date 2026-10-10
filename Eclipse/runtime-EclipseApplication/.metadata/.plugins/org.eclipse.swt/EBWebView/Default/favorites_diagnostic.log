@@ -1,9 +1,9 @@
-2026-10-09 10:44:52.494: [INFO] CurrentProfilePath: C:\GitHub\WorkSpaces\Eclipse\runtime-EclipseApplication\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
-2026-10-09 10:44:52.494: [INFO] Profiles total count: 1
-2026-10-09 10:44:52.494: [INFO] Profile: name=Profil 1 path=C:\GitHub\WorkSpaces\Eclipse\runtime-EclipseApplication\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=null
-2026-10-09 10:44:52.494: [INFO] LastUsedProfileDir: C:\GitHub\WorkSpaces\Eclipse\runtime-EclipseApplication\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
-2026-10-09 10:44:52.494: [INFO] OnDoneLoading sync enabled: 0
-2026-10-09 10:44:52.494: [INFO] BookmarkModelLoaded, ids_reassigned: 0
-2026-10-09 10:44:52.494: [INFO] BookmarksLoadDropped droppedNodes=0
-2026-10-09 10:44:52.494: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
-2026-10-09 10:44:55.743: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-10-10 11:19:56.765: [INFO] CurrentProfilePath: C:\GitHub\WorkSpaces\Eclipse\runtime-EclipseApplication\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-10-10 11:19:56.765: [INFO] Profiles total count: 1
+2026-10-10 11:19:56.765: [INFO] Profile: name=Profil 1 path=C:\GitHub\WorkSpaces\Eclipse\runtime-EclipseApplication\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=null
+2026-10-10 11:19:56.765: [INFO] LastUsedProfileDir: C:\GitHub\WorkSpaces\Eclipse\runtime-EclipseApplication\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-10-10 11:19:56.765: [INFO] OnDoneLoading sync enabled: 0
+2026-10-10 11:19:56.765: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-10-10 11:19:56.765: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-10-10 11:19:56.765: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-10-10 11:19:59.645: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1

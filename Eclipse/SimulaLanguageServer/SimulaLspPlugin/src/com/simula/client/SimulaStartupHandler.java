@@ -1,11 +1,8 @@
 package com.simula.client;
 
 import java.net.URI;
-import java.nio.file.Path;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorReference;
@@ -19,7 +16,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.editors.text.ILocationProvider;
 import com.simula.client.ui.SimulaPerspectiveListener;
 
 public class SimulaStartupHandler implements IStartup {
@@ -141,14 +137,14 @@ public class SimulaStartupHandler implements IStartup {
     			}
 
     			// Fallback for direct instanceof check if the adapter mechanism isn't fully implemented
-    			if (input instanceof IURIEditorInput) {
-    				return ((IURIEditorInput) input).getURI();
+    			if (input instanceof IURIEditorInput uriEditorInput) {
+    				return uriEditorInput.getURI();
     			}
 
     			// 4. Try to adapt or cast to IFileEditorInput (covers typical workspace files)
     			IFileEditorInput fileInput = input.getAdapter(IFileEditorInput.class);
-    			if (fileInput == null && input instanceof IFileEditorInput) {
-    				fileInput = (IFileEditorInput) input;
+    			if (fileInput == null && input instanceof IFileEditorInput fileEditorInput) {
+    				fileInput = fileEditorInput;
     			}
 
     			if (fileInput != null) {

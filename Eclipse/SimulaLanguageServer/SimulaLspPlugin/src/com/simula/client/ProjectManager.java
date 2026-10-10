@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.CopyFilesAndFoldersOperation;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import com.simula.client.newWizard.NewSimulaProjectWizard;
@@ -246,9 +249,13 @@ public class ProjectManager {
 	    }
 	}
 	
-    public void addFileToSrcFolder(IProject project, String fileName, String fileContent, IProgressMonitor monitor) {
+//    public void addFileToSrcFolder(IProject project, String fileName, String fileContent, IProgressMonitor monitor) {
+    public void copyFileToSrcFolder(IProject project, String fileName, URI fileUri) {
+	    IProgressMonitor monitor = new NullProgressMonitor();
         try {
-            // 1. Get a reference to the 'src' folder
+            String content = Files.readString(Paths.get(fileUri));//, StandardCharsets.UTF_8);
+            
+            	// 1. Get a reference to the 'src' folder
             IFolder srcFolder = project.getFolder("src");
             
             // Optional: Create the src folder if it doesn't exist yet
@@ -260,7 +267,7 @@ public class ProjectManager {
             IFile newFile = srcFolder.getFile(fileName);
 
             // 3. Convert your file string content into an InputStream
-            InputStream source = new ByteArrayInputStream(fileContent.getBytes());
+            InputStream source = new ByteArrayInputStream(content.getBytes());
 
             // 4. Create the file in the workspace
             if (!newFile.exists()) {
@@ -270,52 +277,13 @@ public class ProjectManager {
                 newFile.setContents(source, IFile.FORCE, monitor);
             }
 
-        } catch (CoreException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             // Handle Eclipse core exceptions here
         }
     }
 
-//    public void linkFileToSrcFolder(String projectName, String externalFilePath) {
-//    public static void OLD_linkFileToSrcFolder(IProject project, URI fileUri) {
-//        try {
-//            // 1. Get the workspace root
-////            IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-////            IProject project = workspaceRoot.getProject(projectName);
-//            
-//        	IO.println("ProjectManager.linkFileToSrcFolder: " + fileUri);
-//            if (!project.exists()) {
-//                // Handle project missing error
-//            	IO.println("ProjectManager.linkFileToSrcFolder: Project does NOT Exits " + project);
-//                return;
-//            }
-//
-//            // 2. Get the handle to the 'src' folder
-//            IFolder srcFolder = project.getFolder("src");
-//            if (!srcFolder.exists()) {
-//                // Note: If 'src' doesn't exist yet, you can create it or handle it here
-//                srcFolder.create(true, true, null);
-//            }
-//
-//            // 3. Define the virtual name of the file as it will appear under src/
-//            File externalFile = new File(fileUri);
-//            IFile linkedFile = srcFolder.getFile(new Path(externalFile.getName()));
-//
-//            // 4. Validate and create the link
-//            URI locationURI = externalFile.toURI();
-//            
-//            // Optional: Check if the link location is valid
-//            if (project.getWorkspace().validateLinkLocationURI(linkedFile, fileUri).isOK()) {
-//                // This creates the link without copying the physical underlying file
-//                linkedFile.createLink(locationURI, IResource.NONE, null);
-//            }
-//        	IO.println("ProjectManager.linkFileToSrcFolder: DONE: " + fileUri);
-//           
-//        } catch (CoreException e) {
-//            e.printStackTrace();
-//        }
-//    }
-    public static void linkFileToSrcFolder(IProject project, URI fileUri) {
+    public static void OLD_linkFileToSrcFolder(IProject project, URI fileUri) {
     	IO.println("ProjectManager.linkFileToSrcFolder: " + fileUri);
     	// Get the handle to the 'src' folder
     	IFolder srcFolder = project.getFolder("src");
@@ -340,23 +308,25 @@ public class ProjectManager {
     	}
     	IO.println("ProjectManager.linkFileToSrcFolder: DONE: " + fileUri);    	
     }
+    
+    public static void linkFileToSrcFolder(IProject project, URI fileUri) {
+    	IO.println("ProjectManager.linkFileToSrcFolder: " + fileUri);
+	    Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+    	// Get the handle to the 'src' folder
+    	IFolder srcFolder = project.getFolder("src");
+    	CopyFilesAndFoldersOperation operation = new CopyFilesAndFoldersOperation(shell);
 
-	
-	/// Linking an Existing External File.
-	/// If the file already exists somewhere else on the local file system and you want it
-	/// to appear in the Project Explorer without physically moving it, create it as a linked resource:
-	public void linkExternalFile(IProject project, String targetFileName, IPath fileUri) {
-	    IFile file = project.getFile(new Path(targetFileName));
-	    try {
-	        if (!file.exists()) {
-	            // Link the workspace handle to the absolute file system path
-	            file.createLink(externalFilePath, IResource.NONE, new NullProgressMonitor());
-	        }
-	    } catch (CoreException e) {
-	        e.printStackTrace();
-	    }
-	}
+    	// 3. Define the absolute file paths (as Strings) of the files to import
+    	String path = fileUri.getPath(); 
+    	String[] filePaths = new String[] {
+//    	    "C:\\path\\to\\external\\file1.txt",
+//    	    "C:\\path\\to\\external\\file2.jpg"
+    			path
+    	};
 
+    	// 4. Execute the operation. This automatically triggers the Eclipse dialog.
+    	operation.copyFiles(filePaths, srcFolder);
+    }
 	
 
 	public static void printAllProjects() {

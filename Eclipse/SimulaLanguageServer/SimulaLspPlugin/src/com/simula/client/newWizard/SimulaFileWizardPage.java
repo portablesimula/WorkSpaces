@@ -1,5 +1,7 @@
 package com.simula.client.newWizard;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
@@ -7,13 +9,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public class NewSimulaFileWizardPage extends WizardPage {
+public class SimulaFileWizardPage extends WizardPage {
     private Text fileText;
 
-    public NewSimulaFileWizardPage() {
+    public SimulaFileWizardPage() {
         super("wizardPage");
-        setTitle("Custom File Configuration");
-        setDescription("Enter a name for your custom artifact.");
+        setTitle("Simula File Configuration");
+        setDescription("Enter a file name for your Simula source file.");
     }
 
     @Override
@@ -30,6 +32,7 @@ public class NewSimulaFileWizardPage extends WizardPage {
     }
 
     public String getFileName() {
-        return fileText.getText();
+        String fileName = fileText.getText();
+        return fileName;
     }
 }

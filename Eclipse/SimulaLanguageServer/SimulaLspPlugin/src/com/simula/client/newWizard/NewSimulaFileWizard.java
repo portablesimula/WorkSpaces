@@ -1,12 +1,22 @@
 package com.simula.client.newWizard;
 
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+
+import com.simula.client.DEF;
 
 public class NewSimulaFileWizard extends Wizard implements INewWizard {
-    private NewSimulaFileWizardPage page;
+    private SimulaFileWizardPage page;
     
     @SuppressWarnings("unused")
 	private IStructuredSelection selection;
@@ -16,7 +26,7 @@ public class NewSimulaFileWizard extends Wizard implements INewWizard {
     public NewSimulaFileWizard() {
         super();
         setNeedsProgressMonitor(true);
-        setWindowTitle("New Custom Artifact Wizard");
+        setWindowTitle("New Simula File");
     }
 
     // Required by INewWizard - captures current environment state
@@ -29,7 +39,7 @@ public class NewSimulaFileWizard extends Wizard implements INewWizard {
     // Add wizard steps/pages sequentially
     @Override
     public void addPages() {
-        page = new NewSimulaFileWizardPage();
+        page = new SimulaFileWizardPage();
         addPage(page); // Registers page via JFace workflow
     }
 
@@ -43,7 +53,30 @@ public class NewSimulaFileWizard extends Wizard implements INewWizard {
             return false;
         }
 
-        System.out.println("Creating item: " + outputFileName);
+        IPath path = new Path(outputFileName);
+        String extension = path.getFileExtension();
+        if(extension != "sim") {
+        	outputFileName = outputFileName + ".sim";
+//        	page.setMessage("File extension .sim was added to file: " + outputFileName);
+        	IStatus warningStatus = new Status(
+        		    IStatus.WARNING, DEF.SIMULA_PLUGIN_ID, "File extension .sim was added to file: " + outputFileName);
+        	ILog.get().log(warningStatus);
+        	try {
+        	    IWorkbenchPage page = PlatformUI.getWorkbench()
+        	                                    .getActiveWorkbenchWindow()
+        	                                    .getActivePage();
+        	    if (page != null) {
+        	        // Open the view or bring it to the front if already open
+        	        page.showView("org.eclipse.pde.runtime.LogView");
+        	    }
+        	} catch (PartInitException e) {
+        	    // Handle exception if the view fails to open
+        	    e.printStackTrace();
+        	}
+        }
+
+        
+        IO.println("NewSimulaFileWizard.performFinish: Creating item: " + outputFileName);
         // Implement resource manipulation, file system generation, or file generation logic here
         
         return true;
