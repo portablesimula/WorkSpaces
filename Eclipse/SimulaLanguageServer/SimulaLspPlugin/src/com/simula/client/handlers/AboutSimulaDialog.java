@@ -33,14 +33,19 @@ public class AboutSimulaDialog extends Dialog {
 
         // Use the SWT Link component to display text and native-style hyperlinks
         Link link = new Link(container, SWT.NONE);
-//        String href = "<a href=\\\"https://example.com\\\">https://portablesimula.github.io/github.io/</a>";
-//        String href = "<a href="https://portablesimula.github.io/github.io/">https://portablesimula.github.io/github.io/</a>";
         String href = "<a href=\"https://portablesimula.github.io/github.io/\">Portable Simula on GitHub</a>";
 
         link.setText(
-        		"My Custom Eclipse Plugin\n"
-        +"Version 1.0.0\n\n"
-        				+"Visit our website at: " + href);
+        		"Simula Plugin\n"
+        		+"Version 1.0.0\n\n"
+				+ "This is a Simula System created by the Open Source Project 'Portable Simula Revisited'.\n"
+				+ "The project was initiated as a response to the lecture held by James Gosling at the 50th\n"
+				+ "anniversary of Simula at Ifi, University of Oslo (UiO) on 27th September, 2017.\n\n"
+
+				+ "This Simula System is written in pure Java and compiles directly to executable .jar\n"
+				+ "files using the new Java Classfile API.\n\n"
+
+        		+"Visit our website at: " + href);
         link.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
         // Handle hyperlink clicks using the Eclipse workbench browser subsystem

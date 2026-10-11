@@ -2,8 +2,33 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+   <!--                                                                           Startup -->
 	<extension point="org.eclipse.ui.startup">
 	    <startup class="com.simula.client.SimulaStartupHandler"/>
+	</extension>
+   
+   <!--                                                                           Preferences -->
+	<extension point="org.eclipse.core.runtime.preferences">
+	   <initializer class="com.simula.client.preferences.SimulaPreferenceInitializer"/>
+	</extension>
+   
+   <extension point="org.eclipse.ui.preferencePages">
+	   <!-- Main Root Category for Simula -->
+	   <page
+	         id="com.simula.client.preferences.SimulaMainPreferencePage"
+	         name="Simula"
+	         class="com.simula.client.preferences.SimulaPreferencePage">
+	   </page>
+	   
+	   <!-- Optional: Child preference page (e.g., Code Formatting or Syntax Coloring) -->
+	   <!--
+	   <page
+	         id="com.example.simula.preferences.SimulaSyntaxColorPage"
+	         name="Syntax Coloring"
+	         category="com.example.simula.preferences.SimulaMainPreferencePage"
+	         class="com.example.simula.preferences.SimulaColorPreferencePage">
+	   </page>
+	   -->
 	</extension>
    
    <!--                                                                           Content types -->

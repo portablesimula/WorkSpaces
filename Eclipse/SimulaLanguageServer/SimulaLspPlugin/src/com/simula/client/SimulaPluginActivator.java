@@ -5,24 +5,19 @@ import org.osgi.framework.BundleContext;
 
 public class SimulaPluginActivator extends AbstractUIPlugin {
 
+	 // Plug-in ID definert i MANIFEST.MF
+    public static final String PLUGIN_ID = "com.simula.lsp.client";
+
     private static SimulaPluginActivator plugin;
+
+    public SimulaPluginActivator() {
+        // Standard konstruktør kreves av OSGi-rammeverket
+    }
 
     @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
-        
-//		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-//		page.addPartListener(new EditorDropInitializer());
-		
-//		IWorkbench workbench = PlatformUI.getWorkbench();
-//		IWorkbenchWindow[] workbenchWindows = workbench.getWorkbenchWindows();
-//		IO.print("SimulaPluginActivator.start: workbenchWindows: "+workbenchWindows);
-//		
-//		for(IWorkbenchWindow win:workbenchWindows) {
-//			IWorkbenchPage activePage = win.getActivePage();
-//			IO.print("SimulaPluginActivator.start: activePage: "+activePage);
-//		}
     }
 
     @Override

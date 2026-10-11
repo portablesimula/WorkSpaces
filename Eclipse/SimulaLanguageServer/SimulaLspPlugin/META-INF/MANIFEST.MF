@@ -5,6 +5,7 @@ Bundle-SymbolicName: com.simula.lsp.client;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.simula.client.SimulaPluginActivator
 Automatic-Module-Name: com.simula.lsp.client
+Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-25
 Import-Package: com.github.weisj.jsvg.nodes;version="[2.1.0,3.0.0)",
  org.bouncycastle.pqc.jcajce.provider.uov;version="[1.85.0,2.0.0)",

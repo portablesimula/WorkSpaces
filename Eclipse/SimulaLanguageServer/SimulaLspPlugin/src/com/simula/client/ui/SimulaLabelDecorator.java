@@ -22,6 +22,7 @@ import com.simula.client.DEF;
 public class SimulaLabelDecorator implements ILabelDecorator {
 
     // Path matching your icon location
+    private final Image originalIcon;
     private final Image simulaIcon;
 
     public SimulaLabelDecorator() {
@@ -45,9 +46,9 @@ public class SimulaLabelDecorator implements ILabelDecorator {
     	// 3. Convert URL to ImageDescriptor and instantiate the Image
     	ImageDescriptor imageDesc = ImageDescriptor.createFromURL(url);
 //    	simulaIcon = imageDesc.createImage();
-    	Image original = imageDesc.createImage();
+    	originalIcon = imageDesc.createImage();
 //        simulaIcon = IconManager.resizeImage(original, 16, 16);
-        simulaIcon = ResourceManager.resizeImage(original, 12, 12);
+        simulaIcon = ResourceManager.resizeImage(originalIcon, 12, 12);
     }
 
     @Override
@@ -69,6 +70,9 @@ public class SimulaLabelDecorator implements ILabelDecorator {
 
     @Override
     public void dispose() {
+        if (originalIcon != null && !originalIcon.isDisposed()) {
+        	originalIcon.dispose();
+        }
         if (simulaIcon != null && !simulaIcon.isDisposed()) {
             simulaIcon.dispose();
         }

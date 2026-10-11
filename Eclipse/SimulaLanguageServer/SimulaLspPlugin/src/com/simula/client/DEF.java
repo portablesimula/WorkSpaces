@@ -10,5 +10,8 @@ public class DEF {
     public final static String SIM_ICON_PATH = "icons/sim.png"; 
     public final static String GENERIC_EDITOR_ID = "org.eclipse.ui.genericeditor.GenericEditor";
 
+    public final static String P_BOOLEAN_SETTING = "booleanPreferenceSetting";
+    public final static String P_INTEGER_SETTING = "integerPreferenceSetting";
+    public final static String P_STRING_SETTING = "stringPreferenceSetting";
 
 }

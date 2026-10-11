@@ -196,6 +196,7 @@ public class ProjectManager {
                 InputStream source = new ByteArrayInputStream(initialContent.getBytes());
                 // This automatically triggers resource change listeners to refresh Project Explorer
                 file.create(source, true, null); 
+                IO.println("ProjectManager.createAndOpenInGenericEditor: " + fileName);
             } catch (CoreException e) {
                 e.printStackTrace();
                 return;
@@ -238,6 +239,7 @@ public class ProjectManager {
 	            // Create the file. If parent folders don't exist, you'll need to create them first.
 	            if (!file.exists()) {
 	                file.create(source, IFile.FORCE, null);
+	                IO.println("ProjectManager.addFileToProject: " + filePath);
 	            } else {
 	                // If it already exists, update the contents instead
 	                file.setContents(source, IFile.FORCE, null);
@@ -249,24 +251,24 @@ public class ProjectManager {
 	}
 
 	
-	private static void addFileToProject(IProject project, URI fileUri, String desiredFileName) {
-	    IProgressMonitor monitor = new NullProgressMonitor();
-	    
-	    // 1. Get the file handle relative to your target project folder
-	    IFile file = project.getFile(desiredFileName);
-	    
-	    try {
-	        // 2. Link the project-relative handle to the absolute URI location
-	        if (!file.exists()) {
-	            file.createLink(fileUri, IResource.NONE, monitor);
-	        } else {
-	            // If it's already there, just refresh it to make it visible
-	            file.refreshLocal(IResource.DEPTH_ZERO, monitor);
-	        }
-	    } catch (CoreException e) {
-	        e.printStackTrace();
-	    }
-	}
+//	private static void addFileToProject(IProject project, URI fileUri, String desiredFileName) {
+//	    IProgressMonitor monitor = new NullProgressMonitor();
+//	    
+//	    // 1. Get the file handle relative to your target project folder
+//	    IFile file = project.getFile(desiredFileName);
+//	    
+//	    try {
+//	        // 2. Link the project-relative handle to the absolute URI location
+//	        if (!file.exists()) {
+//	            file.createLink(fileUri, IResource.NONE, monitor);
+//	        } else {
+//	            // If it's already there, just refresh it to make it visible
+//	            file.refreshLocal(IResource.DEPTH_ZERO, monitor);
+//	        }
+//	    } catch (CoreException e) {
+//	        e.printStackTrace();
+//	    }
+//	}
 	
 //    public void addFileToSrcFolder(IProject project, String fileName, String fileContent, IProgressMonitor monitor) {
     public void copyFileToSrcFolder(IProject project, String fileName, URI fileUri) {
@@ -291,6 +293,7 @@ public class ProjectManager {
             // 4. Create the file in the workspace
             if (!newFile.exists()) {
                 newFile.create(source, IFile.FORCE, monitor);
+                IO.println("ProjectManager.copyFileToSrcFolder: " + fileName);
             } else {
                 // If it already exists, overwrite its content
                 newFile.setContents(source, IFile.FORCE, monitor);
@@ -302,31 +305,31 @@ public class ProjectManager {
         }
     }
 
-    public static void OLD_linkFileToSrcFolder(IProject project, URI fileUri) {
-    	IO.println("ProjectManager.linkFileToSrcFolder: " + fileUri);
-    	// Get the handle to the 'src' folder
-    	IFolder srcFolder = project.getFolder("src");
-
-    	// The external file you want to link
-    	File externalFile = new File(fileUri);
-    	IPath externalPath = new Path(externalFile.getAbsolutePath());
-
-    	// Define the name the file will have inside the 'src' folder
-    	IFile linkedFile = srcFolder.getFile(externalPath.lastSegment());
-
-    	try {
-    	    // Create the link. 
-    	    // Using IResource.NONE or IResource.REPLACE depends on your fallback strategy
-    	    linkedFile.createLink(externalPath, IResource.NONE, new NullProgressMonitor());
-
-        	// Forces the resource tree to sync with the local file system structure
-        	linkedFile.refreshLocal(IResource.DEPTH_ZERO, new NullProgressMonitor());
-    	} catch (CoreException e) {
-    	    e.printStackTrace();
-    	    // Handle exception (e.g., file already exists, invalid path)
-    	}
-    	IO.println("ProjectManager.linkFileToSrcFolder: DONE: " + fileUri);    	
-    }
+//    public static void OLD_linkFileToSrcFolder(IProject project, URI fileUri) {
+//    	IO.println("ProjectManager.linkFileToSrcFolder: " + fileUri);
+//    	// Get the handle to the 'src' folder
+//    	IFolder srcFolder = project.getFolder("src");
+//
+//    	// The external file you want to link
+//    	File externalFile = new File(fileUri);
+//    	IPath externalPath = new Path(externalFile.getAbsolutePath());
+//
+//    	// Define the name the file will have inside the 'src' folder
+//    	IFile linkedFile = srcFolder.getFile(externalPath.lastSegment());
+//
+//    	try {
+//    	    // Create the link. 
+//    	    // Using IResource.NONE or IResource.REPLACE depends on your fallback strategy
+//    	    linkedFile.createLink(externalPath, IResource.NONE, new NullProgressMonitor());
+//
+//        	// Forces the resource tree to sync with the local file system structure
+//        	linkedFile.refreshLocal(IResource.DEPTH_ZERO, new NullProgressMonitor());
+//    	} catch (CoreException e) {
+//    	    e.printStackTrace();
+//    	    // Handle exception (e.g., file already exists, invalid path)
+//    	}
+//    	IO.println("ProjectManager.linkFileToSrcFolder: DONE: " + fileUri);    	
+//    }
     
     public static void linkFileToSrcFolder(IProject project, URI fileUri) {
     	IO.println("ProjectManager.linkFileToSrcFolder: " + fileUri);
@@ -345,6 +348,7 @@ public class ProjectManager {
 
     	// 4. Execute the operation. This automatically triggers the Eclipse dialog.
     	operation.copyFiles(filePaths, srcFolder);
+        IO.println("ProjectManager.linkFileToSrcFolder: " + fileUri);
     }
 	
 
