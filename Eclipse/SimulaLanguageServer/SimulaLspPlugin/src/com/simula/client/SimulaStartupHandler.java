@@ -16,6 +16,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import com.simula.client.Option;
 import com.simula.client.ui.SimulaPerspectiveListener;
 
 public class SimulaStartupHandler implements IStartup {
@@ -91,9 +92,11 @@ public class SimulaStartupHandler implements IStartup {
     			System.out.println("SimulaStartupHandler'IPartListener2.partOpened: URI: " + uri);
     			SimulaPerspectiveListener.switchToSimulaPerspective();
 
-    			IProject project = ProjectManager.getSimulaProject();
-    			if(project != null)
-    				addFileToProjectExplorer(project, uri);
+    			if(! Option.TESTING_NEW_LAYOUT) {
+	    			IProject project = ProjectManager.getSimulaProject();
+	    			if(project != null)
+	    				addFileToProjectExplorer(project, uri);
+    			}
     		}
     	}
 

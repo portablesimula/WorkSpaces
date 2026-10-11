@@ -242,6 +242,7 @@
 	   </category>
 	   
 	   <!-- New Simula File Wizard -->
+	   <!--
 	   <wizard
 	         id="com.simula.client.wizard.mywizard"
 	         name="New Simula File"
@@ -251,6 +252,7 @@
 	      <description>Creates a custom artifact file inside your project.</description>
 	      <selection class="org.eclipse.core.resources.IResource"/>
 	   </wizard>
+	   -->
 	   <!-- New Simula Project Wizard -->
 	   <wizard
 	         id="com.simula.client.wizards.NewSimulaProjectWizard"
@@ -317,7 +319,7 @@
 	      </possibleChildren>
 	   </navigatorContent>
 	</extension>
-
+	
 
 
    <!-- 4. Provide Code Completion (Content Assist Processors) -->

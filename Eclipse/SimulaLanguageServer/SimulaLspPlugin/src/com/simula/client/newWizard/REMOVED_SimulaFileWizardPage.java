@@ -9,10 +9,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public class SimulaFileWizardPage extends WizardPage {
+public class REMOVED_SimulaFileWizardPage extends WizardPage {
     private Text fileText;
 
-    public SimulaFileWizardPage() {
+    public REMOVED_SimulaFileWizardPage() {
         super("wizardPage");
         setTitle("Simula File Configuration");
         setDescription("Enter a file name for your Simula source file.");

@@ -23,15 +23,15 @@ import org.eclipse.ui.part.FileEditorInput;
 import com.simula.client.DEF;
 import com.simula.client.ProjectManager;
 
-public class NewSimulaFileWizard extends Wizard implements INewWizard {
-    private SimulaFileWizardPage page;
+public class REMOVED_NewSimulaFileWizard extends Wizard implements INewWizard {
+    private REMOVED_SimulaFileWizardPage page;
     
     @SuppressWarnings("unused")
 	private IStructuredSelection selection;
     @SuppressWarnings("unused")
 	private IWorkbench workbench;
 
-    public NewSimulaFileWizard() {
+    public REMOVED_NewSimulaFileWizard() {
         super();
         setNeedsProgressMonitor(true);
         setWindowTitle("New Simula File");
@@ -47,7 +47,7 @@ public class NewSimulaFileWizard extends Wizard implements INewWizard {
     // Add wizard steps/pages sequentially
     @Override
     public void addPages() {
-        page = new SimulaFileWizardPage();
+        page = new REMOVED_SimulaFileWizardPage();
         addPage(page); // Registers page via JFace workflow
     }
 

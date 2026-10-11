@@ -1,6 +1,8 @@
 package com.simula.client.handlers;
 
+import java.net.URI;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -54,7 +56,7 @@ public class AboutSimulaDialog extends Dialog {
             public void widgetSelected(SelectionEvent e) {
                 try {
                     IWebBrowser browser = PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser();
-                    browser.openURL(new java.net.URL(e.text));
+                    browser.openURL(URI.create(e.text).toURL());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -63,4 +65,12 @@ public class AboutSimulaDialog extends Dialog {
 
         return container;
     }
+    
+    // 2. Override this to prevent the default OK and Cancel buttons from generating
+    @Override
+    protected void createButtonsForButtonBar(Composite parent) {
+        // Create only the single button you want (e.g., OK button)
+        createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
+    }
+
 }
