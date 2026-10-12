@@ -9,7 +9,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -24,7 +23,6 @@ import org.eclipse.ui.IWorkbench;
 import org.osgi.framework.Bundle;
 
 import com.simula.client.DEF;
-import com.simula.client.ProjectManager;
 import com.simula.client.ui.SimulaPerspectiveListener;
 
 
@@ -83,62 +81,8 @@ public class NewSimulaProjectWizard extends Wizard implements INewWizard {
             e.printStackTrace();
             return false;
         }
-        ProjectManager.printAllProjects();
+//        ProjectManager.printAllProjects();
         return true;
-    }
-//    @Override
-//    public boolean performFinish() {
-//        final String projectName = page.getProjectName();
-//        final org.eclipse.core.runtime.IPath projectLocation = page.getLocationPath();
-//
-//        // Kjør som en IWorkspaceRunnable for å sikre konsistens og ytelse
-//        IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
-//            @Override
-//            public void run(IProgressMonitor monitor) throws CoreException {
-//                createNewProject(projectName, projectLocation, monitor);
-//            }
-//        };
-//
-//        try {
-//            ResourcesPlugin.getWorkspace().run(runnable, null);
-//        } catch (CoreException e) {
-//            e.printStackTrace();
-//            return false;
-//        }
-//        return true;
-//    }
-    
-    private void createNewProject(String name, org.eclipse.core.runtime.IPath location, IProgressMonitor monitor) throws CoreException {
-        monitor.beginTask("Oppretter prosjekt", 3);
-
-        // 1. Hent prosjekthåndtaket
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
-
-        // 2. Opprett en konsistent IProjectDescription
-        IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(name);
-        if (!ResourcesPlugin.getWorkspace().getRoot().getLocation().equals(location)) {
-            description.setLocation(location);
-        }
-
-        // SIKRE KONSISTENS: Legg til dine egne prosjektnaturer (Natures) her
-        // Dette sørger for at Eclipse gjenkjenner prosjektet riktig hver gang
-        String[] defaultNatures = description.getNatureIds();
-        String[] newNatures = new String[defaultNatures.length + 1];
-        System.arraycopy(defaultNatures, 0, newNatures, 0, defaultNatures.length);
-        newNatures[defaultNatures.length] = DEF.SIMULA_NATURE_ID;
-        description.setNatureIds(newNatures);
-
-        // 3. Opprett og åpne prosjektet med beskrivelsen
-        project.create(description, monitor);
-        monitor.worked(1);
-        
-        project.open(monitor);
-        monitor.worked(1);
-
-        // (Valgfritt) Legg til standardmapper eller filer her
-        // ...
-        
-        monitor.done();
     }
     
     private void createProject(IProject project, URI location, IProgressMonitor monitor, boolean includeSamples) throws Exception {
@@ -146,7 +90,6 @@ public class NewSimulaProjectWizard extends Wizard implements INewWizard {
 
     	// 1. Create and open the base Eclipse Project
     	if (!project.exists()) {
-//    		IProjectDescription description = project.getWorkspace().newProjectDescription(project.getName());
             IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(project.getName());
             IO.println("NewSimulaProject.createProject: location="+location);
             if (location != null) {
@@ -163,9 +106,6 @@ public class NewSimulaProjectWizard extends Wizard implements INewWizard {
     		project.open(subMonitor.split(1));
     	}
     	
-    	
-
-//    	ProjectManager.addSimulaNature(project);
         SimulaPerspectiveListener.switchToSimulaPerspective();
     	
     	// 2. Create the 'src' directory

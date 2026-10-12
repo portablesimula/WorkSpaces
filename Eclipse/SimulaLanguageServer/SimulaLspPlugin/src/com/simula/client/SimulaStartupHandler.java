@@ -91,12 +91,6 @@ public class SimulaStartupHandler implements IStartup {
     			System.out.println("SimulaStartupHandler'IPartListener2.partOpened: Part opened with ID: " + partRef.getId());
     			System.out.println("SimulaStartupHandler'IPartListener2.partOpened: URI: " + uri);
     			SimulaPerspectiveListener.switchToSimulaPerspective();
-
-    			if(! Option.TESTING_NEW_LAYOUT) {
-	    			IProject project = ProjectManager.getSimulaProject();
-	    			if(project != null)
-	    				addFileToProjectExplorer(project, uri);
-    			}
     		}
     	}
 
@@ -115,10 +109,6 @@ public class SimulaStartupHandler implements IStartup {
 //	    @Override public void partBroughtToTop(IWorkbenchPartReference partRef) { }
 //	    @Override public void partInputChanged(IWorkbenchPartReference partRef) { }
     };
-
-    private void addFileToProjectExplorer(IProject project, URI fileUri) {
-    	ProjectManager.linkFileToSrcFolder(project, fileUri);
-    }
 
 
     private boolean isGenericEditor(IWorkbenchPartReference partRef) {

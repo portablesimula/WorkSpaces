@@ -1,4 +1,4 @@
-!SESSION 2026-10-11 16:23:06.363 -----------------------------------------------
+!SESSION 2026-10-12 09:18:52.305 -----------------------------------------------
 eclipse.buildId=4.42.0.20261008-0639
 java.version=25
 java.vendor=Oracle Corporation
@@ -6,12 +6,320 @@ BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=no_NO
 Framework arguments:  -product org.eclipse.epp.package.java.product
 Command-line arguments:  -product org.eclipse.epp.package.java.product -data C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer/../runtime-EclipseApplication -dev file:///C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/.metadata/.plugins/org.eclipse.pde.core/Eclipse%20Application/dev.properties -os win32 -ws win32 -arch x86_64 -consoleLog
 
-!ENTRY org.eclipse.egit.ui 2 0 2026-10-11 16:23:16.711
+!ENTRY org.eclipse.egit.ui 2 0 2026-10-12 09:19:02.569
 !MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
 user global configuration and to define the default location to store repositories: 'C:\Users\omyhr'. If this is
 not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
 EGit might behave differently since they see different configuration options.
 This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
 
-!ENTRY org.eclipse.oomph.setup.ui 1 0 2026-10-11 16:23:23.339
+!ENTRY org.eclipse.oomph.setup.ui 1 0 2026-10-12 09:19:09.307
 !MESSAGE Setup tasks were performed during startup updating 5 preferences. See 'C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer\.metadata\.plugins\org.eclipse.pde.core\Eclipse Application\org.eclipse.oomph.setup\setup.log' for details
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.030
+!MESSAGE [LS:Simula Language Server][Info]	SimulaLanguageServer.connect: EndpointProxy for org.eclipse.lsp4j.jsonrpc.RemoteEndpoint@6973bf95
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.069
+!MESSAGE [LS:Simula Language Server][Info]	initialize.Reply: InitializeResult: InitializeResult [
+  capabilities = ServerCapabilities [
+    positionEncoding = null
+    textDocumentSync = Either [
+      left = Incremental
+      right = null
+    ]
+    notebookDocumentSync = null
+    hoverProvider = null
+    completionProvider = null
+    signatureHelpProvider = null
+    definitionProvider = null
+    typeDefinitionProvider = null
+    implementationProvider = null
+    referencesProvider = null
+    documentHighlightProvider = null
+    documentSymbolProvider = null
+    workspaceSymbolProvider = null
+    codeActionProvider = null
+    codeLensProvider = null
+    documentFormattingProvider = null
+    documentRangeFormattingProvider = null
+    documentOnTypeFormattingProvider = null
+    renameProvider = null
+    documentLinkProvider = null
+    colorProvider = null
+    foldingRangeProvider = null
+    declarationProvider = null
+    executeCommandProvider = null
+    workspace = null
+    typeHierarchyProvider = null
+    callHierarchyProvider = null
+    selectionRangeProvider = null
+    linkedEditingRangeProvider = null
+    semanticTokensProvider = SemanticTokensWithRegistrationOptions [
+      legend = SemanticTokensLegend [
+        tokenTypes = ArrayList (
+          "namespace",
+          "type",
+          "class",
+          "enum",
+          "interface",
+          "struct",
+          "typeParameter",
+          "parameter",
+          "variable",
+          "property",
+          "enumMember",
+          "event",
+          "function",
+          "method",
+          "macro",
+          "keyword",
+          "modifier",
+          "comment",
+          "string",
+          "number",
+          "regexp",
+          "operator",
+          "decorator"
+        )
+        tokenModifiers = ArrayList (
+          "declaration",
+          "definition",
+          "readonly",
+          "static",
+          "deprecated",
+          "abstract",
+          "async",
+          "modification",
+          "documentation",
+          "defaultLibrary"
+        )
+      ]
+      range = null
+      full = Either [
+        left = true
+        right = null
+      ]
+      id = null
+      workDoneProgress = null
+      documentSelector = null
+    ]
+    monikerProvider = null
+    inlayHintProvider = null
+    inlineValueProvider = null
+    diagnosticProvider = null
+    inlineCompletionProvider = null
+    textDocument = null
+    experimental = null
+  ]
+  serverInfo = ServerInfo [
+    name = "SimulaLanguageServer"
+    version = "1.0"
+  ]
+]
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.098
+!MESSAGE [LS:Simula Language Server][Info]	Language Server connected successfully!
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.102
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didOpen: file:///C:/GitHub/WorkSpaces/Eclipse/runtime-EclipseApplication/qqq/samples/HelloWorld.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.103
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didOpen: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.121
+!MESSAGE [LS:Simula Language Server][Info]	StandardClass: INITIATE DONE
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.121
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.createJarFilesDirectory: jarFileDir=C:\Users\omyhr\OneDrive\Desktop\bin
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.123
+!MESSAGE [LS:Simula Language Server][Info]	"DocumentManager.didOpen: openDocuments: {file:///C:/GitHub/WorkSpaces/Eclipse/runtime-EclipseApplication/qqq/samples/HelloWorld.sim=simula.core.DocumentManager@7c867ae3}
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.123
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.tryCreateBuilder: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.125
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder.doParsing: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.130
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder: syntaxTree, tokenList and diagnostics DONE
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.131
+!MESSAGE [LS:Simula Language Server][Info]	SimulaBuilder.doChecking: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.140
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didOpen: RETURNS
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.140
+!MESSAGE [LS:Simula Language Server][Info]	got Request: semanticTokensFull: file:///C:/GitHub/WorkSpaces/Eclipse/runtime-EclipseApplication/qqq/samples/HelloWorld.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.140
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.semanticTokensFull: file:///C:/GitHub/WorkSpaces/Eclipse/runtime-EclipseApplication/qqq/samples/HelloWorld.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.141
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.getDocumentManager: documentUri ==> simula.core.DocumentManager@7c867ae3
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:19:36.141
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.semanticTokensFull: semanticTokens.size=60
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:20:13.661
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didChange: file:///C:/GitHub/WorkSpaces/Eclipse/runtime-EclipseApplication/qqq/samples/HelloWorld.sim
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.661
+!MESSAGE [LS:Simula Language Server][Error]	SimulaTextDocumentService.didChange NOT IMPL
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.662
+!MESSAGE [LS:Simula Language Server][Error]	java.base/java.lang.reflect.Method.invoke(Method.java:565)
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:20:13.663
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didChange: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:20:13.663
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.getDocumentManager: documentUri ==> simula.core.DocumentManager@7c867ae3
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.664
+!MESSAGE [LS:Simula Language Server][Error]	ERROR: Internal error - NOT IMPL
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.664
+!MESSAGE [LS:Simula Language Server][Error]	simula.core.utilities.Util.IERR(Util.java:276)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.664
+!MESSAGE [LS:Simula Language Server][Error]	simula.core.DocumentManager.getText(DocumentManager.java:224)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.665
+!MESSAGE [LS:Simula Language Server][Error]	simula.core.DocumentManager.didChange(DocumentManager.java:266)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.665
+!MESSAGE [LS:Simula Language Server][Error]	simula.server.SimulaTextDocumentService.didChange(SimulaTextDocumentService.java:45)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.665
+!MESSAGE [LS:Simula Language Server][Error]	java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.666
+!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.lambda$recursiveFindRpcMethods$0(GenericEndpoint.java:65)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.666
+!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.notify(GenericEndpoint.java:160)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.666
+!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleNotification(RemoteEndpoint.java:231)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.667
+!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:198)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.667
+!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:185)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.668
+!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.668
+!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:114)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.668
+!MESSAGE [LS:Simula Language Server][Error]	java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.669
+!MESSAGE [LS:Simula Language Server][Error]	java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.669
+!MESSAGE [LS:Simula Language Server][Error]	java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.670
+!MESSAGE [LS:Simula Language Server][Error]	java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.670
+!MESSAGE [LS:Simula Language Server][Error]	java.base/java.lang.Thread.run(Thread.java:1474)
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:20:13.848
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didChange: file:///C:/GitHub/WorkSpaces/Eclipse/runtime-EclipseApplication/qqq/samples/HelloWorld.sim
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.848
+!MESSAGE [LS:Simula Language Server][Error]	SimulaTextDocumentService.didChange NOT IMPL
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:20:13.849
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didChange: BEGIN
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:20:13.849
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.getDocumentManager: documentUri ==> simula.core.DocumentManager@7c867ae3
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.849
+!MESSAGE [LS:Simula Language Server][Error]	ERROR: Internal error - NOT IMPL
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.850
+!MESSAGE [LS:Simula Language Server][Error]	simula.core.utilities.Util.IERR(Util.java:276)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.850
+!MESSAGE [LS:Simula Language Server][Error]	simula.core.DocumentManager.getText(DocumentManager.java:224)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.850
+!MESSAGE [LS:Simula Language Server][Error]	simula.core.DocumentManager.didChange(DocumentManager.java:266)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.850
+!MESSAGE [LS:Simula Language Server][Error]	simula.server.SimulaTextDocumentService.didChange(SimulaTextDocumentService.java:45)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.851
+!MESSAGE [LS:Simula Language Server][Error]	java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.851
+!MESSAGE [LS:Simula Language Server][Error]	java.base/java.lang.reflect.Method.invoke(Method.java:565)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.852
+!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.lambda$recursiveFindRpcMethods$0(GenericEndpoint.java:65)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.852
+!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.notify(GenericEndpoint.java:160)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.852
+!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleNotification(RemoteEndpoint.java:231)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.853
+!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:198)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.853
+!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:185)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.853
+!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.854
+!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:114)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.854
+!MESSAGE [LS:Simula Language Server][Error]	java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.854
+!MESSAGE [LS:Simula Language Server][Error]	java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.855
+!MESSAGE [LS:Simula Language Server][Error]	java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.855
+!MESSAGE [LS:Simula Language Server][Error]	java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-10-12 09:20:13.855
+!MESSAGE [LS:Simula Language Server][Error]	java.base/java.lang.Thread.run(Thread.java:1474)
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:20:14.351
+!MESSAGE [LS:Simula Language Server][Info]	got Request: semanticTokensFull: file:///C:/GitHub/WorkSpaces/Eclipse/runtime-EclipseApplication/qqq/samples/HelloWorld.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:20:14.352
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.semanticTokensFull: file:///C:/GitHub/WorkSpaces/Eclipse/runtime-EclipseApplication/qqq/samples/HelloWorld.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:20:14.352
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.getDocumentManager: documentUri ==> simula.core.DocumentManager@7c867ae3
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:20:14.352
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.semanticTokensFull: semanticTokens.size=60
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:21:42.809
+!MESSAGE [LS:Simula Language Server][Info]	got Notification: didClose: file:///C:/GitHub/WorkSpaces/Eclipse/runtime-EclipseApplication/qqq/samples/HelloWorld.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:21:42.810
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: openDocuments: {file:///C:/GitHub/WorkSpaces/Eclipse/runtime-EclipseApplication/qqq/samples/HelloWorld.sim=simula.core.DocumentManager@7c867ae3}
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:21:42.810
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: file:///C:/GitHub/WorkSpaces/Eclipse/runtime-EclipseApplication/qqq/samples/HelloWorld.sim
+
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-12 09:21:42.811
+!MESSAGE [LS:Simula Language Server][Info]	DocumentManager.didClose: openDocuments: {}

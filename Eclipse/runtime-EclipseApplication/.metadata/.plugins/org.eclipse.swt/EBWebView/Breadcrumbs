@@ -12,4 +12,4 @@
 0:00:00 Tab1 StartNav3 #typed
 0:00:00 Tab1 FinishNav3
 0:00:00 Tab1 PageLoad
-0:00:11 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp
+0:00:03 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp
