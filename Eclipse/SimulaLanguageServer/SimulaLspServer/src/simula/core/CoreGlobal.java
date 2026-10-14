@@ -11,6 +11,7 @@ import java.util.Stack;
 import simula.core.builder.JavaSourceFileCoder;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.utilities.ClassHierarchy;
+import simula.core.utilities.ConsolePanel;
 import simula.server.SimulaLanguageServer;
 import simula.server.SimulaTextDocumentService;
 
@@ -34,7 +35,10 @@ public final class CoreGlobal {
 	public static SimulaTextDocumentService getSimulaTextDocumentService() {
 		return (SimulaTextDocumentService) simulaLanguageServer.getTextDocumentService();
 	}
+
 	
+	public static ConsolePanel debugConsole;
+
 	/// The current source line number.
 	public static int sourceLineNumber;
 	
@@ -53,6 +57,9 @@ public final class CoreGlobal {
 		Object_SEQU = 8001;
 //		includeQueue = null;
 		ClassHierarchy.init();
+//		debugConsole = new ConsolePanel("Simula LSP Server - Debug Console");
+//		debugConsole.popup();
+//		debugConsole.write("Started !");
 //    	Util.println("Global.initiate completed");
 	}
 

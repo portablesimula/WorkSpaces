@@ -349,10 +349,11 @@ public final class Util {
 		String mss = s;//Comn.printable(s);
 		if(CoreGlobal.INLINE_CONNECTED) {
 			IO.println(mss);
-		} else {
-			MessageParams params = new MessageParams(MessageType.Info, mss);
-			SimulaLanguageServer.languageClient.logMessage(params);
-		}
+//		} else if(SimulaLanguageServer.languageClient != null) {
+//			MessageParams params = new MessageParams(MessageType.Info, mss);
+//			SimulaLanguageServer.languageClient.logMessage(params);
+		} else if(CoreGlobal.debugConsole != null)
+			CoreGlobal.debugConsole.write(mss+"\n");
 	}  
 
 	/// Print a error message.

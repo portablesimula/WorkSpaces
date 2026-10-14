@@ -17,7 +17,7 @@ import simula.core.CoreGlobal;
 import simula.server.SimulaExecutor;
 import simula.server.SimulaTextDocumentService;
 
-public class TestBatchLauncher {
+public class TestBatchLauncher2 {
 
 	public static void run(String fileName, Vector<String> argv, Vector<String> argv2) {
 		// Remove time, date, and headers from Logger output.
@@ -62,6 +62,6 @@ public class TestBatchLauncher {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		SimulaExecutor.run(documentUri, argv2);
+		RunDebugManager.run(documentUri, argv2);
 	}
 }

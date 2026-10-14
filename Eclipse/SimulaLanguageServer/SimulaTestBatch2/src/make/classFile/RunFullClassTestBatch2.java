@@ -10,7 +10,7 @@ package make.classFile;
 import java.io.File;
 import java.util.Vector;
 
-import client.TestBatchLauncher;
+import client.TestBatchLauncher2;
 import simula.Option;
 
 /**
@@ -21,7 +21,7 @@ import simula.Option;
  * @author Øystein Myhre Andersen
  *
  */
-public final class RunFullClassTestBatch {
+public final class RunFullClassTestBatch2 {
 	
 //	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
 //	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspServer");
@@ -282,7 +282,7 @@ public final class RunFullClassTestBatch {
 
 		for(String name:names) {
 			String fileName = sourceDir+name;
-			TestBatchLauncher.run(fileName, argv, argv2);
+			TestBatchLauncher2.run(fileName, argv, argv2);
 		}
 
 //		list(testBatchJarDir);

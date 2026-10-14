@@ -14,6 +14,8 @@ import org.eclipse.lsp4j.TraceValue;
 
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.RunDebugManager;
+import simula.core.utilities.Util;
 import simula.server.SimulaExecutor;
 import simula.server.SimulaTextDocumentService;
 
@@ -30,6 +32,7 @@ public class TestBatchLauncher {
 		// Start SimulaLanguageServer and Connect
 		CoreGlobal.initiate();
 		CoreGlobal.INLINE_CONNECTED = true;
+		Util.println("TestBatchLauncher.run: before CoreGlobal.simulaLanguageServer.connect");
 		CoreGlobal.simulaLanguageServer.connect(new TestBatchClient());
 			
 		// Initialize SimulaLanguageServer
@@ -62,6 +65,6 @@ public class TestBatchLauncher {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		SimulaExecutor.run(documentUri, argv2);
+		RunDebugManager.run(documentUri, argv2);
 	}
 }

@@ -29,6 +29,10 @@ public final class Option {
 	public static String editorUIScale;
 	
 	public static int lspTrace;
+
+	public static boolean noPopup;
+
+	public static boolean caseSensitive;
 	
 	/// Testing and debugging options
 	public static class internal {
@@ -129,6 +133,8 @@ public final class Option {
 //		Util.println("SimulaBuilder.extLib            " + SimulaCoder.extLib);
 
 	}
+	
+	/// TestBatch Utility:
 	/// Kalles før parsing og checking
 	public static void decodeArguments(String[] argv) {
 //		Util.println("Option.decodeArguments: ");

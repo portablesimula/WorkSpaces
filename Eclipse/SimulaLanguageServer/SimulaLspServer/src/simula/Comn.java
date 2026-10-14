@@ -1,20 +1,7 @@
 package simula;
 
-import javax.swing.JOptionPane;
-
-import simula.core.utilities.Util;
-import simula.runtime.RTS_Dialog;
-import simula.runtime.RTS_EndProgram;
-
 public class Comn {
 
-    
-	public static void popUp(final String msg) {
-		int res = RTS_Dialog.optionDialog(msg + "\nDo you want to continue ?", "Error", JOptionPane.YES_NO_OPTION,
-				JOptionPane.ERROR_MESSAGE, "Yes", "No");
-		if (res != JOptionPane.YES_OPTION)
-			throw new RTS_EndProgram("Simula - endProgram");
-	}
 
 	/// Replaces invisible control character with visible text escapes.
 	public static String printable(char c) {

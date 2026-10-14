@@ -7,11 +7,12 @@ import org.eclipse.lsp4j.services.*;
 import simula.Comn;
 import simula.Option;
 import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.token.TokenManager;
+import simula.core.utilities.ConsolePanel;
 import simula.core.utilities.LOG;
+import simula.core.utilities.Util;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class SimulaLanguageServer implements LanguageServer, LanguageClientAware {
@@ -30,11 +31,18 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         this.workspaceService = new SimulaWorkspaceService();
     }
 
-    public static void main(String[] args) {
-        Comn.popUp("SERVER: SimulaLanguageServer.main: ");
-        
+    public static void main(String[] argv) {
+		if(! CoreGlobal.INLINE_CONNECTED) {
+			CoreGlobal.debugConsole = new ConsolePanel("Simula LSP Server - Debug Console");
+			CoreGlobal.debugConsole.popup("Simula LSP Server - Debug Console");
+			CoreGlobal.debugConsole.write("SimulaLanguageServer.main: Started !\n");
+		}
+    	// Parse command line arguments.
+    	Option.decodeArguments(argv);
+//    	Util.println("SimulaLanguageServer.main: DocumentManager.noPopup="+DocumentManager.noPopup);
+    	
     	SimulaLanguageServer server = new SimulaLanguageServer();
-//        Comn.popUp("SimulaLanguageServer.main: server: " + server);
+        Util.println("SimulaLanguageServer.main: server: " + server);
         
         // Wire up the launcher to read from standard input/output streams 
         // provided by the IntelliJ Client process
@@ -194,6 +202,13 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         // 4. Return the capabilities wrapped in an InitializeResult object
         InitializeResult reply = new InitializeResult(serverCapabilities, new ServerInfo(CoreGlobal.serverName, CoreGlobal.serverVersion));
         LOG.info("initialize.Reply: InitializeResult: "+reply);
+        
+//		if(! CoreGlobal.INLINE_CONNECTED) {
+//			CoreGlobal.debugConsole = new ConsolePanel("Simula LSP Server - Debug Console");
+//			CoreGlobal.debugConsole.popup("Simula LSP Server - Debug Console");
+//			CoreGlobal.debugConsole.write("Started !");
+//		}
+		
         return reply;
     }
     

@@ -1,0 +1,102 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Simula",
+  "scopeName": "source.simula",
+  "fileTypes": ["sim"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    { "include": "#characters" },
+    { "include": "#keywords" },
+    { "include": "#builtins" },
+    { "include": "#numbers" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.simula",
+          "begin": "(?i)\\bcomment\\b",
+          "end": ";",
+          "beginCaptures": {
+            "0": { "name": "keyword.control.comment.simula" }
+          }
+        },
+        {
+          "name": "comment.line.exclamation.simula",
+          "begin": "!",
+          "end": ";",
+          "beginCaptures": {
+            "0": { "name": "keyword.control.comment.simula" }
+          }
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.simula",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.simula",
+          "match": "\"\""
+        }
+      ]
+    },
+    "characters": {
+      "name": "string.quoted.single.simula",
+      "begin": "'",
+      "end": "'",
+      "patterns": [
+        {
+          "name": "constant.character.escape.simula",
+          "match": "''"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.simula",
+          "match": "(?i)\\b(begin|end|if|then|else|for|do|while|step|until|switch|go\\s*to|goto|inner|inspect|when|otherwise|activate|before|after|at|delay|prior|reactivate)\\b"
+        },
+        {
+          "name": "keyword.declaration.simula",
+          "match": "(?i)\\b(class|procedure|virtual|label|array|name|value|external|protected|hidden|prior)\\b"
+        },
+        {
+          "name": "storage.type.simula",
+          "match": "(?i)\\b(integer|real|long\\s+real|boolean|character|text|ref|short\\s+integer)\\b"
+        },
+        {
+          "name": "constant.language.simula",
+          "match": "(?i)\\b(true|false|none|notext)\\b"
+        }
+      ]
+    },
+    "builtins": {
+      "patterns": [
+        {
+          "name": "support.class.simula",
+          "match": "(?i)\\b(Link|Head|Linkage|Process|Simulation|File|Infile|Outfile|Directfile|Printfile|Sysin|Sysout)\\b"
+        },
+        {
+          "name": "support.function.simula",
+          "match": "(?i)\\b(outtext|outint|outfix|outreal|image|intext|inint|inreal|lastitem|eon|pos|length|sub|strip|open|close|locate|inimage|outimage|linesperpage|spacing|page|current|time|suc|pred|into|out|follow|precede|cardinal|empty|hold|passivate|wait|cancel|accum|randint|uniform|normal|draw)\\b"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.float.simula",
+          "match": "\\b\\d+(\\.\\d+)?(&|&&)[+-]?\\d+\\b|\\b\\d+\\.\\d+\\b"
+        },
+        {
+          "name": "constant.numeric.integer.simula",
+          "match": "\\b\\d+\\b"
+        }
+      ]
+    }
+  }
+}

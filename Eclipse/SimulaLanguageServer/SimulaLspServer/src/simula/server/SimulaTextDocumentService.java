@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import simula.core.DocumentManager;
 import simula.core.utilities.LOG;
+import simula.core.utilities.Util;
 
 public class SimulaTextDocumentService implements TextDocumentService {
 
@@ -28,7 +29,7 @@ public class SimulaTextDocumentService implements TextDocumentService {
     	String sourceCode = itm.getText();
     	// TODO: Store file content in an internal cache and trigger validations
     	int version = itm.getVersion();
-    	LOG.info("got Notification: didOpen: " + documentUri);
+    	LOG.info("\nGot Notification: didOpen: " + documentUri);
     	DocumentManager.didOpen(documentUri, version, sourceCode);
     }
 
@@ -40,7 +41,12 @@ public class SimulaTextDocumentService implements TextDocumentService {
     	// The changes array contains the delta updates or full text
     	List<TextDocumentContentChangeEvent> changes = params.getContentChanges();
     	// TODO: Update your internal document cache
-    	LOG.info("got Notification: didChange: " + documentUri);
+    	Util.println("\nGot Notification: didChange: " + documentUri);
+    	for(TextDocumentContentChangeEvent change:changes) {
+        	Util.println("got Notification: didChange: change=" + change);
+    		
+    	}
+    	LOG.info("\nGot Notification: didChange: " + documentUri);
     	LOG.severe("SimulaTextDocumentService.didChange NOT IMPL");
     	DocumentManager.didChange(documentUri, changes);
     }
@@ -51,7 +57,7 @@ public class SimulaTextDocumentService implements TextDocumentService {
     public void didSave(DidSaveTextDocumentParams params) {
     	String documentUri = params.getTextDocument().getUri();
     	// Handle post-save hooks if necessary
-    	LOG.info("got Notification: didSave: " + documentUri);
+    	LOG.info("\nGot Notification: didSave: " + documentUri);
     	LOG.severe("SimulaCoreExports.didSave NOT IMPL");
     	DocumentManager.didSave(documentUri);
     }
@@ -64,7 +70,7 @@ public class SimulaTextDocumentService implements TextDocumentService {
     public void didClose(DidCloseTextDocumentParams params) {
         String documentUri = params.getTextDocument().getUri();
         // TODO: Clean up cache for this specific document
-        	LOG.info("got Notification: didClose: " + documentUri);
+        	LOG.info("\nGot Notification: didClose: " + documentUri);
 //        	LOG.severe("SimulaCoreExports.didClose NOT IMPL");
     		DocumentManager.didClose(documentUri);
     	}
@@ -81,7 +87,7 @@ public class SimulaTextDocumentService implements TextDocumentService {
 	}
     public SemanticTokens semanticTokensFull_Local(SemanticTokensParams params) {
     	String documentUri = params.getTextDocument().getUri();
-    	LOG.info("got Request: semanticTokensFull: " + documentUri);
+    	LOG.info("\nGot Request: semanticTokensFull: " + documentUri);
 //    	LOG.severe("SimulaCoreExports.semanticTokensFull NOT IMPL");
     	List<Integer> tokens = DocumentManager.semanticTokensFull(documentUri);
     	return new SemanticTokens(tokens);

@@ -10,7 +10,7 @@ package make.classFile;
 import java.io.File;
 import java.util.Vector;
 
-import client.TestBatchLauncher;
+import client.TestBatchLauncher2;
 import simula.Option;
 
 /**
@@ -285,7 +285,7 @@ public final class RunSingleClassTest {
 		
 		for(String name:names) {
 			String fileName = sourceDir+name;
-			TestBatchLauncher.run(fileName, argv, argv2);
+			TestBatchLauncher2.run(fileName, argv, argv2);
 		}
 	}
 	

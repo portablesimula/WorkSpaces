@@ -70,6 +70,7 @@ public class TokenManager {
                 STANDARD_TOKEN_TYPES, 
                 STANDARD_TOKEN_MODIFIERS
             );
+        validerLegend(legend);
         semanticOptions.setLegend(legend);
         semanticOptions.setFull(true); // Enable full document semantic tokens
         // Optionally enable delta tracking if supported by your server logic
@@ -176,11 +177,11 @@ public class TokenManager {
             }
             tokenText = tokenText.stripTrailing();
             length = tokenText.length();
-            if(length != lexToken.length)
-            Util.println("TokenManager.generateSemanticTokens: T"+lexToken.length+'|'+Comn.printable(lexToken.tokenText)+ "| ==> T"
-            		+length+'|'+Comn.printable(tokenText)+ "| ==>"
-            		);
-
+            if(length != lexToken.length) {
+                String from = "T"+lexToken.length+'|'+Comn.printable(lexToken.tokenText)+ "|";
+                String to = "T"	+ length + '|' + Comn.printable(tokenText) + "|";
+                Util.println("TokenManager.generateSemanticTokens: " + from + " ==> " + to);
+            }
             // Add the semantic token
             encodedData.add(deltaLine);
             encodedData.add(deltaStart);
@@ -212,6 +213,78 @@ public class TokenManager {
     }
 
 
+    /**
+     * Validerer semantiske tokens mottatt fra Simula Language Server.
+     * 
+     * @param semtokens Den flate int-matrisen fra serveren (skal være et multiplum av 5)
+     * @param maxTokenType Index for høyeste tillatte tokenType basert på serverens legend
+     * @return En liste med feilmeldinger. Hvis listen er tom, er matrisen gyldig.
+     */
+    public static List<String> verify(List<Integer> semtokens, int maxTokenType) {
+        List<String> errors = new ArrayList<>();
+
+        // Regel 1: Matrisen må være delelig med 5 (hvert token består av 5 verdier)
+        if (semtokens == null || semtokens.size() % 5 != 0) {
+            Util.println("FEIL: Token-matrisen må ha en lengde som er et multiplum av 5. Lengde var: " + (semtokens == null ? "null" : semtokens.size()));
+            errors.add("FEIL: Token-matrisen må ha en lengde som er et multiplum av 5. Lengde var: " + (semtokens == null ? "null" : semtokens.size()));
+            return errors;
+        }
+
+        int currentAbsoluteLine = 0;
+        int currentAbsoluteChar = 0;
+
+        for (int i = 0; i < semtokens.size(); i += 5) {
+            int tokenIndex = i / 5;
+            int deltaLine = semtokens.get(i);
+            int deltaChar = semtokens.get(i + 1);
+            int length = semtokens.get(i + 2);
+            int tokenType = semtokens.get(i + 3);
+            int tokenModifiers = semtokens.get(i + 4);
+
+            // Regel 2: Delta-linje kan aldri være negativ
+            if (deltaLine < 0) {
+                Util.println(String.format("Token %d: deltaLine (%d) kan ikke være negativ.", tokenIndex, deltaLine));
+                errors.add(String.format("Token %d: deltaLine (%d) kan ikke være negativ.", tokenIndex, deltaLine));
+            }
+
+            // Oppdater den absolutte linjeposisjonen i dokumentet
+            if (deltaLine > 0) {
+                currentAbsoluteLine += deltaLine;
+                // Regel 3: Ved linjeskift nullstilles ikke karakter-offsetten absolutt, 
+                // men det nye tegnet måles relativt fra start av den nye linjen (0).
+                currentAbsoluteChar = deltaChar; 
+            } else {
+                // Samme linje som forrige token
+                // Regel 4: Hvis deltaLine er 0, må deltaChar være >= 0 (Tokens må komme sekvensielt)
+                if (deltaChar < 0) {
+                    Util.println(String.format("Token %d: deltaChar (%d) kan ikke være negativ på samme linje.", tokenIndex, deltaChar));
+                    errors.add(String.format("Token %d: deltaChar (%d) kan ikke være negativ på samme linje.", tokenIndex, deltaChar));
+                }
+                currentAbsoluteChar += deltaChar;
+            }
+
+            // Regel 5: Token-lengden må være større enn 0
+            if (length <= 0) {
+                errors.add(String.format("Token %d: Lengden (%d) må være større enn 0.", tokenIndex, length));
+                Util.println(String.format("Token %d: Lengden (%d) må være større enn 0.", tokenIndex, length));
+            }
+
+            // Regel 6: tokenType må stemme overens med indeksene definert i din SemanticTokensLegend
+            if (tokenType < 0 || tokenType > maxTokenType) {
+                errors.add(String.format("Token %d: tokenType (%d) er utenfor grensene til definert legend (0-%d).", tokenIndex, tokenType, maxTokenType));
+                Util.println(String.format("Token %d: tokenType (%d) er utenfor grensene til definert legend (0-%d).", tokenIndex, tokenType, maxTokenType));
+            }
+
+            // Regel 7: Modifiers må være en gyldig bitmaske (valgfritt, sjekker at den ikke er negativ)
+            if (tokenModifiers < 0) {
+                errors.add(String.format("Token %d: tokenModifiers (%d) kan ikke være et negativt tall.", tokenIndex, tokenModifiers));
+                Util.println(String.format("Token %d: tokenModifiers (%d) kan ikke være et negativt tall.", tokenIndex, tokenModifiers));
+            }
+        }
+
+        return errors;
+    }
+
 
 	// ****************************************************************
 	// *** TokenListVerifyer  -- SEE: LspTextPanel.fillTextPane
@@ -220,6 +293,8 @@ public class TokenManager {
 	///
 	/// @param semanticTokens The list of integers to be validated.
 	public static void tokenListVerifyer(List<String> sourceLines, List<Integer> semanticTokens) {
+		
+		verify(semanticTokens, STANDARD_TOKEN_TYPES.size() - 1);
 		
 //		Option.internal.TRACE_VERIFY_TOKEN = 1;
 		boolean TRACE_RECONSTR = false;// true;
@@ -357,5 +432,54 @@ public class TokenManager {
 			System.exit(-1);
 		}
 	}
+
+    /**
+     * Validerer SemanticTokensLegend i henhold til LSP-spesifikasjonen.
+     * En gyldig legend må eksistere og inneholde ikke-tomme lister for tokenTyper.
+     *
+     * @param legend Legenden som skal valideres (mottatt fra server/klient)
+     * @return true dersom legenden er gyldig og kan brukes, false ellers.
+     */
+    public static boolean validerLegend(SemanticTokensLegend legend) {
+        if (legend == null) {
+            Util.println("Validering feilet: Legend er null.");
+            return false;
+        }
+
+        List<String> tokenTypes = legend.getTokenTypes();
+        List<String> tokenModifiers = legend.getTokenModifiers();
+
+        // Token typer er obligatorisk og kan ikke være tom i en fungerende implementasjon
+        if (tokenTypes == null || tokenTypes.isEmpty()) {
+            Util.println("Validering feilet: tokenTypes er null eller tom.");
+            return false;
+        }
+
+        // Sjekk at ingen av token-typene er null eller tomme strenger
+        for (int i = 0; i < tokenTypes.size(); i++) {
+            String type = tokenTypes.get(i);
+            if (type == null || type.trim().isEmpty()) {
+                Util.println("Validering feilet: Ugyldig tokenType på indeks " + i);
+                return false;
+            }
+        }
+
+        // Token modifiers kan være tom, men listen i seg selv bør ikke være null
+        if (tokenModifiers == null) {
+            Util.println("Validering feilet: tokenModifiers-listen er null.");
+            return false;
+        }
+
+        // Sjekk innholdet i token modifiers dersom de finnes
+        for (int i = 0; i < tokenModifiers.size(); i++) {
+            String modifier = tokenModifiers.get(i);
+            if (modifier == null || modifier.trim().isEmpty()) {
+                Util.println("Validering feilet: Ugyldig tokenModifier på indeks " + i);
+                return false;
+            }
+        }
+        Util.println("TokenManager.validerLegend: OK");
+        return true;
+    }
 
 }

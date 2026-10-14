@@ -169,6 +169,27 @@
       </presentationReconciler>
    </extension>
    
+   
+   <!--                                                                           Debug Adaptr -->
+   <!--
+	<extension point="org.eclipse.lsp4e.debug.adapterType">
+	    <adapterType
+	        id="com.simula.dap.adapterType"
+	        name="My Custom Debugger"
+	        launchCommandProvider="com.simula.dap.MyDebugAdapterCommandProvider">
+	    </adapterType>
+	</extension>
+	-->
+   <extension
+         point="org.eclipse.lsp4e.debug.adapterType">
+      <adapterType
+            id="com.simula.dap.simulaAdapterType"
+            name="Simula Resource JAR Debugger"
+            class="com.simula.dap.ResourceJarDebugAdapterProvider">
+      </adapterType>
+   </extension>
+   
+   
    <!-- =====================================================================
    Dette punktet lar utviklere koble en VS Code-kompatibel language-configuration.json-fil
    til en spesifikk filtype (Content Type) i Eclipse. Mens TextMate-grammatikken håndterer
