@@ -39,7 +39,8 @@ public class SimulaPerspectiveFactory implements IPerspectiveFactory {
 
 					+ "Simula source files should, by convention, end with .sim\n\n"
 
-					+ "\t\t• Drop files here to open them\n"
+					+ "\t\t• Drop files here to open them as singletones\n"
+					+ "\t\t• Drop files on the Project Explorer to add them\n"
 					+ "\t\t• Menu: File -> Open File - to open files\n"
 					+ "\t\t• Menu: File -> New - to create a new file\n"
 					+ "\t\t• Press Ctrl+N to create a new file\n"

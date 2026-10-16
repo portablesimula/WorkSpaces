@@ -8,7 +8,7 @@ import simula.core.RunDebugManager;
 
 import java.util.concurrent.CompletableFuture;
 
-public class SimulaDebugServer implements IDebugProtocolServer {
+public class SimulaDebugAdapter implements IDebugProtocolServer {
     
     private IDebugProtocolClient client;
 

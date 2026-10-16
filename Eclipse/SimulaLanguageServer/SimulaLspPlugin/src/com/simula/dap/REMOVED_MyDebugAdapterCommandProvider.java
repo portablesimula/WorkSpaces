@@ -10,7 +10,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.lsp4e.debug.DAPStreamConnectionProvider; // Adjust based on your exact LSP4E target API
 import org.osgi.framework.Bundle;
 
-public class MyDebugAdapterCommandProvider extends DAPStreamConnectionProvider {
+public class REMOVED_MyDebugAdapterCommandProvider extends DAPStreamConnectionProvider {
 
     @Override
     public List<String> getCommands() {

@@ -1,6 +1,14 @@
 package simula.server;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.debug.launch.DSPLauncher;
+import org.eclipse.lsp4j.debug.services.IDebugProtocolClient;
+import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.*;
 
@@ -31,7 +39,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
         this.workspaceService = new SimulaWorkspaceService();
     }
 
-    public static void main(String[] argv) {
+    public static void OLD_main(String[] argv) {
 		if(! CoreGlobal.INLINE_CONNECTED) {
 			CoreGlobal.debugConsole = new ConsolePanel("Simula LSP Server - Debug Console");
 			CoreGlobal.debugConsole.popup("Simula LSP Server - Debug Console");
@@ -54,6 +62,55 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
 
         // Start listening to the input streams
         launcher.startListening();
+    }
+    private static final int DAP_PORT = 4711;
+
+    public static void main(String[] args) {
+		if(! CoreGlobal.INLINE_CONNECTED) {
+			CoreGlobal.debugConsole = new ConsolePanel("Simula LSP Server - Debug Console");
+			CoreGlobal.debugConsole.popup("Simula LSP Server - Debug Console");
+			CoreGlobal.debugConsole.write("SimulaLanguageServer.main: Started !\n");
+		}
+    	// Parse command line arguments.
+    	Option.decodeArguments(args);
+//    	Util.println("SimulaLanguageServer.main: DocumentManager.noPopup="+DocumentManager.noPopup);
+    	
+    	SimulaLanguageServer server = new SimulaLanguageServer();
+        Util.println("SimulaLanguageServer.main: server: " + server);
+        
+        // 1. Start the Language Server on Standard I/O
+    	SimulaLanguageServer languageServer = new SimulaLanguageServer();
+        Launcher<LanguageClient> lspLauncher = LSPLauncher.createServerLauncher(
+                languageServer, System.in, System.out
+        );
+        languageServer.connect(lspLauncher.getRemoteProxy());
+        Thread lspThread = new Thread(() -> lspLauncher.startListening(), "LSP-Thread");
+        lspThread.start();
+
+        // 2. Start the Debug Adapter Server on a Network Socket
+        Thread dapThread = new Thread(() -> {
+            try (ServerSocket serverSocket = new ServerSocket(DAP_PORT)) {
+                // Listens continuously for Incoming Debug Sessions
+                while (true) {
+                    Socket socket = serverSocket.accept();
+                    InputStream inputStream = socket.getInputStream();
+                    OutputStream outputStream = socket.getOutputStream();
+
+//                    MyDebugAdapter debugAdapter = new MyDebugAdapter();
+                    SimulaDebugAdapter debugAdapter = new SimulaDebugAdapter();
+                    Launcher<IDebugProtocolClient> dapLauncher = DSPLauncher.createServerLauncher(
+                            debugAdapter, inputStream, outputStream
+                    );
+                    debugAdapter.connect(dapLauncher.getRemoteProxy());
+                    
+                    // Run this specific session listening loop on its own thread
+                    new Thread(dapLauncher::startListening).start();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, "DAP-Thread");
+        dapThread.start();
     }
 
     

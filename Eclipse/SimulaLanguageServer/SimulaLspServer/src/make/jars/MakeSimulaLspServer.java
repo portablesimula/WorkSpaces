@@ -60,6 +60,7 @@ public class MakeSimulaLspServer {
 
 			Path tempDir = Path.of(LIBRARY_DIR);
 			unpackJarFile("", tempDir, "C:/Eclipse_LSP/org.eclipse.lsp4j-1.0.0.jar");
+			unpackJarFile("", tempDir, "C:/Eclipse_LSP/org.eclipse.lsp4j.debug-1.0.0.jar");
 			unpackJarFile("", tempDir, "C:/Eclipse_LSP/org.eclipse.lsp4j.jsonrpc-0.24.0.jar");
 			unpackJarFile("", tempDir, "C:/Eclipse_LSP/gson-2.9.0.jar");
 			

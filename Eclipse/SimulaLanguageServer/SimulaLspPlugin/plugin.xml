@@ -170,24 +170,6 @@
    </extension>
    
    
-   <!--                                                                           Debug Adaptr -->
-   <!--
-	<extension point="org.eclipse.lsp4e.debug.adapterType">
-	    <adapterType
-	        id="com.simula.dap.adapterType"
-	        name="My Custom Debugger"
-	        launchCommandProvider="com.simula.dap.MyDebugAdapterCommandProvider">
-	    </adapterType>
-	</extension>
-	-->
-   <extension
-         point="org.eclipse.lsp4e.debug.adapterType">
-      <adapterType
-            id="com.simula.dap.simulaAdapterType"
-            name="Simula Resource JAR Debugger"
-            class="com.simula.dap.ResourceJarDebugAdapterProvider">
-      </adapterType>
-   </extension>
    
    
    <!-- =====================================================================
@@ -198,9 +180,9 @@
    • Auto-lukking av klammer og sitattegn (auto close)
    • Kommentering (ut- og innkommentering av linjer/blokker)
    • Parre klammer (matching brackets)
-   • Smarte innrykk når du trykker Enter (on enter support)   -->
+   • Smarte innrykk når du trykker Enter (on enter support)   
    
-   NOTE: SER IKKE UT TIL Å VIRKE
+   NOTE: SER IKKE UT TIL Å VIRKE   -->
    
    <!-- EXAMPLE:
    <extension
@@ -372,5 +354,162 @@
       </hoverProvider>
    </extension>
    -->
+
+
+   
+   <!--                                                                           Debug Adapter -->
+   <!--
+	<extension point="org.eclipse.lsp4e.debug.adapterType">
+	    <adapterType
+	        id="com.simula.dap.adapterType"
+	        name="My Custom Debugger"
+	        launchCommandProvider="com.simula.dap.MyDebugAdapterCommandProvider">
+	    </adapterType>
+	</extension>
+   <extension
+         point="org.eclipse.lsp4e.debug.adapterType">
+      <adapterType
+            id="com.simula.dap.simulaAdapterType"
+            name="Simula Resource JAR Debugger"
+            class="com.simula.dap.ResourceJarDebugAdapterProvider">
+      </adapterType>
+   </extension>
+	-->
+
+	<extension point="org.eclipse.lsp4e.debug.adapterType">
+	    <adapterType
+	        id="simula.debug.adapter"
+	        name="Simula Debug Adapter"
+	        label="Simula Debugger">
+	        
+	        <!-- Siden DAP-serveren forventer TCP-tilkobling på port 4711 -->
+	        <serverLaunch
+	            mode="connect"
+	            host="127.0.0.1"
+	            port="4711">
+	        </serverLaunch>
+	    </adapterType>
+	</extension>
+
+   <!--
+   <extension point="org.eclipse.debug.core.launchConfigurationTypes">
+	   <launchConfigurationType
+	         id="com.simula.debug.launchType"
+	         name="Simula Application"
+	         delegate="org.eclipse.lsp4e.debug.launcher.DSPLaunchDelegate"
+	         modes="run, debug">
+	   </launchConfigurationType>
+	</extension>
+	-->
+	<extension point="org.eclipse.debug.core.launchConfigurationTypes">
+	    <launchConfigurationType
+	         id="com.simula.launchType"
+	         name="Simula Application#1"
+			 icon="icons/favico.png"
+	        delegate="com.simula.dap.SimulaLaunchDelegate"
+	        modes="run, debug"
+	        sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector">
+	    </launchConfigurationType>
+	</extension>
+
+	<extension
+	      point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+	   <launchConfigurationTypeImage
+	         configTypeID="com.simula.launchType"
+			 icon="icons/favico.png"
+	         id="com.simula.launchTypeImage">
+	   </launchConfigurationTypeImage>
+	</extension>
+
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="com.simula.run.SimulaRunTabGroup"
+            id="com.simula.run.SimulaRunTabGroup"
+            type="com.simula.launchType">
+      </launchConfigurationTabGroup>
+   </extension>
+
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            id="com.simula.simulaProjectTester"
+            type="org.eclipse.core.resources.IResource"
+            namespace="com.simula"
+            properties="isSimulaProject"
+            class="com.simula.SimulaProjectTester">
+      </propertyTester>
+   </extension>
+	   
+	<extension point="org.eclipse.debug.ui.launchShortcuts">
+	   <shortcut
+	         id="com.simula.ide.launchShortcut"
+	         class="com.simula.dap.SimulaLaunchShortcut"
+	         label="Simula Application#2"
+			 icon="icons/favico.png">
+	         modes="run, debug">
+	         <!--
+	      <contextualLaunch>
+	         <enablement>
+	            <with variable="selection">
+	               <count value="1"/>
+	               <iterate>
+	                  <test property="org.eclipse.core.resources.name" value="sim"/>
+	               </iterate>
+	            </with>
+	         </enablement>
+	      </contextualLaunch>
+	      -->
+          <configurationType
+             id="com.simula.launchType"
+			 icon="icons/favico.png">
+          </configurationType>
+	   </shortcut>
+	</extension>
+   
+   <extension point="org.eclipse.ui.menus">
+	   <menuContribution
+	         locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+	      <menu
+	            id="org.eclipse.debug.ui.contextualLaunch.run.submenu"
+	            label="Run As">
+	         <command
+	               commandId="org.eclipse.debug.ui.commands.LaunchLast"
+	               label="Simula Application#4"
+				   icon="icons/favico.png"
+	               style="push">
+	            <visibleWhen checkEnabled="false">
+	               <with variable="selection">
+	                  <count value="1"/>
+	                  <iterate>
+	                     <test property="org.eclipse.core.resources.extension" value="sim"/>
+	                  </iterate>
+	               </with>
+	            </visibleWhen>
+	         </command>
+	      </menu>
+	   </menuContribution>
+	</extension>
+   
+
+   <!--                                                                           Export Wizards -->
+   <extension
+         point="org.eclipse.ui.exportWizards">
+      <category
+            id="com.simula.export.category"
+            name="Simula">
+      </category>
+      <wizard
+            id="com.simula.ExportWizard"
+            name="Runnable Simula JAR File"
+            class="com.simula.export.SimulaExportWizard"
+			category="com.simula.export.category"
+            icon="icons/favico.png">
+         <description>
+            Export a Simula project into a runnable JAR file.
+         </description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
 
 </plugin>

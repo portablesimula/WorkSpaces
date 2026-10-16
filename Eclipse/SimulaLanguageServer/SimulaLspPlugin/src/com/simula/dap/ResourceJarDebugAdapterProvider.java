@@ -1,7 +1,6 @@
 package com.simula.dap;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +17,7 @@ public class ResourceJarDebugAdapterProvider extends ProcessStreamConnectionProv
     }
 
     private static List<String> getLaunchCommands() {
+    	IO.println("ResourceJarDebugAdapterProvider.getLaunchCommands: ");
         List<String> commands = new ArrayList<>();
         
         // 1. Locate standard java executable
@@ -28,8 +28,9 @@ public class ResourceJarDebugAdapterProvider extends ProcessStreamConnectionProv
         // 2. Locate the embedded JAR file in your plugin resources
         commands.add("-jar");
         try {
-            Bundle bundle = Platform.getBundle("com.example.debug.plugin.id"); // Replace with your exact bundle symbolic name
-            URL fileURL = bundle.getEntry("resources/my-adapter.jar"); // Path inside your plugin structure
+//          Bundle bundle = Platform.getBundle("com.example.debug.plugin.id"); // Replace with your exact bundle symbolic name
+            Bundle bundle = Platform.getBundle("com.simula.dap.simulaAdapterType"); // Replace with your exact bundle symbolic name
+            URL fileURL = bundle.getEntry("server/SimulaLspServer.jar"); // Path inside your plugin structure
             URL resolvedURL = FileLocator.toFileURL(fileURL);
             
             // Extract the absolute file path on disk

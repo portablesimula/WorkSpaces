@@ -1,4 +1,4 @@
-!SESSION 2026-10-14 11:27:16.636 -----------------------------------------------
+!SESSION 2026-10-16 14:08:20.390 -----------------------------------------------
 eclipse.buildId=4.42.0.20261008-0639
 java.version=25
 java.vendor=Oracle Corporation
@@ -6,47 +6,12 @@ BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=no_NO
 Framework arguments:  -product org.eclipse.epp.package.java.product
 Command-line arguments:  -product org.eclipse.epp.package.java.product -data C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer/../runtime-EclipseApplication -dev file:///C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/.metadata/.plugins/org.eclipse.pde.core/Eclipse%20Application/dev.properties -os win32 -ws win32 -arch x86_64 -consoleLog
 
-!ENTRY org.eclipse.egit.ui 2 0 2026-10-14 11:27:27.300
+!ENTRY org.eclipse.egit.ui 2 0 2026-10-16 14:08:31.317
 !MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
 user global configuration and to define the default location to store repositories: 'C:\Users\omyhr'. If this is
 not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
 EGit might behave differently since they see different configuration options.
 This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
 
-!ENTRY org.eclipse.oomph.setup.ui 1 0 2026-10-14 11:27:33.966
+!ENTRY org.eclipse.oomph.setup.ui 1 0 2026-10-16 14:08:38.022
 !MESSAGE Setup tasks were performed during startup updating 5 preferences. See 'C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer\.metadata\.plugins\org.eclipse.pde.core\Eclipse Application\org.eclipse.oomph.setup\setup.log' for details
-
-!ENTRY org.eclipse.lsp4e 1 0 2026-10-14 11:27:46.159
-!MESSAGE [LS:Simula Language Server][Info]	Language Server connected successfully!
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-14 11:28:18.885
-!MESSAGE ExecutionException occurred during shutdown of EndpointProxy for org.eclipse.lsp4j.jsonrpc.RemoteEndpoint@23fc2edb
-!STACK 0
-java.util.concurrent.ExecutionException: org.eclipse.lsp4j.jsonrpc.JsonRpcException: java.io.IOException: Datakanalen lukkes
-	at java.base/java.util.concurrent.CompletableFuture.wrapInExecutionException(CompletableFuture.java:345)
-	at java.base/java.util.concurrent.CompletableFuture.reportGet(CompletableFuture.java:440)
-	at java.base/java.util.concurrent.CompletableFuture.get(CompletableFuture.java:2117)
-	at org.eclipse.lsp4e.LanguageServerWrapper$LanguageServerContext.close(LanguageServerWrapper.java:232)
-	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1825)
-	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.exec(CompletableFuture.java:1817)
-	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:511)
-	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1450)
-	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:2019)
-	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:187)
-Caused by: org.eclipse.lsp4j.jsonrpc.JsonRpcException: java.io.IOException: Datakanalen lukkes
-	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageConsumer.consume(StreamMessageConsumer.java:72)
-	at org.eclipse.lsp4e.LanguageServerWrapper.lambda$3(LanguageServerWrapper.java:458)
-	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.request(RemoteEndpoint.java:165)
-	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.request(RemoteEndpoint.java:46)
-	at org.eclipse.lsp4j.jsonrpc.services.EndpointProxy.invoke(EndpointProxy.java:91)
-	at jdk.proxy16/jdk.proxy16.$Proxy59.shutdown(Unknown Source)
-	at org.eclipse.lsp4e.LanguageServerWrapper$LanguageServerContext.close(LanguageServerWrapper.java:230)
-	... 6 more
-Caused by: java.io.IOException: Datakanalen lukkes
-	at java.base/java.io.FileOutputStream.writeBytes(Native Method)
-	at java.base/java.io.FileOutputStream.write(FileOutputStream.java:352)
-	at java.base/java.lang.Process$PipeOutputStream.write(Process.java:1027)
-	at java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:123)
-	at java.base/java.io.BufferedOutputStream.flush(BufferedOutputStream.java:203)
-	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageConsumer.consume(StreamMessageConsumer.java:69)
-	... 12 more
