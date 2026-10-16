@@ -51,6 +51,8 @@ public class SimulaExportWizardPage extends WizardPage {
             }
         });
 
+        textDestination.setText("DETTE MÅ SKRIVES FERDIG SEINERE: ");
+
         setControl(container);
     }
 

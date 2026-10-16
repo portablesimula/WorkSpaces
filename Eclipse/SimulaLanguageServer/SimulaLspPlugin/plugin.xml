@@ -89,7 +89,8 @@
 	    <runtime>
 	      <run class="com.simula.client.SimulaNature"/>
 	    </runtime>
-	</extension>
+		<builder id="no.simula.ide.simulaBuilder"/>
+   </extension>
 
 	<extension point="org.eclipse.ui.ide.projectNatureImages">
 	   <image
@@ -489,6 +490,20 @@
 	      </menu>
 	   </menuContribution>
 	</extension>
+   
+
+   <!--                                                                           Builders -->
+   <extension
+         id="com.simula.builder"
+         name="Simula Inclemental Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true"> <!-- Sett til true hvis den krever en spesifikk Project Nature -->
+         <run
+               class="com.simula.builders.SimulaBuilder">
+         </run>
+      </builder>
+   </extension>
    
 
    <!--                                                                           Export Wizards -->
