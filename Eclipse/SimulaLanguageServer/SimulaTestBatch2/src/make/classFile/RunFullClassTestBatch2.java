@@ -23,38 +23,32 @@ import simula.Option;
  */
 public final class RunFullClassTestBatch2 {
 	
-//	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
-//	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspServer");
 	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspServer");
 	private static final String userDir = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaTestBatch";
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 
-//	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula");
-//	private static final File userDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/SimulaTestBatch");
-//	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 	private static final String testBatchJarDir = userDir+"/bin/simulaTestBatch/bin";
 	private static long startTimeMs = System.currentTimeMillis( );
 
-	public static void main(String[] args) {
+	public static void main(String[] argv) {
 
 //		// Set Compiler Options.
 
-		Vector<String> argv = new Vector<>();
-//		argv.add("-caseSensitive");
-//		argv.add("-noextension");
-		argv.add("-noPopup");
-		argv.add("-nowarn");
-//		argv.add("-verbose");
-//		argv.add("-select");
+		Vector<String> args = new Vector<>();
+//		args.add("-caseSensitive");
+//		args.add("-noextension");
+		args.add("-noPopup");
+		args.add("-nowarn");
+//		args.add("-verbose");
+//		args.add("-select");
 
-		Vector<String> argv2 = new Vector<>();
-//		argv2.add("-compilerMode"); argv2.add("viaJavaSource");
-		argv2.add("-compilerMode"); argv2.add("directClassFiles");
+//		args.add("-compilerMode"); args.add("viaJavaSource");
+		args.add("-compilerMode"); args.add("directClassFiles");
 		
-//		argv2.add("-noexec");
-//		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
-		argv2.add("-simulaRtsLib"); argv2.add(new File(simulaDir,"bin").toString()); // To use Eclipse Project's simula.runtime
-//		argv2.add("-extLib"); argv2.add("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin");
+//		args.add("-noexec");
+//		args.add("-keepJava"); args.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
+		args.add("-simulaRtsLib"); args.add(new File(simulaDir,"bin").toString()); // To use Eclipse Project's simula.runtime
+//		args.add("-extLib"); args.add("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin");
 		
 		setOptions();
 		
@@ -282,7 +276,7 @@ public final class RunFullClassTestBatch2 {
 
 		for(String name:names) {
 			String fileName = sourceDir+name;
-			TestBatchLauncher2.run(fileName, argv, argv2);
+			TestBatchLauncher2.run(fileName, args);
 		}
 
 //		list(testBatchJarDir);

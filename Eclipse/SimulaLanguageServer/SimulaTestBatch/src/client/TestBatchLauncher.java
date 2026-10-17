@@ -3,6 +3,7 @@ package client;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.lsp4j.ClientInfo;
@@ -20,7 +21,7 @@ import simula.server.SimulaTextDocumentService;
 
 public class TestBatchLauncher {
 
-	public static void run(String fileName, Vector<String> argv, Vector<String> argv2) {
+	public static void run(String fileName, List<String> argv) {
 		// Remove time, date, and headers from Logger output.
 		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
 
@@ -64,6 +65,6 @@ public class TestBatchLauncher {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		RunDebugManager.run(documentUri, argv2);
+		RunDebugManager.run(documentUri, argv);
 	}
 }

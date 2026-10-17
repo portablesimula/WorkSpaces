@@ -21,32 +21,30 @@ import simula.Option;
  * @author Øystein Myhre Andersen
  *
  */
-public final class RunSingleTest {
+public final class RunSingleTest2 {
 	
-//	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
 	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspServer");
 	private static final String userDir = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaTestBatch";
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 
 
-	public static void main(String[] args) {
+	public static void main(String[] argv) {
 
-		Vector<String> argv = new Vector<>();
-//		argv.add("-caseSensitive");
-//		argv.add("-noextension");
-		argv.add("-noPopup");
-//		argv.add("-nowarn");
-//		argv.add("-verbose");
-//		argv.add("-select");
+		Vector<String> args = new Vector<>();
+//		args.add("-caseSensitive");
+//		args.add("-noextension");
+		args.add("-noPopup");
+//		args.add("-nowarn");
+//		args.add("-verbose");
+//		args.add("-select");
 
-		Vector<String> argv2 = new Vector<>();
-		argv2.add("-compilerMode"); argv2.add("viaJavaSource");
-//		argv2.add("-compilerMode"); argv2.add("directClassFiles");
+		args.add("-compilerMode"); args.add("viaJavaSource");
+//		args.add("-compilerMode"); args.add("directClassFiles");
 		
-//		argv2.add("-noexec");
-//		argv2.add("-keepJava"); argv2.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
-		argv2.add("-simulaRtsLib"); argv2.add(new File(simulaDir,"bin").toString()); // To use Eclipse Project's simula.runtime
-//		argv2.add("-extLib"); argv2.add("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin");
+//		args.add("-noexec");
+//		args.add("-keepJava"); args.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
+		args.add("-simulaRtsLib"); args.add(new File(simulaDir,"bin").toString()); // To use Eclipse Project's simula.runtime
+//		args.add("-extLib"); args.add("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin");
 		
 		setOptions();
 		
@@ -58,7 +56,7 @@ public final class RunSingleTest {
 //		names.add("adHoc03.sim"); // For ad'hoc testing
 //		names.add("adHoc04.sim"); // For ad'hoc testing
 //	names.add("adHoc05.sim"); // For ad'hoc testing
-	names.add("adHoc06.sim"); // For ad'hoc testing
+//	names.add("adHoc06.sim"); // For ad'hoc testing
 //	names.add("adHoc10.sim"); // For ad'hoc testing
 //		names.add("adHoc11.sim"); // For ad'hoc testing
 //		names.add("CLASS_COMMON.sim"); // For ad'hoc testing
@@ -73,8 +71,8 @@ public final class RunSingleTest {
 		
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
-//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
-//		names.add("simtst00.sim"); // OK:  Empty test
+		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
 //		names.add("simtst03.sim"); // OK:  Test Text Value Relations
@@ -293,7 +291,7 @@ public final class RunSingleTest {
 				
 		for(String name:names) {
 			String fileName = sourceDir+name;
-			TestBatchLauncher2.run(fileName, argv, argv2);
+			TestBatchLauncher2.run(fileName, args);
 		}
 	}
 

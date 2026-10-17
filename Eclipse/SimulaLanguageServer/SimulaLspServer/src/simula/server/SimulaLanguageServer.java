@@ -68,7 +68,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
     private static final int DAP_PORT = 4711;
 
     public static void main(String[] args) {
-    	if(args[0].equals("--debugRun")) {
+    	if(args.length > 1 && args[0].equals("--debugRun")) {
     		CoreGlobal.INLINE_CONNECTED = true;
     		String documentUri = args[1];
     		IO.println("Simula LSP Server - Debug RUN: " + documentUri);
