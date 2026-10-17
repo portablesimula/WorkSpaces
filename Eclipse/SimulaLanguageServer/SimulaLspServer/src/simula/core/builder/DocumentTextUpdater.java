@@ -24,6 +24,7 @@ public class DocumentTextUpdater {
     }
 
     private static String applySingleChange(String text, TextDocumentContentChangeEvent change) {
+    	IO.println("DocumentTextUpdater.applySingleChange: \n"+text);
         // If range is null, it means TextDocumentSyncKind.Full is used.
         // The server must replace the entire content.
         if (change.getRange() == null) {

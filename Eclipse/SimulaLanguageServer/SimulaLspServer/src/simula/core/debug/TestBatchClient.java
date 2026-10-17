@@ -1,4 +1,4 @@
-package client;
+package simula.core.debug;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

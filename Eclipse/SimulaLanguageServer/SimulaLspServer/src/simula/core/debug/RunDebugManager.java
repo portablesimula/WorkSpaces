@@ -1,15 +1,27 @@
-package simula.core;
+package simula.core.debug;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.eclipse.lsp4j.ClientInfo;
+import org.eclipse.lsp4j.DidOpenTextDocumentParams;
+import org.eclipse.lsp4j.InitializeParams;
+import org.eclipse.lsp4j.InitializeResult;
+import org.eclipse.lsp4j.TextDocumentItem;
+import org.eclipse.lsp4j.TraceValue;
+
 import simula.Option;
+import simula.core.CoreGlobal;
+import simula.core.DocumentManager;
 import simula.core.builder.SimulaBuilder;
 import simula.core.coder.SimulaCoder;
 import simula.core.coder.SimulaExec;
 import simula.core.utilities.Util;
+import simula.server.SimulaTextDocumentService;
 
 public class RunDebugManager {
 
@@ -40,6 +52,53 @@ public class RunDebugManager {
         
         String documentUri = "?????";
         run(documentUri, args);
+	}
+	
+	public static void doOpen(String fileName) {
+		// Remove time, date, and headers from Logger output.
+		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
+
+//		// Parse runtime arguments.
+//		String[] args = argv.toArray(new String[0]);
+//		Option.decodeArguments(args);
+
+		// Start SimulaLanguageServer and Connect
+		CoreGlobal.initiate();
+		CoreGlobal.INLINE_CONNECTED = true;
+		Util.println("TestBatchLauncher.run: before CoreGlobal.simulaLanguageServer.connect");
+		CoreGlobal.simulaLanguageServer.connect(new TestBatchClient());
+			
+		// Initialize SimulaLanguageServer
+//		ClientCapabilities capabilities = null;
+		ClientInfo clientInfo = new ClientInfo("SimulaEditor");
+		String trace = TraceValue.Off;      // No Tracing
+//		String trace = TraceValue.Messages; // Single message trace
+//		String trace = TraceValue.Verbose;  // Full systematic trace
+
+		InitializeParams initializeParams = new InitializeParams();
+//		initializeParams.setCapabilities(capabilities);
+		initializeParams.setClientInfo(clientInfo);
+		initializeParams.setTrace(trace);
+		@SuppressWarnings("unused")
+		InitializeResult result = CoreGlobal.simulaLanguageServer.initialize_local(initializeParams);
+			
+//		SimulaCoreInitialize.initiate(argv);
+		
+		String documentUri = fileName;
+		int version = 1;
+		try {
+			String content = Files.readString(Path.of(fileName));
+			SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
+			TextDocumentItem textDocument = new TextDocumentItem(documentUri, "Simula", version, content);
+
+			DidOpenTextDocumentParams params = new DidOpenTextDocumentParams();
+			params.setTextDocument(textDocument);
+//			IO.println("SourceModule.doOpenSimulaModule: " + params);
+			simulaTextDocumentService.didOpen(params);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 	
 

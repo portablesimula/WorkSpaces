@@ -17,10 +17,12 @@ import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
 import simula.core.builder.token.TokenManager;
+import simula.core.debug.RunDebugManager;
 import simula.core.utilities.ConsolePanel;
 import simula.core.utilities.LOG;
 import simula.core.utilities.Util;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class SimulaLanguageServer implements LanguageServer, LanguageClientAware {
@@ -66,11 +68,26 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
     private static final int DAP_PORT = 4711;
 
     public static void main(String[] args) {
+    	if(args[0].equals("--debugRun")) {
+    		CoreGlobal.INLINE_CONNECTED = true;
+    		String documentUri = args[1];
+    		IO.println("Simula LSP Server - Debug RUN: " + documentUri);
+    		
+    		DocumentManager.noPopup = true;
+    		RunDebugManager.doOpen(documentUri);
+    		
+    		List<String> list = List.of(args);
+    		RunDebugManager.run(documentUri, list);
+    		System.exit(0);
+    	}
 		if(! CoreGlobal.INLINE_CONNECTED) {
 			CoreGlobal.debugConsole = new ConsolePanel("Simula LSP Server - Debug Console");
 			CoreGlobal.debugConsole.popup("Simula LSP Server - Debug Console");
 			CoreGlobal.debugConsole.write("SimulaLanguageServer.main: Started !\n");
 		}
+    	for(String arg:args) {
+            Util.println("SimulaLanguageServer.main: arg: " + arg);    		
+    	}
     	// Parse command line arguments.
     	Option.decodeArguments(args);
 //    	Util.println("SimulaLanguageServer.main: DocumentManager.noPopup="+DocumentManager.noPopup);

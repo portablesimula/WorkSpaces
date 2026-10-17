@@ -1,67 +1,54 @@
 package client;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
-import org.eclipse.lsp4j.ClientInfo;
-import org.eclipse.lsp4j.DidOpenTextDocumentParams;
-import org.eclipse.lsp4j.InitializeParams;
-import org.eclipse.lsp4j.InitializeResult;
-import org.eclipse.lsp4j.TextDocumentItem;
-import org.eclipse.lsp4j.TraceValue;
-
-import simula.Option;
-import simula.core.CoreGlobal;
-import simula.server.SimulaExecutor;
-import simula.server.SimulaTextDocumentService;
-
 public class TestBatchLauncher2 {
-
+	
 	public static void run(String fileName, Vector<String> argv, Vector<String> argv2) {
-		// Remove time, date, and headers from Logger output.
-		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
+        try {
+            String jarPath = "C:/Users/omyhr/Simula/SimulaLspServer.jar"; 
+            List<String> command = new ArrayList<>();
+            command.add("java");
+            command.add("-jar");
+            command.add(jarPath);
+            command.add("--debugRun");
+            command.add(fileName);
+            for(String arg:argv2) {
+            	command.add(arg);
+            }
+            
+            StringBuilder cmd = new StringBuilder();
+            for(String c:command) {
+            	cmd.append(c).append(' ');
+            }
+            IO.println("TestBatchLauncher2.run: " + cmd);
 
-		// Parse runtime arguments.
-		String[] args = argv.toArray(new String[0]);
-		Option.decodeArguments(args);
+            // 2. Opprett ProcessBuilder
+            ProcessBuilder pb = new ProcessBuilder(command);
 
-		// Start SimulaLanguageServer and Connect
-		CoreGlobal.initiate();
-		CoreGlobal.INLINE_CONNECTED = true;
-		CoreGlobal.simulaLanguageServer.connect(new TestBatchClient());
-			
-		// Initialize SimulaLanguageServer
-//		ClientCapabilities capabilities = null;
-		ClientInfo clientInfo = new ClientInfo("SimulaEditor");
-		String trace = TraceValue.Off;      // No Tracing
-//		String trace = TraceValue.Messages; // Single message trace
-//		String trace = TraceValue.Verbose;  // Full systematic trace
+            // 3. (Valgfritt) Send programmets output direkte til din egen konsoll
+            // Dette hindrer også at prosessen "henger" fordi IO-bufferet blir fullt
+            pb.inheritIO();
 
-		InitializeParams initializeParams = new InitializeParams();
-//		initializeParams.setCapabilities(capabilities);
-		initializeParams.setClientInfo(clientInfo);
-		initializeParams.setTrace(trace);
-		@SuppressWarnings("unused")
-		InitializeResult result = CoreGlobal.simulaLanguageServer.initialize_local(initializeParams);
-			
-//		SimulaCoreInitialize.initiate(argv);
-		
-		String documentUri = fileName;
-		int version = 1;
-		try {
-			String content = Files.readString(Path.of(fileName));
-			SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
-			TextDocumentItem textDocument = new TextDocumentItem(documentUri, "Simula", version, content);
+            // 4. Start prosessen
+            System.out.println("Starter MyProgram.jar...");
+            Process process = pb.start();
 
-			DidOpenTextDocumentParams params = new DidOpenTextDocumentParams();
-			params.setTextDocument(textDocument);
-//			IO.println("SourceModule.doOpenSimulaModule: " + params);
-			simulaTextDocumentService.didOpen(params);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		RunDebugManager.run(documentUri, argv2);
-	}
+            // 5. Vent til prosessen terminerer og hent exit-koden
+            int exitCode = process.waitFor();
+            
+            System.out.println("Prosessen avsluttet med exit-kode: " + exitCode);
+
+        } catch (IOException e) {
+            System.err.println("Klarte ikke å starte prosessen: " + e.getMessage());
+        } catch (InterruptedException e) {
+            System.err.println("Tråden ble avbrutt mens den ventet: " + e.getMessage());
+            Thread.currentThread().interrupt(); // Gjenopprett avbrutt-status
+        }
+    }
+	
+
 }

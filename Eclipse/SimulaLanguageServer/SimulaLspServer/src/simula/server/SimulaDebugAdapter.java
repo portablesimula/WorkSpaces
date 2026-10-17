@@ -4,7 +4,7 @@ import org.eclipse.lsp4j.debug.*;
 import org.eclipse.lsp4j.debug.services.IDebugProtocolClient;
 import org.eclipse.lsp4j.debug.services.IDebugProtocolServer;
 
-import simula.core.RunDebugManager;
+import simula.core.debug.RunDebugManager;
 
 import java.util.concurrent.CompletableFuture;
 

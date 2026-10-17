@@ -21,7 +21,7 @@ import simula.Option;
  * @author Øystein Myhre Andersen
  *
  */
-public final class RunSingleClassTest {
+public final class RunSingleClassTest2 {
 	
 //	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/Simula");
 	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspServer");

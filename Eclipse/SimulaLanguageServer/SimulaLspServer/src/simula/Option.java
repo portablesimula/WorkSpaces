@@ -174,7 +174,8 @@ public final class Option {
 		for(int i=0;i<argv.length;i++) {
 			String arg=argv[i];
 			if (arg.charAt(0) == '-') { // command line option
-				if (arg.equalsIgnoreCase("-compilerMode")) Option.setCompilerMode(documentManager, argv[++i]);
+				if (arg.equalsIgnoreCase("--debugRun")) i++; // Skip it
+				else if (arg.equalsIgnoreCase("-compilerMode")) Option.setCompilerMode(documentManager, argv[++i]);
 				else if (arg.equalsIgnoreCase("-noexec")) DocumentManager.noExecution = true;
 //				else if (arg.equalsIgnoreCase("-noextension")) SimulaCompiler.EXTENSIONS=false;
 				else if (arg.equalsIgnoreCase("-noPopup")) DocumentManager.noPopup = true;
