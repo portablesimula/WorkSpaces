@@ -425,8 +425,8 @@
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
-            class="com.simula.run.SimulaRunTabGroup"
-            id="com.simula.run.SimulaRunTabGroup"
+            class="com.simula.client.run.SimulaRunTabGroup"
+            id="com.simula.client.run.SimulaRunTabGroup"
             type="com.simula.launchType">
       </launchConfigurationTabGroup>
    </extension>
@@ -516,7 +516,7 @@
       <wizard
             id="com.simula.ExportWizard"
             name="Runnable Simula JAR File"
-            class="com.simula.export.SimulaExportWizard"
+            class="com.simula.client.export.SimulaExportWizard"
 			category="com.simula.export.category"
             icon="icons/favico.png">
          <description>

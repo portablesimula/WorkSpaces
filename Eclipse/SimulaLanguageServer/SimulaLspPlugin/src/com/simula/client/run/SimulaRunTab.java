@@ -1,4 +1,4 @@
-package com.simula.run;
+package com.simula.client.run;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -54,7 +54,7 @@ public class SimulaRunTab extends AbstractLaunchConfigurationTab {
         // Implement workspace file dialog or file system dialog here
         // String path = ...
         // fileText.setText(path);
-        fileText.setText("BrowseButtonPressed ?");
+        fileText.setText("BrowseButtonPressed ?  DETTE MÅ RETTES SEINERE");
     }
 
     /**

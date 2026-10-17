@@ -1,4 +1,4 @@
-package com.simula.export;
+package com.simula.client.export;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;

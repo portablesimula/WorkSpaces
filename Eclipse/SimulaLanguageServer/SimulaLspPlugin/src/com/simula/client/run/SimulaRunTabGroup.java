@@ -1,4 +1,4 @@
-package com.simula.run;
+package com.simula.client.run;
 
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.CommonTab;
