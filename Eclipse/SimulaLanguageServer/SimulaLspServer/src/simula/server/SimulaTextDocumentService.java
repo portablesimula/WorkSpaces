@@ -29,7 +29,7 @@ public class SimulaTextDocumentService implements TextDocumentService {
     	String sourceCode = itm.getText();
     	// TODO: Store file content in an internal cache and trigger validations
     	int version = itm.getVersion();
-    	LOG.info("\nGot Notification: didOpen: " + documentUri);
+    	LOG.trace("\nGot Notification: didOpen: " + documentUri);
     	DocumentManager.didOpen(documentUri, version, sourceCode);
     }
 
@@ -46,7 +46,7 @@ public class SimulaTextDocumentService implements TextDocumentService {
         	Util.println("got Notification: didChange: change=" + change);
     		
     	}
-    	LOG.info("\nGot Notification: didChange: " + documentUri);
+    	LOG.trace("\nGot Notification: didChange: " + documentUri);
     	LOG.severe("SimulaTextDocumentService.didChange NOT IMPL");
     	DocumentManager.didChange(documentUri, changes);
     }
@@ -57,7 +57,7 @@ public class SimulaTextDocumentService implements TextDocumentService {
     public void didSave(DidSaveTextDocumentParams params) {
     	String documentUri = params.getTextDocument().getUri();
     	// Handle post-save hooks if necessary
-    	LOG.info("\nGot Notification: didSave: " + documentUri);
+    	LOG.trace("\nGot Notification: didSave: " + documentUri);
     	LOG.severe("SimulaCoreExports.didSave NOT IMPL");
     	DocumentManager.didSave(documentUri);
     }
@@ -70,7 +70,7 @@ public class SimulaTextDocumentService implements TextDocumentService {
     public void didClose(DidCloseTextDocumentParams params) {
         String documentUri = params.getTextDocument().getUri();
         // TODO: Clean up cache for this specific document
-        	LOG.info("\nGot Notification: didClose: " + documentUri);
+        	LOG.trace("\nGot Notification: didClose: " + documentUri);
 //        	LOG.severe("SimulaCoreExports.didClose NOT IMPL");
     		DocumentManager.didClose(documentUri);
     	}
@@ -87,7 +87,7 @@ public class SimulaTextDocumentService implements TextDocumentService {
 	}
     public SemanticTokens semanticTokensFull_Local(SemanticTokensParams params) {
     	String documentUri = params.getTextDocument().getUri();
-    	LOG.info("\nGot Request: semanticTokensFull: " + documentUri);
+    	LOG.trace("\nGot Request: semanticTokensFull: " + documentUri);
 //    	LOG.severe("SimulaCoreExports.semanticTokensFull NOT IMPL");
     	List<Integer> tokens = DocumentManager.semanticTokensFull(documentUri);
     	return new SemanticTokens(tokens);

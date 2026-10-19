@@ -75,9 +75,8 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
     		
     		DocumentManager.noPopup = true;
     		RunDebugManager.doOpen(documentUri);
-    		
-    		List<String> list = List.of(args);
-    		RunDebugManager.run(documentUri, list);
+    		RunDebugManager.run(documentUri, List.of(args));
+    		RunDebugManager.doClose(documentUri);
     		System.exit(0);
     	}
 		if(! CoreGlobal.INLINE_CONNECTED) {
@@ -152,7 +151,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
 //        Comn.popUp("SimulaLanguageServer.connect: " + languageClient.getClass());
         
 //        Util.redirectSystemIO();
-        LOG.info("SimulaLanguageServer.connect: " + languageClient);
+        LOG.trace("SimulaLanguageServer.connect: " + languageClient);
     }
 
     /// --- LanguageServer Implementation ---
@@ -206,7 +205,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
     }
     
     public InitializeResult initialize_local(InitializeParams params) {
-//        LOG.info("SimulaLanguageServer.initialize_local: " + params);
+//        LOG.trace("SimulaLanguageServer.initialize_local: " + params);
         // Retrieve the raw options object sent by the client
         Object options = params.getInitializationOptions(); 
         
@@ -224,10 +223,10 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
 //                .getTokenTypes()
 //                ;
 //                
-//            LOG.info("Klienten støtter følgende token types: " + clientSupportedTokenTypes);
+//            LOG.trace("Klienten støtter følgende token types: " + clientSupportedTokenTypes);
 //        } catch (NullPointerException e) {
 //            // Håndter tilfeller hvor klienten ikke støtter semantisk syntaksutheving i det hele tatt
-//            LOG.info("Klienten har ikke lagt ved støtte for Semantic Tokens.");
+//            LOG.trace("Klienten har ikke lagt ved støtte for Semantic Tokens.");
 //        }
 
         // 1. Capture what the client is capable of doing
@@ -275,7 +274,7 @@ public class SimulaLanguageServer implements LanguageServer, LanguageClientAware
 
         // 4. Return the capabilities wrapped in an InitializeResult object
         InitializeResult reply = new InitializeResult(serverCapabilities, new ServerInfo(CoreGlobal.serverName, CoreGlobal.serverVersion));
-        LOG.info("initialize.Reply: InitializeResult: "+reply);
+        LOG.trace("initialize.Reply: InitializeResult: "+reply);
         
 //		if(! CoreGlobal.INLINE_CONNECTED) {
 //			CoreGlobal.debugConsole = new ConsolePanel("Simula LSP Server - Debug Console");

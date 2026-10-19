@@ -51,7 +51,7 @@ public class DocumentManager {
 
 	/// The Compiler mode.
 //	public CompilerMode compilerMode;
-	public boolean compileViaJavaSource;
+	public static boolean compileViaJavaSource;
 
 	/// The source file name.
 	public String sourceFileName;
@@ -64,11 +64,11 @@ public class DocumentManager {
 
 	// Specifies where to place generated executable .jar file;
 	// Also used to search for precompiled .jar attribute files
-	public File jarFileDir = null;
+	public static File jarFileDir = null;
 	
 	// Specifies where to search for precompiled classes and procedures
 	// If not found, jarFileDir is then searched
-	public File extLib = null;
+	public static File extLib = null;
 
 
 	// ***************************************************************
@@ -141,7 +141,7 @@ public class DocumentManager {
     		File userDir = new File(System.getProperty("user.dir"));
     		this.jarFileDir = new File(userDir,"bin");
     	}
-    	LOG.info("DocumentManager.createJarFilesDirectory: jarFileDir=" + this.jarFileDir);
+    	LOG.trace("DocumentManager.createJarFilesDirectory: jarFileDir=" + this.jarFileDir);
     	this.jarFileDir.mkdirs();
     	if (! this.jarFileDir.canWrite()) {
     		Util.IERR("SimulaCompiler.setOutputDir: Unable to write to " + this.jarFileDir);
@@ -160,7 +160,7 @@ public class DocumentManager {
     /// Debug Utility
     public static DocumentManager getDocumentManager(String documentUri)  {
     	DocumentManager res = openDocuments.get(documentUri);
-    	Util.println("DocumentManager.getDocumentManager: documentUri ==> " + res);
+    	LOG.trace("DocumentManager.getDocumentManager: documentUri ==> " + res);
     	if(res == null) Util.IERR("No such document: " + documentUri);
     	return res;
     }
@@ -241,17 +241,17 @@ public class DocumentManager {
 //    public static void didOpen(DidOpenTextDocumentParams params, SimulaLanguageServer server) {
     public static void didOpen(final String documentUri, final int version, final String sourceCode) {
 //        public DocumentManager documentManager = DocumentManager.get(documentUri);
-    	LOG.info("DocumentManager.didOpen: BEGIN");
+    	LOG.trace("DocumentManager.didOpen: BEGIN");
     	if(openDocuments.get(documentUri) != null) {
     		Util.IERR("DocumentManager.didOpen: DOKUMENTET FINNES FRA FØR: " + documentUri);
     	}
     	DocumentManager documentManager = new DocumentManager(documentUri, version, sourceCode);
     	openDocuments.put(documentUri, documentManager);
-    	Util.println("\"DocumentManager.didOpen: openDocuments: " + openDocuments);
+    	LOG.trace("DocumentManager.didOpen: openDocuments: " + openDocuments);
     	
     	documentManager.tryCreateBuilder();
 
-    	LOG.info("DocumentManager.didOpen: RETURNS");
+    	LOG.trace("DocumentManager.didOpen: RETURNS");
     }
     
 
@@ -259,21 +259,21 @@ public class DocumentManager {
 	/// signal changes to a text document.
 //	public static void didChange(DidChangeTextDocumentParams params, SimulaLanguageServer server) {
 	public static void didChange(final String documentUri, final List<TextDocumentContentChangeEvent> changes) {
-    	LOG.info("DocumentManager.didChange: BEGIN");
+    	LOG.trace("DocumentManager.didChange: BEGIN");
     	DocumentManager documentManager = getDocumentManager(documentUri);
 		
 //		String currentText = sourceItem.getText();
 		String currentText = documentManager.getText();
-    	LOG.info("DocumentManager.didChange: Current Text: " + currentText);
+    	LOG.trace("DocumentManager.didChange: Current Text: " + currentText);
 
 //    	String updatedText = DocumentTextUpdater.applyChanges(currentText, params.getContentChanges());
     	String updatedText = DocumentTextUpdater.applyChanges(currentText, changes);
-    	LOG.info("DocumentManager.didChange: Updated Text: " + updatedText);
+    	LOG.trace("DocumentManager.didChange: Updated Text: " + updatedText);
     	documentManager.setText(updatedText);
     	
     	documentManager.tryCreateBuilder();
 
-    	LOG.info("DocumentManager.didChange: RETURNS");
+    	LOG.trace("DocumentManager.didChange: RETURNS");
 	}
 
 	
@@ -283,7 +283,7 @@ public class DocumentManager {
 //    	DocumentManager documentManager = openDocuments.get(documentUri);
 
 		// 2. Add your pre-save routine here
-		LOG.info("Document is about to save: " + documentUri + " due to reason: " + reason);
+		LOG.trace("Document is about to save: " + documentUri + " due to reason: " + reason);
 
 		// Since TextDocumentSyncKind is 'Full', you already have the latest text state 
 		// synchronized via your prior 'didChange' notification handlers.
@@ -326,10 +326,10 @@ public class DocumentManager {
 	/// a file uri the truth now exists on disk).
 //	public static void didClose(DidCloseTextDocumentParams params, SimulaLanguageServer server) {
 	public static void didClose(final String documentUri) {
-		Util.println("DocumentManager.didClose: openDocuments: " + openDocuments);
+		LOG.trace("DocumentManager.didClose: openDocuments: " + openDocuments);
         openDocuments.remove(documentUri);
-		Util.println("DocumentManager.didClose: " + documentUri);
-		Util.println("DocumentManager.didClose: openDocuments: " + openDocuments);
+        LOG.trace("DocumentManager.didClose: " + documentUri);
+        LOG.trace("DocumentManager.didClose: openDocuments: " + openDocuments);
 	}
 
 	public void publishDiagnostics(List<Diagnostic> diagnostics) {
@@ -345,13 +345,13 @@ public class DocumentManager {
 		if(TESTING) Util.println("DocumentManager.semanticTokensFull: " + documentUri);
     	DocumentManager documentManager = getDocumentManager(documentUri);
     	List<Integer> semanticTokens = documentManager.simBuilder.semTokenList;
-    	LOG.info("DocumentManager.semanticTokensFull: semanticTokens.size=" + semanticTokens.size());
+    	LOG.trace("DocumentManager.semanticTokensFull: semanticTokens.size=" + semanticTokens.size());
 //		TokenManager.validateSemanticTokens(semanticTokens, TokenManager.STANDARD_TOKEN_TYPES.size() - 1);
 		return semanticTokens;
 	}
 	
 	public void tryCreateBuilder() {
-    	LOG.info("DocumentManager.tryCreateBuilder: BEGIN");
+    	LOG.trace("DocumentManager.tryCreateBuilder: BEGIN");
 //		String sourceText = this.getText();
 		SimulaBuilder newSimBuilder = new SimulaBuilder(this);
 		// TRY BUILD SYNTAX TREE ...

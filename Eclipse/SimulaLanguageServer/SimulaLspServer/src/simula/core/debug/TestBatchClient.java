@@ -3,8 +3,6 @@ package simula.core.debug;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import javax.swing.JOptionPane;
-
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.LogTraceParams;
 import org.eclipse.lsp4j.MessageActionItem;
@@ -33,10 +31,12 @@ public class TestBatchClient implements LanguageClient {
 	/// signal results of validation runs.
 	@Override
 	public void publishDiagnostics(PublishDiagnosticsParams params) {
-		IO.println("TestBatchClient.publishDiagnostics: for " + params.getUri());
 		List<Diagnostic> diagnostics = params.getDiagnostics();
-		for(Diagnostic diag:diagnostics) {
-			IO.println("TestBatchClient.publishDiagnostics: - " + diag);			
+		if(! diagnostics.isEmpty()) {
+			IO.println("TestBatchClient.publishDiagnostics: for " + params.getUri());
+			for(Diagnostic diag:diagnostics) {
+				IO.println("TestBatchClient.publishDiagnostics: - " + diag);			
+			}
 		}
 	}
 

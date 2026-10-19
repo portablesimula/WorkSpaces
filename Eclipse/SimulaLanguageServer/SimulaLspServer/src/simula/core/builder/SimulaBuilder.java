@@ -144,7 +144,7 @@ public class SimulaBuilder {
 	public boolean doParsing(SimulaBuilder simBuilder) {
 		boolean builderTerminateNormally = false;
 		documentManager.simBuilder.duringParsing = true;
-    	LOG.info("SimulaBuilder.doParsing: BEGIN");
+    	LOG.trace("SimulaBuilder.doParsing: BEGIN");
     	
         // Do the actual Building
 		simBuilder.getNextParserToken();
@@ -158,7 +158,7 @@ public class SimulaBuilder {
 			simBuilder.lexer.flush();
         }
 
-    	LOG.info("SimulaBuilder: syntaxTree, tokenList and diagnostics DONE");
+    	LOG.trace("SimulaBuilder: syntaxTree, tokenList and diagnostics DONE");
 //    	Util.println("SimulaBuilder: this.syntaxTree: "+simBuilder.syntaxTree); // Root of Syntax Tree
 //    	Util.println("SimulaBuilder: this.diagnostics: "+simBuilder.diagnostics);
 //    	Util.println("SimulaBuilder: this.tokenList: "+simBuilder.tokenList);
@@ -176,7 +176,7 @@ public class SimulaBuilder {
 			Util.println("BEGIN Semantic Checker");
 		documentManager.simBuilder.duringParsing = false;
 		documentManager.simBuilder.duringChecking = true;
-    	LOG.info("SimulaBuilder.doChecking: BEGIN");
+    	LOG.trace("SimulaBuilder.doChecking: BEGIN");
 		StandardClass.ENVIRONMENT.doChecking();
 		ProgramModule programModule = documentManager.simBuilder.syntaxTree;
 		programModule.doChecking();
@@ -358,9 +358,9 @@ public class SimulaBuilder {
 	}
 
 	public void printDiagnostics(String title) {
-		LOG.info("++++++++++++++++ BEGIN DIAGNOSTICS: " + title + " ++++++++++++++++++");
-		for(Diagnostic diagnostic:diagnostics) LOG.info(diagnostic.toString());			
-		LOG.info("++++++++++++++++ ENDOF DIAGNOSTICS: " + title + " ++++++++++++++++++");
+		LOG.trace("++++++++++++++++ BEGIN DIAGNOSTICS: " + title + " ++++++++++++++++++");
+		for(Diagnostic diagnostic:diagnostics) LOG.trace(diagnostic.toString());			
+		LOG.trace("++++++++++++++++ ENDOF DIAGNOSTICS: " + title + " ++++++++++++++++++");
 	}
 	
 	public void printTokenList(String title) {

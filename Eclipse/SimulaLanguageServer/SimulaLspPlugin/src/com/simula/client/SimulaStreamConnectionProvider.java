@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.lsp4e.server.ProcessStreamConnectionProvider;
 import org.osgi.framework.FrameworkUtil;
+
+import com.simula.client.preferences.SimulaPreferencePage;
 
 
 /// Project Structure
@@ -36,8 +39,9 @@ public class SimulaStreamConnectionProvider extends ProcessStreamConnectionProvi
             URL bundleUrl = FrameworkUtil.getBundle(this.getClass()).getEntry("server/SimulaLspServer.jar");
             URL fileUrl = FileLocator.toFileURL(bundleUrl);
             File jarFile = new File(fileUrl.getPath());
+            commands.add(jarFile.getAbsolutePath());            
+            SimulaPreferencePage.addCommands(commands);
             
-            commands.add(jarFile.getAbsolutePath());
         } catch (IOException e) {
             // Fallback command setup or proper error logging
             e.printStackTrace();

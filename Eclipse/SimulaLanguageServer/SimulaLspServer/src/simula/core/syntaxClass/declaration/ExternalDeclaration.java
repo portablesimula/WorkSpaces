@@ -159,7 +159,7 @@ public final class ExternalDeclaration extends Declaration {
 //				Util.println("ExternalDeclaration.expectExternalDeclaration: " + token.getClass().getSimpleName());
 				if(token instanceof SimpleString xident) {
 					externalIdentifier = xident.value;
-					LOG.info("ExternalDeclaration.expectExternalDeclaration: extIdentifier" + externalIdentifier);
+					LOG.trace("ExternalDeclaration.expectExternalDeclaration: extIdentifier" + externalIdentifier);
 				} else {
 					Util.syntaxError(simBuilder, token, "Expecting external identifier string");
 				}

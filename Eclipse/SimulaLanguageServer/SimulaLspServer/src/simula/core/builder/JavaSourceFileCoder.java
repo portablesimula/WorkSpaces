@@ -56,7 +56,7 @@ public final class JavaSourceFileCoder {
 		enclosingJavaCoder = CoreGlobal.currentJavaFileCoder;
 		CoreGlobal.currentJavaFileCoder = this;
 		javaOutputFile = new File(simCoder.tempJavaFileDir, blockDeclaration.getJavaIdentifier() + ".java");
-		LOG.info("JavaSourceFileCoder: javaOutputFile: " + javaOutputFile);
+		LOG.trace("JavaSourceFileCoder: javaOutputFile: " + javaOutputFile);
 		try {
 			javaOutputFile.getParentFile().mkdirs();
 			if (DocumentManager.verbose)

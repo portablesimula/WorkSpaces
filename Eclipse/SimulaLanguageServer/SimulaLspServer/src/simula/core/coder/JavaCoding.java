@@ -85,7 +85,7 @@ public class JavaCoding {
 		if (Option.internal.DEBUGGING) {
 			arguments.add("-version");
 		}
-		LOG.info("JavaCoding.callJavaSystemCompiler: classPath=\"" + classPath + "\"");
+		LOG.trace("JavaCoding.callJavaSystemCompiler: classPath=\"" + classPath + "\"");
 		
 		boolean TESTING = false;//true;
 		String clazzPath = null;

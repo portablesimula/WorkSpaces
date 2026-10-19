@@ -71,7 +71,7 @@ public class SimulaCoder {
 		File tmpClassDir = new File(simulaTempDir, "classes/" + DocumentManager.packetName);
 		tmpClassDir.mkdirs();
 		tempClassFileDir = tmpClassDir.getParentFile();
-		LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempClassFileDir="+tempClassFileDir);
+		LOG.trace("SimulaCompiler.doCodeGeneration: BEGIN: tempClassFileDir="+tempClassFileDir);
 
 		if(documentManager.compileViaJavaSource) {
 			this.javaSourceFileCoders = new Vector<JavaSourceFileCoder>();
@@ -82,7 +82,7 @@ public class SimulaCoder {
 			File tmpJavaDir = new File(javatmp, "src/" + DocumentManager.packetName);
 			tmpJavaDir.mkdirs();
 			this.tempJavaFileDir = tmpJavaDir;
-	    	LOG.info("SimulaCompiler.doCodeGeneration: BEGIN: tempJavaFileDir="+this.tempJavaFileDir);
+	    	LOG.trace("SimulaCompiler.doCodeGeneration: BEGIN: tempJavaFileDir="+this.tempJavaFileDir);
 		}
 	}
 

@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Vector;
-
 import org.eclipse.lsp4j.ClientInfo;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.InitializeParams;
@@ -16,7 +14,6 @@ import org.eclipse.lsp4j.TraceValue;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.debug.RunDebugManager;
-import simula.core.utilities.Util;
 import simula.server.SimulaTextDocumentService;
 
 public class TestBatchLauncher {
@@ -32,7 +29,7 @@ public class TestBatchLauncher {
 		// Start SimulaLanguageServer and Connect
 		CoreGlobal.initiate();
 		CoreGlobal.INLINE_CONNECTED = true;
-		Util.println("TestBatchLauncher.run: before CoreGlobal.simulaLanguageServer.connect");
+//		Util.println("TestBatchLauncher.run: before CoreGlobal.simulaLanguageServer.connect");
 		CoreGlobal.simulaLanguageServer.connect(new TestBatchClient());
 			
 		// Initialize SimulaLanguageServer

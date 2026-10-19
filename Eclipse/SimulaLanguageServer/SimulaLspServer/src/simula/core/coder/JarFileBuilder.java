@@ -173,7 +173,7 @@ public class JarFileBuilder {
 	    	Util.doListDirectory("JarFileBuilder.close: END: ", ""+simCoder.tempClassFileDir + "/" + DocumentManager.packetName);
 		}
 
-		LOG.info("END Create .jar File: " + outputJarFile);
+		LOG.trace("END Create .jar File: " + outputJarFile);
 		return (outputJarFile);
 	}
 

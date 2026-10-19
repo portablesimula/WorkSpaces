@@ -147,60 +147,69 @@ public final class Option {
 			String arg=argv[i];
 //			Util.println("Option.decodeArguments: arg: " + arg);
 			switch(arg) {
-//				case "-help": help(); break;
-				case "-caseSensitive": DocumentManager.CaseSensitive = true; break;
-//				case "-compilerMode": Option.setCompilerMode(argv[++i]); break;
-//				case "-noexec": SimulaCompiler.noExecution=true; break;
-				case "-noextension": DocumentManager.EXTENSIONS = false; break;
-				case "-noPopup": DocumentManager.noPopup = true; break;
-				case "-nowarn": DocumentManager.WARNINGS = false; break;
-				case "-verbose": DocumentManager.verbose = true; break;
-//				case "-version": printVersion(); break;
-//				case "-select": setSelectors(argv[++i]); break;				
-//				case "-keepJava": Option.internal.keepJava = new File(argv[++i]); break;
+				case "--debugRun":      i++; break; // Skip it. Treated by SimulaLanguageServer.main
+				case "-caseSensitive":  DocumentManager.CaseSensitive = true; break;
+				case "-noextension":    DocumentManager.EXTENSIONS = false; break;
+				case "-noPopup":        DocumentManager.noPopup = true; break;
+				case "-nowarn":         DocumentManager.WARNINGS = false; break;
+				case "-verbose":        DocumentManager.verbose = true; break;
+//				case "-version":        printVersion(); break;
+//				case "-select":         setSelectors(argv[++i]); break;				
+				
+				// Simula Compiler Options:
+				case "-compilerMode":   Option.setCompilerMode(argv[++i]); break;
+				case "-noexec":         DocumentManager.noExecution = true; break;
+				case "-keepJava":       Option.internal.keepJava = new File(argv[++i]); break;
 
-//				case "-output": SimulaCoder.jarFileDir = new File(argv[++i]); break;
-//				case "-extLib": SimulaCoder.extLib = new File(argv[++i]); break;
-				default: Util.println("Simula ERROR: Unknown option " + arg);
+				case "-simulaRtsLib":   DocumentManager.simulaRtsLib = new File(argv[++i]); break;
+				case "-output":         DocumentManager.jarFileDir = new File(argv[++i]); break;
+				case "-extLib":         DocumentManager.extLib = new File(argv[++i]); break;
+				
+				// Special RT Options
+//				case "-source": Option.SOURCE_FILE=argv[++i]; break;
+//				case "-sourceFileDir":  sourceFileDir=argv[++i]; break;
+				case "-runtimeUserDir": Option.internal.RUNTIME_USER_DIR=argv[++i]; break;
+				
+//				default: Util.println("Simula ERROR: Unknown option " + arg);
 			}
 		}
 	}
 
-	/// Kalles av 'run' før coding og exec
-	public static void decodeArguments2(DocumentManager documentManager, String[] argv) {
-//		Util.println("Option.decodeArguments2: ");
-
-		// Parse command line arguments.
-		for(int i=0;i<argv.length;i++) {
-			String arg=argv[i];
-			if (arg.charAt(0) == '-') { // command line option
-				if (arg.equalsIgnoreCase("--debugRun")) i++; // Skip it
-				else if (arg.equalsIgnoreCase("-compilerMode")) Option.setCompilerMode(documentManager, argv[++i]);
-				else if (arg.equalsIgnoreCase("-noexec")) DocumentManager.noExecution = true;
-//				else if (arg.equalsIgnoreCase("-noextension")) SimulaCompiler.EXTENSIONS=false;
-				else if (arg.equalsIgnoreCase("-noPopup")) DocumentManager.noPopup = true;
-				else if (arg.equalsIgnoreCase("-nowarn")) DocumentManager.WARNINGS = false;
-				else if (arg.equalsIgnoreCase("-verbose")) DocumentManager.verbose = true;
-//				else if (arg.equalsIgnoreCase("-version")) printVersion();
-//				else if (arg.equalsIgnoreCase("-select")) setSelectors(argv[++i]);				
-				else if (arg.equalsIgnoreCase("-keepJava")) Option.internal.keepJava = new File(argv[++i]);
-
-				else if (arg.equalsIgnoreCase("-simulaRtsLib")) DocumentManager.simulaRtsLib = new File(argv[++i]);
-				else if (arg.equalsIgnoreCase("-output")) documentManager.jarFileDir = new File(argv[++i]);
-				else if (arg.equalsIgnoreCase("-extLib")) documentManager.extLib = new File(argv[++i]);
-				
-				// Special RT Options
-//				else if (arg.equalsIgnoreCase("-source")) Option.SOURCE_FILE=argv[++i];
-//				else if (arg.equalsIgnoreCase("-sourceFileDir")) sourceFileDir=argv[++i];
-				else if (arg.equalsIgnoreCase("-runtimeUserDir")) Option.internal.RUNTIME_USER_DIR=argv[++i];
-				else {
-					Util.println("Simula ERROR: Unknown option " + arg);
-//					help();
-				}
-			} else Util.IERR(arg);
-		}
-//		Util.IERR("STOP HER INTILL VIDERE");
-	}
+//	/// Kalles av 'run' før coding og exec
+//	public static void decodeArguments2(DocumentManager documentManager, String[] argv) {
+////		Util.println("Option.decodeArguments2: ");
+//
+//		// Parse command line arguments.
+//		for(int i=0;i<argv.length;i++) {
+//			String arg=argv[i];
+//			if (arg.charAt(0) == '-') { // command line option
+//				if (arg.equalsIgnoreCase("--debugRun")) i++; // Skip it
+//				else if (arg.equalsIgnoreCase("-compilerMode")) Option.setCompilerMode(documentManager, argv[++i]);
+//				else if (arg.equalsIgnoreCase("-noexec")) DocumentManager.noExecution = true;
+////				else if (arg.equalsIgnoreCase("-noextension")) SimulaCompiler.EXTENSIONS=false;
+//				else if (arg.equalsIgnoreCase("-noPopup")) DocumentManager.noPopup = true;
+//				else if (arg.equalsIgnoreCase("-nowarn")) DocumentManager.WARNINGS = false;
+//				else if (arg.equalsIgnoreCase("-verbose")) DocumentManager.verbose = true;
+////				else if (arg.equalsIgnoreCase("-version")) printVersion();
+////				else if (arg.equalsIgnoreCase("-select")) setSelectors(argv[++i]);				
+//				else if (arg.equalsIgnoreCase("-keepJava")) Option.internal.keepJava = new File(argv[++i]);
+//
+//				else if (arg.equalsIgnoreCase("-simulaRtsLib")) DocumentManager.simulaRtsLib = new File(argv[++i]);
+//				else if (arg.equalsIgnoreCase("-output")) DocumentManager.jarFileDir = new File(argv[++i]);
+//				else if (arg.equalsIgnoreCase("-extLib")) DocumentManager.extLib = new File(argv[++i]);
+//				
+//				// Special RT Options
+////				else if (arg.equalsIgnoreCase("-source")) Option.SOURCE_FILE=argv[++i];
+////				else if (arg.equalsIgnoreCase("-sourceFileDir")) sourceFileDir=argv[++i];
+//				else if (arg.equalsIgnoreCase("-runtimeUserDir")) Option.internal.RUNTIME_USER_DIR=argv[++i];
+//				else {
+////					Util.println("Simula ERROR: Unknown option " + arg);
+////					help();
+//				}
+//			} else Util.IERR(arg);
+//		}
+////		Util.IERR("STOP HER INTILL VIDERE");
+//	}
 
 	
 	/// Initiate Compiler options.
@@ -220,11 +229,11 @@ public final class Option {
 
 	/// Editor Utility: Set Compiler Mode.
 	/// @param id the mode String.
-	public static void setCompilerMode(DocumentManager documentManager, String id) {
+	public static void setCompilerMode(String id) {
 		if(id.equals("viaJavaSource")) {
-			documentManager.compileViaJavaSource = true;
+			DocumentManager.compileViaJavaSource = true;
 		} else if(id.equals("directClassFiles")) {
-			documentManager.compileViaJavaSource = false;
+			DocumentManager.compileViaJavaSource = false;
 		}
 	}
 

@@ -5,12 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
-
 import org.eclipse.lsp4j.ClientInfo;
+import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
+import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.TraceValue;
 
@@ -20,6 +20,7 @@ import simula.core.DocumentManager;
 import simula.core.builder.SimulaBuilder;
 import simula.core.coder.SimulaCoder;
 import simula.core.coder.SimulaExec;
+import simula.core.utilities.LOG;
 import simula.core.utilities.Util;
 import simula.server.SimulaTextDocumentService;
 
@@ -31,6 +32,10 @@ public class RunDebugManager {
         @SuppressWarnings("unchecked")
 		List<String> args = (List<String>) launchArgs.get("args");
         Boolean stopOnEntry = (Boolean) launchArgs.getOrDefault("stopOnEntry", false);
+        
+        LOG.info("RunDebugManager.launch: DETTE MÅ FORSTÅS OG IMPLEMENTERES");
+        LOG.info("RunDebugManager.launch: programPath: " + programPath);
+        LOG.info("RunDebugManager.launch: stopOnEntry: " + stopOnEntry);
 
 //        if (programPath == null || programPath.isEmpty()) {
 //            throw new IllegalArgumentException("The 'program' path must be specified.");
@@ -54,7 +59,7 @@ public class RunDebugManager {
         run(documentUri, args);
 	}
 	
-	public static void doOpen(String fileName) {
+	public static void doOpen(String documentUri) {
 		// Remove time, date, and headers from Logger output.
 		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
 
@@ -65,7 +70,7 @@ public class RunDebugManager {
 		// Start SimulaLanguageServer and Connect
 		CoreGlobal.initiate();
 		CoreGlobal.INLINE_CONNECTED = true;
-		Util.println("TestBatchLauncher.run: before CoreGlobal.simulaLanguageServer.connect");
+//		Util.println("TestBatchLauncher.run: before CoreGlobal.simulaLanguageServer.connect");
 		CoreGlobal.simulaLanguageServer.connect(new TestBatchClient());
 			
 		// Initialize SimulaLanguageServer
@@ -84,10 +89,10 @@ public class RunDebugManager {
 			
 //		SimulaCoreInitialize.initiate(argv);
 		
-		String documentUri = fileName;
+//		String documentUri = documentUri;
 		int version = 1;
 		try {
-			String content = Files.readString(Path.of(fileName));
+			String content = Files.readString(Path.of(documentUri));
 			SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
 			TextDocumentItem textDocument = new TextDocumentItem(documentUri, "Simula", version, content);
 
@@ -103,13 +108,15 @@ public class RunDebugManager {
 	
 
 	// Generate code and execute simula program
+	// Called from: SimulaLanguageServer.main  when --debugRun
+	// Called from: RunDebugManager.launch     when SimulaDebugAdapter is launched
 	public static void run(final String documentUri, List<String> argv) {
 //		Util.println("SimulaCoreExports.run: " + documentUri);
     	DocumentManager documentManager = DocumentManager.getDocumentManager(documentUri);
     	SimulaBuilder simBuilder = documentManager.simBuilder;
 
     	String[] args = argv.toArray(new String[0]);
-		Option.decodeArguments2(documentManager, args);
+		Option.decodeArguments(args);
 
 //    	SimulaCompiler simulaCompiler = new SimulaCompiler(documentManager);
 //    	simulaCompiler.doCompile();
@@ -133,6 +140,13 @@ public class RunDebugManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public static void doClose(String documentUri) {
+		SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
+		TextDocumentIdentifier textDocument = new TextDocumentIdentifier(documentUri);
+		DidCloseTextDocumentParams params = new DidCloseTextDocumentParams(textDocument);		
+		simulaTextDocumentService.didClose(params);
 	}
 
 }

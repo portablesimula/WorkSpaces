@@ -283,7 +283,7 @@ public class Parse {
 	/// Debug utility: Utility TRACE.
 	/// @param msg a message
 	public static void TRACE(final String msg) {
-		LOG.info(msg);
+		LOG.trace(msg);
 	}
 
 }

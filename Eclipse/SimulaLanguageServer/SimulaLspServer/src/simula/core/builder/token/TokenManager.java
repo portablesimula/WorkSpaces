@@ -478,7 +478,7 @@ public class TokenManager {
                 return false;
             }
         }
-        Util.println("TokenManager.validerLegend: OK");
+        LOG.trace("TokenManager.validerLegend: OK");
         return true;
     }
 

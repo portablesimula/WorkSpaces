@@ -20,10 +20,10 @@
 	         class="com.simula.client.preferences.SimulaPreferencePage">
 	   </page>
 	   <page
-	         id="com.simula.client.preferences.SimulaLspPage"
-	         name="Lsp Info"
+	         id="com.simula.client.preferences.SimulaDetailsPage"
+	         name="Details"
 	         category="com.simula.client.preferences.SimulaMainPreferencePage"
-	         class="com.simula.client.preferences.SimulaLspPreferencePage">
+	         class="com.simula.client.preferences.SimulaDetailsPreferencePage">
 	   </page>
 	   
 	   <!-- Optional: Child preference page (e.g., Code Formatting or Syntax Coloring) -->

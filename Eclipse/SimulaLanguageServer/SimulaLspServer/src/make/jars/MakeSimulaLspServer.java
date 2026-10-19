@@ -98,17 +98,15 @@ public class MakeSimulaLspServer {
 		Path target = Paths.get(TARGET_DIR);
 		IO.println("copyInstalledServerToVSCode: source="+source+"   Exists:"+(new File(INSTALLED)).exists());
 		IO.println("copyInstalledServerToVSCode: target="+target+"   Exists:"+(new File(TARGET_DIR)).exists());
-	        
-	        // Kombinerer mappen og filnavnet til den endelige destinasjonsstien
-	        Path destinasjon = target.resolve(source.getFileName());
-
-	        try {
-	            // REPLACE_EXISTING tvinger Java til å overskrive filen hvis den finnes
-	            Files.copy(source, destinasjon, StandardCopyOption.REPLACE_EXISTING);
-	            System.out.println("Filen ble kopiert og overskrevet suksessfullt.");
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
+		Path destinasjon = target.resolve(source.getFileName());
+		File file = new File(TARGET_DIR);
+		file.mkdirs();
+		try {
+			Files.copy(source, destinasjon, StandardCopyOption.REPLACE_EXISTING);
+			System.out.println("Filen ble kopiert og overskrevet suksessfullt.");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	

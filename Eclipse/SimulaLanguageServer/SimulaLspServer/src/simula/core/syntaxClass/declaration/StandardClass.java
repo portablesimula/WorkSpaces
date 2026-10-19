@@ -108,7 +108,7 @@ public final class StandardClass extends ClassDeclaration {
 				initShapeElement(documentManager);
 				initTextElement(documentManager);
 		}
-		LOG.info("StandardClass: INITIATE DONE");
+		LOG.trace("StandardClass: INITIATE DONE");
 	}
 
 
