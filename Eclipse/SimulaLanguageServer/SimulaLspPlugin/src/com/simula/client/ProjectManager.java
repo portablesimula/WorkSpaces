@@ -20,7 +20,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
-import com.simula.client.newWizard.NewSimulaProjectWizard;
+
+import com.simula.client.project.NewSimulaProjectWizard;
 
 public class ProjectManager {
 

@@ -1,4 +1,4 @@
-package simula.server;
+package simula.server.lsp;
 
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;

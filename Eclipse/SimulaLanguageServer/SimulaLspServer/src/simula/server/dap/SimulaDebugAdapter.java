@@ -1,10 +1,11 @@
-package simula.server;
+package simula.server.dap;
 
 import org.eclipse.lsp4j.debug.*;
 import org.eclipse.lsp4j.debug.services.IDebugProtocolClient;
 import org.eclipse.lsp4j.debug.services.IDebugProtocolServer;
 
 import simula.core.debug.RunDebugManager;
+import simula.core.utilities.LOG;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -17,21 +18,25 @@ public class SimulaDebugAdapter implements IDebugProtocolServer {
      */
     public void connect(IDebugProtocolClient client) {
         this.client = client;
+        LOG.trace("SimulaDebugAdapter.connect: " + client);
     }
 
     @Override
     public CompletableFuture<Capabilities> initialize(InitializeRequestArguments args) {
+        LOG.trace("SimulaDebugAdapter.initialize: " + args);
         Capabilities capabilities = new Capabilities();
         // Tell the client what features your Simula debugger supports
         capabilities.setSupportsConfigurationDoneRequest(true);
         capabilities.setSupportsFunctionBreakpoints(false);
         capabilities.setSupportsConditionalBreakpoints(true);
         
+        LOG.trace("SimulaDebugAdapter.initialize: capabilities: " + capabilities);
         return CompletableFuture.completedFuture(capabilities);
     }
 
     @Override
     public CompletableFuture<Void> launch(java.util.Map<String, Object> args) {
+        LOG.trace("SimulaDebugAdapter.launch: " + args);
         // Parse Simula runtime path, source folders, etc. from args
         // Spawn your underlying Simula runtime process in debug mode
     	RunDebugManager.launch(args);

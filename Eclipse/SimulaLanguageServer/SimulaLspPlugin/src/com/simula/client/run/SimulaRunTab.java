@@ -1,6 +1,9 @@
 package com.simula.client.run;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
@@ -60,15 +63,35 @@ public class SimulaRunTab extends AbstractLaunchConfigurationTab {
     /**
      * 2. Initialize the UI fields from an existing launch configuration.
      */
+//    @Override
+//    public void initializeFrom(ILaunchConfiguration configuration) {
+//    	IO.println("SimulaRunTab.initializeFrom: ");
+//        try {
+//            // Read the saved attribute or default to empty string
+//            String program = configuration.getAttribute(ATTR_SIMULA_PROGRAM, "");
+//            fileText.setText(program);
+//        } catch (CoreException e) {
+//            fileText.setText("");
+//        }
+//    }
     @Override
     public void initializeFrom(ILaunchConfiguration configuration) {
-    	IO.println("SimulaRunTab.initializeFrom: ");
         try {
-            // Read the saved attribute or default to empty string
-            String program = configuration.getAttribute(ATTR_SIMULA_PROGRAM, "");
-            fileText.setText(program);
+            // Read the file path attribute stored by the shortcut
+            String filePath = configuration.getAttribute("SIMULA_PROGRAM_FILE", "");
+            
+            // Update your UI text field
+            fileText.setText(filePath);
+            
+            // Optional: Resolve the exact IFile object from the workspace if needed
+            if (!filePath.isEmpty()) {
+                IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(filePath));
+                if (file.exists()) {
+                    // Do any additional processing with the IFile instance here
+                }
+            }
         } catch (CoreException e) {
-            fileText.setText("");
+            e.printStackTrace();
         }
     }
 

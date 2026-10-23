@@ -8,7 +8,7 @@ import simula.core.CoreGlobal;
 import simula.editor.text.SimulaTextPanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Option;
-import simula.server.SimulaTextDocumentService;
+import simula.server.lsp.SimulaTextDocumentService;
 
 import java.awt.*;
 import java.io.IOException;

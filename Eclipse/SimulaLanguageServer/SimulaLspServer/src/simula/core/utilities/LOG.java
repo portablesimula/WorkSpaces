@@ -1,11 +1,13 @@
 package simula.core.utilities;
 
+import java.io.PrintStream;
+
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
 
 import simula.core.CoreGlobal;
 import simula.core.DocumentManager;
-import simula.server.SimulaLanguageServer;
+import simula.server.lsp.SimulaLanguageServer;
 
 public class LOG {
 //	private static final Logger logger = Logger.getLogger(SimulaServer.class.getName());
@@ -15,9 +17,11 @@ public class LOG {
 //		logger.severe(message);
 		if(CoreGlobal.INLINE_CONNECTED)
 			System.err.println(message);
-		else if(CoreGlobal.debugConsole != null)
+		else if(CoreGlobal.debugConsole != null) {
 			CoreGlobal.debugConsole.writeError(message+"\n");
-		else if(SimulaLanguageServer.languageClient != null) {
+			PrintStream prt = CoreGlobal.debugConsole.getOutputStream();
+	        new Exception("LOG: Stack trace: ").printStackTrace(prt);
+		} else if(SimulaLanguageServer.languageClient != null) {
 			MessageParams params = new MessageParams(MessageType.Error, message);
 			SimulaLanguageServer.languageClient.logMessage(params);
 		}

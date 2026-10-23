@@ -19,22 +19,13 @@
 	         name="Simula"
 	         class="com.simula.client.preferences.SimulaPreferencePage">
 	   </page>
+	   <!-- Optional: Child preference page -->
 	   <page
 	         id="com.simula.client.preferences.SimulaDetailsPage"
 	         name="Details"
 	         category="com.simula.client.preferences.SimulaMainPreferencePage"
 	         class="com.simula.client.preferences.SimulaDetailsPreferencePage">
 	   </page>
-	   
-	   <!-- Optional: Child preference page (e.g., Code Formatting or Syntax Coloring) -->
-	   <!--
-	   <page
-	         id="com.example.simula.preferences.SimulaSyntaxColorPage"
-	         name="Syntax Coloring"
-	         category="com.example.simula.preferences.SimulaMainPreferencePage"
-	         class="com.example.simula.preferences.SimulaColorPreferencePage">
-	   </page>
-	   -->
 	</extension>
    
    <!--                                                                           Content types -->
@@ -81,15 +72,30 @@
       </menuContribution>
    </extension>
    
+   
+   <!--                                                                           Builders -->
+   <extension point="org.eclipse.core.resources.builders"
+         id="builder"
+         name="Simula Inclemental Builder">
+      <builder hasNature="true"> <!-- Sett til true hvis den krever en spesifikk Project Nature -->
+         <run class="com.simula.builders.SimulaDummyBuilder"/>
+      </builder>
+   </extension>
+   
+   
    <!--                                                                           Project Nature -->
+   <!-- NOTE: My plugin  ID = com.simula.lsp.client
+              My Builder ID = builder
+        FULLY QUALIFIED BUILDER ID = com.simula.lsp.client.builder
+   -->
 	<extension 
 	    id="simulaNature" 
 	    name="Simula Project Nature" 
 	    point="org.eclipse.core.resources.natures">
 	    <runtime>
-	      <run class="com.simula.client.SimulaNature"/>
+	      <run class="com.simula.client.project.SimulaProjectNature"/>
 	    </runtime>
-		<builder id="no.simula.ide.simulaBuilder"/>
+		<builder id="com.simula.lsp.client.builder"/>
    </extension>
 
 	<extension point="org.eclipse.ui.ide.projectNatureImages">
@@ -224,8 +230,7 @@
             relative="org.eclipse.ui.editorss"
             visible="false"/>
          <!-- Erstatter "YOUR_SIMULA_WIZARD_ID" med ID-en til din File->New Wizard -->
-         <newWizardShortcut id="com.simula.client.newWizard.NewSimulaProjectWizard"/>
-         <newWizardShortcut id="com.simula.client.newWizard.NewSimulaFileWizard"/>
+         <newWizardShortcut id="com.simula.client.project.NewSimulaProjectWizard"/>
       </perspectiveExtension>
    </extension>
 
@@ -243,32 +248,19 @@
 	   </perspectiveExtension>
 	</extension>
    
-	<!--                                                                          File -> New   Wizards	-->   
+	<!--                                                                          File -> New Project Wizard -->   
 	<extension point="org.eclipse.ui.newWizards">
 	   <!-- Optional: Create a custom category/folder for your wizard -->
 	   <category 
 	         id="com.simula.client.category" 
 	         name="Simula">
 	   </category>
-	   
-	   <!-- New Simula File Wizard -->
-	   <!--
-	   <wizard
-	         id="com.simula.client.wizard.mywizard"
-	         name="New Simula File"
-	         category="com.simula.client.category"
-	         class="com.simula.client.newWizard.NewSimulaFileWizard"
-	         icon="icons/favico.png">
-	      <description>Creates a custom artifact file inside your project.</description>
-	      <selection class="org.eclipse.core.resources.IResource"/>
-	   </wizard>
-	   -->
 	   <!-- New Simula Project Wizard -->
 	   <wizard
 	         id="com.simula.client.wizards.NewSimulaProjectWizard"
 	         name="New Simula Project"
 	         category="com.simula.client.category"
-	         class="com.simula.client.newWizard.NewSimulaProjectWizard"
+	         class="com.simula.client.project.NewSimulaProjectWizard"
 	         icon="icons/favico.png"
 	         project="true">
 	      <description>
@@ -288,7 +280,7 @@
    <!--                                                                           Defines: Handlers -->
 	<extension point="org.eclipse.ui.handlers">
 	    <handler
-	        class="com.simula.client.newWizard.CreateSimulaProjectHandler"
+	        class="com.simula.client.project.CreateSimulaProjectHandler"
 	        commandId="com.simula.ide.commands.createProject">
 	    </handler>
 	</extension>
@@ -359,6 +351,13 @@
 
    
    <!--                                                                           Debug Adapter -->
+	<extension point="org.eclipse.lsp4e.debug.debugAdapterFactories">
+	    <debugAdapterFactory
+	        id="com.simula.dap.debugAdapterFactory"
+	        class="com.simula.dap.SimulaDebugAdapterFactory"
+	        language="simula">
+	    </debugAdapterFactory>
+	</extension>
    <!--
 	<extension point="org.eclipse.lsp4e.debug.adapterType">
 	    <adapterType
@@ -379,7 +378,7 @@
 
 	<extension point="org.eclipse.lsp4e.debug.adapterType">
 	    <adapterType
-	        id="simula.debug.adapter"
+	        id="com.simula.dap.adapter"
 	        name="Simula Debug Adapter"
 	        label="Simula Debugger">
 	        
@@ -392,29 +391,31 @@
 	    </adapterType>
 	</extension>
 
-   <!--
-   <extension point="org.eclipse.debug.core.launchConfigurationTypes">
-	   <launchConfigurationType
-	         id="com.simula.debug.launchType"
-	         name="Simula Application"
-	         delegate="org.eclipse.lsp4e.debug.launcher.DSPLaunchDelegate"
-	         modes="run, debug">
-	   </launchConfigurationType>
-	</extension>
-	-->
+   <!--                                                                           Property Testers -->
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            id="com.simula.simulaProjectTester"
+            type="org.eclipse.core.resources.IResource"
+            namespace="com.simula"
+            properties="isSimulaProject"
+            class="com.simula.client.run.SimulaProjectTester">
+      </propertyTester>
+   </extension>
+
+   <!--                                                                           Run / Debug -->
 	<extension point="org.eclipse.debug.core.launchConfigurationTypes">
+		<!-- LATER: MAYBE ADD:
+		     sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector" -->
 	    <launchConfigurationType
-	         id="com.simula.launchType"
-	         name="Simula Application#1"
-			 icon="icons/favico.png"
-	        delegate="com.simula.dap.SimulaLaunchDelegate"
-	        modes="run, debug"
-	        sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector">
+	        id="com.simula.launchType"
+	        name="Simula Application#1"
+			icon="icons/favico.png"
+	        delegate="com.simula.client.run.SimulaLaunchDelegate"
+	        modes="run, debug">
 	    </launchConfigurationType>
 	</extension>
 
-	<extension
-	      point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+	<extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
 	   <launchConfigurationTypeImage
 	         configTypeID="com.simula.launchType"
 			 icon="icons/favico.png"
@@ -425,85 +426,47 @@
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
-            class="com.simula.client.run.SimulaRunTabGroup"
             id="com.simula.client.run.SimulaRunTabGroup"
-            type="com.simula.launchType">
+            type="com.simula.launchType"
+            class="com.simula.client.run.SimulaRunTabGroup">
       </launchConfigurationTabGroup>
    </extension>
-
-   <extension point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-            id="com.simula.simulaProjectTester"
-            type="org.eclipse.core.resources.IResource"
-            namespace="com.simula"
-            properties="isSimulaProject"
-            class="com.simula.SimulaProjectTester">
-      </propertyTester>
-   </extension>
 	   
-	<extension point="org.eclipse.debug.ui.launchShortcuts">
+   <extension point="org.eclipse.debug.ui.launchShortcuts">
 	   <shortcut
-	         id="com.simula.ide.launchShortcut"
-	         class="com.simula.dap.SimulaLaunchShortcut"
-	         label="Simula Application#2"
-			 icon="icons/favico.png">
-	         modes="run, debug">
-	         <!--
+		      id="com.simula.ide.launchShortcut"
+		      class="com.simula.client.run.SimulaLaunchShortcut"
+		      label="Simula Application#2"
+			  icon="icons/favico.png"
+		      modes="run, debug">
+	      
 	      <contextualLaunch>
+	         <contextLabel mode="run" label="Run Simula Application" />
+	         <contextLabel mode="debug" label="Debug Simula Application" />
+	         
 	         <enablement>
 	            <with variable="selection">
+	               <!-- Sørg for at nøyaktig én fil er valgt/aktiv -->
 	               <count value="1"/>
 	               <iterate>
-	                  <test property="org.eclipse.core.resources.name" value="sim"/>
+	                  <!-- Tilpass objektet til en IResource for å sjekke filnavn -->
+	                  <adapt type="org.eclipse.core.resources.IResource">
+	                     <and>
+	                        <!-- Trigger snarveien kun hvis filen slutter på .sim -->
+	                        <test 
+	                           property="org.eclipse.core.resources.name" 
+	                           value="*.sim"/>
+	                     </and>
+	                  </adapt>
 	               </iterate>
 	            </with>
 	         </enablement>
 	      </contextualLaunch>
-	      -->
-          <configurationType
-             id="com.simula.launchType"
-			 icon="icons/favico.png">
-          </configurationType>
+	      
 	   </shortcut>
 	</extension>
-   
-   <extension point="org.eclipse.ui.menus">
-	   <menuContribution
-	         locationURI="popup:org.eclipse.ui.popup.any?after=additions">
-	      <menu
-	            id="org.eclipse.debug.ui.contextualLaunch.run.submenu"
-	            label="Run As">
-	         <command
-	               commandId="org.eclipse.debug.ui.commands.LaunchLast"
-	               label="Simula Application#4"
-				   icon="icons/favico.png"
-	               style="push">
-	            <visibleWhen checkEnabled="false">
-	               <with variable="selection">
-	                  <count value="1"/>
-	                  <iterate>
-	                     <test property="org.eclipse.core.resources.extension" value="sim"/>
-	                  </iterate>
-	               </with>
-	            </visibleWhen>
-	         </command>
-	      </menu>
-	   </menuContribution>
-	</extension>
-   
 
-   <!--                                                                           Builders -->
-   <extension
-         id="com.simula.builder"
-         name="Simula Inclemental Builder"
-         point="org.eclipse.core.resources.builders">
-      <builder
-            hasNature="true"> <!-- Sett til true hvis den krever en spesifikk Project Nature -->
-         <run
-               class="com.simula.builders.SimulaBuilder">
-         </run>
-      </builder>
-   </extension>
+
    
 
    <!--                                                                           Export Wizards -->

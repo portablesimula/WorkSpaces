@@ -30,6 +30,7 @@ import simula.core.builder.SimulaBuilder;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.MessageActionItem;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
@@ -37,13 +38,14 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.jsonrpc.ResponseErrorException;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.jsonrpc.messages.ResponseError;
 import org.eclipse.lsp4j.jsonrpc.messages.ResponseErrorCode;
 
 import simula.core.builder.token.Identifier;
 import simula.core.builder.token.LexToken;
 import simula.core.syntaxClass.SyntaxElement;
-import simula.server.SimulaLanguageServer;
+import simula.server.lsp.SimulaLanguageServer;
 
 /// A set of all static Utility Methods
 /// 
@@ -144,16 +146,16 @@ public final class Util {
 	/// @param msg the message
 	public static void warning(final SimulaBuilder simBuilder, final LexToken token, final String msg) {
         if(Option.LEX_VERIFY) {
-        // SJEKK AT SimPosition er inne på linja !!!
-        if(token.keyWord == KeyWord.NEWLINE) // CRLF or LF ==> ERROR
-        	Util.IERR("Util.warning: Warning not inside text line");
+	        // SJEKK AT SimPosition er inne på linja !!!
+	        if(token.keyWord == KeyWord.NEWLINE) // CRLF or LF ==> ERROR
+	        	Util.IERR("Util.warning: Warning not inside text line");
         }
         Position start = new Position(token.lineNumber, token.column);
         Position end = new Position(token.lineNumber, token.column + token.length);
 		Diagnostic diagnostic = new Diagnostic(new Range(start, end), msg, DiagnosticSeverity.Warning, "Simula.LSP");
 			  		
 		if(DocumentManager.WARNINGS) {
-			LOG.warning(diagnostic.toString());
+			LOG.warning(edDiagnostic(diagnostic));
 			simBuilder.addDiagnostic(diagnostic);
 		}
 	}
@@ -164,7 +166,7 @@ public final class Util {
 //		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Warning, elt.lexRange, msg);
 		Diagnostic diagnostic = new Diagnostic(elt.lexRange, msg, DiagnosticSeverity.Warning, "Simula.LSP");
 		if(DocumentManager.WARNINGS) {
-			LOG.warning(diagnostic.toString());
+			LOG.warning(edDiagnostic(diagnostic));
 			elt.documentManager.simBuilder.addDiagnostic(diagnostic);
 		}
 	}
@@ -176,7 +178,7 @@ public final class Util {
 		Diagnostic diagnostic = new Diagnostic(new Range(start, end), msg, DiagnosticSeverity.Warning, "Simula.LSP");
 
 		if(DocumentManager.WARNINGS) {
-			LOG.warning(diagnostic.toString());
+			LOG.warning(edDiagnostic(diagnostic));
 			simBuilder.addDiagnostic(diagnostic);
 		}
 	}
@@ -232,14 +234,14 @@ public final class Util {
 //		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Error, new Range(start, end), msg);
 		Diagnostic diagnostic = new Diagnostic(new Range(start, end), msg, DiagnosticSeverity.Error, "Simula.LSP");
 		
-		LOG.error(diagnostic.toString());
+		LOG.error(edDiagnostic(diagnostic));
 		simBuilder.addError(diagnostic);
 	}
 	
 	public static void semanticError(final SyntaxElement elt, final String msg) {
 //		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Error, elt.lexRange, msg);
 		Diagnostic diagnostic = new Diagnostic(elt.lexRange, msg, DiagnosticSeverity.Error, "Simula.LSP");
-		LOG.error(diagnostic.toString());
+		LOG.error(edDiagnostic(diagnostic));
 		elt.documentManager.simBuilder.addError(diagnostic);
 	}
 	
@@ -251,11 +253,19 @@ public final class Util {
 		return "[line:" + position.getLine() + ", column:" + position.getCharacter() + ']';
 	}
 	
+	public static String edDiagnostic(Diagnostic diagnostic) {
+		StringBuilder sb = new StringBuilder();
+		Either<String, MarkupContent> xxx = diagnostic.getMessage();
+		String message = xxx.getLeft();
+		sb.append("Diagnostic[").append(diagnostic.getSeverity()).append(": ").append(edRange(diagnostic.getRange())).append(message);
+		return sb.toString();
+	}
+	
 	/// Error during Code generation:
 	public static void codingError(final SyntaxElement elt, final String msg) {
 //		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Error, elt.lexRange, msg);
 		Diagnostic diagnostic = new Diagnostic(elt.lexRange, msg, DiagnosticSeverity.Error, "Simula.LSP");
-		LOG.error(diagnostic.toString());
+		LOG.error(edDiagnostic(diagnostic));
 		elt.documentManager.simCoder.addError(diagnostic);
 	}
 

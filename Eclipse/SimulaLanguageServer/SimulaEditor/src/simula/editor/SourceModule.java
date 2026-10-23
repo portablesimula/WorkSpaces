@@ -21,7 +21,7 @@ import simula.editor.SimulaEditor.Language;
 import simula.editor.text.TabTextPanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Util;
-import simula.server.SimulaTextDocumentService;
+import simula.server.lsp.SimulaTextDocumentService;
 
 public class SourceModule {
 	

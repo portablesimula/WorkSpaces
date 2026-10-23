@@ -359,7 +359,7 @@ public class SimulaBuilder {
 
 	public void printDiagnostics(String title) {
 		LOG.trace("++++++++++++++++ BEGIN DIAGNOSTICS: " + title + " ++++++++++++++++++");
-		for(Diagnostic diagnostic:diagnostics) LOG.trace(diagnostic.toString());			
+		for(Diagnostic diagnostic:diagnostics) LOG.trace(Util.edDiagnostic(diagnostic));			
 		LOG.trace("++++++++++++++++ ENDOF DIAGNOSTICS: " + title + " ++++++++++++++++++");
 	}
 	

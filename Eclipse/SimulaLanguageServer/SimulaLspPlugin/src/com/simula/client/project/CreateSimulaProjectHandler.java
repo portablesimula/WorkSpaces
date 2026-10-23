@@ -1,4 +1,4 @@
-package com.simula.client.newWizard;
+package com.simula.client.project;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

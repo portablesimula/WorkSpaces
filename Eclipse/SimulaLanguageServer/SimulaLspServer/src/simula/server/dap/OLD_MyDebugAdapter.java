@@ -1,11 +1,11 @@
-package simula.server;
+package simula.server.dap;
 import org.eclipse.lsp4j.debug.*;
 import org.eclipse.lsp4j.debug.services.IDebugProtocolServer;
 import org.eclipse.lsp4j.debug.services.IDebugProtocolClient;
 import java.util.concurrent.CompletableFuture;
 import java.util.Map;
 
-public class MyDebugAdapter implements IDebugProtocolServer {
+public class OLD_MyDebugAdapter implements IDebugProtocolServer {
     private IDebugProtocolClient client;
 
     public void connect(IDebugProtocolClient client) {

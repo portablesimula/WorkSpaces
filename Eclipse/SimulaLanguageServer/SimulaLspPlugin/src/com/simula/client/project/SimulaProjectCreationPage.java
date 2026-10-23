@@ -1,4 +1,4 @@
-package com.simula.client.newWizard;
+package com.simula.client.project;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;

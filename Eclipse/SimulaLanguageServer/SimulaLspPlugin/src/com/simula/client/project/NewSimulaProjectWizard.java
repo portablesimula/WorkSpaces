@@ -1,4 +1,4 @@
-package com.simula.client.newWizard;
+package com.simula.client.project;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -81,10 +81,41 @@ public class NewSimulaProjectWizard extends Wizard implements INewWizard {
             e.printStackTrace();
             return false;
         }
+        
+        try {
+			addSimulaNature(project, null);
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 //        ProjectManager.printAllProjects();
         return true;
     }
     
+    public void addSimulaNature(IProject project, IProgressMonitor monitor) throws CoreException {
+        // 1. Hent den eksisterende prosjektbeskrivelsen
+        IProjectDescription description = project.getDescription();
+        String[] prevNatures = description.getNatureIds();
+        
+        // Sjekk om prosjektet allerede har denne naturen for å unngå duplikater
+        for (String nature : prevNatures) {
+            if (SimulaProjectNature.NATURE_ID.equals(nature)) {
+                return; 
+            }
+        }
+        
+        // 2. Opprett en ny tabell som er ett element større
+        String[] newNatures = new String[prevNatures.length + 1];
+        System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
+        
+        // 3. Legg til din Simula nature-ID til slutt
+        newNatures[prevNatures.length] = SimulaProjectNature.NATURE_ID;
+        
+        // 4. Oppdater beskrivelsen og lagre den på prosjektet
+        description.setNatureIds(newNatures);
+        project.setDescription(description, monitor);
+    }
+
     private void createProject(IProject project, URI location, IProgressMonitor monitor, boolean includeSamples) throws Exception {
     	SubMonitor subMonitor = SubMonitor.convert(monitor, "Creating Simula Project", 3);
 

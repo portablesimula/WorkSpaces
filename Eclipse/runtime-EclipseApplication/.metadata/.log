@@ -1,4 +1,4 @@
-!SESSION 2026-10-19 11:36:53.441 -----------------------------------------------
+!SESSION 2026-10-23 12:15:53.902 -----------------------------------------------
 eclipse.buildId=4.42.0.20261008-0639
 java.version=25
 java.vendor=Oracle Corporation
@@ -6,104 +6,15 @@ BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=no_NO
 Framework arguments:  -product org.eclipse.epp.package.java.product
 Command-line arguments:  -product org.eclipse.epp.package.java.product -data C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer/../runtime-EclipseApplication -dev file:///C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/.metadata/.plugins/org.eclipse.pde.core/Eclipse%20Application/dev.properties -os win32 -ws win32 -arch x86_64 -consoleLog
 
-!ENTRY org.eclipse.egit.ui 2 0 2026-10-19 11:37:04.481
+!ENTRY org.eclipse.egit.ui 2 0 2026-10-23 12:16:04.825
 !MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
 user global configuration and to define the default location to store repositories: 'C:\Users\omyhr'. If this is
 not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
 EGit might behave differently since they see different configuration options.
 This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
 
-!ENTRY org.eclipse.oomph.setup.ui 1 0 2026-10-19 11:37:11.265
+!ENTRY org.eclipse.oomph.setup.ui 1 0 2026-10-23 12:16:11.563
 !MESSAGE Setup tasks were performed during startup updating 5 preferences. See 'C:\GitHub\WorkSpaces\Eclipse\SimulaLanguageServer\.metadata\.plugins\org.eclipse.pde.core\Eclipse Application\org.eclipse.oomph.setup\setup.log' for details
 
-!ENTRY org.eclipse.lsp4e 1 0 2026-10-19 11:38:56.162
-!MESSAGE [LS:Simula Language Server][Info]	Language Server connected successfully!
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.815
-!MESSAGE [LS:Simula Language Server][Error]	simula.core.utilities.Util.IERR(Util.java:276)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.816
-!MESSAGE [LS:Simula Language Server][Error]	simula.core.DocumentManager.getText(DocumentManager.java:224)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.816
-!MESSAGE [LS:Simula Language Server][Error]	simula.core.DocumentManager.didChange(DocumentManager.java:266)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.817
-!MESSAGE [LS:Simula Language Server][Error]	simula.server.SimulaTextDocumentService.didChange(SimulaTextDocumentService.java:51)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.817
-!MESSAGE [LS:Simula Language Server][Error]	java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.818
-!MESSAGE [LS:Simula Language Server][Error]	java.base/java.lang.reflect.Method.invoke(Method.java:565)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.818
-!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.lambda$recursiveFindRpcMethods$0(GenericEndpoint.java:65)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.819
-!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.notify(GenericEndpoint.java:160)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.819
-!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleNotification(RemoteEndpoint.java:231)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.820
-!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:198)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.820
-!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:185)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.821
-!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.821
-!MESSAGE [LS:Simula Language Server][Error]	org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:114)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.822
-!MESSAGE [LS:Simula Language Server][Error]	java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.822
-!MESSAGE [LS:Simula Language Server][Error]	java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.823
-!MESSAGE [LS:Simula Language Server][Error]	java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.823
-!MESSAGE [LS:Simula Language Server][Error]	java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:30.824
-!MESSAGE [LS:Simula Language Server][Error]	java.base/java.lang.Thread.run(Thread.java:1474)
-
-!ENTRY org.eclipse.lsp4e 4 0 2026-10-19 11:39:44.249
-!MESSAGE ExecutionException occurred during shutdown of EndpointProxy for org.eclipse.lsp4j.jsonrpc.RemoteEndpoint@778d2641
-!STACK 0
-java.util.concurrent.ExecutionException: org.eclipse.lsp4j.jsonrpc.JsonRpcException: java.io.IOException: Datakanalen lukkes
-	at java.base/java.util.concurrent.CompletableFuture.wrapInExecutionException(CompletableFuture.java:345)
-	at java.base/java.util.concurrent.CompletableFuture.reportGet(CompletableFuture.java:440)
-	at java.base/java.util.concurrent.CompletableFuture.get(CompletableFuture.java:2117)
-	at org.eclipse.lsp4e.LanguageServerWrapper$LanguageServerContext.close(LanguageServerWrapper.java:232)
-	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1825)
-	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.exec(CompletableFuture.java:1817)
-	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:511)
-	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1450)
-	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:2019)
-	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:187)
-Caused by: org.eclipse.lsp4j.jsonrpc.JsonRpcException: java.io.IOException: Datakanalen lukkes
-	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageConsumer.consume(StreamMessageConsumer.java:72)
-	at org.eclipse.lsp4e.LanguageServerWrapper.lambda$3(LanguageServerWrapper.java:458)
-	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.request(RemoteEndpoint.java:165)
-	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.request(RemoteEndpoint.java:46)
-	at org.eclipse.lsp4j.jsonrpc.services.EndpointProxy.invoke(EndpointProxy.java:91)
-	at jdk.proxy16/jdk.proxy16.$Proxy59.shutdown(Unknown Source)
-	at org.eclipse.lsp4e.LanguageServerWrapper$LanguageServerContext.close(LanguageServerWrapper.java:230)
-	... 6 more
-Caused by: java.io.IOException: Datakanalen lukkes
-	at java.base/java.io.FileOutputStream.writeBytes(Native Method)
-	at java.base/java.io.FileOutputStream.write(FileOutputStream.java:352)
-	at java.base/java.lang.Process$PipeOutputStream.write(Process.java:1027)
-	at java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:123)
-	at java.base/java.io.BufferedOutputStream.flush(BufferedOutputStream.java:203)
-	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageConsumer.consume(StreamMessageConsumer.java:69)
-	... 12 more
-
-!ENTRY org.eclipse.lsp4e 1 0 2026-10-19 11:39:44.853
+!ENTRY org.eclipse.lsp4e 1 0 2026-10-23 12:16:24.450
 !MESSAGE [LS:Simula Language Server][Info]	Language Server connected successfully!

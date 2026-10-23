@@ -235,14 +235,14 @@ public final class ConsolePanel extends JPanel {
 	/// Write a string on this panel using styleError.
 	/// @param s a string to write
 	public void writeError(final String s) {
-		IO.println("ConsolePanel.writeError: " + debugName + ": " + s);
+//		IO.println("ConsolePanel.writeError: " + debugName + ": " + s);
 		write(s, styleError);
 	}
 
 	/// Write a string on this panel using styleWarning.
 	/// @param s a string to write
 	public void writeWarning(final String s) {
-		IO.println("ConsolePanel.writeWarning: " + debugName + ": " + s);
+//		IO.println("ConsolePanel.writeWarning: " + debugName + ": " + s);
 		write(s, styleWarning);
 	}
 

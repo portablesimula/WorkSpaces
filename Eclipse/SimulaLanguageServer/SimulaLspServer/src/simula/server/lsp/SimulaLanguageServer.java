@@ -1,4 +1,4 @@
-package simula.server;
+package simula.server.lsp;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,6 +21,7 @@ import simula.core.debug.RunDebugManager;
 import simula.core.utilities.ConsolePanel;
 import simula.core.utilities.LOG;
 import simula.core.utilities.Util;
+import simula.server.dap.SimulaDebugAdapter;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

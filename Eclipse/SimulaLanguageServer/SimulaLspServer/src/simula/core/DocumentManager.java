@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +26,7 @@ import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.statement.ProgramModule;
 import simula.core.utilities.LOG;
 import simula.core.utilities.Util;
-import simula.server.SimulaLanguageServer;
+import simula.server.lsp.SimulaLanguageServer;
 
 /// Vi må lagre innholdet til dokumentene som er åpne i editoren.
 /// Siden editoren kan ha endringer som ikke er lagret til disken ennå,
@@ -125,6 +126,9 @@ public class DocumentManager {
 		sourceLines = sourceCode.lines()
                 .map(line -> line.stripTrailing() + "\n")
                 .collect(Collectors.toList());
+//		sourceLines = sourceCode.lines()
+//                .map(line -> line.stripTrailing() + "\n")
+//                .collect(Collectors.toCollection(LinkedList::new));
 		sourceLines.add(""+(char)SourceTextReader.EOF_MARK);
 		
 //		for(String line:sourceLines) {
@@ -160,8 +164,8 @@ public class DocumentManager {
     /// Debug Utility
     public static DocumentManager getDocumentManager(String documentUri)  {
     	DocumentManager res = openDocuments.get(documentUri);
-    	LOG.trace("DocumentManager.getDocumentManager: documentUri ==> " + res);
     	if(res == null) Util.IERR("No such document: " + documentUri);
+    	else LOG.trace("DocumentManager.getDocumentManager: documentUri ==> " + res.getClass());
     	return res;
     }
 
@@ -221,17 +225,24 @@ public class DocumentManager {
 
 	/// Get the content of the opened text document.
 	public String getText() {
-		Util.IERR("NOT IMPL");
-		String sourceCode = String.join(System.lineSeparator(), sourceLines);
+//		Util.IERR("DocumentManager.getText: NOT IMPL");
+		for(String line:sourceLines) {
+			LOG.trace("DocumentManager.getText: Line|" + Comn.printable(line) + '|');
+		}
+//		String sourceCode = String.join(System.lineSeparator(), sourceLines);
+		String sourceCode = String.join("", sourceLines);
 		return sourceCode;
 	}
 
 	/// Set the content of the opened text document.
 	public void setText(final String text) {
-		Util.IERR("NOT IMPL");
+//		Util.IERR("DocumentManager.setText: NOT IMPL");
 		sourceLines = text.lines()
                 .map(String::strip)
                 .toList();
+		for(String line:sourceLines) {
+			LOG.trace("DocumentManager.setText: Line|" + Comn.printable(line) + '|');
+		}
 	}
     
 	/// The document open notification is sent from the client to the server to
@@ -249,7 +260,7 @@ public class DocumentManager {
     	openDocuments.put(documentUri, documentManager);
     	LOG.trace("DocumentManager.didOpen: openDocuments: " + openDocuments);
     	
-    	documentManager.tryCreateBuilder();
+//    	documentManager.tryCreateBuilder();
 
     	LOG.trace("DocumentManager.didOpen: RETURNS");
     }
@@ -261,17 +272,9 @@ public class DocumentManager {
 	public static void didChange(final String documentUri, final List<TextDocumentContentChangeEvent> changes) {
     	LOG.trace("DocumentManager.didChange: BEGIN");
     	DocumentManager documentManager = getDocumentManager(documentUri);
-		
-//		String currentText = sourceItem.getText();
-		String currentText = documentManager.getText();
-    	LOG.trace("DocumentManager.didChange: Current Text: " + currentText);
-
-//    	String updatedText = DocumentTextUpdater.applyChanges(currentText, params.getContentChanges());
-    	String updatedText = DocumentTextUpdater.applyChanges(currentText, changes);
-    	LOG.trace("DocumentManager.didChange: Updated Text: " + updatedText);
-    	documentManager.setText(updatedText);
+    	documentManager.sourceLines = DocumentTextUpdater.applyChanges(documentManager.sourceLines, changes);
     	
-    	documentManager.tryCreateBuilder();
+//    	documentManager.tryCreateBuilder();
 
     	LOG.trace("DocumentManager.didChange: RETURNS");
 	}
@@ -312,7 +315,7 @@ public class DocumentManager {
 		// 3. Trigger server-side logic (e.g., Compilation, Re-indexing, Validation)
 		try {
 //			DocumentManager.runCompilerOrValidator(documentUri, fullText);
-	    	documentManager.tryCreateBuilder();
+//	    	documentManager.tryCreateBuilder();
 		} catch (Exception e) {
 			// Log your errors appropriately
 			e.printStackTrace();
@@ -344,25 +347,26 @@ public class DocumentManager {
 	public static List<Integer> semanticTokensFull(String documentUri) {
 		if(TESTING) Util.println("DocumentManager.semanticTokensFull: " + documentUri);
     	DocumentManager documentManager = getDocumentManager(documentUri);
+    	documentManager.tryCreateBuilder();
     	List<Integer> semanticTokens = documentManager.simBuilder.semTokenList;
     	LOG.trace("DocumentManager.semanticTokensFull: semanticTokens.size=" + semanticTokens.size());
 //		TokenManager.validateSemanticTokens(semanticTokens, TokenManager.STANDARD_TOKEN_TYPES.size() - 1);
 		return semanticTokens;
 	}
 	
-	public void tryCreateBuilder() {
+	private void tryCreateBuilder() {
     	LOG.trace("DocumentManager.tryCreateBuilder: BEGIN");
 //		String sourceText = this.getText();
 		SimulaBuilder newSimBuilder = new SimulaBuilder(this);
 		// TRY BUILD SYNTAX TREE ...
-		try {
+//		try {
 			newSimBuilder.doBuilding();
 //    		Util.println("DocumentManager.tryCreateBuilder: " + Comn.printable(sourceText));
     		simBuilder = newSimBuilder;
-		} catch (Exception e) {
-			Util.println("DocumentManager.tryCreateBuilder: GOT EXCEPTION: " + e.getMessage());
-			e.printStackTrace();
-		}
+//		} catch (Exception e) {
+//			Util.println("DocumentManager.tryCreateBuilder: GOT EXCEPTION: " + e.getMessage());
+//			e.printStackTrace();
+//		}
 	}
 
 	// ***************************************************************

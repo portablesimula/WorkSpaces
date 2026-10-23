@@ -12,8 +12,8 @@ import simula.core.builder.JavaSourceFileCoder;
 import simula.core.syntaxClass.declaration.DeclarationScope;
 import simula.core.utilities.ClassHierarchy;
 import simula.core.utilities.ConsolePanel;
-import simula.server.SimulaLanguageServer;
-import simula.server.SimulaTextDocumentService;
+import simula.server.lsp.SimulaLanguageServer;
+import simula.server.lsp.SimulaTextDocumentService;
 
 /// Global Variables.
 /// 

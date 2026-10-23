@@ -17,12 +17,12 @@ import simula.core.utilities.Util;
 /// 
 /// @author Øystein Myhre Andersen
 public final class Option {
-	public static boolean TESTING_NEWLINE = true;
+//	public static boolean TESTING_NEWLINE = true;
 	
 	public static boolean LEX_VERIFY = true;
 
 	public static int TRACE_ACCEPT_STATEMENT = 0;
-	public static boolean KEEP_CLASS_LOADER = true;//false;
+//	public static boolean KEEP_CLASS_LOADER = true;//false;
 	
 	/// The UI-Scale factor
 	/// See: https://docs.oracle.com/en/java/javase/25/troubleshoot/java-2d-properties.html
@@ -64,7 +64,7 @@ public final class Option {
 
 		// Parser Trace Options
 		/** Debug option */	public static boolean TRACE_PARSE = false;
-		/** Debug option */	public static boolean TRACE_PSITREE_GROW = false;
+//		/** Debug option */	public static boolean TRACE_PSITREE_GROW = false;
 		/** Debug option */	public static int     PRINT_SYNTAX_TREE = 0;
 		/** Debug option */	public static boolean TRACE_ATTRIBUTE_OUTPUT = false;
 		/** Debug option */	public static boolean TRACE_ATTRIBUTE_INPUT = false;

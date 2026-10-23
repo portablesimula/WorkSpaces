@@ -1,13 +1,16 @@
 package simula.core.builder;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 
+import simula.Comn;
+import simula.core.utilities.LOG;
+import simula.core.utilities.Util;
+
 /// @author Øystein Myhre Andersen
-/// @author Google AI
 public class DocumentTextUpdater {
 
 	/// Applies a list of LSP change events sequentially to the existing source text.
@@ -15,58 +18,79 @@ public class DocumentTextUpdater {
     /// @param currentText The current complete source code text.
     /// @param changes     The list of changes sent by the client.
     /// @return The updated source code text.
-    public static String applyChanges(String currentText, List<TextDocumentContentChangeEvent> changes) {
-        String updatedText = currentText;
+//    public static String OLD_applyChanges(String currentText, List<TextDocumentContentChangeEvent> changes) {
+//        String updatedText = currentText;
+//        for (TextDocumentContentChangeEvent change : changes) {
+//            updatedText = OLD_applySingleChange(updatedText, change);
+//        }
+//        return updatedText;
+//    }
+    public static List<String> applyChanges(List<String> sourceLines, List<TextDocumentContentChangeEvent> changes) {
         for (TextDocumentContentChangeEvent change : changes) {
-            updatedText = applySingleChange(updatedText, change);
+        	sourceLines = applySingleChange(sourceLines, change);
         }
-        return updatedText;
+        return sourceLines;
     }
 
-    private static String applySingleChange(String text, TextDocumentContentChangeEvent change) {
-    	IO.println("DocumentTextUpdater.applySingleChange: \n"+text);
+    private static String edChange(TextDocumentContentChangeEvent change) {
+    	return Util.edRange(change.getRange()) + ", text=|" + Comn.printable(change.getText() + '|');
+    }
+    
+    private static boolean TRACE_applySingleChange = true;
+    private static List<String> applySingleChange(List<String> sourceLines, TextDocumentContentChangeEvent change) {
+    	if(TRACE_applySingleChange) LOG.trace("DocumentTextUpdater.applySingleChange: " + edChange(change));
         // If range is null, it means TextDocumentSyncKind.Full is used.
         // The server must replace the entire content.
         if (change.getRange() == null) {
-            return change.getText();
+    		List<String> newLines = change.getText().lines()
+                    .map(line -> line.stripTrailing() + "\n")
+                    .collect(Collectors.toList());
+    		
+    		if(TRACE_applySingleChange) {
+    			for(String line:newLines) {
+    		    	LOG.trace("DocumentTextUpdater.applySingleChange: newLine|" + Comn.printable(line) + '|');			
+    			}
+    		}
+    		
+            return newLines;
         }
 
         // If a range is provided, it is an incremental update.
         Range range = change.getRange();
-        int startOffset = getOffset(text, range.getStart());
-        int endOffset = getOffset(text, range.getEnd());
-
-        // Reconstruct the string by swapping the old range with the new text chunk
-        StringBuilder sb = new StringBuilder(text);
-        sb.replace(startOffset, endOffset, change.getText());
-        return sb.toString();
-    }
-
-    /// Translates an LSP Line/Character position into a 0-indexed flat string index.
-    private static int getOffset(String text, Position position) {
-        int targetLine = position.getLine();
-        int targetChar = position.getCharacter();
+        int startLine = range.getStart().getLine();
+        int startChar = range.getStart().getCharacter();
+        int endLine = range.getEnd().getLine();
+        int endChar = range.getStart().getCharacter();
+        int nLines = endLine - startLine + 1;
         
-        int currentLine = 0;
-        int offset = 0;
-        int textLength = text.length();
-
-        // Scan characters sequentially to find line boundaries
-        while (currentLine < targetLine && offset < textLength) {
-            char c = text.charAt(offset);
-            if (c == '\r') {
-                // Handle CRLF newlines safely
-                if (offset + 1 < textLength && text.charAt(offset + 1) == '\n') {
-                    offset++;
-                }
-                currentLine++;
-            } else if (c == '\n') {
-                currentLine++;
-            }
-            offset++;
+        String head = sourceLines.get(startLine).substring(0, startChar);
+        String tail = sourceLines.get(endLine).substring(endChar);        
+        StringBuilder sb = new StringBuilder();
+        sb.append(head).append(change.getText()).append(tail);
+        String text = sb.toString();
+        
+        if(TRACE_applySingleChange) {
+	    	LOG.trace("DocumentTextUpdater.applySingleChange: head|" + Comn.printable(head) + '|');
+	    	LOG.trace("DocumentTextUpdater.applySingleChange: tail|" + Comn.printable(tail) + '|');
+	    	LOG.trace("DocumentTextUpdater.applySingleChange: text|" + Comn.printable(text) + '|');
         }
-
-        // Add the character column position to find the final target index
-        return Math.min(offset + targetChar, textLength);
+        
+        while((nLines--) > 0) {
+        	sourceLines.remove(startLine);
+        }
+        
+		List<String> newLines = sb.toString().lines()
+                .map(line -> line.stripTrailing() + "\n")
+                .collect(Collectors.toList());
+		sourceLines.addAll(startLine, newLines);
+		
+		if(TRACE_applySingleChange) {
+			for(String line:sourceLines) {
+		    	LOG.trace("DocumentTextUpdater.applySingleChange: line|" + Comn.printable(line) + '|');			
+			}
+		}
+		
+        return sourceLines;
     }
+
 }

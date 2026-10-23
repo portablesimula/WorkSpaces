@@ -22,7 +22,7 @@ import simula.core.coder.SimulaCoder;
 import simula.core.coder.SimulaExec;
 import simula.core.utilities.LOG;
 import simula.core.utilities.Util;
-import simula.server.SimulaTextDocumentService;
+import simula.server.lsp.SimulaTextDocumentService;
 
 public class RunDebugManager {
 
@@ -33,8 +33,16 @@ public class RunDebugManager {
 		List<String> args = (List<String>) launchArgs.get("args");
         Boolean stopOnEntry = (Boolean) launchArgs.getOrDefault("stopOnEntry", false);
         
+//        launchArgs.put("documentUri", documentUri.toString());
+//        launchArgs.put("mode", mode);
+        String documentUri = (String) launchArgs.get("documentUri");
+        String mode = (String) launchArgs.get("mode");
+
+        
         LOG.info("RunDebugManager.launch: DETTE MÅ FORSTÅS OG IMPLEMENTERES");
         LOG.info("RunDebugManager.launch: programPath: " + programPath);
+        LOG.info("RunDebugManager.launch: documentUri: " + documentUri);
+        LOG.info("RunDebugManager.launch: mode:        " + mode);
         LOG.info("RunDebugManager.launch: stopOnEntry: " + stopOnEntry);
 
 //        if (programPath == null || programPath.isEmpty()) {
@@ -55,7 +63,7 @@ public class RunDebugManager {
 //        // (e.g., attach a JVM debugger via JDWP, LLDB, or an interpreter loop)
 //        myDebuggerEngine.attachToProcess(this.debuggeeProcess, stopOnEntry);
         
-        String documentUri = "?????";
+
         run(documentUri, args);
 	}
 	
@@ -111,15 +119,20 @@ public class RunDebugManager {
 	// Called from: SimulaLanguageServer.main  when --debugRun
 	// Called from: RunDebugManager.launch     when SimulaDebugAdapter is launched
 	public static void run(final String documentUri, List<String> argv) {
-//		Util.println("SimulaCoreExports.run: " + documentUri);
+		Util.println("RunDebugManager.run: documentUri: " + documentUri);
     	DocumentManager documentManager = DocumentManager.getDocumentManager(documentUri);
-    	SimulaBuilder simBuilder = documentManager.simBuilder;
 
-    	String[] args = argv.toArray(new String[0]);
-		Option.decodeArguments(args);
+    	if(argv != null) {
+	    	String[] args = argv.toArray(new String[0]);
+			Option.decodeArguments(args);
+    	}
 
 //    	SimulaCompiler simulaCompiler = new SimulaCompiler(documentManager);
 //    	simulaCompiler.doCompile();
+		@SuppressWarnings("unused")
+		List<Integer> semtokens = DocumentManager.semanticTokensFull(documentUri);
+		
+    	SimulaBuilder simBuilder = documentManager.simBuilder;
     	if(simBuilder.nErrors != 0) {
     		Util.IERR("Can't generate code due to " + simBuilder.nErrors + " errors.");
     	}

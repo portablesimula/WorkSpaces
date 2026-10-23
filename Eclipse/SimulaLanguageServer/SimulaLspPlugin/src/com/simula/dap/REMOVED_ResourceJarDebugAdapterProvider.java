@@ -9,9 +9,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.lsp4e.server.ProcessStreamConnectionProvider;
 import org.osgi.framework.Bundle;
 
-public class ResourceJarDebugAdapterProvider extends ProcessStreamConnectionProvider {
+public class REMOVED_ResourceJarDebugAdapterProvider extends ProcessStreamConnectionProvider {
 
-    public ResourceJarDebugAdapterProvider() {
+    public REMOVED_ResourceJarDebugAdapterProvider() {
         // Invoke the super constructor with our dynamically calculated commands
         super(getLaunchCommands(), null);
     }

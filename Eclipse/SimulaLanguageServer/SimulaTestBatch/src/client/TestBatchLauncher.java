@@ -14,7 +14,7 @@ import org.eclipse.lsp4j.TraceValue;
 import simula.Option;
 import simula.core.CoreGlobal;
 import simula.core.debug.RunDebugManager;
-import simula.server.SimulaTextDocumentService;
+import simula.server.lsp.SimulaTextDocumentService;
 
 public class TestBatchLauncher {
 
