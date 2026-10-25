@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,7 +19,6 @@ import simula.core.builder.DocumentTextUpdater;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.SourceTextReader;
 import simula.core.builder.token.LexToken;
-import simula.core.builder.token.TokenManager;
 import simula.core.coder.SimulaCoder;
 import simula.core.syntaxClass.declaration.StandardClass;
 import simula.core.syntaxClass.statement.ProgramModule;
@@ -164,9 +162,20 @@ public class DocumentManager {
     /// Debug Utility
     public static DocumentManager getDocumentManager(String documentUri)  {
     	DocumentManager res = openDocuments.get(documentUri);
-    	if(res == null) Util.IERR("No such document: " + documentUri);
+    	if(res == null) {
+    		printOpenDocuments();
+    		Util.IERR("No such document: " + documentUri);
+    	}
     	else LOG.trace("DocumentManager.getDocumentManager: documentUri ==> " + res.getClass());
     	return res;
+    }
+    
+    private static void printOpenDocuments() {
+//        private static final ConcurrentHashMap<String, DocumentManager> openDocuments = new ConcurrentHashMap<>();
+    	Util.println("=========== Open Documents:");
+        for (String key : openDocuments.keySet()) {
+            Util.println(key);
+        }
     }
 
 	/// Get the text document's Token List.

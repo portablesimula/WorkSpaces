@@ -11,6 +11,8 @@ import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.osgi.framework.Bundle;
 
+import com.simula.client.DEF;
+
 import java.io.*;
 import java.net.URL;
 import java.util.HashSet;
@@ -83,7 +85,7 @@ public class SimulaExportWizard extends Wizard implements IExportWizard {
 
             // 3. Package Runtime system dependencies 
             // Locating your runtime JAR bundle inside your plugin environment
-            Bundle pluginBundle = Platform.getBundle("simula.ide.plugin.id"); // Replace with your plugin ID
+            Bundle pluginBundle = Platform.getBundle(DEF.SIMULA_PLUGIN_ID); // Replace with your plugin ID
             URL runtimeJarUrl = FileLocator.find(pluginBundle, new org.eclipse.core.runtime.Path("lib/simula-runtime.jar"), null);
             
             if (runtimeJarUrl != null) {

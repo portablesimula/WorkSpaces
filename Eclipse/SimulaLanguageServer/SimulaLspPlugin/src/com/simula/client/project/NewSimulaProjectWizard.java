@@ -165,8 +165,8 @@ public class NewSimulaProjectWizard extends Wizard implements INewWizard {
     }
 
     private void copySamplesToSource(IFolder targetFolder, IProgressMonitor monitor) throws Exception {
-        String pluginId = "com.simula.lsp.client"; 
-        Bundle bundle = Platform.getBundle(pluginId);
+//        String pluginId = "com.simula.lsp.client"; 
+        Bundle bundle = Platform.getBundle(DEF.SIMULA_PLUGIN_ID);
         if (bundle == null) return;
 
         // Locate the /samples directory inside your plugin bundle

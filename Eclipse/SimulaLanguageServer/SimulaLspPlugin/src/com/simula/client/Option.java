@@ -4,4 +4,5 @@ public class Option {
 	public static boolean TESTING_NEW_LAYOUT = true;
 //	public static boolean TESTING_NEWFILE = true;
 
+	public static String simulaRtsLib = null;
 }

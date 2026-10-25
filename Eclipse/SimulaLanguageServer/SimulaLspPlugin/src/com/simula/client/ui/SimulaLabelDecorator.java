@@ -36,7 +36,7 @@ public class SimulaLabelDecorator implements ILabelDecorator {
     	// Option A: If inside a class in the same plugin
     	Bundle bundle = FrameworkUtil.getBundle(getClass()); 
     	// Option B: Hardcoded using your plug-in ID
-    	// Bundle bundle = Platform.getBundle("your.plugin.symbolic.id");
+    	// Bundle bundle = Platform.getBundle(DEF.SIMULA_PLUGIN_ID);
 
     	// 2. Locate the file inside the bundle
 //    	String path = "icons/my_icon.png";

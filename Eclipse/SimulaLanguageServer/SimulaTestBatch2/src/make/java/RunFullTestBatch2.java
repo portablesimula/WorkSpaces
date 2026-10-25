@@ -22,7 +22,7 @@ import simula.Option;
  *
  */
 public final class RunFullTestBatch2 {
-	private static final File simulaDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspServer");
+	private static final File rtsDir=new File("C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaRuntimeSystem");
 	private static final String userDir = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaTestBatch";
 	private static final String sourceDir = userDir+"/src/simulaTestBatch/";
 	private static final String testBatchJarDir = userDir+"/src/simulaTestBatch/bin/";
@@ -45,7 +45,7 @@ public final class RunFullTestBatch2 {
 		
 //		args.add("-noexec");
 //		args.add("-keepJava"); args.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
-		args.add("-simulaRtsLib"); args.add(new File(simulaDir,"bin").toString()); // To use Eclipse Project's simula.runtime
+		args.add("-simulaRtsLib"); args.add(new File(rtsDir,"bin").toString()); // To use Eclipse Project's simula.runtime
 //		args.add("-extLib"); args.add("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin");
 		
 		setOptions();

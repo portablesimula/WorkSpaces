@@ -1,5 +1,6 @@
 package simula.core.debug;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,11 +29,12 @@ public class RunDebugManager {
 
 	public static void launch(Map<String, Object> launchArgs) {
         // 1. Extract and validate parameters from client configuration
-        String programPath = (String) launchArgs.get("program");
+//        String programPath = (String) launchArgs.get("program");
         @SuppressWarnings("unchecked")
-		List<String> args = (List<String>) launchArgs.get("args");
+//		List<String> args = (List<String>) launchArgs.get("args");
         Boolean stopOnEntry = (Boolean) launchArgs.getOrDefault("stopOnEntry", false);
-        
+        String simulaRtsLib = (String) launchArgs.get("simulaRtsLib");
+
 //        launchArgs.put("documentUri", documentUri.toString());
 //        launchArgs.put("mode", mode);
         String documentUri = (String) launchArgs.get("documentUri");
@@ -40,31 +42,16 @@ public class RunDebugManager {
 
         
         LOG.info("RunDebugManager.launch: DETTE MÅ FORSTÅS OG IMPLEMENTERES");
-        LOG.info("RunDebugManager.launch: programPath: " + programPath);
+//        LOG.info("RunDebugManager.launch: programPath: " + programPath);
         LOG.info("RunDebugManager.launch: documentUri: " + documentUri);
         LOG.info("RunDebugManager.launch: mode:        " + mode);
         LOG.info("RunDebugManager.launch: stopOnEntry: " + stopOnEntry);
+        LOG.info("RunDebugManager.launch: simulaRtsLib: " + simulaRtsLib);
 
-//        if (programPath == null || programPath.isEmpty()) {
-//            throw new IllegalArgumentException("The 'program' path must be specified.");
-//        }
-//
-//        // 2. Start your target process (the "debuggee")
-//        ProcessBuilder builder = new ProcessBuilder();
-//        builder.command(programPath);
-//        if (args != null) {
-//            builder.command().addAll(args);
-//        }
-//        
-//        // Spawn the process
-//        this.debuggeeProcess = builder.start();
-//
-//        // 3. Connect your internal debugger engine to this process
-//        // (e.g., attach a JVM debugger via JDWP, LLDB, or an interpreter loop)
-//        myDebuggerEngine.attachToProcess(this.debuggeeProcess, stopOnEntry);
-        
+        DocumentManager.simulaRtsLib = new File(simulaRtsLib);
+        LOG.info("RunDebugManager.launch: DocumentManager.simulaRtsLib: " + DocumentManager.simulaRtsLib);
 
-        run(documentUri, args);
+    	doRun(documentUri);
 	}
 	
 	public static void doOpen(String documentUri) {
@@ -114,21 +101,22 @@ public class RunDebugManager {
 
 	}
 	
-
 	// Generate code and execute simula program
 	// Called from: SimulaLanguageServer.main  when --debugRun
-	// Called from: RunDebugManager.launch     when SimulaDebugAdapter is launched
 	public static void run(final String documentUri, List<String> argv) {
-		Util.println("RunDebugManager.run: documentUri: " + documentUri);
-    	DocumentManager documentManager = DocumentManager.getDocumentManager(documentUri);
-
+		Util.println("RunDebugManager.run(2): documentUri: " + documentUri);
+		Util.println("RunDebugManager.run(2): DocumentManager.simulaRtsLib: " + DocumentManager.simulaRtsLib);
     	if(argv != null) {
 	    	String[] args = argv.toArray(new String[0]);
 			Option.decodeArguments(args);
     	}
+    	doRun(documentUri);
+	}
 
-//    	SimulaCompiler simulaCompiler = new SimulaCompiler(documentManager);
-//    	simulaCompiler.doCompile();
+	private static void doRun(final String documentUri) {
+		Util.println("RunDebugManager.doRun: documentUri: " + documentUri);
+		Util.println("RunDebugManager.doRun: DocumentManager.simulaRtsLib: " + DocumentManager.simulaRtsLib);
+    	DocumentManager documentManager = DocumentManager.getDocumentManager(documentUri);
 		@SuppressWarnings("unused")
 		List<Integer> semtokens = DocumentManager.semanticTokensFull(documentUri);
 		

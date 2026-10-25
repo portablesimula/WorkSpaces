@@ -6,8 +6,6 @@ import java.util.Vector;
 
 import simula.Option;
 import simula.core.DocumentManager;
-import simula.core.DocumentManager;
-import simula.core.builder.SimulaBuilder;
 import simula.core.syntaxClass.statement.ProgramModule;
 import simula.core.utilities.Util;
 

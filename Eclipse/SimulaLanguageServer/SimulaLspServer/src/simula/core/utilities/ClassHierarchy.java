@@ -74,7 +74,7 @@ public abstract class ClassHierarchy {
 	
 	/** Default Constructor: NOT USED */ private ClassHierarchy() {}
 
-	/// Initiale local variables.
+	/// Initiate local variables.
 	public static void init() {
 		classToSuperClass = new HashMap<ClassDesc, ClassDesc>();
 		interfaces = new Vector<ClassDesc>();
@@ -96,6 +96,7 @@ public abstract class ClassHierarchy {
 	/// @param cld a class
 	/// @param sup a super class
 	public static void addClassToSuperClass(ClassDesc cld, ClassDesc sup) {
+		if(classToSuperClass == null) init();
 		classToSuperClass.put(cld, sup);
 	}
 	

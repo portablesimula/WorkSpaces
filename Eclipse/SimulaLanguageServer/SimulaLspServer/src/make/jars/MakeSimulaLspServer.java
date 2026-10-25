@@ -41,6 +41,8 @@ public class MakeSimulaLspServer {
 	private final static String SETUP_ROOT = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspServer";
 	private final static String SERVER_ROOT = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaLspServer";
 	private final static String SERVER_BIN = SERVER_ROOT+"/bin";
+	private final static String RTS_ROOT = "C:/GitHub/WorkSpaces/Eclipse/SimulaLanguageServer/SimulaRuntimeSystem";
+	private final static String RTS_BIN = RTS_ROOT+"/bin";
 	private final static String LIBRARY_DIR = "C:/Eclipse_LSP/UnpackedLibraries";
 
 	private static String installParentDirectory = System.getProperty("user.home");
@@ -75,14 +77,19 @@ public class MakeSimulaLspServer {
 			
 //			new File(INSTALL_DIR, "SimulaLspServer.jar");
 
-			String INSTALLED = makeSimulaLanguageServer();
+			String INSTALLED_LSP = makeSimulaLanguageServer();
+			String INSTALLED_RTS = makeSimulaRuntimeSystem();
 			
 			listJarFile("", new File(INSTALL_DIR, "SimulaLspServer.jar"));
-			listManifest(new JarFile(INSTALLED));
+			listManifest(new JarFile(INSTALLED_LSP));
 
-			copyInstalledServer(INSTALLED, ECLIPSE_SERVER_DIR);
-			copyInstalledServer(INSTALLED, VSCODE_SERVER_DIR);
-			copyInstalledServer(INSTALLED, INTELLIJ_SERVER_DIR);
+			copyInstalledServer(INSTALLED_LSP, ECLIPSE_SERVER_DIR);
+			copyInstalledServer(INSTALLED_LSP, VSCODE_SERVER_DIR);
+			copyInstalledServer(INSTALLED_LSP, INTELLIJ_SERVER_DIR);
+
+			copyInstalledServer(INSTALLED_RTS, ECLIPSE_SERVER_DIR);
+			copyInstalledServer(INSTALLED_RTS, VSCODE_SERVER_DIR);
+			copyInstalledServer(INSTALLED_RTS, INTELLIJ_SERVER_DIR);
 			
 			IO.println("\nSimulaLspServer was created in " + INSTALL_DIR);
 			IO.println("                        and in " + ECLIPSE_SERVER_DIR);
@@ -126,6 +133,26 @@ public class MakeSimulaLspServer {
 				"-C", SERVER_BIN, "./simula",
 				"-C", LIBRARY_DIR, "./com",
 				"-C", LIBRARY_DIR, "./org");
+		
+//		execute("jar", "-tvf", INSTALL_DIR+"/TestSimulaLspServer.jar");
+		return INSTALL_FILE;
+	}
+	
+	
+	// ***************************************************************
+	// *** MAKE SIMULA RUNTIME SYSTEM JAR
+	// ***************************************************************
+	private static String makeSimulaRuntimeSystem() throws IOException	{
+		IO.println("Make Simula Runtime System.jar in "+INSTALL_DIR);
+		INSTALL_DIR.mkdirs();
+		String INSTALL_FILE = INSTALL_DIR+"/SimulaRuntimeSystem.jar";
+		IO.println("Make Simula Runtime System.jar as "+INSTALL_FILE);
+		
+//		String compilerManifest=SETUP_ROOT+"/src/make/jars/MANIFEST.MF";
+//		IO.println("makeSimulaLanguageServer: compilerManifest: " + compilerManifest+"  Exists:" + (new File(compilerManifest)).exists());
+//		execute("jar","cmf", compilerManifest, INSTALL_FILE,
+		execute("jar","cf", INSTALL_FILE,
+				"-C", RTS_BIN, "./simula");
 		
 //		execute("jar", "-tvf", INSTALL_DIR+"/TestSimulaLspServer.jar");
 		return INSTALL_FILE;

@@ -353,7 +353,34 @@ public final class Util {
 		}
 	}
 
-	/// Print a string.
+	/// Print a single character.
+	/// @param c the character
+	public static void print(final char c) {
+		String mss = ""+c;//Comn.printable(s);
+		if(CoreGlobal.INLINE_CONNECTED) {
+			IO.print(mss);
+//		} else if(SimulaLanguageServer.languageClient != null) {
+//			MessageParams params = new MessageParams(MessageType.Info, mss);
+//			SimulaLanguageServer.languageClient.logMessage(params);
+		} else if(CoreGlobal.debugConsole != null)
+			CoreGlobal.debugConsole.write(mss);
+	}  
+
+	/// Print a single character.
+	/// @param c the character
+	public static void printError(final char c) {
+		String mss = ""+c;//Comn.printable(s);
+		if(CoreGlobal.INLINE_CONNECTED) {
+			System.err.print(mss);
+//		} else if(SimulaLanguageServer.languageClient != null) {
+//			MessageParams params = new MessageParams(MessageType.Info, mss);
+//			SimulaLanguageServer.languageClient.logMessage(params);
+		} else if(CoreGlobal.debugConsole != null)
+			CoreGlobal.debugConsole.writeError(mss);
+	}  
+
+
+	/// Print a string with newline
 	/// @param s the string
 	public static void println(final String s) {
 		String mss = s;//Comn.printable(s);
@@ -369,26 +396,29 @@ public final class Util {
 	/// Print a error message.
 	/// @param s the message
 	public static void printError(final String s) {
-		String mss = Comn.printable(s);
+		String mss = s;//Comn.printable(s);
 		if(CoreGlobal.INLINE_CONNECTED) {
 			System.err.println(mss);
-		} else {
-			MessageParams params = new MessageParams(MessageType.Error, mss);
-			SimulaLanguageServer.languageClient.logMessage(params);
-		}
+//			} else if(SimulaLanguageServer.languageClient != null) {
+//			MessageParams params = new MessageParams(MessageType.Info, mss);
+//			SimulaLanguageServer.languageClient.logMessage(params);
+		} else if(CoreGlobal.debugConsole != null)
+			CoreGlobal.debugConsole.write(mss+"\n");
 	}  
 
 	/// Print a warning message.
 	/// @param s the message
 	public static void printWarning(final String s) {
-		String mss = Comn.printable(s);
+		String mss = s;//Comn.printable(s);
 		if(CoreGlobal.INLINE_CONNECTED) {
 			System.err.println(mss);
-		} else {
-			MessageParams params = new MessageParams(MessageType.Warning, mss);
-			SimulaLanguageServer.languageClient.logMessage(params);
-		}
+//			} else if(SimulaLanguageServer.languageClient != null) {
+//			MessageParams params = new MessageParams(MessageType.Info, mss);
+//			SimulaLanguageServer.languageClient.logMessage(params);
+		} else if(CoreGlobal.debugConsole != null)
+			CoreGlobal.debugConsole.writeWarning(mss+"\n");
 	}  
+  
 
     //*******************************************************************************
     //*** isJavaIdentifier - Check if 'ident' is a legal Java Identifier
@@ -543,10 +573,11 @@ public final class Util {
 			Util.println("Execute: " + line);
 		}
 		ProcessBuilder processBuilder = new ProcessBuilder(cmdarray);
-		processBuilder.redirectErrorStream(true);
+//		processBuilder.redirectErrorStream(true);
 		try {
 			Process process = processBuilder.start();		
 			InputStream output = process.getInputStream();  // Process' output
+			InputStream errout = process.getErrorStream();  // Process' output
 //			if (Global.console != null) {
 //				while (process.isAlive()) {
 //					while (output.available() > 0) {
@@ -556,7 +587,11 @@ public final class Util {
 //			} else {
 				while (process.isAlive()) {
 					while (output.available() > 0) {
-						System.out.append((char) output.read());
+//						System.out.append((char) output.read());
+						Util.print((char) output.read());
+					}
+					while (errout.available() > 0) {
+						Util.printError((char) errout.read());
 					}
 				}
 //			}

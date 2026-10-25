@@ -4,6 +4,8 @@ import org.eclipse.lsp4j.debug.launch.DSPLauncher;
 import org.eclipse.lsp4j.debug.services.IDebugProtocolServer;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 
+import com.simula.client.Option;
+
 import java.net.Socket;
 import java.net.URI;
 import java.util.HashMap;
@@ -84,12 +86,13 @@ public class SimulaDapClient {
 
             // 5. KALL LAUNCH-METODEN MED DINE ARGS
             Map<String, Object> launchArgs = new HashMap<>();
-            launchArgs.put("program", "/path/to/my_simula_program.sim");
+//            launchArgs.put("program", "/path/to/my_simula_program.sim");
             launchArgs.put("documentUri", documentUri.toString());
             launchArgs.put("mode", mode);
-            launchArgs.put("stopOnEntry", true);
-            launchArgs.put("compileBeforeLaunch", true);
+            launchArgs.put("stopOnEntry", mode.equals("debug"));
+//            launchArgs.put("compileBeforeLaunch", true);
             // Legg til andre Simula-spesifikke parametere her...
+            launchArgs.put("simulaRtsLib", Option.simulaRtsLib);
 
             IO.println("SimulaDapClient.launchSimula: Request Launch");
             CompletableFuture<Void> launchFuture = dapServer.launch(launchArgs);

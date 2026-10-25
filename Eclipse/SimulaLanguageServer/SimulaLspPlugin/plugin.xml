@@ -74,13 +74,15 @@
    
    
    <!--                                                                           Builders -->
+   <!--
    <extension point="org.eclipse.core.resources.builders"
          id="builder"
          name="Simula Inclemental Builder">
-      <builder hasNature="true"> <!-- Sett til true hvis den krever en spesifikk Project Nature -->
+      <builder hasNature="true">
          <run class="com.simula.builders.SimulaDummyBuilder"/>
       </builder>
    </extension>
+   -->
    
    
    <!--                                                                           Project Nature -->
@@ -95,7 +97,7 @@
 	    <runtime>
 	      <run class="com.simula.client.project.SimulaProjectNature"/>
 	    </runtime>
-		<builder id="com.simula.lsp.client.builder"/>
+		<!--builder id="com.simula.lsp.client.builder"/-->
    </extension>
 
 	<extension point="org.eclipse.ui.ide.projectNatureImages">
