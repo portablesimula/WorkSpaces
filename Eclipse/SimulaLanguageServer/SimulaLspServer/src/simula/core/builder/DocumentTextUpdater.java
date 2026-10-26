@@ -60,11 +60,15 @@ public class DocumentTextUpdater {
         int startLine = range.getStart().getLine();
         int startChar = range.getStart().getCharacter();
         int endLine = range.getEnd().getLine();
-        int endChar = range.getStart().getCharacter();
+        int endChar = range.getEnd().getCharacter();
         int nLines = endLine - startLine + 1;
         
+        // Head is leading part of first to keep
         String head = sourceLines.get(startLine).substring(0, startChar);
-        String tail = sourceLines.get(endLine).substring(endChar);        
+        
+        // Tail is tailing part of last line to keep
+        String tail = sourceLines.get(endLine).substring(endChar);   
+        
         StringBuilder sb = new StringBuilder();
         sb.append(head).append(change.getText()).append(tail);
         String text = sb.toString();

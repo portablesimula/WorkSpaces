@@ -344,8 +344,6 @@ public class DocumentManager {
 				if(! SourceLine.equals(fileLine)) {
 					int lineNumber = i + 1;
 					Util.printError("TokenManager.tokenListVerifyer: VERIFIER FAILED: Internal text differ from saved text on line " + lineNumber);
-//					Util.println("LINE " + lineNumber + ": INTERNAL   LINE: |" + Comn.printable(SourceLine) + '|');
-//					Util.println("LINE " + lineNumber + ": SAVED_FILE LINE: |" + Comn.printable(fileLine) + '|');
 					Util.printError("Saved File: Text(lng:"+fileLine.length()+"): |" + Comn.printable(fileLine) + '|');
 					Util.printError("Internal:   Text(lng:"+SourceLine.length()+"): |" + Comn.printable(SourceLine) + '|');
 				}
