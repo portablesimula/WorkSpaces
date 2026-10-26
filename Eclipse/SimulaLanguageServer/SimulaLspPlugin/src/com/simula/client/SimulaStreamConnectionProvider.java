@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.lsp4e.server.ProcessStreamConnectionProvider;
 import org.osgi.framework.FrameworkUtil;
 
+import com.simula.client.preferences.SimulaPreferencePage2;
 import com.simula.client.preferences.SimulaPreferencePage;
 
 
@@ -41,6 +42,7 @@ public class SimulaStreamConnectionProvider extends ProcessStreamConnectionProvi
             File jarFile = new File(fileUrl.getPath());
             commands.add(jarFile.getAbsolutePath());            
             SimulaPreferencePage.addCommands(commands);
+            SimulaPreferencePage2.addCommands(commands);
             
         } catch (IOException e) {
             // Fallback command setup or proper error logging

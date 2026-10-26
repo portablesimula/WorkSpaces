@@ -20,6 +20,7 @@ public final class Option {
 //	public static boolean TESTING_NEWLINE = true;
 	
 	public static boolean LEX_VERIFY = true;
+	public static boolean CHG_VERIFY = true;
 
 	public static int TRACE_ACCEPT_STATEMENT = 0;
 //	public static boolean KEEP_CLASS_LOADER = true;//false;
@@ -169,6 +170,46 @@ public final class Option {
 //				case "-source": Option.SOURCE_FILE=argv[++i]; break;
 //				case "-sourceFileDir":  sourceFileDir=argv[++i]; break;
 				case "-runtimeUserDir": Option.internal.RUNTIME_USER_DIR=argv[++i]; break;
+				
+				
+			    // Detailed Preferences
+				case "-tracing": Option.internal.TRACING = true; break;
+				case "-debugging": Option.internal.DEBUGGING = true; break;		// Set by EditorMenues - doDebugAction
+
+				// Lexer Trace Options
+				case "-trace-lexer": Option.internal.TRACE_LEXER = 1; break;
+				case "-trace-new-lextoken": Option.internal.TRACE_NEW_LEXTOKEN = 1; break;
+
+				// Parser Trace Options
+				case "-trace-Parse": Option.internal.TRACE_PARSE = true; break;
+				case "-print-syntax-tree": Option.internal.PRINT_SYNTAX_TREE = 1; break;
+				case "-trace-attribute-output": Option.internal.TRACE_ATTRIBUTE_OUTPUT = true; break;
+				case "-trace-attribute-input": Option.internal.TRACE_ATTRIBUTE_INPUT = true; break;
+
+				// Checker Trace Options
+				case "-trace-checker": Option.internal.TRACE_CHECKER = true; break;
+				case "-trace-checker-output": Option.internal.TRACE_CHECKER_OUTPUT = true; break;
+				case "-trace-find-meaning": Option.internal.TRACE_FIND_MEANING = 1; break;
+				
+				// Semantic Token Trace Options
+				case "-trace-new-semtoken": Option.internal.TRACE_NEW_SEMTOKEN = 1; break;
+				case "-trace-verify-token": Option.internal.TRACE_VERIFY_TOKEN = 1; break;
+				case "-lexer-verifyer": Option.LEX_VERIFY = true; break;
+				case "-change-verifyer": Option.CHG_VERIFY = true; break;
+				
+
+				// Java Coder Options
+				case "-trace-coding": Option.internal.TRACE_CODING = true; break;         // Only when .java output
+				case "-generate-line-calls": Option.internal.GNERATE_LINE_CALLS = true; break;   // Only when .java output
+
+				// Byte code engineering Options
+				case "-trace-bytecode-output": Option.internal.TRACE_BYTECODE_OUTPUT = true; break;
+				case "-trace-repaired-instruction-list": Option.internal.LIST_REPAIRED_INSTRUCTION_LIST = true; break;
+				case "-trace-repairing": Option.internal.TRACE_REPAIRING = true; break;
+				case "-list-input-instructuion-list": Option.internal.LIST_INPUT_INSTRUCTION_LIST = true; break;
+				case "-trace-repairing-input": Option.internal.TRACE_REPAIRING_INPUT = true; break;
+				case "-trace-repairing-output": Option.internal.TRACE_REPAIRING_OUTPUT = true; break;
+
 				
 //				default: Util.println("Simula ERROR: Unknown option " + arg);
 			}

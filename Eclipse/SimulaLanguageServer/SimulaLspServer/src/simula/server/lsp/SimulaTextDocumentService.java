@@ -64,9 +64,9 @@ public class SimulaTextDocumentService implements TextDocumentService {
     		String documentUri = params.getTextDocument().getUri();
     		// Handle post-save hooks if necessary
     		LOG.trace("\nGot Notification: didSave: " + documentUri);
-    		LOG.severe("SimulaCoreExports.didSave NOT IMPL");
     		DocumentManager.didSave(documentUri);
     	} catch(Throwable e) {
+    		
     		LOG.severe("SimulaTextDocumentService.didSave: Got exception: " + e);
     	}
     }

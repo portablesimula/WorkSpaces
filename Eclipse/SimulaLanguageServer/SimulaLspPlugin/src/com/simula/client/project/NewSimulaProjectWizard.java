@@ -138,12 +138,10 @@ public class NewSimulaProjectWizard extends Wizard implements INewWizard {
     	}
     	
         SimulaPerspectiveListener.switchToSimulaPerspective();
-    	
-    	// 2. Create the 'src' directory
-    	IFolder srcFolder = project.getFolder("src");
-    	if (!srcFolder.exists()) {
-    		srcFolder.create(IResource.FORCE, true, subMonitor.split(1));
-    	}
+    	createFolder("src");  // Simula Source files
+    	createFolder("jar");  // Generated .jar files
+    	createFolder("java"); // Generated .java files
+    	createFolder("bin");  // Generated .class files
 
         if(includeSamples) {
 	        // 3. Create the 'samples' directory
@@ -162,6 +160,14 @@ public class NewSimulaProjectWizard extends Wizard implements INewWizard {
         }
         monitor.worked(1);
         monitor.done();
+    }
+    
+    private void createFolder(String id) throws CoreException {
+    	IFolder folder = project.getFolder(id);
+    	if (!folder.exists()) {
+    		folder.create(IResource.FORCE, true, null);
+    	}
+    	
     }
 
     private void copySamplesToSource(IFolder targetFolder, IProgressMonitor monitor) throws Exception {

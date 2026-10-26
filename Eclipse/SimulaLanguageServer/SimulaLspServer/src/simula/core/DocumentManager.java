@@ -2,8 +2,10 @@ package simula.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
@@ -15,6 +17,7 @@ import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 
 import simula.Comn;
+import simula.Option;
 import simula.core.builder.DocumentTextUpdater;
 import simula.core.builder.SimulaBuilder;
 import simula.core.builder.SourceTextReader;
@@ -117,36 +120,46 @@ public class DocumentManager {
 		StandardClass.INITIATE(this);
 		createJarFilesDirectory();
 		
-//		sourceLines = sourceCode.lines()
-//                .map(String::strip)
-//                .toList();
-		
-		sourceLines = sourceCode.lines()
-                .map(line -> line.stripTrailing() + "\n")
-                .collect(Collectors.toList());
+////		sourceLines = sourceCode.lines()
+////                .map(String::strip)
+////                .toList();
+//		
 //		sourceLines = sourceCode.lines()
 //                .map(line -> line.stripTrailing() + "\n")
-//                .collect(Collectors.toCollection(LinkedList::new));
-		sourceLines.add(""+(char)SourceTextReader.EOF_MARK);
-		
-//		for(String line:sourceLines) {
-//			IO.println("Line|" + Comn.printable(line) + '|');
-//		}
-//		Util.STOP();
+//                .collect(Collectors.toList());
+////		sourceLines = sourceCode.lines()
+////                .map(line -> line.stripTrailing() + "\n")
+////                .collect(Collectors.toCollection(LinkedList::new));
+//		sourceLines.add(""+(char)SourceTextReader.EOF_MARK);
+//		
+////		for(String line:sourceLines) {
+////			IO.println("Line|" + Comn.printable(line) + '|');
+////		}
+////		Util.STOP();
+		sourceLines = getLines(sourceCode);
+    }
+    
+    private static List<String> getLines(String text){
+    	List<String> lines = new ArrayList<String>();
+		lines = text.lines()
+                .map(line -> line.stripTrailing() + "\n")
+                .collect(Collectors.toList());
+		lines.add(""+(char)SourceTextReader.EOF_MARK);
+    	return lines;
     }
 
 	private void createJarFilesDirectory() {
     	// Create output .jar-files Directory
 //		Util.println("DocumentManager.createJarFilesDirectory: sourceFileDir=" + documentManager.sourceFileDir);
 //		Util.println("DocumentManager.createJarFilesDirectory: jarFileDir=" + SimulaCoder.jarFileDir);
-    	if(this.jarFileDir == null) {
+    	if(DocumentManager.jarFileDir == null) {
     		File userDir = new File(System.getProperty("user.dir"));
-    		this.jarFileDir = new File(userDir,"bin");
+    		DocumentManager.jarFileDir = new File(userDir,"bin");
     	}
-    	LOG.trace("DocumentManager.createJarFilesDirectory: jarFileDir=" + this.jarFileDir);
-    	this.jarFileDir.mkdirs();
-    	if (! this.jarFileDir.canWrite()) {
-    		Util.IERR("SimulaCompiler.setOutputDir: Unable to write to " + this.jarFileDir);
+    	LOG.trace("DocumentManager.createJarFilesDirectory: jarFileDir=" + DocumentManager.jarFileDir);
+    	DocumentManager.jarFileDir.mkdirs();
+    	if (! DocumentManager.jarFileDir.canWrite()) {
+    		Util.IERR("SimulaCompiler.setOutputDir: Unable to write to " + DocumentManager.jarFileDir);
     	}    	
     }
     private String getSourceName(String documentUri) {
@@ -309,25 +322,34 @@ public class DocumentManager {
 	
 	/// The document save notification is sent from the client to the server when
 	/// the document is saved in the client.
+	/// @throws IOException 
 //	public static void didSave(DidSaveTextDocumentParams params, SimulaLanguageServer server) {
-	public static void didSave(final String documentUri) {
-		
+	public static void didSave(final String documentUri) throws IOException {
     	DocumentManager documentManager = getDocumentManager(documentUri);
-		
-		String fullText =  documentManager.getText();
-
-		if (fullText == null) {
-			// Fallback: If cache missed, you could read directly from the URI/disk
-			return;
-		}
-
-		// 3. Trigger server-side logic (e.g., Compilation, Re-indexing, Validation)
-		try {
-//			DocumentManager.runCompilerOrValidator(documentUri, fullText);
-//	    	documentManager.tryCreateBuilder();
-		} catch (Exception e) {
-			// Log your errors appropriately
-			e.printStackTrace();
+		List<String> sourceLines =  documentManager.sourceLines;
+		if(Option.CHG_VERIFY) {
+			URI uri = URI.create(documentUri);
+			Path path = Path.of(uri);
+			String fileText = Files.readString(path);
+			List<String> fileLines = getLines(fileText);
+			int lng1 = fileLines.size();
+			int lng2 = sourceLines.size();
+			if(lng1 != lng2) {
+				Util.printError("DocumentManager.didSave: VERIFIER FAILED: Internal text(size:"+lng2+") differ from saved text(size:"+lng1+"): different size");
+			}
+			int lng = Math.min(lng1, lng2);
+			for(int i = 0; i<lng; i++) {
+				String fileLine = fileLines.get(i);
+				String SourceLine = sourceLines.get(i);
+				if(! SourceLine.equals(fileLine)) {
+					int lineNumber = i + 1;
+					Util.printError("TokenManager.tokenListVerifyer: VERIFIER FAILED: Internal text differ from saved text on line " + lineNumber);
+//					Util.println("LINE " + lineNumber + ": INTERNAL   LINE: |" + Comn.printable(SourceLine) + '|');
+//					Util.println("LINE " + lineNumber + ": SAVED_FILE LINE: |" + Comn.printable(fileLine) + '|');
+					Util.printError("Saved File: Text(lng:"+fileLine.length()+"): |" + Comn.printable(fileLine) + '|');
+					Util.printError("Internal:   Text(lng:"+SourceLine.length()+"): |" + Comn.printable(SourceLine) + '|');
+				}
+			}
 		}
 	}
 	

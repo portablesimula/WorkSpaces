@@ -15,7 +15,7 @@ public class DEF {
     public final static String P_STRING_SETTING = "stringPreferenceSetting";
 
 	
-    // LSP Preferences
+    // Main Preferences
     public static final String P_VERBOSE = "verbose";
     public static final String P_CASE_SENSITIVE = "caseSensitive";
     public static final String P_LANUAGE_EXTENSIONS = "extension";
@@ -37,5 +37,44 @@ public class DEF {
     public static final String CHOICE_VERBOSE = "traceVerbose";
 
     public static final String SIMULA_KEEP_JAVA_PATH = "simulaKeepJavaPath";
+
+    
+    // Detailed Preferences
+	public static final String  P_TRACING = "-tracing";
+	public static final String  P_DEBUGGING = "-debugging";		// Set by EditorMenues - doDebugAction
+
+	// Lexer Trace Options
+	public static final String  P_TRACE_LEXER = "-trace-lexer";
+	public static final String  P_TRACE_NEW_LEXTOKEN = "-trace-new-lextoken";
+
+	// Parser Trace Options
+	public static final String  P_TRACE_PARSE = "-trace-Parse";
+	public static final String  P_PRINT_SYNTAX_TREE = "-print-syntax-tree";
+	public static final String  P_TRACE_ATTRIBUTE_OUTPUT = "-trace-attribute-output";
+	public static final String  P_TRACE_ATTRIBUTE_INPUT = "-trace-attribute-input";
+
+	// Checker Trace Options
+	public static final String  P_TRACE_CHECKER = "-trace-checker";
+	public static final String  P_TRACE_CHECKER_OUTPUT = "-trace-checker-output";
+	public static final String  P_TRACE_FIND_MEANING = "-trace-find-meaning";
+	
+	// Semantic Token Trace Options
+	public static final String  P_TRACE_NEW_SEMTOKEN = "-trace-new-semtoken";
+	public static final String  P_TRACE_VERIFY_TOKEN = "-trace-verify-token";
+	public static final String  P_LEX_VERIFY = "-lexer-verifyer";
+	public static final String  P_CHG_VERIFY = "-change-verifyer";
+	
+
+	// Java Coder Options
+	public static final String  P_TRACE_CODING = "-trace-coding";         // Only when .java output
+	public static final String  P_GNERATE_LINE_CALLS = "-generate-line-calls";   // Only when .java output
+
+	// Byte code engineering Options
+	public static final String  P_TRACE_BYTECODE_OUTPUT = "-trace-bytecode-output";
+	public static final String  P_LIST_REPAIRED_INSTRUCTION_LIST = "-trace-repaired-instruction-list";
+	public static final String  P_TRACE_REPAIRING = "-trace-repairing";
+	public static final String  P_LIST_INPUT_INSTRUCTION_LIST = "-list-input-instructuion-list";
+	public static final String  P_TRACE_REPAIRING_INPUT = "-trace-repairing-input";
+	public static final String  P_TRACE_REPAIRING_OUTPUT = "-trace-repairing-output";
 
 }

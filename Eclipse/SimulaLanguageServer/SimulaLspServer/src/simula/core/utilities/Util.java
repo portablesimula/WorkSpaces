@@ -403,7 +403,7 @@ public final class Util {
 //			MessageParams params = new MessageParams(MessageType.Info, mss);
 //			SimulaLanguageServer.languageClient.logMessage(params);
 		} else if(CoreGlobal.debugConsole != null)
-			CoreGlobal.debugConsole.write(mss+"\n");
+			CoreGlobal.debugConsole.writeError(mss+"\n");
 	}  
 
 	/// Print a warning message.

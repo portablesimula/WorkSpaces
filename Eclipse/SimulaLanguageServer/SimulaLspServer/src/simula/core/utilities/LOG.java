@@ -32,9 +32,11 @@ public class LOG {
 //		SimulaLanguageServer.languageClient.logError(message);
 		if(CoreGlobal.INLINE_CONNECTED)
 			System.err.println(message);
-		else if(CoreGlobal.debugConsole != null)
+		else if(CoreGlobal.debugConsole != null) {
 			CoreGlobal.debugConsole.writeError(message+"\n");
-		else if(SimulaLanguageServer.languageClient != null) {
+			PrintStream prt = CoreGlobal.debugConsole.getErrorStream();
+			new Exception("LOG: Stack trace: ").printStackTrace(prt);
+		} else if(SimulaLanguageServer.languageClient != null) {
 			MessageParams params = new MessageParams(MessageType.Error, message);
 			SimulaLanguageServer.languageClient.logMessage(params);
 		}
