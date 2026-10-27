@@ -755,29 +755,40 @@ public final class SimulaLexer {
     /// </pre>
 	private boolean moreSimpleString() {
 		boolean TRACE_SKIP_SEP = false;//true;
-		if(TRACE_SKIP_SEP) Util.println("\nSimulaLexer.moreSimpleString: BEFORE reader.getCurrent(): " + edChar((char) reader.getCurrent()));
+		if(TRACE_SKIP_SEP) Util.println("\nSimulaLexer.moreSimpleString: BEFORE Current: " + reader.edCurrent());
 
 		// First: Skip Token separators
 		while(currentIsTokenSeparator()) {
 			if(Option.LEX_VERIFY) {
 //				if(reader.getCurrent() == '\n' || reader.getCurrent() == ';' || isWhiteSpace(reader.getCurrent())) ; // OK
 				if(reader.getCurrent() == '\n' || reader.getCurrent() == ';' || Character.isWhitespace((char)reader.getCurrent())) ; // OK
-				else Util.IERR("SimulaLexer.moreSimpleString: TokenSeparator End-Condition Failed: reader.getCurrent() = "+edCurrent());
+				else Util.IERR("SimulaLexer.moreSimpleString: TokenSeparator End-Condition Failed: Current: " + reader.edCurrent());
 			}
 			reader.getNext();
 		}
-		if(TRACE_SKIP_SEP) Util.println("\nSimulaLexer.moreSimpleString: AFTER reader.getCurrent(): " + edChar((char) reader.getCurrent()));
+		if(TRACE_SKIP_SEP) Util.println("\nSimulaLexer.moreSimpleString: AFTER Current: " + reader.edCurrent());
 
 		reader.pushBackPos(1);
-		if(TRACE_SKIP_SEP) Util.println("SimulaLexer.moreSimpleString(2): "+edChar((char) reader.getCurrent()));
+		if(TRACE_SKIP_SEP) Util.println("SimulaLexer.moreSimpleString(2): " + reader.edCurrent());
 		
 		if(reader.nextPos() > tokenStartPos) {
-			LexToken lexToken = (newKeyWordToken(KeyWord.COMMENT_KEY));
+			
+//			int column = currentColumn;
+//			int length = reader.nextPos() - tokenStartPos;
+//			String text = 
+			
+//			LexToken lexToken = (newKeyWordToken(KeyWord.COMMENT_KEY));
+			LexToken lexToken = (newKeyWordToken(KeyWord.WHITESPACES));
+			
+//			String text = lexToken.edText()
+//			Util.println("SimulaLexer.moreSimpleString: lexToken.getText: |" + lexToken.getText() + '|');		
+//			Util.println("SimulaLexer.moreSimpleString: lexToken.edText: |" + lexToken.edText() + '|');		
+			
 			tokenQueueAdd("scanTextConstant - StringSeparator", lexToken);
 		}
 		
 		reader.getNext();
-		if(TRACE_SKIP_SEP) Util.println("SimulaLexer.moreSimpleString: reader.getCurrent(): " + edChar((char) reader.getCurrent()) );
+		if(TRACE_SKIP_SEP) Util.println("SimulaLexer.moreSimpleString: Current: " + reader.edCurrent());
 		return reader.getCurrent() == '"';
 	}
     
@@ -967,7 +978,8 @@ public final class SimulaLexer {
     	if(Character.isLetter((char)reader.getCurrent())) {
     		if((reader.nextPos()-1) > tokenStartPos) {
 	    		reader.pushBackPos(1);
-	    	    tokenQueueAdd("currentIsTokenSeparator - COMMENT-0", newKeyWordToken(KeyWord.COMMENT_KEY));
+//	    	    tokenQueueAdd("currentIsTokenSeparator - COMMENT-0", newKeyWordToken(KeyWord.COMMENT_KEY));
+	    	    tokenQueueAdd("currentIsTokenSeparator - COMMENT-0", newKeyWordToken(KeyWord.WHITESPACES));
 	    	    reader.getNext();
     		}    		    	    
     		String name=scanName();
@@ -1275,7 +1287,8 @@ public final class SimulaLexer {
                 	reader.pushBackPos(name.length());
                 	
                     if(reader.nextPos() > tokenStartPos) {
-                        LexToken lexToken = newCommentToken(KeyWord.COMMENT_TEXT);
+//                        LexToken lexToken = newCommentToken(KeyWord.COMMENT_TEXT);
+            			LexToken lexToken = (newKeyWordToken(KeyWord.WHITESPACES));
                         if(nPhrase > 1) Util.warning(simBuilder, lexToken, "END comment spans multiple lines");
                         tokenQueueAdd("scanEndComment-NAME", lexToken);
                     }

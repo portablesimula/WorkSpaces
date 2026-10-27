@@ -65,9 +65,13 @@ public class LexToken {
 			if(keyWord != KeyWord.NEWLINE) {
 				if(tokenText.contains("\r")) Util.IERR("NEW LexToken: LEX_VERIFY FAILD: Token text contais CR: " + this);
 				if(tokenText.contains("\n")) Util.IERR("NEW LexToken: LEX_VERIFY FAILD: Token text contais NEWLINE: " + this);
-				if(keyWord != KeyWord.WHITESPACES) {
+				if(keyWord == KeyWord.WHITESPACES) {
+					if(tokenText.strip().length() > 0)
+						System.err.println("NEW LexToken: " + this + " --  Illegal WhiteSpaces tokenText containing other than WhiteSpaces");
+				} else if(keyWord != KeyWord.COMMENT_TEXT) {
 					if(! tokenText.stripTrailing().equals(tokenText)) {
-						System.err.println("NEW LexToken: Line "+lineNumber+": "+KeyWord.edit(keyWord)+": Illegal tokenText|" + tokenText + '|');
+						System.err.println("NEW LexToken: " + this + " --  Illegal tokenText containing WhiteSpaces");
+						Thread.dumpStack();
 //						Util.STOP();
 					}	
 				}

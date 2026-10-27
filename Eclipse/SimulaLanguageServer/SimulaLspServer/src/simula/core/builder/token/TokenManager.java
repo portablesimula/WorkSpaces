@@ -177,11 +177,11 @@ public class TokenManager {
             }
             tokenText = tokenText.stripTrailing();
             length = tokenText.length();
-            if(length != lexToken.length) {
-                String from = "T"+lexToken.length+'|'+Comn.printable(lexToken.tokenText)+ "|";
-                String to = "T"	+ length + '|' + Comn.printable(tokenText) + "|";
-                Util.println("TokenManager.generateSemanticTokens: " + from + " ==> " + to);
-            }
+//            if(length != lexToken.length) {
+//                String from = "T"+lexToken.length+'|'+Comn.printable(lexToken.tokenText)+ "|";
+//                String to = "T"	+ length + '|' + Comn.printable(tokenText) + "|";
+//                Util.println("TokenManager.generateSemanticTokens: " + from + " ==> " + to);
+//            }
             // Add the semantic token
             encodedData.add(deltaLine);
             encodedData.add(deltaStart);

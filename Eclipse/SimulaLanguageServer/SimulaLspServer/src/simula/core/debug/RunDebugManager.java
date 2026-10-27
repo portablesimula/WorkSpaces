@@ -104,8 +104,8 @@ public class RunDebugManager {
 	// Generate code and execute simula program
 	// Called from: SimulaLanguageServer.main  when --debugRun
 	public static void run(final String documentUri, List<String> argv) {
-		Util.println("RunDebugManager.run(2): documentUri: " + documentUri);
-		Util.println("RunDebugManager.run(2): DocumentManager.simulaRtsLib: " + DocumentManager.simulaRtsLib);
+//		Util.println("RunDebugManager.run(2): documentUri: " + documentUri);
+//		Util.println("RunDebugManager.run(2): DocumentManager.simulaRtsLib: " + DocumentManager.simulaRtsLib);
     	if(argv != null) {
 	    	String[] args = argv.toArray(new String[0]);
 			Option.decodeArguments(args);
@@ -114,8 +114,8 @@ public class RunDebugManager {
 	}
 
 	private static void doRun(final String documentUri) {
-		Util.println("RunDebugManager.doRun: documentUri: " + documentUri);
-		Util.println("RunDebugManager.doRun: DocumentManager.simulaRtsLib: " + DocumentManager.simulaRtsLib);
+//		Util.println("RunDebugManager.doRun: documentUri: " + documentUri);
+//		Util.println("RunDebugManager.doRun: DocumentManager.simulaRtsLib: " + DocumentManager.simulaRtsLib);
     	DocumentManager documentManager = DocumentManager.getDocumentManager(documentUri);
 		@SuppressWarnings("unused")
 		List<Integer> semtokens = DocumentManager.semanticTokensFull(documentUri);

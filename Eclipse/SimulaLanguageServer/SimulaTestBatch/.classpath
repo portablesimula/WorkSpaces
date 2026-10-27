@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="C:/Eclipse_LSP/org.eclipse.lsp4j.jsonrpc-0.24.0.jar"/>
 	<classpathentry kind="lib" path="C:/Eclipse_LSP/org.eclipse.lsp4j-1.0.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/SimulaLspServer"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SimulaRuntimeSystem"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

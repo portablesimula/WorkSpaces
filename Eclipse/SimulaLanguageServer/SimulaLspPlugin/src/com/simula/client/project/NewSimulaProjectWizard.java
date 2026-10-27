@@ -139,9 +139,9 @@ public class NewSimulaProjectWizard extends Wizard implements INewWizard {
     	
         SimulaPerspectiveListener.switchToSimulaPerspective();
     	createFolder("src");  // Simula Source files
-    	createFolder("jar");  // Generated .jar files
-    	createFolder("java"); // Generated .java files
-    	createFolder("bin");  // Generated .class files
+//    	createFolder("jar");  // Generated .jar files
+//    	createFolder("java"); // Generated .java files
+//    	createFolder("bin");  // Generated .class files
 
         if(includeSamples) {
 	        // 3. Create the 'samples' directory

@@ -54,10 +54,10 @@ public final class RunAdHocTest {
 //		names.add("adHoc01.sim"); // For ad'hoc testing
 //		names.add("adHoc02.sim"); // For ad'hoc testing
 //		names.add("adHoc03.sim"); // For ad'hoc testing
-//		names.add("adHoc04.sim"); // For ad'hoc testing
+		names.add("adHoc04.sim"); // For ad'hoc testing
 //	names.add("adHoc05.sim"); // For ad'hoc testing
 //	names.add("adHoc06.sim"); // For ad'hoc testing
-	names.add("adHoc07.sim"); // For ad'hoc testing
+//	names.add("adHoc07.sim"); // For ad'hoc testing
 //	names.add("adHoc10.sim"); // For ad'hoc testing
 //		names.add("adHoc11.sim"); // For ad'hoc testing
 //		names.add("CLASS_COMMON.sim"); // For ad'hoc testing
@@ -310,7 +310,7 @@ public final class RunAdHocTest {
 
 		// Scanner Trace Options
 //		Option.internal.TRACE_LEXER = 2;
-//		Option.internal.TRACE_NEW_LEXTOKEN = 2;
+		Option.internal.TRACE_NEW_LEXTOKEN = 2;
 //		Option.TRACE_COMMENTS=true;
 
 		// Parser Trace Options

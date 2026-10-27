@@ -1,6 +1,5 @@
 begin
-% --text("Hello World! og mere til");
---   outimage;   dfdfgjcghkhjk  ,,, 
+% --   dfdfgjcghkhjk  ,,, 
    comment en kommentar ;
    outtext("Hello World! og mere til");
 --   outimage;

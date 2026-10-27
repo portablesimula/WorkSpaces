@@ -370,15 +370,15 @@ public class DocumentManager {
 	}
 
 	
-	private final static boolean TESTING = true;
+//	private final static boolean TESTING = true;
 	/// The textDocument/semanticTokens/full request is sent from the client
 	/// to the server to return the semantic tokens for a whole file.
 	public static List<Integer> semanticTokensFull(String documentUri) {
-		if(TESTING) Util.println("DocumentManager.semanticTokensFull: " + documentUri);
+//		if(TESTING) Util.println("DocumentManager.semanticTokensFull: " + documentUri);
     	DocumentManager documentManager = getDocumentManager(documentUri);
     	documentManager.tryCreateBuilder();
     	List<Integer> semanticTokens = documentManager.simBuilder.semTokenList;
-    	LOG.trace("DocumentManager.semanticTokensFull: semanticTokens.size=" + semanticTokens.size());
+//    	LOG.trace("DocumentManager.semanticTokensFull: semanticTokens.size=" + semanticTokens.size());
 //		TokenManager.validateSemanticTokens(semanticTokens, TokenManager.STANDARD_TOKEN_TYPES.size() - 1);
 		return semanticTokens;
 	}

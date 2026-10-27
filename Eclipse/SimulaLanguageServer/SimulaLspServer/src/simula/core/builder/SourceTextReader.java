@@ -2,6 +2,8 @@ package simula.core.builder;
 
 import java.util.List;
 
+import simula.Comn;
+
 public class SourceTextReader {
     private List<String> sourceLines;
     private int charIndex;
@@ -44,6 +46,11 @@ public class SourceTextReader {
 
    	public int getCurrent() {
    		return current;
+   	}
+   	
+   	public String edCurrent() {
+   		String res = "Line:" + lineIndex + ", Col:" + charIndex + "  Value:" + current + '|' + Comn.printable((char)current ) + '|';
+   		return(res);
    	}
    	
     /// Returns next input character.

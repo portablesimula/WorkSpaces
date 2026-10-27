@@ -208,7 +208,7 @@ public class SimulaCoder {
 		Util.println("TempDir .java:   \"" + tempJavaFileDir + "\"");
 		Util.println("TempDir .class:  \"" + tempClassFileDir + "\"");
 		Util.println("SimulaRtsLib:    \"" + DocumentManager.simulaRtsLib + "\"");
-		Util.println("OutputDir:       \"" + documentManager.jarFileDir + "\"");
+		Util.println("JarFileDir:      \"" + documentManager.jarFileDir + "\"");
 	}
 
 	// ***************************************************************

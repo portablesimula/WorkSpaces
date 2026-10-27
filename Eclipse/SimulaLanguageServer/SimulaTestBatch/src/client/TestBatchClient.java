@@ -33,13 +33,13 @@ public class TestBatchClient implements LanguageClient {
 	/// signal results of validation runs.
 	@Override
 	public void publishDiagnostics(PublishDiagnosticsParams params) {
-		List<Diagnostic> diagnostics = params.getDiagnostics();
-		if(! diagnostics.isEmpty()) {
-			IO.println("TestBatchClient.publishDiagnostics: for " + params.getUri());
-			for(Diagnostic diag:diagnostics) {
-				IO.println("TestBatchClient.publishDiagnostics: - " + diag);			
-			}
-		}
+//		List<Diagnostic> diagnostics = params.getDiagnostics();
+//		if(! diagnostics.isEmpty()) {
+//			IO.println("TestBatchClient.publishDiagnostics: for " + params.getUri());
+//			for(Diagnostic diag:diagnostics) {
+//				IO.println("TestBatchClient.publishDiagnostics: - " + diag);			
+//			}
+//		}
 	}
 
 	/// The show message notification is sent from a server to a client to ask

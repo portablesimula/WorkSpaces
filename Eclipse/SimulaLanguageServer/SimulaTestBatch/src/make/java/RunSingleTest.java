@@ -71,7 +71,7 @@ public final class RunSingleTest {
 		
 		// *** SIMULA TEST BATCH TIL EKSEKVERING
 		// String name=Global.packetName+"/sim/InspectionSamples.sim";
-//		names.add("SimulaTest.sim"); // Simula TestBatch Framework
+		names.add("SimulaTest.sim"); // Simula TestBatch Framework
 //		names.add("simtst00.sim"); // OK:  Empty test
 //		names.add("simtst01.sim"); // OK:  Meaningless test of conditional statements,
 //		names.add("simtst02.sim"); // OK:  Test boolean operators/expressions
@@ -169,7 +169,7 @@ public final class RunSingleTest {
 //		names.add("simtst81.sim"); // OK:  Test the value of close.
 //		names.add("simtst82.sim"); // OK:  Simple test of the operations +, -, *, / and //.
 //		names.add("simtst83.sim"); // OK:  Name Parameter with EXTREME BI-EFFECTS
-		names.add("simtst84.sim"); // OK:  Test DirectBytefile.
+//		names.add("simtst84.sim"); // OK:  Test DirectBytefile.
 //		names.add("simtst85.sim"); // OK:  Test Directfile.
 //		names.add("Separat.sim");  // OK:  Precompile this for Simtst 86.
 //		names.add("simtst86.sim"); // OK: Simple Test of Separately Compiled Class.
