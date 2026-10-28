@@ -4,11 +4,11 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 
-public class MyLanguagePresentationReconciler extends PresentationReconciler {
+public class NOT_USED_SimulaLanguagePresentationReconciler extends PresentationReconciler {
 
-    public MyLanguagePresentationReconciler() {
+    public NOT_USED_SimulaLanguagePresentationReconciler() {
         // 1. Create your rule-based code scanner (defined in Step 3)
-    	MyCustomScanner scanner = new MyCustomScanner();
+    	NOT_USED_SimulaRuleBasedScanner scanner = new NOT_USED_SimulaRuleBasedScanner();
 
         // 2. Set up the Damager-Repairer for the default text partition
         DefaultDamagerRepairer dr = new DefaultDamagerRepairer(scanner);

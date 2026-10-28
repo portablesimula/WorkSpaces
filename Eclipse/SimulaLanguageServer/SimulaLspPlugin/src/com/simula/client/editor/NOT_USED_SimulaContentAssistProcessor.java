@@ -9,7 +9,7 @@ import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimulaContentAssistProcessor implements IContentAssistProcessor {
+public class NOT_USED_SimulaContentAssistProcessor implements IContentAssistProcessor {
 
     private static final String[] KEYWORDS = { "select", "where", "insert", "delete" };
 

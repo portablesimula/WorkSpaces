@@ -5,7 +5,7 @@ import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 
-public class SimulaTextHoverProvider implements ITextHover {
+public class NOT_USED_SimulaTextHoverProvider implements ITextHover {
 
     /**
      * Determines the exact text region (offset and length) over which the hover will trigger.

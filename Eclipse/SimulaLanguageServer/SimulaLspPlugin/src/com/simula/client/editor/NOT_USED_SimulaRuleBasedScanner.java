@@ -5,9 +5,9 @@ import org.eclipse.jface.text.rules.*;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
-public class MyCustomScanner extends RuleBasedScanner {
+public class NOT_USED_SimulaRuleBasedScanner extends RuleBasedScanner {
 
-    public MyCustomScanner() {
+    public NOT_USED_SimulaRuleBasedScanner() {
         // 1. Define text attributes (colors & styles)
         Color keywordColor = new Color(Display.getCurrent(), 127, 0, 85); // Purple
         Color stringColor = new Color(Display.getCurrent(), 42, 0, 255);   // Blue

@@ -177,6 +177,7 @@
 	</extension>
 
 
+   <!--                                                                           Provide Syntax Highlighting -->
    <!--                                                                           TextMate Grammar -->
 	<extension point="org.eclipse.tm4e.registry.grammars">
 	   <grammar
@@ -189,21 +190,12 @@
 	   </scopeNameContentTypeBinding>
 	</extension>
 
-   <!-- 3. Provide Syntax Highlighting (Presentation Reconciler) -->
-   <!-- EXAMPLE
-   <extension
-         point="org.eclipse.ui.genericeditor.presentationReconcilers">
-      <presentationReconciler
-            class="org.eclipse.tm4e.ui.text.TMPresentationReconciler"   // DETTE ER EN DEFAULT
-            contentType="org.eclipse.acute.csharp">
-      </presentationReconciler>
-   </extension>
-   -->
    <!--                                                                           Provide Syntax Highlighting -->
+   <!--                                                                           LanguagePresentationReconciler -->
    <!--
    <extension point="org.eclipse.ui.genericeditor.presentationReconcilers">
       <presentationReconciler
-            class="com.simula.client.editor.MyLanguagePresentationReconciler"
+            class="com.simula.client.editor.NOT_USED_SimulaLanguagePresentationReconciler"
             contentType="com.simula.contenttype">
       </presentationReconciler>
    </extension>
@@ -363,7 +355,7 @@
    <!--
    <extension point="org.eclipse.ui.genericeditor.contentAssistProcessors">
       <contentAssistProcessor
-            class="com.simula.client.editor.SimulaContentAssistProcessor"
+            class="com.simula.client.editor.NOT_USED_SimulaContentAssistProcessor"
             contentType="com.simula.contenttype">
       </contentAssistProcessor>
    </extension>
@@ -375,7 +367,7 @@
    <!--
    <extension point="org.eclipse.ui.genericeditor.hoverProviders">
       <hoverProvider
-            class="com.simula.client.editor.SimulaTextHoverProvider"
+            class="com.simula.client.editor.NOT_USED_SimulaTextHoverProvider"
             contentType="com.simula.contenttype">
       </hoverProvider>
    </extension>
