@@ -77,4 +77,15 @@ public class DEF {
 	public static final String  P_TRACE_REPAIRING_INPUT = "-trace-repairing-input";
 	public static final String  P_TRACE_REPAIRING_OUTPUT = "-trace-repairing-output";
 
+	
+	/** Runtime Options */ public static final String  P_RTS_VERBOSE = "-RTS-verbose";
+	/** Runtime Options */ public static final String  P_RTS_NOPOPUP = "-RTS-noPopup";
+	/** Runtime Options */ public static final String  P_RTS_BLOCK_TRACING = "-RTS-block-tracing";
+	/** Runtime Options */ public static final String  P_RTS_GOTO_TRACING = "-RTS-goto-tracing";
+	/** Runtime Options */ public static final String  P_RTS_QPS_TRACING = "-RTS-qps-tracing";
+	/** Runtime Options */ public static final String  P_RTS_SML_TRACING = "-RTS-sml-tracing";
+
+//	/** Runtime Options */ public static final String SOURCE_FILE = "" = "-RTS-source-file";
+	/** Runtime Options */ public static final String P_RTS_RUNTIME_USER_DIR = "-RTS-user-dir";
+
 }

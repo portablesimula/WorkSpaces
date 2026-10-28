@@ -71,7 +71,7 @@ public class SimulaLaunchShortcut implements ILaunchShortcut {
             URI documentUri = java.nio.file.Path.of(file.getLocationURI()).toUri();
             IO.println("SimulaLaunchShortcut.launchFile: documentUri: " + documentUri);
 
-        	IO.println("SimulaLaunchShortcut.launchFile: DETTE MÅ RETTES/IMPLEMENTERES SEINERE: ");
+        	System.err.println("SimulaLaunchShortcut.launchFile: DETTE MÅ RETTES/IMPLEMENTERES SEINERE: ");
         	
         	SimulaDapClient simulaDapClient = new SimulaDapClient();
         	simulaDapClient.launchSimula(documentUri, mode);

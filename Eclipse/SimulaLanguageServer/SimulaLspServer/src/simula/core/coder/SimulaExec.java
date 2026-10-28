@@ -25,9 +25,9 @@ public class SimulaExec {
 		}
 		cmds.add("-jar");
 		cmds.add(jarFile);
-		if (Option.internal.RUNTIME_USER_DIR.length() > 0) {
+		if (Option.rts.RUNTIME_USER_DIR.length() > 0) {
 			cmds.add("-userDir");
-			cmds.add(Option.internal.RUNTIME_USER_DIR);
+			cmds.add(Option.rts.RUNTIME_USER_DIR);
 		}
 		
 		addRTArguments(cmds);
@@ -35,8 +35,8 @@ public class SimulaExec {
 		if(DocumentManager.noPopup) {
 			cmds.add("-noPopup");			
 		}
-		if (Option.internal.SOURCE_FILE != null) {
-			cmds.add(Option.internal.SOURCE_FILE);
+		if (Option.rts.SOURCE_FILE != null) {
+			cmds.add(Option.rts.SOURCE_FILE);
 		}
 		doExecuteJarFile(simCoder, jarFile, cmds);
 		

@@ -1,10 +1,14 @@
 package com.simula.dap;
+
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.lsp4j.debug.*;
 import org.eclipse.lsp4j.debug.launch.DSPLauncher;
 import org.eclipse.lsp4j.debug.services.IDebugProtocolServer;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 
+import com.simula.client.DEF;
 import com.simula.client.Option;
+import com.simula.client.SimulaPluginActivator;
 
 import java.net.Socket;
 import java.net.URI;
@@ -91,9 +95,34 @@ public class SimulaDapClient {
             launchArgs.put("mode", mode);
             launchArgs.put("stopOnEntry", mode.equals("debug"));
 //            launchArgs.put("compileBeforeLaunch", true);
-            // Legg til andre Simula-spesifikke parametere her...
+            
+            
+            // Add other Simula-specific parameters here...
+        	IPreferenceStore preferenceStore = SimulaPluginActivator.getDefault().getPreferenceStore();
+        	if(preferenceStore.getBoolean(DEF.P_RTS_VERBOSE))       launchArgs.put("verbose", true);
+        	if(preferenceStore.getBoolean(DEF.P_RTS_NOPOPUP))       launchArgs.put("noPopup", true);
+        	if(preferenceStore.getBoolean(DEF.P_RTS_BLOCK_TRACING)) launchArgs.put("blockTracing", true);
+        	if(preferenceStore.getBoolean(DEF.P_RTS_GOTO_TRACING))  launchArgs.put("gotoTracing", true);
+        	if(preferenceStore.getBoolean(DEF.P_RTS_QPS_TRACING))   launchArgs.put("qpsTracing", true);
+        	if(preferenceStore.getBoolean(DEF.P_RTS_SML_TRACING))   launchArgs.put("smlTracing", true);
+
+//			else if (arg.equalsIgnoreCase("-verbose"))			RTS_Option.VERBOSE = true;
+//			else if (arg.equalsIgnoreCase("-noPopup"))			RTS_Option.noPopup = true;
+//			else if (arg.equalsIgnoreCase("-blockTracing"))		RTS_Option.BLOCK_TRACING = true;
+//			else if (arg.equalsIgnoreCase("-gotoTracing"))		RTS_Option.GOTO_TRACING = true;
+//			else if (arg.equalsIgnoreCase("-qpsTracing"))		RTS_Option.QPS_TRACING = true;
+//			else if (arg.equalsIgnoreCase("-smlTracing"))		RTS_Option.SML_TRACING = true;
+//			else if (arg.equalsIgnoreCase("-userDir"))			RTS_Option.RUNTIME_USER_DIR = args[++i];
+
+//        	if(preferenceStore.getBoolean(DEF. SOURCE_FILE)) commands.add(DEF.SOURCE_FILE);  // "" = "-RTS-source-file";
+        	String userDir = preferenceStore.getString(DEF.P_RTS_RUNTIME_USER_DIR);
+        	if(userDir != null && userDir.length() > 0)	launchArgs.put("-userDir", userDir);
+                 
             launchArgs.put("simulaRtsLib", Option.simulaRtsLib);
 
+            IO.println("SimulaDapClient.launchSimula: Launch Arguments: " + launchArgs);
+            launchArgs.forEach((key, value) -> IO.println("SimulaDapClient.launchSimula: Launch Argument: " + key + ": " + value));
+            
             IO.println("SimulaDapClient.launchSimula: Request Launch");
             CompletableFuture<Void> launchFuture = dapServer.launch(launchArgs);
             

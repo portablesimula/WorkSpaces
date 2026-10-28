@@ -30,7 +30,7 @@ public class RunDebugManager {
 	public static void launch(Map<String, Object> launchArgs) {
         // 1. Extract and validate parameters from client configuration
 //        String programPath = (String) launchArgs.get("program");
-        @SuppressWarnings("unchecked")
+//        @SuppressWarnings("unchecked")
 //		List<String> args = (List<String>) launchArgs.get("args");
         Boolean stopOnEntry = (Boolean) launchArgs.getOrDefault("stopOnEntry", false);
         String simulaRtsLib = (String) launchArgs.get("simulaRtsLib");
@@ -47,6 +47,24 @@ public class RunDebugManager {
         LOG.info("RunDebugManager.launch: mode:        " + mode);
         LOG.info("RunDebugManager.launch: stopOnEntry: " + stopOnEntry);
         LOG.info("RunDebugManager.launch: simulaRtsLib: " + simulaRtsLib);
+        
+        launchArgs.forEach((key, value) -> {
+        	System.out.println(key + ": " + value);
+            LOG.info("RunDebugManager.launch: " + key + ": " + value);
+            switch(key) {
+	            case "verbose":      SimulaCoder.RTOption_VERBOSE = true; break;
+	            case "blockTracing": SimulaCoder.RTOption_BLOCK_TRACING = true; break;
+	            case "gotoTracing":  SimulaCoder.RTOption_GOTO_TRACING = true; break;
+	            case "qpsTracing":   SimulaCoder.RTOption_QPS_TRACING = true; break;
+	            case "smlTracing":   SimulaCoder.RTOption_SML_TRACING = true; break;
+            }
+        });
+        
+//		if(SimulaCoder.RTOption_VERBOSE) args.add("-verbose");
+//		if(SimulaCoder.RTOption_BLOCK_TRACING) args.add("-blockTracing");
+//		if(SimulaCoder.RTOption_GOTO_TRACING) args.add("-gotoTracing");
+//		if(SimulaCoder.RTOption_QPS_TRACING) args.add("-qpsTracing");
+//		if(SimulaCoder.RTOption_SML_TRACING) args.add("-smlTracing");
 
         DocumentManager.simulaRtsLib = new File(simulaRtsLib);
         LOG.info("RunDebugManager.launch: DocumentManager.simulaRtsLib: " + DocumentManager.simulaRtsLib);

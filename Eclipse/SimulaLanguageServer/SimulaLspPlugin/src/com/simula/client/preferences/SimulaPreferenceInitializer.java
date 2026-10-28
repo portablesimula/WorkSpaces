@@ -68,5 +68,18 @@ public class SimulaPreferenceInitializer extends AbstractPreferenceInitializer {
     	store.setDefault(DEF.P_TRACE_REPAIRING_INPUT, false); // "trace-repairing-input";
     	store.setDefault(DEF.P_TRACE_REPAIRING_OUTPUT, false); // "trace-repairing-output";
 
+    	// Runtime Options
+    	
+    	/** Runtime Options */ store.setDefault(DEF.P_RTS_VERBOSE, true); // "-RTS-verbose";
+    	/** Runtime Options */ store.setDefault(DEF.P_RTS_NOPOPUP, false); // "-RTS-noPopup";
+    	/** Runtime Options */ store.setDefault(DEF.P_RTS_BLOCK_TRACING, false); // "-RTS-block-tracing";
+    	/** Runtime Options */ store.setDefault(DEF.P_RTS_GOTO_TRACING, false); // "-RTS-goto-tracing";
+    	/** Runtime Options */ store.setDefault(DEF.P_RTS_QPS_TRACING, false); // "-RTS-qps-tracing";
+    	/** Runtime Options */ store.setDefault(DEF.P_RTS_SML_TRACING, false); // "-RTS-sml-tracing";
+
+//    	/** Runtime Options */ store.setDefault(DEF.SOURCE_FILE, false); // "-RTS-source-file";
+    	/** Runtime Options */ store.setDefault(DEF.P_RTS_RUNTIME_USER_DIR, ""); // "-RTS-user-dir";
+
+
     }
 }

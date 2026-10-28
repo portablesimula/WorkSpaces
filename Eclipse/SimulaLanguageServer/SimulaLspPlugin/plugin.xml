@@ -21,10 +21,16 @@
 	   </page>
 	   <!-- Optional: Child preference page -->
 	   <page
-	         id="com.simula.client.preferences.SimulaDetailsPage"
-	         name="Details"
+	         id="com.simula.client.preferences.SimulaCompilerPage"
+	         name="Compiler Options"
 	         category="com.simula.client.preferences.SimulaMainPreferencePage"
-	         class="com.simula.client.preferences.SimulaDetailsPreferencePage">
+	         class="com.simula.client.preferences.SimulaPreferencePage2">
+	   </page>
+	   <page
+	         id="com.simula.client.preferences.SimulaRtsPage"
+	         name="Runtime Options"
+	         category="com.simula.client.preferences.SimulaMainPreferencePage"
+	         class="com.simula.client.preferences.SimulaPreferencePage3">
 	   </page>
 	</extension>
    

@@ -36,6 +36,19 @@ public final class Option {
 	public static boolean caseSensitive;
 	
 	/// Testing and debugging options
+	public static class rts {
+		/** Runtime Options */ public static boolean VERBOSE;
+		/** Runtime Options */ public static boolean noPopup;
+		/** Runtime Options */ public static boolean BLOCK_TRACING;
+		/** Runtime Options */ public static boolean GOTO_TRACING;
+		/** Runtime Options */ public static boolean QPS_TRACING;
+		/** Runtime Options */ public static boolean SML_TRACING;
+
+		/** Runtime Options */ public static String SOURCE_FILE = "";
+		/** Runtime Options */ public static String RUNTIME_USER_DIR = "";
+	}
+	
+	/// Testing and debugging options
 	public static class internal {
 		/** Default Constructor: NOT USED */ public internal() { Util.IERR(); }
 
@@ -91,9 +104,6 @@ public final class Option {
 		/** Debug option */	public static boolean LIST_INPUT_INSTRUCTION_LIST = false;
 		/** Debug option */	public static boolean TRACE_REPAIRING_INPUT = false;
 		/** Debug option */	public static boolean TRACE_REPAIRING_OUTPUT = false;
-
-		/** Runtime Options */ public static String SOURCE_FILE = "";
-		/** Runtime Options */ public static String RUNTIME_USER_DIR = "";
 		
 		/// Initiate Compiler options
 		public static void InitCompilerOptions() {
@@ -169,8 +179,17 @@ public final class Option {
 				// Special RT Options
 //				case "-source": Option.SOURCE_FILE=argv[++i]; break;
 //				case "-sourceFileDir":  sourceFileDir=argv[++i]; break;
-				case "-runtimeUserDir": Option.internal.RUNTIME_USER_DIR=argv[++i]; break;
-				
+//				case "-runtimeUserDir": Option.internal.RUNTIME_USER_DIR=argv[++i]; break;
+				case "-RTS-verbose":       Option.rts.VERBOSE = true; break;
+				case "-RTS-noPopup":       Option.rts.noPopup = true; break;
+				case "-RTS-block-tracing": Option.rts.BLOCK_TRACING = true; break;
+				case "-RTS-goto-tracing":  Option.rts.GOTO_TRACING = true; break;
+				case "-RTS-qps-tracing":   Option.rts.QPS_TRACING = true; break;
+				case "-RTS-sml-tracing":   Option.rts.SML_TRACING = true; break;
+
+//				case SOURCE_FILE = "" = "-RTS-source-file";
+//				case RUNTIME_USER_DIR = "-RTS-user-dir";
+
 				
 			    // Detailed Preferences
 				case "-tracing": Option.internal.TRACING = true; break;
