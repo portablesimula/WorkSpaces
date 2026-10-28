@@ -57,4 +57,6 @@ Require-Bundle: org.eclipse.lsp4e;bundle-version="0.19.15",
  org.eclipse.debug.ui;bundle-version="3.22.100",
  org.eclipse.core.expressions;bundle-version="3.9.700",
  org.eclipse.lsp4j.debug;bundle-version="[1.0.0,2.0.0)",
- org.eclipse.lsp4j.jsonrpc;bundle-version="[1.0.0,2.0.0)"
+ org.eclipse.lsp4j.jsonrpc;bundle-version="[1.0.0,2.0.0)",
+ org.eclipse.tm4e.core;bundle-version="0.18.0",
+ org.eclipse.tm4e.ui;bundle-version="0.18.0"

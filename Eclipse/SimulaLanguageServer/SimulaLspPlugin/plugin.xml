@@ -139,6 +139,19 @@
 	         editorId="org.eclipse.ui.genericeditor.GenericEditor">
 	   </editorContentTypeBinding>
 	</extension>
+	<!--
+	<extension point="org.eclipse.ui.editors">
+	   <editor
+	         id="org.eclipse.ui.genericeditor.GenericEditor"
+	         name="Simula Editor"
+	         extensions="sim"
+	         icon="icons/favico.png"
+	         class="org.eclipse.ui.genericeditor.GenericEditor"
+	         contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor">
+	      <contentTypeBinding contentTypeId="com.simula.contenttype"/>
+	   </editor>
+	</extension>
+	-->
 
    <!--                                                                           Bind Simula Icon to the Generic Editor -->
 	<extension point="org.eclipse.ui.genericeditor.icons">
@@ -164,6 +177,17 @@
 	</extension>
 
 
+   <!--                                                                           TextMate Grammar -->
+	<extension point="org.eclipse.tm4e.registry.grammars">
+	   <grammar
+	         path="grammar/simula.tmLanguage.json"
+	         scopeName="source.simula"> <!-- Must match the scopeName inside the JSON file -->
+	   </grammar>
+	   <scopeNameContentTypeBinding
+	         contentTypeId="com.simula.contenttype"
+	         scopeName="source.simula">
+	   </scopeNameContentTypeBinding>
+	</extension>
 
    <!-- 3. Provide Syntax Highlighting (Presentation Reconciler) -->
    <!-- EXAMPLE
@@ -176,12 +200,14 @@
    </extension>
    -->
    <!--                                                                           Provide Syntax Highlighting -->
+   <!--
    <extension point="org.eclipse.ui.genericeditor.presentationReconcilers">
       <presentationReconciler
             class="com.simula.client.editor.MyLanguagePresentationReconciler"
             contentType="com.simula.contenttype">
       </presentationReconciler>
    </extension>
+   -->
    
    
    
