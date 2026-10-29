@@ -11,10 +11,10 @@ import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.TraceValue;
 
-import simula.Option;
-import simula.core.CoreGlobal;
-import simula.core.debug.RunDebugManager;
-import simula.server.lsp.SimulaTextDocumentService;
+import simula.dap.RunDebugManager;
+import simula.lsp.SimulaTextDocumentService;
+import simula.lsp.utilities.LspGlobal;
+import simula.lsp.utilities.Option;
 
 public class TestBatchLauncher {
 
@@ -27,10 +27,10 @@ public class TestBatchLauncher {
 		Option.decodeArguments(args);
 
 		// Start SimulaLanguageServer and Connect
-		CoreGlobal.initiate();
-		CoreGlobal.INLINE_CONNECTED = true;
+		LspGlobal.initiate();
+		LspGlobal.INLINE_CONNECTED = true;
 //		Util.println("TestBatchLauncher.run: before CoreGlobal.simulaLanguageServer.connect");
-		CoreGlobal.simulaLanguageServer.connect(new TestBatchClient());
+		LspGlobal.simulaLanguageServer.connect(new TestBatchClient());
 			
 		// Initialize SimulaLanguageServer
 //		ClientCapabilities capabilities = null;
@@ -44,7 +44,7 @@ public class TestBatchLauncher {
 		initializeParams.setClientInfo(clientInfo);
 		initializeParams.setTrace(trace);
 		@SuppressWarnings("unused")
-		InitializeResult result = CoreGlobal.simulaLanguageServer.initialize_local(initializeParams);
+		InitializeResult result = LspGlobal.simulaLanguageServer.initialize_local(initializeParams);
 			
 //		SimulaCoreInitialize.initiate(argv);
 		
@@ -52,7 +52,7 @@ public class TestBatchLauncher {
 		int version = 1;
 		try {
 			String content = Files.readString(Path.of(fileName));
-			SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
+			SimulaTextDocumentService simulaTextDocumentService = LspGlobal.getSimulaTextDocumentService();
 			TextDocumentItem textDocument = new TextDocumentItem(documentUri, "Simula", version, content);
 
 			DidOpenTextDocumentParams params = new DidOpenTextDocumentParams();

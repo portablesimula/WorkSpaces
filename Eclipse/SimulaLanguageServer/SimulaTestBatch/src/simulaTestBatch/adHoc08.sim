@@ -1,0 +1,5 @@
+begin
+	ref(tull) xxx;
+	
+	inspect xxx when tull do;
+end

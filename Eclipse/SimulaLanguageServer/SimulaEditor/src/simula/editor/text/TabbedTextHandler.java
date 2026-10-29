@@ -31,13 +31,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import simula.Comn;
 import simula.editor.ClosableTabPanel;
 import simula.editor.SimulaEditor;
 import simula.editor.SourceModule;
 import simula.editor.utilities.ConsolePanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Util;
+import simula.lsp.utilities.Comn;
 
 /// @author Google AI
 /// @author Øystein Myhre Andersen

@@ -15,13 +15,14 @@ import org.eclipse.lsp4j.SemanticTokens;
 import org.eclipse.lsp4j.SemanticTokensParams;
 import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.eclipse.lsp4j.TextDocumentItem;
-import simula.core.CoreGlobal;
-import simula.Comn;
+
 import simula.editor.SimulaEditor.Language;
 import simula.editor.text.TabTextPanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Util;
-import simula.server.lsp.SimulaTextDocumentService;
+import simula.lsp.SimulaTextDocumentService;
+import simula.lsp.utilities.Comn;
+import simula.lsp.utilities.LspGlobal;
 
 public class SourceModule {
 	
@@ -141,7 +142,7 @@ public class SourceModule {
 
 	public void doOpenSimulaModule() {
 		try {
-			SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
+			SimulaTextDocumentService simulaTextDocumentService = LspGlobal.getSimulaTextDocumentService();
 			int version = 1;
 			String content = getModifiedText();
 			TextDocumentItem textDocumentItem = new TextDocumentItem(documentUri, "Simula", version, content);
@@ -169,7 +170,7 @@ public class SourceModule {
         openModules.remove(documentUri);
 		IO.println("SourceModule.doCloseSimulaModule: " + openModules);
 //		Util.STOP();
-		SimulaTextDocumentService simulaTextDocumentService = CoreGlobal.getSimulaTextDocumentService();
+		SimulaTextDocumentService simulaTextDocumentService = LspGlobal.getSimulaTextDocumentService();
     	DidCloseTextDocumentParams params = new DidCloseTextDocumentParams(new TextDocumentIdentifier(documentUri));
     	simulaTextDocumentService.didClose(params);
 	}

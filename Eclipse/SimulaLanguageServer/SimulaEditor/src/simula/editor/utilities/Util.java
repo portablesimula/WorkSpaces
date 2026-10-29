@@ -15,7 +15,7 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
-import simula.Comn;
+import simula.lsp.utilities.Comn;
 
 /// A set of all static Utility Methods
 /// 

@@ -4,11 +4,12 @@ import javax.swing.*;
 
 import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.TextDocumentIdentifier;
-import simula.core.CoreGlobal;
+
 import simula.editor.text.SimulaTextPanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Option;
-import simula.server.lsp.SimulaTextDocumentService;
+import simula.lsp.SimulaTextDocumentService;
+import simula.lsp.utilities.LspGlobal;
 
 import java.awt.*;
 import java.io.IOException;

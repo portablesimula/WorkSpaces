@@ -11,7 +11,7 @@ import java.io.File;
 import java.util.Vector;
 
 import client.TestBatchLauncher;
-import simula.Option;
+import simula.lsp.utilities.Option;
 
 /**
  * Simula Test Batch donated by Simula as.

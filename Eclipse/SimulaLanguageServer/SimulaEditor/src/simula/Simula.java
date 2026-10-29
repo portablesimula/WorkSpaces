@@ -12,12 +12,12 @@ import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.TraceValue;
 import client.SimulaEditorClient;
-import simula.core.CoreGlobal;
 import simula.editor.RTOption;
 import simula.editor.SimulaEditor;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Option;
 import simula.editor.utilities.Util;
+import simula.lsp.utilities.LspGlobal;
 
 /// Simula Main class containing the 'main' entry.
 /// 
@@ -207,9 +207,9 @@ public final class Simula {
 //		CoreGlobal.INLINE_CONNECTED = true;
 
 		// Start SimulaLanguageServer and Connect
-		CoreGlobal.initiate();
-		CoreGlobal.INLINE_CONNECTED = true;
-		CoreGlobal.simulaLanguageServer.connect(new SimulaEditorClient());
+		LspGlobal.initiate();
+		LspGlobal.INLINE_CONNECTED = true;
+		LspGlobal.simulaLanguageServer.connect(new SimulaEditorClient());
 			
 		// Initialize SimulaLanguageServer
 //		ClientCapabilities capabilities = null;
@@ -223,7 +223,7 @@ public final class Simula {
 //		params.setCapabilities(capabilities);
 		params.setClientInfo(clientInfo);
 		params.setTrace(trace);
-		InitializeResult replay = CoreGlobal.simulaLanguageServer.initialize_local(params);
+		InitializeResult replay = LspGlobal.simulaLanguageServer.initialize_local(params);
 		Util.println("Simula.main: Server reply: " + replay.getServerInfo());
 
 //	    Vector<String> args = new Vector<>(Arrays.asList(argv));

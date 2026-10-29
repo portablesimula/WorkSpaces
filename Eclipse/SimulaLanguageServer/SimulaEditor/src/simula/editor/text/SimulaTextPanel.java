@@ -30,9 +30,6 @@ import javax.swing.text.TabStop;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
-import simula.Comn;
-import simula.core.builder.token.LexToken;
-import simula.core.builder.token.TokenManager;
 import simula.editor.DiagnosticHandler;
 import simula.editor.Palette;
 import simula.editor.SourceModule;
@@ -41,6 +38,9 @@ import simula.editor.utilities.ConsolePanel;
 import simula.editor.utilities.Global;
 import simula.editor.utilities.Option;
 import simula.editor.utilities.Util;
+import simula.lsp.builder.token.LexToken;
+import simula.lsp.builder.token.TokenManager;
+import simula.lsp.utilities.Comn;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -534,7 +534,7 @@ public class SimulaTextPanel extends TabTextPanel {
 //        styleLineNumber=doc.getStyle("lineNumber");
     }
  
-    /// NOTE: SEE: simula.core.builder.export.TokenManager
+    /// NOTE: SEE: simula.lsp.builder.export.TokenManager
 	public static Style getStyle(int tokenTypeIndex) {
 		switch(tokenTypeIndex) {
 			case TokenManager.SimulaTokenKeyword:	 return styleKeyword;
