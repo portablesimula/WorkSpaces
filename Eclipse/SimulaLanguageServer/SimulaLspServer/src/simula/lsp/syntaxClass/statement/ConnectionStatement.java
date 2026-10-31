@@ -181,7 +181,7 @@ public final class ConnectionStatement extends Statement {
 				ConnectionWhenPart whenPart = new ConnectionWhenPart(documentManager, stm,classIdentifier, connectionBlock, statement);
 				whenPart.setFirstParserToken(firstParserToken);
 				whenPart.setLastParserToken(lastParserToken);
-				Util.println("ConnectionStatement.aacceptWHEN: range = " + Util.edRange(whenPart.getLexRange()));
+//				Util.println("ConnectionStatement.aacceptWHEN: range = " + Util.edRange(whenPart.getLexRange()));
 				stm.connectionPart.add(whenPart);
 				connectionBlock.end();
 			}

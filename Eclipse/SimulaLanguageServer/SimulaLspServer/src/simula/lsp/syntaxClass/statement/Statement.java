@@ -112,6 +112,7 @@ public abstract class Statement extends SyntaxElement {
 		Statement statement = null;
 		int keyWord = simToken.keyWord;
 		
+		LexToken firstParserToken = simBuilder.getCurrentParserToken();
 //		Util.println("\nStatement.acceptUnlabeledStatement(1): keyWord=" + KeyWord.edit(keyWord) + " " + simToken);
 		switch(keyWord) {
 			case KeyWord.BEGIN:
@@ -197,6 +198,12 @@ public abstract class Statement extends SyntaxElement {
 		        simBuilder.getNextParserToken();
 		        statement = DummyStatement.ofImplicit(simBuilder);
 			break;
+		}
+		if(statement != null) {
+			LexToken lastParserToken = simBuilder.getCurrentParserToken();
+			statement.setFirstParserToken(firstParserToken);
+			statement.setLastParserToken(lastParserToken);
+//			Util.println("Statement.acceptUnlabeledStatement: range = " + Util.edRange(statement.getLexRange()));
 		}
 		return statement;
 	}

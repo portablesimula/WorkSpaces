@@ -143,17 +143,12 @@ public class LexToken {
 	}
 	
 	public String edTokenText(SimulaLexer lexer) {
-//		int startOfLine = lexer.getLineStartPos(lineNumber);
-//		int tokenStartPos = startOfLine + column;
-//		CharSequence txt = sourceText.subSequence(tokenStartPos, tokenStartPos + length);
-//		String debugText=txt.toString();
-//		return debugText;
 		try {
-			String sourceLine = sourceLines.get(lineNumber);
+			String sourceLine = sourceLines.get(lineNumber).stripTrailing() + '\n'; 
 //			Util.println("LexToken.edTokenText: Line "+lineNumber+": |"+sourceLine+"| column="+column+", length="+length);
 			String txt = sourceLine.substring(column, column + length);
-//			Util.println("LexToken.edTokenText: Line "+lineNumber+": |"+sourceLine+"| column="+column+", length="+length+" ==> |" + txt +'|');
-		return txt;
+//			Util.println("LexToken.edTokenText: Line "+lineNumber+": |"+sourceLine+"| column="+column+", length="+length+" ==> |" + txt +'|');				
+			return txt;
 		} catch(Exception e) {
 			return "";
 		}

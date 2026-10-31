@@ -6,6 +6,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
@@ -118,32 +119,33 @@ public class DocumentManager {
 		compileViaJavaSource = false;
 		StandardClass.INITIATE(this);
 		createJarFilesDirectory();
-		
-////		sourceLines = sourceCode.lines()
-////                .map(String::strip)
-////                .toList();
-//		
-//		sourceLines = sourceCode.lines()
-//                .map(line -> line.stripTrailing() + "\n")
-//                .collect(Collectors.toList());
-////		sourceLines = sourceCode.lines()
-////                .map(line -> line.stripTrailing() + "\n")
-////                .collect(Collectors.toCollection(LinkedList::new));
-//		sourceLines.add(""+(char)SourceTextReader.EOF_MARK);
-//		
-////		for(String line:sourceLines) {
-////			IO.println("Line|" + Comn.printable(line) + '|');
-////		}
-////		Util.STOP();
 		sourceLines = getLines(sourceCode);
+
+        // Add extra EOF-Mark
+		sourceLines.add(""+(char)SourceTextReader.EOF_MARK);
     }
     
-    private static List<String> getLines(String text){
-    	List<String> lines = new ArrayList<String>();
-		lines = text.lines()
-                .map(line -> line.stripTrailing() + "\n")
-                .collect(Collectors.toList());
-		lines.add(""+(char)SourceTextReader.EOF_MARK);
+    public static List<String> getLines(String text){
+    	
+    	List<String> lines; // = new ArrayList<String>();
+        // Convert the text to a mutable ArrayList without newline characters
+//        lines = text.lines()
+//                .collect(Collectors.toCollection(ArrayList::new));
+        
+    	// Split source text into lines keeping newline characters
+//        String[] linesArray = text.split("(?<=\\r?\\n)");
+//        String[] linesArray = text.split("(?<=\\n)", -1);
+        String[] linesArray = text.split("(?<=\\n)");
+        lines = new ArrayList<>(Arrays.asList(linesArray));
+
+//        // Add extra EOF-Mark
+//		lines.add(""+(char)SourceTextReader.EOF_MARK);
+		
+		LOG.trace("\nDocumentManager.getLines: INPUT Text|" + Comn.printable(text) + '|');
+		int i = 0;
+		for(String line:lines) {
+	    	LOG.trace("DocumentManager.getLines: line " + (i++) + "|" + Comn.printable(line) + '|');			
+		}
     	return lines;
     }
 
@@ -331,10 +333,23 @@ public class DocumentManager {
 			Path path = Path.of(uri);
 			String fileText = Files.readString(path);
 			List<String> fileLines = getLines(fileText);
+	        // Add extra EOF-Mark
+			fileLines.add(""+(char)SourceTextReader.EOF_MARK);
 			int lng1 = fileLines.size();
 			int lng2 = sourceLines.size();
 			if(lng1 != lng2) {
 				Util.printError("DocumentManager.didSave: VERIFIER FAILED: Internal text(size:"+lng2+") differ from saved text(size:"+lng1+"): different size");
+				LOG.trace("\nDocumentManager.didSave: INTERNAL Text: ");
+				int i = 0;
+				for(String line:sourceLines) {
+			    	LOG.trace("DocumentManager.didSave: line " + (i++) + "|" + Comn.printable(line) + '|');			
+				}
+				LOG.trace("\nDocumentManager.didSave: FILE Text: ");
+				i = 0;
+				for(String line:fileLines) {
+			    	LOG.trace("DocumentManager.didSave: line " + (i++) + "|" + Comn.printable(line) + '|');			
+				}
+
 			}
 			int lng = Math.min(lng1, lng2);
 			for(int i = 0; i<lng; i++) {

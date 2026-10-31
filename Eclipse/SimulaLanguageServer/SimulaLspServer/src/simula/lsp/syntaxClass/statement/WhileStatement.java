@@ -15,6 +15,7 @@ import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
+import simula.lsp.builder.token.LexToken;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.Type;
 import simula.lsp.syntaxClass.expression.Constant;
@@ -54,8 +55,8 @@ public final class WhileStatement extends Statement {
 	}
 	
 	static WhileStatement of(final DocumentManager documentManager) {
-		WhileStatement stm = new WhileStatement(documentManager);
 		SimulaBuilder simBuilder = documentManager.simBuilder;
+		WhileStatement stm = new WhileStatement(documentManager);
 		simBuilder.consume(KeyWord.WHILE); //  (add it to tokenList)
 
 //		if (Option.internal.TRACE_PARSE)

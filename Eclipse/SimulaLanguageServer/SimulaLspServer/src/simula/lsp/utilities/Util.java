@@ -463,6 +463,7 @@ public final class Util {
 	/// @param s2 argument string
 	/// @return true if the two specified strings are equal to one another
 	public static boolean equals(Identifier id1,Identifier id2) {
+		if (id1 == null || id2 == null) return id1 == id2;
 		return equals(id1.value, id2.value);
 	}
 	  

@@ -125,7 +125,13 @@ public abstract class Expression extends SyntaxElement {
 //			if(true) throw new RuntimeException("Expression.acceptExpression: NOT IMPL: "+expr);
 			return expr;
 		} else {
+			LexToken firstParserToken = simBuilder.getCurrentParserToken();
 			Expression expr= acceptSimpleExpression(simBuilder);
+			LexToken lastParserToken = simBuilder.getCurrentParserToken();
+
+			expr.setFirstParserToken(firstParserToken);
+			expr.setLastParserToken(lastParserToken);
+//			Util.println("Expression.acceptExpression: " + expr.getClass().getSimpleName() + ": range = " + Util.edRange(expr.getLexRange()));
 			return expr;
 		}
 	} 

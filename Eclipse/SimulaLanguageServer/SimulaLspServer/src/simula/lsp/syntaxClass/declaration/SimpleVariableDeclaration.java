@@ -21,6 +21,7 @@ import simula.lsp.builder.JavaSourceFileCoder;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.Identifier;
+import simula.lsp.builder.token.LexToken;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.SyntaxElement;
 import simula.lsp.syntaxClass.Type;
@@ -119,6 +120,7 @@ public class SimpleVariableDeclaration extends Declaration {
 	/// @param type the variable type
 	/// @param declarationList the declaration list to update
 	static Vector<SyntaxElement> expectSimpleVariable(final SimulaBuilder simBuilder, final Type type) {
+		LexToken firstParserToken = simBuilder.getPrevParserToken();
 		// identifier-list = identifier { , identifier }
 		Vector<SyntaxElement> declarations = new Vector<SyntaxElement>();
 		if (Option.internal.TRACE_PARSE)
@@ -130,6 +132,13 @@ public class SimpleVariableDeclaration extends Declaration {
 				typeDeclaration.constantElement = Expression.expectExpression(simBuilder, "constant");
 			declarations.add(typeDeclaration);
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
+		
+		LexToken lastParserToken = simBuilder.getCurrentParserToken();
+		for(SyntaxElement decl: declarations) {
+			decl.setFirstParserToken(firstParserToken);
+			decl.setLastParserToken(lastParserToken);
+//			Util.println("SimpleVariableDeclaration.expectSimpleVariable: range = " + Util.edRange(decl.getLexRange()));
+		}
 		return declarations;
 	}
 

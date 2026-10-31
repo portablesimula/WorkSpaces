@@ -13,6 +13,7 @@ import simula.lsp.DocumentManager;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.Identifier;
+import simula.lsp.builder.token.LexToken;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.ProtectedSpecification;
 import simula.lsp.syntaxClass.SyntaxElement;
@@ -140,6 +141,7 @@ public abstract class Declaration extends SyntaxElement {
 	protected static Vector<SyntaxElement> acceptDeclaration(final SimulaBuilder simBuilder) {
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse Declaration");
+		LexToken firstParserToken = simBuilder.getCurrentParserToken();
 		Declaration decl = null;
 //		Util.println("Declaration.acceptDeclaration: BEFORE acceptIdentifier");
 		Identifier maybePrefix = Parse.acceptIdentifier(simBuilder);
@@ -192,6 +194,12 @@ public abstract class Declaration extends SyntaxElement {
 			
 			if (Option.internal.TRACE_PARSE)
 				Parse.TRACE("Parse Declaration(2)");
+		}
+		if(decl != null) {
+			LexToken lastParserToken = simBuilder.getCurrentParserToken();
+			decl.setFirstParserToken(firstParserToken);
+			decl.setLastParserToken(lastParserToken);
+//			Util.println("Declaration.acceptDeclaration: range = " + Util.edRange(decl.getLexRange()));
 		}
 		Vector<SyntaxElement> declarations = new Vector<SyntaxElement>();
 		declarations.add(decl);

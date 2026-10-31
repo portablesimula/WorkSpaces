@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 
+import simula.lsp.DocumentManager;
 import simula.lsp.utilities.Comn;
 import simula.lsp.utilities.LOG;
 import simula.lsp.utilities.Util;
@@ -54,6 +55,14 @@ public class DocumentTextUpdater {
     		
             return newLines;
         }
+		
+		if(TRACE_applySingleChange) {
+			LOG.trace("\nDocumentTextUpdater.applySingleChange: Text BEFORE Change: ");
+			int i = 0;
+			for(String line:sourceLines) {
+		    	LOG.trace("DocumentTextUpdater.applySingleChange: line " + (i++) + "|" + Comn.printable(line) + '|');			
+			}
+		}
 
         // If a range is provided, it is an incremental update.
         Range range = change.getRange();
@@ -65,34 +74,50 @@ public class DocumentTextUpdater {
         
         // Head is leading part of first to keep
         String head = sourceLines.get(startLine).substring(0, startChar);
+//        String head = sourceLines.get(startLine).substring(0, startChar - 1);
         
         // Tail is tailing part of last line to keep
         String tail = sourceLines.get(endLine).substring(endChar);   
+//        String tail = sourceLines.get(endLine).substring(endChar - 1);   
         
         StringBuilder sb = new StringBuilder();
 //        sb.append(head).append(change.getText()).append(tail);
-        String chgtext = change.getText().replaceAll("\r\n", "\n");
+//        String chgtext = change.getText().replaceAll("\r\n", "\n");
+        String chgtext = change.getText();
         sb.append(head).append(chgtext).append(tail);
         String text = sb.toString();
         
         if(TRACE_applySingleChange) {
-	    	LOG.trace("DocumentTextUpdater.applySingleChange: head|" + Comn.printable(head) + '|');
+	    	LOG.trace("\nDocumentTextUpdater.applySingleChange: head|" + Comn.printable(head) + '|');
+	    	LOG.trace("DocumentTextUpdater.applySingleChange: chgt|" + Comn.printable(chgtext) + '|');
 	    	LOG.trace("DocumentTextUpdater.applySingleChange: tail|" + Comn.printable(tail) + '|');
-	    	LOG.trace("DocumentTextUpdater.applySingleChange: text|" + Comn.printable(text) + "|\n");
+	    	LOG.trace("DocumentTextUpdater.applySingleChange: text|" + Comn.printable(text) + "|");
         }
         
         while((nLines--) > 0) {
         	sourceLines.remove(startLine);
         }
+		if(TRACE_applySingleChange) {
+			LOG.trace("\nDocumentTextUpdater.applySingleChange: Text AFTER REMOVE: ");
+			int i = 0;
+			for(String line:sourceLines) {
+		    	LOG.trace("DocumentTextUpdater.applySingleChange: line " + (i++) + "|" + Comn.printable(line) + '|');			
+			}
+		}
         
-		List<String> newLines = sb.toString().lines()
-                .map(line -> line.stripTrailing() + "\n")
-                .collect(Collectors.toList());
+//		List<String> newLines = sb.toString().lines()
+//                .map(line -> line.stripTrailing() + "\n")
+//                .collect(Collectors.toList());
+		
+		List<String> newLines = DocumentManager.getLines(text);
+		
 		sourceLines.addAll(startLine, newLines);
 		
 		if(TRACE_applySingleChange) {
+			LOG.trace("\nDocumentTextUpdater.applySingleChange: Text AFTER Change: ");
+			int i = 0;
 			for(String line:sourceLines) {
-		    	LOG.trace("DocumentTextUpdater.applySingleChange: line|" + Comn.printable(line) + '|');			
+		    	LOG.trace("DocumentTextUpdater.applySingleChange: line " + (i++) + "|" + Comn.printable(line) + '|');			
 			}
 		}
 		

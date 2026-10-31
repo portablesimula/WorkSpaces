@@ -1411,7 +1411,9 @@ public final class SimulaLexer {
 	
     /// Only when Option LEX_VERIFY = true
     public void verifyToken(LexToken lexToken, int lineNumber, int column, int length) {
-    	String sourceLine = sourceLines.get(lineNumber);
+//    	String sourceLine = sourceLines.get(lineNumber);
+    	String sourceLine = sourceLines.get(lineNumber).stripTrailing() + '\n'; 
+//    	IO.println("SimulaLexer.verifyToken: sourceLine|" + Comn.printable(sourceLine) + '|');
 		int check = column + length;
 		if(length == 0) {
 			Util.IERR("LEX_VERIFY FAILED: Token length is Zero: " + lexToken);

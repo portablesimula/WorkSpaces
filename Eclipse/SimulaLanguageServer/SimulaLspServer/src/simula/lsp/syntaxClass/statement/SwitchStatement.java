@@ -18,6 +18,7 @@ import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
+import simula.lsp.builder.token.LexToken;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.Type;
 import simula.lsp.syntaxClass.expression.Expression;
@@ -115,8 +116,8 @@ public final class SwitchStatement extends Statement {
 	}
 	
 	static SwitchStatement of(final DocumentManager documentManager) {
-		SwitchStatement stm = new SwitchStatement(documentManager);
 		SimulaBuilder simBuilder = documentManager.simBuilder;
+		SwitchStatement stm = new SwitchStatement(documentManager);
 		simBuilder.consume(KeyWord.SWITCH); //  (add it to tokenList)
 
 //		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);

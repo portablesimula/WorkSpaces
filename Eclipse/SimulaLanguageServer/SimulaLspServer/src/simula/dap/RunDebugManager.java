@@ -132,7 +132,7 @@ public class RunDebugManager {
 	}
 
 	private static void doRun(final String documentUri) {
-//		Util.println("RunDebugManager.doRun: documentUri: " + documentUri);
+		Util.println("RunDebugManager.doRun: documentUri: " + documentUri);
 //		Util.println("RunDebugManager.doRun: DocumentManager.simulaRtsLib: " + DocumentManager.simulaRtsLib);
     	DocumentManager documentManager = DocumentManager.getDocumentManager(documentUri);
 		@SuppressWarnings("unused")

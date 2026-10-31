@@ -160,7 +160,7 @@ public class TokenManager {
             	if(lexToken.tokenText == null || lexToken.tokenText.isEmpty()) Util.IERR(""+lexToken);
                 if(lexToken.length < 1 ) {
                 	Util.IERR("TokenManager.generateSemanticTokens: FAILED: lexToken.length < 1  " + lexToken);
-                	System.exit(0);
+//                	System.exit(0);
                 }
             }
             
@@ -415,7 +415,7 @@ public class TokenManager {
 	}
 
 	private static void checkEqual(String debugName, int tokenTypeIndex, int lineNumber, String original, String reconstr) {
-		String originalLine = original.replace("\t", " ");
+		String originalLine = original.replace("\t", " ").stripTrailing() + '\n'; 
 		String reconstrLine = reconstr.replace("\t", " ") + '\n';
 		if(Option.internal.TRACE_VERIFY_TOKEN > 0) {
 			Util.println("LINE " + lineNumber + ": RECONSTR: |" + Comn.printable(reconstrLine) + '|');
@@ -429,7 +429,7 @@ public class TokenManager {
 			int lng2 = reconstr.length();
 			LOG.error("Original Text(lng:"+lng1+"): |" + Comn.printable(original) + '|');
 			LOG.error("Reconstr Text(lng:"+lng2+"): |" + Comn.printable(reconstr) + '|');
-			System.exit(-1);
+//			System.exit(-1);
 		}
 	}
 

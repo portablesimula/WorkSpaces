@@ -185,7 +185,6 @@ public final class VariableExpression extends Expression {
 	public static VariableExpression expectVariable(final SimulaBuilder simBuilder, final Identifier identifier) {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse Variable: current=" + Parse.getCurrentParserToken(simBuilder));
-		LexToken firstParserToken = simBuilder.getPrevParserToken();
 		VariableExpression variable = new VariableExpression(simBuilder.documentManager, identifier);
 		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
 //			Util.println("VariableExpression.expectVariable: GOT BEGPAR");
@@ -205,10 +204,6 @@ public final class VariableExpression extends Expression {
 		}
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW Variable: " + variable);
-		LexToken lastParserToken = simBuilder.getCurrentParserToken();
-		variable.setFirstParserToken(firstParserToken);
-		variable.setLastParserToken(lastParserToken);
-		Util.println("VariableExpression.expectVariable: range = " + Util.edRange(variable.getLexRange()));
 		return (variable);
 	}
 

@@ -224,7 +224,7 @@ public abstract class SyntaxElement {
 		if (!CHECKED) {
 			Util.println("FATAL error - THE Semantic checker not called: " + this.getClass().getName() + ", " + this);
 			Util.IERR("");
-			System.exit(-1);
+//			System.exit(-1);
 		}
 		if (this instanceof Declaration decl) {
 			if (decl.externalIdent == null) {

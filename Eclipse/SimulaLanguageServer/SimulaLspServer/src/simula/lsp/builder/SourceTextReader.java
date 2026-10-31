@@ -3,11 +3,15 @@ package simula.lsp.builder;
 import java.util.List;
 
 import simula.lsp.utilities.Comn;
+import simula.lsp.utilities.Option;
 
 public class SourceTextReader {
     private List<String> sourceLines;
     private int charIndex;
     private int lineIndex;
+    
+    private String strippedLine; // Current line striped for trailing whitespaces, but including NEWLINE
+    private int prevlineLength;
 
 	/// The current character read.
     private int current;
@@ -21,7 +25,8 @@ public class SourceTextReader {
 
     public SourceTextReader(List<String> sourceLines) {
     	this.sourceLines = sourceLines;
-//		testGetNext();
+    	strippedLine = sourceLines.get(0).stripTrailing() + '\n'; 
+//    	IO.println("SourceTextReader.getNext: FIRST LINE " + lineIndex + "|" + Comn.printable(strippedLine) + '|');
     }
     
    	public boolean eof() {
@@ -33,11 +38,11 @@ public class SourceTextReader {
    	}
    	
    	public String currentLine() {
-   		return sourceLines.get(lineIndex);
+   		return strippedLine;
    	}
    	
    	public int prevLineLength() {
-   		return sourceLines.get(lineIndex - 1).length();
+   		return prevlineLength;
    	}
 
    	public int nextPos() {
@@ -56,8 +61,8 @@ public class SourceTextReader {
     /// Returns next input character.
     /// currentColumn is incremented to point to the next character
     /// @return next input character
-    /// Retrieves the next character in the source code, 
-    /// including the trailing newline (LF) at the end of each line.
+    /// Retrieves the next character in the source code, excluding trailing
+    /// whitespaces but including the newline (LF) at the end of each line.
     /// 
     /// Note: A single character line containing EOF_MARK was added
     ///       to List<String> sourceLines in DocumentManager.
@@ -68,14 +73,17 @@ public class SourceTextReader {
     		EOF_SEEN = true;
     		return current;
     	}
-        String currentLine = sourceLines.get(lineIndex);
-        current = currentLine.charAt(charIndex++);
+        current = strippedLine.charAt(charIndex++);    		
 
-        // If we just returned the newline character, move to the start of the next line
+        // If newline character, move to the start of the next line
         if (current == '\n') {
         	lineIndex++;
         	charIndex = 0;
+        	prevlineLength = strippedLine.length();
+        	strippedLine = sourceLines.get(lineIndex).stripTrailing() + '\n'; 
+//        	IO.println("SourceTextReader.getNext: NESTE LINE " + lineIndex + "|" + Comn.printable(strippedLine) + '|');
         }
+//        IO.println("SourceTextReader.getNext: RETURN: " + current + ':' + Comn.printable((char)current) + "   charIndex=" + charIndex);
         return current;
     }
     
@@ -111,8 +119,8 @@ public class SourceTextReader {
         if (lineIndex >= sourceLines.size()) {
             return false; // End of input reached, cannot match any character
         }
-        char nextChar = sourceLines.get(lineIndex).charAt(charIndex);
-        return nextChar == expected;
+        char nextChar = strippedLine.charAt(charIndex);
+        return nextChar == expected;        	
     }
 
 
@@ -138,7 +146,14 @@ public class SourceTextReader {
                 }
                 
                 // Set the character pointer to the end of the previous line
-                charIndex = sourceLines.get(lineIndex).length();
+            	if(lineIndex > 0) {
+            		String prevLine = sourceLines.get(lineIndex - 1).stripTrailing() + '\n'; 
+            		prevlineLength = prevLine.length();
+            	} else prevlineLength = 0;
+            	
+        		strippedLine = sourceLines.get(lineIndex).stripTrailing() + '\n'; 
+//            	IO.println("SourceTextReader.getNext: BACK  LINE " + lineIndex + "|" + Comn.printable(strippedLine) + '|');
+                charIndex = strippedLine.length();
             }
         }
         EOF_SEEN=false;

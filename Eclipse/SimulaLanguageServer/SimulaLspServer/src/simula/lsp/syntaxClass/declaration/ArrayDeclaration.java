@@ -25,6 +25,7 @@ import simula.lsp.builder.JavaSourceFileCoder;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.Identifier;
+import simula.lsp.builder.token.LexToken;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.SyntaxElement;
 import simula.lsp.syntaxClass.Type;
@@ -148,6 +149,7 @@ public final class ArrayDeclaration extends Declaration {
 	static Vector<SyntaxElement> expectArrayDeclaration(final SimulaBuilder simBuilder, final Type type) {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse ArrayDeclaration, type=" + type + ", current=" + Parse.getCurrentParserToken(simBuilder));
+		LexToken firstParserToken = simBuilder.getPrevParserToken();
 		// IdentifierList = Identifier { , Identifier }
 		Vector<BoundPair> boundPairList = null;
 		Vector<SyntaxElement> declarations = new Vector<SyntaxElement>();
@@ -180,6 +182,13 @@ public final class ArrayDeclaration extends Declaration {
 			}				
 			
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
+		LexToken lastParserToken = simBuilder.getCurrentParserToken();
+		for(SyntaxElement decl: declarations) {
+			decl.setFirstParserToken(firstParserToken);
+			decl.setLastParserToken(lastParserToken);
+//			Util.println("ArrayDeclaration.expectArrayDeclaration: range = " + Util.edRange(decl.getLexRange()));
+		}
+		
 		return declarations;
 	}
 

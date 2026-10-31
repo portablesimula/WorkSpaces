@@ -37,6 +37,7 @@ public class Identifier extends LexToken {
 	}
 	
 	public boolean equals(Identifier other) {
+		if(other == null) return false;
 		return this.value.equals(other.value);
 	}
 	
@@ -45,6 +46,7 @@ public class Identifier extends LexToken {
 	}
 	
 	public boolean equalsIgnoreCase(Identifier other) {
+		if(other == null) return false;
 		return this.value.equalsIgnoreCase(other.value);
 	}
 	

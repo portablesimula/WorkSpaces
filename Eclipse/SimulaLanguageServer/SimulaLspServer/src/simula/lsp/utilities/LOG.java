@@ -18,8 +18,8 @@ public class LOG {
 			System.err.println(message);
 		else if(LspGlobal.debugConsole != null) {
 			LspGlobal.debugConsole.writeError(message+"\n");
-			PrintStream prt = LspGlobal.debugConsole.getOutputStream();
-	        new Exception("LOG: Stack trace: ").printStackTrace(prt);
+//			PrintStream prt = LspGlobal.debugConsole.getOutputStream();
+//	        new Exception("LOG: Stack trace: ").printStackTrace(prt);
 		} else if(SimulaLanguageServer.languageClient != null) {
 			MessageParams params = new MessageParams(MessageType.Error, message);
 			SimulaLanguageServer.languageClient.logMessage(params);
@@ -33,8 +33,8 @@ public class LOG {
 			System.err.println(message);
 		else if(LspGlobal.debugConsole != null) {
 			LspGlobal.debugConsole.writeError(message+"\n");
-			PrintStream prt = LspGlobal.debugConsole.getErrorStream();
-			new Exception("LOG: Stack trace: ").printStackTrace(prt);
+//			PrintStream prt = LspGlobal.debugConsole.getErrorStream();
+//			new Exception("LOG: Stack trace: ").printStackTrace(prt);
 		} else if(SimulaLanguageServer.languageClient != null) {
 			MessageParams params = new MessageParams(MessageType.Error, message);
 			SimulaLanguageServer.languageClient.logMessage(params);

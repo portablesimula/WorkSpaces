@@ -16,7 +16,7 @@ import simula.lsp.DocumentManager;
 /// 
 /// @author Øystein Myhre Andersen
 public final class Option {
-//	public static boolean TESTING_NEWLINE = true;
+//	public static boolean TESTING_ENDLINE = true;
 	
 	public static boolean LEX_VERIFY = true;
 	public static boolean CHG_VERIFY = true;
