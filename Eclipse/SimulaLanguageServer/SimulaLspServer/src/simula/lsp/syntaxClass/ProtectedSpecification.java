@@ -44,8 +44,7 @@ public final class ProtectedSpecification extends SyntaxElement {
     /// Create a new ProtectedSpecification.
     /// @param definedIn the class it is defined in
     /// @param identifier the protected identifier
-	public ProtectedSpecification(final DocumentManager documentManager, final ClassDeclaration definedIn,final Identifier identifier) {
-		super(documentManager);
+	public ProtectedSpecification(final ClassDeclaration definedIn,final Identifier identifier) {
 		this.definedIn=definedIn;
 		this.identifier=identifier;
 	}
@@ -109,8 +108,8 @@ public final class ProtectedSpecification extends SyntaxElement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ProtectedSpecification(final DocumentManager documentManager) {
-		super(documentManager);
+	private ProtectedSpecification() {
+//		super(documentManager);
 	}
 	
 	@Override
@@ -130,13 +129,13 @@ public final class ProtectedSpecification extends SyntaxElement {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static ProtectedSpecification readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		ProtectedSpecification spec = new ProtectedSpecification(documentManager);
+		ProtectedSpecification spec = new ProtectedSpecification();
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
 		// *** SyntaxElement
 		
 		// *** ProtectedSpecification
 		spec.identifier = inpt.readIdentifier();
-		spec.definedIn = (ClassDeclaration) inpt.readObj(documentManager);
+		spec.definedIn = (ClassDeclaration) inpt.readObj();
 		Util.TRACE_INPUT("ProtectedSpecification: " + spec.identifier.value);
 		return(spec);
 	}

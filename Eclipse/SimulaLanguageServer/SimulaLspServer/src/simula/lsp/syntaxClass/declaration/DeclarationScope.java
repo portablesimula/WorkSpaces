@@ -61,8 +61,8 @@ public abstract class DeclarationScope extends Declaration  {
 	/// Create a new DeclarationScope.
 	/// 
 	/// @param ident scope identifier
-	protected DeclarationScope(final DocumentManager documentManager, final Identifier ident) {
-		super(documentManager, ident);
+	protected DeclarationScope(final Identifier ident) {
+		super(ident);
 		declarationList = new DeclarationList(getClass().getSimpleName() + ':' + identifierValue() + ":Line=" + LspGlobal.sourceLineNumber);
 		declaredIn = LspGlobal.getCurrentScope();
 		LspGlobal.setScope(this);
@@ -173,7 +173,7 @@ public abstract class DeclarationScope extends Declaration  {
 				DocumentManager.WARNINGS = true;
 				Util.warning(this, "Undefined variable: " + identifierValue() + "  Could be because SimulaCompiler.CaseSensitive == true");
 			}
-			UndefinedDeclaration undef = new UndefinedDeclaration(documentManager, identifier);
+			UndefinedDeclaration undef = new UndefinedDeclaration(identifier);
 			meaning = new Meaning(undef, this); // Error Recovery
 		}
 		if(Option.internal.TRACE_FIND_MEANING > 0)

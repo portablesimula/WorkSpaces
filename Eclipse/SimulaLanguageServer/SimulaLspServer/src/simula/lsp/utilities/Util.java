@@ -27,6 +27,7 @@ import simula.lsp.SimulaLanguageServer;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.Identifier;
 import simula.lsp.builder.token.LexToken;
+import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.SyntaxElement;
 
 import org.eclipse.lsp4j.Diagnostic;
@@ -163,7 +164,14 @@ public final class Util {
 		Diagnostic diagnostic = new Diagnostic(elt.getLexRange(), msg, DiagnosticSeverity.Warning, "Simula.LSP");
 		if(DocumentManager.WARNINGS) {
 			LOG.warning(edDiagnostic(diagnostic));
-			elt.documentManager.simBuilder.addDiagnostic(diagnostic);
+			SimulaBuilder simBuilder = elt.getSimBuilder();
+			
+			if(simBuilder == null) {
+				Util.printError("Util.warning: Missing simBuilder: " + elt.getClass().getSimpleName());
+				Util.printError("Util.warning: Missing simBuilder: " + edDiagnostic(diagnostic));
+			} else
+				
+			simBuilder.addDiagnostic(diagnostic);
 		}
 	}
 
@@ -238,13 +246,14 @@ public final class Util {
 //		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Error, elt.lexRange, msg);
 		Diagnostic diagnostic = new Diagnostic(elt.getLexRange(), msg, DiagnosticSeverity.Error, "Simula.LSP");
 		LOG.error(edDiagnostic(diagnostic));
+		SimulaBuilder simBuilder = elt.getSimBuilder();
 		
-		if(elt.documentManager == null) {
-			Util.printError("Util.semanticError: Missing DocumentManager: " + elt.getClass().getSimpleName());
-			Util.printError("Util.semanticError: Missing DocumentManager: " + edDiagnostic(diagnostic));
+		if(simBuilder == null) {
+			Util.printError("Util.semanticError: Missing simBuilder: " + elt.getClass().getSimpleName());
+			Util.printError("Util.semanticError: Missing simBuilder: " + edDiagnostic(diagnostic));
 		} else
 			
-		elt.documentManager.simBuilder.addError(diagnostic);
+		simBuilder.addError(diagnostic);
 	}
 	
 	public static String edRange(Range range) {
@@ -269,7 +278,14 @@ public final class Util {
 //		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Error, elt.lexRange, msg);
 		Diagnostic diagnostic = new Diagnostic(elt.getLexRange(), msg, DiagnosticSeverity.Error, "Simula.LSP");
 		LOG.error(edDiagnostic(diagnostic));
-		elt.documentManager.simCoder.addError(diagnostic);
+		SimulaCoder simCoder = elt.getSimCoder();
+		
+		if(simCoder == null) {
+			Util.printError("Util.codingError: Missing simCoder: " + elt.getClass().getSimpleName());
+			Util.printError("Util.codingError: Missing simCoder: " + edDiagnostic(diagnostic));
+		} else
+			
+		simCoder.addError(diagnostic);
 	}
 
 	/// Exit with Thread.dumpStack

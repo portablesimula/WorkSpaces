@@ -1,17 +1,14 @@
 package simula.lsp.builder.token;
 
-import java.util.List;
-
-import simula.lsp.builder.SimulaLexer;
+import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.utilities.KeyWord;
 import simula.lsp.utilities.Option;
 
 public class StringToken extends LexToken {
 	public final String value;
 
-	public StringToken(int tokenStartLine, List<String> sourceLines, int column, int length, String value, SimulaLexer lexer) {
-//		super(tokenStartLine, sourceText, startOffset, endOffset, KeyWord.TEXTKONST);
-		super(tokenStartLine, sourceLines, column, length, KeyWord.TEXTKONST, SemanticTokenTypes.String, lexer);
+	public StringToken(SimulaBuilder simBuilder, int tokenStartLine, int column, int length, String value) {
+		super(simBuilder, tokenStartLine, column, length, KeyWord.TEXTKONST, SemanticTokenTypes.String);
 		this.value = value;
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();
 	}

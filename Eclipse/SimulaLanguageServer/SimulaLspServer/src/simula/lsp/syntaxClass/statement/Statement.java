@@ -61,11 +61,6 @@ import simula.lsp.utilities.Util;
 /// @author Øystein Myhre Andersen
 public abstract class Statement extends SyntaxElement {
 	
-	/// Create a new Statement.
-	protected Statement(final DocumentManager documentManager) {
-		super(documentManager);
-	}
-	
 	/// Parse a statement.
 	/// @return the statement
 	public static Statement acceptStatement(SimulaBuilder simBuilder) {
@@ -129,10 +124,10 @@ public abstract class Statement extends SyntaxElement {
 		    case KeyWord.GO,
 		         KeyWord.GOTO:		 statement = new GotoStatement(simBuilder.documentManager, keyWord); break;
 		    case KeyWord.FOR:		 statement = ForStatement.of(simBuilder.documentManager); break;
-		    case KeyWord.WHILE:		 statement = WhileStatement.of(simBuilder.documentManager); break;
+		    case KeyWord.WHILE:		 statement = WhileStatement.of(); break;
 		    case KeyWord.INSPECT:	 statement = ConnectionStatement.of(simBuilder.documentManager); break;
 		    case KeyWord.SWITCH:	 if(DocumentManager.EXTENSIONS) {
-		    							 statement = SwitchStatement.of(simBuilder.documentManager);
+		    							 statement = SwitchStatement.of();
 		    						 } break;
 		    case KeyWord.ACTIVATE,
 		         KeyWord.REACTIVATE: statement = ActivationStatement.of(simBuilder.documentManager); break;
@@ -179,12 +174,12 @@ public abstract class Statement extends SyntaxElement {
 //							Util.println("Statement.acceptUnlabeledStatement: GOT BlockStatement: "+statement);
 							break;
 		      			} else {
-		      				statement = new StandaloneExpression(simBuilder.documentManager, expr);
+		      				statement = new StandaloneExpression(expr);
 //							Util.println("Statement.acceptUnlabeledStatement: GOT StandaloneExpression(1): "+statement);
 		      				break;
 	      				}
 	      			} else {
-	      				statement = new StandaloneExpression(simBuilder.documentManager, expr);
+	      				statement = new StandaloneExpression(expr);
 //						Util.println("Statement.acceptUnlabeledStatement: GOT StandaloneExpression(2): "+statement);
 	      				break;
 	      			}

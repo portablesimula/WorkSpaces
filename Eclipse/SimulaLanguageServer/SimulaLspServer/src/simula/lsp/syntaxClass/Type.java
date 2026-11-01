@@ -99,10 +99,8 @@ public class Type extends SyntaxElement {
 	/// Simula's Ref(classIdent) type
 	/// @param classIdent the class name
 	/// @return a new ref(classIdent) type.
-	public static final Type Ref(Identifier classIdent) { return (new Type(Type.T_REF, classIdent, null)); }
-	public static final Type Ref(String classIdent) { return (new Type(Type.T_REF, new Identifier(classIdent), null)); }
-	public static final Type Ref(String classIdent, DocumentManager documentManager)
-	{ return (new Type(Type.T_REF, new Identifier(classIdent), documentManager)); }
+	public static final Type Ref(Identifier classIdent) { return (new Type(Type.T_REF, classIdent)); }
+	public static final Type Ref(String classIdent) { return (new Type(Type.T_REF, new Identifier(classIdent))); }
 	
 
 	// **************************************************************************************************
@@ -112,16 +110,14 @@ public class Type extends SyntaxElement {
 	/// Create a new simple Type with the given keyWord
 	/// @param keyWord the given keyWord
 	private Type(int keyWord) {
-		super(null);
 		this.keyWord = keyWord;
 	}
 	
 	/// Create a new simple Type with the given keyWord and classIdent
 	/// @param keyWord the given keyWord
 	/// @param classIdent the given class identifier
-	public Type(int keyWord, Identifier classIdent) { this(keyWord, classIdent, null); }
-	public Type(int keyWord, Identifier classIdent, DocumentManager documentManager) {
-		super(documentManager);
+//	public Type(int keyWord, Identifier classIdent) { this(keyWord, classIdent, null); }
+	public Type(int keyWord, Identifier classIdent) {
 		if(classIdent != null && !DocumentManager.CaseSensitive) classIdent.value = classIdent.value.toUpperCase();
 		this.keyWord = keyWord;
 		this.classIdent = classIdent;
@@ -142,8 +138,6 @@ public class Type extends SyntaxElement {
 	/// @param tp the given Type
 	/// @param declaredIn the ConnectionBlock
 	public Type(Type tp,ConnectionBlock declaredIn) {
-//		super(null);
-		super(tp.documentManager);
 		this.keyWord = tp.keyWord;
 		this.classIdent = tp.classIdent;
 		this.qual = tp.qual;

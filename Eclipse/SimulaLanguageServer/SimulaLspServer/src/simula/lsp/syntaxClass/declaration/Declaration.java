@@ -9,7 +9,6 @@ import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.CodeBuilder;
 import java.util.Vector;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.Identifier;
@@ -75,8 +74,7 @@ public abstract class Declaration extends SyntaxElement {
 	// ***********************************************************************************************
 	/// Create a new Declaration.
 	/// @param identifier the given identifier
-	protected Declaration(final DocumentManager documentManager, final Identifier identifier) {
-		super(documentManager);
+	protected Declaration(final Identifier identifier) {
 		this.identifier = identifier;
 		if(identifier != null) this.externalIdent = identifierValue(); // May be overwritten
 		declaredIn = LspGlobal.getCurrentScope();
@@ -129,9 +127,9 @@ public abstract class Declaration extends SyntaxElement {
 			}
 		}
 		if (error)
-			Util.syntaxError(documentManager.simBuilder, identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
+			Util.syntaxError(this.getSimBuilder(), identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
 		else if (warning)
-			Util.warning(documentManager.simBuilder, identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
+			Util.warning(this.getSimBuilder(), identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
 	}
 
 	/// Parse a declaration and add it to the given declaration list.

@@ -8,7 +8,6 @@ package simula.lsp.utilities;
 import java.io.IOException;
 import java.util.Vector;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.syntaxClass.SyntaxElement;
@@ -48,14 +47,14 @@ public class ObjectList<E> extends Vector<E> {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ObjectList object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ObjectList<?> read(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static ObjectList<?> read(final AttributeInputStream inpt) throws IOException {
 		ObjectList<?> list = null;
 		int n = inpt.readShort();
 		if (n >= 0)
 			list = new ObjectList<Object>();
 		if(n > 0) {
 			for (int i = 0; i < n; i++)
-				list.add(inpt.readObj(documentManager));
+				list.add(inpt.readObj());
 		}
 		return list;
 	}

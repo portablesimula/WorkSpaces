@@ -18,7 +18,6 @@ import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
-import simula.lsp.builder.token.LexToken;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.Type;
 import simula.lsp.syntaxClass.expression.Expression;
@@ -108,16 +107,16 @@ public final class SwitchStatement extends Statement {
 	/// The end label.
 	private Label endLabel;
 
-	/// Create a new SwitchStatement.
-	/// @param line the source line number
-	/// Default constructor used by Attribute File I/O
-	private SwitchStatement(final DocumentManager documentManager) {
-		super(documentManager);
-	}
+//	/// Create a new SwitchStatement.
+//	/// @param line the source line number
+//	/// Default constructor used by Attribute File I/O
+//	private SwitchStatement(final DocumentManager documentManager) {
+//		super(documentManager);
+//	}
 	
-	static SwitchStatement of(final DocumentManager documentManager) {
-		SimulaBuilder simBuilder = documentManager.simBuilder;
-		SwitchStatement stm = new SwitchStatement(documentManager);
+	static SwitchStatement of() {
+		SwitchStatement stm = new SwitchStatement();
+		SimulaBuilder simBuilder = stm.getSimBuilder();
 		simBuilder.consume(KeyWord.SWITCH); //  (add it to tokenList)
 
 //		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);
@@ -323,9 +322,9 @@ public final class SwitchStatement extends Statement {
     	lowKey.doChecking(); hiKey.doChecking();
     	switchKey.doChecking();
 		if(switchKey.type.keyWord == Type.T_CHARACTER) {
-			switchKey=TypeConversion.testAndCreate(documentManager, Type.Character,switchKey);
+			switchKey=TypeConversion.testAndCreate(getDocumentManager(), Type.Character,switchKey);
 		} else
-			switchKey=TypeConversion.testAndCreate(documentManager, Type.Integer,switchKey);
+			switchKey=TypeConversion.testAndCreate(getDocumentManager(), Type.Integer,switchKey);
     	for(SwitchWhenPart when:switchCases) {
     		for(SwitchInterval casePair:when.caseKeyList)
 			if(casePair!=null) {
@@ -439,7 +438,7 @@ public final class SwitchStatement extends Statement {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static SwitchStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		SwitchStatement stm = new SwitchStatement(documentManager);
+		SwitchStatement stm = new SwitchStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		

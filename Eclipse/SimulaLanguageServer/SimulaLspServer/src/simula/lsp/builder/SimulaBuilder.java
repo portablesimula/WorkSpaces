@@ -3,6 +3,7 @@ package simula.lsp.builder;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.lsp4j.Diagnostic;
@@ -13,6 +14,7 @@ import simula.lsp.builder.token.SimpleString;
 import simula.lsp.builder.token.TokenManager;
 import simula.lsp.syntaxClass.declaration.StandardClass;
 import simula.lsp.syntaxClass.statement.ProgramModule;
+import simula.lsp.utilities.Comn;
 import simula.lsp.utilities.EOTException;
 import simula.lsp.utilities.KeyWord;
 import simula.lsp.utilities.LOG;
@@ -24,8 +26,9 @@ public class SimulaBuilder {
 	final public DocumentManager documentManager;
 	
     public SimulaLexer lexer;
+	public List<String> sourceLines;
     
-    public DocumentManager simulaCompiler;
+//    public DocumentManager simulaCompiler;
     
 	/// Compiler state: True while Parsing
 	public boolean duringParsing;
@@ -48,15 +51,19 @@ public class SimulaBuilder {
 	public List<LexToken> lexTokenList;
 	public List<Integer> semTokenList;
 	
-	public SimulaBuilder(DocumentManager documentManager) {
+	public SimulaBuilder(DocumentManager documentManager, String sourceCode) {
 		this.documentManager = documentManager;
-		documentManager.simBuilder = this;
     	// INIT:
 		this.nErrors = 0;
     	this.diagnostics  = new ArrayList<>();
     	this.lexTokenList = new ArrayList<>();
-//        lexer = new SimulaLexer(this, documentManager.sourceCode);
-        lexer = new SimulaLexer(this, documentManager.sourceLines);
+//    	Util.println("NEW SimulaBuilder: ");
+    	
+    	// Expand SourceCode
+		this.sourceLines = getLines(sourceCode);
+        // Add extra EOF-Mark
+		this.sourceLines.add(""+(char)SourceTextReader.EOF_MARK);
+        lexer = new SimulaLexer(this);
 
 		File desktop = new File(System.getProperty("user.home"), "Desktop");
 		if (DocumentManager.verbose) {
@@ -90,49 +97,41 @@ public class SimulaBuilder {
 			Option.print(" SIMULA VARIABLES SUMMARY");
 		}
 	}
+    
+    public static List<String> getLines(String text){
+    	
+    	List<String> lines; // = new ArrayList<String>();
+        // Convert the text to a mutable ArrayList without newline characters
+//        lines = text.lines()
+//                .collect(Collectors.toCollection(ArrayList::new));
+        
+    	// Split source text into lines keeping newline characters
+//        String[] linesArray = text.split("(?<=\\r?\\n)");
+//        String[] linesArray = text.split("(?<=\\n)", -1);
+        String[] linesArray = text.split("(?<=\\n)");
+        lines = new ArrayList<>(Arrays.asList(linesArray));
+
+//        // Add extra EOF-Mark
+//		lines.add(""+(char)SourceTextReader.EOF_MARK);
+		
+		LOG.trace("\nDocumentManager.getLines: INPUT Text|" + Comn.printable(text) + '|');
+		int i = 0;
+		for(String line:lines) {
+	    	LOG.trace("DocumentManager.getLines: line " + (i++) + "|" + Comn.printable(line) + '|');			
+		}
+    	return lines;
+    }
 	
 	public void doBuilding() {
 		boolean builderTerminateNormally = this.doParsing(this);
-    	
-//    	if(Option.LEX_VERIFY && (!Option.TESTING_VERIFY)) {
-////        	Util.println("SimulaBuilder: documentManager.sourceCode: "+documentManager.sourceCode);
-//    		StringBuilder sb = new StringBuilder();
-//    		for(LexToken lexToken : lexTokenList)
-//    			sb.append(lexToken.getText());
-//    		String reconstr = Comn.printable(sb.toString());
-//    		String original = Comn.printable(documentManager.sourceCode);
-//    		int lng1 = original.length();
-//    		if(! reconstr.equals(original)) {
-//    			int lng2 = reconstr.length();
-//    			LOG.error("SimulaBuilder: VERIFIER FAILED: Reconstructed text differ from original text");
-//    			LOG.error("Original Text(lng:"+lng1+"): " + original);
-//    			LOG.error("Reconstr Text(lng:"+lng2+"): " + reconstr);
-//    			int n = Math.min(lng1, lng2);
-//    			LOOP:for(int i=0;i<n;i++) {
-//    				if(reconstr.charAt(i) != original.charAt(i)) { 
-//    	    			LOG.error("First deviation at pos " + i + ", original: " + original.charAt(i) + ", reconstr: " + reconstr.charAt(i));
-//    					break LOOP;
-//    				}
-//    			}
-//    			if(lng1 != lng2) {
-//    				int pos = Math.max(0, n - 100);
-//        			LOG.error("Original Tail: " + original.substring(pos));
-//        			LOG.error("Reconstr Tail: " + reconstr.substring(pos));
-//    			}
-//    			Util.IERR("");
-//    		}
-//    	}
-
-//		Util.IERR("STOP HER INTILL VIDERE");	
 		if(builderTerminateNormally) {	
-//			simulaCompiler.doChecking(this);
 			this.doChecking();
 		} else {
 			Util.IERR("");
 		}
     	this.semTokenList = TokenManager.generateSemanticTokens(lexTokenList);
 		if(Option.LEX_VERIFY) {
-			TokenManager.tokenListVerifyer(documentManager.sourceLines, semTokenList);
+			TokenManager.tokenListVerifyer(sourceLines, semTokenList);
 		}
 //		Util.IERR("STOP HER INTILL VIDERE: BYGG og CHECK SemTokenList ??");	
 		documentManager.publishDiagnostics(diagnostics);

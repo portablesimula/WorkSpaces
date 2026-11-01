@@ -8,7 +8,6 @@ package simula.lsp.utilities;
 import java.io.IOException;
 import java.util.Vector;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.token.Identifier;
@@ -89,13 +88,13 @@ public final class DeclarationList extends Vector<Declaration> {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the DeclarationList object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static DeclarationList readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static DeclarationList readObject(final AttributeInputStream inpt) throws IOException {
 		String identifier = inpt.readString();
 		DeclarationList list = new DeclarationList(identifier);
 		int n = inpt.readShort();
 		if(n > 0) {
 			for (int i = 0; i < n; i++) {
-				Declaration dcl = (Declaration) inpt.readObj(documentManager);
+				Declaration dcl = (Declaration) inpt.readObj();
 				list.add(dcl);
 			}
 		}

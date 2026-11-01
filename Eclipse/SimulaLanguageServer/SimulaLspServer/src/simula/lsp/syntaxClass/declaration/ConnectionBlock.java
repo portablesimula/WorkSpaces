@@ -69,9 +69,9 @@ public final class ConnectionBlock extends DeclarationScope {
 	/// Create a new ConnectionBlock.
 	/// @param inspectedVariable   the inspected variable
 	/// @param whenClassIdentifier the when class identifier
-	public ConnectionBlock(final DocumentManager documentManager, final VariableExpression inspectedVariable, final Identifier whenClassIdentifier) {
+	public ConnectionBlock(final VariableExpression inspectedVariable, final Identifier whenClassIdentifier) {
 //		super("Connection block at line " + (Global.sourceLineNumber - 1));
-		super(documentManager, new Identifier("Inspect " + inspectedVariable));
+		super(new Identifier("Inspect " + inspectedVariable));
 		declarationKind = ObjectKind.ConnectionBlock;
 		this.inspectedVariable = inspectedVariable;
 		this.whenClassIdentifier = whenClassIdentifier;
@@ -83,7 +83,7 @@ public final class ConnectionBlock extends DeclarationScope {
 	/// @return inspected variable.
 	public Expression getTypedInspectedVariable() {
 		Type type = classDeclaration.type;
-		return ((Expression) TypeConversion.testAndCreate(documentManager, type, inspectedVariable));
+		return ((Expression) TypeConversion.testAndCreate(type, inspectedVariable));
 	}
 
 	/// Connection block end.
@@ -109,6 +109,8 @@ public final class ConnectionBlock extends DeclarationScope {
 
 	@Override
 	public Meaning findMeaning(final Identifier identifier) {
+		DocumentManager documentManager = this.getDocumentManager();
+
 		if(Option.internal.TRACE_FIND_MEANING > 0)
 			LOG.trace("ConnectionBlock.findMeaning("+identifierValue()+"): BEGIN Search "+identifierValue());
 		if (classDeclaration == null && documentManager.simBuilder.duringParsing) {
@@ -133,7 +135,7 @@ public final class ConnectionBlock extends DeclarationScope {
 		}
 		if (result == null) {
 //			Util.error("Undefined variable: " + identifierValue());
-			UndefinedDeclaration undef = new UndefinedDeclaration(documentManager, identifier);
+			UndefinedDeclaration undef = new UndefinedDeclaration(identifier);
 			result = new Meaning(undef, this); // Error Recovery
 		}
 		if (Option.internal.TRACE_FIND_MEANING > 0)
@@ -265,8 +267,8 @@ public final class ConnectionBlock extends DeclarationScope {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	/// @param identifier the block identifier.
-	public ConnectionBlock(final DocumentManager documentManager, Identifier identifier) {
-		super(documentManager, identifier);
+	public ConnectionBlock(Identifier identifier) {
+		super(identifier);
 		declarationKind = ObjectKind.ConnectionBlock;
 	}
 
@@ -305,9 +307,9 @@ public final class ConnectionBlock extends DeclarationScope {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ConnectionBlock readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static ConnectionBlock readObject(final AttributeInputStream inpt) throws IOException {
 		Identifier identifier = inpt.readIdentifier();
-		ConnectionBlock blk = new ConnectionBlock(documentManager, identifier);
+		ConnectionBlock blk = new ConnectionBlock(identifier);
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
 		
 		// *** SyntaxElement
@@ -317,18 +319,18 @@ public final class ConnectionBlock extends DeclarationScope {
 		//blk.identifier = inpt.readIdentifier();
 		blk.externalIdent = inpt.readString();
 		blk.type = inpt.readType();
-		blk.declaredIn = (DeclarationScope) inpt.readObj(documentManager);
+		blk.declaredIn = (DeclarationScope) inpt.readObj();
 
 		// *** DeclarationScope
 		blk.sourceFileName = inpt.readString();
 		blk.hasLocalClasses = inpt.readBoolean();
-		blk.labelList = LabelList.readLabelList(documentManager, inpt);
-		blk.declarationList = DeclarationList.readObject(documentManager, inpt);
+		blk.labelList = LabelList.readLabelList(inpt);
+		blk.declarationList = DeclarationList.readObject(inpt);
 		
 		// *** ConnectionBlock
-		blk.statement = (Statement) inpt.readObj(documentManager);
+		blk.statement = (Statement) inpt.readObj();
 		blk.whenClassIdentifier = inpt.readIdentifier();
-		blk.inspectedVariable = (VariableExpression) inpt.readObj(documentManager);
+		blk.inspectedVariable = (VariableExpression) inpt.readObj();
 
 		blk.isPreCompiledFromFile = inpt.jarFileName;
 		Util.TRACE_INPUT("END Read ConnectionBlock: " + identifier.value + ", Declared in: "+blk.declaredIn);

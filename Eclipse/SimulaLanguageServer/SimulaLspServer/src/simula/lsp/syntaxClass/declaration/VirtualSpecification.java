@@ -306,7 +306,7 @@ public final class VirtualSpecification extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static SyntaxElement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static SyntaxElement readObject( final AttributeInputStream inpt) throws IOException {
 		VirtualSpecification virt = new VirtualSpecification(documentManager);
 		virt.OBJECT_SEQU = inpt.readSEQU(virt);
 		// *** VirtualSpecification

@@ -36,8 +36,8 @@ public class UndefinedDeclaration extends Declaration {
 	/// Create a new UndefinedDeclaration.
 	/// 
 	/// @param identifier the variable identifier
-	public UndefinedDeclaration(final DocumentManager documentManager, final Identifier identifier) {
-		super(documentManager, identifier);
+	public UndefinedDeclaration(final Identifier identifier) {
+		super(identifier);
 		this.declarationKind = ObjectKind.UndefinedDeclaration;
 		this.type = Type.Undef;
 	}
@@ -119,7 +119,7 @@ public class UndefinedDeclaration extends Declaration {
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
 	public UndefinedDeclaration(final DocumentManager documentManager) {
-		super(documentManager, null);
+		super(null);
 		this.declarationKind = ObjectKind.SimpleVariableDeclaration;
 	}
 

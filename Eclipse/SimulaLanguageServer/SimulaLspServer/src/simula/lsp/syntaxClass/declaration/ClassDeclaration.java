@@ -150,8 +150,8 @@ public class ClassDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Create a new ClassDeclaration.
 	/// @param identifier the given identifier
-	protected ClassDeclaration(final DocumentManager documentManager, final Identifier identifier) {
-		super(documentManager, identifier);
+	protected ClassDeclaration(final Identifier identifier) {
+		super(identifier);
 		this.declarationKind = ObjectKind.Class;
 	}
 
@@ -188,7 +188,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			}
 		}
 //		LexToken first = (identifier != null)? identifier : simBuilder.getPrevParserToken();
-		ClassDeclaration cls = new ClassDeclaration(simBuilder.documentManager, null);
+		ClassDeclaration cls = new ClassDeclaration(null);
 		cls.sourceFileName = simBuilder.documentManager.documentUri;
 		if(identifier != null) cls.prefix = identifier;
 		cls.declaredIn.hasLocalClasses = true;
@@ -237,7 +237,7 @@ public class ClassDeclaration extends BlockDeclaration {
 					}
 				if (parameter == null) {
 					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
-					parameter = new Parameter(simBuilder.documentManager, identifier);
+					parameter = new Parameter(identifier);
 				}
 				parameter.setMode(Parameter.Mode.value);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
@@ -285,7 +285,7 @@ public class ClassDeclaration extends BlockDeclaration {
 					}
 				if (parameter == null) {
 					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
-					parameter = new Parameter(simBuilder.documentManager, identifier);
+					parameter = new Parameter(identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
@@ -340,9 +340,9 @@ public class ClassDeclaration extends BlockDeclaration {
 		do {
 			Identifier identifier = Parse.expectIdentifier(simBuilder);
 			if (hidden)
-				cls.hiddenList.add(new HiddenSpecification(simBuilder.documentManager, cls, identifier));
+				cls.hiddenList.add(new HiddenSpecification(cls, identifier));
 			if (prtected)
-				cls.protectedList.add(new ProtectedSpecification(simBuilder.documentManager, cls, identifier));
+				cls.protectedList.add(new ProtectedSpecification(cls, identifier));
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		Parse.expect(simBuilder, KeyWord.SEMICOLON);
 	}
@@ -1470,7 +1470,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	@SuppressWarnings("unchecked")
 	public static ClassDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
 		Identifier identifier = inpt.readIdentifier();
-		ClassDeclaration cls = new ClassDeclaration(documentManager, identifier);
+		ClassDeclaration cls = new ClassDeclaration(identifier);
 		Util.TRACE_INPUT("BEGIN Read ClassDeclaration: " + identifier.value + ", Declared in: " + cls.declaredIn);
 		cls.declarationKind = ObjectKind.Class;
 		cls.OBJECT_SEQU = inpt.readSEQU(cls);
@@ -1485,8 +1485,8 @@ public class ClassDeclaration extends BlockDeclaration {
 		// *** DeclarationScope
 		cls.sourceFileName = inpt.readString();
 		cls.hasLocalClasses = inpt.readBoolean();
-		cls.labelList = LabelList.readLabelList(documentManager, inpt);
-		cls.declarationList = DeclarationList.readObject(documentManager, inpt);
+		cls.labelList = LabelList.readLabelList(inpt);
+		cls.declarationList = DeclarationList.readObject(inpt);
 
 		// *** BlockDeclaration
 		cls.isMainModule = inpt.readBoolean();

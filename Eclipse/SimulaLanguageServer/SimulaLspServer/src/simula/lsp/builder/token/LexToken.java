@@ -1,9 +1,8 @@
 package simula.lsp.builder.token;
 
-import java.util.List;
-
 import org.eclipse.lsp4j.Position;
 
+import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.SimulaLexer;
 import simula.lsp.utilities.Comn;
 import simula.lsp.utilities.KeyWord;
@@ -12,7 +11,9 @@ import simula.lsp.utilities.Util;
 
 public class LexToken {
 //    CharSequence sourceText; // Pointer to the Whole FILE
-	List<String> sourceLines;
+//	List<String> sourceLines;
+	public SimulaBuilder simBuilder;
+	
     public int lineNumber;
 //    public int startOffset;
 //    public int endOffset;
@@ -32,25 +33,23 @@ public class LexToken {
 //    	Util.println("LexToken.setTokenTypeIndex: " + tokenType);
 //    	Util.println("LexToken.setTokenTypeIndex: " + tokenType + " ==> " + this.edit());
      }
-
-
-//	public LexToken(int tokenStartLine, CharSequence sourceText, int column, int length, int keyWord, SimulaLexer lexer) {
-//		this(tokenStartLine, sourceText, column, length, keyWord, "keyword", lexer);
-//	}
 	
 	public Position getPosition() {
 		return new Position(lineNumber, column);
 	}
 	
-	public LexToken(int tokenStartLine, List<String> sourceLines, int column, int length, int keyWord, String tokenType, SimulaLexer lexer) {
+	public LexToken(SimulaBuilder simBuilder, int tokenStartLine, int column, int length, int keyWord, String tokenType) {
+		this.simBuilder = simBuilder;
 		this.lineNumber = tokenStartLine;
-		this.sourceLines = sourceLines;
+//		this.sourceLines = sourceLines;
+//		this.sourceLines = simBuilder.sourceLines;
 		this.column = column;
 		this.length = length;
 		this.keyWord = keyWord;
 //		this.styleName = styleName;
 		this.setTokenTypeIndex(tokenType);
 		
+		SimulaLexer lexer = simBuilder.lexer;
 		if(Option.LEX_VERIFY) {
 	    	if(length == 0 && keyWord == KeyWord.EOF) {
 	    		prevToken = null;
@@ -144,7 +143,7 @@ public class LexToken {
 	
 	public String edTokenText(SimulaLexer lexer) {
 		try {
-			String sourceLine = sourceLines.get(lineNumber).stripTrailing() + '\n'; 
+			String sourceLine = simBuilder.sourceLines.get(lineNumber).stripTrailing() + '\n'; 
 //			Util.println("LexToken.edTokenText: Line "+lineNumber+": |"+sourceLine+"| column="+column+", length="+length);
 			String txt = sourceLine.substring(column, column + length);
 //			Util.println("LexToken.edTokenText: Line "+lineNumber+": |"+sourceLine+"| column="+column+", length="+length+" ==> |" + txt +'|');				

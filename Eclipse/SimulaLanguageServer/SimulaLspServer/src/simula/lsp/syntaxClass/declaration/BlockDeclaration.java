@@ -14,7 +14,6 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Stack;
 import java.util.Vector;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.JavaSourceFileCoder;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
@@ -102,8 +101,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// 
 	/// Used by expectMaybeBlock, i.e. CompoundStatement, SubBlock or PrefixedBlock.
 	/// @param identifier the given identifier
-	protected BlockDeclaration(final DocumentManager documentManager, Identifier identifier) {
-		super(documentManager, identifier);
+	protected BlockDeclaration(Identifier identifier) {
+		super(identifier);
 	}
 
 	/// Create a new BlockDeclaration.
@@ -111,8 +110,8 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// This constructor is only used by ClassDeclaration. ProcedureDeclaration and MaybeBlockDeclaration.
 	/// @param identifier the block identifier
 	/// @param declarationKind the declaration kind
-	private BlockDeclaration(final DocumentManager documentManager, final Identifier identifier,final int declarationKind) {
-		super(documentManager, identifier);
+	private BlockDeclaration(final Identifier identifier,final int declarationKind) {
+		super(identifier);
 		this.declarationKind = declarationKind;
 	}
 	
@@ -127,7 +126,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// @param pList the parameter list
 	protected static void expectFormalParameterPart(final SimulaBuilder simBuilder, final Vector<Parameter> pList) {
 		do { // ParameterPart = Parameter ; { Parameter ; }
-			new Parameter(simBuilder.documentManager, Parse.expectIdentifier(simBuilder)).into(pList);
+			new Parameter(Parse.expectIdentifier(simBuilder)).into(pList);
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		Parse.expect(simBuilder, KeyWord.ENDPAR);
 	}

@@ -98,7 +98,6 @@ public final class ProgramModule extends Statement {
 
 	/// Create a new ProgramModule.
 	public ProgramModule(DocumentManager documentManager) {
-		super(documentManager);
 		Identifier sysinID = new Identifier("sysin");
 		sysin = new  VariableExpression(documentManager, sysinID);
 		sysin.meaning = StandardClass.BASICIO.findMeaning(sysinID);
@@ -112,12 +111,12 @@ public final class ProgramModule extends Statement {
 	
 	public void doBuild() {
 //		try	{
-			SimulaBuilder simBuilder = documentManager.simBuilder;
+			SimulaBuilder simBuilder = this.getSimBuilder();
 			if(Option.internal.TRACE_PARSE) Parse.TRACE("Parse Program");
 			LspGlobal.setScope(StandardClass.BASICIO);		  // BASICIO Begin
-			new ConnectionBlock(documentManager, sysin, null)            //    Inspect sysin do
+			new ConnectionBlock(sysin, null)            //    Inspect sysin do
 			     .setClassDeclaration(StandardClass.Infile);
-			new ConnectionBlock(documentManager, sysout, null)           //    Inspect sysout do
+			new ConnectionBlock(sysout, null)           //    Inspect sysout do
 			     .setClassDeclaration(StandardClass.Printfile);
 			LspGlobal.getCurrentScope().sourceBlockLevel=0;
 			
@@ -179,6 +178,7 @@ public final class ProgramModule extends Statement {
 	/// Parse Simula Program by expecting a Statement.
 	/// @return the Program Statement.
 	private DeclarationScope doParseProgram() {
+		DocumentManager documentManager = this.getDocumentManager();
 		SimulaBuilder simBuilder = documentManager.simBuilder;
 		String sourceName = documentManager.sourceName;
 		BlockDeclaration mainBlock = new MaybeBlockDeclaration(documentManager, new Identifier(sourceName));

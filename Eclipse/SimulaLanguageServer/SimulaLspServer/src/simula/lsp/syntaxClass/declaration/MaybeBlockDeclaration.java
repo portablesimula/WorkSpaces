@@ -67,12 +67,12 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 	/// Create a new MaybeBlockDeclaration, i.e. CompoundStatement or SubBlock.
 	/// @param identifier block identifier
-	public MaybeBlockDeclaration(final DocumentManager documentManager, final Identifier identifier) {
-		super(documentManager, identifier);
+	public MaybeBlockDeclaration(final Identifier identifier) {
+		super(identifier);
 		if(identifier != null)
 			modifyIdentifier(identifier);
 //		else modifyIdentifier("Block" + firstLineNumber());
-		else modifyIdentifier(new Identifier("Block" + documentManager.simBuilder.getSourceLineNumber()));
+		else modifyIdentifier(new Identifier("Block" + this.firstLineNumber()));
 	}
 
 //	// ***********************************************************************************************
@@ -535,7 +535,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	// ***********************************************************************************************
 
 	/// Default constructor used by Attribute File I/O
-	public MaybeBlockDeclaration(final DocumentManager documentManager) { super(documentManager, null); }
+	public MaybeBlockDeclaration() { super(null); }
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -572,9 +572,9 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static MaybeBlockDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt, final int declarationKind) throws IOException {
+	public static MaybeBlockDeclaration readObject(final AttributeInputStream inpt, final int declarationKind) throws IOException {
 		DeclarationScope scope = LspGlobal.getCurrentScope();
-		MaybeBlockDeclaration blk = new MaybeBlockDeclaration(documentManager);
+		MaybeBlockDeclaration blk = new MaybeBlockDeclaration();
 		blk.declarationKind = declarationKind;
 		blk.OBJECT_SEQU = inpt.readSEQU(blk);
 		// *** SyntaxElement
@@ -584,18 +584,18 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		blk.identifier = inpt.readIdentifier();
 		blk.externalIdent = inpt.readString();
 		blk.type = inpt.readType();
-		blk.declaredIn = (DeclarationScope) inpt.readObj(documentManager);
+		blk.declaredIn = (DeclarationScope) inpt.readObj();
 
 		// *** DeclarationScope
 		blk.sourceFileName = inpt.readString();
 		blk.hasLocalClasses = inpt.readBoolean();
-		blk.labelList = LabelList.readLabelList(documentManager, inpt);
-		blk.declarationList = DeclarationList.readObject(documentManager, inpt);
+		blk.labelList = LabelList.readLabelList(inpt);
+		blk.declarationList = DeclarationList.readObject(inpt);
 
 		// *** BlockDeclaration
 		if (declarationKind == ObjectKind.CompoundStatement) {
 			blk.isMainModule = inpt.readBoolean();
-			blk.statements = (ObjectList<Statement>) inpt.readObjectList(documentManager);
+			blk.statements = (ObjectList<Statement>) inpt.readObjectList();
 		}
 
 		LspGlobal.setScope(scope);

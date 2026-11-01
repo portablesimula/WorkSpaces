@@ -312,17 +312,17 @@ public class LabelList {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the LabelList object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static LabelList readLabelList(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static LabelList readLabelList(final AttributeInputStream inpt) throws IOException {
 		boolean present = inpt.readBoolean();
 		LabelList labelList = null;
 		if(present) {
-			DeclarationScope declaredIn = (DeclarationScope) inpt.readObj(documentManager);
+			DeclarationScope declaredIn = (DeclarationScope) inpt.readObj();
 			labelList = new LabelList(declaredIn);
 			int n = inpt.readShort();
 			if(TRACING)
 				Util.println("LabelList.readLabelList: Read Label List: "+n);
 			for(int i=0;i<n;i++) {
-				LabelDeclaration lab = (LabelDeclaration) inpt.readObj(documentManager);
+				LabelDeclaration lab = (LabelDeclaration) inpt.readObj();
 				labelList.add(lab);
 			}
 		}

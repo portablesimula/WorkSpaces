@@ -18,7 +18,6 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -118,8 +117,8 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param identifier the array identifier
 	/// @param type the array type
 	/// @param boundPairList The list of BoundPair
-	private ArrayDeclaration(final DocumentManager documentManager, final Identifier identifier, final Type type, final Vector<BoundPair> boundPairList) {
-		super(documentManager, identifier);
+	private ArrayDeclaration(final Identifier identifier, final Type type, final Vector<BoundPair> boundPairList) {
+		super(identifier);
 		this.declarationKind = ObjectKind.ArrayDeclaration;
 		this.type = type;
 		this.boundPairList = boundPairList;
@@ -170,13 +169,13 @@ public final class ArrayDeclaration extends Declaration {
 				Expression LB = Expression.expectExpression(simBuilder, "lowerbound");
 				Parse.expect(simBuilder, KeyWord.COLON);
 				Expression UB = Expression.expectExpression(simBuilder, "upperbound");
-				boundPairList.add(new BoundPair(simBuilder.documentManager, LB, UB));
+				boundPairList.add(new BoundPair(LB, UB));
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
 			Parse.expect(simBuilder, KeyWord.ENDPAR);
 			simBuilder.setParsingBoundPairList(false);
 			for (Enumeration<Identifier> e = identList.elements(); e.hasMoreElements();) {
 				Identifier identifier = e.nextElement();
-				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(simBuilder.documentManager, identifier, type, boundPairList);
+				ArrayDeclaration arrayDeclaration = new ArrayDeclaration(identifier, type, boundPairList);
 //				Util.println("ArrayDecleration.expectArrayDeclaration: NEW "+arrayDeclaration);
 				declarations.add(arrayDeclaration);
 			}				
@@ -199,7 +198,6 @@ public final class ArrayDeclaration extends Declaration {
 	///    BoundPair = ArithmeticExpression : ArithmeticExpression
 	/// </pre>
 	private static class BoundPair {
-		final DocumentManager documentManager;
 		/// The lower bound expression.
 		Expression LB;
 		/// The upper bound expression.
@@ -208,8 +206,7 @@ public final class ArrayDeclaration extends Declaration {
 		/// Create a new BoundPair.
 		/// @param LB The lower bound expression
 		/// @param UB The upper bound expression
-		BoundPair(final DocumentManager documentManager, final Expression LB, final Expression UB) {
-			this.documentManager = documentManager;
+		BoundPair(final Expression LB, final Expression UB) {
 			this.LB = LB;
 			this.UB = UB;
 		}
@@ -218,8 +215,8 @@ public final class ArrayDeclaration extends Declaration {
 		private void doChecking() {
 			LB.doChecking();
 			UB.doChecking();
-			LB = (Expression) TypeConversion.testAndCreate(documentManager, Type.Integer, LB);
-			UB = (Expression) TypeConversion.testAndCreate(documentManager, Type.Integer, UB);
+			LB = (Expression) TypeConversion.testAndCreate(Type.Integer, LB);
+			UB = (Expression) TypeConversion.testAndCreate(Type.Integer, UB);
 		}
 
 		@Override
@@ -567,8 +564,8 @@ public final class ArrayDeclaration extends Declaration {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public ArrayDeclaration(final DocumentManager documentManager) {
-		super(documentManager, null);
+	public ArrayDeclaration() {
+		super(null);
 		this.declarationKind = ObjectKind.ArrayDeclaration;
 	}
 
@@ -598,8 +595,8 @@ public final class ArrayDeclaration extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ArrayDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		ArrayDeclaration arr = new ArrayDeclaration(documentManager);
+	public static ArrayDeclaration readObject(final AttributeInputStream inpt) throws IOException {
+		ArrayDeclaration arr = new ArrayDeclaration();
 		arr.OBJECT_SEQU = inpt.readSEQU(arr);
 
 		// *** SyntaxElement
@@ -613,9 +610,9 @@ public final class ArrayDeclaration extends Declaration {
 		arr.nDim = inpt.readShort();
 		arr.boundPairList = new Vector<BoundPair>();
 		for(int i=0;i<arr.nDim;i++) {
-			Expression LB = (Expression) inpt.readObj(documentManager);
-			Expression UB = (Expression) inpt.readObj(documentManager);
-			arr.boundPairList.add(new BoundPair(documentManager, LB, UB));
+			Expression LB = (Expression) inpt.readObj();
+			Expression UB = (Expression) inpt.readObj();
+			arr.boundPairList.add(new BoundPair(LB, UB));
 		}
 		Util.TRACE_INPUT("Array: " + arr);
 		return(arr);

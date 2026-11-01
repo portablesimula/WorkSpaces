@@ -75,8 +75,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// ***********************************************************************************************
 	/// PrefixedBlock.
 	/// @param isMainModule true: this is the main module.
-	private PrefixedBlockDeclaration(final DocumentManager documentManager, final boolean isMainModule) {
-		super(documentManager, null);
+	private PrefixedBlockDeclaration(final boolean isMainModule) {
+		super(null);
 //		if(isMainModule)
 //			modifyIdentifier(Global.sourceName);
 //		else modifyIdentifier("PBLK" + firstLineNumber());
@@ -90,7 +90,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	/// @param isMainModule true if main module
 	/// @return the resulting PrefixedBlockDeclaration
 	public static PrefixedBlockDeclaration expectPrefixedBlock(final SimulaBuilder simBuilder, final VariableExpression blockPrefix,boolean isMainModule) {
-		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(simBuilder.documentManager, isMainModule);
+		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(isMainModule);
 		block.declarationKind=ObjectKind.PrefixedBlock;
 		Util.ASSERT(blockPrefix != null,"blockPrefix == null");
 		block.blockPrefix = blockPrefix;
@@ -360,8 +360,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Private Constructor used by Attribute File I/O.
-	private PrefixedBlockDeclaration(final DocumentManager documentManager) {
-		super(documentManager, null);
+	private PrefixedBlockDeclaration() {
+		super(null);
 	}
 
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -406,8 +406,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static PrefixedBlockDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		PrefixedBlockDeclaration pbl = new PrefixedBlockDeclaration(documentManager);
+	public static PrefixedBlockDeclaration readObject(final AttributeInputStream inpt) throws IOException {
+		PrefixedBlockDeclaration pbl = new PrefixedBlockDeclaration();
 		pbl.identifier = inpt.readIdentifier();
 		pbl.declarationKind = ObjectKind.Class;
 		pbl.OBJECT_SEQU = inpt.readSEQU(pbl);
@@ -421,24 +421,24 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 		// *** DeclarationScope
 		pbl.sourceFileName = inpt.readString();
 		pbl.hasLocalClasses = inpt.readBoolean();
-		pbl.labelList = LabelList.readLabelList(documentManager, inpt);
-		pbl.declarationList = DeclarationList.readObject(documentManager, inpt);
+		pbl.labelList = LabelList.readLabelList(inpt);
+		pbl.declarationList = DeclarationList.readObject(inpt);
 
 		// *** BlockDeclaration
 		pbl.isMainModule = inpt.readBoolean();
-		pbl.statements = (ObjectList<Statement>) inpt.readObjectList(documentManager);
+		pbl.statements = (ObjectList<Statement>) inpt.readObjectList();
 		
 		// *** ClassDeclaration
 		pbl.prefix = inpt.readIdentifier();
 		pbl.detachUsed = inpt.readBoolean();
-		pbl.parameterList = (ObjectList<Parameter>) inpt.readObjectList(documentManager);
-		pbl.virtualSpecList = (ObjectList<VirtualSpecification>) inpt.readObjectList(documentManager);
-		pbl.hiddenList = (ObjectList<HiddenSpecification>) inpt.readObjectList(documentManager);
-		pbl.protectedList = (ObjectList<ProtectedSpecification>) inpt.readObjectList(documentManager);
-		pbl.statements1 = (ObjectList<Statement>) inpt.readObjectList(documentManager);
+		pbl.parameterList = (ObjectList<Parameter>) inpt.readObjectList();
+		pbl.virtualSpecList = (ObjectList<VirtualSpecification>) inpt.readObjectList();
+		pbl.hiddenList = (ObjectList<HiddenSpecification>) inpt.readObjectList();
+		pbl.protectedList = (ObjectList<ProtectedSpecification>) inpt.readObjectList();
+		pbl.statements1 = (ObjectList<Statement>) inpt.readObjectList();
 		
 		// *** PrefixedBlockDeclaration
-		pbl.blockPrefix = (VariableExpression) inpt.readObj(documentManager);
+		pbl.blockPrefix = (VariableExpression) inpt.readObj();
 		
 		pbl.isPreCompiledFromFile = inpt.jarFileName;
 		Util.TRACE_INPUT("END Read PrefixedBlockDeclaration: " + pbl.identifierValue() + ", Declared in: " + pbl.declaredIn);

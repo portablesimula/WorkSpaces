@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.utilities.Comn;
 import simula.lsp.utilities.LOG;
 import simula.lsp.utilities.Util;
@@ -109,7 +108,7 @@ public class DocumentTextUpdater {
 //                .map(line -> line.stripTrailing() + "\n")
 //                .collect(Collectors.toList());
 		
-		List<String> newLines = DocumentManager.getLines(text);
+		List<String> newLines = SimulaBuilder.getLines(text);
 		
 		sourceLines.addAll(startLine, newLines);
 		

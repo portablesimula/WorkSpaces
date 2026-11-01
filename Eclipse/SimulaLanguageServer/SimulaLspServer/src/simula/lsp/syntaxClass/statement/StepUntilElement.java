@@ -57,6 +57,7 @@ public class StepUntilElement extends ForListElement {
 
 	@Override
 	public void doChecking() {
+		DocumentManager documentManager = this.getDocumentManager();
 		expr1.doChecking();
 		expr1 = TypeConversion.testAndCreate(documentManager, forStatement.controlVariable.type, expr1);
 //		expr1.doChecking();

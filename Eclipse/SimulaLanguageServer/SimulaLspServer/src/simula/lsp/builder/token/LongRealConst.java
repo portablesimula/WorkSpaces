@@ -1,16 +1,14 @@
 package simula.lsp.builder.token;
 
-import java.util.List;
-
-import simula.lsp.builder.SimulaLexer;
+import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.utilities.KeyWord;
 import simula.lsp.utilities.Option;
 
 public class LongRealConst extends LexToken {
 	public final double value;
 
-	public LongRealConst(int tokenStartLine, List<String> sourceLines, int column, int length, double value, SimulaLexer lexer) {
-		super(tokenStartLine, sourceLines, column, length, KeyWord.LONGREALKONST, SemanticTokenTypes.Number, lexer);
+	public LongRealConst(SimulaBuilder simBuilder, int tokenStartLine, int column, int length, double value) {
+		super(simBuilder, tokenStartLine, column, length, KeyWord.LONGREALKONST, SemanticTokenTypes.Number);
 		this.value = value;
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();
 	}

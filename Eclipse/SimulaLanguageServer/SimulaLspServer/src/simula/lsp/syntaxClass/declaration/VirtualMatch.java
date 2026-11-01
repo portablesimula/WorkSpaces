@@ -10,7 +10,6 @@ import java.lang.classfile.ClassFile;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.MethodTypeDesc;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.JavaSourceFileCoder;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.SyntaxElement;
@@ -36,8 +35,8 @@ public final class VirtualMatch extends Declaration {
 	/// Create a new VirtualMatch.
 	/// @param virtualSpec the virtual specification
 	/// @param match a matching ProcedureDeclaration
-	VirtualMatch(final DocumentManager documentManager, final VirtualSpecification virtualSpec, final ProcedureDeclaration match) {
-		super(documentManager, virtualSpec.identifier);
+	VirtualMatch(final VirtualSpecification virtualSpec, final ProcedureDeclaration match) {
+		super(virtualSpec.identifier);
 		this.declarationKind = ObjectKind.VirtualMatch;
 		// NOTE: Called during Checking
 		this.virtualSpec = virtualSpec;

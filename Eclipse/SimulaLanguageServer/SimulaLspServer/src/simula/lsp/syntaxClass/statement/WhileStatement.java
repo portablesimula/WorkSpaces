@@ -47,16 +47,10 @@ public final class WhileStatement extends Statement {
 	
 	/// The statement after DO
 	private Statement doStatement;
-
-	/// Create a new WhileStatement.
-	/// @param line the source line number
-	private WhileStatement(final DocumentManager documentManager) {
-		super(documentManager);
-	}
 	
-	static WhileStatement of(final DocumentManager documentManager) {
-		SimulaBuilder simBuilder = documentManager.simBuilder;
-		WhileStatement stm = new WhileStatement(documentManager);
+	static WhileStatement of() {
+		WhileStatement stm = new WhileStatement();
+		SimulaBuilder simBuilder = stm.getSimBuilder();
 		simBuilder.consume(KeyWord.WHILE); //  (add it to tokenList)
 
 //		if (Option.internal.TRACE_PARSE)
@@ -142,7 +136,7 @@ public final class WhileStatement extends Statement {
 	/// @return the WhileStatement object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static WhileStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		WhileStatement stm = new WhileStatement(documentManager);
+		WhileStatement stm = new WhileStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		

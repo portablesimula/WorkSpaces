@@ -52,9 +52,9 @@ public final class StandaloneExpression extends Statement {
 	/// @param expression the expression
 //	StandaloneExpression(final PsiBuilder simBuilder, final int line,final Expression expression) {
 //		super(line);
-	StandaloneExpression(final DocumentManager documentManager, final Expression expression) {
-		super(documentManager);
-		SimulaBuilder simBuilder = documentManager.simBuilder;
+	StandaloneExpression(final Expression expression) {
+//		super(documentManager);
+		SimulaBuilder simBuilder = this.getSimBuilder();
 //		Util.println("\nNEW StandaloneExpression: expr="+expression);
 //		simBuilder.printPSI("NEW StandaloneExpression: expr="+expression);
 //		this.lastParserToken = expression.lastParserToken;
@@ -164,8 +164,8 @@ public final class StandaloneExpression extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private StandaloneExpression(final DocumentManager documentManager) {
-		super(documentManager);
+	private StandaloneExpression() {
+//		super(documentManager);
 	}
 
 	@Override
@@ -184,7 +184,7 @@ public final class StandaloneExpression extends Statement {
 	/// @return the StandaloneExpression object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static StandaloneExpression readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		StandaloneExpression stm = new StandaloneExpression(documentManager);
+		StandaloneExpression stm = new StandaloneExpression();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 

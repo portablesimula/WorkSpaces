@@ -114,8 +114,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// Create a new ProcedureDeclaration.
 	/// @param identifier procedure identifier
 	/// @param declarationKind procedure or switch
-	protected ProcedureDeclaration(final DocumentManager documentManager, final Identifier identifier,final int declarationKind) {
-		super(documentManager, identifier);
+	protected ProcedureDeclaration(final Identifier identifier,final int declarationKind) {
+		super(identifier);
 		this.declarationKind = declarationKind;
 	}
 
@@ -143,7 +143,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @param type procedure's type
 	/// @return a newly created ProcedureDeclaration
 	public static ProcedureDeclaration expectProcedureDeclaration(final SimulaBuilder simBuilder, final Type type) {
-		ProcedureDeclaration proc = new ProcedureDeclaration(simBuilder.documentManager, null, ObjectKind.Procedure);
+		ProcedureDeclaration proc = new ProcedureDeclaration(null, ObjectKind.Procedure);
 		proc.sourceFileName = simBuilder.documentManager.sourceFileName;
 //		proc.OLD_lineNumber = simBuilder.getSourceLineNumber();
 		proc.type = type;
@@ -200,7 +200,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					}
 				if (parameter == null) {
 					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
-					parameter = new Parameter(simBuilder.documentManager, identifier);
+					parameter = new Parameter(identifier);
 				}
 				parameter.setMode(mode);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
@@ -253,7 +253,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					if (Util.equals(identifier,par.identifier)) { parameter = par; break; }
 				if (parameter == null) {
 					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
-					parameter = new Parameter(simBuilder.documentManager, identifier);
+					parameter = new Parameter(identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
@@ -320,7 +320,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		LspGlobal.enterScope(this);
 			LabelList.accumLabelList(this);
 			if(type != null) {
-				this.result = new SimpleVariableDeclaration(documentManager, type, new Identifier("_RESULT"));
+				this.result = new SimpleVariableDeclaration(type, new Identifier("_RESULT"));
 				declarationList.add(result);
 			}
 			int prfx = 0;// prefixLevel();
@@ -345,7 +345,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 								Util.semanticError(this, "Virtual match has wrong heading. Parameter " + (i+1) + " does not match the specification");	
 					}
 				} 
-				myVirtual = new VirtualMatch(documentManager, virtualSpec, this);
+				myVirtual = new VirtualMatch(virtualSpec, this);
 				ClassDeclaration decl = (ClassDeclaration) declaredIn;
 				decl.virtualMatchList.add(myVirtual);
 				if (decl == virtualSpec.declaredIn) virtualSpec.hasDefaultMatch = true;
@@ -1113,9 +1113,9 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static ProcedureDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static ProcedureDeclaration readObject(final AttributeInputStream inpt) throws IOException {
 		Identifier identifier = inpt.readIdentifier();
-		ProcedureDeclaration pro = new ProcedureDeclaration(documentManager, identifier, ObjectKind.Procedure);
+		ProcedureDeclaration pro = new ProcedureDeclaration(identifier, ObjectKind.Procedure);
 		pro.OBJECT_SEQU = inpt.readSEQU(pro);
 
 		// *** SyntaxElement
@@ -1130,7 +1130,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		pro.hasLocalClasses = inpt.readBoolean();
 		
 		// *** ProcedurekDeclaration
-		pro.parameterList = (ObjectList<Parameter>) inpt.readObjectList(documentManager);
+		pro.parameterList = (ObjectList<Parameter>) inpt.readObjectList();
 
 		pro.isPreCompiledFromFile = inpt.jarFileName;
 //		Util.TRACE_INPUT("END Read ProcedureDeclaration: Procedure "+identifierValue() + ", Declared in: "+pro.declaredIn);

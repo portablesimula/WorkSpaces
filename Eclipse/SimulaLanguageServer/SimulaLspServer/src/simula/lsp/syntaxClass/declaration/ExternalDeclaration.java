@@ -105,15 +105,15 @@ public final class ExternalDeclaration extends Declaration {
 	/// Create a new ExternalDeclaration.
 	/// @param identifier the identifier.
 	/// @param extIdentitier the external identifier.
-	private ExternalDeclaration(final DocumentManager documentManager, Identifier identifier,String extIdentitier) {
-		super(documentManager, identifier);
+	private ExternalDeclaration(final Identifier identifier, final String extIdentitier) {
+		super(identifier);
 		this.declarationKind = ObjectKind.ExternalDeclaration;
 		this.externalIdent = extIdentitier;
 	}
 	
 	/// Private Constructor used by Attribute File I/O.
-	private ExternalDeclaration(final DocumentManager documentManager) {
-		super(documentManager, null);
+	private ExternalDeclaration() {
+		super(null);
 		this.declarationKind = ObjectKind.ExternalDeclaration;
 	}
 
@@ -165,7 +165,7 @@ public final class ExternalDeclaration extends Declaration {
 				}
 				simBuilder.getNextParserToken();
 			}
-			ExternalDeclaration externalDeclaration = new ExternalDeclaration(simBuilder.documentManager, identifier, externalIdentifier);
+			ExternalDeclaration externalDeclaration = new ExternalDeclaration(identifier, externalIdentifier);
 			externalDeclaration.type = expectedType;
 			declarations.add(externalDeclaration);
 //			Util.println("ExternalDeclaration.expectExternalDeclaration: externalDeclaration: " + externalDeclaration);
@@ -282,7 +282,7 @@ public final class ExternalDeclaration extends Declaration {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static ExternalDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		ExternalDeclaration ext = new ExternalDeclaration(documentManager);
+		ExternalDeclaration ext = new ExternalDeclaration();
 		ext.OBJECT_SEQU = inpt.readSEQU(ext);
 
 		// *** SyntaxElement

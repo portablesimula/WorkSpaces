@@ -82,10 +82,10 @@ public final class SimulaLexer {
 	/// Constructs a new SimulaScanner that produces Items scanned from the specified source.
 	/// @param reader The character source to scan
 	/// @param editorMode true: delivers tokens to the SimulaEditor
-	public SimulaLexer(final SimulaBuilder simBuilder, final List<String> sourceLines) {
+	public SimulaLexer(final SimulaBuilder simBuilder) {
 		this.simBuilder = simBuilder;
+		this.sourceLines = simBuilder.sourceLines;
 		this.reader = new SourceTextReader(sourceLines);
-		this.sourceLines = sourceLines;
 		LspGlobal.sourceLineNumber=1;
 	}
 
@@ -278,7 +278,7 @@ public final class SimulaLexer {
     		break LOOP;
     	}
     	reader.pushBackPos(1);
-    	return new WhiteSpaceToken(reader.currentLineNumber(), sourceLines, currentColumn, reader.nextPos() - tokenStartPos, this);
+    	return new WhiteSpaceToken(simBuilder, reader.currentLineNumber(), currentColumn, reader.nextPos() - tokenStartPos);
      }
 
     
@@ -1340,7 +1340,7 @@ public final class SimulaLexer {
     /// @return the newly created Token
 	private LexToken newKeyWordToken(final int keyWord) {
 //		Util.println("SimulaLexer.newKeyWordToken: "+KeyWord.edit(keyWord)+", currentColumn="+currentColumn+", reader.nextPos="+reader.nextPos()+", tokenStartPos="+tokenStartPos);
-		return new KeyWordToken(reader.currentLineNumber(), sourceLines, currentColumn, reader.nextPos() - tokenStartPos, keyWord, this);
+		return new KeyWordToken(simBuilder, reader.currentLineNumber(), currentColumn, reader.nextPos() - tokenStartPos, keyWord);
 	}
 
     /// Create a new keyWord Token
@@ -1348,7 +1348,7 @@ public final class SimulaLexer {
     /// @return the newly created Token
 	private LexToken newCommentToken(final int keyWord) {
 //		Util.println("SimulaLexer.newKeyWordToken: "+KeyWord.edit(keyWord)+", currentColumn="+currentColumn+", reader.nextPos="+reader.nextPos()+", tokenStartPos="+tokenStartPos);
-		return new CommentToken(reader.currentLineNumber(), sourceLines, currentColumn, reader.nextPos() - tokenStartPos, this);
+		return new CommentToken(simBuilder, reader.currentLineNumber(), currentColumn, reader.nextPos() - tokenStartPos);
 	}
 
     /// Create a new keyWord Token
@@ -1357,7 +1357,7 @@ public final class SimulaLexer {
 	private LexToken newNewlineToken() {
 		int line = reader.currentLineNumber() - 1;
 		int lngt = reader.prevLineLength() - 1;
-		LexToken newlineToken = new KeyWordToken(line, sourceLines, lngt, 1, KeyWord.NEWLINE, this);
+		LexToken newlineToken = new KeyWordToken(simBuilder, line, lngt, 1, KeyWord.NEWLINE);
     	currentColumn = 0;
     	if(TRACE_CURRENT_COLUMN) Util.println("SimulaLexer.newNewlineToken: currentColumn="+currentColumn);
        	if(Option.LEX_VERIFY) {
@@ -1374,7 +1374,7 @@ public final class SimulaLexer {
     /// @param value the value
     /// @return the newly created Token
 	private LexToken newIntegerToken(final long value) {
-		return new IntegerConst(reader.currentLineNumber(), sourceLines, currentColumn, reader.nextPos() - tokenStartPos, value, this);
+		return new IntegerConst(simBuilder, reader.currentLineNumber(), currentColumn, reader.nextPos() - tokenStartPos, value);
 	}
 	  
     /// Create a new Character Token
@@ -1382,7 +1382,7 @@ public final class SimulaLexer {
     /// @param value the value
     /// @return the newly created Token
 	private LexToken newCharacterToken(final char value) {
-		return new CharacterConst(reader.currentLineNumber(), sourceLines, currentColumn, reader.nextPos() - tokenStartPos, value, this);
+		return new CharacterConst(simBuilder, reader.currentLineNumber(), currentColumn, reader.nextPos() - tokenStartPos, value);
 	}
 	  
     /// Create a new Simple String Token
@@ -1390,7 +1390,7 @@ public final class SimulaLexer {
     /// @param value the value
     /// @return the newly created Token
 	private LexToken newSimpleStringToken(final String value) {
-		return new SimpleString(reader.currentLineNumber(), sourceLines, currentColumn, reader.nextPos() - tokenStartPos, value, this);
+		return new SimpleString(simBuilder, reader.currentLineNumber(), currentColumn, reader.nextPos() - tokenStartPos, value);
 	}
 
     /// Create a new Real Token
@@ -1398,7 +1398,7 @@ public final class SimulaLexer {
     /// @param value the value
     /// @return the newly created Token
 	private LexToken newRealToken(final float value) {
-		return new RealConst(reader.currentLineNumber(), sourceLines, currentColumn, reader.nextPos() - tokenStartPos, value, this);
+		return new RealConst(simBuilder, reader.currentLineNumber(), currentColumn, reader.nextPos() - tokenStartPos, value);
 	}
 
     /// Create a new Long Real Token
@@ -1406,7 +1406,7 @@ public final class SimulaLexer {
     /// @param value the value
     /// @return the newly created Token
 	private LexToken newLongRealToken(final double value) {
-		return new LongRealConst(reader.currentLineNumber(), sourceLines, currentColumn, reader.nextPos() - tokenStartPos, value, this);
+		return new LongRealConst(simBuilder, reader.currentLineNumber(), currentColumn, reader.nextPos() - tokenStartPos, value);
 	}
 	
     /// Only when Option LEX_VERIFY = true
@@ -1433,7 +1433,7 @@ public final class SimulaLexer {
     /// @param ident the Token's identifier
     /// @return an identifier Token
     private LexToken identifierToken(final String ident) {
-    	return new Identifier(reader.currentLineNumber(), sourceLines, currentColumn, reader.nextPos() - tokenStartPos, this);
+    	return new Identifier(simBuilder, reader.currentLineNumber(), currentColumn, reader.nextPos() - tokenStartPos);
     }
 
 	/// Utility: Edit reader.getCurrent() character.

@@ -7,7 +7,6 @@ package simula.lsp.syntaxClass.expression;
 
 import java.lang.classfile.CodeBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.CharacterConst;
@@ -101,9 +100,9 @@ public abstract class Expression extends SyntaxElement {
 	public SyntaxElement backLink;
 
 	/// Expression.
-	public Expression(final DocumentManager documentManager){
-		super(documentManager);
-	}
+//	public Expression(final DocumentManager documentManager){
+//		super(documentManager);
+//	}
 
 	/// Accept expression.
 	/// <pre>
@@ -381,18 +380,18 @@ public abstract class Expression extends SyntaxElement {
 		Expression expr=null;
 		LexToken prevToken = Parse.getCurrentParserToken(simBuilder);
 		if(Parse.accept(simBuilder, KeyWord.BEGPAR)) { expr = acceptExpression(simBuilder); Parse.expect(simBuilder, KeyWord.ENDPAR); }
-		else if(Parse.accept(simBuilder, KeyWord.INTEGERKONST)) expr = new Constant(simBuilder.documentManager, Type.Integer,((IntegerConst)prevToken).value);
+		else if(Parse.accept(simBuilder, KeyWord.INTEGERKONST)) expr = new Constant(Type.Integer,((IntegerConst)prevToken).value);
 		else if(Parse.accept(simBuilder, KeyWord.REALKONST)) expr = Constant.createRealType(simBuilder, ((RealConst)prevToken).value);
 		else if(Parse.accept(simBuilder, KeyWord.LONGREALKONST)) expr = Constant.createLongRealType(simBuilder, ((LongRealConst)prevToken).value);
 
 //		else if(PsiParse.accept(simBuilder, KeyWord.BOOLEANKONST)) expr = new Constant(Type.Boolean,((IntegerConst)prevToken).value);
-		else if(Parse.accept(simBuilder, KeyWord.TRUE)) expr = new Constant(simBuilder.documentManager, Type.Boolean,true);
-		else if(Parse.accept(simBuilder, KeyWord.FALSE)) expr = new Constant(simBuilder.documentManager, Type.Boolean,false);
+		else if(Parse.accept(simBuilder, KeyWord.TRUE)) expr = new Constant(Type.Boolean,true);
+		else if(Parse.accept(simBuilder, KeyWord.FALSE)) expr = new Constant(Type.Boolean,false);
 
-		else if(Parse.accept(simBuilder, KeyWord.CHARACTERKONST)) expr = new Constant(simBuilder.documentManager, Type.Character,((CharacterConst)prevToken).value);
-		else if(Parse.accept(simBuilder, KeyWord.TEXTKONST)) expr = new Constant(simBuilder.documentManager, Type.Text,simBuilder.getTextString(prevToken));
-		else if(Parse.accept(simBuilder, KeyWord.NONE)) expr = new Constant(simBuilder.documentManager, Type.Ref,null);
-		else if(Parse.accept(simBuilder, KeyWord.NOTEXT)) expr = new Constant(simBuilder.documentManager, Type.Text,null);
+		else if(Parse.accept(simBuilder, KeyWord.CHARACTERKONST)) expr = new Constant(Type.Character,((CharacterConst)prevToken).value);
+		else if(Parse.accept(simBuilder, KeyWord.TEXTKONST)) expr = new Constant(Type.Text,simBuilder.getTextString(prevToken));
+		else if(Parse.accept(simBuilder, KeyWord.NONE)) expr = new Constant(Type.Ref,null);
+		else if(Parse.accept(simBuilder, KeyWord.NOTEXT)) expr = new Constant(Type.Text,null);
 		else if(Parse.accept(simBuilder, KeyWord.NEW)) expr = ObjectGenerator.expectNew(simBuilder);
 		else if(Parse.accept(simBuilder, KeyWord.THIS)) expr = LocalObject.expectThisIdentifier(simBuilder); 
 		else {

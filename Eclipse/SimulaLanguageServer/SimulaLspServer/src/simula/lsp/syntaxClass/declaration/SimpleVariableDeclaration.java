@@ -14,7 +14,6 @@ import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
 import java.util.Vector;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -72,8 +71,8 @@ public class SimpleVariableDeclaration extends Declaration {
 	/// 
 	/// @param type       the variable type
 	/// @param identifier the variable identifier
-	public SimpleVariableDeclaration(final DocumentManager documentManager, final Type type, final Identifier identifier) {
-		super(documentManager, identifier);
+	public SimpleVariableDeclaration(final Type type, final Identifier identifier) {
+		super(identifier);
 		this.declarationKind = ObjectKind.SimpleVariableDeclaration;
 		this.type = type;
 	}
@@ -83,8 +82,8 @@ public class SimpleVariableDeclaration extends Declaration {
 	/// @param identifier      the variable identifier
 	/// @param constant        the constant indicator
 	/// @param constantElement a constant initial value
-	SimpleVariableDeclaration(final DocumentManager documentManager, final Type type, final Identifier identifier, final boolean constant, final Constant constantElement) {
-		this(documentManager, type, identifier);
+	SimpleVariableDeclaration(final Type type, final Identifier identifier, final boolean constant, final Constant constantElement) {
+		this(type, identifier);
 		this.constant = constant;
 		this.constantElement = constantElement;
 	}
@@ -127,7 +126,7 @@ public class SimpleVariableDeclaration extends Declaration {
 			Parse.TRACE("Parse IdentifierList");
 		do {
 			Identifier ident = Parse.expectIdentifier(simBuilder);
-			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(simBuilder.documentManager, type, ident);
+			SimpleVariableDeclaration typeDeclaration = new SimpleVariableDeclaration(type, ident);
 			if (Parse.accept(simBuilder, KeyWord.EQ))
 				typeDeclaration.constantElement = Expression.expectExpression(simBuilder, "constant");
 			declarations.add(typeDeclaration);
@@ -152,7 +151,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		type.doChecking(LspGlobal.getCurrentScope(), this);
 		if (constantElement != null) {
 			constantElement.doChecking();
-			constantElement = TypeConversion.testAndCreate(documentManager, type, constantElement);
+			constantElement = TypeConversion.testAndCreate(type, constantElement);
 			constantElement.type = type;
 			constantElement.backLink = this;
 		}
@@ -257,8 +256,8 @@ public class SimpleVariableDeclaration extends Declaration {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public SimpleVariableDeclaration(final DocumentManager documentManager) {
-		super(documentManager, null);
+	public SimpleVariableDeclaration() {
+		super(null);
 		this.declarationKind = ObjectKind.SimpleVariableDeclaration;
 	}
 
@@ -286,8 +285,8 @@ public class SimpleVariableDeclaration extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static SimpleVariableDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		SimpleVariableDeclaration var = new SimpleVariableDeclaration(documentManager);
+	public static SimpleVariableDeclaration readObject(final AttributeInputStream inpt) throws IOException {
+		SimpleVariableDeclaration var = new SimpleVariableDeclaration();
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
 		// *** SyntaxElement
@@ -297,11 +296,11 @@ public class SimpleVariableDeclaration extends Declaration {
 		var.identifier = inpt.readIdentifier();
 		var.externalIdent = inpt.readString();
 		var.type = inpt.readType();
-		var.declaredIn = (DeclarationScope) inpt.readObj(documentManager);
+		var.declaredIn = (DeclarationScope) inpt.readObj();
 		
 		// *** SimpleVariableDeclaration
 		var.constant = inpt.readBoolean();
-		var.constantElement = (Expression) inpt.readObj(documentManager);
+		var.constantElement = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("Variable: " + var.OBJECT_SEQU + " " + var);
 		return(var);
 	}

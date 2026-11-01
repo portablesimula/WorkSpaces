@@ -15,6 +15,7 @@ import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
+import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.LexToken;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.declaration.Declaration;
@@ -92,14 +93,11 @@ import simula.lsp.utilities.Util;
 public abstract class SyntaxElement {
 
 	/// The associated Document Manager
-//	public SimulaBuilder simBuilder;
-	public final DocumentManager documentManager;
+//	public final DocumentManager documentManager;
 	
+	/// Not present for System or External modules
 	private LexToken firstParserToken;
 	private LexToken lastParserToken;
-	
-//	/// Not present for System or External modules
-//	public Range lexRange;
 
 	/// Controls semantic checking.
 	/// 
@@ -113,30 +111,24 @@ public abstract class SyntaxElement {
 	public int OBJECT_SEQU;
 	
 	/// Create a new SyntaxElement.
-	protected SyntaxElement(DocumentManager documentManager) {
-//		if(documentManager == null && (!(this instanceof Type))) Util.IERR("documentManager == null for "+this.getClass());
-//		OLD_lineNumber = Global.sourceLineNumber;
-//		this.simBuilder= simBuilder;
-		this.documentManager= documentManager;
-		
-		if(documentManager == null) Util.println("NEW SyntaxElement: " + this.getClass().getSimpleName() + ": documentManager == null");
-		else if(documentManager.simBuilder == null) Util.println("NEW SyntaxElement: " + this.getClass().getSimpleName() + ": documentManager.simBuilder == null");
-
-//		if(documentManager != null && documentManager.simBuilder != null) {
-////			this.firstParserToken = this.lastParserToken = documentManager.simBuilder.getCurrentParserToken();
-////			LexToken current = documentManager.simBuilder.getCurrentParserToken();
-//			LexToken current = documentManager.simBuilder.getPrevParserToken();
-//			if(current == null) current = documentManager.simBuilder.getCurrentParserToken();
-//			if(current != null) {
-//				Position firstLexPosition = new Position(current.lineNumber, current.column);
-//				Position lastLexPosition = new Position(current.lineNumber, current.column + current.length);
-//				this.lexRange = new Range(firstLexPosition, lastLexPosition);
-//			} else {
-//				Util.IERR("DETTE MÅ SKRIVES: LAG DEFAULT RANGE");
-//			}
-//		}
+//	protected SyntaxElement(DocumentManager documentManager) {
+//		this.documentManager= documentManager;
+	
+	public DocumentManager getDocumentManager() {
+		if(firstParserToken == null) return null;
+		return firstParserToken.simBuilder.documentManager;
 	}
 	
+	public SimulaBuilder getSimBuilder() {
+		if(firstParserToken == null) return null;
+		return firstParserToken.simBuilder;
+	}
+
+	public SimulaCoder getSimCoder() {
+		if(firstParserToken == null) return null;
+		return firstParserToken.simBuilder.documentManager.simCoder;
+	}
+
 	public void setFirstParserToken(LexToken lexToken) {
 		firstParserToken = lexToken;
 		if(lastParserToken == null) lastParserToken = lexToken;
@@ -166,37 +158,16 @@ public abstract class SyntaxElement {
 		return lexRange;
 	}
 
-//	/// The first source line number
-//	public LexToken getFirstLexToken() {
-////		Util.println("SyntaxElement.getFirstLexToken: "+this.getClass());
-////		return lexTokenRange.getFirstLexToken();			
-//		return firstParserToken;			
-//	}
-//
-//	/// The last source line number
-//	public LexToken getLastLexToken() {
-////		return lexTokenRange.getLastLexToken();			
-//		return lastParserToken;			
-//	}
-
 	/// The first source line number
 	public int firstLineNumber() {
 		if(firstParserToken == null) return 0;
 		return firstParserToken.firstLineNumber();			
-//		if(firstLexPosition == null) return 0;
-//		return firstLexPosition.getLine();			
-//		if(lexRange == null) return 0;
-//		return lexRange.getStart().getLine();			
 	}
 
 	/// The last source line number
 	public int lastLineNumber() {
 		if(lastParserToken == null) return 0;
 		return lastParserToken.lastLineNumber();			
-//		if(lastLexPosition == null) return 0;
-//		return lastLexPosition.getLine();			
-//		if(lexRange == null) return 0;
-//		return lexRange.getEnd().getLine();			
 	}
 	
 	/// Perform semantic checking.
@@ -315,7 +286,7 @@ public abstract class SyntaxElement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static SyntaxElement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static SyntaxElement readObject( final AttributeInputStream inpt) throws IOException {
 		Util.IERR("Method 'readObject' needs a redefiniton");
 		return(null);
 	}

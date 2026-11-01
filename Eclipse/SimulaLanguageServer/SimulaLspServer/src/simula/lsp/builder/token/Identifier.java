@@ -1,10 +1,8 @@
 package simula.lsp.builder.token;
 
-import java.util.List;
-
 import javax.lang.model.SourceVersion;
 
-import simula.lsp.builder.SimulaLexer;
+import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.syntaxClass.declaration.DeclarationScope;
 import simula.lsp.utilities.KeyWord;
 import simula.lsp.utilities.LspGlobal;
@@ -15,9 +13,9 @@ public class Identifier extends LexToken {
 	public DeclarationScope scope;
 	public String value;
 
-	public Identifier(int tokenStartLine, List<String> sourceLines, int column, int length, SimulaLexer lexer) {
-		super(tokenStartLine, sourceLines, column, length, KeyWord.IDENTIFIER, SemanticTokenTypes.Type, lexer);
-		this.value = this.edTokenText(lexer);
+	public Identifier(SimulaBuilder simBuilder, int tokenStartLine, int column, int length) {
+		super(simBuilder, tokenStartLine, column, length, KeyWord.IDENTIFIER, SemanticTokenTypes.Type);
+		this.value = this.edTokenText(simBuilder.lexer);
 		if(SourceVersion.isKeyword(value)) value = "_" + value;
 		if(Option.internal.TRACE_NEW_LEXTOKEN > 0) TRACE_NEW_LEXTOKEN();
 		if(value == null) Util.IERR("");

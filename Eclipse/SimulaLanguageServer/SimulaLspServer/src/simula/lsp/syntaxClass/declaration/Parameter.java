@@ -16,7 +16,6 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.token.Identifier;
@@ -95,8 +94,8 @@ public final class Parameter extends Declaration {
 
 	/// Create a new Parameter.
 	/// @param identifier parameter identifier
-	public Parameter(final DocumentManager documentManager, final Identifier identifier) {
-		super(documentManager, identifier);
+	public Parameter(final Identifier identifier) {
+		super(identifier);
 		this.declarationKind = ObjectKind.Parameter;
 	}
 
@@ -104,8 +103,8 @@ public final class Parameter extends Declaration {
 	/// @param identifier parameter identifier
 	/// @param type parameter type
 	/// @param kind parameter kind
-	Parameter(final DocumentManager documentManager, final Identifier identifier, final Type type, final int kind) {
-		this(documentManager, identifier);
+	Parameter(final Identifier identifier, final Type type, final int kind) {
+		this(identifier);
 		this.type = type;
 		this.kind = kind;
 	}
@@ -115,8 +114,8 @@ public final class Parameter extends Declaration {
 	/// @param type parameter type
 	/// @param kind parameter kind
 	/// @param nDim parameter's number of dimension in case of array kind.
-	public Parameter(final DocumentManager documentManager, final Identifier identifier, final Type type, final int kind, final int nDim) {
-		this(documentManager, identifier, type, kind);
+	public Parameter(final Identifier identifier, final Type type, final int kind, final int nDim) {
+		this(identifier, type, kind);
 		this.nDim = nDim;
 	}
 
@@ -128,7 +127,7 @@ public final class Parameter extends Declaration {
 	public void into(final Vector<Parameter> parameterList) {
 		for (Parameter par : parameterList)
 			if (Util.equals(par.identifier, this.identifier)) {
-				Util.syntaxError(documentManager.simBuilder, "Parameter already defined: " + identifierValue());
+				Util.syntaxError(getSimBuilder(), "Parameter already defined: " + identifierValue());
 				return;
 			}
 		parameterList.add(this);
@@ -152,7 +151,7 @@ public final class Parameter extends Declaration {
 	/// @param mode the new mode
 	void setMode(final int mode) {
 		if (this.mode != 0)
-			Util.syntaxError(documentManager.simBuilder, "Parameter " + identifierValue() + " is already specified by " + this.mode);
+			Util.syntaxError(getSimBuilder(), "Parameter " + identifierValue() + " is already specified by " + this.mode);
 		this.mode = mode;
 	}
 
@@ -488,8 +487,8 @@ public final class Parameter extends Declaration {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private Parameter(final DocumentManager documentManager) {
-		super(documentManager, null);
+	private Parameter() {
+		super(null);
 		this.declarationKind = ObjectKind.Parameter;
 	}
 	
@@ -510,8 +509,8 @@ public final class Parameter extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static SyntaxElement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		Parameter par = new Parameter(documentManager);
+	public static SyntaxElement readObject(final AttributeInputStream inpt) throws IOException {
+		Parameter par = new Parameter();
 		par.OBJECT_SEQU = inpt.readSEQU(par);
 		// *** Parameter
 		par.identifier = inpt.readIdentifier();

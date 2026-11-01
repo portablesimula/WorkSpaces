@@ -7,7 +7,6 @@ package simula.lsp.syntaxClass;
 
 import java.io.IOException;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.token.Identifier;
@@ -50,8 +49,7 @@ public final class HiddenSpecification extends SyntaxElement {
 	/// Create a new HiddenSpecification.
 	/// @param definedIn  the class where Hidden is specified
 	/// @param identifier the hidden identifier
-	public HiddenSpecification(final DocumentManager documentManager, final ClassDeclaration definedIn, final Identifier identifier) {
-		super(documentManager);
+	public HiddenSpecification(final ClassDeclaration definedIn, final Identifier identifier) {
 		this.definedIn = definedIn;
 		this.identifier = identifier;
 	}
@@ -136,8 +134,8 @@ public final class HiddenSpecification extends SyntaxElement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private HiddenSpecification(final DocumentManager documentManager) {
-		super(documentManager);
+	private HiddenSpecification() {
+//		super(documentManager);
 	}
 	
 	@Override
@@ -156,14 +154,14 @@ public final class HiddenSpecification extends SyntaxElement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static HiddenSpecification readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		HiddenSpecification spec = new HiddenSpecification(documentManager);
+	public static HiddenSpecification readObject(final AttributeInputStream inpt) throws IOException {
+		HiddenSpecification spec = new HiddenSpecification();
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
 		// *** SyntaxElement
 
 		// *** HiddenSpecification
 		spec.identifier = inpt.readIdentifier();
-		spec.definedIn = (ClassDeclaration) inpt.readObj(documentManager);
+		spec.definedIn = (ClassDeclaration) inpt.readObj();
 		Util.TRACE_INPUT("HiddenSpecification: " + spec.identifier.value);
 		return(spec);
 	}
