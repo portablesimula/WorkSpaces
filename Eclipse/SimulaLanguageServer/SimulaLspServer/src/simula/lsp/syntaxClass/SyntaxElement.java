@@ -118,6 +118,10 @@ public abstract class SyntaxElement {
 //		OLD_lineNumber = Global.sourceLineNumber;
 //		this.simBuilder= simBuilder;
 		this.documentManager= documentManager;
+		
+		if(documentManager == null) Util.println("NEW SyntaxElement: " + this.getClass().getSimpleName() + ": documentManager == null");
+		else if(documentManager.simBuilder == null) Util.println("NEW SyntaxElement: " + this.getClass().getSimpleName() + ": documentManager.simBuilder == null");
+
 //		if(documentManager != null && documentManager.simBuilder != null) {
 ////			this.firstParserToken = this.lastParserToken = documentManager.simBuilder.getCurrentParserToken();
 ////			LexToken current = documentManager.simBuilder.getCurrentParserToken();

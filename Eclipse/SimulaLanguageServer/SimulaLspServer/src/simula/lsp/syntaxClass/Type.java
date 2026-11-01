@@ -142,7 +142,8 @@ public class Type extends SyntaxElement {
 	/// @param tp the given Type
 	/// @param declaredIn the ConnectionBlock
 	public Type(Type tp,ConnectionBlock declaredIn) {
-		super(null);
+//		super(null);
+		super(tp.documentManager);
 		this.keyWord = tp.keyWord;
 		this.classIdent = tp.classIdent;
 		this.qual = tp.qual;

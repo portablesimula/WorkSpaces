@@ -1,3 +1,8 @@
 begin 
 	integer a,b,c=z; 
+	ref(C) nn;
+	class C(x); ref(C) x; hidden yy;
+	begin
+	   nn.x :- new C;
+	end;
 end;

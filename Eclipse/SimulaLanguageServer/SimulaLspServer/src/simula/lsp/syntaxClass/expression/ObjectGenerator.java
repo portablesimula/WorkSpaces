@@ -120,7 +120,7 @@ public final class ObjectGenerator extends Expression {
 //			meaning = new Meaning(null, null); // Error Recovery: No Meaning
 		}
 		if (!(meaning.declaredAs instanceof ClassDeclaration)) {
-			Util.semanticError(this, "NEW " + classIdentifier + ": Not a Class");
+			Util.semanticError(this, "new " + classIdentifier.value + ": Not a Class");
 			SET_SEMANTICS_CHECKED();
 			return;
 		}

@@ -238,6 +238,12 @@ public final class Util {
 //		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Error, elt.lexRange, msg);
 		Diagnostic diagnostic = new Diagnostic(elt.getLexRange(), msg, DiagnosticSeverity.Error, "Simula.LSP");
 		LOG.error(edDiagnostic(diagnostic));
+		
+		if(elt.documentManager == null) {
+			Util.printError("Util.semanticError: Missing DocumentManager: " + elt.getClass().getSimpleName());
+			Util.printError("Util.semanticError: Missing DocumentManager: " + edDiagnostic(diagnostic));
+		} else
+			
 		elt.documentManager.simBuilder.addError(diagnostic);
 	}
 	
