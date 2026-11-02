@@ -9,13 +9,11 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
-import simula.lsp.builder.token.LexToken;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.Type;
 import simula.lsp.syntaxClass.expression.Constant;
@@ -135,14 +133,14 @@ public final class WhileStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the WhileStatement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static WhileStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static WhileStatement readObject(final AttributeInputStream inpt) throws IOException {
 		WhileStatement stm = new WhileStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		
 		// *** WhileStatement
-		stm.condition  = (Expression) inpt.readObj(documentManager);
-		stm.doStatement = (Statement) inpt.readObj(documentManager);
+		stm.condition  = (Expression) inpt.readObj();
+		stm.doStatement = (Statement) inpt.readObj();
 		Util.TRACE_INPUT("WhileStatement: " + stm);
 		return(stm);
 	}

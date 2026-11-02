@@ -1468,7 +1468,7 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static ClassDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static ClassDeclaration readObject(final AttributeInputStream inpt) throws IOException {
 		Identifier identifier = inpt.readIdentifier();
 		ClassDeclaration cls = new ClassDeclaration(identifier);
 		Util.TRACE_INPUT("BEGIN Read ClassDeclaration: " + identifier.value + ", Declared in: " + cls.declaredIn);

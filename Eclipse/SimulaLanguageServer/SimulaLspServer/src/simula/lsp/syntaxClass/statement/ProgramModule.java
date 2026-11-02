@@ -97,13 +97,13 @@ public final class ProgramModule extends Statement {
 	}
 
 	/// Create a new ProgramModule.
-	public ProgramModule(DocumentManager documentManager) {
+	public ProgramModule() {
 		Identifier sysinID = new Identifier("sysin");
-		sysin = new  VariableExpression(documentManager, sysinID);
+		sysin = new  VariableExpression(sysinID);
 		sysin.meaning = StandardClass.BASICIO.findMeaning(sysinID);
 		sysin.SET_SEMANTICS_CHECKED();
 		Identifier sysoutID = new Identifier("sysout");
-		sysout = new VariableExpression(documentManager, sysoutID);
+		sysout = new VariableExpression(sysoutID);
 		sysout.meaning = StandardClass.BASICIO.findMeaning(sysoutID);
 		sysout.SET_SEMANTICS_CHECKED();
 //		Util.println("NEW ProgramModule: sysout.meaning="+sysout.meaning);
@@ -179,9 +179,9 @@ public final class ProgramModule extends Statement {
 	/// @return the Program Statement.
 	private DeclarationScope doParseProgram() {
 		DocumentManager documentManager = this.getDocumentManager();
-		SimulaBuilder simBuilder = documentManager.simBuilder;
+		SimulaBuilder simBuilder = getSimBuilder();
 		String sourceName = documentManager.sourceName;
-		BlockDeclaration mainBlock = new MaybeBlockDeclaration(documentManager, new Identifier(sourceName));
+		BlockDeclaration mainBlock = new MaybeBlockDeclaration(new Identifier(sourceName));
 		
 		mainBlock.isMainModule = true;
 		mainBlock.declarationKind = ObjectKind.SimulaProgram;

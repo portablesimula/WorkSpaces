@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.coder.SimulaCoder;
@@ -51,9 +50,7 @@ public final class ConditionalExpression extends Expression {
 	/// @param condition the condition
 	/// @param thenExpression then branch expression
 	/// @param elseExpression else branch expression
-	ConditionalExpression(final DocumentManager documentManager, final Type type, final Expression condition, final Expression thenExpression, final Expression elseExpression) {
-		super(documentManager);
-//		SimulaBuilder simBuilder = documentManager.simBuilder;
+	ConditionalExpression(final Type type, final Expression condition, final Expression thenExpression, final Expression elseExpression) {
 		this.condition = condition;
 		this.thenExpression = thenExpression; thenExpression.backLink=this;
 		this.elseExpression = elseExpression; elseExpression.backLink=this;
@@ -73,8 +70,8 @@ public final class ConditionalExpression extends Expression {
 		thenExpression.doChecking();
 		elseExpression.doChecking();
 		Type expectedType=commonTypeConversion(thenExpression.type,elseExpression.type);
-		thenExpression = TypeConversion.testAndCreate(documentManager, expectedType, thenExpression);
-		elseExpression = TypeConversion.testAndCreate(documentManager, expectedType, elseExpression);
+		thenExpression = TypeConversion.testAndCreate(expectedType, thenExpression);
+		elseExpression = TypeConversion.testAndCreate(expectedType, elseExpression);
 		thenExpression.doChecking(); // In case TypeConversion was added
 		elseExpression.doChecking(); // In case TypeConversion was added
 		this.type=expectedType;
@@ -141,8 +138,7 @@ public final class ConditionalExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ConditionalExpression(final DocumentManager documentManager) {
-		super(documentManager);
+	private ConditionalExpression() {
 	}
 
 	@Override
@@ -165,18 +161,18 @@ public final class ConditionalExpression extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ConditionalExpression read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ConditionalExpression readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		ConditionalExpression expr = new ConditionalExpression(documentManager);
+	public static ConditionalExpression readObject(final AttributeInputStream inpt) throws IOException {
+		ConditionalExpression expr = new ConditionalExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** ConditionalExpression
-		expr.condition = (Expression) inpt.readObj(documentManager);
-		expr.thenExpression = (Expression) inpt.readObj(documentManager);
-		expr.elseExpression = (Expression) inpt.readObj(documentManager);
+		expr.condition = (Expression) inpt.readObj();
+		expr.thenExpression = (Expression) inpt.readObj();
+		expr.elseExpression = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("readConditionalExpression: " + expr);
 		return(expr);
 	}

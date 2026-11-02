@@ -96,7 +96,7 @@ public final class ObjectRelation extends Expression {
 	/// @param classIdentifier the right hand class identifier
 	ObjectRelation(final DocumentManager documentManager, final Expression lhs, final int opr, final Identifier classIdentifier) {
 		super(documentManager);
-//		SimulaBuilder simBuilder = documentManager.simBuilder;
+//		SimulaBuilder simBuilder = getSimBuilder();
 		this.lhs = lhs;
 		this.opr = opr;
 		this.classIdentifier = classIdentifier;
@@ -196,7 +196,7 @@ public final class ObjectRelation extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ObjectRelation object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ObjectRelation readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static ObjectRelation readObject(final AttributeInputStream inpt) throws IOException {
 		ObjectRelation expr = new ObjectRelation(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		

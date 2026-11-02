@@ -8,7 +8,6 @@ package simula.lsp.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -57,9 +56,8 @@ public final class GotoStatement extends Statement {
 
 	/// Create a new GotoStatement.
 	/// @param line source line
-	GotoStatement(final DocumentManager documentManager, final int keyWord) {
-		super(documentManager);
-		SimulaBuilder simBuilder = documentManager.simBuilder;
+	GotoStatement(final int keyWord) {
+		SimulaBuilder simBuilder = getSimBuilder();
 		simBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to tokenList)
 		if(keyWord != KeyWord.GOTO) {
 	        if (!Parse.accept(simBuilder, KeyWord.TO))
@@ -126,8 +124,7 @@ public final class GotoStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public GotoStatement(final DocumentManager documentManager) {
-		super(documentManager);
+	public GotoStatement() {
 	}
 
 	@Override
@@ -145,13 +142,13 @@ public final class GotoStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the GotoStatement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static GotoStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		GotoStatement stm = new GotoStatement(documentManager);
+	public static GotoStatement readObject(final AttributeInputStream inpt) throws IOException {
+		GotoStatement stm = new GotoStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		
 		// *** GotoStatement
-		stm.label = (Expression) inpt.readObj(documentManager);
+		stm.label = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("GotoStatement: " + stm);
 		return(stm);
 	}

@@ -8,7 +8,6 @@ package simula.lsp.syntaxClass.expression;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.coder.SimulaCoder;
@@ -34,8 +33,7 @@ import simula.lsp.utilities.Util;
 public final class MissingExpression extends Expression {
 
 	/// Create a new MissingExpression.
-	public MissingExpression(final DocumentManager documentManager) {
-		super(documentManager);
+	public MissingExpression() {
 		this.type = Type.Undef;
 	}
 
@@ -94,14 +92,14 @@ public final class MissingExpression extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the UnaryOperation object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static MissingExpression readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		MissingExpression expr = new MissingExpression(documentManager);
+	public static MissingExpression readObject(final AttributeInputStream inpt) throws IOException {
+		MissingExpression expr = new MissingExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** UnaryOperation
 		Util.TRACE_INPUT("readMissingExpression: " + expr);
 		return(expr);

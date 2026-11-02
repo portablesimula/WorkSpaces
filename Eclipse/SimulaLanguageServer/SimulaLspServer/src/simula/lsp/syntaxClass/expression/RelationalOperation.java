@@ -64,16 +64,16 @@ public final class RelationalOperation extends Expression {
 	/// @param rhs the right hand side
 	RelationalOperation(final DocumentManager documentManager, final Expression lhs,final int opr,final Expression rhs) {
 		super(documentManager);
-//		SimulaBuilder simBuilder = documentManager.simBuilder;
+//		SimulaBuilder simBuilder = getSimBuilder();
 		this.type = Type.Boolean;
 		this.lhs = lhs; this.opr = opr; this.rhs = rhs;
 		if (this.lhs == null) {
 			Util.semanticError(this, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression(documentManager);
+			this.lhs = new MissingExpression();
 		}
 		if (this.rhs == null) {
 			Util.semanticError(this, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression(documentManager);
+			this.rhs = new MissingExpression();
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
@@ -289,7 +289,7 @@ public final class RelationalOperation extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static RelationalOperation readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static RelationalOperation readObject(final AttributeInputStream inpt) throws IOException {
 		RelationalOperation expr = new RelationalOperation(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement

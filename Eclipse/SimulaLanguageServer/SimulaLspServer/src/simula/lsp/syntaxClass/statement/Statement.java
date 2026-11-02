@@ -76,7 +76,7 @@ public abstract class Statement extends SyntaxElement {
 //			Util.println("\n\nStatement.acceptStatement: MAYBE LABEL IDENTIFIER: " + mayBeLabel);
 			if(Parse.accept(simBuilder, KeyWord.COLON)) {
 				if (labels == null)	labels = new ObjectList<LabelDeclaration>();
-				LabelDeclaration label = new LabelDeclaration(simBuilder.documentManager, mayBeLabel);
+				LabelDeclaration label = new LabelDeclaration(mayBeLabel);
 				labels.add(label);
 				DeclarationScope scope = LspGlobal.getCurrentScope();
 				if(scope.labelList == null) scope.labelList = new LabelList(scope); 
@@ -94,7 +94,7 @@ public abstract class Statement extends SyntaxElement {
 		if (labels != null) {
 //			Util.println("Statement.acceptStatement: LABELS: " + labels);
 //			Util.println("Statement.acceptStatement: prevParserToken: " + simBuilder.prevParserToken());
-			statement = new LabeledStatement(simBuilder.documentManager, labels, statement);
+			statement = new LabeledStatement(labels, statement);
 //			Util.println("Statement.acceptStatement: DONE LabeledStatement: " + statement);				
 		}
 //		Util.println("Statement.acceptStatement: DONE: " + statement);
@@ -115,23 +115,23 @@ public abstract class Statement extends SyntaxElement {
 				if(Option.TRACE_ACCEPT_STATEMENT > 1)
 					Util.println("\nStatement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
 
-				MaybeBlockDeclaration block = new MaybeBlockDeclaration(simBuilder.documentManager, null);
+				MaybeBlockDeclaration block = new MaybeBlockDeclaration(null);
 				block.expectMaybeBlock(simBuilder);
-				statement = new BlockStatement(simBuilder.documentManager, block, "Statement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
+				statement = new BlockStatement(block, "Statement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
 				break;
 				
-			case KeyWord.IF:		 statement = ConditionalStatement.of(simBuilder.documentManager); break;
+			case KeyWord.IF:		 statement = ConditionalStatement.of(); break;
 		    case KeyWord.GO,
-		         KeyWord.GOTO:		 statement = new GotoStatement(simBuilder.documentManager, keyWord); break;
-		    case KeyWord.FOR:		 statement = ForStatement.of(simBuilder.documentManager); break;
+		         KeyWord.GOTO:		 statement = new GotoStatement(keyWord); break;
+		    case KeyWord.FOR:		 statement = ForStatement.of(); break;
 		    case KeyWord.WHILE:		 statement = WhileStatement.of(); break;
-		    case KeyWord.INSPECT:	 statement = ConnectionStatement.of(simBuilder.documentManager); break;
+		    case KeyWord.INSPECT:	 statement = ConnectionStatement.of(); break;
 		    case KeyWord.SWITCH:	 if(DocumentManager.EXTENSIONS) {
 		    							 statement = SwitchStatement.of();
 		    						 } break;
 		    case KeyWord.ACTIVATE,
-		         KeyWord.REACTIVATE: statement = ActivationStatement.of(simBuilder.documentManager); break;
-		    case KeyWord.INNER:		 statement = new InnerStatement(simBuilder.documentManager, true); break;
+		         KeyWord.REACTIVATE: statement = ActivationStatement.of(); break;
+		    case KeyWord.INNER:		 statement = new InnerStatement(true); break;
 		    case KeyWord.SEMICOLON:	 statement = DummyStatement.ofExplicit(simBuilder); break;
 		    case KeyWord.END:	  // statement = DummyStatement.ofImplicit(simBuilder); break; // Dummy Statement, keep END
 		    case KeyWord.EOF:		 statement = DummyStatement.ofImplicit(simBuilder); break; // Dummy Statement, keep EOF
@@ -170,7 +170,7 @@ public abstract class Statement extends SyntaxElement {
 							
 						if (Parse.accept(simBuilder, KeyWord.BEGIN)) {
 							PrefixedBlockDeclaration prfblk = PrefixedBlockDeclaration.expectPrefixedBlock(simBuilder, var,false);
-							statement = new BlockStatement(simBuilder.documentManager, prfblk, "Statement.acceptIdentifierStatement: GOT VariableExpression: "+var);
+							statement = new BlockStatement(prfblk, "Statement.acceptIdentifierStatement: GOT VariableExpression: "+var);
 //							Util.println("Statement.acceptUnlabeledStatement: GOT BlockStatement: "+statement);
 							break;
 		      			} else {

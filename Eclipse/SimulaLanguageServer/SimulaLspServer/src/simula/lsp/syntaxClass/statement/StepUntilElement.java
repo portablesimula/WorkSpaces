@@ -11,7 +11,6 @@ import java.lang.classfile.Label;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.MethodTypeDesc;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -49,25 +48,24 @@ public class StepUntilElement extends ForListElement {
 	/// @param expr1 The first expression
 	/// @param expr2 The second expression
 	/// @param expr3 The third expression
-	public StepUntilElement(final DocumentManager documentManager, final ForStatement forStatement, final Expression expr1, final Expression expr2, final Expression expr3) {
-		super(documentManager, forStatement, expr1);
+	public StepUntilElement(final ForStatement forStatement, final Expression expr1, final Expression expr2, final Expression expr3) {
+		super(forStatement, expr1);
 		this.expr2 = expr2;
 		this.expr3 = expr3;
 	}
 
 	@Override
 	public void doChecking() {
-		DocumentManager documentManager = this.getDocumentManager();
 		expr1.doChecking();
-		expr1 = TypeConversion.testAndCreate(documentManager, forStatement.controlVariable.type, expr1);
+		expr1 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr1);
 //		expr1.doChecking();
 		expr1.backLink = forStatement; // To ensure _RESULT from functions
 		expr2.doChecking();
-		expr2 = TypeConversion.testAndCreate(documentManager, forStatement.controlVariable.type, expr2);
+		expr2 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr2);
 //		expr2.doChecking();
 		expr2.backLink = forStatement; // To ensure _RESULT from functions
 		expr3.doChecking();
-		expr3 = TypeConversion.testAndCreate(documentManager, forStatement.controlVariable.type, expr3);
+		expr3 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr3);
 //		expr3.doChecking();
 		expr3.backLink = forStatement; // To ensure _RESULT from functions
 	}
@@ -361,7 +359,7 @@ public class StepUntilElement extends ForListElement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private StepUntilElement(final DocumentManager documentManager) { super(documentManager);}
+	private StepUntilElement() { }
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -381,16 +379,16 @@ public class StepUntilElement extends ForListElement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static StepUntilElement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		StepUntilElement elt = new StepUntilElement(documentManager);
+	public static StepUntilElement readObject(final AttributeInputStream inpt) throws IOException {
+		StepUntilElement elt = new StepUntilElement();
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
 		// *** SyntaxElement
 		
 		// *** ForListElement
-		elt.forStatement = (ForStatement) inpt.readObj(documentManager);
-		elt.expr1 = (Expression) inpt.readObj(documentManager);
-		elt.expr2 = (Expression) inpt.readObj(documentManager);
-		elt.expr3 = (Expression) inpt.readObj(documentManager);
+		elt.forStatement = (ForStatement) inpt.readObj();
+		elt.expr1 = (Expression) inpt.readObj();
+		elt.expr2 = (Expression) inpt.readObj();
+		elt.expr3 = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("StepUntilElement: " + elt);
 		return(elt);
 	}

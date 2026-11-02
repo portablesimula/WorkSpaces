@@ -8,7 +8,6 @@ package simula.lsp.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -48,10 +47,7 @@ public final class LabeledStatement extends Statement {
 	/// @param line the source line number
 	/// @param labels the label identifiers
 	/// @param statement the labeled statement
-//	LabeledStatement(final int line,final ObjectList<LabelDeclaration> labels,final Statement statement) {
-	LabeledStatement(final DocumentManager documentManager, final ObjectList<LabelDeclaration> labels, final Statement statement) {
-		super(documentManager);
-//		SimulaBuilder simBuilder = documentManager.simBuilder;
+	LabeledStatement(final ObjectList<LabelDeclaration> labels, final Statement statement) {
 		this.labels = labels;
 		this.statement = statement;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": LabeledStatement: "+this);
@@ -119,8 +115,7 @@ public final class LabeledStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private LabeledStatement(final DocumentManager documentManager) {
-		super(documentManager);
+	private LabeledStatement() {
 	}
 
 	@Override
@@ -140,14 +135,14 @@ public final class LabeledStatement extends Statement {
 	/// @return the LabeledStatement object read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static LabeledStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		LabeledStatement stm = new LabeledStatement(documentManager);
+	public static LabeledStatement readObject(final AttributeInputStream inpt) throws IOException {
+		LabeledStatement stm = new LabeledStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		
 		// *** LabeledStatement
-		stm.statement = (Statement) inpt.readObj(documentManager);
-		stm.labels = (ObjectList<LabelDeclaration>) inpt.readObjectList(documentManager);
+		stm.statement = (Statement) inpt.readObj();
+		stm.labels = (ObjectList<LabelDeclaration>) inpt.readObjectList();
 		Util.TRACE_INPUT("LabeledStatement: " + stm);
 		return(stm);
 	}

@@ -78,7 +78,7 @@ public final class QualifiedObject extends Expression {
 	/// @param classIdentifier class identifier
 	QualifiedObject(final DocumentManager documentManager, final Expression lhs, final Identifier classIdentifier) {
 		super(documentManager);
-//		SimulaBuilder simBuilder = documentManager.simBuilder;
+//		SimulaBuilder simBuilder = getSimBuilder();
 		this.lhs = lhs;
 		this.classIdentifier = classIdentifier;
 		lhs.backLink = this;
@@ -155,7 +155,7 @@ public final class QualifiedObject extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the QualifiedObject object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static QualifiedObject readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static QualifiedObject readObject(final AttributeInputStream inpt) throws IOException {
 		QualifiedObject expr = new QualifiedObject(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement

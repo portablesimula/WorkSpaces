@@ -226,7 +226,7 @@ public abstract class ClassHierarchy {
 	/// Read a ClassHierarchy object.
 	/// @param inpt the AttributeInputStream to read from
 	/// @throws IOException if something went wrong.
-	public static void readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static void readObject(final AttributeInputStream inpt) throws IOException {
 		String next = inpt.readString();
 		while(! next.equals(mark)) {
 			ClassDesc sub = ClassDesc.of(next+'.'+inpt.readString());

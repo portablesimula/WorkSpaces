@@ -12,7 +12,6 @@ import java.lang.classfile.instruction.SwitchCase;
 import java.util.List;
 import java.util.Vector;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -322,9 +321,9 @@ public final class SwitchStatement extends Statement {
     	lowKey.doChecking(); hiKey.doChecking();
     	switchKey.doChecking();
 		if(switchKey.type.keyWord == Type.T_CHARACTER) {
-			switchKey=TypeConversion.testAndCreate(getDocumentManager(), Type.Character,switchKey);
+			switchKey=TypeConversion.testAndCreate(Type.Character,switchKey);
 		} else
-			switchKey=TypeConversion.testAndCreate(getDocumentManager(), Type.Integer,switchKey);
+			switchKey=TypeConversion.testAndCreate(Type.Integer,switchKey);
     	for(SwitchWhenPart when:switchCases) {
     		for(SwitchInterval casePair:when.caseKeyList)
 			if(casePair!=null) {
@@ -437,14 +436,14 @@ public final class SwitchStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static SwitchStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static SwitchStatement readObject(final AttributeInputStream inpt) throws IOException {
 		SwitchStatement stm = new SwitchStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		
-		stm.lowKey = (Expression) inpt.readObj(documentManager);
-		stm.hiKey = (Expression) inpt.readObj(documentManager);
-		stm.switchKey = (Expression) inpt.readObj(documentManager);
+		stm.lowKey = (Expression) inpt.readObj();
+		stm.hiKey = (Expression) inpt.readObj();
+		stm.switchKey = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("SwitchStatement: " + stm);
 		return(stm);
 	}

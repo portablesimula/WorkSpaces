@@ -49,11 +49,11 @@ public final class UnaryOperation extends Expression {
 	/// @param operand the operand Expression
 	private UnaryOperation(final DocumentManager documentManager, final int oprator,final Expression operand) {
 		super(documentManager);
-		SimulaBuilder simBuilder = documentManager.simBuilder;
+		SimulaBuilder simBuilder = getSimBuilder();
 		this.oprator = oprator; this.operand = operand;
 		if(this.operand==null)
 		{ Util.syntaxError(simBuilder, "Missing operand after unary "+KeyWord.edit(oprator));
-		  this.operand=new MissingExpression(documentManager);
+		  this.operand=new MissingExpression();
 		}
 		this.operand.backLink=this;
 	}
@@ -183,7 +183,7 @@ public final class UnaryOperation extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the UnaryOperation object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static UnaryOperation readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static UnaryOperation readObject(final AttributeInputStream inpt) throws IOException {
 		UnaryOperation expr = new UnaryOperation(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement

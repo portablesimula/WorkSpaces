@@ -329,7 +329,7 @@ public final class RemoteVariable extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static RemoteVariable readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static RemoteVariable readObject(final AttributeInputStream inpt) throws IOException {
 		RemoteVariable rem = new RemoteVariable(documentManager);
 		rem.OBJECT_SEQU = inpt.readSEQU(rem);
 		// *** SyntaxElement

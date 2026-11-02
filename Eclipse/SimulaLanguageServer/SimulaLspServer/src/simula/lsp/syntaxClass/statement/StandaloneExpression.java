@@ -8,7 +8,6 @@ package simula.lsp.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -69,7 +68,7 @@ public final class StandaloneExpression extends Statement {
 		LexToken prevToken = null;
 		while ((prevToken = Parse.acceptParserToken(simBuilder, KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF)) != null) { 
 //			Util.println("NEW StandaloneExpression: prevToken="+prevToken);
-			this.expression = new AssignmentOperation(simBuilder.documentManager, this.expression, prevToken.keyWord, expectStandaloneExpression(simBuilder));
+			this.expression = new AssignmentOperation(this.expression, prevToken.keyWord, expectStandaloneExpression(simBuilder));
 		}		
 		
 //		Util.println("\nEND NEW StandaloneExpression: expr="+expression);
@@ -90,7 +89,7 @@ public final class StandaloneExpression extends Statement {
 		LexToken prevToken = null;
 		while ((prevToken = Parse.acceptParserToken(simBuilder, KeyWord.ASSIGNVALUE,KeyWord.ASSIGNREF)) != null) {
 			int opr=prevToken.keyWord;
-			retExpr=new AssignmentOperation(simBuilder.documentManager, retExpr, opr, expectStandaloneExpression(simBuilder));
+			retExpr=new AssignmentOperation(retExpr, opr, expectStandaloneExpression(simBuilder));
 		}
 //		Util.println("StandaloneExpression.expectStandaloneExpression: RETURN: "+retExpr+" ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 		return retExpr;
@@ -183,13 +182,13 @@ public final class StandaloneExpression extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the StandaloneExpression object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static StandaloneExpression readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static StandaloneExpression readObject(final AttributeInputStream inpt) throws IOException {
 		StandaloneExpression stm = new StandaloneExpression();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 
 		// *** StandaloneExpression
-		stm.expression = (Expression) inpt.readObj(documentManager);
+		stm.expression = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("StandaloneExpression: " + stm);
 		return(stm);
 	}

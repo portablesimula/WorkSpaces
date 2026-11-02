@@ -265,7 +265,7 @@ public final class CallProcedure {
 //								actualParameter=new Constant(null, Type.Integer, decl.firstLineNumber());
 								int lno = var.firstLineNumber() + 1;
 								if(lno <= 0) Util.IERR("CallProcedure.codeCPF: Illegal lineNumber: " + lno);
-								actualParameter=new Constant(simCoder.documentManager, Type.Integer, lno);
+								actualParameter=new Constant(Type.Integer, lno);
 							actualParameter.doChecking();
 							}
 						}

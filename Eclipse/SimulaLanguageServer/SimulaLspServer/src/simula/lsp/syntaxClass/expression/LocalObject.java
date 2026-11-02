@@ -74,7 +74,7 @@ public final class LocalObject extends Expression {
 	/// @param ident class-identifier
 	private LocalObject(final DocumentManager documentManager, final Identifier ident) {
 		super(documentManager);
-//		SimulaBuilder simBuilder = documentManager.simBuilder;
+//		SimulaBuilder simBuilder = getSimBuilder();
 		this.classIdentifier = ident;
 		this.type=Type.Ref(classIdentifier);
 		if (Option.internal.TRACE_PARSE)
@@ -203,7 +203,7 @@ public final class LocalObject extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static LocalObject readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static LocalObject readObject(final AttributeInputStream inpt) throws IOException {
 		LocalObject expr = new LocalObject(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement

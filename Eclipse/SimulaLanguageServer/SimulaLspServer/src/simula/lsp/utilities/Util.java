@@ -242,6 +242,20 @@ public final class Util {
 		simBuilder.addError(diagnostic);
 	}
 	
+	public static void syntaxError(final SyntaxElement elt, final String msg) {
+//		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Error, elt.lexRange, msg);
+		Diagnostic diagnostic = new Diagnostic(elt.getLexRange(), msg, DiagnosticSeverity.Error, "Simula.LSP");
+		LOG.error(edDiagnostic(diagnostic));
+		SimulaBuilder simBuilder = elt.getSimBuilder();
+		
+		if(simBuilder == null) {
+			Util.printError("Util.syntaxError: Missing simBuilder: " + elt.getClass().getSimpleName());
+			Util.printError("Util.syntaxError: Missing simBuilder: " + edDiagnostic(diagnostic));
+		} else
+			
+		simBuilder.addError(diagnostic);
+	}
+	
 	public static void semanticError(final SyntaxElement elt, final String msg) {
 //		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Error, elt.lexRange, msg);
 		Diagnostic diagnostic = new Diagnostic(elt.getLexRange(), msg, DiagnosticSeverity.Error, "Simula.LSP");

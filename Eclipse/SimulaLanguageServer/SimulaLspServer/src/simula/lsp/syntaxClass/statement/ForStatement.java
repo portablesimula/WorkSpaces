@@ -12,7 +12,6 @@ import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -158,18 +157,17 @@ public final class ForStatement extends Statement {
 
 	/// Create a new ForStatement.
 	/// @param line the source line number
-	private ForStatement(final DocumentManager documentManager) {
-		super(documentManager);
+	private ForStatement() {
 	}
 	
-	static ForStatement of(final DocumentManager documentManager) {
-		ForStatement stm = new ForStatement(documentManager);
-		SimulaBuilder simBuilder = documentManager.simBuilder;
+	static ForStatement of() {
+		ForStatement stm = new ForStatement();
+		SimulaBuilder simBuilder = stm.getSimBuilder();
 		simBuilder.consume(KeyWord.FOR); //  (add it to tokenList)
 
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ForStatement");
-		stm.controlVariable = new VariableExpression(documentManager, Parse.expectIdentifier(simBuilder));
+		stm.controlVariable = new VariableExpression(Parse.expectIdentifier(simBuilder));
 		LexToken prevToken = Parse.getCurrentParserToken(simBuilder);
 		if (!Parse.accept(simBuilder, KeyWord.ASSIGNVALUE))
 			Parse.expect(simBuilder, KeyWord.ASSIGNREF);
@@ -196,13 +194,13 @@ public final class ForStatement extends Statement {
 			Parse.TRACE("Parse ForListElement");
 		Expression expr1 = Expression.expectExpression(simBuilder, "for list");
 		if (Parse.accept(simBuilder, KeyWord.WHILE))
-			return (new ForWhileElement(documentManager, this, expr1, Expression.expectExpression(simBuilder, "for while")));
+			return (new ForWhileElement(this, expr1, Expression.expectExpression(simBuilder, "for while")));
 		if (Parse.accept(simBuilder, KeyWord.STEP)) {
 			Expression expr2 = Expression.expectExpression(simBuilder, "for step");
 			Parse.expect(simBuilder, KeyWord.UNTIL);
-			return (new StepUntilElement(documentManager, this, expr1, expr2, Expression.expectExpression(simBuilder, "for until")));
+			return (new StepUntilElement(this, expr1, expr2, Expression.expectExpression(simBuilder, "for until")));
 		} else
-			return (new ForListElement(documentManager, this, expr1));
+			return (new ForListElement(this, expr1));
 	}
 
 	@Override
@@ -414,16 +412,16 @@ public final class ForStatement extends Statement {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static ForStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		ForStatement stm = new ForStatement(documentManager);
+	public static ForStatement readObject(final AttributeInputStream inpt) throws IOException {
+		ForStatement stm = new ForStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		
 		// *** ForStatement
-		stm.controlVariable = (VariableExpression) inpt.readObj(documentManager);
+		stm.controlVariable = (VariableExpression) inpt.readObj();
 		stm.assignmentOperator = inpt.readShort();
-		stm.forList = (ObjectList<ForListElement>) inpt.readObjectList(documentManager);
-		stm.doStatement = (Statement) inpt.readObj(documentManager);
+		stm.forList = (ObjectList<ForListElement>) inpt.readObjectList();
+		stm.doStatement = (Statement) inpt.readObj();
 		Util.TRACE_INPUT("ForStatement: " + stm);
 		return(stm);
 	}

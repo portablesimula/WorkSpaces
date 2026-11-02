@@ -11,7 +11,6 @@ import java.lang.classfile.Label;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.MethodTypeDesc;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -48,8 +47,8 @@ public class ForWhileElement extends ForListElement {
 	/// @param forStatement the ForStatement
 	/// @param expr1 first expression 
 	/// @param expr2 second expression
-	public ForWhileElement(final DocumentManager documentManager, final ForStatement forStatement, final Expression expr1, final Expression expr2) {
-		super(documentManager, forStatement, expr1);
+	public ForWhileElement(final ForStatement forStatement, final Expression expr1, final Expression expr2) {
+		super(forStatement, expr1);
 		this.expr2 = expr2;
 	}
 
@@ -58,7 +57,7 @@ public class ForWhileElement extends ForListElement {
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN WhileElement(" + this + ").doChecking - Current Scope Chain: " + LspGlobal.getCurrentScope().edScopeChain());
 		expr1.doChecking();
-		expr1 = TypeConversion.testAndCreate(documentManager, forStatement.controlVariable.type, expr1);
+		expr1 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr1);
 //		expr1.doChecking();
 		expr1.backLink = forStatement; // To ensure _RESULT from functions
 		expr2.doChecking();
@@ -149,7 +148,7 @@ public class ForWhileElement extends ForListElement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ForWhileElement(final DocumentManager documentManager) { super(documentManager);}
+	private ForWhileElement() { super();}
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -168,15 +167,15 @@ public class ForWhileElement extends ForListElement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ForWhileElement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ForWhileElement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		ForWhileElement elt = new ForWhileElement(documentManager);
+	public static ForWhileElement readObject(final AttributeInputStream inpt) throws IOException {
+		ForWhileElement elt = new ForWhileElement();
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
 		// *** SyntaxElement
 		
 		// *** ForListElement
-		elt.forStatement = (ForStatement) inpt.readObj(documentManager);
-		elt.expr1 = (Expression) inpt.readObj(documentManager);
-		elt.expr2 = (Expression) inpt.readObj(documentManager);
+		elt.forStatement = (ForStatement) inpt.readObj();
+		elt.expr1 = (Expression) inpt.readObj();
+		elt.expr2 = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("ForWhileElement: " + elt);
 		return(elt);
 	}

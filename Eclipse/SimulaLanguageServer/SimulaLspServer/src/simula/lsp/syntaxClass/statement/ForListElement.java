@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.MethodTypeDesc;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -49,9 +48,7 @@ public class ForListElement extends SyntaxElement {
 	/// Create a new ForListElement.
 	/// @param forStatement the ForStatement
 	/// @param expr1 The first expression
-	public ForListElement(final DocumentManager documentManager, final ForStatement forStatement, final Expression expr1) {
-		super(documentManager);
-//		SimulaBuilder simBuilder = documentManager.simBuilder;
+	public ForListElement(final ForStatement forStatement, final Expression expr1) {
 		this.forStatement = forStatement;
 		this.expr1 = expr1;
 		if (Option.internal.TRACE_PARSE)
@@ -64,7 +61,7 @@ public class ForListElement extends SyntaxElement {
 			Util.TRACE("BEGIN ForListElement(" + this + ").doChecking - Current Scope Chain: "
 					+ LspGlobal.getCurrentScope().edScopeChain());
 		expr1.doChecking();
-		expr1 = TypeConversion.testAndCreate(documentManager, forStatement.controlVariable.type, expr1);
+		expr1 = TypeConversion.testAndCreate(forStatement.controlVariable.type, expr1);
 //		expr1.doChecking();
 		expr1.backLink = forStatement; // To ensure _RESULT from functions
 	}
@@ -160,8 +157,7 @@ public class ForListElement extends SyntaxElement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	protected ForListElement(final DocumentManager documentManager) {
-		super(documentManager);
+	protected ForListElement() {
 	}
 
 	@Override
@@ -180,14 +176,14 @@ public class ForListElement extends SyntaxElement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ForListElement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		ForListElement elt = new ForListElement(documentManager);
+	public static ForListElement readObject(final AttributeInputStream inpt) throws IOException {
+		ForListElement elt = new ForListElement();
 		elt.OBJECT_SEQU = inpt.readSEQU(elt);
 		// *** SyntaxElement
 		
 		// *** ForListElement
-		elt.forStatement = (ForStatement) inpt.readObj(documentManager);
-		elt.expr1 = (Expression) inpt.readObj(documentManager);
+		elt.forStatement = (ForStatement) inpt.readObj();
+		elt.expr1 = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("ForListElement: " + elt);
 		return(elt);
 	}

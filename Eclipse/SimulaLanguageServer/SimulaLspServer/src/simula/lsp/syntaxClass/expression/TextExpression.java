@@ -98,15 +98,15 @@ public final class TextExpression extends Expression {
 	/// @param lhs left hand side
 	/// @param rhs rigth hand side
 	TextExpression(final DocumentManager documentManager, final Expression lhs, final Expression rhs) {
-		super(documentManager); SimulaBuilder simBuilder = documentManager.simBuilder;
+		super(documentManager); SimulaBuilder simBuilder = getSimBuilder();
 		this.lhs = lhs; this.rhs = rhs;
 		if (this.lhs == null) {
 			Util.syntaxError(simBuilder, "Missing operand before &");
-			this.lhs = new MissingExpression(documentManager);
+			this.lhs = new MissingExpression();
 		}
 		if (this.rhs == null) {
 			Util.syntaxError(simBuilder, "Missing operand after &");
-			this.rhs = new MissingExpression(documentManager);
+			this.rhs = new MissingExpression();
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
@@ -184,7 +184,7 @@ public final class TextExpression extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static TextExpression readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static TextExpression readObject(final AttributeInputStream inpt) throws IOException {
 		TextExpression expr = new TextExpression(documentManager);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement

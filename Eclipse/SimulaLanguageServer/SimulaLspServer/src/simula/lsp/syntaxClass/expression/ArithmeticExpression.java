@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.MethodTypeDesc;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.SimulaBuilder;
@@ -111,17 +110,16 @@ public final class ArithmeticExpression extends Expression {
 	/// @param lhs left hand side
 	/// @param opr arithmetic operation
 	/// @param rhs right hand side
-	private ArithmeticExpression(final DocumentManager documentManager, final Expression lhs, final int opr, final Expression rhs) {
-		super(documentManager);
+	private ArithmeticExpression(final Expression lhs, final int opr, final Expression rhs) {
 		this.opr = opr;
 		if (lhs == null) {
-			Util.syntaxError(documentManager.simBuilder, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression(documentManager);
+			Util.syntaxError(this, "Missing operand before " + KeyWord.edit(opr));
+			this.lhs = new MissingExpression();
 		} else
 			this.lhs = lhs;
 		if (rhs == null) {
-			Util.syntaxError(documentManager.simBuilder, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression(documentManager);
+			Util.syntaxError(this, "Missing operand after " + KeyWord.edit(opr));
+			this.rhs = new MissingExpression();
 		} else
 			this.rhs = rhs;
 		this.lhs.backLink = this.rhs.backLink = this;
@@ -144,7 +142,7 @@ public final class ArithmeticExpression extends Expression {
 			Util.syntaxError(simBuilder, "Arithmetic overflow: " + lhs + ' ' + KeyWord.edit(opr) + ' ' + rhs + "   " + e);
 			e.printStackTrace();
 		}
-		return (new ArithmeticExpression(simBuilder.documentManager, lhs, opr, rhs));
+		return (new ArithmeticExpression(lhs, opr, rhs));
 	}
 
 //	@Override
@@ -163,7 +161,7 @@ public final class ArithmeticExpression extends Expression {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		SimulaBuilder simBuilder = documentManager.simBuilder;
+		SimulaBuilder simBuilder = getSimBuilder();
 		LspGlobal.sourceLineNumber = firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ArithmeticOperation" + toString() + ".doChecking - Current Scope Chain: "	+ LspGlobal.getCurrentScope().edScopeChain());
@@ -175,8 +173,8 @@ public final class ArithmeticExpression extends Expression {
 				Type type1 = lhs.type;
 				Type type2 = rhs.type;
 				this.type = Type.arithmeticTypeConversion(type1, type2);
-				lhs = (Expression) TypeConversion.testAndCreate(simBuilder.documentManager, this.type, lhs);
-				rhs = (Expression) TypeConversion.testAndCreate(simBuilder.documentManager, this.type, rhs);
+				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
+				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);
 //				if (this.type == null)
 //					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
 			}
@@ -191,8 +189,8 @@ public final class ArithmeticExpression extends Expression {
 				this.type = Type.arithmeticTypeConversion(type1, type2);
 				if (this.type.keyWord == Type.T_INTEGER)
 					this.type = Type.Real;
-				lhs = (Expression) TypeConversion.testAndCreate(simBuilder.documentManager, this.type, lhs);
-				rhs = (Expression) TypeConversion.testAndCreate(simBuilder.documentManager, this.type, rhs);
+				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
+				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);
 //				if (this.type == null)
 //					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
 			}
@@ -202,16 +200,16 @@ public final class ArithmeticExpression extends Expression {
 				if ((lhs.type.keyWord != Type.T_INTEGER) || (rhs.type.keyWord != Type.T_INTEGER))
 					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
 				this.type = Type.Integer;
-				lhs = (Expression) TypeConversion.testAndCreate(simBuilder.documentManager, this.type, lhs);
-				rhs = (Expression) TypeConversion.testAndCreate(simBuilder.documentManager, this.type, rhs);
+				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
+				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);
 			}
 			case KeyWord.EXP -> {
 				lhs.doChecking();
 				rhs.doChecking();
 				if ((lhs.type.keyWord != Type.T_INTEGER) || (rhs.type.keyWord != Type.T_INTEGER)) {
 					this.type = Type.LongReal; // Deviation from Simula Standard
-					lhs = (Expression) TypeConversion.testAndCreate(simBuilder.documentManager, this.type, lhs);
-					rhs = (Expression) TypeConversion.testAndCreate(simBuilder.documentManager, this.type, rhs);
+					lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
+					rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);
 				} else
 					this.type = Type.Integer;
 			}
@@ -333,8 +331,7 @@ public final class ArithmeticExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ArithmeticExpression(final DocumentManager documentManager) {
-		super(documentManager);
+	private ArithmeticExpression() {
 	}
 
 	@Override
@@ -357,18 +354,18 @@ public final class ArithmeticExpression extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ArithmeticExpression read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ArithmeticExpression readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		ArithmeticExpression expr = new ArithmeticExpression(documentManager);
+	public static ArithmeticExpression readObject(final AttributeInputStream inpt) throws IOException {
+		ArithmeticExpression expr = new ArithmeticExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** ArithmeticExpression
-		expr.lhs = (Expression) inpt.readObj(documentManager);
+		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();
-		expr.rhs = (Expression) inpt.readObj(documentManager);
+		expr.rhs = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("readArithmeticExpression: " + expr);
 		return(expr);
 	}

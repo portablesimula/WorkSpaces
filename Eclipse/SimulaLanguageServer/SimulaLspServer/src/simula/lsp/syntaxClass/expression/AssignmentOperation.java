@@ -10,7 +10,6 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.coder.SimulaCoder;
@@ -70,12 +69,12 @@ public final class AssignmentOperation extends Expression {
 		this.opr = opr;
 		this.rhs = rhs;
 		if (this.lhs == null) {
-			Util.syntaxError(documentManager.simBuilder, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression(documentManager);
+			Util.syntaxError(this, "Missing operand before " + KeyWord.edit(opr));
+			this.lhs = new MissingExpression();
 		}
 		if (this.rhs == null) {
-			Util.syntaxError(documentManager.simBuilder, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression(documentManager);
+			Util.syntaxError(this, "Missing operand after " + KeyWord.edit(opr));
+			this.rhs = new MissingExpression();
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}

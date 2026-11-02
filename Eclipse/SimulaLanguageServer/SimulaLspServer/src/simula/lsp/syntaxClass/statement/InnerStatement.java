@@ -8,7 +8,6 @@ package simula.lsp.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.SimulaBuilder;
@@ -39,9 +38,8 @@ public final class InnerStatement extends Statement {
 
 	/// Create a new InnerStatement.
 	/// @param line the source line number
-	public InnerStatement(final DocumentManager documentManager, boolean explicit) {
-		super(documentManager);
-		SimulaBuilder simBuilder = documentManager.simBuilder;
+	public InnerStatement(boolean explicit) {
+		SimulaBuilder simBuilder = getSimBuilder();
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": InnerStatement: "+this);
 //		Util.println("NEW InnerStatement: Line "+firstLineNumber()+": InnerStatement: "+this+ "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 //		Thread.dumpStack();
@@ -96,8 +94,7 @@ public final class InnerStatement extends Statement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public InnerStatement(final DocumentManager documentManager) {
-		super(documentManager);
+	public InnerStatement() {
 	}
 
 	@Override
@@ -114,8 +111,8 @@ public final class InnerStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the InnerStatement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static InnerStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		InnerStatement stm = new InnerStatement(documentManager);
+	public static InnerStatement readObject(final AttributeInputStream inpt) throws IOException {
+		InnerStatement stm = new InnerStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		

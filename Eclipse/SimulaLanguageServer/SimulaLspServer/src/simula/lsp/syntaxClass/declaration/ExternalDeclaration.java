@@ -281,7 +281,7 @@ public final class ExternalDeclaration extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ExternalDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static ExternalDeclaration readObject(final AttributeInputStream inpt) throws IOException {
 		ExternalDeclaration ext = new ExternalDeclaration();
 		ext.OBJECT_SEQU = inpt.readSEQU(ext);
 

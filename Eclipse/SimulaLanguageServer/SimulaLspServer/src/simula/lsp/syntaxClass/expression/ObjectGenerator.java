@@ -75,7 +75,7 @@ public final class ObjectGenerator extends Expression {
 	/// @param params the actual parameters
 	private ObjectGenerator(final DocumentManager documentManager, final Identifier ident,final Vector<Expression> params) {
 		super(documentManager);
-//		SimulaBuilder simBuilder = documentManager.simBuilder;
+//		SimulaBuilder simBuilder = getSimBuilder();
 		this.classIdentifier = ident;
 		this.type = Type.Ref(classIdentifier);
 		this.params = params;
@@ -292,7 +292,7 @@ public final class ObjectGenerator extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ObjectGenerator object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ObjectGenerator readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static ObjectGenerator readObject(final AttributeInputStream inpt) throws IOException {
 		ObjectGenerator gen = new ObjectGenerator(documentManager);
 		gen.OBJECT_SEQU = inpt.readSEQU(gen);
 		// *** SyntaxElement

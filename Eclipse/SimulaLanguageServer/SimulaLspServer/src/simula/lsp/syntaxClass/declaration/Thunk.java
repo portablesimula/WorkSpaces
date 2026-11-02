@@ -51,9 +51,8 @@ public final class Thunk extends DeclarationScope {
 	/// Create a new Thunk object.
 	/// @param kind the kind code
 	/// @param expr the Thunk expression.
-	private Thunk(final int kind, final Expression expr) {
-//		super(new Identifier(DocumentManager.sourceName + "$THUNK$" + (++OBJECT_SEQU)));
-		super(new Identifier("$THUNK$" + (++OBJECT_SEQU)));
+	private Thunk(final SimulaCoder simCoder, final int kind, final Expression expr) {
+		super(new Identifier(simCoder.documentManager.sourceName + "$THUNK$" + (++OBJECT_SEQU)));
 		this.declarationKind = ObjectKind.Thunk;
 		this.kind = kind;
 		this.expr = expr;
@@ -91,7 +90,7 @@ public final class Thunk extends DeclarationScope {
 		//        return("+apar.toJavaCode()+");
 		//     }
 		//  }	
-		Thunk thunk = new Thunk(kind, expr);
+		Thunk thunk = new Thunk(simCoder, kind, expr);
 		try { thunk.createJavaClassFile(simCoder); } catch (IOException e) { e.printStackTrace(); }
 		ClassDesc CD_THUNK=thunk.getClassDesc();
 		codeBuilder

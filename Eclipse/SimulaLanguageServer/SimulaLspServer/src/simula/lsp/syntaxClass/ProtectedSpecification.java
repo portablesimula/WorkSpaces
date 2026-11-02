@@ -128,7 +128,7 @@ public final class ProtectedSpecification extends SyntaxElement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ProtectedSpecification readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static ProtectedSpecification readObject(final AttributeInputStream inpt) throws IOException {
 		ProtectedSpecification spec = new ProtectedSpecification();
 		spec.OBJECT_SEQU = inpt.readSEQU(spec);
 		// *** SyntaxElement

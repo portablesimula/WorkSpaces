@@ -182,7 +182,7 @@ public class SimpleVariableDeclaration extends Declaration {
 		if (this.isConstant())
 			modifier = modifier + "final ";
 		if (constantElement != null) {
-//			constantElement = TypeConversion.testAndCreate(simBuilder.documentManager, type, constantElement.evaluate(null));
+//			constantElement = TypeConversion.testAndCreate(type, constantElement.evaluate(null));
 			constantElement.doChecking();
 			if (constantElement instanceof Constant) {
 				String value = constantElement.toJavaCode();
