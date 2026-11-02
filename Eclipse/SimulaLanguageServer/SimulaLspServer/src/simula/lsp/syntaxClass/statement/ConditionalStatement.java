@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -55,13 +54,12 @@ public final class ConditionalStatement extends Statement {
 
 	/// Create a new ConditionalStatement.
 	/// @param line the source line number
-	private ConditionalStatement(final DocumentManager documentManager) {
-		super(documentManager);
+	private ConditionalStatement() {
 	}
 	
-	static ConditionalStatement of(final DocumentManager documentManager) {
-		ConditionalStatement conn = new ConditionalStatement(documentManager);
-		SimulaBuilder simBuilder = documentManager.simBuilder;
+	static ConditionalStatement of() {
+		ConditionalStatement conn = new ConditionalStatement();
+		SimulaBuilder simBuilder = conn.getSimBuilder();
 		int lno = simBuilder.getSourceLineNumber();
 //		Util.println("NEW ConditionalStatement: "+simBuilder.getSourceLineNumber());
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN IfStatement: ");
@@ -187,15 +185,15 @@ public final class ConditionalStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ConditionalStatement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ConditionalStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		ConditionalStatement stm = new ConditionalStatement(documentManager);
+	public static ConditionalStatement readObject(final AttributeInputStream inpt) throws IOException {
+		ConditionalStatement stm = new ConditionalStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		
 		// *** ConditionalStatement
-		stm.condition = (Expression) inpt.readObj(documentManager);
-		stm.thenStatement = (Statement) inpt.readObj(documentManager);
-		stm.elseStatement = (Statement) inpt.readObj(documentManager);
+		stm.condition = (Expression) inpt.readObj();
+		stm.thenStatement = (Statement) inpt.readObj();
+		stm.elseStatement = (Statement) inpt.readObj();
 
 		Util.TRACE_INPUT("ConditionalStatement: " + stm);
 		return(stm);

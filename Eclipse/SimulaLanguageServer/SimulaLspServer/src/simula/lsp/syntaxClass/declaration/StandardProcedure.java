@@ -8,7 +8,6 @@ package simula.lsp.syntaxClass.declaration;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Vector;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.token.Identifier;
 import simula.lsp.syntaxClass.OverLoad;
 import simula.lsp.syntaxClass.ProcedureSpecification;
@@ -41,8 +40,8 @@ public final class StandardProcedure extends ProcedureDeclaration {
 	/// @param kind the declaration kind
 	/// @param type the procedure's type
 	/// @param ident the procedure identifier
-	StandardProcedure(final DocumentManager documentManager, DeclarationScope declaredIn,int kind,Type type, String ident) {
-		super(documentManager, new Identifier(ident), kind); this.declaredIn = declaredIn; this.type = type;
+	StandardProcedure(DeclarationScope declaredIn,int kind,Type type, String ident) {
+		super(new Identifier(ident), kind); this.declaredIn = declaredIn; this.type = type;
 //		this.declarationKind = ObjectKind.StandardProcedure;
 //		this.CHECKED = true;
 	}
@@ -53,8 +52,8 @@ public final class StandardProcedure extends ProcedureDeclaration {
 	/// @param type the procuedre's type
 	/// @param ident the procedure identifier
 	/// @param param the parameters
-	StandardProcedure(final DocumentManager documentManager, DeclarationScope declaredIn,int kind,Type type, String ident,Parameter... param) {
-		this(documentManager, declaredIn,kind,type,ident);
+	StandardProcedure(DeclarationScope declaredIn,int kind,Type type, String ident,Parameter... param) {
+		this(declaredIn,kind,type,ident);
 		for(int i=0;i<param.length;i++) param[i].into(parameterList); }
 
 	/// Create a new StandardProcedure with parameters.
@@ -64,8 +63,8 @@ public final class StandardProcedure extends ProcedureDeclaration {
 	/// @param type the procuedre's type
 	/// @param ident the procedure identifier
 	/// @param param the parameters
-	StandardProcedure(final DocumentManager documentManager, DeclarationScope declaredIn,int kind,String[] mtdSet,Type type, String ident,Parameter... param) {
-		this(documentManager, declaredIn,kind,type,ident);
+	StandardProcedure(DeclarationScope declaredIn,int kind,String[] mtdSet,Type type, String ident,Parameter... param) {
+		this(declaredIn,kind,type,ident);
 		this.mtdSet = mtdSet;
 		for(int i=0;i<param.length;i++) param[i].into(parameterList); 
 	}
@@ -83,9 +82,9 @@ public final class StandardProcedure extends ProcedureDeclaration {
 	/// Get OverLoadMatch.
 	/// @param params the actual parameters
 	/// @return OverLoadMatch
-	public ProcedureSpecification getOverLoadMatch(final DocumentManager documentManager, final Vector<Expression> params) {
+	public ProcedureSpecification getOverLoadMatch(final Vector<Expression> params) {
 		if(mtdSet != null) for(String mtd:mtdSet) {
-			ProcedureSpecification legal = getLegalOverLoadMatch(documentManager, mtd, params);
+			ProcedureSpecification legal = getLegalOverLoadMatch(mtd, params);
 			if(legal != null) {
 				this.overLoadMatch = legal;
 				return(legal);
@@ -98,8 +97,8 @@ public final class StandardProcedure extends ProcedureDeclaration {
 	/// @param mtd a method type descriptor
 	/// @param params the actual parameters.
 	/// @return a legal OverLoadMatch or null.
-	private ProcedureSpecification getLegalOverLoadMatch(final DocumentManager documentManager, final String mtd, final Vector<Expression> params) {
-		ProcedureSpecification spec = getProcedureSpecification(documentManager, mtd);
+	private ProcedureSpecification getLegalOverLoadMatch(final String mtd, final Vector<Expression> params) {
+		ProcedureSpecification spec = getProcedureSpecification(mtd);
 		int n = params.size();
 		int m = spec.parameterList.size();
 		if(spec.parameterList.size() != params.size())
@@ -117,7 +116,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 	/// Return the getProcedureSpecification obtained from the given MethodTypeDesc.
 	/// @param mtd the MethodTypeDesc
 	/// @return the getProcedureSpecification obtained from the given MethodTypeDesc.
-	public ProcedureSpecification getProcedureSpecification(final DocumentManager documentManager, final String mtd) {
+	public ProcedureSpecification getProcedureSpecification(final String mtd) {
 		Type type = null;
 		ObjectList<Parameter> pList = new ObjectList<Parameter>();
 		
@@ -143,7 +142,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 				}
 				default -> Util.IERR(""+c);
 			}
-			Parameter par = new Parameter(documentManager, new Identifier("_p"+(pos-1)), pType, Parameter.Kind.Simple);
+			Parameter par = new Parameter(new Identifier("_p"+(pos-1)), pType, Parameter.Kind.Simple);
 			pList.add(par);
 		}
 		char c = mtd.charAt(pos++);
@@ -163,25 +162,25 @@ public final class StandardProcedure extends ProcedureDeclaration {
 			default -> Util.IERR(""+c);
 		}
 		
-		return(new ProcedureSpecification(documentManager, identifier, type, pList)); 
+		return(new ProcedureSpecification(identifier, type, pList)); 
 	}
 	
 	/// Get MethodTypeDesc
 	/// @param beforeDot the Expression beforeDot
 	/// @param params the actual parameters
 	/// @return MethodTypeDesc
-	public MethodTypeDesc getMethodTypeDesc(final DocumentManager documentManager, final Expression beforeDot, Vector<Expression> params) {
+	public MethodTypeDesc getMethodTypeDesc(final Expression beforeDot, Vector<Expression> params) {
 		if(overLoadMatch !=null) {
-			getOverLoadMatch(documentManager, params);
+			getOverLoadMatch(params);
 			return(MethodTypeDesc.ofDescriptor(mtdPicked));
-		} else return(MethodTypeDesc.ofDescriptor(this.edMethodTypeDesc(documentManager, beforeDot,params)));
+		} else return(MethodTypeDesc.ofDescriptor(this.edMethodTypeDesc(beforeDot,params)));
 	}
 	
 	/// Edit MethodTypeDesc
 	/// @param beforeDot the Expression beforeDot
 	/// @param params the actual parameters
 	/// @return MethodTypeDesc String
-	private String edMethodTypeDesc(final DocumentManager documentManager, Expression beforeDot,Vector<Expression> params) {
+	private String edMethodTypeDesc(Expression beforeDot,Vector<Expression> params) {
 		// MethodTypeDesc.ofDescriptor("()Lsimula/runtime/RTS_Printfile;");
 		StringBuilder sb=new StringBuilder("(");
 		if(beforeDot != null) {
@@ -216,7 +215,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 		Identifier id=identifier;
 		if(id.value.equalsIgnoreCase("detach") | id.value.equalsIgnoreCase("call") | id.value.equalsIgnoreCase("resume")) {
 			// Push extra parameter 'sourceLineNumber'
-			Parameter lno=new Parameter(documentManager, id, Type.Integer, Parameter.Kind.Simple);
+			Parameter lno=new Parameter(id, Type.Integer, Parameter.Kind.Simple);
 			sb.append(lno.type.toJVMType());
 		}
 		sb.append(')');

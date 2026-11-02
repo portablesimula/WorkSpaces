@@ -8,7 +8,6 @@ package simula.lsp.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -51,7 +50,6 @@ import simula.lsp.utilities.Util;
 /// @author SIMULA Standards Group
 /// @author Øystein Myhre Andersen
 public final class BlockStatement extends Statement {
-//	public String debugName;
 	
 	/// The associated block declaration.
 	public BlockDeclaration blockDeclaration;
@@ -59,10 +57,7 @@ public final class BlockStatement extends Statement {
 //	private static int SEQU = 1;
 	/// Create a new BlockStatement.
 	/// @param blockDeclaration the BlockDeclaration
-	public BlockStatement(final DocumentManager documentManager, final BlockDeclaration blockDeclaration, String debugName1) {
-		super(documentManager);
-//		SimulaBuilder simBuilder = documentManager.simBuilder;
-//		debugName = "ZZZ_BlockStatement: "+SEQU++;
+	public BlockStatement(final BlockDeclaration blockDeclaration, String debugName1) {
 		this.blockDeclaration = blockDeclaration;
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": BlockStatement: "+this);
 //		Util.println("NEW BlockStatement: " + debugName + '[' + debugName1 + ']');
@@ -146,8 +141,7 @@ public final class BlockStatement extends Statement {
 	// ***********************************************************************************************
 
 	/// Default constructor used by Attribute File I/O
-	private BlockStatement(final DocumentManager documentManager) {
-		super(documentManager);
+	private BlockStatement() {
 	}
 
 	@Override
@@ -165,13 +159,13 @@ public final class BlockStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the BlockStatement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static BlockStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		BlockStatement stm = new BlockStatement(documentManager);
+	public static BlockStatement readObject(final AttributeInputStream inpt) throws IOException {
+		BlockStatement stm = new BlockStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		
 		// *** BlockStatement
-		stm.blockDeclaration = (BlockDeclaration) inpt.readObj(documentManager);
+		stm.blockDeclaration = (BlockDeclaration) inpt.readObj();
 
 		Util.TRACE_INPUT("BlockStatement: " + stm);
 		return(stm);

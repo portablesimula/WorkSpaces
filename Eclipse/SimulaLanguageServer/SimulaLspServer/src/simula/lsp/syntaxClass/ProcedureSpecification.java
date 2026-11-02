@@ -7,7 +7,6 @@ package simula.lsp.syntaxClass;
 
 import java.io.IOException;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.Parse;
@@ -175,13 +174,13 @@ public final class ProcedureSpecification extends SyntaxElement {
 	/// @return the ProcedureSpecification read from the stream.
 	/// @throws IOException if something went wrong.
 	@SuppressWarnings("unchecked")
-	public static ProcedureSpecification readProcedureSpec(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
+	public static ProcedureSpecification readProcedureSpec(final AttributeInputStream inpt) throws IOException {
 		boolean present = inpt.readBoolean();
 		if(!present) return(null);
 		ProcedureSpecification spec = new ProcedureSpecification();
 		spec.identifier = inpt.readIdentifier();
 		spec.type = inpt.readType();
-		spec.parameterList = (ObjectList<Parameter>) inpt.readObjectList(documentManager);
+		spec.parameterList = (ObjectList<Parameter>) inpt.readObjectList();
 		
 		Util.TRACE_INPUT("END Read ProcedureSpecification: " + spec.identifier.value);
 		return(spec);

@@ -65,8 +65,7 @@ public final class AssignmentOperation extends Expression {
 	/// @param lhs the left hand side
 	/// @param opr the operation
 	/// @param rhs the right hand side
-	public AssignmentOperation(final DocumentManager documentManager, final Expression lhs, final int opr, final Expression rhs) {
-		super(documentManager);
+	public AssignmentOperation(final Expression lhs, final int opr, final Expression rhs) {
 		this.lhs = lhs;
 		this.opr = opr;
 		this.rhs = rhs;
@@ -115,7 +114,7 @@ public final class AssignmentOperation extends Expression {
 		}
 		if (opr == KeyWord.ASSIGNVALUE)
 			this.textValueAssignment = (toType.keyWord == Type.T_TEXT);
-		rhs = (Expression) TypeConversion.testAndCreate(documentManager, toType, rhs);
+		rhs = (Expression) TypeConversion.testAndCreate(toType, rhs);
 		this.type = toType;
 		if (this.type == null)
 			Util.semanticError(rhs, "doAssignmentChecking: Illegal types: " + toType + " := " + fromType);
@@ -457,8 +456,7 @@ public final class AssignmentOperation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private AssignmentOperation(final DocumentManager documentManager) {
-		super(documentManager);
+	private AssignmentOperation() {
 	}
 
 	@Override
@@ -481,18 +479,18 @@ public final class AssignmentOperation extends Expression {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the AssignmentOperation read from the stream.
 	/// @throws IOException if something went wrong.
-	public static AssignmentOperation readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		AssignmentOperation expr = new AssignmentOperation(documentManager);
+	public static AssignmentOperation readObject(final AttributeInputStream inpt) throws IOException {
+		AssignmentOperation expr = new AssignmentOperation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** AssignmentOperation
-		expr.lhs = (Expression) inpt.readObj(documentManager);
+		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();
-		expr.rhs = (Expression) inpt.readObj(documentManager);
+		expr.rhs = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("readAssignmentOperation: " + expr);
 		return(expr);
 	}

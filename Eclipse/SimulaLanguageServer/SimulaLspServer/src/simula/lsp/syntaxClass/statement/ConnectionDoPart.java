@@ -8,7 +8,6 @@ package simula.lsp.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.token.Identifier;
@@ -41,9 +40,7 @@ public class ConnectionDoPart extends SyntaxElement {
 	/// @param connectionStatement The owner.
 	/// @param connectionBlock The associated connection block
 	/// @param statement the statement after DO
-	ConnectionDoPart(final DocumentManager documentManager, final ConnectionStatement connectionStatement, final ConnectionBlock connectionBlock,final Statement statement) {
-		super(documentManager);
-//		SimulaBuilder simBuilder = documentManager.simBuilder;
+	ConnectionDoPart(final ConnectionStatement connectionStatement, final ConnectionBlock connectionBlock,final Statement statement) {
 		this.connectionStatement = connectionStatement;
 		this.connectionBlock = connectionBlock; // this.statement=statement;
 		connectionBlock.setStatement(statement);
@@ -101,8 +98,7 @@ public class ConnectionDoPart extends SyntaxElement {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	protected ConnectionDoPart(final DocumentManager documentManager) {
-		super(documentManager);
+	protected ConnectionDoPart() {
 	}
 
 	@Override
@@ -121,14 +117,14 @@ public class ConnectionDoPart extends SyntaxElement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ConnectionDoPart object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ConnectionDoPart readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		ConnectionDoPart dop = new ConnectionDoPart(documentManager);
+	public static ConnectionDoPart readObject(final AttributeInputStream inpt) throws IOException {
+		ConnectionDoPart dop = new ConnectionDoPart();
 		dop.OBJECT_SEQU = inpt.readSEQU(dop);
 		// *** SyntaxElement
 
 		// *** ConnectionDoPart
-		dop.connectionStatement = (ConnectionStatement) inpt.readObj(documentManager);
-		dop.connectionBlock = (ConnectionBlock) inpt.readObj(documentManager);
+		dop.connectionStatement = (ConnectionStatement) inpt.readObj();
+		dop.connectionBlock = (ConnectionBlock) inpt.readObj();
 		Util.TRACE_INPUT("ConnectionDoPart: " + dop);
 		return(dop);
 	}

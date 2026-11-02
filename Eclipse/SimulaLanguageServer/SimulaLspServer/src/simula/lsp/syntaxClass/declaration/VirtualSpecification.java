@@ -12,7 +12,6 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -84,8 +83,8 @@ public final class VirtualSpecification extends Declaration {
 	/// @param kind the vitual Kind
 	/// @param prefixLevel the prefix level of the class with this virtual specification
 	/// @param procedureSpec the ProcedureSpecification or null if not present
-	VirtualSpecification(final DocumentManager documentManager, final Identifier identifier, final Type type, final int kind, final int prefixLevel, final ProcedureSpecification procedureSpec) {
-		super(documentManager, identifier);
+	VirtualSpecification(final Identifier identifier, final Type type, final int kind, final int prefixLevel, final ProcedureSpecification procedureSpec) {
+		super(identifier);
 		this.declarationKind = ObjectKind.VirtualSpecification;
 		this.externalIdent = identifierValue();
 		this.type = type;
@@ -135,9 +134,9 @@ public final class VirtualSpecification extends Declaration {
 					Parse.expect(simBuilder, KeyWord.PROCEDURE);
 					procedureSpec = ProcedureSpecification.expectProcedureSpecification(simBuilder, type);						
 					cls.virtualSpecList
-							.add(new VirtualSpecification(simBuilder.documentManager, identifier, type, Kind.Procedure, cls.prefixLevel(), procedureSpec));
+							.add(new VirtualSpecification(identifier, type, Kind.Procedure, cls.prefixLevel(), procedureSpec));
 				} else {
-					cls.virtualSpecList.add(new VirtualSpecification(simBuilder.documentManager, identifier, type, Kind.Procedure, cls.prefixLevel(), null));
+					cls.virtualSpecList.add(new VirtualSpecification(identifier, type, Kind.Procedure, cls.prefixLevel(), null));
 					if (Parse.accept(simBuilder, KeyWord.COMMA))
 						expectIdentifierList(simBuilder, cls, type, Kind.Procedure);
 					else
@@ -161,7 +160,7 @@ public final class VirtualSpecification extends Declaration {
 	private static void expectIdentifierList(final SimulaBuilder simBuilder, final ClassDeclaration cls, final Type type, final int kind) {
 		do {
 			Identifier identifier = Parse.expectIdentifier(simBuilder);
-			cls.virtualSpecList.add(new VirtualSpecification(simBuilder.documentManager, identifier, type, kind, cls.prefixLevel(), null));
+			cls.virtualSpecList.add(new VirtualSpecification(identifier, type, kind, cls.prefixLevel(), null));
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		Parse.expect(simBuilder, KeyWord.SEMICOLON);
 	}
@@ -177,7 +176,7 @@ public final class VirtualSpecification extends Declaration {
 		// Label and switch attributes are implicit specified 'protected'
 		if (kind == Kind.Label || kind == Kind.Switch)
 			((ClassDeclaration) declaredIn).protectedList
-					.add(new ProtectedSpecification(documentManager, (ClassDeclaration) declaredIn, identifier));
+					.add(new ProtectedSpecification((ClassDeclaration) declaredIn, identifier));
 		SET_SEMANTICS_CHECKED();
 	}
 
@@ -283,8 +282,8 @@ public final class VirtualSpecification extends Declaration {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private VirtualSpecification(final DocumentManager documentManager) {
-		super(documentManager, null);
+	private VirtualSpecification() {
+		super(null);
 		this.declarationKind = ObjectKind.VirtualSpecification;
 	}
 	
@@ -307,7 +306,7 @@ public final class VirtualSpecification extends Declaration {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static SyntaxElement readObject( final AttributeInputStream inpt) throws IOException {
-		VirtualSpecification virt = new VirtualSpecification(documentManager);
+		VirtualSpecification virt = new VirtualSpecification();
 		virt.OBJECT_SEQU = inpt.readSEQU(virt);
 		// *** VirtualSpecification
 		virt.identifier = inpt.readIdentifier();
@@ -315,7 +314,7 @@ public final class VirtualSpecification extends Declaration {
 		virt.type = inpt.readType();
 		virt.kind = inpt.readShort();
 		virt.prefixLevel = inpt.readShort();
-		virt.procedureSpec = ProcedureSpecification.readProcedureSpec(documentManager, inpt);
+		virt.procedureSpec = ProcedureSpecification.readProcedureSpec(inpt);
 		Util.TRACE_INPUT("VirtualSpec: " + virt);
 		return(virt);
 	}

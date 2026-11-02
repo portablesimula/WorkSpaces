@@ -7,7 +7,6 @@ package simula.lsp.syntaxClass.statement;
 
 import java.lang.classfile.CodeBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.JavaSourceFileCoder;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.utilities.LspGlobal;
@@ -36,8 +35,7 @@ public final class InlineStatement extends Statement {
 	
 	/// Create a new InlineStatement.
 	/// @param kind the kind code string.
-	public InlineStatement(final DocumentManager documentManager, String kind) {
-		super(documentManager);
+	public InlineStatement(String kind) {
 		this.kind = kind;
 		SET_SEMANTICS_CHECKED();
 	}

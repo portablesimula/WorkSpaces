@@ -13,7 +13,6 @@ import java.lang.constant.ConstantDescs;
 import java.util.List;
 import java.util.Vector;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.JavaSourceFileCoder;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
@@ -54,9 +53,9 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 
 	/// Create a new SwitchDeclaration.
 	/// @param ident switch identifier
-	public SwitchDeclaration(DocumentManager documentManager, final Identifier ident) {
-		super(documentManager, ident, ObjectKind.Procedure);
-		SimulaBuilder simBuilder = documentManager.simBuilder;
+	public SwitchDeclaration(final Identifier ident) {
+		super(ident, ObjectKind.Procedure);
+		SimulaBuilder simBuilder = getSimBuilder();
 		Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
 		syntaxElements.add(this);
 		if (Option.internal.TRACE_PARSE)
@@ -67,7 +66,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse SwitchDeclaration(3), switchList=" + switchList);
-		new Parameter(documentManager, new Identifier("_SW"), Type.Integer, Parameter.Kind.Simple).into(parameterList);
+		new Parameter(new Identifier("_SW"), Type.Integer, Parameter.Kind.Simple).into(parameterList);
 		LspGlobal.setScope(declaredIn);
 
 		for(Expression expr:switchList) syntaxElements.add(expr);
@@ -86,7 +85,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		if(virtSpec==null) {
 			// Switch attributes are implicit specified 'protected'
 			if(declaredIn.declarationKind==ObjectKind.Class)
-				((ClassDeclaration)declaredIn).protectedList.add(new ProtectedSpecification(documentManager, (ClassDeclaration)LspGlobal.getCurrentScope(),identifier));
+				((ClassDeclaration)declaredIn).protectedList.add(new ProtectedSpecification((ClassDeclaration)LspGlobal.getCurrentScope(),identifier));
 		}
 	}
 

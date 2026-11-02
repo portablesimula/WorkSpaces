@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -47,8 +46,8 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 	/// @param classIdentifier the WHEN class-identifier
 	/// @param connectionBlock The associated connection block
 	/// @param statement the statement after DO
-	public ConnectionWhenPart(final DocumentManager documentManager, final ConnectionStatement connectionStatement, final Identifier classIdentifier,final ConnectionBlock connectionBlock,final Statement statement) {
-		super(documentManager, connectionStatement, connectionBlock, statement);
+	public ConnectionWhenPart(final ConnectionStatement connectionStatement, final Identifier classIdentifier,final ConnectionBlock connectionBlock,final Statement statement) {
+		super(connectionStatement, connectionBlock, statement);
 		this.classIdentifier = classIdentifier;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW ConnectionDoPart: " + toString());
@@ -117,7 +116,7 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ConnectionWhenPart(final DocumentManager documentManager) { super(documentManager);}
+	private ConnectionWhenPart() { }
 
 	@Override
 	public void writeObject(AttributeOutputStream oupt) throws IOException {
@@ -136,15 +135,15 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ConnectionDoPart object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ConnectionDoPart readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		ConnectionWhenPart whn = new ConnectionWhenPart(documentManager);
+	public static ConnectionDoPart readObject(final AttributeInputStream inpt) throws IOException {
+		ConnectionWhenPart whn = new ConnectionWhenPart();
 		whn.OBJECT_SEQU = inpt.readSEQU(whn);
 		// *** SyntaxElement
 
 		// *** ConnectionDoPart
 		whn.classIdentifier = inpt.readIdentifier();
-		whn.connectionStatement = (ConnectionStatement) inpt.readObj(documentManager);
-		whn.connectionBlock = (ConnectionBlock) inpt.readObj(documentManager);
+		whn.connectionStatement = (ConnectionStatement) inpt.readObj();
+		whn.connectionBlock = (ConnectionBlock) inpt.readObj();
 		Util.TRACE_INPUT("ConnectionDoPart: " + whn);
 		return(whn);
 	}

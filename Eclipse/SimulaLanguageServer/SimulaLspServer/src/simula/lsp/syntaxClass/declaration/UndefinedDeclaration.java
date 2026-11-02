@@ -13,7 +13,6 @@ import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.classfile.constantpool.FieldRefEntry;
 import java.lang.constant.ClassDesc;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.token.Identifier;
@@ -118,7 +117,7 @@ public class UndefinedDeclaration extends Declaration {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public UndefinedDeclaration(final DocumentManager documentManager) {
+	public UndefinedDeclaration() {
 		super(null);
 		this.declarationKind = ObjectKind.SimpleVariableDeclaration;
 	}
@@ -147,8 +146,8 @@ public class UndefinedDeclaration extends Declaration {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static UndefinedDeclaration readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		UndefinedDeclaration var = new UndefinedDeclaration(documentManager);
+	public static UndefinedDeclaration readObject(final AttributeInputStream inpt) throws IOException {
+		UndefinedDeclaration var = new UndefinedDeclaration();
 		var.OBJECT_SEQU = inpt.readSEQU(var);
 
 		// *** SyntaxElement
@@ -158,7 +157,7 @@ public class UndefinedDeclaration extends Declaration {
 		var.identifier = inpt.readIdentifier();
 		var.externalIdent = inpt.readString();
 		var.type = inpt.readType();
-		var.declaredIn = (DeclarationScope) inpt.readObj(documentManager);
+		var.declaredIn = (DeclarationScope) inpt.readObj();
 		
 //		// *** SimpleVariableDeclaration
 //		var.constant = inpt.readBoolean();

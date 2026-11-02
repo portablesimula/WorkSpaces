@@ -8,7 +8,6 @@ package simula.lsp.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
@@ -41,19 +40,17 @@ public final class DummyStatement extends Statement {
 //		super(line);
 //		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": DummyStatement: "+this);
 //	}
-	private DummyStatement(final DocumentManager documentManager) {
-		super(documentManager);
-//		SimulaBuilder simBuilder = documentManager.simBuilder;
+	private DummyStatement() {
 	}
 
 	public static DummyStatement ofExplicit(final SimulaBuilder simBuilder) {
 		simBuilder.consume(KeyWord.SEMICOLON); //  (add it to tokenList)
-		DummyStatement dummyStatement = new DummyStatement(simBuilder.documentManager);		
+		DummyStatement dummyStatement = new DummyStatement();		
 		return dummyStatement;
 	}
 
 	public static DummyStatement ofImplicit(final SimulaBuilder simBuilder) {
-		DummyStatement dummyStatement = new DummyStatement(simBuilder.documentManager);		
+		DummyStatement dummyStatement = new DummyStatement();		
 		return dummyStatement;
 	}
 
@@ -106,8 +103,8 @@ public final class DummyStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the DummyStatement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static DummyStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		DummyStatement stm = new DummyStatement(documentManager);
+	public static DummyStatement readObject(final AttributeInputStream inpt) throws IOException {
+		DummyStatement stm = new DummyStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		

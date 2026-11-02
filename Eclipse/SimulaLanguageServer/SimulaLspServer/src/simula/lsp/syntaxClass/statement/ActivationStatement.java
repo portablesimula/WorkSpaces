@@ -8,7 +8,6 @@ package simula.lsp.syntaxClass.statement;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.Parse;
@@ -103,12 +102,11 @@ public final class ActivationStatement extends Statement {
 
 	/// Create a new ActivationStatement.
 	/// @param line the source line number
-	private ActivationStatement(final DocumentManager documentManager) {
-		super(documentManager);
+	private ActivationStatement() {
 	}
-	static ActivationStatement of(final DocumentManager documentManager) {
-		ActivationStatement stm = new ActivationStatement(documentManager);
-		SimulaBuilder simBuilder = documentManager.simBuilder;
+	static ActivationStatement of() {
+		ActivationStatement stm = new ActivationStatement();
+		SimulaBuilder simBuilder = stm.getSimBuilder();
 		LexToken activator = Parse.getCurrentParserToken(simBuilder);
 		stm.REAC = activator.keyWord == KeyWord.REACTIVATE;
 		simBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to tokenList)
@@ -144,9 +142,9 @@ public final class ActivationStatement extends Statement {
 	public String toJavaCode() {
 		Type refProcess = Type.Ref("Process");
 		if (object1 != null)
-			object1 = TypeConversion.testAndCreate(documentManager, refProcess, object1);
+			object1 = TypeConversion.testAndCreate(refProcess, object1);
 		if (object2 != null)
-			object2 = TypeConversion.testAndCreate(documentManager, refProcess, object2);
+			object2 = TypeConversion.testAndCreate(refProcess, object2);
 		switch (code) {
 		    case at:     return (edActivateAt());
 		    case delay:	 return (edActivateDelay());
@@ -206,14 +204,14 @@ public final class ActivationStatement extends Statement {
 	public void buildByteCode(SimulaCoder simCoder, CodeBuilder codeBuilder) {
 		Type refProcess = Type.Ref("Process");
 		if (object1 != null) {
-			object1 = TypeConversion.testAndCreate(documentManager, refProcess, object1);
+			object1 = TypeConversion.testAndCreate(refProcess, object1);
 			object1.backLink = this;
 		}
 		if (object2 != null) {
-			object2 = TypeConversion.testAndCreate(documentManager, refProcess, object2);
+			object2 = TypeConversion.testAndCreate(refProcess, object2);
 			object2.backLink = this;
 		}
-		if(time != null) 	 time = TypeConversion.testAndCreate(documentManager, Type.LongReal, time);
+		if(time != null) 	 time = TypeConversion.testAndCreate(Type.LongReal, time);
 
 		switch (code) {
 		    case at:     buildActivateAt(simCoder, codeBuilder); break;
@@ -340,16 +338,16 @@ public final class ActivationStatement extends Statement {
 	/// @param inpt the AttributeInputStream to read from
 	/// @return the ActivationStatement object read from the stream.
 	/// @throws IOException if something went wrong.
-	public static ActivationStatement readObject(final DocumentManager documentManager, final AttributeInputStream inpt) throws IOException {
-		ActivationStatement stm = new ActivationStatement(documentManager);
+	public static ActivationStatement readObject(final AttributeInputStream inpt) throws IOException {
+		ActivationStatement stm = new ActivationStatement();
 		stm.OBJECT_SEQU = inpt.readSEQU(stm);
 		// *** SyntaxElement
 		
 		// *** ActivationStatement
 		stm.REAC = inpt.readBoolean();
-		stm.object1 = (Expression) inpt.readObj(documentManager);
-		stm.object2 = (Expression) inpt.readObj(documentManager);
-		stm.time = (Expression) inpt.readObj(documentManager);
+		stm.object1 = (Expression) inpt.readObj();
+		stm.object2 = (Expression) inpt.readObj();
+		stm.time = (Expression) inpt.readObj();
 		stm.prior = inpt.readBoolean();
 		Util.TRACE_INPUT("ActivationStatement: " + stm);
 		return(stm);
