@@ -222,7 +222,7 @@ public final class TypeConversion extends Expression {
 					case Type.T_INTEGER: codeBuilder.i2f(); break;
 					case Type.T_LONG_REAL: codeBuilder.d2f(); break;
 					default:
-						if((! getDocumentManager().compileViaJavaSource) && fromType instanceof OverLoad otp) {
+						if((! DocumentManager.compileViaJavaSource) && fromType instanceof OverLoad otp) {
 							if(!otp.contains(Type.Real)) Util.IERR();
 						} else if (fromType.keyWord != Type.T_REAL) Util.IERR();
 				} break;
@@ -232,7 +232,7 @@ public final class TypeConversion extends Expression {
 					case Type.T_INTEGER: codeBuilder.i2d(); break;
 					case Type.T_REAL: codeBuilder.f2d(); break;
 					default:
-						if((! getDocumentManager().compileViaJavaSource) && fromType instanceof OverLoad otp) {
+						if((! DocumentManager.compileViaJavaSource) && fromType instanceof OverLoad otp) {
 							if(!otp.contains(Type.LongReal)) Util.IERR();
 						} else if (fromType.keyWord != Type.T_LONG_REAL) Util.IERR();
 				}

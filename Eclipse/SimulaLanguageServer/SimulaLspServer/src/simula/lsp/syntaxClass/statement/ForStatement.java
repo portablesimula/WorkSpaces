@@ -160,9 +160,9 @@ public final class ForStatement extends Statement {
 	private ForStatement() {
 	}
 	
-	static ForStatement of() {
+	static ForStatement of(SimulaBuilder simBuilder) {
 		ForStatement stm = new ForStatement();
-		SimulaBuilder simBuilder = stm.getSimBuilder();
+//		SimulaBuilder simBuilder = stm.getSimBuilder();
 		simBuilder.consume(KeyWord.FOR); //  (add it to tokenList)
 
 		if (Option.internal.TRACE_PARSE)

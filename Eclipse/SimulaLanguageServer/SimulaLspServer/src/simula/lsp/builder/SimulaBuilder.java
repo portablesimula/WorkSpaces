@@ -147,9 +147,9 @@ public class SimulaBuilder {
     	
         // Do the actual Building
 		simBuilder.getNextParserToken();
-		simBuilder.syntaxTree = new ProgramModule(simBuilder.documentManager);
+		simBuilder.syntaxTree = new ProgramModule();
         try {
-        	simBuilder.syntaxTree.doBuild();
+        	simBuilder.syntaxTree.doBuild(simBuilder);
         	builderTerminateNormally = true;
         } catch(EOTException e) {
 			System.err.println("SimulaBuilder: GOT EXCEPTION: " + e.getMessage());

@@ -148,11 +148,11 @@ public final class AttributeFileIO {
 		String vers = inpt.readString();
 		if(!(vers.equals(version))) Util.generalError("Malformed SimulaAttributeFile: " + fileID);
 
-		ClassHierarchy.readObject(simBuilder.documentManager, inpt);
+		ClassHierarchy.readObject(inpt);
 
 		int declarationKind = inpt.readKind();
 		while(declarationKind == ObjectKind.ExternalDeclaration) {
-			ExternalDeclaration xdecl = ExternalDeclaration.readObject(simBuilder.documentManager, inpt);
+			ExternalDeclaration xdecl = ExternalDeclaration.readObject(inpt);
 			/// Read external Attribute file.
 			File jarFile = JarFileBuilder.findJarFile(simBuilder, xdecl.identifierValue(), xdecl.externalIdent);
 			if (jarFile == null) {
@@ -167,8 +167,8 @@ public final class AttributeFileIO {
 		}
 		
 		BlockDeclaration module=null;
-		if(declarationKind == ObjectKind.Procedure)  module = ProcedureDeclaration.readObject(simBuilder.documentManager, inpt);
-		else if(declarationKind == ObjectKind.Class) module = ClassDeclaration.readObject(simBuilder.documentManager, inpt);
+		if(declarationKind == ObjectKind.Procedure)  module = ProcedureDeclaration.readObject(inpt);
+		else if(declarationKind == ObjectKind.Class) module = ClassDeclaration.readObject(inpt);
 		else Util.IERR();
 		inpt.close();
 		if (DocumentManager.verbose)	Util.TRACE("*** ENDOF Read SimulaAttributeFile: " + fileID);

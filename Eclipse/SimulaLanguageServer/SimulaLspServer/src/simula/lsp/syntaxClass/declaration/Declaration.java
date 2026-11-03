@@ -126,10 +126,11 @@ public abstract class Declaration extends SyntaxElement {
 				break LOOP;
 			}
 		}
+//		Util.println("Declaration.checkAlreadyDefined: " + this.getClass().getSimpleName());
 		if (error)
-			Util.syntaxError(this.getSimBuilder(), identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
+			Util.syntaxError(this, identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
 		else if (warning)
-			Util.warning(this.getSimBuilder(), identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
+			Util.warning(this, identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
 	}
 
 	/// Parse a declaration and add it to the given declaration list.
@@ -173,7 +174,7 @@ public abstract class Declaration extends SyntaxElement {
 				Parse.saveCurrentToken(simBuilder);
 				return null;
 			}
-			decl = new SwitchDeclaration(simBuilder.documentManager, ident);
+			decl = new SwitchDeclaration(simBuilder, ident);
 		} else if (Parse.accept(simBuilder, KeyWord.EXTERNAL)) {
 			Vector<SyntaxElement> ext = ExternalDeclaration.expectExternalDeclaration(simBuilder);	
 			return ext;

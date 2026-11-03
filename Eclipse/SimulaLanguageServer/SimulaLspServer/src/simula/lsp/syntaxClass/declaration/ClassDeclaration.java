@@ -376,13 +376,13 @@ public class ClassDeclaration extends BlockDeclaration {
 			cls.parseBlock(simBuilder);
 			if(! cls.hasInner()) {
 //				Util.println("ClassDeclaration.expectClassBody: ADD IMPLICIT INNER");
-				cls.statements.add(new InnerStatement(simBuilder.documentManager, false)); // Implicit INNER
+				cls.statements.add(new InnerStatement(simBuilder, false)); // Implicit INNER
 			}
 		} else {
 			if(Parse.getCurrentParserToken(simBuilder).keyWord != KeyWord.SEMICOLON)
 				cls.statements.add(Statement.acceptStatement(simBuilder));
 			if(! cls.hasInner())
-				cls.statements.add(new InnerStatement(simBuilder.documentManager, false)); // Implicit INNER
+				cls.statements.add(new InnerStatement(simBuilder, false)); // Implicit INNER
 		}
 	}
 
@@ -1490,16 +1490,16 @@ public class ClassDeclaration extends BlockDeclaration {
 
 		// *** BlockDeclaration
 		cls.isMainModule = inpt.readBoolean();
-		cls.statements = (ObjectList<Statement>) inpt.readObjectList(documentManager);
+		cls.statements = (ObjectList<Statement>) inpt.readObjectList();
 		
 		// *** ClassDeclaration
 		cls.prefix = inpt.readIdentifier();
 		cls.detachUsed = inpt.readBoolean();
-		cls.parameterList = (ObjectList<Parameter>) inpt.readObjectList(documentManager);
-		cls.virtualSpecList = (ObjectList<VirtualSpecification>) inpt.readObjectList(documentManager);
-		cls.hiddenList = (ObjectList<HiddenSpecification>) inpt.readObjectList(documentManager);
-		cls.protectedList = (ObjectList<ProtectedSpecification>) inpt.readObjectList(documentManager);
-		cls.statements1 = (ObjectList<Statement>) inpt.readObjectList(documentManager);
+		cls.parameterList = (ObjectList<Parameter>) inpt.readObjectList();
+		cls.virtualSpecList = (ObjectList<VirtualSpecification>) inpt.readObjectList();
+		cls.hiddenList = (ObjectList<HiddenSpecification>) inpt.readObjectList();
+		cls.protectedList = (ObjectList<ProtectedSpecification>) inpt.readObjectList();
+		cls.statements1 = (ObjectList<Statement>) inpt.readObjectList();
 
 		cls.isPreCompiledFromFile = inpt.jarFileName;
 		Util.TRACE_INPUT("END Read ClassDeclaration: " + identifier.value + ", Declared in: " + cls.declaredIn);

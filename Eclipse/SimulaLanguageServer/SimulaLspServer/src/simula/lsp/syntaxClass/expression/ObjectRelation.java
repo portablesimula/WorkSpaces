@@ -8,7 +8,6 @@ package simula.lsp.syntaxClass.expression;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.token.Identifier;
@@ -94,9 +93,7 @@ public final class ObjectRelation extends Expression {
 	/// @param lhs left hand side
 	/// @param opr the operation: IN or IS
 	/// @param classIdentifier the right hand class identifier
-	ObjectRelation(final DocumentManager documentManager, final Expression lhs, final int opr, final Identifier classIdentifier) {
-		super(documentManager);
-//		SimulaBuilder simBuilder = getSimBuilder();
+	ObjectRelation(final Expression lhs, final int opr, final Identifier classIdentifier) {
 		this.lhs = lhs;
 		this.opr = opr;
 		this.classIdentifier = classIdentifier;
@@ -172,8 +169,7 @@ public final class ObjectRelation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ObjectRelation(final DocumentManager documentManager) {
-		super(documentManager);
+	private ObjectRelation() {
 	}
 
 	@Override
@@ -197,12 +193,12 @@ public final class ObjectRelation extends Expression {
 	/// @return the ObjectRelation object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static ObjectRelation readObject(final AttributeInputStream inpt) throws IOException {
-		ObjectRelation expr = new ObjectRelation(documentManager);
+		ObjectRelation expr = new ObjectRelation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
-		expr.lhs = (Expression) inpt.readObj(documentManager);
+		expr.backLink = (SyntaxElement) inpt.readObj();
+		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();
 		expr.classIdentifier = inpt.readIdentifier();
 		Util.TRACE_INPUT("readObjectRelation: " + expr);

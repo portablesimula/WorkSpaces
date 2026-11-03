@@ -53,9 +53,9 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 
 	/// Create a new SwitchDeclaration.
 	/// @param ident switch identifier
-	public SwitchDeclaration(final Identifier ident) {
+	public SwitchDeclaration(final SimulaBuilder simBuilder, final Identifier ident) {
 		super(ident, ObjectKind.Procedure);
-		SimulaBuilder simBuilder = getSimBuilder();
+//		SimulaBuilder simBuilder = getSimBuilder();
 		Vector<SyntaxElement> syntaxElements = new Vector<SyntaxElement>();
 		syntaxElements.add(this);
 		if (Option.internal.TRACE_PARSE)

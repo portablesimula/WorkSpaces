@@ -73,8 +73,7 @@ public final class RemoteVariable extends Expression {
 	/// Create a new RemoteVariable
 	/// @param obj object expression
 	/// @param var the variable
-	RemoteVariable(final DocumentManager documentManager, final Expression obj, final VariableExpression var) {
-		super(documentManager);
+	RemoteVariable(final Expression obj, final VariableExpression var) {
 		this.obj = obj;
 		this.var = var;
 		obj.backLink = var.backLink = this;
@@ -130,7 +129,7 @@ public final class RemoteVariable extends Expression {
 			if (remoteAttribute == null) {
 				if(objType.keyWord != Type.T_UNDEF)
 					Util.semanticError(obj, "RemoteVariable.doRemoteChecking: " + ident.value + " is not an attribute of "	+ objType.getRefIdent().value);
-				UndefinedDeclaration undef = new UndefinedDeclaration(documentManager, ident);
+				UndefinedDeclaration undef = new UndefinedDeclaration(this, ident);
 				remoteAttribute = new Meaning(undef, LspGlobal.getCurrentScope()); // Error Recovery
 			}
 			var.setRemotelyAccessed(remoteAttribute);
@@ -195,9 +194,9 @@ public final class RemoteVariable extends Expression {
 	public String toJavaCode() {
 		ASSERT_SEMANTICS_CHECKED();
 		if (callRemoteProcedure != null)
-			return (CallProcedure.remote(documentManager.simCoder, obj, callRemoteProcedure, var, backLink));
+			return (CallProcedure.remote(getSimCoder(), obj, callRemoteProcedure, var, backLink));
 		else if (callRemoteVirtual != null)
-			return (CallProcedure.remoteVirtual(documentManager.simCoder, obj, var, callRemoteVirtual));
+			return (CallProcedure.remoteVirtual(getSimCoder(), obj, var, callRemoteVirtual));
 		else if (accessRemoteArray)
 			return (doAccessRemoteArray(obj, var));
 		Expression constantElement=remoteAttribute.getConstant();
@@ -291,7 +290,7 @@ public final class RemoteVariable extends Expression {
 			for(Expression expr:variable.checkedParams)
 				expr.buildEvaluation(simCoder, null, codeBuilder);
 
-		codeBuilder.invokestatic(RTS.CD.RTS_TXT, pro.identifierValue(), pro.getMethodTypeDesc(simCoder.documentManager, beforeDot, variable.checkedParams));
+		codeBuilder.invokestatic(RTS.CD.RTS_TXT, pro.identifierValue(), pro.getMethodTypeDesc(beforeDot, variable.checkedParams));
 		if(pro.type != null && backLink == null) {
 			codeBuilder.pop();
 		}
@@ -306,8 +305,7 @@ public final class RemoteVariable extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private RemoteVariable(final DocumentManager documentManager) {
-		super(documentManager);
+	private RemoteVariable() {
 	}
 
 	@Override
@@ -330,16 +328,16 @@ public final class RemoteVariable extends Expression {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static RemoteVariable readObject(final AttributeInputStream inpt) throws IOException {
-		RemoteVariable rem = new RemoteVariable(documentManager);
+		RemoteVariable rem = new RemoteVariable();
 		rem.OBJECT_SEQU = inpt.readSEQU(rem);
 		// *** SyntaxElement
 
 		// *** SyntaxElement
 		rem.type = inpt.readType();
-		rem.backLink = (SyntaxElement) inpt.readObj(documentManager);
+		rem.backLink = (SyntaxElement) inpt.readObj();
 		// *** RemoteVariable
-		rem.obj = (Expression) inpt.readObj(documentManager);
-		rem.var = (VariableExpression) inpt.readObj(documentManager);
+		rem.obj = (Expression) inpt.readObj();
+		rem.var = (VariableExpression) inpt.readObj();
 		Util.TRACE_INPUT("readRemoteVariable: " + rem);
 		return(rem);
 	}

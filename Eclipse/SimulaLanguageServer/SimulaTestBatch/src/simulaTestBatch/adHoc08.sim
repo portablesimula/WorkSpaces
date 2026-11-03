@@ -1,5 +1,39 @@
 begin
-	ref(tull) xxx;
+
+	integer            isum;               ! To contain control sum.     ;
+	real               rsum;               ! To contain control sum.     ;
+	text               txt;                ! Used in controlling real    ;
+                                       ! controll sum.               ;
+	outtext("Enter block: " & edit(sourceline) & ", isum=" & edit(isum)); outimage;
 	
-	inspect xxx when tull do;
-end
+	begin
+		integer            intr;
+		real               rea;
+
+		intr := 1;
+		rea := 1;
+		outtext("Enter block: " & edit(sourceline) & ", intr=" & edit(intr)); outimage;
+
+ 		begin
+			integer            intr;
+			real               rea;
+
+			intr := 10;
+			rea := 10;
+			outtext("Enter block: " & edit(sourceline) & ", intr=" & edit(intr)); outimage;
+		end;
+		
+		rea := 0;
+
+ 		begin
+			integer            intr;
+			real               rea;
+
+			intr := 10;
+			rea := 10;
+			outtext("Enter block: " & edit(sourceline) & ", intr=" & edit(intr)); outimage;
+		end;
+	end;		
+end;
+
+end of program

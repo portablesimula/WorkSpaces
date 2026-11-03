@@ -138,7 +138,7 @@ public class RunDebugManager {
 		@SuppressWarnings("unused")
 		List<Integer> semtokens = DocumentManager.semanticTokensFull(documentUri);
 		
-    	SimulaBuilder simBuilder = getSimBuilder();
+    	SimulaBuilder simBuilder = documentManager.simBuilder;
     	if(simBuilder.nErrors != 0) {
     		Util.IERR("Can't generate code due to " + simBuilder.nErrors + " errors.");
     	}

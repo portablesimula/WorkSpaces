@@ -8,10 +8,8 @@ package simula.lsp.syntaxClass.expression;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
-import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.SyntaxElement;
 import simula.lsp.syntaxClass.Type;
@@ -97,15 +95,14 @@ public final class TextExpression extends Expression {
 	/// Create a new TextExpression
 	/// @param lhs left hand side
 	/// @param rhs rigth hand side
-	TextExpression(final DocumentManager documentManager, final Expression lhs, final Expression rhs) {
-		super(documentManager); SimulaBuilder simBuilder = getSimBuilder();
+	TextExpression(final Expression lhs, final Expression rhs) {
 		this.lhs = lhs; this.rhs = rhs;
 		if (this.lhs == null) {
-			Util.syntaxError(simBuilder, "Missing operand before &");
+			Util.syntaxError(this, "Missing operand before &");
 			this.lhs = new MissingExpression();
 		}
 		if (this.rhs == null) {
-			Util.syntaxError(simBuilder, "Missing operand after &");
+			Util.syntaxError(this, "Missing operand after &");
 			this.rhs = new MissingExpression();
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
@@ -161,8 +158,7 @@ public final class TextExpression extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private TextExpression(final DocumentManager documentManager) {
-		super(documentManager);
+	private TextExpression() {
 	}
 
 	@Override
@@ -185,16 +181,16 @@ public final class TextExpression extends Expression {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static TextExpression readObject(final AttributeInputStream inpt) throws IOException {
-		TextExpression expr = new TextExpression(documentManager);
+		TextExpression expr = new TextExpression();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** TextExpression
-		expr.lhs = (Expression) inpt.readObj(documentManager);
-		expr.rhs = (Expression) inpt.readObj(documentManager);
+		expr.lhs = (Expression) inpt.readObj();
+		expr.rhs = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("readTextExpression: " + expr);
 		return(expr);
 	}

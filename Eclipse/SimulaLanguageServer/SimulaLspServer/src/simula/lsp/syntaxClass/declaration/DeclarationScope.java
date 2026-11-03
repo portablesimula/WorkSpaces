@@ -173,7 +173,7 @@ public abstract class DeclarationScope extends Declaration  {
 				DocumentManager.WARNINGS = true;
 				Util.warning(this, "Undefined variable: " + identifierValue() + "  Could be because SimulaCompiler.CaseSensitive == true");
 			}
-			UndefinedDeclaration undef = new UndefinedDeclaration(identifier);
+			UndefinedDeclaration undef = new UndefinedDeclaration(this, identifier);
 			meaning = new Meaning(undef, this); // Error Recovery
 		}
 		if(Option.internal.TRACE_FIND_MEANING > 0)

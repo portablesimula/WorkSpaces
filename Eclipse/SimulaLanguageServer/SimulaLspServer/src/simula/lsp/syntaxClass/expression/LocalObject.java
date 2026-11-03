@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.constantpool.ConstantPoolBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.Parse;
@@ -72,9 +71,7 @@ public final class LocalObject extends Expression {
 
 	/// Create a new LocalObject
 	/// @param ident class-identifier
-	private LocalObject(final DocumentManager documentManager, final Identifier ident) {
-		super(documentManager);
-//		SimulaBuilder simBuilder = getSimBuilder();
+	private LocalObject(final Identifier ident) {
 		this.classIdentifier = ident;
 		this.type=Type.Ref(classIdentifier);
 		if (Option.internal.TRACE_PARSE)
@@ -87,7 +84,7 @@ public final class LocalObject extends Expression {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse ThisObjectExpression, current=" + Parse.getCurrentParserToken(simBuilder));
 		Identifier classIdentifier = Parse.expectIdentifier(simBuilder);
-		Expression expr = new LocalObject(simBuilder.documentManager, classIdentifier);
+		Expression expr = new LocalObject(classIdentifier);
 		return(expr);
 	}
 
@@ -181,8 +178,7 @@ public final class LocalObject extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	public LocalObject(final DocumentManager documentManager) {
-		super(documentManager);
+	public LocalObject() {
 	}
 
 	@Override
@@ -204,13 +200,13 @@ public final class LocalObject extends Expression {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static LocalObject readObject(final AttributeInputStream inpt) throws IOException {
-		LocalObject expr = new LocalObject(documentManager);
+		LocalObject expr = new LocalObject();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** LocalObject
 		expr.classIdentifier = inpt.readIdentifier();
 		Util.TRACE_INPUT("readLocalObject: " + expr);

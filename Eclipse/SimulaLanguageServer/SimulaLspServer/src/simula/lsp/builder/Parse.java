@@ -250,7 +250,7 @@ public class Parse {
 //			Util.println("Parse.aacceptType: range = " + Util.edRange(lexRange));
 //
 ////			type=Type.Ref(classIdentifier.toString()); 
-			type=Type.Ref(classIdentifier.getText(), simBuilder.documentManager); 
+			type=Type.Ref(classIdentifier.getText()); 
 			type.setFirstParserToken(firstParserToken);
 			type.setLastParserToken(lastParserToken);
 			Util.println("Parse.aacceptType: range = " + Util.edRange(type.getLexRange()));

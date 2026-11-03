@@ -120,18 +120,18 @@ public abstract class Statement extends SyntaxElement {
 				statement = new BlockStatement(block, "Statement.acceptUnlabeledStatement: BEGIN ==> parseBlock");
 				break;
 				
-			case KeyWord.IF:		 statement = ConditionalStatement.of(); break;
+			case KeyWord.IF:		 statement = ConditionalStatement.of(simBuilder); break;
 		    case KeyWord.GO,
-		         KeyWord.GOTO:		 statement = new GotoStatement(keyWord); break;
-		    case KeyWord.FOR:		 statement = ForStatement.of(); break;
-		    case KeyWord.WHILE:		 statement = WhileStatement.of(); break;
-		    case KeyWord.INSPECT:	 statement = ConnectionStatement.of(); break;
+		         KeyWord.GOTO:		 statement = new GotoStatement(simBuilder, keyWord); break;
+		    case KeyWord.FOR:		 statement = ForStatement.of(simBuilder); break;
+		    case KeyWord.WHILE:		 statement = WhileStatement.of(simBuilder); break;
+		    case KeyWord.INSPECT:	 statement = ConnectionStatement.of(simBuilder); break;
 		    case KeyWord.SWITCH:	 if(DocumentManager.EXTENSIONS) {
-		    							 statement = SwitchStatement.of();
+		    							 statement = SwitchStatement.of(simBuilder);
 		    						 } break;
 		    case KeyWord.ACTIVATE,
-		         KeyWord.REACTIVATE: statement = ActivationStatement.of(); break;
-		    case KeyWord.INNER:		 statement = new InnerStatement(true); break;
+		         KeyWord.REACTIVATE: statement = ActivationStatement.of(simBuilder); break;
+		    case KeyWord.INNER:		 statement = new InnerStatement(simBuilder, true); break;
 		    case KeyWord.SEMICOLON:	 statement = DummyStatement.ofExplicit(simBuilder); break;
 		    case KeyWord.END:	  // statement = DummyStatement.ofImplicit(simBuilder); break; // Dummy Statement, keep END
 		    case KeyWord.EOF:		 statement = DummyStatement.ofImplicit(simBuilder); break; // Dummy Statement, keep EOF

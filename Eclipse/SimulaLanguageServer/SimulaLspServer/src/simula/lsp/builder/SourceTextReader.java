@@ -3,7 +3,6 @@ package simula.lsp.builder;
 import java.util.List;
 
 import simula.lsp.utilities.Comn;
-import simula.lsp.utilities.Option;
 
 public class SourceTextReader {
     private List<String> sourceLines;

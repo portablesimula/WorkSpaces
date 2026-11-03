@@ -119,7 +119,7 @@ public abstract class Expression extends SyntaxElement {
 				Expression thenExpression=acceptSimpleExpression(simBuilder);
 			Parse.expect(simBuilder, KeyWord.ELSE);
 				Expression elseExpression=acceptExpression(simBuilder);
-			Expression expr=new ConditionalExpression(simBuilder.documentManager, Type.Boolean, condition, thenExpression, elseExpression);
+			Expression expr=new ConditionalExpression(Type.Boolean, condition, thenExpression, elseExpression);
 			if(Option.internal.TRACE_PARSE) Util.TRACE("Expression: ParseExpression, result="+expr);
 //			if(true) throw new RuntimeException("Expression.acceptExpression: NOT IMPL: "+expr);
 			return expr;
@@ -147,7 +147,7 @@ public abstract class Expression extends SyntaxElement {
 		Expression expr=acceptExpression(simBuilder);
 		if(expr==null) {
 //			Util.syntaxError(simBuilder, "Expecting Expression");
-			expr = new MissingExpression(simBuilder.documentManager);
+			expr = new MissingExpression();
 			Util.semanticError(expr, "Expecting " + kind + " Expression");
 		}
 //		Util.println("Expression.expectExpression: END: expr="+expr);
@@ -177,7 +177,7 @@ public abstract class Expression extends SyntaxElement {
 	private static Expression acceptSimpleExpression(SimulaBuilder simBuilder)  { 
 		Expression expr = acceptANDTHEN(simBuilder);
 		while(Parse.accept_OR_ELSE(simBuilder)) {
-			expr=new BooleanExpression(simBuilder.documentManager, expr, KeyWord.OR_ELSE, acceptANDTHEN(simBuilder));
+			expr=new BooleanExpression(expr, KeyWord.OR_ELSE, acceptANDTHEN(simBuilder));
 		}
 		return(expr);
 	}
@@ -190,7 +190,7 @@ public abstract class Expression extends SyntaxElement {
 	private static Expression acceptANDTHEN(SimulaBuilder simBuilder) {
 		Expression expr = acceptEQV(simBuilder);
 		while(Parse.accept_AND_THEN(simBuilder)) {
-			expr=new BooleanExpression(simBuilder.documentManager, expr, KeyWord.AND_THEN, acceptEQV(simBuilder));
+			expr=new BooleanExpression(expr, KeyWord.AND_THEN, acceptEQV(simBuilder));
 		}
 		return(expr);
 	}
@@ -203,7 +203,7 @@ public abstract class Expression extends SyntaxElement {
 	private static Expression acceptEQV(SimulaBuilder simBuilder) { 
 		Expression expr=acceptIMP(simBuilder);
 		while(Parse.accept(simBuilder, KeyWord.EQV)) {
-			expr=new BooleanExpression(simBuilder.documentManager, expr, KeyWord.EQV, acceptIMP(simBuilder));
+			expr=new BooleanExpression(expr, KeyWord.EQV, acceptIMP(simBuilder));
 		}
 		return(expr);
 	}
@@ -216,7 +216,7 @@ public abstract class Expression extends SyntaxElement {
 	private static Expression acceptIMP(SimulaBuilder simBuilder) {
 		Expression expr=acceptOR(simBuilder);
 		while(Parse.accept(simBuilder, KeyWord.IMP)) {
-			expr=new BooleanExpression(simBuilder.documentManager, expr, KeyWord.IMP, acceptOR(simBuilder));
+			expr=new BooleanExpression(expr, KeyWord.IMP, acceptOR(simBuilder));
 		}
 		return(expr);
 	}
@@ -229,7 +229,7 @@ public abstract class Expression extends SyntaxElement {
 	private static Expression acceptOR(SimulaBuilder simBuilder) {
 		Expression expr=acceptAND(simBuilder);
 		while(Parse.accept_OR_ONLY(simBuilder)) {
-			expr=new BooleanExpression(simBuilder.documentManager, expr, KeyWord.OR, acceptAND(simBuilder));
+			expr=new BooleanExpression(expr, KeyWord.OR, acceptAND(simBuilder));
 		}
 		return(expr);
 	}
@@ -242,7 +242,7 @@ public abstract class Expression extends SyntaxElement {
 	private static Expression acceptAND(SimulaBuilder simBuilder) {
 		Expression expr=acceptNOT(simBuilder);
 		while(Parse.accept_AND_ONLY(simBuilder)) {
-			expr=new BooleanExpression(simBuilder.documentManager, expr, KeyWord.AND, acceptNOT(simBuilder));
+			expr=new BooleanExpression(expr, KeyWord.AND, acceptNOT(simBuilder));
 		}
 		return(expr);
 	}
@@ -270,7 +270,7 @@ public abstract class Expression extends SyntaxElement {
 	private static Expression acceptTEXTCONC(SimulaBuilder simBuilder) {
 		Expression expr=acceptRelation(simBuilder);
 		while(Parse.accept(simBuilder, KeyWord.AMPERSAND)) {
-			expr=new TextExpression(simBuilder.documentManager, expr, acceptRelation(simBuilder));
+			expr=new TextExpression(expr, acceptRelation(simBuilder));
 		}
 		return(expr);
 	}
@@ -286,7 +286,7 @@ public abstract class Expression extends SyntaxElement {
 		LexToken prevToken = null;
 		if((prevToken = Parse.acceptRelationalOperator(simBuilder)) != null)   { 
 			int opr = prevToken.keyWord;
-			expr = new RelationalOperation(simBuilder.documentManager, expr, opr, acceptAdditiveOperation(simBuilder));
+			expr = new RelationalOperation(expr, opr, acceptAdditiveOperation(simBuilder));
 		}
 		return(expr);
 	}
@@ -410,13 +410,13 @@ public abstract class Expression extends SyntaxElement {
 		while ((prevToken = Parse.acceptPostfixOprator(simBuilder)) != null) {
 			int opr = prevToken.keyWord; // opr == DOT || opr== IS || opr == IN || opr == QUA
 			if (opr == KeyWord.DOT ) 
-				expr=new RemoteVariable(simBuilder.documentManager, expr, expectVariable(simBuilder));
+				expr=new RemoteVariable(expr, expectVariable(simBuilder));
 			else {  // opr == IS or opr == IN or opr == QUA.  Then a class identifier must follow.
 //				String classIdentifier=PsiParse.acceptIdentifier(simBuilder).getText();
 				Identifier classIdentifier=Parse.acceptIdentifier(simBuilder);
 				if(opr==KeyWord.QUA)
-					expr=new QualifiedObject(simBuilder.documentManager, expr, classIdentifier);
-				else expr=new ObjectRelation(simBuilder.documentManager, expr, opr, classIdentifier);
+					expr=new QualifiedObject(expr, classIdentifier);
+				else expr=new ObjectRelation(expr, opr, classIdentifier);
 			}
 		}
 //		if(Option.internal.TRACE_PARSE) PsiParse.TRACE("Expression: acceptBasicExpression returns: "+expr);

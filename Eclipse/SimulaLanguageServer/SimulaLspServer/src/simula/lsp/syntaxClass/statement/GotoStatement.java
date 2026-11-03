@@ -56,8 +56,8 @@ public final class GotoStatement extends Statement {
 
 	/// Create a new GotoStatement.
 	/// @param line source line
-	GotoStatement(final int keyWord) {
-		SimulaBuilder simBuilder = getSimBuilder();
+	GotoStatement(final SimulaBuilder simBuilder, final int keyWord) {
+//		SimulaBuilder simBuilder = getSimBuilder();
 		simBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to tokenList)
 		if(keyWord != KeyWord.GOTO) {
 	        if (!Parse.accept(simBuilder, KeyWord.TO))

@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.coder.SimulaCoder;
@@ -62,9 +61,7 @@ public final class RelationalOperation extends Expression {
 	/// @param lhs the left hand side
 	/// @param opr the relation
 	/// @param rhs the right hand side
-	RelationalOperation(final DocumentManager documentManager, final Expression lhs,final int opr,final Expression rhs) {
-		super(documentManager);
-//		SimulaBuilder simBuilder = getSimBuilder();
+	RelationalOperation(final Expression lhs,final int opr,final Expression rhs) {
 		this.type = Type.Boolean;
 		this.lhs = lhs; this.opr = opr; this.rhs = rhs;
 		if (this.lhs == null) {
@@ -101,8 +98,8 @@ public final class RelationalOperation extends Expression {
 					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
 					Util.semanticError(this, "RelationalOperation: Illegal types: " + type1 + " " + opr + " " + type2);
 				}
-				lhs = (Expression) TypeConversion.testAndCreate(documentManager, atype, lhs);
-				rhs = (Expression) TypeConversion.testAndCreate(documentManager, atype, rhs);
+				lhs = (Expression) TypeConversion.testAndCreate(atype, lhs);
+				rhs = (Expression) TypeConversion.testAndCreate(atype, rhs);
 				break;
 			}
 			case KeyWord.EQR: case KeyWord.NER: {
@@ -265,8 +262,7 @@ public final class RelationalOperation extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private RelationalOperation(final DocumentManager documentManager) {
-		super(documentManager);
+	private RelationalOperation() {
 	}
 
 	@Override
@@ -290,17 +286,17 @@ public final class RelationalOperation extends Expression {
 	/// @return the object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static RelationalOperation readObject(final AttributeInputStream inpt) throws IOException {
-		RelationalOperation expr = new RelationalOperation(documentManager);
+		RelationalOperation expr = new RelationalOperation();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** RelationalOperation
-		expr.lhs = (Expression) inpt.readObj(documentManager);
+		expr.lhs = (Expression) inpt.readObj();
 		expr.opr = inpt.readShort();
-		expr.rhs = (Expression) inpt.readObj(documentManager);
+		expr.rhs = (Expression) inpt.readObj();
 		Util.TRACE_INPUT("readRelationalOperation: " + expr);
 		return(expr);
 	}

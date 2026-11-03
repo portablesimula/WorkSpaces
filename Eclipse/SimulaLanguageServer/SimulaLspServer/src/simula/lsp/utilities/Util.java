@@ -84,8 +84,8 @@ public final class Util {
 	/// @param msg the message
 	public static void generalWarning(final String msg) {
 		if(DocumentManager.WARNINGS) {
-			String mss = "General Error: " + msg;
-			LOG.error(mss);
+			String mss = "General Warning: " + msg;
+			LOG.warning(mss);
 			showOkExitDialog(mss);
 		}
 	}
@@ -94,8 +94,8 @@ public final class Util {
 	/// @param msg the message
 		public static void generalWarning(final int lineNumber, final String msg) {
 			if(DocumentManager.WARNINGS) {
-				String mss = "Line " + lineNumber + ": General Error: " + msg;
-				LOG.error(mss);
+				String mss = "Line " + lineNumber + ": General Warning: " + msg;
+				LOG.warning(mss);
 				showOkExitDialog(mss);
 			}
 		}

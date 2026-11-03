@@ -57,9 +57,9 @@ public final class ConditionalStatement extends Statement {
 	private ConditionalStatement() {
 	}
 	
-	static ConditionalStatement of() {
+	static ConditionalStatement of(SimulaBuilder simBuilder) {
 		ConditionalStatement conn = new ConditionalStatement();
-		SimulaBuilder simBuilder = conn.getSimBuilder();
+//		SimulaBuilder simBuilder = conn.getSimBuilder();
 		int lno = simBuilder.getSourceLineNumber();
 //		Util.println("NEW ConditionalStatement: "+simBuilder.getSourceLineNumber());
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN IfStatement: ");

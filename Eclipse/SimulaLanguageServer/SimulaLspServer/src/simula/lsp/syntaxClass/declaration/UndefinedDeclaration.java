@@ -17,6 +17,7 @@ import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.token.Identifier;
 import simula.lsp.coder.SimulaCoder;
+import simula.lsp.syntaxClass.SyntaxElement;
 import simula.lsp.syntaxClass.Type;
 import simula.lsp.utilities.LspGlobal;
 import simula.lsp.utilities.ObjectKind;
@@ -35,10 +36,12 @@ public class UndefinedDeclaration extends Declaration {
 	/// Create a new UndefinedDeclaration.
 	/// 
 	/// @param identifier the variable identifier
-	public UndefinedDeclaration(final Identifier identifier) {
+	public UndefinedDeclaration(final SyntaxElement reason, final Identifier identifier) {
 		super(identifier);
 		this.declarationKind = ObjectKind.UndefinedDeclaration;
 		this.type = Type.Undef;
+		this.firstParserToken = reason.firstParserToken;
+		this.lastParserToken = reason.lastParserToken;
 	}
 
 	@Override

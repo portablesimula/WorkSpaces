@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.token.Identifier;
 import simula.lsp.syntaxClass.HiddenSpecification;
 import simula.lsp.syntaxClass.ProtectedSpecification;
@@ -208,7 +207,7 @@ public class AttributeInputStream {
     /// @return the Object list read.
     /// @throws IOException if an I/O error occurs.
 	public ObjectList<?> readObjectList() throws IOException {
-		return ObjectList.read(, this);
+		return ObjectList.read(this);
 	}
 
 	/// Reads and returns an Object sequence number from the underlying DataInputStream.

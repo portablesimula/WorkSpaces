@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import client.TestBatchLauncher;
 import simula.lsp.utilities.Option;
+import simula.runtime.RTS_Option;
 
 /**
  * Simula Test Batch donated by Simula as.
@@ -42,7 +43,7 @@ public final class RunAdHocTest {
 //		args.add("-compilerMode"); args.add("directClassFiles");
 		
 //		args.add("-noexec");
-//		args.add("-keepJava"); args.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
+		args.add("-keepJava"); args.add(userDir); // Generated .java Source is then found in Eclipse Package simulaTestBatch
 		args.add("-simulaRtsLib"); args.add(new File(rtsDir,"bin").toString()); // To use Eclipse Project's simula.runtime
 //		args.add("-extLib"); args.add("C:/GitHub/WorkSpaces/Eclipse/SimulaProjects/Simula/src/simulaTestBatch/sim/bin");
 		
@@ -341,6 +342,7 @@ public final class RunAdHocTest {
 //		RTOption.VERBOSE = true;
 //		RTOption.USE_CONSOLE=true;
 //		RTOption.BLOCK_TRACING = true;
+		RTS_Option.BLOCK_TRACING = true;
 //		RTOption.GOTO_TRACING = true;
 //		RTOption.QPS_TRACING = true;
 //		RTOption.SML_TRACING = true;

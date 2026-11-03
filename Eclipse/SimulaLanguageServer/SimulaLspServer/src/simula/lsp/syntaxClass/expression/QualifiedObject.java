@@ -8,7 +8,6 @@ package simula.lsp.syntaxClass.expression;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.token.Identifier;
@@ -76,9 +75,7 @@ public final class QualifiedObject extends Expression {
 	/// Create a new QualifiedObject
 	/// @param lhs left hand side
 	/// @param classIdentifier class identifier
-	QualifiedObject(final DocumentManager documentManager, final Expression lhs, final Identifier classIdentifier) {
-		super(documentManager);
-//		SimulaBuilder simBuilder = getSimBuilder();
+	QualifiedObject(final Expression lhs, final Identifier classIdentifier) {
 		this.lhs = lhs;
 		this.classIdentifier = classIdentifier;
 		lhs.backLink = this;
@@ -132,8 +129,7 @@ public final class QualifiedObject extends Expression {
 	// *** Externalization
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private QualifiedObject(final DocumentManager documentManager) {
-		super(documentManager);
+	private QualifiedObject() {
 	}
 
 	@Override
@@ -156,15 +152,15 @@ public final class QualifiedObject extends Expression {
 	/// @return the QualifiedObject object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static QualifiedObject readObject(final AttributeInputStream inpt) throws IOException {
-		QualifiedObject expr = new QualifiedObject(documentManager);
+		QualifiedObject expr = new QualifiedObject();
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		
 		// *** Expression
 		expr.type = inpt.readType();
-		expr.backLink = (SyntaxElement) inpt.readObj(documentManager);
+		expr.backLink = (SyntaxElement) inpt.readObj();
 		// *** QualifiedObject
-		expr.lhs = (Expression) inpt.readObj(documentManager);
+		expr.lhs = (Expression) inpt.readObj();
 		expr.classIdentifier = inpt.readIdentifier();
 		Util.TRACE_INPUT("readQualifiedObject: " + expr);
 		return(expr);

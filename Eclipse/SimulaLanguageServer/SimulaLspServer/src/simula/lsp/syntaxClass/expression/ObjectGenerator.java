@@ -12,7 +12,6 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Iterator;
 import java.util.Vector;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.Parse;
@@ -73,9 +72,7 @@ public final class ObjectGenerator extends Expression {
 	/// Create a new ObjectGenerator.
 	/// @param ident class-identifier
 	/// @param params the actual parameters
-	private ObjectGenerator(final DocumentManager documentManager, final Identifier ident,final Vector<Expression> params) {
-		super(documentManager);
-//		SimulaBuilder simBuilder = getSimBuilder();
+	private ObjectGenerator(final Identifier ident,final Vector<Expression> params) {
 		this.classIdentifier = ident;
 		this.type = Type.Ref(classIdentifier);
 		this.params = params;
@@ -104,7 +101,7 @@ public final class ObjectGenerator extends Expression {
 			Parse.expect(simBuilder, KeyWord.ENDPAR);
 		}
 
-		Expression expr = new ObjectGenerator(simBuilder.documentManager, classIdentifier, params);
+		Expression expr = new ObjectGenerator(classIdentifier, params);
 		return (expr);
 	}
 
@@ -143,7 +140,7 @@ public final class ObjectGenerator extends Expression {
 			Type actualType = actualParameter.type;
 			if (Option.internal.TRACE_CHECKER)
 				Util.TRACE("Actual Parameter: " + actualType + " " + actualParameter + ", Actual Type=" + actualType);
-			Expression checkedParameter = TypeConversion.testAndCreate(documentManager, formalType, actualParameter);
+			Expression checkedParameter = TypeConversion.testAndCreate(formalType, actualParameter);
 			checkedParameter.backLink = this;
 			checkedParams.add(checkedParameter);
 
@@ -264,8 +261,7 @@ public final class ObjectGenerator extends Expression {
 	// *** Attribute File I/O
 	// ***********************************************************************************************
 	/// Default constructor used by Attribute File I/O
-	private ObjectGenerator(final DocumentManager documentManager) {
-		super(documentManager);
+	private ObjectGenerator() {
 	}
 
 	@Override
@@ -293,20 +289,20 @@ public final class ObjectGenerator extends Expression {
 	/// @return the ObjectGenerator object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static ObjectGenerator readObject(final AttributeInputStream inpt) throws IOException {
-		ObjectGenerator gen = new ObjectGenerator(documentManager);
+		ObjectGenerator gen = new ObjectGenerator();
 		gen.OBJECT_SEQU = inpt.readSEQU(gen);
 		// *** SyntaxElement
 
 		// *** Expression
 		gen.type = inpt.readType();
-		gen.backLink = (SyntaxElement) inpt.readObj(documentManager);
+		gen.backLink = (SyntaxElement) inpt.readObj();
 		// *** ObjectGenerator
 		gen.classIdentifier = inpt.readIdentifier();
 		int n = inpt.readShort();
 		if(n >= 0) {
 			gen.params = new Vector<Expression>();
 			for(int i=0;i<n;i++)
-				gen.params.add((Expression) inpt.readObj(documentManager));
+				gen.params.add((Expression) inpt.readObj());
 		}
 		Util.TRACE_INPUT("ObjectGenerator: "+gen);
 		return(gen);

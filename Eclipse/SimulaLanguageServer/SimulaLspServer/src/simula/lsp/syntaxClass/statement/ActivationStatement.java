@@ -104,9 +104,9 @@ public final class ActivationStatement extends Statement {
 	/// @param line the source line number
 	private ActivationStatement() {
 	}
-	static ActivationStatement of() {
+	static ActivationStatement of(SimulaBuilder simBuilder) {
 		ActivationStatement stm = new ActivationStatement();
-		SimulaBuilder simBuilder = stm.getSimBuilder();
+//		SimulaBuilder simBuilder = stm.getSimBuilder();
 		LexToken activator = Parse.getCurrentParserToken(simBuilder);
 		stm.REAC = activator.keyWord == KeyWord.REACTIVATE;
 		simBuilder.consume(KeyWord.ACTIVATE, KeyWord.REACTIVATE); //  (add it to tokenList)

@@ -161,7 +161,6 @@ public final class ArithmeticExpression extends Expression {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())
 			return;
-		SimulaBuilder simBuilder = getSimBuilder();
 		LspGlobal.sourceLineNumber = firstLineNumber();
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("BEGIN ArithmeticOperation" + toString() + ".doChecking - Current Scope Chain: "	+ LspGlobal.getCurrentScope().edScopeChain());

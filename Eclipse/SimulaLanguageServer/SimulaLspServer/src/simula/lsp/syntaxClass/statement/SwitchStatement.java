@@ -113,9 +113,9 @@ public final class SwitchStatement extends Statement {
 //		super(documentManager);
 //	}
 	
-	static SwitchStatement of() {
+	static SwitchStatement of(SimulaBuilder simBuilder) {
 		SwitchStatement stm = new SwitchStatement();
-		SimulaBuilder simBuilder = stm.getSimBuilder();
+//		SimulaBuilder simBuilder = stm.getSimBuilder();
 		simBuilder.consume(KeyWord.SWITCH); //  (add it to tokenList)
 
 //		if (Option.internal.TRACE_PARSE)	PsiParse.TRACE("Parse SwitchStatement: line="+line);

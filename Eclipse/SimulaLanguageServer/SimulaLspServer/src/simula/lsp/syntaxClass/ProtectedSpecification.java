@@ -7,7 +7,6 @@ package simula.lsp.syntaxClass;
 
 import java.io.IOException;
 
-import simula.lsp.DocumentManager;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.token.Identifier;

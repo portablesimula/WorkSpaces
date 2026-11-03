@@ -109,9 +109,9 @@ public final class ProgramModule extends Statement {
 //		Util.println("NEW ProgramModule: sysout.meaning="+sysout.meaning);
 	}
 	
-	public void doBuild() {
+	public void doBuild(SimulaBuilder simBuilder) {
 //		try	{
-			SimulaBuilder simBuilder = this.getSimBuilder();
+//			SimulaBuilder simBuilder = this.getSimBuilder();
 			if(Option.internal.TRACE_PARSE) Parse.TRACE("Parse Program");
 			LspGlobal.setScope(StandardClass.BASICIO);		  // BASICIO Begin
 			new ConnectionBlock(sysin, null)            //    Inspect sysin do
@@ -139,14 +139,14 @@ public final class ProgramModule extends Statement {
 			    else {
 //			    	Util.println("ProgramModule.doBuild: IDENTIFIER ...");
 			    	Parse.saveCurrentToken(simBuilder);
-			    	mainModule = doParseProgram();
+			    	mainModule = doParseProgram(simBuilder);
 			    }
 			}
 			else if(Parse.accept(simBuilder, KeyWord.CLASS)) mainModule=ClassDeclaration.expectClassDeclaration(simBuilder, null);
 			else {
 				Type type=Parse.acceptType(simBuilder);
 			    if(Parse.accept(simBuilder, KeyWord.PROCEDURE)) mainModule=ProcedureDeclaration.expectProcedureDeclaration(simBuilder, type);
-			    else mainModule = doParseProgram();
+			    else mainModule = doParseProgram(simBuilder);
 			}
 			
 			StandardClass.BASICIO.declarationList.add(mainModule);
@@ -177,10 +177,11 @@ public final class ProgramModule extends Statement {
 	
 	/// Parse Simula Program by expecting a Statement.
 	/// @return the Program Statement.
-	private DeclarationScope doParseProgram() {
-		DocumentManager documentManager = this.getDocumentManager();
-		SimulaBuilder simBuilder = getSimBuilder();
-		String sourceName = documentManager.sourceName;
+	private DeclarationScope doParseProgram(SimulaBuilder simBuilder) {
+//		DocumentManager documentManager = this.getDocumentManager();
+//		SimulaBuilder simBuilder = getSimBuilder();
+//		String sourceName = documentManager.sourceName;
+		String sourceName = simBuilder.documentManager.sourceName;
 		BlockDeclaration mainBlock = new MaybeBlockDeclaration(new Identifier(sourceName));
 		
 		mainBlock.isMainModule = true;

@@ -49,6 +49,8 @@ public class LexToken {
 //		this.styleName = styleName;
 		this.setTokenTypeIndex(tokenType);
 		
+		if(simBuilder == null) Util.IERR("MISSING simBuilder");
+		
 		SimulaLexer lexer = simBuilder.lexer;
 		if(Option.LEX_VERIFY) {
 	    	if(length == 0 && keyWord == KeyWord.EOF) {

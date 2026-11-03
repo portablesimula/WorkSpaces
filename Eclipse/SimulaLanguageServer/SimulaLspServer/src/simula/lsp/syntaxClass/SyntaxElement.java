@@ -96,8 +96,8 @@ public abstract class SyntaxElement {
 //	public final DocumentManager documentManager;
 	
 	/// Not present for System or External modules
-	private LexToken firstParserToken;
-	private LexToken lastParserToken;
+	public LexToken firstParserToken;
+	public LexToken lastParserToken;
 
 	/// Controls semantic checking.
 	/// 

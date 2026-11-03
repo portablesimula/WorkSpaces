@@ -22,6 +22,7 @@ import simula.lsp.builder.JavaSourceFileCoder;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.Identifier;
+import simula.lsp.builder.token.LexToken;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.statement.BlockStatement;
 import simula.lsp.syntaxClass.statement.DummyStatement;
@@ -69,27 +70,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	/// @param identifier block identifier
 	public MaybeBlockDeclaration(final Identifier identifier) {
 		super(identifier);
-		if(identifier != null)
-			modifyIdentifier(identifier);
-//		else modifyIdentifier("Block" + firstLineNumber());
-		else modifyIdentifier(new Identifier("Block" + this.firstLineNumber()));
 	}
-
-//	// ***********************************************************************************************
-//	// *** createMainProgramBlock
-//	// ***********************************************************************************************
-//	/// Create the main program block. Used by ProgramModule.
-//	/// 
-//	/// @return the main program block
-//	public static MaybeBlockDeclaration createMainProgramBlock() {
-//		int lineNumber=Parse.prevToken.lineNumber;
-//		if (Option.internal.TRACE_PARSE)	Util.TRACE("BlockStatement.createMainProgramBlock: line="+lineNumber+" "+Parse.prevToken);
-//		MaybeBlockDeclaration module = new MaybeBlockDeclaration(Global.sourceName);
-//		module.isMainModule = true;
-//		module.declarationKind = ObjectKind.SimulaProgram;
-//		module.expectMaybeBlock(lineNumber);
-//		return (module);
-//	}
 
 	// ***********************************************************************************************
 	// *** Parsing: expectMaybeBlock
@@ -109,14 +90,17 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 	/// Pre-condition: BEGIN is already read.
 	/// @param line source line number
 	/// @return a BlockStatement
-	private static int SEQU = 1;
 	public BlockStatement expectMaybeBlock(SimulaBuilder simBuilder) {
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse MayBeBlock");
+		LexToken beginToken = simBuilder.getCurrentParserToken();
+		int lno = beginToken.lineNumber;
+		String debugName = "MaybeBlockDeclaration: " + lno;
 		
-		String debugName = "MaybeBlockDeclaration: "+(SEQU++);
-		
-		int lno = simBuilder.getSourceLineNumber();
+		if(identifier != null)
+			 modifyIdentifier(identifier);
+		else modifyIdentifier(new Identifier("Block" + lno));
+
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line " + lno + ": BEGIN "+debugName);
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) Util.println("BlockStatement expectMaybeBlock: BEGIN " + debugName);
 
@@ -134,7 +118,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 					moveLabelsFrom(this); // Label is also declaration
 			}
 		}
-		BlockStatement block = new BlockStatement(simBuilder.documentManager, this, debugName);
+		BlockStatement block = new BlockStatement(this, debugName);
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) Util.println("MaybeBlockDeclaration.expectMaybeBlock: ENDOF " + debugName + "  " + block);
 		LspGlobal.setScope(declaredIn);
 		if (Option.internal.TRACE_PARSE)

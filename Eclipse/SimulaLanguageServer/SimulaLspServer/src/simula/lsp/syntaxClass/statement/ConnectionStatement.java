@@ -129,9 +129,9 @@ public final class ConnectionStatement extends Statement {
 	/// 
 	/// Pre-Condition: INSPECT  is already read.
 	/// @param line the source line number
-	static ConnectionStatement of() {
+	static ConnectionStatement of(SimulaBuilder simBuilder) {
 		ConnectionStatement stm = new ConnectionStatement();
-		SimulaBuilder simBuilder = stm.getSimBuilder();
+//		SimulaBuilder simBuilder = stm.getSimBuilder();
 		simBuilder.consume(KeyWord.INSPECT); //  (add it to tokenList)
 
 		if (Option.internal.TRACE_PARSE)

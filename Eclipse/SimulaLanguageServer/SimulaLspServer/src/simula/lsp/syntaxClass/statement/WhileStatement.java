@@ -46,9 +46,9 @@ public final class WhileStatement extends Statement {
 	/// The statement after DO
 	private Statement doStatement;
 	
-	static WhileStatement of() {
+	static WhileStatement of(SimulaBuilder simBuilder) {
 		WhileStatement stm = new WhileStatement();
-		SimulaBuilder simBuilder = stm.getSimBuilder();
+//		SimulaBuilder simBuilder = stm.getSimBuilder();
 		simBuilder.consume(KeyWord.WHILE); //  (add it to tokenList)
 
 //		if (Option.internal.TRACE_PARSE)

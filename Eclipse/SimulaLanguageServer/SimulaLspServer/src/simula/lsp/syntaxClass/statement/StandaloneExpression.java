@@ -53,7 +53,6 @@ public final class StandaloneExpression extends Statement {
 //		super(line);
 	StandaloneExpression(final Expression expression) {
 //		super(documentManager);
-		SimulaBuilder simBuilder = this.getSimBuilder();
 //		Util.println("\nNEW StandaloneExpression: expr="+expression);
 //		simBuilder.printPSI("NEW StandaloneExpression: expr="+expression);
 //		this.lastParserToken = expression.lastParserToken;
@@ -61,9 +60,10 @@ public final class StandaloneExpression extends Statement {
 		this.setFirstParserToken(expression.getFirstParserToken());
 		this.setLastParserToken(expression.getLastParserToken());
 		this.expression = expression;
+		SimulaBuilder simBuilder = this.getSimBuilder();
 		if (Option.internal.TRACE_PARSE) {
-			Util.TRACE("Line "+firstLineNumber()+": StandaloneExpression: "+this);
-			Util.println("Line "+firstLineNumber()+": StandaloneExpression: "+this+"   "+simBuilder.getCurrentParserToken());
+			Util.TRACE("Line " + firstLineNumber() + ": StandaloneExpression: "+this);
+			Util.println("Line " + firstLineNumber() + ": StandaloneExpression: "+this + "   " + simBuilder.getCurrentParserToken());
 		}
 		LexToken prevToken = null;
 		while ((prevToken = Parse.acceptParserToken(simBuilder, KeyWord.ASSIGNVALUE, KeyWord.ASSIGNREF)) != null) { 

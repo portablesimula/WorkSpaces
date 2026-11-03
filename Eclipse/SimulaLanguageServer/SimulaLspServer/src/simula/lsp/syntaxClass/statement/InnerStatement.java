@@ -38,8 +38,8 @@ public final class InnerStatement extends Statement {
 
 	/// Create a new InnerStatement.
 	/// @param line the source line number
-	public InnerStatement(boolean explicit) {
-		SimulaBuilder simBuilder = getSimBuilder();
+	public InnerStatement(SimulaBuilder simBuilder, boolean explicit) {
+//		SimulaBuilder simBuilder = getSimBuilder();
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+firstLineNumber()+": InnerStatement: "+this);
 //		Util.println("NEW InnerStatement: Line "+firstLineNumber()+": InnerStatement: "+this+ "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 //		Thread.dumpStack();
