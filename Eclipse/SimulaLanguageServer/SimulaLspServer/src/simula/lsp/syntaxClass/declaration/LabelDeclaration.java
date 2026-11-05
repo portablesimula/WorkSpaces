@@ -69,7 +69,7 @@ public final class LabelDeclaration extends SimpleVariableDeclaration {
 			// Label attributes are implicit specified 'protected'
 			if (declaredIn.declarationKind == ObjectKind.Class)
 				((ClassDeclaration) declaredIn).protectedList
-						.add(new ProtectedSpecification((ClassDeclaration) declaredIn, identifier));
+					.add(new ProtectedSpecification((ClassDeclaration) declaredIn, identifier, this.tokenRange));
 		} else {
 			// This Label is a Virtual Match
 			ClassDeclaration decl = (ClassDeclaration) declaredIn;

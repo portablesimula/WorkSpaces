@@ -114,22 +114,6 @@ public abstract class BlockDeclaration extends DeclarationScope {
 		super(identifier);
 		this.declarationKind = declarationKind;
 	}
-	
-	/// Parse Utility: Expect formal-parameter-part and build the parameter list.
-	/// <pre>
-	/// Syntax:
-	/// 
-	///     formal-parameter-part = "(" identifier { , identifier } ")"
-	/// </pre>
-	/// 
-	/// Precondition: BEGPAR is already read.
-	/// @param pList the parameter list
-	protected static void expectFormalParameterPart(final SimulaBuilder simBuilder, final Vector<Parameter> pList) {
-		do { // ParameterPart = Parameter ; { Parameter ; }
-			new Parameter(Parse.expectIdentifier(simBuilder)).into(pList);
-		} while (Parse.accept(simBuilder, KeyWord.COMMA));
-		Parse.expect(simBuilder, KeyWord.ENDPAR);
-	}
 
 	// ***********************************************************************************************
 	// *** Parsing: parseBlock

@@ -66,7 +66,7 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse SwitchDeclaration(3), switchList=" + switchList);
-		new Parameter(new Identifier("_SW"), Type.Integer, Parameter.Kind.Simple).into(parameterList);
+		new Parameter(this, new Identifier("_SW"), Type.Integer, Parameter.Kind.Simple).into(parameterList);
 		LspGlobal.setScope(declaredIn);
 
 		for(Expression expr:switchList) syntaxElements.add(expr);
@@ -85,7 +85,8 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		if(virtSpec==null) {
 			// Switch attributes are implicit specified 'protected'
 			if(declaredIn.declarationKind==ObjectKind.Class)
-				((ClassDeclaration)declaredIn).protectedList.add(new ProtectedSpecification((ClassDeclaration)LspGlobal.getCurrentScope(),identifier));
+				((ClassDeclaration)declaredIn).protectedList
+				.add(new ProtectedSpecification((ClassDeclaration)LspGlobal.getCurrentScope(), identifier, this.tokenRange));
 		}
 	}
 

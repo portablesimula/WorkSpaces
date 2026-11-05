@@ -60,7 +60,7 @@ public class SimulaExec {
 	/// @param arg the arguments
 	/// @throws IOException if something went wrong.
 	private static void doExecuteJarFile(SimulaCoder simCoder, String jarFile, Vector<String> arg) throws IOException {
-		ProgramModule programModule = simCoder.documentManager.simBuilder.syntaxTree;
+		ProgramModule programModule = simCoder.documentManager.currentSimBuilder.syntaxTree;
 		if (!programModule.isExecutable()) {
 			if (DocumentManager.verbose)
 				Util.println("Separate Compilation - No Execution of .jar File: " + jarFile);

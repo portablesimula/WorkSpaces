@@ -127,10 +127,11 @@ public abstract class Expression extends SyntaxElement {
 			LexToken firstParserToken = simBuilder.getCurrentParserToken();
 			Expression expr= acceptSimpleExpression(simBuilder);
 			LexToken lastParserToken = simBuilder.getCurrentParserToken();
-
-			expr.setFirstParserToken(firstParserToken);
-			expr.setLastParserToken(lastParserToken);
-//			Util.println("Expression.acceptExpression: " + expr.getClass().getSimpleName() + ": range = " + Util.edRange(expr.getLexRange()));
+			if(expr != null) {
+				expr.setFirstParserToken(firstParserToken);
+				expr.setLastParserToken(lastParserToken);
+//				Util.println("Expression.acceptExpression: " + expr.getClass().getSimpleName() + ": range = " + Util.edRange(expr.getLexRange()));
+			}
 			return expr;
 		}
 	} 

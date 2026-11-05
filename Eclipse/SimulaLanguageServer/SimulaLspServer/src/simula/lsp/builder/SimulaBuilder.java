@@ -3,7 +3,6 @@ package simula.lsp.builder;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.lsp4j.Diagnostic;
@@ -26,7 +25,7 @@ public class SimulaBuilder {
 	final public DocumentManager documentManager;
 	
     public SimulaLexer lexer;
-	public List<String> sourceLines;
+//	public List<String> sourceLines;
     
 //    public DocumentManager simulaCompiler;
     
@@ -51,19 +50,15 @@ public class SimulaBuilder {
 	public List<LexToken> lexTokenList;
 	public List<Integer> semTokenList;
 	
-	public SimulaBuilder(DocumentManager documentManager, String sourceCode) {
+	public SimulaBuilder(DocumentManager documentManager) {
 		this.documentManager = documentManager;
     	// INIT:
 		this.nErrors = 0;
     	this.diagnostics  = new ArrayList<>();
     	this.lexTokenList = new ArrayList<>();
 //    	Util.println("NEW SimulaBuilder: ");
-    	
-    	// Expand SourceCode
-		this.sourceLines = getLines(sourceCode);
-        // Add extra EOF-Mark
-		this.sourceLines.add(""+(char)SourceTextReader.EOF_MARK);
-        lexer = new SimulaLexer(this);
+
+    	lexer = new SimulaLexer(this);
 
 		File desktop = new File(System.getProperty("user.home"), "Desktop");
 		if (DocumentManager.verbose) {
@@ -97,39 +92,32 @@ public class SimulaBuilder {
 			Option.print(" SIMULA VARIABLES SUMMARY");
 		}
 	}
-    
-    public static List<String> getLines(String text){
-    	
-    	List<String> lines; // = new ArrayList<String>();
-        // Convert the text to a mutable ArrayList without newline characters
-//        lines = text.lines()
-//                .collect(Collectors.toCollection(ArrayList::new));
-        
-    	// Split source text into lines keeping newline characters
-//        String[] linesArray = text.split("(?<=\\r?\\n)");
-//        String[] linesArray = text.split("(?<=\\n)", -1);
-        String[] linesArray = text.split("(?<=\\n)");
-        lines = new ArrayList<>(Arrays.asList(linesArray));
-
-//        // Add extra EOF-Mark
-//		lines.add(""+(char)SourceTextReader.EOF_MARK);
-		
-		LOG.trace("\nDocumentManager.getLines: INPUT Text|" + Comn.printable(text) + '|');
-		int i = 0;
-		for(String line:lines) {
-	    	LOG.trace("DocumentManager.getLines: line " + (i++) + "|" + Comn.printable(line) + '|');			
-		}
-    	return lines;
-    }
 	
 	public void doBuilding() {
 		boolean builderTerminateNormally = this.doParsing(this);
+		List<String> sourceLines = documentManager.sourceLines;
+		
+		boolean TESTING = false;//true;
+		
+		if(TESTING) {
+			int lastPrintedLine = 0;
+			Util.println("SimulaBuilder.doBuilding: PARSING DONE:");
+			Util.println("SimulaBuilder.doBuilding: Line 0: |" + Comn.printable(sourceLines.get(0)) + '|');
+			for(LexToken lexToken:lexTokenList) {
+				if(lexToken.lineNumber > lastPrintedLine) {
+					lastPrintedLine = lexToken.lineNumber;
+					Util.println("\nSimulaBuilder.doBuilding: Line " + lastPrintedLine + ": |" + Comn.printable(sourceLines.get(lastPrintedLine)) + '|');
+				}
+				Util.println("SimulaBuilder.doBuilding: LexToken: " + lexToken);				
+			}
+		}
+		
 		if(builderTerminateNormally) {	
 			this.doChecking();
 		} else {
 			Util.IERR("");
 		}
-    	this.semTokenList = TokenManager.generateSemanticTokens(lexTokenList);
+    	this.semTokenList = TokenManager.generateSemanticTokens(sourceLines, lexTokenList);
 		if(Option.LEX_VERIFY) {
 			TokenManager.tokenListVerifyer(sourceLines, semTokenList);
 		}
@@ -142,7 +130,7 @@ public class SimulaBuilder {
 	// ***************************************************************
 	public boolean doParsing(SimulaBuilder simBuilder) {
 		boolean builderTerminateNormally = false;
-		documentManager.simBuilder.duringParsing = true;
+		documentManager.currentSimBuilder.duringParsing = true;
     	LOG.trace("SimulaBuilder.doParsing: BEGIN");
     	
         // Do the actual Building
@@ -173,11 +161,11 @@ public class SimulaBuilder {
 	public void doChecking() {
 		if (Option.internal.TRACING)
 			Util.println("BEGIN Semantic Checker");
-		documentManager.simBuilder.duringParsing = false;
-		documentManager.simBuilder.duringChecking = true;
+		documentManager.currentSimBuilder.duringParsing = false;
+		documentManager.currentSimBuilder.duringChecking = true;
     	LOG.trace("SimulaBuilder.doChecking: BEGIN");
 		StandardClass.ENVIRONMENT.doChecking();
-		ProgramModule programModule = documentManager.simBuilder.syntaxTree;
+		ProgramModule programModule = documentManager.currentSimBuilder.syntaxTree;
 		programModule.doChecking();
 		
 //		programModule.doChecking();
@@ -186,8 +174,8 @@ public class SimulaBuilder {
 			if (Option.internal.TRACE_CHECKER_OUTPUT && programModule != null)
 				programModule.print(0);
 		}
-		if(DocumentManager.verbose) Util.println("SimulaBuilder.doChecking: " + documentManager.simBuilder.documentManager.sourceName + ": Semantic Checker completed");
-		documentManager.simBuilder.duringChecking = false;
+		if(DocumentManager.verbose) Util.println("SimulaBuilder.doChecking: " + documentManager.currentSimBuilder.documentManager.sourceName + ": Semantic Checker completed");
+		documentManager.currentSimBuilder.duringChecking = false;
 		if(Option.internal.PRINT_SYNTAX_TREE > 0) {
 			Util.println("\nSimulaCompiler.doCompile: =========== Resulting Syntax Tree after Checking ================");
 			programModule.printTree(1);

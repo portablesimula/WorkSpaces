@@ -8,7 +8,6 @@ package simula.lsp.syntaxClass;
 import java.io.IOException;
 import java.lang.classfile.CodeBuilder;
 
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import simula.lsp.DocumentManager;
@@ -17,6 +16,7 @@ import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.LexToken;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.declaration.Declaration;
 import simula.lsp.utilities.LspGlobal;
@@ -96,8 +96,7 @@ public abstract class SyntaxElement {
 //	public final DocumentManager documentManager;
 	
 	/// Not present for System or External modules
-	public LexToken firstParserToken;
-	public LexToken lastParserToken;
+	public LexTokenRange tokenRange = new LexTokenRange();;
 
 	/// Controls semantic checking.
 	/// 
@@ -115,59 +114,55 @@ public abstract class SyntaxElement {
 //		this.documentManager= documentManager;
 	
 	public DocumentManager getDocumentManager() {
-		if(firstParserToken == null) return null;
-		return firstParserToken.simBuilder.documentManager;
+		if(tokenRange == null) return null;
+		return tokenRange.getDocumentManager();
 	}
 	
 	public SimulaBuilder getSimBuilder() {
-		if(firstParserToken == null) return null;
-		return firstParserToken.simBuilder;
+		if(tokenRange == null) return null;
+		return tokenRange.getSimBuilder();
 	}
 
 	public SimulaCoder getSimCoder() {
-		if(firstParserToken == null) return null;
-		return firstParserToken.simBuilder.documentManager.simCoder;
+		if(tokenRange == null) return null;
+		return tokenRange.getSimCoder();
 	}
 
 	public void setFirstParserToken(LexToken lexToken) {
-		firstParserToken = lexToken;
-		if(lastParserToken == null) lastParserToken = lexToken;
+		tokenRange.setFirstParserToken(lexToken);
 	}
 	public void setLastParserToken(LexToken lexToken) {
-		lastParserToken = lexToken;
-		if(firstParserToken == null) firstParserToken = lexToken;
+		tokenRange.setLastParserToken(lexToken);
 	}
 	public LexToken getFirstParserToken() {
-		return firstParserToken;
+		if(tokenRange == null) return null;
+		return tokenRange.getFirstParserToken();
 	}
 	public LexToken getLastParserToken() {
-		return lastParserToken;
+		if(tokenRange == null) return null;
+		return tokenRange.getLastParserToken();
 	}
 	
 	public Range getLexRange() {
-		Position firstLexPosition;
-		Position lastLexPosition;
-		if(firstParserToken != null) {
-			firstLexPosition = new Position(firstParserToken.lineNumber, firstParserToken.column);
-			lastLexPosition = new Position(lastParserToken.lineNumber, lastParserToken.column + lastParserToken.length);
-		} else {
-			firstLexPosition = new Position(0, 0);
-			lastLexPosition = new Position(0, 0);			
-		}
-		Range lexRange = new Range(firstLexPosition, lastLexPosition);
-		return lexRange;
+		if(tokenRange == null) return null;
+		return tokenRange.getLexRange();
 	}
 
-	/// The first source line number
+	/// The first source line number (one based)
+	public int sourceLineNumber() {
+		return firstLineNumber() + 1;			
+	}
+
+	/// The first source line number (zero based)
 	public int firstLineNumber() {
-		if(firstParserToken == null) return 0;
-		return firstParserToken.firstLineNumber();			
+		if(tokenRange == null) return 0;
+		return tokenRange.firstLineNumber();			
 	}
 
-	/// The last source line number
+	/// The last source line number (zero based)
 	public int lastLineNumber() {
-		if(lastParserToken == null) return 0;
-		return lastParserToken.lastLineNumber();			
+		if(tokenRange == null) return 0;
+		return tokenRange.lastLineNumber();			
 	}
 	
 	/// Perform semantic checking.

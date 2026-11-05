@@ -105,7 +105,7 @@ public final class RemoteVariable extends Expression {
 		obj.doChecking();
 		Type objType = obj.type;
 		if(objType == null) {
-			Util.semanticError(obj, "doRemoteChecking: Object Expression (" + obj + ") has no type");
+			Util.semanticError(obj, "Object Expression (" + obj + ") has no type");
 			return Type.Undef;
 		}
 		if (objType.keyWord == Type.T_TEXT)
@@ -115,7 +115,7 @@ public final class RemoteVariable extends Expression {
 		ClassDeclaration qual = objType.getQual();
 		if (qual == null) {
 			if(objType.keyWord != Type.T_UNDEF)
-				Util.semanticError(obj, "doRemoteChecking: Object Expression (" + obj + ") is not a ref() type rather " + objType);
+				Util.semanticError(obj, "Object Expression (" + obj + ") is not a ref() type");
 		} else if (qual.hasLocalClasses) {
 			if (DocumentManager.EXTENSIONS)
 				 Util.warning(obj, "Illegal remote access into object of class with local classes.");
@@ -128,7 +128,7 @@ public final class RemoteVariable extends Expression {
 			if(qual!=null) remoteAttribute = qual.findRemoteAttributeMeaning(ident);
 			if (remoteAttribute == null) {
 				if(objType.keyWord != Type.T_UNDEF)
-					Util.semanticError(obj, "RemoteVariable.doRemoteChecking: " + ident.value + " is not an attribute of "	+ objType.getRefIdent().value);
+					Util.semanticError(obj, ident.value + " is not an attribute of "	+ objType.getRefIdent().value);
 				UndefinedDeclaration undef = new UndefinedDeclaration(this, ident);
 				remoteAttribute = new Meaning(undef, LspGlobal.getCurrentScope()); // Error Recovery
 			}

@@ -40,8 +40,7 @@ public class UndefinedDeclaration extends Declaration {
 		super(identifier);
 		this.declarationKind = ObjectKind.UndefinedDeclaration;
 		this.type = Type.Undef;
-		this.firstParserToken = reason.firstParserToken;
-		this.lastParserToken = reason.lastParserToken;
+		this.tokenRange = reason.tokenRange;
 	}
 
 	@Override
@@ -53,6 +52,10 @@ public class UndefinedDeclaration extends Declaration {
 		
 		SET_SEMANTICS_CHECKED();
 	}
+	
+	@Override
+	protected void checkAlreadyDefined() {}
+
 
 	@Override
 	public void doDeclarationCoding(final SimulaCoder simCoder) {

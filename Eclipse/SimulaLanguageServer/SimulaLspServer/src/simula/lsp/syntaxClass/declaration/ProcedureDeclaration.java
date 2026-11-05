@@ -153,9 +153,9 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		proc.modifyIdentifier(Parse.expectIdentifier(simBuilder));
 //		Util.println("ProcedureDeclaration.expectProcedureDeclaration: "+proc.identifierValue());
 		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
-			expectFormalParameterPart(simBuilder, proc.parameterList);
+			expectFormalParameterPart(simBuilder, proc);
 			Parse.expect(simBuilder, KeyWord.SEMICOLON);
-			while(acceptModePart(simBuilder, proc.parameterList));
+			while(acceptModePart(simBuilder, proc));
 			expectSpecificationPart(simBuilder, proc);
 		} else Parse.expect(simBuilder, KeyWord.SEMICOLON);
 //		Util.println("ProcedureDeclaration.expectProcedureDeclaration: BEFORE PARSE PROCEDURE BLOCK");
@@ -167,6 +167,24 @@ public class ProcedureDeclaration extends BlockDeclaration {
 		LspGlobal.setScope(proc.declaredIn);
 		
 		return (proc);
+	}
+
+	
+	/// Parse Utility: Expect formal-parameter-part and build the parameter list.
+	/// <pre>
+	/// Syntax:
+	/// 
+	///     formal-parameter-part = "(" identifier { , identifier } ")"
+	/// </pre>
+	/// 
+	/// Precondition: BEGPAR is already read.
+	/// @param pList the parameter list
+	protected static void expectFormalParameterPart(final SimulaBuilder simBuilder, final ProcedureDeclaration proc) {
+		Vector<Parameter> pList = proc.parameterList;
+		do { // ParameterPart = Parameter ; { Parameter ; }
+			new Parameter(proc, Parse.expectIdentifier(simBuilder)).into(pList);
+		} while (Parse.accept(simBuilder, KeyWord.COMMA));
+		Parse.expect(simBuilder, KeyWord.ENDPAR);
 	}
 
 	/// Parse Utility: Accept mode-part and set matching parameter's mode.
@@ -183,7 +201,8 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// </pre>
 	/// @param pList the parameter list
 	/// @return true: if mode-part was present.
-	private static boolean acceptModePart(SimulaBuilder simBuilder, Vector<Parameter> pList) {
+	private static boolean acceptModePart(SimulaBuilder simBuilder, ProcedureDeclaration proc) {
+		Vector<Parameter> pList = proc.parameterList;
 		LexToken prevToken = Parse.getCurrentParserToken(simBuilder);
 		if (Parse.accept(simBuilder, KeyWord.VALUE, KeyWord.NAME)) {
 //			Util.println("ProcedureDeclaration.acceptModePart: BEGIN VALUE/NAME");
@@ -200,7 +219,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					}
 				if (parameter == null) {
 					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
-					parameter = new Parameter(identifier);
+					parameter = new Parameter(proc, identifier);
 				}
 				parameter.setMode(mode);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
@@ -253,7 +272,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 					if (Util.equals(identifier,par.identifier)) { parameter = par; break; }
 				if (parameter == null) {
 					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
-					parameter = new Parameter(identifier);
+					parameter = new Parameter(proc, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));

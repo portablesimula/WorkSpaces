@@ -84,7 +84,7 @@ public final class SimulaLexer {
 	/// @param editorMode true: delivers tokens to the SimulaEditor
 	public SimulaLexer(final SimulaBuilder simBuilder) {
 		this.simBuilder = simBuilder;
-		this.sourceLines = simBuilder.sourceLines;
+		this.sourceLines = simBuilder.documentManager.sourceLines;
 		this.reader = new SourceTextReader(sourceLines);
 		LspGlobal.sourceLineNumber=1;
 	}

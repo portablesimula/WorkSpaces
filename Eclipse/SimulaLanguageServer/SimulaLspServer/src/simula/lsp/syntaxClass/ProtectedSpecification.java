@@ -10,6 +10,7 @@ import java.io.IOException;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.token.Identifier;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.syntaxClass.declaration.ClassDeclaration;
 import simula.lsp.syntaxClass.declaration.Declaration;
 import simula.lsp.syntaxClass.declaration.VirtualSpecification;
@@ -43,9 +44,10 @@ public final class ProtectedSpecification extends SyntaxElement {
     /// Create a new ProtectedSpecification.
     /// @param definedIn the class it is defined in
     /// @param identifier the protected identifier
-	public ProtectedSpecification(final ClassDeclaration definedIn,final Identifier identifier) {
-		this.definedIn=definedIn;
-		this.identifier=identifier;
+	public ProtectedSpecification(final ClassDeclaration definedIn,final Identifier identifier, final LexTokenRange tokenRange) {
+		this.definedIn = definedIn;
+		this.identifier = identifier;
+		this.tokenRange = tokenRange;
 	}
 	
 	/// Returns the Attribute being Protected.
@@ -69,16 +71,19 @@ public final class ProtectedSpecification extends SyntaxElement {
 	@Override
 	public void doChecking() {
 		Declaration attribute=getAttribute();
-		if(attribute!=null) attribute.isProtected=this;
-		else Util.semanticError(this, "No Attribute " + identifier.value + " match 'protected' specification: " + this);
-		VirtualSpecification virtSpec=VirtualSpecification.getVirtualSpecification(attribute);
-		if(virtSpec!=null) {
-			if( virtSpec.declaredIn != attribute.declaredIn )
-				Util.semanticError(this, "A virtual attribute may only be specified protected in the class heading in which the virtual specification occurs.");
+		if(attribute == null) {
+			Util.semanticError(this, "No Attribute " + identifier.value + " match 'protected' specification: " + this);
+		} else {
+			attribute.isProtected=this;
+			VirtualSpecification virtSpec=VirtualSpecification.getVirtualSpecification(attribute);
+			if(virtSpec!=null) {
+				if( virtSpec.declaredIn != attribute.declaredIn )
+					Util.semanticError(this, "A virtual attribute may only be specified protected in the class heading in which the virtual specification occurs.");
+			}
+			// Virtual specification together with Attribute definition.
+			VirtualSpecification vir=getVirtualSpecification();
+			if(vir!=null) vir.isProtected=this;
 		}
-		// Virtual specification together with Attribute definition.
-		VirtualSpecification vir=getVirtualSpecification();
-		if(vir!=null) vir.isProtected=this;
 	}
 
 

@@ -176,7 +176,7 @@ public final class VirtualSpecification extends Declaration {
 		// Label and switch attributes are implicit specified 'protected'
 		if (kind == Kind.Label || kind == Kind.Switch)
 			((ClassDeclaration) declaredIn).protectedList
-					.add(new ProtectedSpecification((ClassDeclaration) declaredIn, identifier));
+				.add(new ProtectedSpecification((ClassDeclaration) declaredIn, identifier, this.tokenRange));
 		SET_SEMANTICS_CHECKED();
 	}
 

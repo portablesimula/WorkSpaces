@@ -20,6 +20,8 @@ import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.Identifier;
+import simula.lsp.builder.token.LexToken;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.OverLoad;
 import simula.lsp.syntaxClass.ProcedureSpecification;
@@ -184,6 +186,7 @@ public final class VariableExpression extends Expression {
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("Parse Variable: current=" + Parse.getCurrentParserToken(simBuilder));
 		VariableExpression variable = new VariableExpression(identifier);
+		LexToken firstParserToken = simBuilder.getPrevParserToken();
 		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
 //			Util.println("VariableExpression.expectVariable: GOT BEGPAR");
 			variable.params = new Vector<Expression>();
@@ -200,6 +203,8 @@ public final class VariableExpression extends Expression {
 			Parse.expect(simBuilder, KeyWord.ENDPAR);
 //			Util.println("VariableExpression.expectVariable: GOT ENDPAR");
 		}
+		variable.tokenRange = new LexTokenRange(firstParserToken, simBuilder.getPrevParserToken());
+
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW Variable: " + variable);
 		return (variable);
@@ -231,17 +236,12 @@ public final class VariableExpression extends Expression {
 
 		switch(declaredAs) {
 			case UndefinedDeclaration undef -> {
-				Util.semanticError(this, "Undefined variable: " + undef.identifierValue());
+				if(remotelyAccessed)
+					 Util.semanticError(this, "Undefined attribute: " + undef.identifierValue());
+				else Util.semanticError(this, "Undefined variable: " + undef.identifierValue());
 			}
 			case StandardProcedure sproc -> {
 				if (Util.equals(sproc.identifierValue(), "detach")) {
-//					if (meaning.declaredIn instanceof ConnectionBlock conn)
-//						conn.classDeclaration.detachUsed = true;
-//					else if (meaning.declaredIn instanceof ClassDeclaration cdecl)
-//						cdecl.detachUsed = true;
-//					else
-//						Util.semanticError(this, "Variable(" + identifierValue() + ").doChecking:INTERNAL ERROR, "
-//								+ meaning.declaredIn.getClass().getSimpleName());
 					switch(meaning.declaredIn) {
 						case ConnectionBlock  conn  -> { conn.classDeclaration.detachUsed = true; }
 						case ClassDeclaration cdecl -> { cdecl.detachUsed = true; }

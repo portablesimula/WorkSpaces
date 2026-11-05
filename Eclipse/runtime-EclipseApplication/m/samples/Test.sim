@@ -1,8 +1,9 @@
 begin 
-	integer a,b,c=z; 
+	integer a,b,fc=44; 
 	ref(C) nn;
-	class C(x); ref(C) x; hidden yy;
+	class C(x); ref(C) x; hidden protected yy;
 	begin
-	   nn.x :- new C;
+		integer yy;
+	   nn.x :- new C(none);
 	end;
 end;

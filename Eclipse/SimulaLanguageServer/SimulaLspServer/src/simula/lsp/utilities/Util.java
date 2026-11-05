@@ -263,8 +263,9 @@ public final class Util {
 		SimulaBuilder simBuilder = elt.getSimBuilder();
 		
 		if(simBuilder == null) {
-			Util.printError("Util.semanticError: Missing simBuilder: " + elt.getClass().getSimpleName());
+			Util.printError("Util.semanticError: Missing simBuilder: " + elt.getClass().getSimpleName() + "  " + elt);
 			Util.printError("Util.semanticError: Missing simBuilder: " + edDiagnostic(diagnostic));
+			dumpStack("Util.semanticError: Missing simBuilder: ");
 		} else
 			
 		simBuilder.addError(diagnostic);
@@ -283,7 +284,6 @@ public final class Util {
 		Either<String, MarkupContent> xxx = diagnostic.getMessage();
 		String message = xxx.getLeft();
 		sb.append("Diagnostic[").append(diagnostic.getSeverity()).append(": ").append(edRange(diagnostic.getRange())).append(message);
-//		Thread.dumpStack();
 		return sb.toString();
 	}
 	
@@ -300,6 +300,16 @@ public final class Util {
 		} else
 			
 		simCoder.addError(diagnostic);
+	}
+	
+	public static void dumpStack(String title) {
+		Exception e = new Exception("Util.dumpStack: ");
+		// e.printStackTrace();
+		Util.printError("Util.dumpStack: " + title);
+		StackTraceElement[] stackTraceElements = e.getStackTrace();
+		for(StackTraceElement elt:stackTraceElements) {
+			Util.printError("   at " + elt.toString());
+		}
 	}
 
 	/// Exit with Thread.dumpStack

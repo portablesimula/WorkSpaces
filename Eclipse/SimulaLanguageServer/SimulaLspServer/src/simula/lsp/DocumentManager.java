@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
@@ -40,10 +42,10 @@ public class DocumentManager {
 	final public File sourceFileDir;
 	public int documentVersion;
 	
-//	public String sourceCode;
-//	public List<String> sourceLines;
+	public String sourceCode;
+	public List<String> sourceLines;
 	
-	public SimulaBuilder simBuilder;
+	public SimulaBuilder currentSimBuilder;
 	public SimulaCoder simCoder;
 	
 
@@ -112,7 +114,7 @@ public class DocumentManager {
     	this.documentUri = documentUri;
     	this.sourceFileDir = new File(documentUri).getParentFile();
     	this.documentVersion = documentVersion;
-//    	this.sourceCode = sourceCode;    		    		
+    	this.sourceCode = sourceCode;    		    		
     	sourceFileName = this.documentUri;
 		sourceName = getSourceName(this.documentUri);
 		externalJarFileNames = new Vector<String>();
@@ -121,7 +123,36 @@ public class DocumentManager {
 		createJarFilesDirectory();
 		
 //		Util.println("NEW DocumentManager: INIT DONE");
-		simBuilder = new SimulaBuilder(this, sourceCode);
+    	
+    	// Expand SourceCode
+		this.sourceLines = getLines(sourceCode);
+        // Add extra EOF-Mark
+		this.sourceLines.add(""+(char)SourceTextReader.EOF_MARK);
+
+//		simBuilder = new SimulaBuilder(this);
+    }
+    
+    public static List<String> getLines(String text){
+    	List<String> lines; // = new ArrayList<String>();
+        // Convert the text to a mutable ArrayList without newline characters
+//        lines = text.lines()
+//                .collect(Collectors.toCollection(ArrayList::new));
+        
+    	// Split source text into lines keeping newline characters
+//        String[] linesArray = text.split("(?<=\\r?\\n)");
+//        String[] linesArray = text.split("(?<=\\n)", -1);
+        String[] linesArray = text.split("(?<=\\n)");
+        lines = new ArrayList<>(Arrays.asList(linesArray));
+
+//        // Add extra EOF-Mark
+//		lines.add(""+(char)SourceTextReader.EOF_MARK);
+		
+		LOG.trace("\nDocumentManager.getLines: INPUT Text|" + Comn.printable(text) + '|');
+		int i = 0;
+		for(String line:lines) {
+	    	LOG.trace("DocumentManager.getLines: line " + (i++) + "|" + Comn.printable(line) + '|');			
+		}
+    	return lines;
     }
 
 	private void createJarFilesDirectory() {
@@ -169,17 +200,17 @@ public class DocumentManager {
 
 	/// Get the text document's Token List.
 	public List<LexToken> getTokenList() {
-		return simBuilder.lexTokenList;
+		return currentSimBuilder.lexTokenList;
 	}
 
 	/// Get the text document's getDiagnostic List.
 	public List<Diagnostic> getDiagnostics() {
-		return simBuilder.diagnostics;
+		return currentSimBuilder.diagnostics;
 	}
 
 	/// Get the text document's SyntaxTree.
 	public ProgramModule getSyntaxTree() {
-		return simBuilder.syntaxTree;
+		return currentSimBuilder.syntaxTree;
 	}
 
 //	/// Set the text document's SyntaxTree.
@@ -189,7 +220,7 @@ public class DocumentManager {
 
 	/// Get the text document's diagnostics.
 	public List<Diagnostic> getDiagnostis() {
-		return simBuilder.diagnostics;
+		return currentSimBuilder.diagnostics;
 	}
 	
 //	public void addDiagnostic(Diagnostic diagnostic) {
@@ -224,21 +255,21 @@ public class DocumentManager {
 	/// Get the content of the opened text document.
 	public String getText() {
 //		Util.IERR("DocumentManager.getText: NOT IMPL");
-		for(String line:simBuilder.sourceLines) {
+		for(String line:sourceLines) {
 			LOG.trace("DocumentManager.getText: Line|" + Comn.printable(line) + '|');
 		}
 //		String sourceCode = String.join(System.lineSeparator(), sourceLines);
-		String sourceCode = String.join("", simBuilder.sourceLines);
+		String sourceCode = String.join("", sourceLines);
 		return sourceCode;
 	}
 
 	/// Set the content of the opened text document.
 	public void setText(final String text) {
 //		Util.IERR("DocumentManager.setText: NOT IMPL");
-		simBuilder.sourceLines = text.lines()
+		sourceLines = text.lines()
                 .map(String::strip)
                 .toList();
-		for(String line:simBuilder.sourceLines) {
+		for(String line:sourceLines) {
 			LOG.trace("DocumentManager.setText: Line|" + Comn.printable(line) + '|');
 		}
 	}
@@ -270,7 +301,7 @@ public class DocumentManager {
 	public static void didChange(final String documentUri, final List<TextDocumentContentChangeEvent> changes) {
     	LOG.trace("DocumentManager.didChange: BEGIN");
     	DocumentManager documentManager = getDocumentManager(documentUri);
-    	documentManager.simBuilder.sourceLines = DocumentTextUpdater.applyChanges(documentManager.simBuilder.sourceLines, changes);
+    	documentManager.sourceLines = DocumentTextUpdater.applyChanges(documentManager.sourceLines, changes);
     	
 //    	documentManager.tryCreateBuilder();
 
@@ -302,12 +333,12 @@ public class DocumentManager {
 //	public static void didSave(DidSaveTextDocumentParams params, SimulaLanguageServer server) {
 	public static void didSave(final String documentUri) throws IOException {
     	DocumentManager documentManager = getDocumentManager(documentUri);
-		List<String> sourceLines =  documentManager.simBuilder.sourceLines;
+		List<String> sourceLines =  documentManager.sourceLines;
 		if(Option.CHG_VERIFY) {
 			URI uri = URI.create(documentUri);
 			Path path = Path.of(uri);
 			String fileText = Files.readString(path);
-			List<String> fileLines = SimulaBuilder.getLines(fileText);
+			List<String> fileLines = getLines(fileText);
 	        // Add extra EOF-Mark
 			fileLines.add(""+(char)SourceTextReader.EOF_MARK);
 			int lng1 = fileLines.size();
@@ -365,8 +396,9 @@ public class DocumentManager {
 	public static List<Integer> semanticTokensFull(String documentUri) {
 //		if(TESTING) Util.println("DocumentManager.semanticTokensFull: " + documentUri);
     	DocumentManager documentManager = getDocumentManager(documentUri);
-    	documentManager.simBuilder.doBuilding();
-    	List<Integer> semanticTokens = documentManager.simBuilder.semTokenList;
+    	documentManager.currentSimBuilder = new SimulaBuilder(documentManager);
+    	documentManager.currentSimBuilder.doBuilding();
+    	List<Integer> semanticTokens = documentManager.currentSimBuilder.semTokenList;
 //    	LOG.trace("DocumentManager.semanticTokensFull: semanticTokens.size=" + semanticTokens.size());
 //		TokenManager.validateSemanticTokens(semanticTokens, TokenManager.STANDARD_TOKEN_TYPES.size() - 1);
 		return semanticTokens;

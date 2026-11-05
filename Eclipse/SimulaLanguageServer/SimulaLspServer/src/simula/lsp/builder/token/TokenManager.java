@@ -115,18 +115,24 @@ public class TokenManager {
 	/// - For the First Token (i = 0): deltaLine is relative to the start of the file/document (line 0),
 	///   and deltaStart is relative to column 0.
 	/// 
-	public static List<Integer> generateSemanticTokens(List<LexToken> lexTokenList) {
+	public static List<Integer> generateSemanticTokens(List<String> sourceLines, List<LexToken> lexTokenList) {
 		
-//		Option.internal.TRACE_NEW_SEMTOKEN = 1;
+//		Option.internal.TRACE_NEW_SEMTOKEN = 1;// 2;
 		
-		if(Option.internal.TRACE_NEW_SEMTOKEN > 0) Util.println("DocumentManager.generateSemanticTokens: " + lexTokenList.size());
         List<Integer> encodedData = new ArrayList<>();
         
         int currentLine = 0;
         int prevTokenLine = 0;
         int prevTokenColumn = 0;
+        int trcLine = 0;
         
+		if(Option.internal.TRACE_NEW_SEMTOKEN > 0) {
+			Util.println("\nDocumentManager.generateSemanticTokens: " + lexTokenList.size());
+			Util.println("\nDocumentManager.generateSemanticTokens: Line 0" + ": |" + sourceLines.get(0) + '|');
+		}
+		
         LOOP:for (LexToken lexToken : lexTokenList) {
+//    		if(Option.internal.TRACE_NEW_SEMTOKEN > 0) Util.println("\nGOT LEXTOKEN: " + lexToken);            	
         	
         	if(lexToken.keyWord == KeyWord.COMMENT_TEXT || lexToken.keyWord == KeyWord.COMMENT_KEY) {
         		if(lexToken.tokenText.stripTrailing() == "") {
@@ -141,6 +147,13 @@ public class TokenManager {
                                 // or from the start of the line if deltaLine > 0.
             deltaLine = currentLine - prevTokenLine;
             if(deltaLine > 0) {
+        		if(Option.internal.TRACE_NEW_SEMTOKEN > 0) {
+//        			Util.println("\nDocumentManager.generateSemanticTokens: deltaLine=" + deltaLine + ", trcLine=" + trcLine + ", currentLine=" + currentLine);
+        			for(int i=0;i<deltaLine;i++) {
+        				String line = Comn.printable(sourceLines.get(++trcLine));
+        				Util.println("\nDocumentManager.generateSemanticTokens: Line " + trcLine + ": |" + line + '|');
+        			}
+        		}
         		// Start NEWLINE,
             	// meaning the current token is on a new line relative to the previous token),
             	// deltaStart is relative to 0 (the absolute beginning/left margin of that new line).
@@ -194,7 +207,7 @@ public class TokenManager {
             
 //            Option.internal.TRACE_NEW_SEMTOKEN = 1;
             if(Option.internal.TRACE_NEW_SEMTOKEN > 0) {
-        		String str = Comn.printable(tokenText);
+         		String str = Comn.printable(tokenText);
         		String sem = ("DeltaLine " + deltaLine + ": " + TokenManager.STANDARD_TOKEN_TYPES.get(lexToken.tokenTypeIndex)
         					+ "[deltaStart:" + deltaStart + ", lng:" + length + "] Text: \"" + str + '"');
             	if(Option.internal.TRACE_NEW_SEMTOKEN > 1) {
@@ -294,6 +307,8 @@ public class TokenManager {
 	/// @param semanticTokens The list of integers to be validated.
 	public static void tokenListVerifyer(List<String> sourceLines, List<Integer> semanticTokens) {
 		
+//		Option.internal.TRACE_VERIFY_TOKEN = 1;
+		
 		verify(semanticTokens, STANDARD_TOKEN_TYPES.size() - 1);
 		
 //		Option.internal.TRACE_VERIFY_TOKEN = 1;
@@ -384,6 +399,9 @@ public class TokenManager {
 			}
 
 			// 4. Insert the token text
+//			Util.println("TokenManager.tokenListVerifyer: SO FAR|"+Comn.printable(reconstr.toString())+'|');
+//			Util.println("TokenManager.tokenListVerifyer: originalLine|"+Comn.printable(originalLine)+'|');
+//			Util.println("TokenManager.tokenListVerifyer: length="+length+", sourcePos="+sourcePos);
 			if(length > 0) {
 				String tokenText = originalLine.substring(sourcePos, sourcePos + length);
 				if(hasTrailingBlanks(tokenText)) {

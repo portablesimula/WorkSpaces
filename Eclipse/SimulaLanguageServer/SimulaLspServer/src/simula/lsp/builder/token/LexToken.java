@@ -145,7 +145,7 @@ public class LexToken {
 	
 	public String edTokenText(SimulaLexer lexer) {
 		try {
-			String sourceLine = simBuilder.sourceLines.get(lineNumber).stripTrailing() + '\n'; 
+			String sourceLine = simBuilder.documentManager.sourceLines.get(lineNumber).stripTrailing() + '\n'; 
 //			Util.println("LexToken.edTokenText: Line "+lineNumber+": |"+sourceLine+"| column="+column+", length="+length);
 			String txt = sourceLine.substring(column, column + length);
 //			Util.println("LexToken.edTokenText: Line "+lineNumber+": |"+sourceLine+"| column="+column+", length="+length+" ==> |" + txt +'|');				

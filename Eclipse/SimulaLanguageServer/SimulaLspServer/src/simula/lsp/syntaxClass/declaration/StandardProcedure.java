@@ -142,7 +142,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 				}
 				default -> Util.IERR(""+c);
 			}
-			Parameter par = new Parameter(new Identifier("_p"+(pos-1)), pType, Parameter.Kind.Simple);
+			Parameter par = new Parameter(this, new Identifier("_p"+(pos-1)), pType, Parameter.Kind.Simple);
 			pList.add(par);
 		}
 		char c = mtd.charAt(pos++);
@@ -215,7 +215,7 @@ public final class StandardProcedure extends ProcedureDeclaration {
 		Identifier id=identifier;
 		if(id.value.equalsIgnoreCase("detach") | id.value.equalsIgnoreCase("call") | id.value.equalsIgnoreCase("resume")) {
 			// Push extra parameter 'sourceLineNumber'
-			Parameter lno=new Parameter(id, Type.Integer, Parameter.Kind.Simple);
+			Parameter lno=new Parameter(this, id, Type.Integer, Parameter.Kind.Simple);
 			sb.append(lno.type.toJVMType());
 		}
 		sb.append(')');

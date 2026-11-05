@@ -113,7 +113,7 @@ public final class ConnectionBlock extends DeclarationScope {
 
 		if(Option.internal.TRACE_FIND_MEANING > 0)
 			LOG.trace("ConnectionBlock.findMeaning("+identifierValue()+"): BEGIN Search "+identifierValue());
-		if (classDeclaration == null && documentManager.simBuilder.duringParsing) {
+		if (classDeclaration == null && documentManager.currentSimBuilder.duringParsing) {
 			return (null); // Still in Pass1(Parser)
 		}
 		Meaning result = null;

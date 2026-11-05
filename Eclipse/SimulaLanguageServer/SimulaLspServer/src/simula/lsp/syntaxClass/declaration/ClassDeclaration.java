@@ -27,6 +27,7 @@ import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.Identifier;
 import simula.lsp.builder.token.LexToken;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.HiddenSpecification;
 import simula.lsp.syntaxClass.ProtectedSpecification;
@@ -196,10 +197,10 @@ public class ClassDeclaration extends BlockDeclaration {
 			cls.prefix = StandardClass.CLASS.identifier;
 		cls.modifyIdentifier(Parse.expectIdentifier(simBuilder));
 		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
-			expectFormalParameterPart(simBuilder, cls.parameterList);
+			expectFormalParameterPart(simBuilder, cls);
 			Parse.expect(simBuilder, KeyWord.SEMICOLON);
-			acceptValuePart(simBuilder, cls.parameterList);
-			acceptParameterSpecificationPart(simBuilder, cls.parameterList);
+			acceptValuePart(simBuilder, cls);
+			acceptParameterSpecificationPart(simBuilder, cls);
 		} else
 			Parse.expect(simBuilder, KeyWord.SEMICOLON);
 
@@ -216,6 +217,24 @@ public class ClassDeclaration extends BlockDeclaration {
 		return (cls);
 	}
 
+	
+	/// Parse Utility: Expect formal-parameter-part and build the parameter list.
+	/// <pre>
+	/// Syntax:
+	/// 
+	///     formal-parameter-part = "(" identifier { , identifier } ")"
+	/// </pre>
+	/// 
+	/// Precondition: BEGPAR is already read.
+	/// @param pList the parameter list
+	protected static void expectFormalParameterPart(final SimulaBuilder simBuilder, final ClassDeclaration cls) {
+		Vector<Parameter> pList = cls.parameterList;
+		do { // ParameterPart = Parameter ; { Parameter ; }
+			new Parameter(cls, Parse.expectIdentifier(simBuilder)).into(pList);
+		} while (Parse.accept(simBuilder, KeyWord.COMMA));
+		Parse.expect(simBuilder, KeyWord.ENDPAR);
+	}
+
 	// ***********************************************************************************************
 	// *** PARSING: acceptValuePart
 	// ***********************************************************************************************
@@ -225,7 +244,8 @@ public class ClassDeclaration extends BlockDeclaration {
 	///              VALUE identifier-list ;
 	/// </pre>
 	/// @param pList Parameter list
-	private static void acceptValuePart(final SimulaBuilder simBuilder, final Vector<Parameter> pList) {
+	private static void acceptValuePart(final SimulaBuilder simBuilder, final ClassDeclaration cls) {
+		Vector<Parameter> pList = cls.parameterList;
 		if (Parse.accept(simBuilder, KeyWord.VALUE)) {
 			do {
 				Identifier identifier = Parse.expectIdentifier(simBuilder);
@@ -237,7 +257,7 @@ public class ClassDeclaration extends BlockDeclaration {
 					}
 				if (parameter == null) {
 					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
-					parameter = new Parameter(identifier);
+					parameter = new Parameter(cls, identifier);
 				}
 				parameter.setMode(Parameter.Mode.value);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
@@ -258,7 +278,8 @@ public class ClassDeclaration extends BlockDeclaration {
 	///        class-parameter-specifier = Type | [Type] ARRAY
 	/// </pre>
 	/// @param pList the parameter list
-	private static void acceptParameterSpecificationPart(final SimulaBuilder simBuilder, final Vector<Parameter> pList) {
+	private static void acceptParameterSpecificationPart(final SimulaBuilder simBuilder, final ClassDeclaration cls) {
+		Vector<Parameter> pList = cls.parameterList;
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ParameterSpecifications");
 		while (true) {
@@ -285,7 +306,7 @@ public class ClassDeclaration extends BlockDeclaration {
 					}
 				if (parameter == null) {
 					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
-					parameter = new Parameter(identifier);
+					parameter = new Parameter(cls, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
@@ -337,12 +358,14 @@ public class ClassDeclaration extends BlockDeclaration {
 	/// @param hidden if true, update the hidden list
 	/// @param prtected if true, update the protected list
 	private static void expectHiddenProtectedList(final SimulaBuilder simBuilder, final ClassDeclaration cls, final boolean hidden, final boolean prtected) {
+		LexToken firstParserToken = simBuilder.getPrevParserToken();
 		do {
 			Identifier identifier = Parse.expectIdentifier(simBuilder);
+			LexTokenRange tokenRange = new LexTokenRange(firstParserToken, simBuilder.getPrevParserToken());
 			if (hidden)
-				cls.hiddenList.add(new HiddenSpecification(cls, identifier));
+				cls.hiddenList.add(new HiddenSpecification(cls, identifier, tokenRange));
 			if (prtected)
-				cls.protectedList.add(new ProtectedSpecification(cls, identifier));
+				cls.protectedList.add(new ProtectedSpecification(cls, identifier, tokenRange));
 		} while (Parse.accept(simBuilder, KeyWord.COMMA));
 		Parse.expect(simBuilder, KeyWord.SEMICOLON);
 	}

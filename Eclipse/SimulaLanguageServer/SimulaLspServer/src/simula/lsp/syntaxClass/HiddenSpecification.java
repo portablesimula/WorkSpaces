@@ -10,6 +10,7 @@ import java.io.IOException;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.token.Identifier;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.syntaxClass.declaration.ClassDeclaration;
 import simula.lsp.utilities.ObjectKind;
 import simula.lsp.utilities.Util;
@@ -49,9 +50,10 @@ public final class HiddenSpecification extends SyntaxElement {
 	/// Create a new HiddenSpecification.
 	/// @param definedIn  the class where Hidden is specified
 	/// @param identifier the hidden identifier
-	public HiddenSpecification(final ClassDeclaration definedIn, final Identifier identifier) {
+	public HiddenSpecification(final ClassDeclaration definedIn, final Identifier identifier, final LexTokenRange tokenRange) {
 		this.definedIn = definedIn;
 		this.identifier = identifier;
+		this.tokenRange = tokenRange;
 	}
 
 	/// Utility: Perform semantic checking.

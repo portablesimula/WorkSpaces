@@ -94,17 +94,21 @@ public final class Parameter extends Declaration {
 
 	/// Create a new Parameter.
 	/// @param identifier parameter identifier
-	public Parameter(final Identifier identifier) {
+	public Parameter(final Declaration owner, final Identifier identifier) {
 		super(identifier);
 		this.declarationKind = ObjectKind.Parameter;
+		if(owner != null) {
+			this.tokenRange = owner.tokenRange;
+		}
+//		Util.println("NEW Parameter: "+owner+"  tokenRange="+tokenRange+" - " + this);
 	}
 
 	/// Create a new Parameter.
 	/// @param identifier parameter identifier
 	/// @param type parameter type
 	/// @param kind parameter kind
-	Parameter(final Identifier identifier, final Type type, final int kind) {
-		this(identifier);
+	Parameter(final Declaration owner, final Identifier identifier, final Type type, final int kind) {
+		this(owner, identifier);
 		this.type = type;
 		this.kind = kind;
 	}
@@ -114,8 +118,8 @@ public final class Parameter extends Declaration {
 	/// @param type parameter type
 	/// @param kind parameter kind
 	/// @param nDim parameter's number of dimension in case of array kind.
-	public Parameter(final Identifier identifier, final Type type, final int kind, final int nDim) {
-		this(identifier, type, kind);
+	public Parameter(final Declaration owner, final Identifier identifier, final Type type, final int kind, final int nDim) {
+		this(owner, identifier, type, kind);
 		this.nDim = nDim;
 	}
 
@@ -177,7 +181,7 @@ public final class Parameter extends Declaration {
 			return;
 		LspGlobal.sourceLineNumber = firstLineNumber();
 		if (kind == 0) {
-			Util.semanticError(this.declaredIn, "Parameter " + identifierValue() + " is not specified -- assumed Simple Integer");
+			Util.semanticError(this, "Parameter " + identifierValue() + " is not specified -- assumed Simple Integer");
 			kind = Kind.Simple;
 			type = Type.Integer;
 		}

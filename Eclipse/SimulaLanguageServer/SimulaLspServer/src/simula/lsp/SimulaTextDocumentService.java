@@ -88,7 +88,7 @@ public class SimulaTextDocumentService implements TextDocumentService {
     }
 
     
-    private static final boolean TRACE_semanticTokensFull = true;
+    private static final boolean TRACE_semanticTokensFull = false;// true;
 	/// The textDocument/semanticTokens/full request is sent from the client
 	/// to the server to return the semantic tokens for a whole file.
 //    @Override
