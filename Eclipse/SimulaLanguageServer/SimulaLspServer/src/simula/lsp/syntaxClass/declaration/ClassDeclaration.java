@@ -190,6 +190,7 @@ public class ClassDeclaration extends BlockDeclaration {
 		}
 //		LexToken first = (identifier != null)? identifier : simBuilder.getPrevParserToken();
 		ClassDeclaration cls = new ClassDeclaration(null);
+		cls.tokenRange = new LexTokenRange(simBuilder.getPrevParserToken());
 		cls.sourceFileName = simBuilder.documentManager.documentUri;
 		if(identifier != null) cls.prefix = identifier;
 		cls.declaredIn.hasLocalClasses = true;
@@ -704,6 +705,18 @@ public class ClassDeclaration extends BlockDeclaration {
 		if (Option.internal.TRACE_FIND_MEANING > 0)
 			LOG.trace("ClassDeclaration.findVisibleAttributeMeaning: ENDOF Search "+identifierValue()+" for "+ident.value+" ========= NOT FOUND ============== "+identifierValue()+" ==================================");
 		return (null);
+	}
+
+	
+	// ***********************************************************************************************
+	// *** Utility: findClassDeclaration
+	// ***********************************************************************************************
+	public static ClassDeclaration findClassDeclaration(Identifier refIdent) {
+		Meaning meaning = LspGlobal.getCurrentScope().findMeaning(refIdent);
+		if(meaning != null) {
+			if(meaning.declaredAs instanceof ClassDeclaration result) return result;
+		}
+		return null;
 	}
 
 	// ***********************************************************************************************

@@ -96,7 +96,7 @@ public abstract class SyntaxElement {
 //	public final DocumentManager documentManager;
 	
 	/// Not present for System or External modules
-	public LexTokenRange tokenRange = new LexTokenRange();;
+	public LexTokenRange tokenRange;
 
 	/// Controls semantic checking.
 	/// 
@@ -110,8 +110,9 @@ public abstract class SyntaxElement {
 	public int OBJECT_SEQU;
 	
 	/// Create a new SyntaxElement.
-//	protected SyntaxElement(DocumentManager documentManager) {
-//		this.documentManager= documentManager;
+	protected SyntaxElement() {
+		tokenRange = new LexTokenRange();
+	}
 	
 	public DocumentManager getDocumentManager() {
 		if(tokenRange == null) return null;

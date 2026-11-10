@@ -13,6 +13,7 @@ import simula.lsp.builder.token.CharacterConst;
 import simula.lsp.builder.token.Identifier;
 import simula.lsp.builder.token.IntegerConst;
 import simula.lsp.builder.token.LexToken;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.builder.token.LongRealConst;
 import simula.lsp.builder.token.RealConst;
 import simula.lsp.coder.SimulaCoder;
@@ -114,12 +115,15 @@ public abstract class Expression extends SyntaxElement {
 	public static Expression acceptExpression(SimulaBuilder simBuilder) {
 //		Util.println("Expression.acceptExpression: current: " + simBuilder.getCurrentParserToken());
 		if(Parse.accept(simBuilder, KeyWord.IF)) {
+			LexTokenRange tokenRange = new LexTokenRange(simBuilder.getPrevParserToken());
 			Expression condition=acceptExpression(simBuilder);
 			Parse.expect(simBuilder, KeyWord.THEN);
 				Expression thenExpression=acceptSimpleExpression(simBuilder);
 			Parse.expect(simBuilder, KeyWord.ELSE);
 				Expression elseExpression=acceptExpression(simBuilder);
 			Expression expr=new ConditionalExpression(Type.Boolean, condition, thenExpression, elseExpression);
+			tokenRange.lastParserToken = simBuilder.getPrevParserToken();
+			expr.tokenRange = tokenRange;
 			if(Option.internal.TRACE_PARSE) Util.TRACE("Expression: ParseExpression, result="+expr);
 //			if(true) throw new RuntimeException("Expression.acceptExpression: NOT IMPL: "+expr);
 			return expr;

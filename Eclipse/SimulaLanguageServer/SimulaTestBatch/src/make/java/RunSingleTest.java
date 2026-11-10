@@ -80,7 +80,7 @@ public final class RunSingleTest {
 //		names.add("simtst05.sim"); // OK:  Test Aritmetisk Relations
 //		names.add("simtst06.sim"); // OK:  Test Mathematical Functions
 //		names.add("simtst07.sim"); // OK:  Test Mathematical Library
-		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
+//		names.add("simtst08.sim"); // OK:  Test Scope of Variables.
 //		names.add("simtst09.sim"); // OK:  Test relation operator and some Funtions
 //		names.add("simtst10.sim"); // OK:  Test Evaluation of Text-Constants
 //
@@ -223,7 +223,7 @@ public final class RunSingleTest {
 //		names.add("simtst128.sim"); // OK: Standard Procedure edit and edfix
 //			names.add("Precompiled129.sim"); // OK: Precompile this for Simtst 129.
 //			names.add("simtst129.sim"); // OK: Switch in precompiled class
-//		names.add("simtst130.sim"); // OK: Class SimLib, a set of utility procedures from DEC Handbook.
+		names.add("simtst130.sim"); // OK: Class SimLib, a set of utility procedures from DEC Handbook.
 //
 //		names.add("simtst131.sim"); // OK: Catching Errors
 //		names.add("simtst132.sim"); // OK: SPORT Options

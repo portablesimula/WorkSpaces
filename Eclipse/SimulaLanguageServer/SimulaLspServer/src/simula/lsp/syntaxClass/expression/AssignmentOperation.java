@@ -91,12 +91,23 @@ public final class AssignmentOperation extends Expression {
 		Type toType = lhs.type;
 		if(toType == null) toType = Type.Undef;
 //		Util.println("AssignmentOperation.doChecking: lhs="+lhs.getClass().getSimpleName()+"  "+lhs);
+		
+		rhs.doChecking();
+		Type fromType = rhs.type;
+		if(toType.keyWord == Type.T_UNDEF) {
+			lhs.type = fromType;
+		}
+		
 		if (lhs instanceof VariableExpression var) {
 			Meaning meaning = var.getMeaning();
 //			Util.println("AssignmentOperation.doChecking: meaning.declaredAs="+meaning.declaredAs.getClass().getSimpleName()+"  "+meaning.declaredAs);
 			switch(meaning.declaredAs) {
 				case SimpleVariableDeclaration dcl -> { if (dcl.isConstant()) Util.semanticError(var, "Assignment to Constant: '" + lhs + "' is Illegal"); }
 				case ClassDeclaration cls -> { Util.semanticError(lhs, "Can't assign to Class Identifier: " + cls.identifierValue()); }
+				case ProcedureDeclaration pro -> {
+					if(! isProcedureCallLegalAsLHS(var, fromType))
+						Util.semanticError(lhs, "Can't assign to Procedure: " + pro.identifierValue());
+				}
 				default -> {} // NOTHING
 			}
 		}
@@ -106,18 +117,39 @@ public final class AssignmentOperation extends Expression {
 			}
 //			else Util.println("AssignmentOperation.doChecking: lhs.getWriteableVariable="+lhs.getWriteableVariable().getClass().getSimpleName() + "  " + lhs.getWriteableVariable());
 //		}
-		rhs.doChecking();
-		Type fromType = rhs.type;
-		if(toType.keyWord == Type.T_UNDEF) {
-			lhs.type = fromType;
-		}
 		if (opr == KeyWord.ASSIGNVALUE)
 			this.textValueAssignment = (toType.keyWord == Type.T_TEXT);
+		
+//		Util.println("AssignmentOperation.doChecking: fromType="+fromType+", toType="+toType);
 		rhs = (Expression) TypeConversion.testAndCreate(toType, rhs);
 		this.type = toType;
 		if (this.type == null)
 			Util.semanticError(rhs, "doAssignmentChecking: Illegal types: " + toType + " := " + fromType);
 		SET_SEMANTICS_CHECKED();
+	}
+
+	/// P(p1,p2,...) := / :- expression 
+	private static boolean isProcedureCallLegalAsLHS(final VariableExpression lhs, final Type rhsType) {
+		Meaning meaning = lhs.getMeaning();
+		ProcedureDeclaration lhsPro = (ProcedureDeclaration) meaning.declaredAs;
+		Type lhsType = lhsPro.type;
+		
+		if(lhs.hasArguments()) {
+			// Case: P(1,2) := / :- "Abra"   - Legal if Procedure type Text
+			// Case: P(1,2) :- obj           - Legal if Procedure type ref()
+			if(lhsType != null && lhsType.isReferenceType()) { // Text or ref()
+//				Util.println("VariableExpression.isProcedureCallLegalAsLHS: lhs="+lhs);
+//				Util.println("VariableExpression.isProcedureCallLegalAsLHS: meaning="+meaning);
+				if(rhsType == Type.Text)     return true;
+				if(rhsType.isRefClassType()) return true;
+			}
+		} else {
+			// Case: P := / :- result within the Procedure P body
+//			Util.println("VariableExpression.isProcedureCallLegalAsLHS: lhsPro="+lhsPro);
+//			Util.println("VariableExpression.isProcedureCallLegalAsLHS: declaredIn="+meaning.declaredIn);
+			return true; // TODO: DETTE ER MIDLERTIDIG
+		}
+		return false;
 	}
 
 	// Returns true if this expression may be used as a statement.

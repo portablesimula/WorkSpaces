@@ -97,6 +97,7 @@ public final class TypeConversion extends Expression {
 	/// @return the resulting expression
 	public static Expression testAndCreate(final Type toType,final Expression expression) {
 		Type fromType=expression.type;
+//		Util.println("TypeConversion.testAndCreate: fromType="+fromType+", toType="+toType);
 		Identifier qual=(fromType==null)?null:fromType.getRefIdent();
 		if(qual != null) {
 			int rhsBL=(fromType!=null && fromType.declaredIn!=null)?fromType.declaredIn.getRTBlockLevel() : 0;
@@ -157,7 +158,8 @@ public final class TypeConversion extends Expression {
 			case ConvertRef:		return (true);
 			case Illegal:
 				if(expression.type != Type.Undef)
-					Util.semanticError(expression, "TypeConversion: Illegal cast: (" + toType + ") " + expression);
+//					Util.semanticError(expression, "TypeConversion: Illegal cast: (" + toType + ") " + expression);
+					Util.semanticError(expression, "The expression " + expression + " can't be converted to " + toType);
 			default: return (false);
 		}
 	}

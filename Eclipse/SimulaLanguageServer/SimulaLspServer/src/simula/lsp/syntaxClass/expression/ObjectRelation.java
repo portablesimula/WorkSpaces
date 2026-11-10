@@ -109,14 +109,18 @@ public final class ObjectRelation extends Expression {
 			Util.TRACE("BEGIN ObjectRelation" + toString() + ".doChecking - Current Scope Chain: " + LspGlobal.getCurrentScope().edScopeChain());
 		classDeclaration = getQualification(classIdentifier);
 		if(classDeclaration == null) {
-			Util.semanticError(this, "Illegal Object relation IS/IN: " + classIdentifier.value + " is not a class");
+			String reason = (classIdentifier == null)? "" : classIdentifier.value + " is not a class";
+			Util.semanticError(this, "Illegal Object relation IS/IN: " + reason);
 		}
 		// Object IS ClassIdentifier | Object IN ClassIdentifier
 		lhs.doChecking();
 		Type type1 = lhs.type;
 		Identifier refIdent = type1.getRefIdent();
-		if (refIdent == null)
-			Util.warning(this, "NONE IS/IN " + classIdentifier + " -- Rewrite program");
+		if (refIdent == null) {
+//			Util.semanticError(this, type1.toString() + " IS/IN " + classIdentifier.value + " -- Rewrite program");
+			String reason = (classIdentifier == null)? "" : classIdentifier.value + " -- " + lhs + " is not an object expression";
+			Util.semanticError(lhs, lhs.toString() + " IS/IN " + reason);
+		}
 		this.type = Type.Boolean;
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("END ObjectRelation" + toString() + ".doChecking - Result type=" + this.type);

@@ -1,0 +1,7 @@
+begin
+	ref(D) x;
+	inspect sysin when ccc do begin
+		if x in C then x :- new C;
+		x qua C.y := 44;
+	end;
+end

@@ -20,6 +20,7 @@ import simula.lsp.builder.JavaSourceFileCoder;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.Identifier;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.HiddenSpecification;
 import simula.lsp.syntaxClass.ProtectedSpecification;
@@ -91,6 +92,7 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 	/// @return the resulting PrefixedBlockDeclaration
 	public static PrefixedBlockDeclaration expectPrefixedBlock(final SimulaBuilder simBuilder, final VariableExpression blockPrefix,boolean isMainModule) {
 		PrefixedBlockDeclaration block=new PrefixedBlockDeclaration(isMainModule);
+		block.tokenRange = new LexTokenRange(simBuilder.getPrevParserToken());
 		block.declarationKind=ObjectKind.PrefixedBlock;
 		Util.ASSERT(blockPrefix != null,"blockPrefix == null");
 		block.blockPrefix = blockPrefix;
@@ -121,7 +123,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 //			getPrefixClass().doChecking();
 			prefixClass = getPrefixClass();
 			if(prefixClass == null) {
-				Util.semanticError(this, "Prefix " + prefix.value + " is not a Class");
+//				Util.semanticError(this, "Prefix " + prefix.value + " is not a Class");
+				Util.semanticError(blockPrefix, "Prefix " + blockPrefix + " is not a Class");
 			} else {
 				prefixClass.doChecking();
 			}

@@ -1,0 +1,9 @@
+begin
+	integer pre2;
+	
+	prefix begin
+	end;
+	
+	pre2(13, 24) begin
+	end;
+end

@@ -14,6 +14,7 @@ import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.syntaxClass.declaration.ClassDeclaration;
 import simula.lsp.syntaxClass.declaration.Declaration;
 import simula.lsp.syntaxClass.declaration.VirtualSpecification;
+import simula.lsp.utilities.Meaning;
 import simula.lsp.utilities.ObjectKind;
 import simula.lsp.utilities.Util;
 
@@ -53,7 +54,8 @@ public final class ProtectedSpecification extends SyntaxElement {
 	/// Returns the Attribute being Protected.
 	/// @return the Attribute being Protected
 	private Declaration getAttribute() {
-		return(definedIn.findLocalAttribute(identifier));
+		Meaning meaning = definedIn.findRemoteAttributeMeaning(identifier);
+		return (meaning == null)? null : meaning.declaredAs;
 	}
 	
 	/// Returns the virtual specification or null.
@@ -70,14 +72,15 @@ public final class ProtectedSpecification extends SyntaxElement {
 	/// Perform semantic checking.
 	@Override
 	public void doChecking() {
-		Declaration attribute=getAttribute();
+		Declaration attribute = getAttribute();
 		if(attribute == null) {
-			Util.semanticError(this, "No Attribute " + identifier.value + " match 'protected' specification: " + this);
+			Util.semanticError(this, "No Attribute " + identifier.value + " match 'protected' specification");
 		} else {
-			attribute.isProtected=this;
+			attribute.isProtected = this;
 			VirtualSpecification virtSpec=VirtualSpecification.getVirtualSpecification(attribute);
-			if(virtSpec!=null) {
-				if( virtSpec.declaredIn != attribute.declaredIn )
+//			Util.println("ProtectedSpecification.doChecking: virtSpec: " + virtSpec);
+			if(virtSpec != null) {
+				if( this.definedIn != attribute.declaredIn)
 					Util.semanticError(this, "A virtual attribute may only be specified protected in the class heading in which the virtual specification occurs.");
 			}
 			// Virtual specification together with Attribute definition.

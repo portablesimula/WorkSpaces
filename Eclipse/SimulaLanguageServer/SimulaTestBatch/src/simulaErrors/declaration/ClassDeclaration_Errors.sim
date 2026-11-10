@@ -1,0 +1,7 @@
+begin
+	ZZZ class C;;
+	
+	Class A;;
+	A class B;;
+	B class A;;
+end

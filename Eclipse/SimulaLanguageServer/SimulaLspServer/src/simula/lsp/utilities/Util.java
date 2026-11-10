@@ -249,7 +249,7 @@ public final class Util {
 		SimulaBuilder simBuilder = elt.getSimBuilder();
 		
 		if(simBuilder == null) {
-			Util.printError("Util.syntaxError: Missing simBuilder: " + elt.getClass().getSimpleName());
+			Util.printError("Util.syntaxError: Missing simBuilder: " + elt.getClass().getSimpleName() + "  TokenRange: " + elt.tokenRange);
 			Util.printError("Util.syntaxError: Missing simBuilder: " + edDiagnostic(diagnostic));
 		} else
 			

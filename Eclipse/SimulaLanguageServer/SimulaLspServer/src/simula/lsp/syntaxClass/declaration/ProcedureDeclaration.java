@@ -33,6 +33,7 @@ import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.Identifier;
 import simula.lsp.builder.token.LexToken;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.Type;
 import simula.lsp.syntaxClass.expression.Constant;
@@ -144,6 +145,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	/// @return a newly created ProcedureDeclaration
 	public static ProcedureDeclaration expectProcedureDeclaration(final SimulaBuilder simBuilder, final Type type) {
 		ProcedureDeclaration proc = new ProcedureDeclaration(null, ObjectKind.Procedure);
+		proc.tokenRange = new LexTokenRange(simBuilder.getPrevParserToken());
 		proc.sourceFileName = simBuilder.documentManager.sourceFileName;
 //		proc.OLD_lineNumber = simBuilder.getSourceLineNumber();
 		proc.type = type;

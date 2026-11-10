@@ -974,7 +974,7 @@ public final class VariableExpression extends Expression {
 		Vector<Expression> par = (checkedParams != null)? checkedParams : params;
 //		sb.append("TEST: "+par+" ");
 		if (par == null) {
-			if(type != null) sb.append("  type=").append(type);
+//			if(type != null) sb.append("  type=").append(type);
 		} else {
 //			return (("" + identifier + params).replace('[', '(').replace(']', ')') );
 //			sb.append(params);

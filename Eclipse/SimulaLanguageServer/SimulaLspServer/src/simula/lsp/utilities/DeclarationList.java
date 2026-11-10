@@ -46,7 +46,7 @@ public final class DeclarationList extends Vector<Declaration> {
 	/// @return the resulting Declaration
 	public Declaration find(Identifier identifier2) {
 		for(Declaration d:this)
-			if(d.identifier.equals(identifier2)) return(d);
+			if(Util.equals(d.identifier, identifier2)) return(d);
 		return(null);
 	}
 	

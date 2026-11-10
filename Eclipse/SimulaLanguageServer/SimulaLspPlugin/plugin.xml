@@ -114,6 +114,7 @@
 	</extension>
    
 
+   <!--                                                                           Project Nature -->
    <extension
          id="com.simula.server"
          name="Simula Language Server"

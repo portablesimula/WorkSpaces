@@ -188,7 +188,7 @@ public final class Parameter extends Declaration {
 		if (type != null)
 			type.doChecking(LspGlobal.getCurrentScope().declaredIn, this);
 		if (!legalTransmitionMode())
-			Util.semanticError(this, "Illegal transmission mode: " + mode + ' ' + kind + ' ' + identifierValue() + " by " + edMode(mode) + " is not allowed");
+			Util.semanticError(this, "Illegal transmission mode: " + edKind(kind) + ' ' + type + ' '	+ identifierValue() + " by " + edMode(mode) + " is not allowed");
 		SET_SEMANTICS_CHECKED();
 	}
 

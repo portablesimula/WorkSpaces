@@ -1,0 +1,15 @@
+begin
+	integer i=44;
+	integer x, y;
+	ref(C) rC;
+	
+	class C;;
+	procedure P(x); integer x;;
+	
+	i := 22;
+	C := 55;
+	P(4) := 66;
+	(x+y) := 22;
+	rC :- 99;
+
+end

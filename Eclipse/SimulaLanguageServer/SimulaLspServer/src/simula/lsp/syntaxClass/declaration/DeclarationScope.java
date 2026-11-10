@@ -360,7 +360,9 @@ public abstract class DeclarationScope extends Declaration  {
 	/// Debug utility: print DeclarationList.
 	/// @param indent the indentation.
 	protected void printDeclarationList(int indent) {
-		for(Declaration d:declarationList) d.printTree(indent);
+		for(Declaration d:declarationList) {
+			d.printTree(indent);
+		}
 		if(labelList != null) for(LabelDeclaration d:labelList.getDeclaredLabels()) d.printTree(indent);
 	}
 

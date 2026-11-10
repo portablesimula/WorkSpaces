@@ -105,7 +105,6 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) Util.println("BlockStatement expectMaybeBlock: BEGIN " + debugName);
 
 		simBuilder.consume(KeyWord.BEGIN); // consume BEGIN (add it to tokenList)
-
 		parseBlock(simBuilder);
 
 //		Util.println("MaybeBlockDeclaration.expectMaybeBlock: GOT END or EOF");
@@ -118,6 +117,7 @@ public final class MaybeBlockDeclaration extends BlockDeclaration {
 					moveLabelsFrom(this); // Label is also declaration
 			}
 		}
+
 		BlockStatement block = new BlockStatement(this, debugName);
 		if(Option.TRACE_ACCEPT_STATEMENT > 0) Util.println("MaybeBlockDeclaration.expectMaybeBlock: ENDOF " + debugName + "  " + block);
 		LspGlobal.setScope(declaredIn);

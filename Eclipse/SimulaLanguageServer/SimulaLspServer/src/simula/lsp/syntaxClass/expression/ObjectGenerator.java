@@ -113,7 +113,7 @@ public final class ObjectGenerator extends Expression {
 			Util.TRACE("BEGIN ObjectGenerator(" + classIdentifier + ").doChecking - Current Scope Chain: " + LspGlobal.getCurrentScope().edScopeChain());
 		meaning = LspGlobal.getCurrentScope().findMeaning(classIdentifier);
 		if (meaning.declaredAs instanceof UndefinedDeclaration) {
-			Util.semanticError(this, "Undefined class identifier: " + classIdentifier);
+			Util.semanticError(this, "Undefined class identifier: " + classIdentifier.value);
 //			meaning = new Meaning(null, null); // Error Recovery: No Meaning
 		}
 		if (!(meaning.declaredAs instanceof ClassDeclaration)) {
@@ -254,7 +254,7 @@ public final class ObjectGenerator extends Expression {
 
 	@Override
 	public String toString() {
-		return (("NEW " + classIdentifier + params).replace('[', '(').replace(']', ')'));
+		return (("NEW " + classIdentifier.value + params).replace('[', '(').replace(']', ')'));
 	}
 	
 	// ***********************************************************************************************

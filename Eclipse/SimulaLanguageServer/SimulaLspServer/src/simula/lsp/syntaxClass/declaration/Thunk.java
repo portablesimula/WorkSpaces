@@ -92,7 +92,7 @@ public final class Thunk extends DeclarationScope {
 		//  }	
 		Thunk thunk = new Thunk(simCoder, kind, expr);
 		try { thunk.createJavaClassFile(simCoder); } catch (IOException e) { e.printStackTrace(); }
-		ClassDesc CD_THUNK=thunk.getClassDesc();
+		ClassDesc CD_THUNK = thunk.getClassDesc();
 		codeBuilder
 			.new_(CD_THUNK)
 			.dup()
@@ -119,8 +119,8 @@ public final class Thunk extends DeclarationScope {
 							codeBuilder -> buildConstructor(codeBuilder))
 						.withMethodBody("get", MethodTypeDesc.ofDescriptor("()Ljava/lang/Object;"), ClassFile.ACC_PUBLIC,
 							codeBuilder -> buildMethod_get(simCoder, codeBuilder));
-				    VariableExpression writeableVariable=expr.getWriteableVariable();
-				    if(writeableVariable!=null) {
+				    VariableExpression writeableVariable = expr.getWriteableVariable();
+				    if(writeableVariable != null) {
 				    	Declaration declaredAs = writeableVariable.meaning.declaredAs;
 				    	switch(declaredAs.declarationKind) {
 		    				case ObjectKind.ArrayDeclaration -> writeableVariable = null; // OK 
@@ -134,8 +134,8 @@ public final class Thunk extends DeclarationScope {
 				    		default -> Util.IERR(ObjectKind.edit(declaredAs.declarationKind));
 				    	}
 				    }
-				    if(writeableVariable!=null) {
-				    	String MTD_put=null;
+				    if(writeableVariable != null) {
+				    	String MTD_put = null;
 				    	if(expr.type != null) {
 				    		switch(expr.type.keyWord) {
 								case Type.T_INTEGER   -> MTD_put = "(Ljava/lang/Integer;)Ljava/lang/Integer;";
@@ -145,13 +145,13 @@ public final class Thunk extends DeclarationScope {
 					    		case Type.T_CHARACTER -> MTD_put = "(Ljava/lang/Character;)Ljava/lang/Character;";
 					    		case Type.T_LABEL     -> MTD_put = "(Lsimula/runtime/RTS_LABEL;)Lsimula/runtime/RTS_LABEL;";
 					    		case Type.T_TEXT, Type.T_REF -> {
-					    			String CDS=expr.type.toClassDesc().descriptorString();
+					    			String CDS = expr.type.toClassDesc().descriptorString();
 					    			MTD_put = "("+CDS+')'+CDS;
 					    		}
 					    		default -> Util.IERR();
 				    		}
 				    	
-				    		Expression beforeDot=(expr instanceof RemoteVariable rem)?rem.obj:null;
+				    		Expression beforeDot = (expr instanceof RemoteVariable rem)?rem.obj:null;
 				    		classBuilder
 				    			.withMethodBody("put", MethodTypeDesc.ofDescriptor(MTD_put), ClassFile.ACC_PUBLIC,
 				    				codeBuilder -> buildMethod_put(simCoder, codeBuilder,beforeDot,expr))
@@ -210,7 +210,7 @@ public final class Thunk extends DeclarationScope {
 				.labelBinding(begScope)
 				.localVariable(0,"this",CD_ThisClass,begScope,endScope);
 
-			if(kind==0) {
+			if(kind == 0) {
 				expr.buildEvaluation(simCoder, null, codeBuilder);
 				expr.type.buildObjectValueOf(codeBuilder);
 			} else {
@@ -244,9 +244,9 @@ public final class Thunk extends DeclarationScope {
 	/// @param beforeDot expression.
 	/// @param expr the Thunk expression.
 	void buildMethod_put(final SimulaCoder simCoder, final CodeBuilder codeBuilder, final Expression beforeDot, final Expression expr) {
-		ConstantPoolBuilder pool=codeBuilder.constantPool();
-		VariableExpression writeableVariable=expr.getWriteableVariable();
-		Meaning meaning=writeableVariable.meaning;
+		ConstantPoolBuilder pool = codeBuilder.constantPool();
+		VariableExpression writeableVariable = expr.getWriteableVariable();
+		Meaning meaning = writeableVariable.meaning;
 		Declaration declaredAs = meaning.declaredAs;
 		LspGlobal.enterScope(this);
 			Label begScope = codeBuilder.newLabel();
@@ -293,11 +293,11 @@ public final class Thunk extends DeclarationScope {
 				else Util.IERR();
 			}
 				
-			String ident=null;
-			if(declaredAs instanceof SimpleVariableDeclaration var) ident=var.getFieldIdentifier();
-			else if(declaredAs instanceof Parameter par)            ident=par.getFieldIdentifier();
-			else if(declaredAs instanceof ArrayDeclaration arr)     ident=arr.identifierValue();
-			else if(declaredAs instanceof ProcedureDeclaration pro) ident=pro.identifierValue();
+			String ident = null;
+			if(declaredAs instanceof SimpleVariableDeclaration var) ident = var.getFieldIdentifier();
+			else if(declaredAs instanceof Parameter par)            ident = par.getFieldIdentifier();
+			else if(declaredAs instanceof ArrayDeclaration arr)     ident = arr.identifierValue();
+			else if(declaredAs instanceof ProcedureDeclaration pro) ident = pro.identifierValue();
 			else Util.IERR();
 
 			if(nameParameter != null) {
@@ -367,9 +367,9 @@ public final class Thunk extends DeclarationScope {
 					.checkcast(RTS.CD.RTS_LABEL)
 					.invokevirtual(owner, "put", MethodTypeDesc.ofDescriptor("(Lsimula/runtime/RTS_LABEL;)Lsimula/runtime/RTS_LABEL;"));
 			case Type.T_TEXT, Type.T_REF -> {
-				ClassDesc CD=expr.type.toClassDesc();
-				String CDS=CD.descriptorString();
-				MethodTypeDesc MTD_put=MethodTypeDesc.ofDescriptor("("+CDS+')'+CDS);
+				ClassDesc CD = expr.type.toClassDesc();
+				String CDS = CD.descriptorString();
+				MethodTypeDesc MTD_put = MethodTypeDesc.ofDescriptor("("+CDS+')'+CDS);
 				codeBuilder
 					.checkcast(CD)
 					.invokevirtual(owner, "put", MTD_put);
@@ -395,13 +395,13 @@ public final class Thunk extends DeclarationScope {
 //        7: checkcast     #15                 // class simulaTestPrograms/adHoc000
 //       10: ldc           #17                 // class simulaTestPrograms/adHoc000_SWITCH1
 //       12: invokespecial #19                 // Method simula/runtime/RTS_PRCQNT."<init>":(Lsimula/runtime/RTS_RTObject;Ljava/lang/Class;)V
-		ConstantPoolBuilder pool=codeBuilder.constantPool();
+		ConstantPoolBuilder pool = codeBuilder.constantPool();
 	    if (apar instanceof VariableExpression var) {
     		Meaning meaning = var.meaning;
-			Declaration decl=meaning.declaredAs;
+			Declaration decl = meaning.declaredAs;
 	    	String procIdent = decl.getJavaIdentifier();
 			if (decl instanceof Parameter par) {
-				DeclarationScope curScope=LspGlobal.getCurrentScope();
+				DeclarationScope curScope = LspGlobal.getCurrentScope();
 				// The current scope. In case of Thunk one level up to Thunk.ENV
 				if(curScope instanceof Thunk) curScope = curScope.declaredIn;
 				ClassDesc CD_ENV = RTS.CD.classDesc(curScope.externalIdent);
@@ -415,7 +415,7 @@ public final class Thunk extends DeclarationScope {
 					codeBuilder.checkcast(RTS.CD.RTS_PRCQNT);
 				}
 			} else if (decl instanceof ProcedureDeclaration procedure) {
-				if(procedure.myVirtual!=null) {
+				if(procedure.myVirtual != null) {
     	    		boolean withFollowSL = meaning.declaredIn.buildCTX(codeBuilder);
     	    		if(withFollowSL) codeBuilder.checkcast(meaning.declaredIn.getClassDesc());
 
@@ -437,7 +437,7 @@ public final class Thunk extends DeclarationScope {
 	    } else if (apar instanceof RemoteVariable rem) {
 			Meaning meaning = rem.var.meaning;
 			if (meaning.declaredAs instanceof ProcedureDeclaration procedure) {
-    	    	if(procedure.myVirtual!=null) {
+    	    	if(procedure.myVirtual != null) {
 					rem.obj.buildEvaluation(simCoder, null, codeBuilder);
 					
 			    	ClassDesc owner = meaning.declaredIn.getClassDesc();

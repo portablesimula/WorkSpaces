@@ -24,7 +24,9 @@ import simula.lsp.syntaxClass.expression.Expression;
 import simula.lsp.syntaxClass.expression.MissingExpression;
 import simula.lsp.syntaxClass.expression.VariableExpression;
 import simula.lsp.utilities.LspGlobal;
+import simula.lsp.utilities.Meaning;
 import simula.lsp.utilities.ObjectKind;
+import simula.lsp.utilities.Option;
 import simula.lsp.utilities.RTS;
 import simula.lsp.utilities.Util;
 
@@ -63,6 +65,11 @@ public class Type extends SyntaxElement {
 	
 	/// The Class Identifier in case of ref(classIdent)
 	public Identifier classIdent;
+	
+	public String classIdentValue() {
+		if(classIdent == null) return "";
+		return classIdent.value;
+	}
 	
 	/// Qual in case of ref(Qual) type. Set by doChecking
 	protected ClassDeclaration qual;   // Qual in case of ref(Qual) type; Set by doChecking below
@@ -227,12 +234,14 @@ public class Type extends SyntaxElement {
 //			    else Util.generalError("Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class");
 //			    else Util.semanticError(scope, "Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class");
 			    else {
-			    	String err = "Illegal Type: " + this.toString()+" - " + refIdent.value + " is not a Class, rather "
-			    			+ decl.getClass().getSimpleName() + " declared at line: " + decl.sourceLineNumber();
+			    	String err = "Illegal Type: " + this.toString()+" - " + refIdent.value + " is not a Class";
+			    	if(decl instanceof UndefinedDeclaration)
+			    		 err = err + ", " + refIdent.value + " is undefined";
+			    	else err = err + ", rather " + decl.getClass().getSimpleName() + " declared at line: " + decl.sourceLineNumber();
 //			    	if(elt != null)
 //			    		Util.semanticError(elt, err);
 //			    	else Util.generalError(err);
-			    	Util.semanticError(elt, err);
+			    	Util.semanticError(this, err);
 			    }
 //				Util.println("Type.doChecking: refIdent="+refIdent.value+", qual="+qual);
 			}
@@ -321,9 +330,11 @@ public class Type extends SyntaxElement {
 	    else if(to.keyWord == T_UNDEF) result=ConversionKind.DirectAssignable;
 	    else if(this.equals(to)) result=ConversionKind.DirectAssignable;
 	    else if(this.isArithmeticType()&&to.isArithmeticType()) result=ConversionKind.ConvertValue;
+	    else if(to instanceof OverLoad types && types.contains(this)) result=ConversionKind.DirectAssignable;
 	    else if(this.isSubReferenceOf(to)) result=ConversionKind.DirectAssignable;  
 	    else if(to.isSubReferenceOf(this)) result=ConversionKind.ConvertRef; // Needs Runtime-Check
 	    else result=ConversionKind.Illegal;
+//		Util.println("Type.isConvertableTo: thisType="+this+", toType="+to+" ==> " + result);
 	    return(result); 
     }
   
@@ -336,17 +347,29 @@ public class Type extends SyntaxElement {
     /// @param other the other type
     /// @return true if the condition holds
 	public boolean isSubReferenceOf(final Type other) {
-		Identifier thisRef=this.getRefIdent();   // May be null for NONE
-		Identifier otherRef=other.getRefIdent(); // May be null for NONE
+		if(! this.isRefClassType()) {
+//			Util.println("Type.isSubReferenceOf: thisType="+this+", otherType="+other+" ==> FALSE(1)");
+			return false;
+		}
+		if(! other.isRefClassType()) {
+//			Util.println("Type.isSubReferenceOf: thisType="+this+", otherType="+other+" ==> FALSE(2)");
+			return false;
+		}
+		Identifier thisRef=this.getRefIdent();  // May be null for NONE
+		Identifier othrRef=other.getRefIdent(); // May be null for NONE
 		boolean result;		
-		if(otherRef==null) result=false;     // No ref is a super-reference of NONE
+		if(othrRef==null) result=false;     // No ref is a super-reference of NONE
 		else if(thisRef==null) result=true;  // Any ref is a sub-reference of NONE
 		else {
-			ClassDeclaration thisDecl=(ClassDeclaration)LspGlobal.getCurrentScope().findMeaning(thisRef).declaredAs;
-			ClassDeclaration otherDecl=(ClassDeclaration)LspGlobal.getCurrentScope().findMeaning(otherRef).declaredAs;
+//			ClassDeclaration thisDecl=(ClassDeclaration)LspGlobal.getCurrentScope().findMeaning(thisRef).declaredAs;
+//			ClassDeclaration otherDecl=(ClassDeclaration)LspGlobal.getCurrentScope().findMeaning(otherRef).declaredAs;
+			ClassDeclaration thisDecl = ClassDeclaration.findClassDeclaration(thisRef);
+			ClassDeclaration othrDecl = ClassDeclaration.findClassDeclaration(othrRef);
 			if(thisDecl==null) result=false; // Error Recovery
-			else result=thisDecl.isSubClassOf(otherDecl);
+			else if(othrDecl==null) result=false; // Error Recovery
+			else result=thisDecl.isSubClassOf(othrDecl);
 		}
+//		Util.println("Type.isSubReferenceOf: thisType="+this+", otherType="+other+" ==> " + result);
 		return(result); 
 	}
   
@@ -720,9 +743,9 @@ public class Type extends SyntaxElement {
 			case T_LABEL:		return "Label";
 			case T_REF:
 				if(declaredIn==null) {
-					return("ref("+classIdent.value+')');
+					return("ref("+classIdentValue()+')');
 				}
-				return("ref("+classIdent+") declared in "+declaredIn.identifier.value);
+				return("ref("+classIdent+")");
 		}
 		return "UNKNOWN";
 	}

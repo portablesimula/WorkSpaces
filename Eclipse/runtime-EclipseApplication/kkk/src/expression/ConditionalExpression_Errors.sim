@@ -1,0 +1,8 @@
+begin
+	integer i;
+	character c;
+	boolean b;
+	real r;
+	i := if c then j else r;
+	i := if b then c else r;
+end

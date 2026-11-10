@@ -1,0 +1,16 @@
+begin
+
+	class A; virtual: procedure P; begin
+		integer procedure P; begin
+		end;
+	end;
+
+	class B; virtual: procedure Q is procedure Q(x); integer x;; begin
+		procedure Q(x, y); integer x, y;;
+	end;
+
+	class C; virtual: procedure R is procedure R(x, y); integer x, y;; begin
+		procedure R(x, y); integer x; text y;;
+	end;
+
+end

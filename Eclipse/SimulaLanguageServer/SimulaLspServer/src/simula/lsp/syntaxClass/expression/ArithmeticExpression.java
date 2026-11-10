@@ -174,8 +174,8 @@ public final class ArithmeticExpression extends Expression {
 				this.type = Type.arithmeticTypeConversion(type1, type2);
 				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
 				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);
-//				if (this.type == null)
-//					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
+				if (this.type == null)
+					Util.semanticError(this, "Incompatible types in binary operation: " + toString() + " -- " + type1 + " incompatible with " + type2);
 			}
 			case KeyWord.DIV -> { // Real Division
 				// The operator / denotes real division.
@@ -190,14 +190,16 @@ public final class ArithmeticExpression extends Expression {
 					this.type = Type.Real;
 				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
 				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);
-//				if (this.type == null)
-//					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
+				if (this.type == null)
+					Util.semanticError(this, "Incompatible types in binary operation: " + toString() + " -- " + type1 + " incompatible with " + type2);
 			}
 			case KeyWord.INTDIV -> { // Integer Division
 				lhs.doChecking();
 				rhs.doChecking();
-				if ((lhs.type.keyWord != Type.T_INTEGER) || (rhs.type.keyWord != Type.T_INTEGER))
-					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
+				Type type1 = lhs.type;
+				Type type2 = rhs.type;
+				if ((type1.keyWord != Type.T_INTEGER) || (type2.keyWord != Type.T_INTEGER))
+					Util.semanticError(this, "Incompatible types in Integer Division: " + toString() + " -- " + type1 + " incompatible with " + type2);
 				this.type = Type.Integer;
 				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
 				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);

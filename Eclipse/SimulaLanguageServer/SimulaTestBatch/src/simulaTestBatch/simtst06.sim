@@ -49,7 +49,7 @@ begin
           outtext (" *** rel. error= ");
           outreal (diff, 16, 23);
           outimage;
-          realdiff:=  true;
+          realdiff :=  true;
        end
     end of procedure realdiff;
 

@@ -1,0 +1,8 @@
+begin
+	integer i;
+	real r;
+	text t;
+	i := i + t;
+	i := r // i;
+	r := r ** t;
+end

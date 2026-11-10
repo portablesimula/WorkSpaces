@@ -89,29 +89,25 @@ public abstract class Declaration extends SyntaxElement {
 
 	/// Check if a declaration with this identifier is already defined.
 	protected void checkAlreadyDefined() {
+		int lno = 0;
 		boolean error = false;
 		boolean warning = false;
-		if (identifier == null)
-			return;
-		if (identifier.equals("_RESULT"))
-			return;
-		if (declaredIn == null)
-			return;
-		if (declaredIn instanceof StandardClass)
-			return;
-		if (declaredIn instanceof StandardProcedure)
-			return;
+		if (identifier == null)						 return;
+		if (identifier.equals("_RESULT"))			 return;
+		if (declaredIn == null)						 return;
+		if (declaredIn instanceof StandardClass)	 return;
+		if (declaredIn instanceof StandardProcedure) return;
 		Vector<Parameter> parameterList;
 		if (declaredIn instanceof ProcedureDeclaration proc)
-			parameterList = proc.parameterList;
+			 parameterList = proc.parameterList;
 		else if (declaredIn instanceof ClassDeclaration cls)
-			parameterList = cls.parameterList;
-		else
-			parameterList = null; // No parameters
+			 parameterList = cls.parameterList;
+		else parameterList = null; // No parameters
 
 		if (parameterList != null) {
 			for (Declaration decl : parameterList)
 				if (Util.equals(decl.identifier, identifier)) {
+					lno = decl.sourceLineNumber();
 					warning = true;
 					break;
 				}
@@ -122,15 +118,15 @@ public abstract class Declaration extends SyntaxElement {
 			if (decl.identifier == null)
 				return; // Error recovery
 			if (Util.equals(decl.identifier, identifier)) {
+				lno = decl.sourceLineNumber();
 				error = true;
 				break LOOP;
 			}
 		}
 //		Util.println("Declaration.checkAlreadyDefined: " + this.getClass().getSimpleName());
-		if (error)
-			Util.syntaxError(this, identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
-		else if (warning)
-			Util.warning(this, identifierValue() + " is alrerady defined in " + declaredIn.identifierValue());
+		String msg = identifierValue() + " is alrerady defined at line " + lno + " in " + declaredIn.identifierValue();
+		if (error) Util.syntaxError(this, msg);
+		else if (warning) Util.warning(this, msg);
 	}
 
 	/// Parse a declaration and add it to the given declaration list.

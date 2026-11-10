@@ -13,11 +13,11 @@ public class LOG {
 	public static void error(String message) {
 		if(LspGlobal.INLINE_CONNECTED) {
 			System.err.println(message);
-			Thread.dumpStack();
+//			Thread.dumpStack();
 		} else if(LspGlobal.debugConsole != null) {
 			LspGlobal.debugConsole.writeError(message+"\n");
 			PrintStream prt = LspGlobal.debugConsole.getOutputStream();
-	        new Exception("LOG: Stack trace: ").printStackTrace(prt);
+//	        new Exception("LOG: Stack trace: ").printStackTrace(prt);
 		} else if(SimulaLanguageServer.languageClient != null) {
 			MessageParams params = new MessageParams(MessageType.Error, message);
 			SimulaLanguageServer.languageClient.logMessage(params);

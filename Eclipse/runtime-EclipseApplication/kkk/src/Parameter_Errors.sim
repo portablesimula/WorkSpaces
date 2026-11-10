@@ -1,0 +1,7 @@
+begin
+	class C(rA,y); value rA; ref(C) array rA; begin
+	end;
+	
+	procedure P(x); value x; ref(C) x; begin
+	end;
+end

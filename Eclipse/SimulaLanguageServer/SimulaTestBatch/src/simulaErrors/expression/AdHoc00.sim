@@ -1,0 +1,5 @@
+begin
+	procedure P(x); integer x;;
+	
+	P(4) := 66;
+end

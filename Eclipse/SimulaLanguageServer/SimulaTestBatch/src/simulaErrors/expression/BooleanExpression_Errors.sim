@@ -1,0 +1,6 @@
+begin
+	integer i;
+	boolean b;
+	i := i + b;
+	b := b and i;
+end

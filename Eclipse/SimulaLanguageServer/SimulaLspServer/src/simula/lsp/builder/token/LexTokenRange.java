@@ -6,6 +6,7 @@ import org.eclipse.lsp4j.Range;
 import simula.lsp.DocumentManager;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.coder.SimulaCoder;
+import simula.lsp.utilities.Util;
 
 public class LexTokenRange {
 	
@@ -78,6 +79,11 @@ public class LexTokenRange {
 	public int lastLineNumber() {
 		if(lastParserToken == null) return 0;
 		return lastParserToken.lastLineNumber();			
+	}
+	
+	@Override
+	public String toString() {
+		return Util.edRange(getLexRange());
 	}
 
 }

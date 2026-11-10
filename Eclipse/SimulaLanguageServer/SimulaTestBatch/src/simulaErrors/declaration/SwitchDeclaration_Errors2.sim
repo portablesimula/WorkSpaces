@@ -1,0 +1,5 @@
+begin
+	switch cases := L1, L2, L3;
+	
+	L3:
+end

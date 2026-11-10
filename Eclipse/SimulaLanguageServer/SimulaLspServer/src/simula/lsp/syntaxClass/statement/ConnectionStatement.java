@@ -19,6 +19,7 @@ import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.Identifier;
 import simula.lsp.builder.token.LexToken;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.Type;
 import simula.lsp.syntaxClass.declaration.BlockDeclaration;
@@ -159,6 +160,7 @@ public final class ConnectionStatement extends Statement {
 		if (Parse.accept(simBuilder, KeyWord.DO)) {
 			hasDoPart = true;
 			ConnectionBlock connectionBlock = new ConnectionBlock(stm.inspectedVariable, null);
+			connectionBlock.tokenRange = new LexTokenRange(simBuilder.getPrevParserToken());
 			DeclarationScope prevScope = LspGlobal.getCurrentScope();
 			LspGlobal.setScope(connectionBlock);
 			Statement statement = Statement.acceptStatement(simBuilder);
@@ -174,6 +176,7 @@ public final class ConnectionStatement extends Statement {
 				LexToken lastParserToken = simBuilder.getCurrentParserToken();
 				
 				ConnectionBlock connectionBlock = new ConnectionBlock(stm.inspectedVariable, classIdentifier);
+				connectionBlock.tokenRange = new LexTokenRange(simBuilder.getPrevParserToken());
 				hasWhenPart = true;
 				Statement statement = Statement.acceptStatement(simBuilder);
 				ConnectionWhenPart whenPart = new ConnectionWhenPart(stm,classIdentifier, connectionBlock, statement);

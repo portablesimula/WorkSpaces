@@ -1,9 +1,0 @@
-begin 
-	integer a,b,fc=44; 
-	ref(C) nn;
-	class C(x); ref(C) x; hidden protected yy;
-	begin
-		integer yy;
-	   nn.x :- new C(none);
-	end;
-end;

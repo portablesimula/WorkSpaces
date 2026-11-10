@@ -76,6 +76,7 @@ public final class RemoteVariable extends Expression {
 	RemoteVariable(final Expression obj, final VariableExpression var) {
 		this.obj = obj;
 		this.var = var;
+		this.tokenRange = var.tokenRange;
 		obj.backLink = var.backLink = this;
 	}
 

@@ -78,6 +78,7 @@ public final class QualifiedObject extends Expression {
 	QualifiedObject(final Expression lhs, final Identifier classIdentifier) {
 		this.lhs = lhs;
 		this.classIdentifier = classIdentifier;
+		this.tokenRange = lhs.tokenRange;
 		lhs.backLink = this;
 	}
 
@@ -95,6 +96,7 @@ public final class QualifiedObject extends Expression {
 		if (!checkCompatibility(lhs, classIdentifier))
 			Util.semanticError(this, "Illegal Object Expression: " + lhs + " is not compatible with " + classIdentifier);
 		this.type = new Type(classIdentifier);
+		this.type.tokenRange = this.tokenRange;
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("END QualifiedObject" + toString() + ".doChecking - Result type=" + this.type);
 		SET_SEMANTICS_CHECKED();
@@ -122,7 +124,7 @@ public final class QualifiedObject extends Expression {
 
 	@Override
 	public String toString() {
-		return ("(" + lhs + " QUA " + classIdentifier + ")");
+		return ("(" + lhs + " QUA " + classIdentifier.value + ")");
 	}
 
 	// ***********************************************************************************************

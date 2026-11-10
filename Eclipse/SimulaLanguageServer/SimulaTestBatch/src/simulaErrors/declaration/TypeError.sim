@@ -1,0 +1,6 @@
+begin
+	integer C;
+	ref(C) x;
+	ref(D) y;
+	ref(E) z;
+end;

@@ -188,7 +188,7 @@ public class SimulaBuilder {
 //			Thread.dumpStack();
 //			throw new RuntimeException(msg);
 		}
-
+//		this.printSyntaxTree("SimulaBuilder.doChecking: DONE: ");
 	}
 
 
@@ -338,7 +338,10 @@ public class SimulaBuilder {
 //	}
 	
 	public void printSyntaxTree(String title) {
+		Option.internal.PRINT_SYNTAX_TREE = 3;
 		Util.println("======================================== BEGIN SYNTAX TREE: " + title + " ============================ ");
+		Util.println("SSimulaBuilder.printSyntaxTree: syntaxTree: " + syntaxTree.getClass().getSimpleName() + "  " + syntaxTree.getIdentifier());
+		Util.println("SSimulaBuilder.printSyntaxTree: syntaxTree: " + syntaxTree.mainModule.getClass().getSimpleName() + "  " + syntaxTree.mainModule.identifierValue());
 //		if(syntaxTree.mainModule != null) syntaxTree.print(0);
 		if(syntaxTree.mainModule != null) syntaxTree.printTree(0);
 		Util.println("======================================== ENDOF SYNTAX TREE: " + title + " ============================ ");
