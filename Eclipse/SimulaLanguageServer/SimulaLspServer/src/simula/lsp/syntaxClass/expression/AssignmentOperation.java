@@ -12,6 +12,7 @@ import java.lang.classfile.constantpool.FieldRefEntry;
 
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
+import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.SyntaxElement;
 import simula.lsp.syntaxClass.Type;
@@ -65,16 +66,17 @@ public final class AssignmentOperation extends Expression {
 	/// @param opr the operation
 	/// @param rhs the right hand side
 	public AssignmentOperation(final Expression lhs, final int opr, final Expression rhs) {
+		SimulaBuilder simBuilder = getSimBuilder();
 		this.lhs = lhs;
 		this.opr = opr;
 		this.rhs = rhs;
 		if (this.lhs == null) {
 			Util.syntaxError(this, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression();
+			this.lhs = new MissingExpression(simBuilder);
 		}
 		if (this.rhs == null) {
 			Util.syntaxError(this, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression();
+			this.rhs = new MissingExpression(simBuilder);
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}

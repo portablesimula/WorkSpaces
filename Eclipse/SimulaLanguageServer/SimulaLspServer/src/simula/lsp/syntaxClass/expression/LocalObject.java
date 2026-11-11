@@ -130,7 +130,7 @@ public final class LocalObject extends Expression {
 			}
 			thisScope=thisScope.declaredIn;
 		}
-		Util.semanticError(this, "This "+classIdentifier+" -- Is not on static chain.");
+		Util.semanticError(this, "This " + classIdentifier.value + " -- Is not on static chain.");
 	}
 
 	// Returns true if this expression may be used as a statement.
@@ -171,7 +171,7 @@ public final class LocalObject extends Expression {
 
 	@Override
 	public String toString() {
-		return ("THIS " + classIdentifier);
+		return ("THIS " + classIdentifier.value);
 	}
 
 	// ***********************************************************************************************

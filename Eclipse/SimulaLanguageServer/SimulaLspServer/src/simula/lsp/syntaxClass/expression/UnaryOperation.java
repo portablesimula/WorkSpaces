@@ -47,10 +47,11 @@ public final class UnaryOperation extends Expression {
 	/// @param oprator the unary operator.
 	/// @param operand the operand Expression
 	private UnaryOperation(final int oprator,final Expression operand) {
+		SimulaBuilder simBuilder = getSimBuilder();
 		this.oprator = oprator; this.operand = operand;
 		if(this.operand==null) {
 			Util.syntaxError(this, "Missing operand after unary "+KeyWord.edit(oprator));
-			this.operand=new MissingExpression();
+			this.operand=new MissingExpression(simBuilder);
 		}
 		this.operand.backLink=this;
 	}

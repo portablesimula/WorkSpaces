@@ -94,7 +94,7 @@ public final class QualifiedObject extends Expression {
 
 		lhs.doChecking();
 		if (!checkCompatibility(lhs, classIdentifier))
-			Util.semanticError(this, "Illegal Object Expression: " + lhs + " is not compatible with " + classIdentifier);
+			Util.semanticError(this, "Illegal Object Expression: " + lhs + " is not compatible with " + classIdentifier.value);
 		this.type = new Type(classIdentifier);
 		this.type.tokenRange = this.tokenRange;
 		if (Option.internal.TRACE_CHECKER)

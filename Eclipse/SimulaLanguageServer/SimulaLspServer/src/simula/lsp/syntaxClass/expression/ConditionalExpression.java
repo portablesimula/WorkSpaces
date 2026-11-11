@@ -65,7 +65,7 @@ public final class ConditionalExpression extends Expression {
 		condition.doChecking();
 		condition.backLink=this; // To ensure _RESULT from functions
 		if(! Type.checkType(condition, Type.T_BOOLEAN)) {
-			Util.semanticError(this, "ConditionalExpression: Condition is not a boolean (rather " + condition.type + ")");
+			Util.semanticError(condition, "ConditionalExpression: Condition is not a boolean (rather " + condition.type + ")");
 		}
 		thenExpression.doChecking();
 		elseExpression.doChecking();

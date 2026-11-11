@@ -125,11 +125,11 @@ public final class BooleanExpression extends Expression {
 		this.lhs = lhs; this.opr = opr; this.rhs = rhs;
 		if (this.lhs == null) {
 			Util.syntaxError(simBuilder, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression();
+			this.lhs = new MissingExpression(simBuilder);
 		}
 		if (this.rhs == null) {
 			Util.syntaxError(simBuilder, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression();
+			this.rhs = new MissingExpression(simBuilder);
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}

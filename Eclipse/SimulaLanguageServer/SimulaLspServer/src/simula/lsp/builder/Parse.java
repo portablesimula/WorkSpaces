@@ -197,7 +197,7 @@ public class Parse {
 
 	/// Skip misplaced current symbol.
 	public static void skipMisplacedCurrentSymbol(final SimulaBuilder simBuilder) {
-		Util.syntaxError(simBuilder, "Misplaced symbol: "+Parse.getCurrentParserToken(simBuilder)+" -- Ignored");
+		Util.syntaxError(simBuilder, "Misplaced symbol: " + Parse.getCurrentParserToken(simBuilder).edText() + " -- Ignored");
 		nextToken(simBuilder);
 	}
 	

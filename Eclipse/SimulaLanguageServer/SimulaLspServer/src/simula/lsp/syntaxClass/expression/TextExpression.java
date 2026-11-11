@@ -10,6 +10,8 @@ import java.lang.classfile.CodeBuilder;
 
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
+import simula.lsp.builder.SimulaBuilder;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.SyntaxElement;
 import simula.lsp.syntaxClass.Type;
@@ -95,17 +97,22 @@ public final class TextExpression extends Expression {
 	/// Create a new TextExpression
 	/// @param lhs left hand side
 	/// @param rhs rigth hand side
-	TextExpression(final Expression lhs, final Expression rhs) {
+	TextExpression(final SimulaBuilder simBuilder, final Expression lhs, final Expression rhs) {
 		this.lhs = lhs; this.rhs = rhs;
 		if (this.lhs == null) {
-			Util.syntaxError(this, "Missing operand before &");
-			this.lhs = new MissingExpression();
+			this.lhs = new MissingExpression(simBuilder);
+			Util.syntaxError(this.lhs, "Missing operand before &");
 		}
 		if (this.rhs == null) {
-			Util.syntaxError(this, "Missing operand after &");
-			this.rhs = new MissingExpression();
+			this.rhs = new MissingExpression(simBuilder);
+			Util.syntaxError(this.rhs, "Missing operand after &");
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
+		this.tokenRange = new LexTokenRange(this.lhs.getFirstParserToken(), this.rhs.getLastParserToken());
+		
+//		Util.println("NEW TextExpression: tokenRange="+tokenRange);
+//		Util.println("NEW TextExpression: simBuilder="+tokenRange.getSimBuilder());
+//		Util.println("NEW TextExpression: this.lhs="+this.lhs.getClass().getSimpleName()+"  "+this.lhs);
 	}
 
 	@Override

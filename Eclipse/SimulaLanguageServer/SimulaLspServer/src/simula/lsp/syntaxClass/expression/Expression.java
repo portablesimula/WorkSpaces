@@ -105,22 +105,38 @@ public abstract class Expression extends SyntaxElement {
 //		super(documentManager);
 //	}
 
-	/// Accept expression.
+	/// Expect expression.
 	/// <pre>
 	/// Expression  =  SimpleExpression
 	/// 	        |  IF  BooleanExpression  THEN  SimpleExpression  ELSE  Expression
 	/// </pre>
 	/// 
-	/// @return Expression or null if no expression is found.
-	public static Expression acceptExpression(SimulaBuilder simBuilder) {
-//		Util.println("Expression.acceptExpression: current: " + simBuilder.getCurrentParserToken());
+	/// @return Expression or MissingExpression if no expression is found.
+	public static Expression REMOVED_expectExpression(SimulaBuilder simBuilder) {
+//		Util.println("Expression.expectExpression: current: " + simBuilder.getCurrentParserToken());
+		Expression expr = acceptExpression(simBuilder);
+		if(expr != null) return expr;
+		return new MissingExpression(simBuilder);
+	}
+
+		/// Accept expression.
+		/// <pre>
+		/// Expression  =  SimpleExpression
+		/// 	        |  IF  BooleanExpression  THEN  SimpleExpression  ELSE  Expression
+		/// </pre>
+		/// 
+		/// @return Expression or null if no expression is found.
+		public static Expression acceptExpression(SimulaBuilder simBuilder) {
+//			Util.println("Expression.acceptExpression: current: " + simBuilder.getCurrentParserToken());
 		if(Parse.accept(simBuilder, KeyWord.IF)) {
 			LexTokenRange tokenRange = new LexTokenRange(simBuilder.getPrevParserToken());
 			Expression condition=acceptExpression(simBuilder);
 			Parse.expect(simBuilder, KeyWord.THEN);
-				Expression thenExpression=acceptSimpleExpression(simBuilder);
+//				Expression thenExpression=acceptSimpleExpression(simBuilder);
+				Expression thenExpression=expectSimpleExpression(simBuilder, "then");
 			Parse.expect(simBuilder, KeyWord.ELSE);
-				Expression elseExpression=acceptExpression(simBuilder);
+//				Expression elseExpression=acceptExpression(simBuilder);
+				Expression elseExpression = expectExpression(simBuilder, "else");
 			Expression expr=new ConditionalExpression(Type.Boolean, condition, thenExpression, elseExpression);
 			tokenRange.lastParserToken = simBuilder.getPrevParserToken();
 			expr.tokenRange = tokenRange;
@@ -152,7 +168,7 @@ public abstract class Expression extends SyntaxElement {
 		Expression expr=acceptExpression(simBuilder);
 		if(expr==null) {
 //			Util.syntaxError(simBuilder, "Expecting Expression");
-			expr = new MissingExpression();
+			expr = new MissingExpression(simBuilder);
 			Util.semanticError(expr, "Expecting " + kind + " Expression");
 		}
 //		Util.println("Expression.expectExpression: END: expr="+expr);
@@ -179,6 +195,14 @@ public abstract class Expression extends SyntaxElement {
 	/// </pre>             
 	///        
 	/// @return Expression or null if no expression is found.
+	private static Expression expectSimpleExpression(SimulaBuilder simBuilder, String kind)  { 
+		Expression expr = acceptSimpleExpression(simBuilder);
+		if(expr == null) {
+			expr = new MissingExpression(simBuilder);
+			Util.semanticError(expr, "Expecting simple " + kind + " Expression");
+		}
+		return expr;
+	}
 	private static Expression acceptSimpleExpression(SimulaBuilder simBuilder)  { 
 		Expression expr = acceptANDTHEN(simBuilder);
 		while(Parse.accept_OR_ELSE(simBuilder)) {
@@ -275,7 +299,7 @@ public abstract class Expression extends SyntaxElement {
 	private static Expression acceptTEXTCONC(SimulaBuilder simBuilder) {
 		Expression expr=acceptRelation(simBuilder);
 		while(Parse.accept(simBuilder, KeyWord.AMPERSAND)) {
-			expr=new TextExpression(expr, acceptRelation(simBuilder));
+			expr=new TextExpression(simBuilder, expr, acceptRelation(simBuilder));
 		}
 		return(expr);
 	}
@@ -383,6 +407,7 @@ public abstract class Expression extends SyntaxElement {
 		// Merk: Alt som kan stå foran et postfix (DOT, IS, IN og QUA) må være et BASICEXPR
 		if(Option.internal.TRACE_PARSE) Parse.TRACE("Expression: acceptExpression");
 		Expression expr=null;
+		LexToken prevParserToken = Parse.getCurrentParserToken(simBuilder);
 		LexToken prevToken = Parse.getCurrentParserToken(simBuilder);
 		if(Parse.accept(simBuilder, KeyWord.BEGPAR)) { expr = acceptExpression(simBuilder); Parse.expect(simBuilder, KeyWord.ENDPAR); }
 		else if(Parse.accept(simBuilder, KeyWord.INTEGERKONST)) expr = new Constant(Type.Integer,((IntegerConst)prevToken).value);
@@ -423,6 +448,11 @@ public abstract class Expression extends SyntaxElement {
 					expr=new QualifiedObject(expr, classIdentifier);
 				else expr=new ObjectRelation(expr, opr, classIdentifier);
 			}
+		}
+		if(expr != null) {
+			expr.tokenRange = new LexTokenRange(prevParserToken, Parse.getPrevParserToken(simBuilder));
+//			Util.println("Expression.acceptBASICEXPR: prevParserToken="+prevParserToken);
+//			Util.println("Expression.acceptBASICEXPR: "+expr.getClass().getSimpleName()+"  expr.tokenRange="+expr.tokenRange);
 		}
 //		if(Option.internal.TRACE_PARSE) PsiParse.TRACE("Expression: acceptBasicExpression returns: "+expr);
 		return(expr);
@@ -477,7 +507,7 @@ public abstract class Expression extends SyntaxElement {
 		ClassDeclaration objDecl=getQualification(simpleObjectExpression);
 		ClassDeclaration quaDecl=getQualification(classIdentifier);
 		if(quaDecl == null) {
-//			Util.semanticError(simpleObjectExpression, "Illegal: " + classIdentifier + " is not a class");
+//			Util.semanticError(simpleObjectExpression, "Illegal: " + classIdentifier.value + " is not a class");
 		} else {
 			if(quaDecl==objDecl) ; // Nothing: Util.warning("Unneccessary QUA/IS/IN "+ classIdentifier);
 			else if(!(objDecl.isCompatibleClasses(quaDecl))) return(false);

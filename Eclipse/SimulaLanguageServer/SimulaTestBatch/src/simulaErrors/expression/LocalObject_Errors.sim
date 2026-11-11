@@ -1,0 +1,9 @@
+begin
+	class A;;
+	class B;;
+	ref(A) x;
+	ref(B) y;
+	
+	y :- this A;
+	x :- this C;
+end

@@ -1,0 +1,10 @@
+begin
+	class A;;
+	ref(A) x;
+	boolean b;
+	
+	b := x is C;
+	b := x in C;
+	b := b is C;
+	b := b in C;
+end

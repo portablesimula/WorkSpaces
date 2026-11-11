@@ -11,6 +11,7 @@ import java.lang.classfile.Label;
 
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
+import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.SyntaxElement;
 import simula.lsp.syntaxClass.Type;
@@ -62,15 +63,16 @@ public final class RelationalOperation extends Expression {
 	/// @param opr the relation
 	/// @param rhs the right hand side
 	RelationalOperation(final Expression lhs,final int opr,final Expression rhs) {
+		SimulaBuilder simBuilder = getSimBuilder();
 		this.type = Type.Boolean;
 		this.lhs = lhs; this.opr = opr; this.rhs = rhs;
 		if (this.lhs == null) {
 			Util.semanticError(this, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression();
+			this.lhs = new MissingExpression(simBuilder);
 		}
 		if (this.rhs == null) {
 			Util.semanticError(this, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression();
+			this.rhs = new MissingExpression(simBuilder);
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}
@@ -96,7 +98,7 @@ public final class RelationalOperation extends Expression {
 				Type atype = Type.arithmeticTypeConversion(type1, type2);
 				if (atype == null) {
 					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
-					Util.semanticError(this, "RelationalOperation: Illegal types: " + type1 + " " + opr + " " + type2);
+					Util.semanticError(this, "RelationalOperation: Illegal types: " + type1 + " " + KeyWord.edit(opr) + " " + type2);
 				}
 				lhs = (Expression) TypeConversion.testAndCreate(atype, lhs);
 				rhs = (Expression) TypeConversion.testAndCreate(atype, rhs);
@@ -105,7 +107,7 @@ public final class RelationalOperation extends Expression {
 			case KeyWord.EQR: case KeyWord.NER: {
 				// Object =/= Object or Object == Object
 				if ((!type1.isReferenceType()) || (!type2.isReferenceType()))
-					Util.semanticError(this, "RelationalOperation: Illegal types: " + type1 + " " + opr + " " + type2);
+					Util.semanticError(this, "RelationalOperation: Illegal types: " + type1 + " " + KeyWord.edit(opr) + " " + type2);
 				break;
 			}
 			default:

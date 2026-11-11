@@ -65,7 +65,15 @@ public final class RunErrorTest {
 //		names.add("expression/ArithmeticExpression_Errors");
 //		names.add("expression/AssignmentOperation_Errors");
 //		names.add("expression/BooleanExpression_Errors");
-		names.add("expression/ConditionalExpression_Errors");
+//		names.add("expression/ConditionalExpression_Errors");
+//		names.add("expression/LocalObject_Errors");
+//		names.add("expression/ObjectGenerator_Errors");
+//		names.add("expression/ObjectRelation_Errors");
+//		names.add("expression/QualifiedObject_Errors");
+//		names.add("expression/RelationalOperation_Errors");
+//		names.add("expression/RemoteVariable_Errors");
+//		names.add("expression/TextExpression_Errors");
+		names.add("expression/TypeConversionExpression_Errors");
 
 		
 //		names.add("ObjectRelation_Errors");

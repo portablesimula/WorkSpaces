@@ -128,8 +128,14 @@ public final class RemoteVariable extends Expression {
 			qual = objType.getQual();
 			if(qual!=null) remoteAttribute = qual.findRemoteAttributeMeaning(ident);
 			if (remoteAttribute == null) {
-				if(objType.keyWord != Type.T_UNDEF)
-					Util.semanticError(obj, ident.value + " is not an attribute of "	+ objType.getRefIdent().value);
+				if(objType.keyWord != Type.T_UNDEF) {
+					Identifier refId = objType.getRefIdent();
+					if(refId != null) {
+						Util.semanticError(obj, ident.value + " is not an attribute of "	+ refId.value);
+					} else {
+						Util.semanticError(obj, "Illegal remote access");
+					}
+				}
 				UndefinedDeclaration undef = new UndefinedDeclaration(this, ident);
 				remoteAttribute = new Meaning(undef, LspGlobal.getCurrentScope()); // Error Recovery
 			}
@@ -153,7 +159,7 @@ public final class RemoteVariable extends Expression {
 				return (result);
 			}
 		} else {
-			Util.semanticError(obj, "Illegal attribute(" + attr + ") in remote access");
+			Util.semanticError(attr, "Illegal attribute(" + attr + ") in remote access");
 			result = attr.type;
 		}
 		return (result);
@@ -170,7 +176,7 @@ public final class RemoteVariable extends Expression {
 			Meaning meaning = StandardClass.typeText.findMeaning(ident);
 //			Util.println("RemoteVatiable.doRemoteTextChecking: meaning=" + meaning.declaredAs.getClass().getSimpleName());
 			if (meaning.declaredAs instanceof UndefinedDeclaration) {
-				Util.semanticError(obj, "RemoteVariable.doRemoteTextChecking: " + ident + " is not a Text attribute");
+				Util.semanticError(attr, "RemoteVariable.doRemoteTextChecking: " + ident.value + " is not a Text attribute");
 				return Type.Undef;
 			}
 			var.setRemotelyAccessed(meaning);
@@ -178,7 +184,7 @@ public final class RemoteVariable extends Expression {
 			result = meaning.declaredAs.type;
 
 		} else {
-			Util.semanticError(obj, "Illegal attribute(" + attr + ") in remote access");
+			Util.semanticError(attr, "Illegal attribute(" + attr + ") in remote access");
 			result = attr.type;
 		}
 		return (result);

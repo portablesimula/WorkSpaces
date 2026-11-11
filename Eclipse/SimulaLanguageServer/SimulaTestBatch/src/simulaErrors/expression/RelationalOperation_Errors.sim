@@ -1,0 +1,13 @@
+begin
+	class A;;
+	ref(A) x;
+	boolean b;
+	
+	b := x == b;
+	b := x =/= b;
+	
+	b := x = b;
+	b := x <= b;
+	b := x >= b;
+	
+end

@@ -117,7 +117,6 @@ public final class ObjectRelation extends Expression {
 		Type type1 = lhs.type;
 		Identifier refIdent = type1.getRefIdent();
 		if (refIdent == null) {
-//			Util.semanticError(this, type1.toString() + " IS/IN " + classIdentifier.value + " -- Rewrite program");
 			String reason = (classIdentifier == null)? "" : classIdentifier.value + " -- " + lhs + " is not an object expression";
 			Util.semanticError(lhs, lhs.toString() + " IS/IN " + reason);
 		}

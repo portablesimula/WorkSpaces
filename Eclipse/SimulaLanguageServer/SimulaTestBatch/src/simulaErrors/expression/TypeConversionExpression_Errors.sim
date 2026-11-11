@@ -1,0 +1,12 @@
+begin
+	integer i,j,k;
+	text t;
+	class C;;
+	class D;;
+	ref(C) x;
+	ref(D) y;
+	
+	i := t;
+	i := "abra";
+	x :- y;
+end

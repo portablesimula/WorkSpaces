@@ -111,15 +111,16 @@ public final class ArithmeticExpression extends Expression {
 	/// @param opr arithmetic operation
 	/// @param rhs right hand side
 	private ArithmeticExpression(final Expression lhs, final int opr, final Expression rhs) {
+		SimulaBuilder simBuilder = getSimBuilder();
 		this.opr = opr;
 		if (lhs == null) {
 			Util.syntaxError(this, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression();
+			this.lhs = new MissingExpression(simBuilder);
 		} else
 			this.lhs = lhs;
 		if (rhs == null) {
 			Util.syntaxError(this, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression();
+			this.rhs = new MissingExpression(simBuilder);
 		} else
 			this.rhs = rhs;
 		this.lhs.backLink = this.rhs.backLink = this;

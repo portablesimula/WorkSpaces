@@ -10,6 +10,8 @@ import java.lang.classfile.CodeBuilder;
 
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
+import simula.lsp.builder.SimulaBuilder;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.SyntaxElement;
 import simula.lsp.syntaxClass.Type;
@@ -33,8 +35,9 @@ import simula.lsp.utilities.Util;
 public final class MissingExpression extends Expression {
 
 	/// Create a new MissingExpression.
-	public MissingExpression() {
+	public MissingExpression(SimulaBuilder simBuilder) {
 		this.type = Type.Undef;
+		this.tokenRange = new LexTokenRange(simBuilder.getPrevParserToken());
 	}
 
 	@Override
@@ -93,7 +96,7 @@ public final class MissingExpression extends Expression {
 	/// @return the UnaryOperation object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static MissingExpression readObject(final AttributeInputStream inpt) throws IOException {
-		MissingExpression expr = new MissingExpression();
+		MissingExpression expr = new MissingExpression(null);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		
