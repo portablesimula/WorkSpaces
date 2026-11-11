@@ -1,0 +1,4 @@
+begin
+	character b;
+	if b then x := 44;
+end

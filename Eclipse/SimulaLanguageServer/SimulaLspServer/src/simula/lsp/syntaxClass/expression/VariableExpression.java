@@ -305,7 +305,7 @@ public final class VariableExpression extends Expression {
 					} else {
 						if(!(declaredAs instanceof SwitchDeclaration)) {
 							if(backLink == null && paramIterator.hasNext())
-								Util.semanticError(this, "Missing parameter(s) to Switch " + declaredAs.identifierValue());
+								Util.semanticError(this, "Missing parameter(s) to " + declaredAs.identifierValue());
 						}
 					}
 				} else {

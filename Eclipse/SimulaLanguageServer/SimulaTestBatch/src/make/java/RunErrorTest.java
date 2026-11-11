@@ -56,11 +56,12 @@ public final class RunErrorTest {
 		// *** SIMULA ERROR TEST BATCH TIL EKSEKVERING
 //		names.add("TypeError");
 //		names.add("HiddenProtected_Errors");
-//		names.add("ClassDeclaration_Errors");
-//		names.add("Declaration_Errors");
-//		names.add("Parameter_Errors");
-//		names.add("PrefixedBlock_Errors");
-//		names.add("ProcedureDeclaration_Errors");
+		
+//		names.add("declaration/ClassDeclaration_Errors");
+//		names.add("declaration/Declaration_Errors");
+//		names.add("declaration/Parameter_Errors");
+//		names.add("declaration/PrefixedBlock_Errors");
+//		names.add("declaration/ProcedureDeclaration_Errors");
 
 //		names.add("expression/ArithmeticExpression_Errors");
 //		names.add("expression/AssignmentOperation_Errors");
@@ -73,7 +74,11 @@ public final class RunErrorTest {
 //		names.add("expression/RelationalOperation_Errors");
 //		names.add("expression/RemoteVariable_Errors");
 //		names.add("expression/TextExpression_Errors");
-		names.add("expression/TypeConversionExpression_Errors");
+//		names.add("expression/TypeConversionExpression_Errors");
+//		names.add("expression/VariableExpression_Errors");
+
+//		names.add("statement/ConditionalStatement_Errors");
+		names.add("statement/ConnectionDoPart_Errors");
 
 		
 //		names.add("ObjectRelation_Errors");

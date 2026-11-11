@@ -5,4 +5,5 @@ begin
 	real r;
 	i := if c then j else r;
 	i := if b then c else r;
+	i := if b then else ;
 end

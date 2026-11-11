@@ -105,7 +105,7 @@ public final class ConditionalStatement extends Statement {
 		condition.backLink=this; // To ensure _RESULT from functions
 		if (condition.type == null || condition.type.keyWord != Type.T_BOOLEAN) {
 			if(condition.type != Type.Undef )
-				Util.semanticError(this, "ConditionalStatement.doChecking: Condition is not of Type Boolean, but: " + condition.type);
+				Util.semanticError(condition, "Condition is not of Type Boolean, but: " + condition.type);
 		}
 		thenStatement.doChecking();
 		if (elseStatement != null) {
