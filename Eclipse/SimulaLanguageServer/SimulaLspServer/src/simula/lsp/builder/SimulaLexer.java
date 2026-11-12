@@ -551,10 +551,10 @@ public final class SimulaLexer {
     	String result=number.toString(); number=null;
     	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanDotDigit, result='"+result);
     	reader.pushBackPos(1);
-    	Util.println("SimulaLexer.scanDotDigit: result="+result);
+//    	Util.println("SimulaLexer.scanDotDigit: result="+result);
     	try {
     		float fResult = Float.parseFloat(result);
-        	Util.println("SimulaLexer.scanDotDigit: fResult="+fResult);
+//        	Util.println("SimulaLexer.scanDotDigit: fResult="+fResult);
         	if(Float.isInfinite(fResult)) {
         		LexToken lexToken = newRealToken(0);
         		Util.syntaxError(simBuilder, lexToken, "Illegal fix point number: "+result);
@@ -599,12 +599,12 @@ public final class SimulaLexer {
     	result=number.toString(); number=null;
     	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("scanDigitsExp, result='"+result);
     	reader.pushBackPos(1);
-    	Util.println("SimulaLexer.scanDotDigit: result="+result);
+//    	Util.println("SimulaLexer.scanDigitsExp: result="+result);
     	try {
     		if(doubleAmpersand) return newLongRealToken(Double.parseDouble(result));
 //    		return newRealToken(Float.parseFloat(result));
     		float fResult = Float.parseFloat(result);
-        	Util.println("SimulaLexer.scanDigitsExp: fResult="+fResult);
+//        	Util.println("SimulaLexer.scanDigitsExp: fResult="+fResult);
         	if(Float.isInfinite(fResult)) {
         		LexToken lexToken = newRealToken(0);
         		Util.syntaxError(simBuilder, lexToken, "Illegal exponented number: "+result);
@@ -690,7 +690,7 @@ public final class SimulaLexer {
     	
     	if(reader.getCurrent() != '\'') {
     		if(errors == null) errors = new ArrayList<>();
-    		errors.add("Character constant is not terminated. "+edcurrent());
+    		errors.add("Character constant badly formed and not terminated. "+edcurrent());
     		reader.pushBackPos(1);
     	}
     	if(Option.internal.TRACE_LEXER > 0) Util.TRACE("END scanCharacterConstant, result='"+result+"', "+edcurrent());

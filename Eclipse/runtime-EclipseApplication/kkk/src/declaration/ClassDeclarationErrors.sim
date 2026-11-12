@@ -4,4 +4,15 @@ begin
 	Class A;;
 	A class B;;
 	B class A;;
+	
+	Class CC1(x); integer x, z;;
+	
+	Class CC2(x); value y; integer x;;
+	
+	Class CC3(x, x);;
+	
+	Class CC(x); value y; integer z; begin
+	
+	end;
+
 end

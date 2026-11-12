@@ -137,9 +137,9 @@ public final class ExternalDeclaration extends Declaration {
 	/// @param enclosure the BlockDeclaration which is updated
 	/// @return a Vector of ExternalDeclaration
 	public static Vector<SyntaxElement> expectExternalDeclaration(final SimulaBuilder simBuilder) {
-		LexToken kind = Parse.acceptIdentifier(simBuilder);
+		Identifier kind = Parse.acceptIdentifier(simBuilder);
 		if (kind != null)
-			Util.syntaxError(simBuilder, "*** NOT IMPLEMENTED: " + "External " + kind + " Procedure");
+			Util.syntaxError(simBuilder, "*** NOT IMPLEMENTED: " + "External " + kind.value + " Procedure");
 		Type expectedType = Parse.acceptType(simBuilder);
 //		if (!(PsiParse.accept(simBuilder, KeyWord.CLASS) || PsiParse.accept(simBuilder, KeyWord.PROCEDURE)))
 		if (!(Parse.accept(simBuilder, KeyWord.CLASS, KeyWord.PROCEDURE)))
@@ -167,10 +167,10 @@ public final class ExternalDeclaration extends Declaration {
 			ExternalDeclaration externalDeclaration = new ExternalDeclaration(identifier, externalIdentifier);
 			externalDeclaration.type = expectedType;
 			declarations.add(externalDeclaration);
-			Util.println("ExternalDeclaration.expectExternalDeclaration: externalDeclaration: " + externalDeclaration);
+//			Util.println("ExternalDeclaration.expectExternalDeclaration: externalDeclaration: " + externalDeclaration);
 
 			File jarFile = JarFileBuilder.findJarFile(simBuilder, identifier.value, externalIdentifier);
-			Util.println("ExternalDeclaration.expectExternalDeclaration: jarFile: " + jarFile);
+//			Util.println("ExternalDeclaration.expectExternalDeclaration: jarFile: " + jarFile);
 			if(jarFile == null) {
 //				Util.syntaxError(simBuilder, "Can't find attribute file: " + identifier.value + '[' + externalIdentifier + ']');
 				String mss = "Illegal External Declaration: Can't find attribute file: " + identifier.value;

@@ -146,6 +146,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 	public static ProcedureDeclaration expectProcedureDeclaration(final SimulaBuilder simBuilder, final Type type) {
 		ProcedureDeclaration proc = new ProcedureDeclaration(null, ObjectKind.Procedure);
 		proc.tokenRange = new LexTokenRange(simBuilder.getPrevParserToken());
+		proc.specRange = new LexTokenRange(simBuilder.getPrevParserToken());
 		proc.sourceFileName = simBuilder.documentManager.sourceFileName;
 //		proc.OLD_lineNumber = simBuilder.getSourceLineNumber();
 		proc.type = type;
@@ -160,6 +161,9 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			while(acceptModePart(simBuilder, proc));
 			expectSpecificationPart(simBuilder, proc);
 		} else Parse.expect(simBuilder, KeyWord.SEMICOLON);
+		
+		proc.specRange.lastParserToken = simBuilder.getPrevParserToken();
+		
 //		Util.println("ProcedureDeclaration.expectProcedureDeclaration: BEFORE PARSE PROCEDURE BLOCK");
 		expectProcedureBody(simBuilder, proc);
 

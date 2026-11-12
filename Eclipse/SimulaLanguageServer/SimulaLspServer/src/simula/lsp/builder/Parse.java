@@ -225,6 +225,10 @@ public class Parse {
 	
 	public static Identifier expectIdentifier(final SimulaBuilder simBuilder) {
         Identifier ident = acceptIdentifier(simBuilder);
+        if(ident == null) {
+        	Util.syntaxError(simBuilder, "Missing identifier");
+        	return new Identifier("");
+        }
 		return ident;
 	}  
 

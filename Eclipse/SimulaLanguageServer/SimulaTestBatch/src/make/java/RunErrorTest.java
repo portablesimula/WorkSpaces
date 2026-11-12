@@ -57,11 +57,12 @@ public final class RunErrorTest {
 //		names.add("TypeError");
 //		names.add("HiddenProtected_Errors");
 //		names.add("Parse_Errors");
-		names.add("SimulaLexer_Errors");
+//		names.add("SimulaLexer_Errors");
 		
+//		names.add("declaration/BlockDeclaration_Errors");
 //		names.add("declaration/ClassDeclaration_Errors");
 //		names.add("declaration/Declaration_Errors");
-//		names.add("declaration/ExternalDeclaration_Errors");
+		names.add("declaration/ExternalDeclaration_Errors");
 //		names.add("declaration/Parameter_Errors");
 //		names.add("declaration/PrefixedBlock_Errors");
 //		names.add("declaration/ProcedureDeclaration_Errors");

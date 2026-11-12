@@ -2,4 +2,7 @@
 external class dabra = "abra_ca_dab";
 begin
 	external class abra;
+	external fortran procedure P;
+	external label ll;
+	external class;
 end

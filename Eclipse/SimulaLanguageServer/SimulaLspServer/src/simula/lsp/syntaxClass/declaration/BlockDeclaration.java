@@ -19,6 +19,7 @@ import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.Identifier;
 import simula.lsp.builder.token.LexToken;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.SyntaxElement;
 import simula.lsp.syntaxClass.Type;
@@ -77,6 +78,9 @@ public abstract class BlockDeclaration extends DeclarationScope {
 	/// Note: First Local Variable is used by the outermost try-catch block.
 	public int nLocalVariables = 1;
 	
+	/// Range of Specification Part
+	public LexTokenRange specRange;
+
 	/// Get current ClassDesc.
 	/// @return the current ClassDesc.
 	public static ClassDesc currentClassDesc() {

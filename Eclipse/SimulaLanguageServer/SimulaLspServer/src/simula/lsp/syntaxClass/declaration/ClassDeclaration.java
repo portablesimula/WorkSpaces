@@ -191,6 +191,7 @@ public class ClassDeclaration extends BlockDeclaration {
 //		LexToken first = (identifier != null)? identifier : simBuilder.getPrevParserToken();
 		ClassDeclaration cls = new ClassDeclaration(null);
 		cls.tokenRange = new LexTokenRange(simBuilder.getPrevParserToken());
+		cls.specRange = new LexTokenRange(simBuilder.getPrevParserToken());
 		cls.sourceFileName = simBuilder.documentManager.documentUri;
 		if(identifier != null) cls.prefix = identifier;
 		cls.declaredIn.hasLocalClasses = true;
@@ -208,6 +209,9 @@ public class ClassDeclaration extends BlockDeclaration {
 		acceptProtectionPart(simBuilder, cls);
 		if (Parse.accept(simBuilder, KeyWord.VIRTUAL))
 			VirtualSpecification.expectVirtualPart(simBuilder, cls);
+		
+		cls.specRange.lastParserToken = simBuilder.getPrevParserToken();
+		
 		expectClassBody(simBuilder, cls);
 		
 		cls.type = Type.Ref(cls.identifier);
@@ -257,7 +261,7 @@ public class ClassDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
+					Util.syntaxError(simBuilder, "The specified: value " + identifier.value + " is not defined in this scope");
 					parameter = new Parameter(cls, identifier);
 				}
 				parameter.setMode(Parameter.Mode.value);

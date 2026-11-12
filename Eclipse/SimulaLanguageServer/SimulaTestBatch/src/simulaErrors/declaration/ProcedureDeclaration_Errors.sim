@@ -12,5 +12,16 @@ begin
 	class C; virtual: procedure R is procedure R(x, y); integer x, y;; begin
 		procedure R(x, y); integer x; text y;;
 	end;
+	
+	procedure PP(x);;
+	
+	procedure PP1(x); integer x, z;;
+	
+	procedure PP2(x); value y; integer x;;
+	
+	procedure PP3(x);;
+	
+	procedure PP4(x); value y; integer z; begin
+	
 
 end

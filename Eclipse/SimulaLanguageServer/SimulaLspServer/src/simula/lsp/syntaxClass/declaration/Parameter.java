@@ -94,11 +94,11 @@ public final class Parameter extends Declaration {
 
 	/// Create a new Parameter.
 	/// @param identifier parameter identifier
-	public Parameter(final Declaration owner, final Identifier identifier) {
+	public Parameter(final BlockDeclaration owner, final Identifier identifier) {
 		super(identifier);
 		this.declarationKind = ObjectKind.Parameter;
 		if(owner != null) {
-			this.tokenRange = owner.tokenRange;
+			this.tokenRange = owner.specRange;
 		}
 //		Util.println("NEW Parameter: "+owner+"  tokenRange="+tokenRange+" - " + this);
 	}
@@ -107,7 +107,7 @@ public final class Parameter extends Declaration {
 	/// @param identifier parameter identifier
 	/// @param type parameter type
 	/// @param kind parameter kind
-	Parameter(final Declaration owner, final Identifier identifier, final Type type, final int kind) {
+	Parameter(final BlockDeclaration owner, final Identifier identifier, final Type type, final int kind) {
 		this(owner, identifier);
 		this.type = type;
 		this.kind = kind;
@@ -118,7 +118,7 @@ public final class Parameter extends Declaration {
 	/// @param type parameter type
 	/// @param kind parameter kind
 	/// @param nDim parameter's number of dimension in case of array kind.
-	public Parameter(final Declaration owner, final Identifier identifier, final Type type, final int kind, final int nDim) {
+	public Parameter(final BlockDeclaration owner, final Identifier identifier, final Type type, final int kind, final int nDim) {
 		this(owner, identifier, type, kind);
 		this.nDim = nDim;
 	}
@@ -155,7 +155,7 @@ public final class Parameter extends Declaration {
 	/// @param mode the new mode
 	void setMode(final int mode) {
 		if (this.mode != 0)
-			Util.syntaxError(getSimBuilder(), "Parameter " + identifierValue() + " is already specified by " + this.mode);
+			Util.syntaxError(getSimBuilder(), "Parameter " + identifierValue() + " is already specified as by " + edMode(this.mode));
 		this.mode = mode;
 	}
 
