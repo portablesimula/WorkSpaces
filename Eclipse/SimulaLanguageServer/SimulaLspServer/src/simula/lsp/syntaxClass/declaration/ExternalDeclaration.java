@@ -167,12 +167,15 @@ public final class ExternalDeclaration extends Declaration {
 			ExternalDeclaration externalDeclaration = new ExternalDeclaration(identifier, externalIdentifier);
 			externalDeclaration.type = expectedType;
 			declarations.add(externalDeclaration);
-//			Util.println("ExternalDeclaration.expectExternalDeclaration: externalDeclaration: " + externalDeclaration);
+			Util.println("ExternalDeclaration.expectExternalDeclaration: externalDeclaration: " + externalDeclaration);
 
 			File jarFile = JarFileBuilder.findJarFile(simBuilder, identifier.value, externalIdentifier);
-//			Util.println("ExternalDeclaration.expectExternalDeclaration: jarFile: " + jarFile);
+			Util.println("ExternalDeclaration.expectExternalDeclaration: jarFile: " + jarFile);
 			if(jarFile == null) {
-				Util.syntaxError(simBuilder, "Can't find attribute file: " + identifier.value + '[' + externalIdentifier + ']');
+//				Util.syntaxError(simBuilder, "Can't find attribute file: " + identifier.value + '[' + externalIdentifier + ']');
+				String mss = "Illegal External Declaration: Can't find attribute file: " + identifier.value;
+				if(externalIdentifier != null) mss = mss + '[' + externalIdentifier + ']';
+				Util.syntaxError(simBuilder, mss);
 			}
 			if (jarFile != null) {
 				if(AttributeFileIO.checkJarFiles(simBuilder, jarFile.toString())) {

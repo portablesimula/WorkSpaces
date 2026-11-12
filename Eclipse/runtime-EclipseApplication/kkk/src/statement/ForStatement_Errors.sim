@@ -1,0 +1,13 @@
+begin
+	procedure P(n); name n; integer n; begin
+		for n := 4, 5 step 1 until 16 do begin
+			res := n;
+		end;
+	end;
+	class C;;
+	ref(C) x;
+	integer i;
+	
+	for x := new C do ;
+	for i := i+1 while x do ;
+end

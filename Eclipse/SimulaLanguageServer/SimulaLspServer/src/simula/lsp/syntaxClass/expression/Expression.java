@@ -486,7 +486,8 @@ public abstract class Expression extends SyntaxElement {
 		Identifier refIdent=expr.type.getRefIdent();
 		Declaration objDecl = LspGlobal.getCurrentScope().findMeaning(refIdent).declaredAs;
 		if(objDecl instanceof ClassDeclaration cls)	return(cls);
-		Util.semanticError(expr, "Illegal ref(" + refIdent.value + "): " + refIdent.value + " is not a class");
+		if(refIdent != null)
+			Util.semanticError(expr, "Illegal ref(" + refIdent.value + "): " + refIdent.value + " is not a class");
 		return(null);
 	}
 

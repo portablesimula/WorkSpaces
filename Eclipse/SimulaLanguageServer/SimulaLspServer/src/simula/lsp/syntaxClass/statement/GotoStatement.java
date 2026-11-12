@@ -71,7 +71,8 @@ public final class GotoStatement extends Statement {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
 		label.doChecking();
-		IF_TEST:if (label.type == null) {
+		Util.println("GotoStatement.doChecking: label.type="+label.type);
+		IF_TEST:if (label.type != null) {
 			if(label.type.keyWord == Type.T_LABEL) break IF_TEST;
 			if(label.type.keyWord == Type.T_UNDEF) break IF_TEST;
 			Util.semanticError(this, "Goto " + label + ", " + label + " is not a Label");

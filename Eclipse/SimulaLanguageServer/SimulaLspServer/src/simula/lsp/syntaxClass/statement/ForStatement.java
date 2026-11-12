@@ -18,6 +18,7 @@ import simula.lsp.builder.JavaSourceFileCoder;
 import simula.lsp.builder.Parse;
 import simula.lsp.builder.SimulaBuilder;
 import simula.lsp.builder.token.LexToken;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.Type;
 import simula.lsp.syntaxClass.declaration.BlockDeclaration;
@@ -167,8 +168,10 @@ public final class ForStatement extends Statement {
 
 		if (Option.internal.TRACE_PARSE)
 			Parse.TRACE("Parse ForStatement");
+		LexToken firstParserToken = simBuilder.getCurrentParserToken();
 		stm.controlVariable = new VariableExpression(Parse.expectIdentifier(simBuilder));
 		LexToken prevToken = Parse.getCurrentParserToken(simBuilder);
+		stm.controlVariable.tokenRange = new LexTokenRange(firstParserToken, prevToken);
 		if (!Parse.accept(simBuilder, KeyWord.ASSIGNVALUE))
 			Parse.expect(simBuilder, KeyWord.ASSIGNREF);
 		stm.assignmentOperator = prevToken.keyWord;
@@ -210,11 +213,15 @@ public final class ForStatement extends Statement {
 		LspGlobal.sourceLineNumber = firstLineNumber();
 		controlVariable.doChecking();
 		Declaration decl = controlVariable.meaning.declaredAs;
-		if (decl instanceof Parameter par && par.mode == Parameter.Mode.name)
-			Util.semanticError(this, "For-Statement's Controled Variable(" + controlVariable + ") can't be a formal parameter by Name");
+		if (decl instanceof Parameter par && par.mode == Parameter.Mode.name) {
+//			Util.semanticError(this, "For-Statement's Controled Variable(" + controlVariable + ") can't be a formal parameter by Name");
+//			Util.semanticError(forList.firstElement(), "For-Statement's Controled Variable(" + controlVariable + ") can't be a formal parameter by Name");
+			Util.semanticError(controlVariable, "For-Statement's Controled Variable(" + controlVariable + ") can't be a formal parameter by Name");
+		}
 		Type type = controlVariable.type;
 		if (type.keyWord != Type.T_TEXT && assignmentOperator == KeyWord.ASSIGNVALUE && type.isReferenceType())
-			Util.semanticError(this, "Illegal For-Statement with object value assignment ( := )");
+//			Util.semanticError(this, "Illegal For-Statement with object value assignment ( := )");
+			Util.semanticError(forList.firstElement(), "Illegal For-Statement with object value assignment ( := )");
 		Iterator<ForListElement> iterator = forList.iterator();
 		while (iterator.hasNext()) {
 			iterator.next().doChecking();

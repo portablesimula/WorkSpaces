@@ -51,6 +51,7 @@ public class ForListElement extends SyntaxElement {
 	public ForListElement(final ForStatement forStatement, final Expression expr1) {
 		this.forStatement = forStatement;
 		this.expr1 = expr1;
+		this.tokenRange = expr1.tokenRange;
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW ForListElement: " + toString());
 	}

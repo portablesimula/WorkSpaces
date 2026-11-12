@@ -43,6 +43,7 @@ public class ConnectionDoPart extends SyntaxElement {
 	ConnectionDoPart(final ConnectionStatement connectionStatement, final ConnectionBlock connectionBlock,final Statement statement) {
 		this.connectionStatement = connectionStatement;
 		this.connectionBlock = connectionBlock; // this.statement=statement;
+		this.tokenRange = connectionBlock.tokenRange;
 		connectionBlock.setStatement(statement);
 		if (Option.internal.TRACE_PARSE)
 			Util.TRACE("NEW ConnectionDoPart: " + toString());
@@ -58,7 +59,7 @@ public class ConnectionDoPart extends SyntaxElement {
 		ClassDeclaration classDeclaration = AssignmentOperation.getQualification(refIdentifier);
 		if(classDeclaration != null) {
 			connectionBlock.setClassDeclaration(classDeclaration);
-		} else {
+		} else if(refIdentifier != null) {
 			Util.semanticError(this, "Illegal connection variable: " + refIdentifier.value + " is not a class");			
 		}
 		

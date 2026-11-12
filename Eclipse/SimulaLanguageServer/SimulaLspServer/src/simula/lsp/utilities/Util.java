@@ -265,6 +265,8 @@ public final class Util {
 		if(simBuilder == null) {
 			Util.printError("Util.semanticError: Missing simBuilder: " + elt.getClass().getSimpleName() + "  " + elt);
 			Util.printError("Util.semanticError: Missing simBuilder: " + edDiagnostic(diagnostic));
+			Util.printError("Util.semanticError: Missing simBuilder: firstParserToken=" + elt.tokenRange.firstParserToken);
+			Util.printError("Util.semanticError: Missing simBuilder: lastParserToken=" + elt.tokenRange.lastParserToken);
 			dumpStack("Util.semanticError: Missing simBuilder: ");
 		} else
 			

@@ -1,0 +1,18 @@
+begin
+	procedure character_Errors; begin
+		character c;
+		c := '';
+		c := 'c ';
+		c := '!5x!';
+	end;
+
+	procedure number_Errors; begin
+		integer i;
+		real r;
+		i := 9999999999999999999999999999999999999999999999999;
+		r := 999999999999999999999999999999999999999999999999999999999999.888888;
+		r := 999999999.888888&777777777777777777777;
+	end;
+		
+	if x =/z y then ;
+end;

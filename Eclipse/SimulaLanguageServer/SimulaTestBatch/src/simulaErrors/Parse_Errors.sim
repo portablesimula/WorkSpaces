@@ -1,0 +1,4 @@
+begin
+	if b else "error";
+	<=
+end;

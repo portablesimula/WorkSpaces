@@ -1,0 +1,5 @@
+
+external class dabra = "abra_ca_dab";
+begin
+	external class abra;
+end

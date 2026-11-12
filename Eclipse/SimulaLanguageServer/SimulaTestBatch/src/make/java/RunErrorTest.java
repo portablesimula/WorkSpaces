@@ -56,9 +56,12 @@ public final class RunErrorTest {
 		// *** SIMULA ERROR TEST BATCH TIL EKSEKVERING
 //		names.add("TypeError");
 //		names.add("HiddenProtected_Errors");
+//		names.add("Parse_Errors");
+		names.add("SimulaLexer_Errors");
 		
 //		names.add("declaration/ClassDeclaration_Errors");
 //		names.add("declaration/Declaration_Errors");
+//		names.add("declaration/ExternalDeclaration_Errors");
 //		names.add("declaration/Parameter_Errors");
 //		names.add("declaration/PrefixedBlock_Errors");
 //		names.add("declaration/ProcedureDeclaration_Errors");
@@ -78,10 +81,12 @@ public final class RunErrorTest {
 //		names.add("expression/VariableExpression_Errors");
 
 //		names.add("statement/ConditionalStatement_Errors");
-		names.add("statement/ConnectionDoPart_Errors");
-
-		
-//		names.add("ObjectRelation_Errors");
+//		names.add("statement/ConnectionDoPart_Errors");
+//		names.add("statement/ConnectionWhenPart_Errors");
+//		names.add("statement/ForStatement_Errors");
+//		names.add("statement/GotoStatement_Errors");
+//		names.add("statement/InnerStatement_Errors");
+//		names.add("statement/WhileStatement_Errors");
 
 				
 		for(String name:names) {

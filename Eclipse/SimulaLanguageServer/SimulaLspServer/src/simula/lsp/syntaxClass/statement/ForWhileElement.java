@@ -14,6 +14,7 @@ import java.lang.constant.MethodTypeDesc;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.Type;
 import simula.lsp.syntaxClass.declaration.Parameter;
@@ -50,6 +51,7 @@ public class ForWhileElement extends ForListElement {
 	public ForWhileElement(final ForStatement forStatement, final Expression expr1, final Expression expr2) {
 		super(forStatement, expr1);
 		this.expr2 = expr2;
+		this.tokenRange = new LexTokenRange(expr1.tokenRange.firstParserToken,expr2.tokenRange.lastParserToken);
 	}
 
 	@Override
@@ -64,7 +66,7 @@ public class ForWhileElement extends ForListElement {
 		expr2.backLink = forStatement; // To ensure _RESULT from functions
 //		if (expr2.type == null || expr2.type.keyWord != Type.T_BOOLEAN)
 		if(! Type.checkType(expr2, Type.T_BOOLEAN)) {
-			Util.semanticError(this, "While condition is not Boolean but " + expr2.type);	
+			Util.semanticError(expr2, "While condition is not Boolean but " + expr2.type);	
 		}
 	}
 

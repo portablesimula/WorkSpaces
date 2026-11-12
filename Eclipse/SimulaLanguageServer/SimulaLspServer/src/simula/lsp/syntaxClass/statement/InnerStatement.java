@@ -48,12 +48,12 @@ public final class InnerStatement extends Statement {
 		
 		if(LspGlobal.getCurrentScope() instanceof ClassDeclaration cls) {
 			if(cls.statements1 != null) {
-				Util.semanticError(this, "Multiple Inner Statements");
+				Util.syntaxError(simBuilder, "Multiple Inner Statements");
 			} else {
 				cls.statements1 = cls.statements;
 				cls.statements = new ObjectList<Statement>();
 			}
-		} else Util.semanticError(this, "Missplaced Inner Statement");
+		} else Util.syntaxError(simBuilder, "Missplaced Inner Statement");
 	}
 
 	@Override

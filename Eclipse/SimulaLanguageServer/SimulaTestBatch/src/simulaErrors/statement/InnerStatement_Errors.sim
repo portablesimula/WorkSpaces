@@ -1,0 +1,11 @@
+begin
+	class C; begin
+		i := 44;
+		inner;
+		i := 66;
+		inner;
+	end;
+	
+	inner;
+	
+end

@@ -14,6 +14,7 @@ import java.lang.constant.MethodTypeDesc;
 import simula.lsp.builder.AttributeInputStream;
 import simula.lsp.builder.AttributeOutputStream;
 import simula.lsp.builder.JavaSourceFileCoder;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.coder.SimulaCoder;
 import simula.lsp.syntaxClass.Type;
 import simula.lsp.syntaxClass.declaration.BlockDeclaration;
@@ -52,6 +53,7 @@ public class StepUntilElement extends ForListElement {
 		super(forStatement, expr1);
 		this.expr2 = expr2;
 		this.expr3 = expr3;
+		this.tokenRange = new LexTokenRange(expr1.tokenRange.firstParserToken,expr3.tokenRange.lastParserToken);
 	}
 
 	@Override

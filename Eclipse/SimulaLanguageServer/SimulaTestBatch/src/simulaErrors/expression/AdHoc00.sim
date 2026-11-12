@@ -1,5 +1,3 @@
 begin
-	procedure P(x); integer x;;
-	
-	P(4) := 66;
+	external class abra;
 end

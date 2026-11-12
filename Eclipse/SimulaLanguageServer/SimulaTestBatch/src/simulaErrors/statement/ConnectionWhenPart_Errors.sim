@@ -1,0 +1,8 @@
+begin
+	ref(C) x;
+	integer i;
+	inspect x when A do begin
+	end;
+	inspect i when C do begin
+	end;
+end
