@@ -121,15 +121,13 @@ public final class BooleanExpression extends Expression {
 	/// @param opr Boolean operation
 	/// @param rhs right hand side
 	BooleanExpression(Expression lhs, int opr, Expression rhs) {
-		SimulaBuilder simBuilder = getSimBuilder();
+		SimulaBuilder simBuilder = (lhs != null) ? lhs.getSimBuilder() : rhs.getSimBuilder();
 		this.lhs = lhs; this.opr = opr; this.rhs = rhs;
 		if (this.lhs == null) {
-			Util.syntaxError(simBuilder, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression(simBuilder);
+			this.lhs = new MissingExpression(simBuilder, "Missing operand before " + KeyWord.edit(opr));
 		}
 		if (this.rhs == null) {
-			Util.syntaxError(simBuilder, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression(simBuilder);
+			this.rhs = new MissingExpression(simBuilder, "Missing operand after " + KeyWord.edit(opr));
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}

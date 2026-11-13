@@ -100,12 +100,10 @@ public final class TextExpression extends Expression {
 	TextExpression(final SimulaBuilder simBuilder, final Expression lhs, final Expression rhs) {
 		this.lhs = lhs; this.rhs = rhs;
 		if (this.lhs == null) {
-			this.lhs = new MissingExpression(simBuilder);
-			Util.syntaxError(this.lhs, "Missing operand before &");
+			this.lhs = new MissingExpression(simBuilder, "Missing operand before &");
 		}
 		if (this.rhs == null) {
-			this.rhs = new MissingExpression(simBuilder);
-			Util.syntaxError(this.rhs, "Missing operand after &");
+			this.rhs = new MissingExpression(simBuilder, "Missing operand after &");
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 		this.tokenRange = new LexTokenRange(this.lhs.getFirstParserToken(), this.rhs.getLastParserToken());

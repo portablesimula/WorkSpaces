@@ -35,9 +35,10 @@ import simula.lsp.utilities.Util;
 public final class MissingExpression extends Expression {
 
 	/// Create a new MissingExpression.
-	public MissingExpression(SimulaBuilder simBuilder) {
+	public MissingExpression(final SimulaBuilder simBuilder, final String reason) {
 		this.type = Type.Undef;
 		this.tokenRange = new LexTokenRange(simBuilder.getPrevParserToken());
+		Util.semanticError(this, reason);
 	}
 
 	@Override
@@ -96,7 +97,7 @@ public final class MissingExpression extends Expression {
 	/// @return the UnaryOperation object read from the stream.
 	/// @throws IOException if something went wrong.
 	public static MissingExpression readObject(final AttributeInputStream inpt) throws IOException {
-		MissingExpression expr = new MissingExpression(null);
+		MissingExpression expr = new MissingExpression(null, null);
 		expr.OBJECT_SEQU = inpt.readSEQU(expr);
 		// *** SyntaxElement
 		

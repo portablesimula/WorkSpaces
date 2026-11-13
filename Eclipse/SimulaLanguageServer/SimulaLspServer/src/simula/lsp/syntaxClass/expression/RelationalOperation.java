@@ -67,12 +67,10 @@ public final class RelationalOperation extends Expression {
 		this.type = Type.Boolean;
 		this.lhs = lhs; this.opr = opr; this.rhs = rhs;
 		if (this.lhs == null) {
-			Util.semanticError(this, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression(simBuilder);
+			this.lhs = new MissingExpression(simBuilder, "Missing operand before " + KeyWord.edit(opr));
 		}
 		if (this.rhs == null) {
-			Util.semanticError(this, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression(simBuilder);
+			this.rhs = new MissingExpression(simBuilder, "Missing operand after " + KeyWord.edit(opr));
 		}
 		this.lhs.backLink = this.rhs.backLink = this;
 	}

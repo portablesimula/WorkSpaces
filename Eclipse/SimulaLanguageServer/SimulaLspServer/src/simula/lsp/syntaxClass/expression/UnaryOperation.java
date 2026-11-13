@@ -50,8 +50,7 @@ public final class UnaryOperation extends Expression {
 		SimulaBuilder simBuilder = getSimBuilder();
 		this.oprator = oprator; this.operand = operand;
 		if(this.operand==null) {
-			Util.syntaxError(this, "Missing operand after unary "+KeyWord.edit(oprator));
-			this.operand=new MissingExpression(simBuilder);
+			this.operand=new MissingExpression(simBuilder, "Missing operand after unary "+KeyWord.edit(oprator));
 		}
 		this.operand.backLink=this;
 	}

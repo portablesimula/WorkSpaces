@@ -111,16 +111,14 @@ public final class ArithmeticExpression extends Expression {
 	/// @param opr arithmetic operation
 	/// @param rhs right hand side
 	private ArithmeticExpression(final Expression lhs, final int opr, final Expression rhs) {
-		SimulaBuilder simBuilder = getSimBuilder();
+		SimulaBuilder simBuilder = (lhs != null) ? lhs.getSimBuilder() : rhs.getSimBuilder();
 		this.opr = opr;
 		if (lhs == null) {
-			Util.syntaxError(this, "Missing operand before " + KeyWord.edit(opr));
-			this.lhs = new MissingExpression(simBuilder);
+			this.lhs = new MissingExpression(simBuilder, "Missing operand before " + KeyWord.edit(opr));
 		} else
 			this.lhs = lhs;
 		if (rhs == null) {
-			Util.syntaxError(this, "Missing operand after " + KeyWord.edit(opr));
-			this.rhs = new MissingExpression(simBuilder);
+			this.rhs = new MissingExpression(simBuilder, "Missing operand after " + KeyWord.edit(opr));
 		} else
 			this.rhs = rhs;
 		this.lhs.backLink = this.rhs.backLink = this;
@@ -133,15 +131,17 @@ public final class ArithmeticExpression extends Expression {
 	/// @return the newly created ArithmeticExpression
 	static Expression create(final SimulaBuilder simBuilder, final Expression lhs, final int opr, final Expression rhs) {
 		try { // Try to Compile-time Evaluate this expression
-			Number lhn = lhs.getNumber();
-			if (lhn != null) {
-				Number rhn = rhs.getNumber();
-				if (rhn != null)
-					return (Constant.evaluate(simBuilder, lhn, opr, rhn));
+			if(lhs != null) {
+				Number lhn = lhs.getNumber();
+				if (lhn != null && rhs != null) {
+					Number rhn = rhs.getNumber();
+					if (rhn != null)
+						return (Constant.evaluate(simBuilder, lhn, opr, rhn));
+				}
 			}
 		} catch (Exception e) {
 			Util.syntaxError(simBuilder, "Arithmetic overflow: " + lhs + ' ' + KeyWord.edit(opr) + ' ' + rhs + "   " + e);
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		return (new ArithmeticExpression(lhs, opr, rhs));
 	}

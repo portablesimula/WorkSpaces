@@ -3,4 +3,8 @@ begin
 	boolean b;
 	i := i + b;
 	b := b & i;
+	
+	b := b or ;
+	b := and b;
+	
 end

@@ -104,19 +104,22 @@ public abstract class Expression extends SyntaxElement {
 //	public Expression(final DocumentManager documentManager){
 //		super(documentManager);
 //	}
-
+	
 	/// Expect expression.
 	/// <pre>
-	/// Expression  =  SimpleExpression
+	/// Expression	=  SimpleExpression
 	/// 	        |  IF  BooleanExpression  THEN  SimpleExpression  ELSE  Expression
 	/// </pre>
-	/// 
-	/// @return Expression or MissingExpression if no expression is found.
-	public static Expression REMOVED_expectExpression(SimulaBuilder simBuilder) {
-//		Util.println("Expression.expectExpression: current: " + simBuilder.getCurrentParserToken());
-		Expression expr = acceptExpression(simBuilder);
-		if(expr != null) return expr;
-		return new MissingExpression(simBuilder);
+	/// If no expression is found an error message is printed.
+	/// @return Expression or 'MissingExpression' if no expression is found.
+	public static Expression expectExpression(SimulaBuilder simBuilder, String kind) {
+//		Util.println("Expression.expectExpression: BEGIN");
+		Expression expr=acceptExpression(simBuilder);
+		if(expr==null) {
+			expr = new MissingExpression(simBuilder, "Expecting " + kind + " Expression");
+		}
+//		Util.println("Expression.expectExpression: END: expr="+expr);
+		return(expr);
 	}
 
 		/// Accept expression.
@@ -148,32 +151,14 @@ public abstract class Expression extends SyntaxElement {
 			Expression expr= acceptSimpleExpression(simBuilder);
 			LexToken lastParserToken = simBuilder.getCurrentParserToken();
 			if(expr != null) {
-				expr.setFirstParserToken(firstParserToken);
-				expr.setLastParserToken(lastParserToken);
-//				Util.println("Expression.acceptExpression: " + expr.getClass().getSimpleName() + ": range = " + Util.edRange(expr.getLexRange()));
+//				expr.setFirstParserToken(firstParserToken);
+//				expr.setLastParserToken(lastParserToken);
+				expr.tokenRange = new LexTokenRange(firstParserToken, lastParserToken);
+//				Util.println("Expression.acceptExpression: " + expr.getClass().getSimpleName() + "  " + expr + ": range = " + Util.edRange(expr.getLexRange()));
 			}
 			return expr;
 		}
 	} 
-	
-	/// Expect expression.
-	/// <pre>
-	/// Expression	=  SimpleExpression
-	/// 	        |  IF  BooleanExpression  THEN  SimpleExpression  ELSE  Expression
-	/// </pre>
-	/// If no expression is found an error message is printed.
-	/// @return Expression or 'MissingExpression' if no expression is found.
-	public static Expression expectExpression(SimulaBuilder simBuilder, String kind) {
-//		Util.println("Expression.expectExpression: BEGIN");
-		Expression expr=acceptExpression(simBuilder);
-		if(expr==null) {
-//			Util.syntaxError(simBuilder, "Expecting Expression");
-			expr = new MissingExpression(simBuilder);
-			Util.semanticError(expr, "Expecting " + kind + " Expression");
-		}
-//		Util.println("Expression.expectExpression: END: expr="+expr);
-		return(expr);
-	}
 	
 	
 
@@ -198,8 +183,7 @@ public abstract class Expression extends SyntaxElement {
 	private static Expression expectSimpleExpression(SimulaBuilder simBuilder, String kind)  { 
 		Expression expr = acceptSimpleExpression(simBuilder);
 		if(expr == null) {
-			expr = new MissingExpression(simBuilder);
-			Util.semanticError(expr, "Expecting simple " + kind + " Expression");
+			expr = new MissingExpression(simBuilder, "Expecting simple " + kind + " Expression");
 		}
 		return expr;
 	}
