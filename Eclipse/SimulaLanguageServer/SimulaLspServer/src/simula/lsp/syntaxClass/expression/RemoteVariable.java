@@ -106,7 +106,7 @@ public final class RemoteVariable extends Expression {
 		obj.doChecking();
 		Type objType = obj.type;
 		if(objType == null) {
-			Util.semanticError(obj, "Object Expression (" + obj + ") has no type");
+			Util.diagnosticError(obj, "Object Expression (" + obj + ") has no type");
 			return Type.Undef;
 		}
 		if (objType.keyWord == Type.T_TEXT)
@@ -116,11 +116,11 @@ public final class RemoteVariable extends Expression {
 		ClassDeclaration qual = objType.getQual();
 		if (qual == null) {
 			if(objType.keyWord != Type.T_UNDEF)
-				Util.semanticError(obj, "Object Expression (" + obj + ") is not a ref() type");
+				Util.diagnosticError(obj, "Object Expression (" + obj + ") is not a ref() type");
 		} else if (qual.hasLocalClasses) {
 			if (DocumentManager.EXTENSIONS)
 				 Util.warning(obj, "Illegal remote access into object of class with local classes.");
-			else Util.semanticError(obj, "Illegal remote access into object of class with local classes.");
+			else Util.diagnosticError(obj, "Illegal remote access into object of class with local classes.");
 		}
 
 		if (attr instanceof VariableExpression var) {
@@ -131,9 +131,9 @@ public final class RemoteVariable extends Expression {
 				if(objType.keyWord != Type.T_UNDEF) {
 					Identifier refId = objType.getRefIdent();
 					if(refId != null) {
-						Util.semanticError(obj, ident.value + " is not an attribute of "	+ refId.value);
+						Util.diagnosticError(obj, ident.value + " is not an attribute of "	+ refId.value);
 					} else {
-						Util.semanticError(obj, "Illegal remote access");
+						Util.diagnosticError(obj, "Illegal remote access");
 					}
 				}
 				UndefinedDeclaration undef = new UndefinedDeclaration(this, ident);
@@ -159,7 +159,7 @@ public final class RemoteVariable extends Expression {
 				return (result);
 			}
 		} else {
-			Util.semanticError(attr, "Illegal attribute(" + attr + ") in remote access");
+			Util.diagnosticError(attr, "Illegal attribute(" + attr + ") in remote access");
 			result = attr.type;
 		}
 		return (result);
@@ -176,7 +176,7 @@ public final class RemoteVariable extends Expression {
 			Meaning meaning = StandardClass.typeText.findMeaning(ident);
 //			Util.println("RemoteVatiable.doRemoteTextChecking: meaning=" + meaning.declaredAs.getClass().getSimpleName());
 			if (meaning.declaredAs instanceof UndefinedDeclaration) {
-				Util.semanticError(attr, "RemoteVariable.doRemoteTextChecking: " + ident.value + " is not a Text attribute");
+				Util.diagnosticError(attr, "RemoteVariable.doRemoteTextChecking: " + ident.value + " is not a Text attribute");
 				return Type.Undef;
 			}
 			var.setRemotelyAccessed(meaning);
@@ -184,7 +184,7 @@ public final class RemoteVariable extends Expression {
 			result = meaning.declaredAs.type;
 
 		} else {
-			Util.semanticError(attr, "Illegal attribute(" + attr + ") in remote access");
+			Util.diagnosticError(attr, "Illegal attribute(" + attr + ") in remote access");
 			result = attr.type;
 		}
 		return (result);

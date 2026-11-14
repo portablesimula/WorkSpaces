@@ -123,8 +123,8 @@ public final class PrefixedBlockDeclaration extends ClassDeclaration {
 //			getPrefixClass().doChecking();
 			prefixClass = getPrefixClass();
 			if(prefixClass == null) {
-//				Util.semanticError(this, "Prefix " + prefix.value + " is not a Class");
-				Util.semanticError(blockPrefix, "Prefix " + blockPrefix + " is not a Class");
+//				Util.diagnosticError(this, "Prefix " + prefix.value + " is not a Class");
+				Util.diagnosticError(blockPrefix, "Prefix " + blockPrefix + " is not a Class");
 			} else {
 				prefixClass.doChecking();
 			}

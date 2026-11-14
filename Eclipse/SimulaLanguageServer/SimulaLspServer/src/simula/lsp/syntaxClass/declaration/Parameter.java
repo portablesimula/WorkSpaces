@@ -131,7 +131,7 @@ public final class Parameter extends Declaration {
 	public void into(final Vector<Parameter> parameterList) {
 		for (Parameter par : parameterList)
 			if (Util.equals(par.identifier, this.identifier)) {
-				Util.syntaxError(getSimBuilder(), "Parameter already defined: " + identifierValue());
+				Util.diagnosticError(getSimBuilder(), "Parameter already defined: " + identifierValue());
 				return;
 			}
 		parameterList.add(this);
@@ -155,7 +155,7 @@ public final class Parameter extends Declaration {
 	/// @param mode the new mode
 	void setMode(final int mode) {
 		if (this.mode != 0)
-			Util.syntaxError(getSimBuilder(), "Parameter " + identifierValue() + " is already specified as by " + edMode(this.mode));
+			Util.diagnosticError(getSimBuilder(), "Parameter " + identifierValue() + " is already specified as by " + edMode(this.mode));
 		this.mode = mode;
 	}
 
@@ -181,14 +181,14 @@ public final class Parameter extends Declaration {
 			return;
 		LspGlobal.sourceLineNumber = firstLineNumber();
 		if (kind == 0) {
-			Util.semanticError(this, "Parameter " + identifierValue() + " is not specified -- assumed Simple Integer");
+			Util.diagnosticError(this, "Parameter " + identifierValue() + " is not specified -- assumed Simple Integer");
 			kind = Kind.Simple;
 			type = Type.Integer;
 		}
 		if (type != null)
 			type.doChecking(LspGlobal.getCurrentScope().declaredIn, this);
 		if (!legalTransmitionMode())
-			Util.semanticError(this, "Illegal transmission mode: " + edKind(kind) + ' ' + type + ' '	+ identifierValue() + " by " + edMode(mode) + " is not allowed");
+			Util.diagnosticError(this, "Illegal transmission mode: " + edKind(kind) + ' ' + type + ' '	+ identifierValue() + " by " + edMode(mode) + " is not allowed");
 		SET_SEMANTICS_CHECKED();
 	}
 

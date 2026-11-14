@@ -1,9 +1,0 @@
-begin
-	integer LL;
-	goto L;
-	goto LL;
-	
-	go L2;
-	
-	L2:
-end

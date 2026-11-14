@@ -160,7 +160,7 @@ public abstract class BlockDeclaration extends DeclarationScope {
 //	        Util.println("BlockDeclaration.parseBlock: TESTING token: " + token);
 	        if(token != null) {
 		        if(token.keyWord == KeyWord.EOF)
-		        	Util.syntaxError(simBuilder, token, "Missing final block end");
+		        	Util.diagnosticError(simBuilder, token, "Missing final block end");
 	        	break LOOP;
 	        }
 			Statement stm = Statement.acceptStatement(simBuilder);

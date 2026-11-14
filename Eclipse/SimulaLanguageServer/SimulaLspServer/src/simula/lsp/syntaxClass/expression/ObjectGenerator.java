@@ -95,7 +95,7 @@ public final class ObjectGenerator extends Expression {
 		if (Parse.accept(simBuilder, KeyWord.BEGPAR)) {
 			do {
 				Expression par=acceptExpression(simBuilder);
-				if(par==null) Util.syntaxError(simBuilder, "Missing class parameter");
+				if(par==null) Util.diagnosticError(simBuilder, "Missing class parameter");
 				else params.add(par);
 			} while (Parse.accept(simBuilder, KeyWord.COMMA));
 			Parse.expect(simBuilder, KeyWord.ENDPAR);
@@ -113,11 +113,11 @@ public final class ObjectGenerator extends Expression {
 			Util.TRACE("BEGIN ObjectGenerator(" + classIdentifier + ").doChecking - Current Scope Chain: " + LspGlobal.getCurrentScope().edScopeChain());
 		meaning = LspGlobal.getCurrentScope().findMeaning(classIdentifier);
 		if (meaning.declaredAs instanceof UndefinedDeclaration) {
-			Util.semanticError(this, "Undefined class identifier: " + classIdentifier.value);
+			Util.diagnosticError(this, "Undefined class identifier: " + classIdentifier.value);
 //			meaning = new Meaning(null, null); // Error Recovery: No Meaning
 		}
 		if (!(meaning.declaredAs instanceof ClassDeclaration)) {
-			Util.semanticError(this, "new " + classIdentifier.value + ": Not a Class");
+			Util.diagnosticError(this, "new " + classIdentifier.value + ": Not a Class");
 			SET_SEMANTICS_CHECKED();
 			return;
 		}
@@ -127,7 +127,7 @@ public final class ObjectGenerator extends Expression {
 		Iterator<Expression> actualIterator = params.iterator();
 		LOOP: while (actualIterator.hasNext()) {
 			if (!formalIterator.hasNext()) {
-				Util.semanticError(this, "Wrong number of parameters to Class " + cls.identifierValue());
+				Util.diagnosticError(this, "Wrong number of parameters to Class " + cls.identifierValue());
 				break LOOP;
 			}
 			Declaration formalParameter = formalIterator.next();
@@ -146,7 +146,7 @@ public final class ObjectGenerator extends Expression {
 
 		}
 		if (formalIterator.hasNext())
-			Util.semanticError(this, "Missing parameter '" + formalIterator.next().identifierValue() + "' to Class " + cls.identifierValue());
+			Util.diagnosticError(this, "Missing parameter '" + formalIterator.next().identifierValue() + "' to Class " + cls.identifierValue());
 		if (Option.internal.TRACE_CHECKER)
 			Util.TRACE("END ObjectGenerator(" + classIdentifier + ").doChecking: type=" + type);
 		SET_SEMANTICS_CHECKED();

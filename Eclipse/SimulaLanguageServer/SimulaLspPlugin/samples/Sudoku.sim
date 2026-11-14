@@ -1,7 +1,7 @@
-Simset begin ref(Head) SQchain; 
+SIMSET begin ref(head) SQchain; 
   ref(SQ) array SQinst( 1 : 9, 1 : 9 ); 
    
-  Link class SQexit(success); boolean success; 
+  link class SQexit(success); Boolean success; 
   begin integer i, j; 
     detach; 
     if success then begin 
@@ -14,14 +14,14 @@ Simset begin ref(Head) SQchain;
       outimage; 
       outtext( "WE DID IT!" ); 
     end 
-    else outtext( "The puzzle has no solution!" ); 
+    else Outtext( "The puzzle has no solution!" ); 
   end; 
  
-  Link class SQ( row, col, val ); integer row, col, val;  
+  link class SQ( row, col, val ); integer row, col, val;  
   begin 
     integer next_val; 
      
-    boolean procedure legit(val); integer val; 
+    Boolean procedure legit(val); integer val; 
     begin 
       integer i, j, reg_row, reg_col; 
  
@@ -35,7 +35,7 @@ Simset begin ref(Head) SQchain;
       for i := reg_row step 1 until reg_row + 2 do   
       for j := reg_col step 1 until reg_col + 2 do  
          if SQinst( i, j ).val = val then goto exit;  
-      legit := true; 
+      legit := TRUE; 
 exit:   
     end; 
   
@@ -44,7 +44,7 @@ exit:
        into(SQchain); 
     detach; 
      
-    while true do begin 
+    while TRUE do begin 
       for next_val := 1 step 1 until 9 do 
         if legit(next_val) then begin 
            val := next_val; 
@@ -60,21 +60,21 @@ exit:
     integer i, j; 
     
     outtext( "PUZZLE INPUT:" ); outimage; 
-    inspect new InFile( "data/SudokuDifficult.txt" ) do begin 
-      open( blanks(80) ); 
+    inspect new infile( "data/SudokuDifficult.txt" ) do begin 
+      Open( Blanks(80) ); 
       for i := 1 step 1 until 9 do begin  
         for j := 1 step 1 until 9 do 
-           SQinst( i, j ) :- new SQ( i, j, inint ); 
+           SQInst( i, j ) :- new SQ( i, j, inint ); 
         outimage; 
       end;  
-      close; 
+      Close; 
     end; 
     outimage; 
   end; 
       
-  SQchain :- new Head; 
-  new SQexit(false).into(SQchain); 
+  SQchain :- new head; 
+  new SQexit(FALSE).into(SQchain); 
   get_input; 
-  new SQexit(true).into(SQchain); 
+  new SQexit(TRUE).into(SQchain); 
   resume( SQchain.first.suc ); 
 end

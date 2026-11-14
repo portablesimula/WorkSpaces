@@ -74,14 +74,14 @@ public final class ProtectedSpecification extends SyntaxElement {
 	public void doChecking() {
 		Declaration attribute = getAttribute();
 		if(attribute == null) {
-			Util.semanticError(this, "No Attribute " + identifier.value + " match 'protected' specification");
+			Util.diagnosticError(this, "No Attribute " + identifier.value + " match 'protected' specification");
 		} else {
 			attribute.isProtected = this;
 			VirtualSpecification virtSpec=VirtualSpecification.getVirtualSpecification(attribute);
 //			Util.println("ProtectedSpecification.doChecking: virtSpec: " + virtSpec);
 			if(virtSpec != null) {
 				if( this.definedIn != attribute.declaredIn)
-					Util.semanticError(this, "A virtual attribute may only be specified protected in the class heading in which the virtual specification occurs.");
+					Util.diagnosticError(this, "A virtual attribute may only be specified protected in the class heading in which the virtual specification occurs.");
 			}
 			// Virtual specification together with Attribute definition.
 			VirtualSpecification vir=getVirtualSpecification();

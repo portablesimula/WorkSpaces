@@ -86,7 +86,7 @@ public final class HiddenSpecification extends SyntaxElement {
 			}
 			scope = scope.getPrefixClass();
 		}
-		Util.semanticError(this, identifier.value + " is specified HIDDEN without being PROTECTED");
+		Util.diagnosticError(this, identifier.value + " is specified HIDDEN without being PROTECTED");
 		return (null);
 	}
 

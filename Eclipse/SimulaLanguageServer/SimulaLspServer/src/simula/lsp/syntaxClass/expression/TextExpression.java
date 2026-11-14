@@ -124,7 +124,7 @@ public final class TextExpression extends Expression {
 		rhs.doChecking();
 		if (lhs.type.keyWord != Type.T_TEXT || rhs.type.keyWord != Type.T_TEXT) {
 			if(lhs.type != Type.Undef && rhs.type != Type.Undef)
-				Util.semanticError(this, "Operand Type to Text Concatenation(&) is not Text: "+lhs.type+" & "+rhs.type);
+				Util.diagnosticError(this, "Operand Type to Text Concatenation(&) is not Text: "+lhs.type+" & "+rhs.type);
 		}
 		this.type = Type.Text;
 		if (Option.internal.TRACE_CHECKER)

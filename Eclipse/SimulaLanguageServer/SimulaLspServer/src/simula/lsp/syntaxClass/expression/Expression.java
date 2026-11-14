@@ -471,7 +471,7 @@ public abstract class Expression extends SyntaxElement {
 		Declaration objDecl = LspGlobal.getCurrentScope().findMeaning(refIdent).declaredAs;
 		if(objDecl instanceof ClassDeclaration cls)	return(cls);
 		if(refIdent != null)
-			Util.semanticError(expr, "Illegal ref(" + refIdent.value + "): " + refIdent.value + " is not a class");
+			Util.diagnosticError(expr, "Illegal ref(" + refIdent.value + "): " + refIdent.value + " is not a class");
 		return(null);
 	}
 
@@ -492,7 +492,7 @@ public abstract class Expression extends SyntaxElement {
 		ClassDeclaration objDecl=getQualification(simpleObjectExpression);
 		ClassDeclaration quaDecl=getQualification(classIdentifier);
 		if(quaDecl == null) {
-//			Util.semanticError(simpleObjectExpression, "Illegal: " + classIdentifier.value + " is not a class");
+//			Util.diagnosticError(simpleObjectExpression, "Illegal: " + classIdentifier.value + " is not a class");
 		} else {
 			if(quaDecl==objDecl) ; // Nothing: Util.warning("Unneccessary QUA/IS/IN "+ classIdentifier);
 			else if(!(objDecl.isCompatibleClasses(quaDecl))) return(false);

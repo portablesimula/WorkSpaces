@@ -261,7 +261,7 @@ public class ClassDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.syntaxError(simBuilder, "The specified: value " + identifier.value + " is not defined in this scope");
+					Util.diagnosticError(simBuilder, "The specified: value " + identifier.value + " is not defined in this scope");
 					parameter = new Parameter(cls, identifier);
 				}
 				parameter.setMode(Parameter.Mode.value);
@@ -310,7 +310,7 @@ public class ClassDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
+					Util.diagnosticError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
 					parameter = new Parameter(cls, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
@@ -457,7 +457,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			prefixClass = getPrefixClass();
 //			Util.println("ClassDecleration.doChecking: prefixClass: " + prefixClass );
 			if(prefixClass == null) {
-				Util.semanticError(this, "Prefix " + prefix.value + " is not a Class");
+				Util.diagnosticError(this, "Prefix " + prefix.value + " is not a Class");
 			} else {
 				prefixClass.doChecking();
 				if (prefixClass.declarationKind != ObjectKind.StandardClass) {
@@ -753,7 +753,7 @@ public class ClassDeclaration extends BlockDeclaration {
 			return null;
 		Declaration decl = meaning.declaredAs;
 		if (decl == this) {
-			Util.semanticError(this, "Class prefix chain loops: " + identifierValue());
+			Util.diagnosticError(this, "Class prefix chain loops: " + identifierValue());
 			return null;
 		}
 		if (decl instanceof ClassDeclaration cls) {

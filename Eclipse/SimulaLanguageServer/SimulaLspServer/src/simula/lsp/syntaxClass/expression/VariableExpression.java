@@ -194,7 +194,7 @@ public final class VariableExpression extends Expression {
 //				Util.println("VariableExpression.expectVariable: GOT BEGPAR OR COMMA");
 				Expression par = acceptExpression(simBuilder);
 				if (par == null)
-					Util.syntaxError(simBuilder, "Missing procedure parameter");
+					Util.diagnosticError(simBuilder, "Missing procedure parameter");
 				else{
 					variable.params.add(par);
 					par.backLink = variable;
@@ -237,15 +237,15 @@ public final class VariableExpression extends Expression {
 		switch(declaredAs) {
 			case UndefinedDeclaration undef -> {
 				if(remotelyAccessed)
-					 Util.semanticError(this, "Undefined attribute: " + undef.identifierValue());
-				else Util.semanticError(this, "Undefined variable: " + undef.identifierValue());
+					 Util.diagnosticError(this, "Undefined attribute: " + undef.identifierValue());
+				else Util.diagnosticError(this, "Undefined variable: " + undef.identifierValue());
 			}
 			case StandardProcedure sproc -> {
 				if (Util.equals(sproc.identifierValue(), "detach")) {
 					switch(meaning.declaredIn) {
 						case ConnectionBlock  conn  -> { conn.classDeclaration.detachUsed = true; }
 						case ClassDeclaration cdecl -> { cdecl.detachUsed = true; }
-						default -> { Util.semanticError(this, "Variable(" + identifier.value + ").doChecking:INTERNAL ERROR, "
+						default -> { Util.diagnosticError(this, "Variable(" + identifier.value + ").doChecking:INTERNAL ERROR, "
 									+ meaning.declaredIn.getClass().getSimpleName()); }
 					}
 				}
@@ -261,7 +261,7 @@ public final class VariableExpression extends Expression {
 				if(params != null) {
 					// Check parameters
 					if (params.size() != array.nDim)
-						Util.semanticError(this, "Wrong number of indices to " + array);
+						Util.diagnosticError(this, "Wrong number of indices to " + array);
 					checkedParams = new Vector<Expression>();
 					for (Expression actualParameter : params) {
 						actualParameter.doChecking();
@@ -301,11 +301,11 @@ public final class VariableExpression extends Expression {
 				if (params == null) {
 					if(declaredAs.declarationKind != ObjectKind.Procedure) {
 						if (paramIterator.hasNext())
-							Util.semanticError(this, "Missing parameter(s) to " + ObjectKind.edit(declaredAs.declarationKind) + " " + declaredAs.identifierValue());
+							Util.diagnosticError(this, "Missing parameter(s) to " + ObjectKind.edit(declaredAs.declarationKind) + " " + declaredAs.identifierValue());
 					} else {
 						if(!(declaredAs instanceof SwitchDeclaration)) {
 							if(backLink == null && paramIterator.hasNext())
-								Util.semanticError(this, "Missing parameter(s) to " + declaredAs.identifierValue());
+								Util.diagnosticError(this, "Missing parameter(s) to " + declaredAs.identifierValue());
 						}
 					}
 				} else {
@@ -314,7 +314,7 @@ public final class VariableExpression extends Expression {
 					Iterator<Expression> actualIterator = params.iterator();
 					LOOP: while (actualIterator.hasNext()) {
 						if (!paramIterator.hasNext()) {
-							Util.semanticError(this, "Too many parameters to " + declaredAs.identifierValue());
+							Util.diagnosticError(this, "Too many parameters to " + declaredAs.identifierValue());
 							break LOOP;
 						}
 						Parameter formalParameter = (Parameter) paramIterator.next();
@@ -331,13 +331,13 @@ public final class VariableExpression extends Expression {
 						if (formalParameter.kind == Parameter.Kind.Array) {
 							if (formalType != null && (!formalType.equals(actualParameter.type))
 									&& formalType.isArithmeticType())
-								Util.semanticError(this, "Parameter Array " + actualParameter + " must be of Type " + formalType);
+								Util.diagnosticError(this, "Parameter Array " + actualParameter + " must be of Type " + formalType);
 						} else {
 							if(actualParameter instanceof VariableExpression pvar) {
 								if(! pvar.hasArguments()) {
 									Declaration pdecl = pvar.meaning.declaredAs;
 									if(pdecl instanceof ArrayDeclaration)
-										Util.semanticError(this, "Array identifier '" + actualParameter + "' as actual parameter does not match formal type " + formalParameter);
+										Util.diagnosticError(this, "Array identifier '" + actualParameter + "' as actual parameter does not match formal type " + formalParameter);
 								}
 							}
 						}
@@ -346,7 +346,7 @@ public final class VariableExpression extends Expression {
 						checkedParams.add(checkedParameter);
 					}
 					if (paramIterator.hasNext())
-						Util.semanticError(this, "Missing parameter(s) to " + declaredAs.identifierValue());
+						Util.diagnosticError(this, "Missing parameter(s) to " + declaredAs.identifierValue());
 				}
 				if (type instanceof OverLoad)
 					this.type = overloadedType;
@@ -366,7 +366,7 @@ public final class VariableExpression extends Expression {
 						actualParameter.doChecking();
 						if (kind == Parameter.Kind.Array) {
 							if (!actualParameter.type.isArithmeticType())
-								Util.semanticError(this, "Illegal index-type");
+								Util.diagnosticError(this, "Illegal index-type");
 							Expression checkedParameter = TypeConversion.testAndCreate(Type.Integer, actualParameter);
 							checkedParameter.backLink = this;
 							checkedParams.add(checkedParameter);
@@ -394,7 +394,7 @@ public final class VariableExpression extends Expression {
 			case ObjectKind.UndefinedDeclaration:
 				if(params != null) {
 //					Util.println("VariableExpression.doChecking: " + ObjectKind.edit(declaredAs.declarationKind) + " " + declaredAs);
-					Util.semanticError(this, "Illegal subscription of variable " + this.identifier.value);
+					Util.diagnosticError(this, "Illegal subscription of variable " + this.identifier.value);
 				}
 				break;
 				

@@ -51,7 +51,7 @@ public final class RunErrorTest {
 		
 		Vector<String> names=new Vector<String>();
 		
-//		names.add("expression/AdHoc00");
+		names.add("expression/AdHoc00");
 
 		// *** SIMULA ERROR TEST BATCH TIL EKSEKVERING
 //		names.add("TypeError");
@@ -87,7 +87,7 @@ public final class RunErrorTest {
 //		names.add("statement/ForStatement_Errors");
 //		names.add("statement/GotoStatement_Errors");
 //		names.add("statement/InnerStatement_Errors");
-		names.add("statement/SwitchStatement_Errors");
+//		names.add("statement/SwitchStatement_Errors");
 //		names.add("statement/WhileStatement_Errors");
 
 				

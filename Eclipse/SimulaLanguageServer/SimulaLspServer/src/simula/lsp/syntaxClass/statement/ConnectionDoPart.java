@@ -54,13 +54,13 @@ public class ConnectionDoPart extends SyntaxElement {
 		Type type = connectionStatement.inspectVariableDeclaration.type;
 		Identifier refIdentifier = type.getRefIdent();
 		if (refIdentifier == null) {
-			Util.semanticError(this, "The Variable " + connectionStatement.inspectedVariable + " is not ref() type");
+			Util.diagnosticError(this, "The Variable " + connectionStatement.inspectedVariable + " is not ref() type");
 		}
 		ClassDeclaration classDeclaration = AssignmentOperation.getQualification(refIdentifier);
 		if(classDeclaration != null) {
 			connectionBlock.setClassDeclaration(classDeclaration);
 		} else if(refIdentifier != null) {
-			Util.semanticError(this, "Illegal connection variable: " + refIdentifier.value + " is not a class");			
+			Util.diagnosticError(this, "Illegal connection variable: " + refIdentifier.value + " is not a class");			
 		}
 		
 		connectionBlock.doChecking();

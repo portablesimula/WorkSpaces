@@ -16,4 +16,4 @@ begin integer array q,u,d (-17:17);
    
    p(0,17,q,u,d);
    
-end;
+end program.

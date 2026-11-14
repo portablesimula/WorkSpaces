@@ -110,7 +110,7 @@ public final class ObjectRelation extends Expression {
 		classDeclaration = getQualification(classIdentifier);
 		if(classDeclaration == null) {
 			String reason = (classIdentifier == null)? "" : classIdentifier.value + " is not a class";
-			Util.semanticError(this, "Illegal Object relation IS/IN: " + reason);
+			Util.diagnosticError(this, "Illegal Object relation IS/IN: " + reason);
 		}
 		// Object IS ClassIdentifier | Object IN ClassIdentifier
 		lhs.doChecking();
@@ -118,7 +118,7 @@ public final class ObjectRelation extends Expression {
 		Identifier refIdent = type1.getRefIdent();
 		if (refIdent == null) {
 			String reason = (classIdentifier == null)? "" : classIdentifier.value + " -- " + lhs + " is not an object expression";
-			Util.semanticError(lhs, lhs.toString() + " IS/IN " + reason);
+			Util.diagnosticError(lhs, lhs.toString() + " IS/IN " + reason);
 		}
 		this.type = Type.Boolean;
 		if (Option.internal.TRACE_CHECKER)

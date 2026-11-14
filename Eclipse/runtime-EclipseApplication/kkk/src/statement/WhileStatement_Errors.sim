@@ -1,4 +1,0 @@
-begin
-	integer gruff;
-	while gruff do ;
-end

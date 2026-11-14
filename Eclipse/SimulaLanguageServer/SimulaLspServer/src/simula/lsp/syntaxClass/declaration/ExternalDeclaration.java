@@ -139,12 +139,12 @@ public final class ExternalDeclaration extends Declaration {
 	public static Vector<SyntaxElement> expectExternalDeclaration(final SimulaBuilder simBuilder) {
 		Identifier kind = Parse.acceptIdentifier(simBuilder);
 		if (kind != null)
-			Util.syntaxError(simBuilder, "*** NOT IMPLEMENTED: " + "External " + kind.value + " Procedure");
+			Util.diagnosticError(simBuilder, "*** NOT IMPLEMENTED: " + "External " + kind.value + " Procedure");
 		Type expectedType = Parse.acceptType(simBuilder);
 //		if (!(PsiParse.accept(simBuilder, KeyWord.CLASS) || PsiParse.accept(simBuilder, KeyWord.PROCEDURE)))
 		if (!(Parse.accept(simBuilder, KeyWord.CLASS, KeyWord.PROCEDURE)))
-//			Util.syntaxError(simBuilder.getCurrentParserToken(), "parseExternalDeclaration: Expecting CLASS or PROCEDURE");
-			Util.syntaxError(simBuilder, "parseExternalDeclaration: Expecting CLASS or PROCEDURE");
+//			Util.diagnosticError(simBuilder.getCurrentParserToken(), "parseExternalDeclaration: Expecting CLASS or PROCEDURE");
+			Util.diagnosticError(simBuilder, "parseExternalDeclaration: Expecting CLASS or PROCEDURE");
 
 		Vector<SyntaxElement> declarations = new Vector<SyntaxElement>();
 		Identifier identifier = Parse.expectIdentifier(simBuilder);
@@ -160,7 +160,7 @@ public final class ExternalDeclaration extends Declaration {
 					externalIdentifier = xident.value;
 					LOG.trace("ExternalDeclaration.expectExternalDeclaration: extIdentifier" + externalIdentifier);
 				} else {
-					Util.syntaxError(simBuilder, token, "Expecting external identifier string");
+					Util.diagnosticError(simBuilder, token, "Expecting external identifier string");
 				}
 				simBuilder.getNextParserToken();
 			}
@@ -172,28 +172,28 @@ public final class ExternalDeclaration extends Declaration {
 			File jarFile = JarFileBuilder.findJarFile(simBuilder, identifier.value, externalIdentifier);
 //			Util.println("ExternalDeclaration.expectExternalDeclaration: jarFile: " + jarFile);
 			if(jarFile == null) {
-//				Util.syntaxError(simBuilder, "Can't find attribute file: " + identifier.value + '[' + externalIdentifier + ']');
+//				Util.diagnosticError(simBuilder, "Can't find attribute file: " + identifier.value + '[' + externalIdentifier + ']');
 				String mss = "Illegal External Declaration: Can't find attribute file: " + identifier.value;
 				if(externalIdentifier != null) mss = mss + '[' + externalIdentifier + ']';
-				Util.syntaxError(simBuilder, mss);
+				Util.diagnosticError(simBuilder, mss);
 			}
 			if (jarFile != null) {
 				if(AttributeFileIO.checkJarFiles(simBuilder, jarFile.toString())) {
 					DeclarationScope scope = LspGlobal.getCurrentScope();
 					Type moduleType = AttributeFileIO.readAttributeEntry(simBuilder, identifier.value, jarFile, scope.getEnclosingBlock());
 					if(moduleType == null) {
-						if (expectedType != null) Util.syntaxError(simBuilder, "Missing external type: "+expectedType);
+						if (expectedType != null) Util.diagnosticError(simBuilder, "Missing external type: "+expectedType);
 					} else if(expectedType == null) {
 						// NOTHING
 					} else if (!moduleType.equals(expectedType)) {
 						if (expectedType != null)
-							Util.syntaxError(simBuilder, "Wrong external type: "+moduleType+". Expected type: "+expectedType);
+							Util.diagnosticError(simBuilder, "Wrong external type: "+moduleType+". Expected type: "+expectedType);
 					}
 				}
 			}
 
 			if (Parse.accept(simBuilder, KeyWord.IS)) {
-				Util.syntaxError(simBuilder, "*** NOT IMPLEMENTED: " + "External non-Simula Procedure");
+				Util.diagnosticError(simBuilder, "*** NOT IMPLEMENTED: " + "External non-Simula Procedure");
 				break LOOP;
 			}
 			if (!Parse.accept(simBuilder, KeyWord.COMMA))

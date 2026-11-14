@@ -158,7 +158,7 @@ public final class AttributeFileIO {
 			if (jarFile == null) {
 				String mss = "Illegal External Declaration: Can't find attribute file: " + xdecl.identifier;
 				if(xdecl.externalIdent != null) mss = mss + '[' + xdecl.externalIdent + ']';
-				Util.syntaxError(simBuilder, mss);
+				Util.diagnosticError(simBuilder, mss);
 			} else {
 				if(checkJarFiles(simBuilder, jarFile.toString())) {
 					BlockDeclaration enclosure = StandardClass.BASICIO;

@@ -95,8 +95,8 @@ public final class RelationalOperation extends Expression {
 				// Arithmetic Relation
 				Type atype = Type.arithmeticTypeConversion(type1, type2);
 				if (atype == null) {
-					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
-					Util.semanticError(this, "RelationalOperation: Illegal types: " + type1 + " " + KeyWord.edit(opr) + " " + type2);
+					Util.diagnosticError(this, "Incompatible types in binary operation: " + toString());
+					Util.diagnosticError(this, "RelationalOperation: Illegal types: " + type1 + " " + KeyWord.edit(opr) + " " + type2);
 				}
 				lhs = (Expression) TypeConversion.testAndCreate(atype, lhs);
 				rhs = (Expression) TypeConversion.testAndCreate(atype, rhs);
@@ -105,7 +105,7 @@ public final class RelationalOperation extends Expression {
 			case KeyWord.EQR: case KeyWord.NER: {
 				// Object =/= Object or Object == Object
 				if ((!type1.isReferenceType()) || (!type2.isReferenceType()))
-					Util.semanticError(this, "RelationalOperation: Illegal types: " + type1 + " " + KeyWord.edit(opr) + " " + type2);
+					Util.diagnosticError(this, "RelationalOperation: Illegal types: " + type1 + " " + KeyWord.edit(opr) + " " + type2);
 				break;
 			}
 			default:

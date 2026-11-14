@@ -1,4 +1,4 @@
-Drawing("Elevator simulation",1000,1000) begin 
+Drawing("Elevator simulation",1000,900) begin 
 -----------------------------------------------------------------------------------------
 -- This is a simulation model of a number of elevators in an office buiding.
 --
@@ -34,8 +34,8 @@ real decelerationTime=0.001; -- Deceleration time for lift
 real startTime=7.0;          -- Starting time in the morning
 real endTime=19.0;           -- Ending time in the evening
 
-outtext("Number of lifts: ");
-breakoutimage; nLifts := inint;
+% outtext("Number of lifts: "); breakoutimage; nLifts := inint;
+nLifts := prompt("LiftSimulation", "Number of lifts:").getInt;
 if(nLifts < 2)  then nLifts := 2;
 if(nLifts > 10) then nLifts := 10;
 
@@ -399,7 +399,7 @@ Simulation begin
     Process class Reporter; begin 
         integer lb=150;    -- Shaft left border
         integer width=40;  -- Shaft width
-        integer ffdist=70; -- floors to floor distance
+        integer ffdist=60; -- floors to floor distance
         real prevTime,timeStep; -- Used to synchronize time
         ref(TextElement) simTimeLabel,maxWaitLabel,meanWaitLabel,totalWaitLabel;
         ref(TextElement) arriveLabel,leftLabel,toLuchLabel,fromLunchLabel; 
@@ -446,7 +446,7 @@ Simulation begin
         --- Reporter - Story board (simulation events)
         -----------------------------------------------
         setStroke(2.5); setFontStyleBold;
-        setDrawColor(black); setFontSize(24);
+        setDrawColor(black); setFontSize(18);
         drawText("Simulated time",100,50);            simTimeLabel:-drawText(" ",300,50); 
         drawText("Max waiting time",100,80);          maxWaitLabel:-drawText(" ",300,80); 
         drawText("Mean waiting time",100,110);        meanWaitLabel:-drawText(" ",300,110); 
@@ -510,7 +510,6 @@ Simulation begin
     ----------------------------------
 
     hold(startTime);
-    activate new Reporter; 
 
     begin -- Initiate global variables
         integer j;
@@ -531,6 +530,8 @@ Simulation begin
             activate new Person(randint(1,nFloors,U1)) at persionActivationTime;
         end;
     end;
+ 
+    activate new Reporter; 
     
     hold(endTime - time);
   

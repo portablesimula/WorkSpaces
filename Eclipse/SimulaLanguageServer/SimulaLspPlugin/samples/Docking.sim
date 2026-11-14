@@ -13,7 +13,7 @@ begin
    boolean verbose=true;!false; 
  
    procedure trace(msg); text msg; 
-   begin if verbose then 
+   begin if verbose then
    begin outtext(msg); outimage; end; end; 
  
      
@@ -247,4 +247,4 @@ begin
      
    while true do begin end; ! Until Window close ; 
        
-end Animation Program; 
+end Animation Program;

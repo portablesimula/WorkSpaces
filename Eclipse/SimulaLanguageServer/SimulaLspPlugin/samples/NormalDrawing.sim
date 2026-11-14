@@ -39,4 +39,4 @@ Drawing("Normal Drawing",900,900) begin
 	init;
 	sampler;
 
-end;
+end program.

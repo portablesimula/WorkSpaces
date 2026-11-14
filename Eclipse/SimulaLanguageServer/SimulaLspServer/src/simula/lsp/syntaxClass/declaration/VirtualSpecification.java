@@ -129,7 +129,7 @@ public final class VirtualSpecification extends Declaration {
 //				Util.println("\n\nVirtualSpecification.expectVirtualPart: " + identifierValue());
 				ProcedureSpecification procedureSpec = null;
 				if (Parse.accept(simBuilder, KeyWord.IS)) {
-					if(type != null) Util.syntaxError(simBuilder, "An IS-specified virtual procedure can have its type only after IS.");
+					if(type != null) Util.diagnosticError(simBuilder, "An IS-specified virtual procedure can have its type only after IS.");
 					type = Parse.acceptType(simBuilder);
 					Parse.expect(simBuilder, KeyWord.PROCEDURE);
 					procedureSpec = ProcedureSpecification.expectProcedureSpecification(simBuilder, type);						
@@ -145,7 +145,7 @@ public final class VirtualSpecification extends Declaration {
 //				Util.println("\n\nVirtualSpecification.expectVirtualPart: AFTER: " + identifierValue());
 			}
 		}
-		if(cls.virtualSpecList.size()==0) Util.syntaxError(simBuilder, "Missing virtual specifier after VIRTUAL:");
+		if(cls.virtualSpecList.size()==0) Util.diagnosticError(simBuilder, "Missing virtual specifier after VIRTUAL:");
 	}
 
 	/// Parse a virtual identifier list.

@@ -66,7 +66,7 @@ public class ForWhileElement extends ForListElement {
 		expr2.backLink = forStatement; // To ensure _RESULT from functions
 //		if (expr2.type == null || expr2.type.keyWord != Type.T_BOOLEAN)
 		if(! Type.checkType(expr2, Type.T_BOOLEAN)) {
-			Util.semanticError(expr2, "While condition is not Boolean but " + expr2.type);	
+			Util.diagnosticError(expr2, "While condition is not Boolean but " + expr2.type);	
 		}
 	}
 

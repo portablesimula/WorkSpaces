@@ -12,9 +12,10 @@ begin
    integer flow; 
    character c;
  
-   outtext("Do you want flow tracking (Y/N): "); breakoutimage;  
-   c:=inchar;
-   if c='y' or c='Y' then flow:= 1; 
+%   outtext("Do you want flow tracking (Y/N): "); breakoutimage;  
+%   c:=inchar;
+%   if c='y' or c='Y' then flow:= 1; 
+   if confirmDialog("Sudoku puzzle","Do you want flow tracking") then flow:= 1;
 
    Drawing("Sudoku",540,540) begin 
      Link class SQ(row, col, val); 
@@ -142,4 +143,5 @@ begin
      nSteps:= 0; maxSteps:= 2500; 
      if given_is_good then resume(SQchain.first); 
    end; 
-end;
+   
+end program.

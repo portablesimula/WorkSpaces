@@ -77,8 +77,8 @@ public final class SwitchDeclaration extends ProcedureDeclaration {
 		super.doChecking();
 		for (Expression expr : switchList) {
 			expr.doChecking();
-//			if(expr.type.keyWord != Type.T_LABEL) Util.semanticError(this, "Switch element "+expr+" is not a Label");
-			if(! Type.checkType(expr, Type.T_LABEL)) Util.semanticError(expr, "Switch element "+expr+" is not a Label");
+//			if(expr.type.keyWord != Type.T_LABEL) Util.diagnosticError(this, "Switch element "+expr+" is not a Label");
+			if(! Type.checkType(expr, Type.T_LABEL)) Util.diagnosticError(expr, "Switch element "+expr+" is not a Label");
 			expr.backLink = this; // To ensure _RESULT from functions
 		}
 		VirtualSpecification virtSpec=VirtualSpecification.getVirtualSpecification(this);

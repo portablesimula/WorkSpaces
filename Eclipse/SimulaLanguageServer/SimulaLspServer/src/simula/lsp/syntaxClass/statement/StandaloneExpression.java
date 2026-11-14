@@ -102,7 +102,7 @@ public final class StandaloneExpression extends Statement {
 		if (Option.internal.TRACE_CHECKER) Util.TRACE("StandaloneExpression("+expression+").doChecking - Current Scope Chain: "+LspGlobal.getCurrentScope().edScopeChain());
 		expression.doChecking();
 		if(!expression.maybeStatement() && expression.type != Type.Undef) {
-			Util.semanticError(expression, "Illegal/Missplaced Expression: "+expression);
+			Util.diagnosticError(expression, "Illegal/Missplaced Expression: "+expression);
 		}
 		if (Option.internal.TRACE_CHECKER) Util.TRACE("END StandaloneExpression(" + expression+ ").doChecking:");
 		SET_SEMANTICS_CHECKED();

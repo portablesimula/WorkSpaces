@@ -22,4 +22,4 @@ Dates begin
   if not M17.Is_weekend then outtext("ikke "); 
   outtext("helg.");  outimage; 
    
-end 
+end program.

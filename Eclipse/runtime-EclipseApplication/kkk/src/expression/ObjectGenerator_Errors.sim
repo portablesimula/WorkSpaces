@@ -1,9 +1,0 @@
-begin
-	class A(x, y); integer x, y; ;
-	ref(A) x;
-	
-	x :- new C;
-	x :- new A;
-	x :- new A(44);
-	x :- new A(1,2,3,4);
-end

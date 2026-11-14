@@ -66,5 +66,6 @@ Simulation begin
    activate new Person("Harry"); 
    activate new Person("Robert"); 
    activate new Person("John"); 
-   hold(100); 
-end;
+   hold(100);
+    
+end program.

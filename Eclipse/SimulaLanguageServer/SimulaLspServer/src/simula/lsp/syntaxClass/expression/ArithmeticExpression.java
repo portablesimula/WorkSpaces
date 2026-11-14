@@ -140,7 +140,7 @@ public final class ArithmeticExpression extends Expression {
 				}
 			}
 		} catch (Exception e) {
-			Util.syntaxError(simBuilder, "Arithmetic overflow: " + lhs + ' ' + KeyWord.edit(opr) + ' ' + rhs + "   " + e);
+			Util.diagnosticError(simBuilder, "Arithmetic overflow: " + lhs + ' ' + KeyWord.edit(opr) + ' ' + rhs + "   " + e);
 //			e.printStackTrace();
 		}
 		return (new ArithmeticExpression(lhs, opr, rhs));
@@ -176,7 +176,7 @@ public final class ArithmeticExpression extends Expression {
 				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
 				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);
 				if (this.type == null)
-					Util.semanticError(this, "Incompatible types in binary operation: " + toString() + " -- " + type1 + " incompatible with " + type2);
+					Util.diagnosticError(this, "Incompatible types in binary operation: " + toString() + " -- " + type1 + " incompatible with " + type2);
 			}
 			case KeyWord.DIV -> { // Real Division
 				// The operator / denotes real division.
@@ -192,7 +192,7 @@ public final class ArithmeticExpression extends Expression {
 				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
 				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);
 				if (this.type == null)
-					Util.semanticError(this, "Incompatible types in binary operation: " + toString() + " -- " + type1 + " incompatible with " + type2);
+					Util.diagnosticError(this, "Incompatible types in binary operation: " + toString() + " -- " + type1 + " incompatible with " + type2);
 			}
 			case KeyWord.INTDIV -> { // Integer Division
 				lhs.doChecking();
@@ -200,7 +200,7 @@ public final class ArithmeticExpression extends Expression {
 				Type type1 = lhs.type;
 				Type type2 = rhs.type;
 				if ((type1.keyWord != Type.T_INTEGER) || (type2.keyWord != Type.T_INTEGER))
-					Util.semanticError(this, "Incompatible types in Integer Division: " + toString() + " -- " + type1 + " incompatible with " + type2);
+					Util.diagnosticError(this, "Incompatible types in Integer Division: " + toString() + " -- " + type1 + " incompatible with " + type2);
 				this.type = Type.Integer;
 				lhs = (Expression) TypeConversion.testAndCreate(this.type, lhs);
 				rhs = (Expression) TypeConversion.testAndCreate(this.type, rhs);

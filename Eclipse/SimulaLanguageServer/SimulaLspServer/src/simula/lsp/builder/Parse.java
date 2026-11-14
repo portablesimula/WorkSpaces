@@ -4,6 +4,7 @@ import java.io.Reader;
 
 import simula.lsp.builder.token.Identifier;
 import simula.lsp.builder.token.LexToken;
+import simula.lsp.builder.token.LexTokenRange;
 import simula.lsp.syntaxClass.Type;
 import simula.lsp.utilities.KeyWord;
 import simula.lsp.utilities.LOG;
@@ -91,7 +92,7 @@ public class Parse {
 		if (accept(simBuilder, key)) {
 			return (true);
 		}
-		Util.syntaxError(simBuilder, simBuilder.getCurrentParserToken(), 
+		Util.diagnosticError(simBuilder, simBuilder.getCurrentParserToken(), 
 				"Got symbol '" + Parse.getCurrentParserToken(simBuilder).edText() + "' while expecting KeyWord " + KeyWord.edit(key).toLowerCase());
 		return (false);
 	}
@@ -197,7 +198,7 @@ public class Parse {
 
 	/// Skip misplaced current symbol.
 	public static void skipMisplacedCurrentSymbol(final SimulaBuilder simBuilder) {
-		Util.syntaxError(simBuilder, "Misplaced symbol: " + Parse.getCurrentParserToken(simBuilder).edText() + " -- Ignored");
+		Util.diagnosticError(simBuilder, "Misplaced symbol: " + Parse.getCurrentParserToken(simBuilder).edText() + " -- Ignored");
 		nextToken(simBuilder);
 	}
 	
@@ -226,7 +227,7 @@ public class Parse {
 	public static Identifier expectIdentifier(final SimulaBuilder simBuilder) {
         Identifier ident = acceptIdentifier(simBuilder);
         if(ident == null) {
-        	Util.syntaxError(simBuilder, "Missing identifier");
+        	Util.diagnosticError(simBuilder, "Missing identifier");
         	return new Identifier("");
         }
 		return ident;
@@ -248,16 +249,11 @@ public class Parse {
 			Parse.expect(simBuilder, KeyWord.BEGPAR); LexToken classIdentifier=Parse.getCurrentParserToken(simBuilder);
 			Parse.expect(simBuilder, KeyWord.IDENTIFIER); Parse.expect(simBuilder, KeyWord.ENDPAR); 
 			LexToken lastParserToken = simBuilder.getCurrentParserToken();
-//			Position firstLexPosition = new Position(firstLexToken.lineNumber, firstLexToken.column);
-//			Position lastLexPosition = new Position(lastLexToken.lineNumber, lastLexToken.column + lastLexToken.length);
-//			Range lexRange = new Range(firstLexPosition, lastLexPosition);
-//			Util.println("Parse.aacceptType: range = " + Util.edRange(lexRange));
-//
-////			type=Type.Ref(classIdentifier.toString()); 
 			type=Type.Ref(classIdentifier.getText()); 
-			type.setFirstParserToken(firstParserToken);
-			type.setLastParserToken(lastParserToken);
-			Util.println("Parse.aacceptType: range = " + Util.edRange(type.getLexRange()));
+//			type.setFirstParserToken(firstParserToken);
+//			type.setLastParserToken(lastParserToken);
+			type.tokenRange = new LexTokenRange(firstParserToken, lastParserToken);
+//			Util.println("Parse.aacceptType: range = " + Util.edRange(type.getLexRange()));
 		}
 		return(type);  
 	}

@@ -90,11 +90,11 @@ public final class QualifiedObject extends Expression {
 			Util.TRACE("BEGIN QualifiedObject" + toString() + ".doChecking - Current Scope Chain: "	+ LspGlobal.getCurrentScope().edScopeChain());
 		classDeclaration = getQualification(classIdentifier);
 		if(classDeclaration == null)
-			Util.semanticError(this, "Undefined cast because " + classIdentifier.value + " is not a class");
+			Util.diagnosticError(this, "Undefined cast because " + classIdentifier.value + " is not a class");
 
 		lhs.doChecking();
 		if (!checkCompatibility(lhs, classIdentifier))
-			Util.semanticError(this, "Illegal Object Expression: " + lhs + " is not compatible with " + classIdentifier.value);
+			Util.diagnosticError(this, "Illegal Object Expression: " + lhs + " is not compatible with " + classIdentifier.value);
 		this.type = new Type(classIdentifier);
 		this.type.tokenRange = this.tokenRange;
 		if (Option.internal.TRACE_CHECKER)

@@ -188,7 +188,7 @@ public final class ConnectionStatement extends Statement {
 			}
 
 		}
-		if(!(hasDoPart | hasWhenPart)) Util.syntaxError(simBuilder, "Incomplete Inspect statement: "+stm.objectExpression + ", missing DO or WHEN");
+		if(!(hasDoPart | hasWhenPart)) Util.diagnosticError(simBuilder, "Incomplete Inspect statement: "+stm.objectExpression + ", missing DO or WHEN");
 		Statement otherwise = null;
 		if (Parse.accept(simBuilder, KeyWord.OTHERWISE)) otherwise = Statement.acceptStatement(simBuilder);
 		stm.otherwise=otherwise;

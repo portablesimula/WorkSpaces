@@ -102,18 +102,18 @@ public final class AssignmentOperation extends Expression {
 			Meaning meaning = var.getMeaning();
 //			Util.println("AssignmentOperation.doChecking: meaning.declaredAs="+meaning.declaredAs.getClass().getSimpleName()+"  "+meaning.declaredAs);
 			switch(meaning.declaredAs) {
-				case SimpleVariableDeclaration dcl -> { if (dcl.isConstant()) Util.semanticError(var, "Assignment to Constant: '" + lhs + "' is Illegal"); }
-				case ClassDeclaration cls -> { Util.semanticError(lhs, "Can't assign to Class Identifier: " + cls.identifierValue()); }
+				case SimpleVariableDeclaration dcl -> { if (dcl.isConstant()) Util.diagnosticError(var, "Assignment to Constant: '" + lhs + "' is Illegal"); }
+				case ClassDeclaration cls -> { Util.diagnosticError(lhs, "Can't assign to Class Identifier: " + cls.identifierValue()); }
 				case ProcedureDeclaration pro -> {
 					if(! isProcedureCallLegalAsLHS(var, fromType))
-						Util.semanticError(lhs, "Can't assign to Procedure: " + pro.identifierValue());
+						Util.diagnosticError(lhs, "Can't assign to Procedure: " + pro.identifierValue());
 				}
 				default -> {} // NOTHING
 			}
 		}
 //		else {
 			if (lhs.getWriteableVariable() == null) {
-				Util.semanticError(lhs, "Can't assign to " + lhs);
+				Util.diagnosticError(lhs, "Can't assign to " + lhs);
 			}
 //			else Util.println("AssignmentOperation.doChecking: lhs.getWriteableVariable="+lhs.getWriteableVariable().getClass().getSimpleName() + "  " + lhs.getWriteableVariable());
 //		}
@@ -124,7 +124,7 @@ public final class AssignmentOperation extends Expression {
 		rhs = (Expression) TypeConversion.testAndCreate(toType, rhs);
 		this.type = toType;
 		if (this.type == null)
-			Util.semanticError(rhs, "doAssignmentChecking: Illegal types: " + toType + " := " + fromType);
+			Util.diagnosticError(rhs, "doAssignmentChecking: Illegal types: " + toType + " := " + fromType);
 		SET_SEMANTICS_CHECKED();
 	}
 

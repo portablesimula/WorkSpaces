@@ -1,3 +1,4 @@
 begin
-	external class abra;
+	ref(Simset) x;
+	outtext("Test: " & edit(x)); outimage
 end

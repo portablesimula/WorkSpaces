@@ -181,7 +181,7 @@ public final class ForStatement extends Statement {
 		Parse.expect(simBuilder, KeyWord.DO);
 		Statement doStatement = Statement.acceptStatement(simBuilder);
 		if (doStatement == null) {
-			Util.syntaxError(simBuilder, "No statement following DO in For statement");
+			Util.diagnosticError(simBuilder, "No statement following DO in For statement");
 			doStatement = DummyStatement.ofImplicit(simBuilder);
 		}
 		stm.doStatement = doStatement;
@@ -214,14 +214,14 @@ public final class ForStatement extends Statement {
 		controlVariable.doChecking();
 		Declaration decl = controlVariable.meaning.declaredAs;
 		if (decl instanceof Parameter par && par.mode == Parameter.Mode.name) {
-//			Util.semanticError(this, "For-Statement's Controled Variable(" + controlVariable + ") can't be a formal parameter by Name");
-//			Util.semanticError(forList.firstElement(), "For-Statement's Controled Variable(" + controlVariable + ") can't be a formal parameter by Name");
-			Util.semanticError(controlVariable, "For-Statement's Controled Variable(" + controlVariable + ") can't be a formal parameter by Name");
+//			Util.diagnosticError(this, "For-Statement's Controled Variable(" + controlVariable + ") can't be a formal parameter by Name");
+//			Util.diagnosticError(forList.firstElement(), "For-Statement's Controled Variable(" + controlVariable + ") can't be a formal parameter by Name");
+			Util.diagnosticError(controlVariable, "For-Statement's Controled Variable(" + controlVariable + ") can't be a formal parameter by Name");
 		}
 		Type type = controlVariable.type;
 		if (type.keyWord != Type.T_TEXT && assignmentOperator == KeyWord.ASSIGNVALUE && type.isReferenceType())
-//			Util.semanticError(this, "Illegal For-Statement with object value assignment ( := )");
-			Util.semanticError(forList.firstElement(), "Illegal For-Statement with object value assignment ( := )");
+//			Util.diagnosticError(this, "Illegal For-Statement with object value assignment ( := )");
+			Util.diagnosticError(forList.firstElement(), "Illegal For-Statement with object value assignment ( := )");
 		Iterator<ForListElement> iterator = forList.iterator();
 		while (iterator.hasNext()) {
 			iterator.next().doChecking();

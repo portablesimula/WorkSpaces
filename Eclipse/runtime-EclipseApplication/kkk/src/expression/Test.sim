@@ -1,5 +1,0 @@
-begin
-	class C;;
-	ref(C) rC;
-	rC :- 55;
-end;

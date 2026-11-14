@@ -125,7 +125,7 @@ public abstract class Declaration extends SyntaxElement {
 		}
 //		Util.println("Declaration.checkAlreadyDefined: " + this.getClass().getSimpleName());
 		String msg = identifierValue() + " is alrerady defined at line " + lno + " in " + declaredIn.identifierValue();
-		if (error) Util.syntaxError(this, msg);
+		if (error) Util.diagnosticError(this, msg);
 		else if (warning) Util.warning(this, msg);
 	}
 
@@ -214,9 +214,9 @@ public abstract class Declaration extends SyntaxElement {
 	/// @return the resulting boolean value
 	public boolean isCompatibleClasses(final Declaration other) {
 		if (!(this instanceof ClassDeclaration))
-			Util.semanticError(this, "" + this.identifierValue() + " is not a class");
+			Util.diagnosticError(this, "" + this.identifierValue() + " is not a class");
 		if (!(other instanceof ClassDeclaration))
-			Util.semanticError(other, "" + other.identifierValue() + " is not a class");
+			Util.diagnosticError(other, "" + other.identifierValue() + " is not a class");
 
 		if (((ClassDeclaration) this).isSubClassOf((ClassDeclaration) other))
 			return (true);

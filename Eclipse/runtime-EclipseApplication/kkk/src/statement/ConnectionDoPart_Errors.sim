@@ -1,8 +1,0 @@
-begin
-	ref(C) x;
-	integer i;
-	inspect x do begin
-	end;
-	inspect i do begin
-	end;
-end

@@ -59,11 +59,11 @@ public final class ConnectionWhenPart extends ConnectionDoPart {
 			Type type = connectionStatement.inspectVariableDeclaration.type;
 			classIdentifier = type.getRefIdent();
 			if (classIdentifier == null)
-				Util.semanticError(this, "The Variable " + connectionStatement.inspectedVariable + " is not ref() type");
+				Util.diagnosticError(this, "The Variable " + connectionStatement.inspectedVariable + " is not ref() type");
 		}
 		if (classIdentifier != null) {
 			classDeclaration = AssignmentOperation.getQualification(classIdentifier);
-			if(classDeclaration == null) Util.semanticError(this, "Illegal WHEN part: " + classIdentifier.value + " is not a class");
+			if(classDeclaration == null) Util.diagnosticError(this, "Illegal WHEN part: " + classIdentifier.value + " is not a class");
 			connectionBlock.setClassDeclaration(classDeclaration);
 		}
 		if (!AssignmentOperation.checkCompatibility(connectionStatement.objectExpression, classIdentifier)) {

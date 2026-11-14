@@ -1,4 +1,5 @@
 begin
+	ref(Simset) xx;
 	integer i,j,k;
 	text t;
 	class C;;
@@ -9,4 +10,7 @@ begin
 	i := t;
 	i := "abra";
 	x :- y;
+	
+	outtext("Test: " & edit(xx)); outimage
+	
 end

@@ -16,7 +16,9 @@ begin
 
       procedure inputFile;
       begin text F;
-            inpt:-new InByteFile("File");
+      		F :- fileChooser("Hexdump: Select file", notext);
+%            inpt:-new InByteFile("File");
+            inpt:-new InByteFile(F);
             if not inpt.open then
             begin outimage; outtext("The File """); outtext(F);
                   outtext(""" does not exist or is not accessible");
@@ -72,4 +74,5 @@ FINISH:
       outimage; outimage;
       outtext("END  --  Input Bytes "); outint(sequ,0);
       outimage; outimage;
-end;
+
+end program.

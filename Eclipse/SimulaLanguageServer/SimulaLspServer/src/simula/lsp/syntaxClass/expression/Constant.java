@@ -128,7 +128,7 @@ public final class Constant extends Expression {
 	        		default     -> Util.IERR();
 				}
 				if(result.longValue() > Integer.MAX_VALUE || result.longValue() < Integer.MIN_VALUE)
-					Util.syntaxError(simBuilder, "Arithmetic overflow: "+lhn+' '+KeyWord.edit(opr)+' '+rhn);
+					Util.diagnosticError(simBuilder, "Arithmetic overflow: "+lhn+' '+KeyWord.edit(opr)+' '+rhn);
 				result=(int) result.longValue();
 			}
 			case Type.T_REAL -> {

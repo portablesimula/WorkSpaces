@@ -274,4 +274,5 @@ begin
   WE_tab(4) :- "Thursday";   WN_tab(4) :- "torsdag"; 
   WE_tab(5) :- "Friday";     WN_tab(5) :- "fredag"; 
   WE_tab(6) :- "Saturday";   WN_tab(6) :- "lørdag"; 
-end Dates; 
+  
+end Dates.

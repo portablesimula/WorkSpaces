@@ -103,7 +103,7 @@ public final class TypeConversion extends Expression {
 			int rhsBL=(fromType!=null && fromType.declaredIn!=null)?fromType.declaredIn.getRTBlockLevel() : 0;
 			int lhsBL=(toType!=null && toType.declaredIn!=null)?toType.declaredIn.getRTBlockLevel() : 0;
 			if(rhsBL != 0 && lhsBL != 0 && rhsBL != lhsBL) {
-				Util.semanticError(expression, "Incompatible types: "+expression+" of type "+expression.type+" can't be converted to "+toType);
+				Util.diagnosticError(expression, "Incompatible types: "+expression+" of type "+expression.type+" can't be converted to "+toType);
 			}
 		}
 		if (testCastNeccessary(toType, expression)) {
@@ -147,7 +147,7 @@ public final class TypeConversion extends Expression {
 		}
 		Type fromType = expression.type;
 		if(fromType==null) {
-//			Util.semanticError(expression, "Expression "+expression+" has no type - can't be converted to "+toType);
+//			Util.diagnosticError(expression, "Expression "+expression+" has no type - can't be converted to "+toType);
 //			Thread.dumpStack();
 			return(false);
 		}
@@ -158,8 +158,8 @@ public final class TypeConversion extends Expression {
 			case ConvertRef:		return (true);
 			case Illegal:
 				if(expression.type != Type.Undef)
-//					Util.semanticError(expression, "TypeConversion: Illegal cast: (" + toType + ") " + expression);
-					Util.semanticError(expression, "The expression " + expression + " can't be converted to " + toType);
+//					Util.diagnosticError(expression, "TypeConversion: Illegal cast: (" + toType + ") " + expression);
+					Util.diagnosticError(expression, "The expression " + expression + " can't be converted to " + toType);
 			default: return (false);
 		}
 	}
@@ -178,7 +178,7 @@ public final class TypeConversion extends Expression {
 		expression.doChecking();
 		Type type = expression.type;
 		if (type.isConvertableTo(this.type).equals(Type.ConversionKind.Illegal))
-			Util.semanticError(this, "Illegal Type Conversion " + type + " ==> " + this.type);
+			Util.diagnosticError(this, "Illegal Type Conversion " + type + " ==> " + this.type);
 		SET_SEMANTICS_CHECKED();
 	}
 

@@ -224,7 +224,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 						break;
 					}
 				if (parameter == null) {
-					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
+					Util.diagnosticError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
 					parameter = new Parameter(proc, identifier);
 				}
 				parameter.setMode(mode);
@@ -277,7 +277,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 				for (Parameter par : proc.parameterList)
 					if (Util.equals(identifier,par.identifier)) { parameter = par; break; }
 				if (parameter == null) {
-					Util.syntaxError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
+					Util.diagnosticError(simBuilder, "Identifier " + identifier.value + " is not defined in this scope");
 					parameter = new Parameter(proc, identifier);
 				}
 				parameter.setTypeAndKind(type, kind);
@@ -296,7 +296,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 				case Parameter.Kind.Simple:
 				default:
 					if (par.type == null)
-						Util.syntaxError(simBuilder, "Missing specification of parameter: " + par.identifierValue());
+						Util.diagnosticError(simBuilder, "Missing specification of parameter: " + par.identifierValue());
 				}
 		}
 	}
@@ -319,7 +319,7 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			proc.parseBlock(simBuilder);
 
 			if (Parse.getPrevParserToken(simBuilder).keyWord == KeyWord.EOF) {
-				Util.syntaxError(simBuilder, "Illegal termination of procedure declaration. Missing END.");
+				Util.diagnosticError(simBuilder, "Illegal termination of procedure declaration. Missing END.");
 			}
 		}
 		else {
@@ -358,16 +358,16 @@ public class ProcedureDeclaration extends BlockDeclaration {
 			if (virtualSpec != null) {
 				// This Procedure is a Virtual Match
 				if(! Type.equalsOrSubordinate(virtualSpec.type, this.type))
-					Util.semanticError(this, "Virtual match has wrong type " + type + ", specified as " + virtualSpec.type);
+					Util.diagnosticError(this, "Virtual match has wrong type " + type + ", specified as " + virtualSpec.type);
 				if(virtualSpec.procedureSpec != null) {
 					ObjectList<Parameter> list1 = this.parameterList;
 					ObjectList<Parameter> list2 = virtualSpec.procedureSpec.parameterList;
 					if(list1.size() != list2.size()) {
-						Util.semanticError(this, "Virtual match has wrong number of parameters " + list1.size() + ". Specified with " + list2.size());	
+						Util.diagnosticError(this, "Virtual match has wrong number of parameters " + list1.size() + ". Specified with " + list2.size());	
 					} else {
 						for(int i=0;i<list1.size();i++)
 							if(! list1.get(i).equals(list2.get(i)))
-								Util.semanticError(this, "Virtual match has wrong heading. Parameter " + (i+1) + " does not match the specification");	
+								Util.diagnosticError(this, "Virtual match has wrong heading. Parameter " + (i+1) + " does not match the specification");	
 					}
 				} 
 				myVirtual = new VirtualMatch(virtualSpec, this);

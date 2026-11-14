@@ -61,7 +61,7 @@ public final class GotoStatement extends Statement {
 		simBuilder.consume(KeyWord.GOTO, KeyWord.GO); //  (add it to tokenList)
 		if(keyWord != KeyWord.GOTO) {
 	        if (!Parse.accept(simBuilder, KeyWord.TO))
-	        	Util.syntaxError(simBuilder, "Missing 'TO' after 'GO'");
+	        	Util.diagnosticError(simBuilder, "Missing 'TO' after 'GO'");
 		}
 		label = Expression.expectExpression(simBuilder, "designational");
 		if (Option.internal.TRACE_PARSE) Util.TRACE("Line "+this.firstLineNumber()+": GotoStatement: "+this);
@@ -71,11 +71,11 @@ public final class GotoStatement extends Statement {
 	public void doChecking() {
 		if (IS_SEMANTICS_CHECKED())	return;
 		label.doChecking();
-		Util.println("GotoStatement.doChecking: label.type="+label.type);
+//		Util.println("GotoStatement.doChecking: label.type="+label.type);
 		IF_TEST:if (label.type != null) {
 			if(label.type.keyWord == Type.T_LABEL) break IF_TEST;
 			if(label.type.keyWord == Type.T_UNDEF) break IF_TEST;
-			Util.semanticError(this, "Goto " + label + ", " + label + " is not a Label");
+			Util.diagnosticError(this, "Goto " + label + ", " + label + " is not a Label");
 		}
 		label.backLink = this; // To ensure _RESULT from functions
 		SET_SEMANTICS_CHECKED();

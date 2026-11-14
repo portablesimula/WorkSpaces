@@ -220,13 +220,13 @@ public final class Util {
 		generalError("Line " + lineNumber + ": General Error: " + msg);
 	}
 	
-	/// Print a error message.
+	/// Create an diagnostic error message.
 	/// @param msg the message
-	public static void syntaxError(final SimulaBuilder simBuilder, final String msg) {
-		syntaxError(simBuilder, simBuilder.getPrevParserToken(), msg);
+	public static void diagnosticError(final SimulaBuilder simBuilder, final String msg) {
+		diagnosticError(simBuilder, simBuilder.getPrevParserToken(), msg);
 	}
 	
-	public static void syntaxError(final SimulaBuilder simBuilder, final LexToken token, final String msg) {
+	public static void diagnosticError(final SimulaBuilder simBuilder, final LexToken token, final String msg) {
 //		Thread.dumpStack();
         if(Option.LEX_VERIFY) {
         // SJEKK AT SimPosition er inne på linja !!!
@@ -242,32 +242,18 @@ public final class Util {
 		simBuilder.addError(diagnostic);
 	}
 	
-	public static void syntaxError(final SyntaxElement elt, final String msg) {
+	public static void diagnosticError(final SyntaxElement elt, final String msg) {
 //		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Error, elt.lexRange, msg);
 		Diagnostic diagnostic = new Diagnostic(elt.getLexRange(), msg, DiagnosticSeverity.Error, "Simula.LSP");
 		LOG.error(edDiagnostic(diagnostic));
 		SimulaBuilder simBuilder = elt.getSimBuilder();
 		
 		if(simBuilder == null) {
-			Util.printError("Util.syntaxError: Missing simBuilder: " + elt.getClass().getSimpleName() + "  TokenRange: " + elt.tokenRange);
-			Util.printError("Util.syntaxError: Missing simBuilder: " + edDiagnostic(diagnostic));
-		} else
-			
-		simBuilder.addError(diagnostic);
-	}
-	
-	public static void semanticError(final SyntaxElement elt, final String msg) {
-//		Diagnostic diagnostic = new Diagnostic(DiagnosticSeverity.Error, elt.lexRange, msg);
-		Diagnostic diagnostic = new Diagnostic(elt.getLexRange(), msg, DiagnosticSeverity.Error, "Simula.LSP");
-		LOG.error(edDiagnostic(diagnostic));
-		SimulaBuilder simBuilder = elt.getSimBuilder();
-		
-		if(simBuilder == null) {
-			Util.printError("Util.semanticError: Missing simBuilder: " + elt.getClass().getSimpleName() + "  " + elt);
-			Util.printError("Util.semanticError: Missing simBuilder: " + edDiagnostic(diagnostic));
-			Util.printError("Util.semanticError: Missing simBuilder: firstParserToken=" + elt.tokenRange.firstParserToken);
-			Util.printError("Util.semanticError: Missing simBuilder: lastParserToken=" + elt.tokenRange.lastParserToken);
-			dumpStack("Util.semanticError: Missing simBuilder: ");
+			Util.printError("Util.diagnosticError: Missing simBuilder: " + elt.getClass().getSimpleName() + "  " + elt);
+			Util.printError("Util.diagnosticError: Missing simBuilder: " + edDiagnostic(diagnostic));
+			Util.printError("Util.diagnosticError: Missing simBuilder: firstParserToken=" + elt.tokenRange.firstParserToken);
+			Util.printError("Util.diagnosticError: Missing simBuilder: lastParserToken=" + elt.tokenRange.lastParserToken);
+			dumpStack("Util.diagnosticError: Missing simBuilder: ");
 		} else
 			
 		simBuilder.addError(diagnostic);
@@ -541,16 +527,16 @@ public final class Util {
 	public static int IPOW(final SimulaBuilder simBuilder, final long base, long x) {
 		if (x == 0) {
 			if (base == 0)
-				syntaxError(simBuilder, "Exponentiation: " + base + " ** " + x + "  Result is undefined.");
+				diagnosticError(simBuilder, "Exponentiation: " + base + " ** " + x + "  Result is undefined.");
 			return (1); // any ** 0 ==> 1
 		} else if (x < 0)
-			syntaxError(simBuilder, "Exponentiation: " + base + " ** " + x + "  Result is undefined.");
+			diagnosticError(simBuilder, "Exponentiation: " + base + " ** " + x + "  Result is undefined.");
 		else if (base == 0)
 			return (0); // 0 ** non_zero ==> 0
 		
 		long res=(long) Math.pow((double)base,(double)x);
 		if(res > Integer.MAX_VALUE || res < Integer.MIN_VALUE)
-			syntaxError(simBuilder, "Arithmetic overflow: "+base+" ** "+x+" ==> "+res
+			diagnosticError(simBuilder, "Arithmetic overflow: "+base+" ** "+x+" ==> "+res
 					+" which is outside integer value range["+Integer.MIN_VALUE+':'+Integer.MAX_VALUE+']');
 		return((int)res);
 	}

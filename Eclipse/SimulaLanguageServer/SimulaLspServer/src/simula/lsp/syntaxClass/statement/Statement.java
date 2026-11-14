@@ -189,7 +189,7 @@ public abstract class Statement extends SyntaxElement {
 				
 			default:
 		        // Error handling and consuming unknown tokens
-		        Util.syntaxError(simBuilder, simToken, "Misplaced symbol: '" + simToken.edText() + "' ignored");
+		        Util.diagnosticError(simBuilder, simToken, "Misplaced symbol: '" + simToken.edText() + "' ignored");
 		        simBuilder.getNextParserToken();
 		        statement = DummyStatement.ofImplicit(simBuilder);
 			break;

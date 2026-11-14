@@ -132,7 +132,7 @@ public final class SwitchStatement extends Statement {
 			Vector<SwitchInterval> caseKeyList=new Vector<SwitchInterval>();
 			if (Parse.accept(simBuilder, KeyWord.NONE)) {
 				caseKeyList.add(null);
-				if(stm.has_NONE_case) Util.syntaxError(simBuilder, "NONE Case is already used");
+				if(stm.has_NONE_case) Util.diagnosticError(simBuilder, "NONE Case is already used");
 				stm.has_NONE_case=true;
 			}
 			else {

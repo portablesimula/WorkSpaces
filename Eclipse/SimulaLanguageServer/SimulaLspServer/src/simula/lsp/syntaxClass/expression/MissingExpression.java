@@ -38,7 +38,7 @@ public final class MissingExpression extends Expression {
 	public MissingExpression(final SimulaBuilder simBuilder, final String reason) {
 		this.type = Type.Undef;
 		this.tokenRange = new LexTokenRange(simBuilder.getPrevParserToken());
-		Util.semanticError(this, reason);
+		Util.diagnosticError(this, reason);
 	}
 
 	@Override

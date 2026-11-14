@@ -43,4 +43,4 @@ Drawing("Animation Test",900,900) begin
       txt1.moveTo(200,100,500);
    end;
     
-end;
+end program.

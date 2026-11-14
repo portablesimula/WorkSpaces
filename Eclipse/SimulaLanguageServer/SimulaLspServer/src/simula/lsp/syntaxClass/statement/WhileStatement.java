@@ -65,7 +65,7 @@ public final class WhileStatement extends Statement {
 		if (IS_SEMANTICS_CHECKED())	return;
 		LspGlobal.sourceLineNumber=firstLineNumber();
 		condition.doChecking(); condition.backLink=this;
-		if (condition.type == null || condition.type.keyWord != Type.T_BOOLEAN) Util.semanticError(condition, "While condition is not Boolean");
+		if (condition.type == null || condition.type.keyWord != Type.T_BOOLEAN) Util.diagnosticError(condition, "While condition is not Boolean");
 		doStatement.doChecking();
 		SET_SEMANTICS_CHECKED();
 	}

@@ -65,7 +65,7 @@ public final class ConditionalExpression extends Expression {
 		condition.doChecking();
 		condition.backLink=this; // To ensure _RESULT from functions
 		if(! Type.checkType(condition, Type.T_BOOLEAN)) {
-			Util.semanticError(condition, "ConditionalExpression: Condition is not a boolean (rather " + condition.type + ")");
+			Util.diagnosticError(condition, "ConditionalExpression: Condition is not a boolean (rather " + condition.type + ")");
 		}
 		thenExpression.doChecking();
 		elseExpression.doChecking();
@@ -89,10 +89,10 @@ public final class ConditionalExpression extends Expression {
 		if(type1.isReferenceType() && type2.isReferenceType()) {
 			if(type1.isSubReferenceOf(type2)) return(type2);
 		    if(type2.isSubReferenceOf(type1)) return(type1);
-		    Util.semanticError(this, "Incompatible types: "+type1+", "+type2);
+		    Util.diagnosticError(this, "Incompatible types: "+type1+", "+type2);
 		    return(type1);
 		}
-		Util.semanticError(this, "Incompatible types: "+type1+", "+type2);
+		Util.diagnosticError(this, "Incompatible types: "+type1+", "+type2);
 		return(null);
 	}
 

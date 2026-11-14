@@ -97,7 +97,7 @@ public final class LocalObject extends Expression {
 		Meaning meaning=LspGlobal.getCurrentScope().findMeaning(classIdentifier);
 		Declaration decl = meaning.declaredAs;
 		if (decl instanceof ClassDeclaration cdecl) classDeclaration=cdecl;
-		else Util.semanticError(this, "LocalObject("+this+") " + classIdentifier.value + " is not a class");
+		else Util.diagnosticError(this, "LocalObject("+this+") " + classIdentifier.value + " is not a class");
 		findThis();
 		SET_SEMANTICS_CHECKED();
 	}
@@ -130,7 +130,7 @@ public final class LocalObject extends Expression {
 			}
 			thisScope=thisScope.declaredIn;
 		}
-		Util.semanticError(this, "This " + classIdentifier.value + " -- Is not on static chain.");
+		Util.diagnosticError(this, "This " + classIdentifier.value + " -- Is not on static chain.");
 	}
 
 	// Returns true if this expression may be used as a statement.

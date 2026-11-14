@@ -149,7 +149,7 @@ public final class BooleanExpression extends Expression {
 				&&  (type2 != null && type2.keyWord == Type.T_BOOLEAN) )
 					this.type = Type.Boolean;
 				if (this.type == null)
-					Util.semanticError(this, "Incompatible types in binary operation: " + toString());
+					Util.diagnosticError(this, "Incompatible types in binary operation: " + toString());
 				break;
 		    }
 		    default: Util.IERR();

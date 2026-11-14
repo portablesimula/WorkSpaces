@@ -1,9 +1,0 @@
-begin
-	text t;
-	character ca;
-	t := "abra" & ca & "dab";
-
-	t := "abra" & & "dab";
-
-	t := & "abra";
-end

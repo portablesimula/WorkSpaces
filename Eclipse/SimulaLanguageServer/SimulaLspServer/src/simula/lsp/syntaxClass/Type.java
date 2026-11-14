@@ -232,16 +232,16 @@ public class Type extends SyntaxElement {
 //				Util.println("Type.doChecking: decl="+decl);
 			    if(decl instanceof ClassDeclaration cdecl) qual=cdecl;
 //			    else Util.generalError("Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class");
-//			    else Util.semanticError(scope, "Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class");
+//			    else Util.diagnosticError(scope, "Illegal Type: "+this.toString()+" - "+refIdent+" is not a Class");
 			    else {
 			    	String err = "Illegal Type: " + this.toString()+" - " + refIdent.value + " is not a Class";
 			    	if(decl instanceof UndefinedDeclaration)
 			    		 err = err + ", " + refIdent.value + " is undefined";
 			    	else err = err + ", rather " + decl.getClass().getSimpleName() + " declared at line: " + decl.sourceLineNumber();
 //			    	if(elt != null)
-//			    		Util.semanticError(elt, err);
+//			    		Util.diagnosticError(elt, err);
 //			    	else Util.generalError(err);
-			    	Util.semanticError(this, err);
+			    	Util.diagnosticError(this, err);
 			    }
 //				Util.println("Type.doChecking: refIdent="+refIdent.value+", qual="+qual);
 			}

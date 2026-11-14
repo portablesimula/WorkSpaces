@@ -1,8 +1,0 @@
-begin
-	integer G;
-	
-	Class A;;
-	A class B;;
-	
-	if(G in A) then G := 44;
-end

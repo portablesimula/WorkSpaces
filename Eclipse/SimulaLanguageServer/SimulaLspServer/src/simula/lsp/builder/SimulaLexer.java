@@ -192,7 +192,7 @@ public final class SimulaLexer {
 			            	String error = "Illegal character combination =/"+(char)reader.getCurrent();
 //			            	LexToken lexToken = newKeyWordToken(KeyWord.BAD_CHARACTERS);
 			            	LexToken lexToken = newKeyWordToken(KeyWord.COMMENT_TEXT);
-			        		Util.syntaxError(simBuilder, lexToken, error);
+			        		Util.diagnosticError(simBuilder, lexToken, error);
 			            	return lexToken;
 		                }
 		            }
@@ -516,7 +516,7 @@ public final class SimulaLexer {
     		res=Integer.parseInt(result,radix);
     	} catch (NumberFormatException e) {
     		LexToken lexToken = newIntegerToken(res);
-    		Util.syntaxError(simBuilder, lexToken, "Integer number out of range: "+result);
+    		Util.diagnosticError(simBuilder, lexToken, "Integer number out of range: "+result);
     		return lexToken;
     	}
     	return(newIntegerToken(res));
@@ -557,13 +557,13 @@ public final class SimulaLexer {
 //        	Util.println("SimulaLexer.scanDotDigit: fResult="+fResult);
         	if(Float.isInfinite(fResult)) {
         		LexToken lexToken = newRealToken(0);
-        		Util.syntaxError(simBuilder, lexToken, "Illegal fix point number: "+result);
+        		Util.diagnosticError(simBuilder, lexToken, "Illegal fix point number: "+result);
         		return lexToken;        		
         	}
     		return newRealToken(fResult);
     	} catch(NumberFormatException e) {
     		LexToken lexToken = newRealToken(0);
-    		Util.syntaxError(simBuilder, lexToken, "Illegal number: "+result);
+    		Util.diagnosticError(simBuilder, lexToken, "Illegal number: "+result);
     		return lexToken;
     	}
     }
@@ -607,13 +607,13 @@ public final class SimulaLexer {
 //        	Util.println("SimulaLexer.scanDigitsExp: fResult="+fResult);
         	if(Float.isInfinite(fResult)) {
         		LexToken lexToken = newRealToken(0);
-        		Util.syntaxError(simBuilder, lexToken, "Illegal exponented number: "+result);
+        		Util.diagnosticError(simBuilder, lexToken, "Illegal exponented number: "+result);
         		return lexToken;        		
         	}
     		return newRealToken(fResult);
     	} catch(NumberFormatException e) {
     		LexToken lexToken = newRealToken(0);
-    		Util.syntaxError(simBuilder, lexToken, "Illegal number: "+result);
+    		Util.diagnosticError(simBuilder, lexToken, "Illegal number: "+result);
     		return lexToken;
     	}
     }
@@ -697,7 +697,7 @@ public final class SimulaLexer {
     	
     	LexToken lexToken = newCharacterToken(result);
     	if(errors != null) for(String error : errors) {
-    		Util.syntaxError(simBuilder, lexToken, error);
+    		Util.diagnosticError(simBuilder, lexToken, error);
     	}
     	return lexToken;
     }  

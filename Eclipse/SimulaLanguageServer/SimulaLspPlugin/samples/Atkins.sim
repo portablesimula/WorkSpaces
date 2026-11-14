@@ -1,7 +1,8 @@
 begin integer MAX, SQRT_MAX;  
    
-  outtext( "Find out how many primes are less than " ); breakoutimage;  
-  MAX      := inint; outimage; 
+%  outtext( "Find out how many primes are less than " ); breakoutimage;  
+%  MAX      := inint; outimage; 
+  MAX := prompt("Atkins", "Find out how many primes are less than ").getInt;
   SQRT_MAX := sqrt(MAX) + 1; 
     
   begin boolean array bArray( 0 : MAX );  
@@ -39,4 +40,5 @@ begin integer MAX, SQRT_MAX;
     outint( s, 7 );     outtext( " primes, according to Atkin." ); outimage; outimage; 
     outtext( " CPU time used :" ); outfix( cputime - t, 4, 7 ); outtext( " sec." ); 
   end; 
-end
+  
+end program.
